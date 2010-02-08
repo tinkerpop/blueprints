@@ -1,0 +1,11 @@
+!http://github.com/tinkerpop/webling/raw/master/doc/images/blueprints-logo.png!
+
+Blueprints is a collection of abstract data models, their implementations, and their test suites. Currently, the following data and implementations exist:
+
+* Property Graph Model
+** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
+** "Neo4j":http://neo4j.org/ graph database
+** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
+* Object Document Model
+
+The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
