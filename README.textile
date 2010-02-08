@@ -1,4 +1,4 @@
-!http://github.com/tinkerpop/webling/raw/master/doc/images/blueprints-logo.png!
+!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
 
 Blueprints is a collection of abstract data models, their implementations, and their test suites. Currently, the following data and implementations exist:
 
