@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tinkerpop</groupId>
+    <artifactId>blueprints</artifactId>
+    <version>0.1</version>
+    <packaging>jar</packaging>
+    <url>http://blueprints.tinkerpop.com</url>
+    <name>Blueprints: Abstract Data Models and their Implementations</name>
+    <description>Blueprints is a collection of abstract data models, their implementations, and their test suites.</description>
+    <developers>
+        <developer>
+            <name>Marko A. Rodriguez</name>
+            <email>marko@markorodriguez.com</email>
+            <url>http://markorodriguez.com</url>
+        </developer>
+    </developers>
+    <inceptionYear>2010</inceptionYear>
+    <dependencies>
+        <!-- GRAPH IMPLEMENTATION SUPPORT -->
+        <!-- JUNG SUPPORT -->
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-algorithms</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <!-- NEO4J SUPPORT -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <version>1.0-rc</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-index</artifactId>
+            <version>1.0-b1</version>
+        </dependency>
+        <!-- LINKED DATA SAIL SUPPORT -->
+        <dependency>
+            <groupId>net.fortytwo</groupId>
+            <artifactId>linked-data-sail</artifactId>
+            <version>0.5</version>
+        </dependency>
+        <!-- SESAME SUPPORT -->
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame</artifactId>
+            <version>2.3-pr1</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-core</artifactId>
+            <version>2.3-pr1</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-model</artifactId>
+            <version>2.3-pr1</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail</artifactId>
+            <version>2.3-pr1</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-api</artifactId>
+            <version>2.3-pr1</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-memory</artifactId>
+            <version>2.3-pr1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-repository-sail</artifactId>
+            <version>2.3-pr1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-rio-ntriples</artifactId>
+            <version>2.3-pr1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-nativerdf</artifactId>
+            <version>2.3-pr1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryparser-sparql</artifactId>
+            <version>2.3-pr1</version>
+            <type>jar</type>
+        </dependency>
+        <!-- MONGODB SUPPORT
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>1.0</version>
+        </dependency>-->
+        <!-- TESTING -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <!--<scope>test</scope>-->
+        </dependency>
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <id>maven repository</id>
+            <url>http://mvnrepository.com</url>
+        </repository>
+        <repository>
+            <id>aduna-repo</id>
+            <name>Aduna repository</name>
+            <url>http://repo.aduna-software.org/maven2/releases</url>
+        </repository>
+        <repository>
+            <id>neo4j-public-repository</id>
+            <name>Publically available Maven 2 repository for Neo4j</name>
+            <url>http://m2.neo4j.org</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>http://tinkerpop.com/maven2</url>
+        </repository>
+    </repositories>
+    <build>
+        <directory>${basedir}/target</directory>
+        <finalName>${artifactId}-${version}
+        </finalName>
+        <sourceDirectory>${basedir}/src/main/java
+        </sourceDirectory>
+        <testSourceDirectory>${basedir}/src/test/java
+        </testSourceDirectory>
+        <outputDirectory>${basedir}/target/classes
+        </outputDirectory>
+        <testOutputDirectory>${basedir}/target/test-classes
+        </testOutputDirectory>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources
+                </directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/resources
+                </directory>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/standalone.xml</descriptor>
+                        <descriptor>src/assembly/distribution.xml</descriptor>
+                    </descriptors>
+                    <finalName>gremlin-${project.version}</finalName>
+                    <outputDirectory>target</outputDirectory>
+                    <workDirectory>target/assembly/work</workDirectory>
+                    <tarLongFileMode>warn</tarLongFileMode>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.tinkerpop.gremlin.Console</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <systemProperties>
+                        <!-- TINKERGRAPH TEST PROPERTIES -->
+                        <property>
+                            <name>testTinkerGraph</name>
+                            <value>true</value>
+                        </property>
+                        <!-- NEO4J TEST PROPERTIES -->
+                        <property>
+                            <name>testNeo4j</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>neo4jDirectory</name>
+                            <value>/tmp/gremlin_test</value>
+                        </property>
+                        <!-- SAIL TEST PROPERTIES -->
+                        <property>
+                            <name>testSail</name>
+                            <value>true</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
