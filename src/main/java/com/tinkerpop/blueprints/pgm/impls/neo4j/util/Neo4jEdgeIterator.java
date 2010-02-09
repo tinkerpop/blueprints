@@ -1,0 +1,36 @@
+package com.tinkerpop.blueprints.pgm.impls.neo4j.util;
+
+
+import org.neo4j.graphdb.Relationship;
+
+import java.util.Iterator;
+
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jEdge;
+
+/**
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public class Neo4jEdgeIterator implements Iterator<Edge> {
+
+    Iterator<Relationship> relationships;
+    Neo4jGraph graph;
+
+    public Neo4jEdgeIterator(final Iterable<Relationship> relationships, final Neo4jGraph graph) {
+        this.graph = graph;
+        this.relationships = relationships.iterator();
+    }
+
+    public void remove() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    public Edge next() {
+        return new Neo4jEdge(this.relationships.next(), this.graph);
+    }
+
+    public boolean hasNext() {
+        return this.relationships.hasNext();
+    }
+}
