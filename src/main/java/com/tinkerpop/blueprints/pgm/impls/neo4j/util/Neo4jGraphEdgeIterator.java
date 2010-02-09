@@ -1,14 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j.util;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jEdge;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.Iterator;
-
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jEdge;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

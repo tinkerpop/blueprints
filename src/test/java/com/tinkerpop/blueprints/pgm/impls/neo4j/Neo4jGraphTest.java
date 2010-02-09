@@ -1,12 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
+import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 import junit.framework.TestCase;
 
 import java.io.File;
 import java.lang.reflect.Method;
-
-import com.tinkerpop.blueprints.pgm.*;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

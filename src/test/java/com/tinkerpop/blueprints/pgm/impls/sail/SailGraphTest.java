@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
+import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.*;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.LiteralImpl;
@@ -9,9 +11,6 @@ import org.openrdf.sail.memory.MemoryStore;
 
 import java.lang.reflect.Method;
 import java.util.regex.Matcher;
-
-import com.tinkerpop.blueprints.BaseTest;
-import com.tinkerpop.blueprints.pgm.*;
 
 
 /**
@@ -111,7 +110,7 @@ public class SailGraphTest extends BaseTest {
         assertEquals(v.getProperty(SailTokens.LANGUAGE), "en");
         assertNull(v.getProperty(SailTokens.DATATYPE));
     }
-    
+
     //// TEST SUITES
 
     public void testVertexSuite() throws Exception {

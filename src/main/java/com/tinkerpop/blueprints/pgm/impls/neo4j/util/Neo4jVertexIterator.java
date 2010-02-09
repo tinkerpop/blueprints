@@ -1,13 +1,12 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j.util;
 
 
-import org.neo4j.graphdb.Node;
-
-import java.util.Iterator;
-
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jVertex;
+import org.neo4j.graphdb.Node;
+
+import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

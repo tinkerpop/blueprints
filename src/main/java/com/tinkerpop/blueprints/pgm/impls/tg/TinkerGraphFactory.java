@@ -12,7 +12,6 @@ import javax.xml.stream.XMLStreamException;
 public class TinkerGraphFactory {
 
     public static TinkerGraph createTinkerGraph() {
-        // see graph-example-1.pdf for a visualization of this graph
 
         TinkerGraph graph = new TinkerGraph();
 

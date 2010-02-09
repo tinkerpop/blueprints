@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.fs;
 
 
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.io.File;

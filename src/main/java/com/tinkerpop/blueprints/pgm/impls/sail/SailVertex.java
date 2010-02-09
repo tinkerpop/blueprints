@@ -1,6 +1,9 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -15,10 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

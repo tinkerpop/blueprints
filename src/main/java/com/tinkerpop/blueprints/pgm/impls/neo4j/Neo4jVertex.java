@@ -1,12 +1,12 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

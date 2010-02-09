@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.Vertex;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -86,7 +86,6 @@ public class TinkerGraph implements Graph {
     }
 
     public void removeEdge(final Edge edge) {
-        // TODO: handle nulls from $g/V[g:remove-ve($g,.)
         TinkerVertex outVertex = (TinkerVertex) edge.getOutVertex();
         TinkerVertex inVertex = (TinkerVertex) edge.getInVertex();
         if (null != outVertex && null != outVertex.outEdges)

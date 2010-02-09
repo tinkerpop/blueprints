@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
-import org.neo4j.graphdb.Relationship;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import org.neo4j.graphdb.Relationship;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

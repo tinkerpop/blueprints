@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
-import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
 
 import java.util.HashMap;
 import java.util.HashSet;

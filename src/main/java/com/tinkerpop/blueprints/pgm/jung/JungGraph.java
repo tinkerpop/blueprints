@@ -1,14 +1,13 @@
 package com.tinkerpop.blueprints.pgm.jung;
 
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 
 import java.util.*;
-
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
 
 
 /**
@@ -20,6 +19,10 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
 
     public JungGraph(final Graph graph) {
         this.graph = graph;
+    }
+
+    public Graph getGraph() {
+        return this.graph;
     }
 
     public boolean addVertex(final Vertex vertex) {

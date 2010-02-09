@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import info.aduna.iteration.CloseableIteration;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.model.*;
@@ -18,11 +22,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Graph;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -12,9 +14,6 @@ import org.openrdf.sail.SailException;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Vertex;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

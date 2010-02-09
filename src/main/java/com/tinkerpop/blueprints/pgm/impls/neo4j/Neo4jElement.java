@@ -1,16 +1,14 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
-
 import com.tinkerpop.blueprints.pgm.Element;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

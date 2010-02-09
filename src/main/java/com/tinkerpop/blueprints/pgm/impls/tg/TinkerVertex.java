@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 
 /**

@@ -1,15 +1,14 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
 import org.neo4j.graphdb.Node;
 import org.neo4j.index.IndexService;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Element;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

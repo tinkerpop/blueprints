@@ -1,5 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexIterable;
 import org.neo4j.graphdb.*;
 import org.neo4j.index.Isolation;
 import org.neo4j.index.lucene.LuceneIndexService;
@@ -8,13 +14,6 @@ import org.neo4j.kernel.impl.core.NodeManager;
 import org.neo4j.kernel.impl.transaction.TransactionFailureException;
 
 import java.io.File;
-
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexIterable;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
