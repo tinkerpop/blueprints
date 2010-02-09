@@ -61,12 +61,12 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
     }
 
     public boolean addEdge(final Edge edge, final Vertex outVertex, final Vertex inVertex) {
-        this.graph.addEdge(null, outVertex, inVertex, edge.getLabel());
+        this.graph.addEdge(edge.getId(), outVertex, inVertex, edge.getLabel());
         return true;
     }
 
-    public boolean addEdge(final Edge e, final Vertex v1, final Vertex v2, final EdgeType edgeType) {
-        return this.addEdge(e, v1, v2);
+    public boolean addEdge(final Edge edge, final Vertex outVertex, final Vertex inVertex, final EdgeType edgeType) {
+        return this.addEdge(edge, outVertex, inVertex);
     }
 
     public boolean removeEdge(final Edge edge) {

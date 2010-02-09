@@ -111,7 +111,7 @@ public class SailGraphTest extends BaseTest {
         assertEquals(v.getProperty(SailTokens.LANGUAGE), "en");
         assertNull(v.getProperty(SailTokens.DATATYPE));
     }
-
+    
     //// TEST SUITES
 
     public void testVertexSuite() throws Exception {

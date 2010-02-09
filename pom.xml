@@ -23,7 +23,7 @@
         <!-- JUNG SUPPORT -->
         <dependency>
             <groupId>net.sf.jung</groupId>
-            <artifactId>jung-algorithms</artifactId>
+            <artifactId>jung-api</artifactId>
             <version>2.0</version>
         </dependency>
         <!-- NEO4J SUPPORT -->
@@ -201,15 +201,10 @@
                         <descriptor>src/assembly/standalone.xml</descriptor>
                         <descriptor>src/assembly/distribution.xml</descriptor>
                     </descriptors>
-                    <finalName>gremlin-${project.version}</finalName>
+                    <finalName>blueprints-${project.version}</finalName>
                     <outputDirectory>target</outputDirectory>
                     <workDirectory>target/assembly/work</workDirectory>
                     <tarLongFileMode>warn</tarLongFileMode>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.tinkerpop.gremlin.Console</mainClass>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
             <plugin>
@@ -230,7 +225,7 @@
                         </property>
                         <property>
                             <name>neo4jDirectory</name>
-                            <value>/tmp/gremlin_test</value>
+                            <value>/tmp/blueprints_test</value>
                         </property>
                         <!-- SAIL TEST PROPERTIES -->
                         <property>

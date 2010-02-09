@@ -53,7 +53,7 @@ public class Neo4jGraphTest extends TestCase {
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("neo4jDirectory");
             if (directory == null)
-                directory = "/tmp/gremlin_test";
+                directory = "/tmp/blueprints_test";
             for (Method method : suite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     Graph graph = new Neo4jGraph(directory);
@@ -105,7 +105,7 @@ public class Neo4jGraphTest extends TestCase {
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("neo4jDirectory");
             if (directory == null) {
-                directory = "/tmp/gremlin_test";
+                directory = "/tmp/blueprints_test";
                 Neo4jGraphTest.deleteGraphDirectory(new File(directory));
                 Neo4jGraph graph = new Neo4jGraph(directory);
                 graph.clear();
