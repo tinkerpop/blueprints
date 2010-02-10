@@ -1,0 +1,41 @@
+Blueprints: Data Models and their Implementations
+"http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
+
+<repository>
+  <id>tinkerpop-repository</id>
+  <name>TinkerPop Maven2 Repository</name>
+  <url>http://tinkerpop.com/maven2</url>
+</repository>
+
+==<hr/>==
+
+!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
+
+h3. Version 0.2 (Kermi -- NOT OFFICIALLY RELEASED YET)
+
+bc. <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>blueprints</artifactId>
+  <version>0.2</version>
+</dependency>
+
+* Renamed tg package to tinkergraph package
+* Added object document interfaces
+* Added TinkerDoc implementation of the object document interfaces
+* Added MongoDB implementation of the object document interfaces
+* Added CouchDB implementation of the object document interfaces
+
+==<hr/>==
+
+!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-bob-the-builder.png!
+
+h3. Version 0.1 (Bob the Builder -- February 9, 2010)
+
+bc. <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>blueprints</artifactId>
+  <version>0.1</version>
+</dependency>
+
+* Initial release providing the property graph model
+* Code originally packaged with "Gremlin":http://gremlin.tinkerpop.com

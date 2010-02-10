@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.impls.tg;
+package com.tinkerpop.blueprints.pgm.impls.tinkergraph;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;

@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.pgm.jung;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
+import com.tinkerpop.blueprints.pgm.impls.tinkergraph.TinkerGraphFactory;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import junit.framework.TestCase;
 

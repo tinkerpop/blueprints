@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
-    <name>Blueprints: Abstract Data Models and their Implementations</name>
+    <name>Blueprints: Data Models and their Implementations</name>
     <description>Blueprints is a collection of abstract data models, their implementations, and their test suites.</description>
     <developers>
         <developer>
@@ -19,7 +19,7 @@
     </developers>
     <inceptionYear>2010</inceptionYear>
     <dependencies>
-        <!-- GRAPH IMPLEMENTATION SUPPORT -->
+        <!-- PROPERY GRAPH MODEL IMPLEMENTATION SUPPORT -->
         <!-- JUNG SUPPORT -->
         <dependency>
             <groupId>net.sf.jung</groupId>
@@ -104,12 +104,13 @@
             <version>2.3-pr1</version>
             <type>jar</type>
         </dependency>
-        <!-- MONGODB SUPPORT
+        <!-- OBJECT DOCUMENT MODEL IMPLEMENTATION SUPPORT -->
+        <!-- MONGODB SUPPORT -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>1.0</version>
-        </dependency>-->
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -213,6 +214,7 @@
                 <version>2.4.2</version>
                 <configuration>
                     <systemProperties>
+                        <!-- PROPERY GRAPH MODEL TEST SUITE -->
                         <!-- TINKERGRAPH TEST PROPERTIES -->
                         <property>
                             <name>testTinkerGraph</name>
@@ -232,6 +234,7 @@
                             <name>testSail</name>
                             <value>true</value>
                         </property>
+                        <!-- OBJECT DOCUMENT MODEL TEST SUITE -->
                     </systemProperties>
                 </configuration>
             </plugin>

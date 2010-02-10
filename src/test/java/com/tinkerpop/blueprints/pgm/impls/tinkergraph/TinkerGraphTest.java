@@ -1,6 +1,7 @@
-package com.tinkerpop.blueprints.pgm.impls.tg;
+package com.tinkerpop.blueprints.pgm.impls.tinkergraph;
 
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.impls.tinkergraph.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 import junit.framework.TestCase;
 
