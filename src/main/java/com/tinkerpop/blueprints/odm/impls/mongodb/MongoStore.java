@@ -1,13 +1,10 @@
 package com.tinkerpop.blueprints.odm.impls.mongodb;
 
-import com.mongodb.Mongo;
-import com.mongodb.DB;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import com.tinkerpop.blueprints.odm.Store;
-import com.tinkerpop.blueprints.odm.Document;
 
 import java.net.UnknownHostException;
+import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -16,27 +13,32 @@ public class MongoStore implements Store {
 
     private Mongo mongo;
     private DB database;
+    private DBCollection collection;
 
-    public MongoStore(String host, int port, String database) throws UnknownHostException {
+    public MongoStore(String host, int port, String database, String collection) throws UnknownHostException {
         this.mongo = new Mongo(host, port);
         this.database = this.mongo.getDB(database);
+        this.collection = this.database.getCollection(collection);
     }
 
-    public Document getDocument(String collection, String id) {
-        DBObject idObject = new BasicDBObject("_id", id);
-        DBObject returnObject = this.database.getCollection(collection).findOne(idObject);
-        return null;
+    public Map get(Map document) {
+        DBObject idObject = new BasicDBObject(document);
+        DBObject returnObject = this.collection.findOne(idObject);
+        return returnObject.toMap();
     }
 
-    public void putDocument(Document document) {
+    public void put(Map document) {
+        DBObject dbObject = new BasicDBObject(document);
+        this.collection.insert(dbObject);
 
     }
 
-    public void removeDocument(Document document) {
-
+    public void remove(Map document) {
+        DBObject dbObject = new BasicDBObject(document);
+        this.collection.remove(dbObject);
     }
 
     public void shutdown() {
-        this.mongo = null;
+        // TODO: what is needed to shutdown a connection in MongoDB?
     }
 }

@@ -9,7 +9,8 @@
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: Data Models and their Implementations</name>
-    <description>Blueprints is a collection of abstract data models, their implementations, and their test suites.</description>
+    <description>Blueprints is a collection of abstract data models, their implementations, and their test suites.
+    </description>
     <developers>
         <developer>
             <name>Marko A. Rodriguez</name>
@@ -111,6 +112,12 @@
             <artifactId>mongo-java-driver</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- COUCHDB SUPPORT -->
+        <!--<dependency>
+            <groupId>com.google.code</groupId>
+            <artifactId>couchdb4j</artifactId>
+            <version>0.1.2</version>
+        </dependency>-->
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>

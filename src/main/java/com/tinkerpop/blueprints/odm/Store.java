@@ -1,15 +1,17 @@
 package com.tinkerpop.blueprints.odm;
 
+import java.util.Map;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface Store {
 
-    public Document getDocument(String collection, String id);
+    public Map get(Map document);
 
-    public void putDocument(Document document);
+    public void put(Map document);
 
-    public void removeDocument(Document document);
+    public void remove(Map document);
 
     public void shutdown();
 }
