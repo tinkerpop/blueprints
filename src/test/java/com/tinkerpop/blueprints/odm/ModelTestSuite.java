@@ -1,12 +1,12 @@
-package com.tinkerpop.blueprints.pgm;
+package com.tinkerpop.blueprints.odm;
 
+import junit.framework.TestCase;
 import com.tinkerpop.blueprints.BaseTest;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class ModelTestSuite extends BaseTest {
-
+public class ModelTestSuite extends BaseTest {
     protected SuiteConfiguration config;
 
     public ModelTestSuite() {
@@ -14,14 +14,6 @@ public abstract class ModelTestSuite extends BaseTest {
 
     public ModelTestSuite(final SuiteConfiguration config) {
         this.config = config;
-    }
-
-    protected String convertId(final String id) {
-        if (this.config.requiresRDFIds) {
-            return "gremlin:" + id;
-        } else {
-            return id;
-        }
     }
 
     public void testTrue() {

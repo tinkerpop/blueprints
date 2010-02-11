@@ -47,7 +47,7 @@ public class TinkerGraphTest extends TestCase {
     }
 
 
-    private void doSuiteTest(ModelTestSuite suite) throws Exception {
+    private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testTinkerGraph");
         if (doTest == null || doTest.equals("true")) {
             for (Method method : suite.getClass().getDeclaredMethods()) {

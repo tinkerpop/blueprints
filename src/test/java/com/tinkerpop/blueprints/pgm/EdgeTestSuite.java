@@ -12,11 +12,11 @@ public class EdgeTestSuite extends ModelTestSuite {
     public EdgeTestSuite() {
     }
 
-    public EdgeTestSuite(SuiteConfiguration config) {
+    public EdgeTestSuite(final SuiteConfiguration config) {
         super(config);
     }
 
-    public void testEdgeEquality(Graph graph) {
+    public void testEdgeEquality(final Graph graph) {
         Vertex v = graph.addVertex(convertId("1"));
         Vertex u = graph.addVertex(convertId("2"));
         Edge e = graph.addEdge(null, v, u, convertId("test_label"));
@@ -36,7 +36,7 @@ public class EdgeTestSuite extends ModelTestSuite {
 
     }
 
-    public void testAddEdges(Graph graph) {
+    public void testAddEdges(final Graph graph) {
         Vertex v1 = graph.addVertex(convertId("1"));
         Vertex v2 = graph.addVertex(convertId("2"));
         Vertex v3 = graph.addVertex(convertId("3"));
@@ -51,7 +51,7 @@ public class EdgeTestSuite extends ModelTestSuite {
         assertEquals(count(v3.getInEdges()), 2);
     }
 
-    public void testAddManyEdges(Graph graph) {
+    public void testAddManyEdges(final Graph graph) {
         long counter = 0l;
         for (int i = 0; i < 1000; i++) {
             Vertex out = graph.addVertex(convertId("" + counter++));
@@ -75,7 +75,7 @@ public class EdgeTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testRemoveManyEdges(Graph graph) {
+    public void testRemoveManyEdges(final Graph graph) {
         long counter = 200000l;
         int numberOfEdges = 100;
         Set<Edge> edges = new HashSet<Edge>();
@@ -116,7 +116,7 @@ public class EdgeTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testAddingDuplicateEdges(Graph graph) {
+    public void testAddingDuplicateEdges(final Graph graph) {
 
         Vertex v1 = graph.addVertex(convertId("1"));
         Vertex v2 = graph.addVertex(convertId("2"));
@@ -154,7 +154,7 @@ public class EdgeTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testRemoveEdgesByRemovingVertex(Graph graph) {
+    public void testRemoveEdgesByRemovingVertex(final Graph graph) {
         Vertex v1 = graph.addVertex(convertId("1"));
         Vertex v2 = graph.addVertex(convertId("2"));
         Vertex v3 = graph.addVertex(convertId("3"));
@@ -199,7 +199,7 @@ public class EdgeTestSuite extends ModelTestSuite {
 
     }
 
-    public void testRemoveEdges(Graph graph) {
+    public void testRemoveEdges(final Graph graph) {
         Vertex v1 = graph.addVertex(convertId("1"));
         Vertex v2 = graph.addVertex(convertId("2"));
         Vertex v3 = graph.addVertex(convertId("3"));
@@ -263,7 +263,7 @@ public class EdgeTestSuite extends ModelTestSuite {
 
     }
 
-    public void testAddingSelfLoops(Graph graph) {
+    public void testAddingSelfLoops(final Graph graph) {
         if (config.allowsSelfLoops) {
             Vertex v1 = graph.addVertex(convertId("1"));
             Vertex v2 = graph.addVertex(convertId("2"));
@@ -288,7 +288,7 @@ public class EdgeTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testRemoveSelfLoops(Graph graph) {
+    public void testRemoveSelfLoops(final Graph graph) {
         if (config.allowsSelfLoops) {
             Vertex v1 = graph.addVertex(convertId("1"));
             Vertex v2 = graph.addVertex(convertId("2"));
@@ -332,7 +332,7 @@ public class EdgeTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testEdgeIterator(Graph graph) {
+    public void testEdgeIterator(final Graph graph) {
         if (config.supportsEdgeIteration) {
             Vertex v1 = graph.addVertex(convertId("1"));
             Vertex v2 = graph.addVertex(convertId("2"));

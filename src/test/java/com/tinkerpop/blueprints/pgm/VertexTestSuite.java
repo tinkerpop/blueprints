@@ -15,11 +15,11 @@ public class VertexTestSuite extends ModelTestSuite {
     public VertexTestSuite() {
     }
 
-    public VertexTestSuite(SuiteConfiguration config) {
+    public VertexTestSuite(final SuiteConfiguration config) {
         super(config);
     }
 
-    public void testVertexEquality(Graph graph) {
+    public void testVertexEquality(final Graph graph) {
         Vertex v = graph.addVertex(convertId("1"));
         Vertex u = graph.getVertex(convertId("1"));
         assertEquals(v, u);
@@ -45,7 +45,7 @@ public class VertexTestSuite extends ModelTestSuite {
         assertEquals(set.size(), 1);
     }
 
-    public void testAddVertex(Graph graph) {
+    public void testAddVertex(final Graph graph) {
         if (config.supportsVertexIteration) {
             graph.addVertex(convertId("1"));
             graph.addVertex(convertId("2"));
@@ -66,7 +66,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testRemoveVertex(Graph graph) {
+    public void testRemoveVertex(final Graph graph) {
         Vertex v1 = graph.addVertex(convertId("1"));
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 1);
@@ -87,7 +87,7 @@ public class VertexTestSuite extends ModelTestSuite {
             assertEquals(count(graph.getVertices()), 0);
     }
 
-    public void testGetNonExistantVertices(Graph graph) {
+    public void testGetNonExistantVertices(final Graph graph) {
         try {
             assertNull(graph.getVertex("asbv"));
             assertNull(graph.getVertex(12.0d));
@@ -97,7 +97,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testRemoveVertexNullId(Graph graph) {
+    public void testRemoveVertexNullId(final Graph graph) {
         Vertex v1 = graph.addVertex(null);
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 1);
@@ -119,7 +119,7 @@ public class VertexTestSuite extends ModelTestSuite {
 
     }
 
-    public void testVertexIterator(Graph graph) {
+    public void testVertexIterator(final Graph graph) {
         if (config.supportsVertexIteration) {
             Set ids = new HashSet();
             for (int i = 0; i < 1000; i++) {
@@ -131,7 +131,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testAddVertexProperties(Graph graph) {
+    public void testAddVertexProperties(final Graph graph) {
         if (!config.isRDFModel) {
             Vertex v1 = graph.addVertex(convertId("1"));
             Vertex v2 = graph.addVertex(convertId("2"));
@@ -159,7 +159,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testAddManyVertexProperties(Graph graph) {
+    public void testAddManyVertexProperties(final Graph graph) {
         if (!config.isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             for (int i = 0; i < 50; i++) {
@@ -197,7 +197,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testRemoveVertexProperties(Graph graph) {
+    public void testRemoveVertexProperties(final Graph graph) {
 
         if (!config.isRDFModel) {
             Vertex v1 = graph.addVertex("1");
@@ -260,7 +260,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testVertexPropertyInconsistency(Graph graph) {
+    public void testVertexPropertyInconsistency(final Graph graph) {
         if (!config.isRDFModel) {
             Vertex v1 = graph.addVertex(convertId("1"));
             v1.setProperty("key1", "value1");

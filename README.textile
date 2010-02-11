@@ -6,5 +6,8 @@ Blueprints is a collection of abstract data models, their implementations, and t
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
+* Object Document Model
+** "MongoDB":http://mongodb.org document-oriented database (in development)
+** "CouchDB":http://couchdb.apache.org/ document-oriented database (in development)
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

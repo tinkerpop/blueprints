@@ -11,12 +11,12 @@ public class IndexTestSuite extends ModelTestSuite {
     public IndexTestSuite() {
     }
 
-    public IndexTestSuite(SuiteConfiguration config) {
+    public IndexTestSuite(final SuiteConfiguration config) {
         super(config);
     }
 
 
-    public void testVertexIndexRemove(Graph graph) {
+    public void testVertexIndexRemove(final Graph graph) {
         if (config.supportsVertexIndex) {
             Vertex v1 = graph.addVertex("1");
             Vertex v2 = graph.addVertex("2");
@@ -43,7 +43,7 @@ public class IndexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testVertexIndexAdding(Graph graph) {
+    public void testVertexIndexAdding(final Graph graph) {
         if (config.supportsVertexIndex && !config.isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             for (int i = 0; i < 10; i++) {
@@ -92,7 +92,7 @@ public class IndexTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testEdgeIndexAdding(Graph graph) {
+    public void testEdgeIndexAdding(final Graph graph) {
         if (config.supportsEdgeIndex && !config.isRDFModel) {
             Set<Edge> edges = new HashSet<Edge>();
             for (int i = 0; i < 10; i++) {

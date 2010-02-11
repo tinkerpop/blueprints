@@ -10,11 +10,11 @@ public class GraphTestSuite extends ModelTestSuite {
     public GraphTestSuite() {
     }
 
-    public GraphTestSuite(SuiteConfiguration config) {
+    public GraphTestSuite(final SuiteConfiguration config) {
         super(config);
     }
 
-    public void testClear(Graph graph) {
+    public void testClear(final Graph graph) {
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 0);
         if (config.supportsEdgeIteration)
@@ -40,7 +40,7 @@ public class GraphTestSuite extends ModelTestSuite {
 
     }
 
-    public void testAddingVerticesAndEdges(Graph graph) {
+    public void testAddingVerticesAndEdges(final Graph graph) {
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
         Edge edge = graph.addEdge(null, a, b, convertId("knows"));
@@ -70,7 +70,7 @@ public class GraphTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testRemovingEdges(Graph graph) {
+    public void testRemovingEdges(final Graph graph) {
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Edge> edges = new ArrayList<Edge>();
         Random random = new Random();
@@ -99,7 +99,7 @@ public class GraphTestSuite extends ModelTestSuite {
 
     }
 
-    public void testRemovingVertices(Graph graph) {
+    public void testRemovingVertices(final Graph graph) {
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Edge> edges = new ArrayList<Edge>();
         for (int i = 0; i < 500; i++) {
@@ -127,7 +127,7 @@ public class GraphTestSuite extends ModelTestSuite {
         }
     }
 
-    public void testConnectivityPatterns(Graph graph) {
+    public void testConnectivityPatterns(final Graph graph) {
         Vertex a = graph.addVertex(convertId("1"));
         Vertex b = graph.addVertex(convertId("2"));
         Vertex c = graph.addVertex(convertId("3"));
@@ -204,7 +204,7 @@ public class GraphTestSuite extends ModelTestSuite {
 
     }
 
-    public void testTreeConnectivity(Graph graph) {
+    public void testTreeConnectivity(final Graph graph) {
         int branchSize = 11;
         Vertex start = graph.addVertex(null);
         for (int i = 0; i < branchSize; i++) {

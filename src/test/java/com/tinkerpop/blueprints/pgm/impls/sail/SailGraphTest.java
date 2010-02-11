@@ -129,7 +129,7 @@ public class SailGraphTest extends BaseTest {
         doSuiteTest(new IndexTestSuite(config));
     }
 
-    private void doSuiteTest(ModelTestSuite suite) throws Exception {
+    private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testSail");
         if (doTest == null || doTest.equals("true")) {
             for (Method method : suite.getClass().getDeclaredMethods()) {
@@ -143,7 +143,7 @@ public class SailGraphTest extends BaseTest {
         }
     }
 
-    private static int countStatements(CloseableIteration<? extends Statement, SailException> itty, boolean print) throws SailException {
+    private static int countStatements(final CloseableIteration<? extends Statement, SailException> itty, final boolean print) throws SailException {
         int counter = 0;
         while (itty.hasNext()) {
             Statement s = itty.next();

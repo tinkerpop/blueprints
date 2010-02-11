@@ -242,6 +242,23 @@
                             <value>true</value>
                         </property>
                         <!-- OBJECT DOCUMENT MODEL TEST SUITE -->
+                        <!-- NEO4J TEST PROPERTIES -->
+                        <property>
+                            <name>testMongoDB</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>mongDBHost</name>
+                            <value>localhost</value>
+                        </property>
+                        <property>
+                            <name>mongDBPort</name>
+                            <value>27017</value>
+                        </property>
+                        <property>
+                            <name>mongDBDatabase</name>
+                            <value>blueprints_test</value>
+                        </property>
                     </systemProperties>
                 </configuration>
             </plugin>

@@ -17,19 +17,19 @@ public class BaseTest extends TestCase {
         assertTrue(true);
     }
 
-    public static void printList(List list) {
+    public static void printList(final List list) {
         for (Object o : list) {
             System.out.println(o);
         }
     }
 
-    public static void printIterator(Iterator itty) {
+    public static void printIterator(final Iterator itty) {
         while (itty.hasNext()) {
             System.out.println(itty.next());
         }
     }
 
-    public static int count(Iterator iterator) {
+    public static int count(final Iterator iterator) {
         int counter = 0;
         while (iterator.hasNext()) {
             iterator.next();
@@ -38,11 +38,11 @@ public class BaseTest extends TestCase {
         return counter;
     }
 
-    public static int count(Iterable iterable) {
+    public static int count(final Iterable iterable) {
         return count(iterable.iterator());
     }
 
-    public static List asList(Object x, int times) {
+    public static List asList(final Object x, final int times) {
         List list = new ArrayList();
         for (int i = 0; i < times; i++) {
             list.add(x);

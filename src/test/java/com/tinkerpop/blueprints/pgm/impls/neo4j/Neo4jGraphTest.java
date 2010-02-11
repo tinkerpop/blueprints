@@ -47,7 +47,7 @@ public class Neo4jGraphTest extends TestCase {
     }
 
 
-    private void doSuiteTest(ModelTestSuite suite) throws Exception {
+    private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testNeo4j");
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("neo4jDirectory");
@@ -114,7 +114,7 @@ public class Neo4jGraphTest extends TestCase {
         return null;
     }
 
-    protected static void deleteGraphDirectory(File directory) {
+    protected static void deleteGraphDirectory(final File directory) {
         if (directory.exists()) {
             for (File file : directory.listFiles()) {
                 if (file.isDirectory()) {
