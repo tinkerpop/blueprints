@@ -58,7 +58,7 @@ public class Neo4jGraph implements Graph {
         } catch (NotFoundException e) {
             return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Neo vertex ids must be convertible to a long value.");
+            throw new RuntimeException("Neo vertex ids must be convertible to a long value");
         }
     }
 
@@ -179,8 +179,6 @@ public class Neo4jGraph implements Graph {
 
 
     public String toString() {
-        EmbeddedGraphDatabase embeddedNeo = (EmbeddedGraphDatabase) neo;
-        NodeManager nodeManager = embeddedNeo.getConfig().getNeoModule().getNodeManager();
-        return "neograph[db:" + this.directory + ", vertices:" + nodeManager.getNumberOfIdsInUse(Node.class) + ", edges:" + nodeManager.getNumberOfIdsInUse(Relationship.class) + "]";
+        return "neo4jgraph[" + this.directory + "]";
     }
 }
