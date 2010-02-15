@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.odm.impls.mongodb;
 
 import com.mongodb.*;
 import com.tinkerpop.blueprints.odm.Store;
+import com.tinkerpop.blueprints.odm.Document;
 
 import java.net.UnknownHostException;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class MongoStore implements Store {
+public class MongoStore implements Store<MongoDocument> {
 
     private Mongo mongo;
     private DB database;
@@ -25,39 +26,34 @@ public class MongoStore implements Store {
         this.collection = this.database.getCollection(collection);
     }
 
-    public Map get(final Map document) {
-        DBObject idObject = new BasicDBObject(document);
-        DBObject returnObject = this.collection.findOne(idObject);
-        return returnObject.toMap();
+    public MongoDocument retrieve(final String id) {
+        DBObject queryObject = new BasicDBObject();
+        queryObject.put(ID, id);
+        return new MongoDocument(this.collection.findOne(queryObject));
     }
 
-    public Map get(final String id) {
-        Map map = new HashMap();
-        map.put(ID, id);
-        return this.get(map);
-    }
-
-    public Iterable<Map> getAll(final Map document) {
-        DBCursor cursor = this.collection.find(new BasicDBObject(document));
+    public Iterable<MongoDocument> retrieve(final MongoDocument document) {
+        DBCursor cursor = this.collection.find(document.getRawObject());
         return new MongoIterable(cursor);
     }
 
-    public void put(final Map document) {
-        DBObject dbObject = new BasicDBObject(document);
-        this.collection.insert(dbObject);
-
+    public void save(final MongoDocument document) {
+        this.collection.insert(document.getRawObject());
     }
 
-    public void remove(final Map document) {
-        DBObject dbObject = new BasicDBObject(document);
-        this.collection.remove(dbObject);
+    public void delete(final MongoDocument document) {
+        this.collection.remove(document.getRawObject());
+    }
+
+    public MongoDocument makeDocument(Map map) {
+        return new MongoDocument(new BasicDBObject(map));
     }
 
     public void shutdown() {
         // TODO: what is needed to shutdown a connection in MongoDB?
     }
 
-    private class MongoIterable implements Iterable<Map> {
+    private class MongoIterable implements Iterable<MongoDocument> {
 
         private final DBCursor cursor;
 
@@ -65,12 +61,12 @@ public class MongoStore implements Store {
             this.cursor = cursor;
         }
 
-        public Iterator<Map> iterator() {
+        public Iterator<MongoDocument> iterator() {
             return new MongoIterator(this.cursor);
         }
     }
 
-    private class MongoIterator implements Iterator<Map> {
+    private class MongoIterator implements Iterator<MongoDocument> {
 
         private final DBCursor cursor;
 
@@ -86,8 +82,8 @@ public class MongoStore implements Store {
             throw new UnsupportedOperationException();
         }
 
-        public Map next() {
-            return this.cursor.next().toMap();
+        public MongoDocument next() {
+            return new MongoDocument(this.cursor.next());
         }
     }
 }

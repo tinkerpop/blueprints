@@ -14,7 +14,7 @@ public class StoreTestSuite extends ModelTestSuite {
         super(config);
     }
 
-    public void testAddingSimpleDocuments(final Store store) {
+    public void testAddingSimpleDocuments(final Store<Document> store) {
         int total = 20;
         List<String> ids = new ArrayList<String>();
         for (int i = 0; i < total; i++) {
@@ -25,13 +25,13 @@ public class StoreTestSuite extends ModelTestSuite {
             document.put("name", "marko");
             document.put("age", 30);
             document.put("index", i);
-            store.put(document);
+            store.save(store.makeDocument(document));
         }
         assertEquals(ids.size(), total);
         for (int i = 0; i < total; i++) {
-            Map document = new HashMap();
-            document.put(config.id, ids.get(i));
-            document = store.get(document);
+            Map map = new HashMap();
+            map.put(config.id, ids.get(i));
+            Document document = store.retrieve(store.makeDocument(map)).iterator().next();
             assertEquals(document.get(config.id), ids.get(i));
             assertEquals(document.get("index"), i);
             assertEquals(document.get("name"), "marko");

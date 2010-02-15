@@ -55,7 +55,7 @@ public class GraphMLReader {
                     String outStringId = reader.getAttributeValue(null, GraphMLTokens.SOURCE);
                     String inStringId = reader.getAttributeValue(null, GraphMLTokens.TARGET);
 
-                    // TODO: current edge get by id first?
+                    // TODO: current edge retrieve by id first?
                     Object outObjectId = vertexIdMap.get(outStringId);
                     Object inObjectId = vertexIdMap.get(inStringId);
 

@@ -81,7 +81,7 @@ public class TinkerGraph implements Graph {
         TinkerEdge edge = new TinkerEdge(idString, outVertex, inVertex, label, this.index);
         out.outEdges.add(edge);
         in.inEdges.add(edge);
-        //this.edges.put(edge.getId(), edge);
+        //this.edges.save(edge.getId(), edge);
         return edge;
     }
 
@@ -92,7 +92,7 @@ public class TinkerGraph implements Graph {
             outVertex.outEdges.remove(edge);
         if (null != inVertex && null != inVertex.inEdges)
             inVertex.inEdges.remove(edge);
-        //this.edges.remove(edge.getId());
+        //this.edges.delete(edge.getId());
     }
 
     public Index getIndex() {

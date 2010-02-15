@@ -5,17 +5,17 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public interface Store {
+public interface Store<T extends Document> {
 
-    public Map get(Map document);
+    public T makeDocument(Map map);
 
-    public Map get(String id);
+    public T retrieve(String id);
 
-    public Iterable<Map> getAll(Map document);
+    public Iterable<T> retrieve(T document);
 
-    public void put(Map document);
+    public void save(T document);
 
-    public void remove(Map document);
+    public void delete(T document);
 
     public void shutdown();
 }
