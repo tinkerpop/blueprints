@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
+
 import java.util.*;
 
 /**
@@ -20,18 +22,22 @@ public class GraphTestSuite extends ModelTestSuite {
         if (config.supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 0);
 
+        this.stopWatch();
         for (int i = 0; i < 25; i++) {
             Vertex a = graph.addVertex(null);
             Vertex b = graph.addVertex(null);
             graph.addEdge(null, a, b, convertId("knows"));
         }
+        BaseTest.printPerformance(graph.toString(), 75, "elements added", this.stopWatch());
 
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 50);
         if (config.supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 25);
 
+        this.stopWatch();
         graph.clear();
+        BaseTest.printPerformance(graph.toString(), 75, "elements deleted", this.stopWatch());
 
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 0);
@@ -71,12 +77,17 @@ public class GraphTestSuite extends ModelTestSuite {
     }
 
     public void testRemovingEdges(final Graph graph) {
+        int vertexCount = 500;
+        int edgeCount = 1000;
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Edge> edges = new ArrayList<Edge>();
         Random random = new Random();
+        this.stopWatch();
         for (int i = 0; i < 500; i++) {
             vertices.add(graph.addVertex(null));
         }
+        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
+        this.stopWatch();
         for (int i = 0; i < 1000; i++) {
             Vertex a = vertices.get(random.nextInt(vertices.size()));
             Vertex b = vertices.get(random.nextInt(vertices.size()));
@@ -84,6 +95,8 @@ public class GraphTestSuite extends ModelTestSuite {
                 edges.add(graph.addEdge(null, a, b, convertId("a" + UUID.randomUUID())));
             }
         }
+        BaseTest.printPerformance(graph.toString(), edgeCount, "edges added", this.stopWatch());
+        this.stopWatch();
         int counter = 0;
         for (Edge e : edges) {
             counter = counter + 1;
@@ -95,22 +108,32 @@ public class GraphTestSuite extends ModelTestSuite {
                 assertEquals(count(graph.getVertices()), vertices.size());
             }
         }
+        BaseTest.printPerformance(graph.toString(), edgeCount, "edges deleted (with size check on each delete)", this.stopWatch());
 
 
     }
 
     public void testRemovingVertices(final Graph graph) {
+        int vertexCount = 500;
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Edge> edges = new ArrayList<Edge>();
-        for (int i = 0; i < 500; i++) {
+
+        this.stopWatch();
+        for (int i = 0; i < vertexCount; i++) {
             vertices.add(graph.addVertex(null));
         }
-        for (int i = 0; i < 500; i = i + 2) {
+        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
+
+        this.stopWatch();
+        for (int i = 0; i < vertexCount; i = i + 2) {
             Vertex a = vertices.get(i);
             Vertex b = vertices.get(i + 1);
             edges.add(graph.addEdge(null, a, b, convertId("a" + UUID.randomUUID())));
 
         }
+        BaseTest.printPerformance(graph.toString(), vertexCount/2, "edges added", this.stopWatch());
+
+        this.stopWatch();
         int counter = 0;
         for (Vertex v : vertices) {
             counter = counter + 1;
@@ -125,6 +148,7 @@ public class GraphTestSuite extends ModelTestSuite {
                 assertEquals(count(graph.getVertices()), vertices.size() - counter);
             }
         }
+        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices deleted (with size check on each delete)", this.stopWatch());
     }
 
     public void testConnectivityPatterns(final Graph graph) {
@@ -205,6 +229,7 @@ public class GraphTestSuite extends ModelTestSuite {
     }
 
     public void testTreeConnectivity(final Graph graph) {
+        this.stopWatch();
         int branchSize = 11;
         Vertex start = graph.addVertex(null);
         for (int i = 0; i < branchSize; i++) {
@@ -242,21 +267,26 @@ public class GraphTestSuite extends ModelTestSuite {
         for (int i = 0; i < 4; i++) {
             totalVertices = totalVertices + (int) Math.pow(branchSize, i);
         }
+        BaseTest.printPerformance(graph.toString(), totalVertices, "vertices added in a tree structure", this.stopWatch());
 
         if (config.supportsVertexIteration) {
+            this.stopWatch();
             Set<Vertex> vertices = new HashSet<Vertex>();
             for (Vertex v : graph.getVertices()) {
                 vertices.add(v);
             }
             assertEquals(vertices.size(), totalVertices);
+            BaseTest.printPerformance(graph.toString(), totalVertices, "vertices iterated", this.stopWatch());
         }
 
         if (config.supportsEdgeIteration) {
+            this.stopWatch();
             Set<Edge> edges = new HashSet<Edge>();
             for (Edge e : graph.getEdges()) {
                 edges.add(e);
             }
             assertEquals(edges.size(), totalVertices - 1);
+            BaseTest.printPerformance(graph.toString(), totalVertices-1, "edges iterated", this.stopWatch());
         }
 
     }

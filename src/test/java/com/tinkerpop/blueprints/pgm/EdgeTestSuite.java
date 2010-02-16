@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +39,7 @@ public class EdgeTestSuite extends ModelTestSuite {
     }
 
     public void testAddEdges(final Graph graph) {
+        this.stopWatch();
         Vertex v1 = graph.addVertex(convertId("1"));
         Vertex v2 = graph.addVertex(convertId("2"));
         Vertex v3 = graph.addVertex(convertId("3"));
@@ -49,19 +52,31 @@ public class EdgeTestSuite extends ModelTestSuite {
         assertEquals(count(v1.getInEdges()), 0);
         assertEquals(count(v2.getInEdges()), 1);
         assertEquals(count(v3.getInEdges()), 2);
+        BaseTest.printPerformance(graph.toString(), 6, "elements added and checked", this.stopWatch());
+
     }
 
     public void testAddManyEdges(final Graph graph) {
+        int edgeCount = 1000;
+        int vertexCount = 2000;
         long counter = 0l;
-        for (int i = 0; i < 1000; i++) {
+        this.stopWatch();
+        for (int i = 0; i < edgeCount; i++) {
             Vertex out = graph.addVertex(convertId("" + counter++));
             Vertex in = graph.addVertex(convertId("" + counter++));
             graph.addEdge(null, out, in, convertId(UUID.randomUUID().toString()));
         }
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 1000);
+        BaseTest.printPerformance(graph.toString(), vertexCount+edgeCount, "elements added", this.stopWatch());
+        if (config.supportsEdgeIteration) {
+            this.stopWatch();
+            assertEquals(count(graph.getEdges()), edgeCount);
+            BaseTest.printPerformance(graph.toString(), edgeCount, "edges counted", this.stopWatch());
+        }
         if (config.supportsVertexIteration) {
-            assertEquals(count(graph.getVertices()), 2000);
+            this.stopWatch();
+            assertEquals(count(graph.getVertices()), vertexCount);
+            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
+            this.stopWatch();
             for (Vertex vertex : graph.getVertices()) {
                 if (count(vertex.getOutEdges()) > 0) {
                     assertEquals(count(vertex.getOutEdges()), 1);
@@ -72,27 +87,34 @@ public class EdgeTestSuite extends ModelTestSuite {
                     assertFalse(count(vertex.getOutEdges()) > 0);
                 }
             }
+            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices checked", this.stopWatch());
         }
     }
 
     public void testRemoveManyEdges(final Graph graph) {
         long counter = 200000l;
-        int numberOfEdges = 100;
+        int edgeCount = 100;
         Set<Edge> edges = new HashSet<Edge>();
-        for (int i = 0; i < numberOfEdges; i++) {
+        for (int i = 0; i < edgeCount; i++) {
             Vertex out = graph.addVertex(convertId("" + counter++));
             Vertex in = graph.addVertex(convertId("" + counter++));
             edges.add(graph.addEdge(null, out, in, convertId("a" + UUID.randomUUID().toString())));
         }
-        assertEquals(edges.size(), numberOfEdges);
+        assertEquals(edges.size(), edgeCount);
 
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), numberOfEdges * 2);
+        if (config.supportsVertexIteration) {
+            this.stopWatch();
+            assertEquals(count(graph.getVertices()), edgeCount * 2);
+            BaseTest.printPerformance(graph.toString(), edgeCount * 2, "vertices counted", this.stopWatch());
+        }
 
         if (config.supportsEdgeIteration) {
-            assertEquals(count(graph.getEdges()), numberOfEdges);
+            this.stopWatch();
+            assertEquals(count(graph.getEdges()), edgeCount);
+            BaseTest.printPerformance(graph.toString(), edgeCount, "edges counted", this.stopWatch());
 
-            int i = numberOfEdges;
+            int i = edgeCount;
+            this.stopWatch();
             for (Edge edge : edges) {
                 graph.removeEdge(edge);
                 i--;
@@ -110,9 +132,10 @@ public class EdgeTestSuite extends ModelTestSuite {
                             x++;
                         }
                     }
-                    assertEquals(x, (numberOfEdges - i) * 2);
+                    assertEquals(x, (edgeCount - i) * 2);
                 }
             }
+            BaseTest.printPerformance(graph.toString(), edgeCount, "edges removed and graph checked", this.stopWatch());
         }
     }
 

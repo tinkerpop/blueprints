@@ -4,6 +4,8 @@ import com.tinkerpop.blueprints.odm.Document;
 import com.mongodb.DBObject;
 import com.mongodb.BasicDBObject;
 
+import java.util.Map;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -20,7 +22,12 @@ public class MongoDocument implements Document<DBObject> {
     }
 
     public Object get(String key) {
-        return object.get(key);
+        Object nestedObject = object.get(key);
+        if(nestedObject instanceof DBObject) {
+            return new MongoDocument((DBObject)nestedObject);
+        } else {
+            return nestedObject;
+        }
     }
 
     public Object put(String key, Object value) {
@@ -29,6 +36,10 @@ public class MongoDocument implements Document<DBObject> {
 
     public Iterable<String> keys() {
         return this.object.keySet();
+    }
+
+    public Map asMap() {
+        return this.object.toMap();
     }
 
     public DBObject getRawObject() {

@@ -2,34 +2,35 @@ package com.tinkerpop.blueprints.odm.impls.mongodb;
 
 import com.mongodb.*;
 import com.tinkerpop.blueprints.odm.Store;
-import com.tinkerpop.blueprints.odm.Document;
 
 import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.List;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class MongoStore implements Store<MongoDocument> {
 
-    private Mongo mongo;
-    private DB database;
     private DBCollection collection;
 
     private static final String ID = "_id";
 
-    public MongoStore(final String host, final int port, final String database, final String collection) throws UnknownHostException {
-        this.mongo = new Mongo(host, port);
-        this.database = this.mongo.getDB(database);
-        this.collection = this.database.getCollection(collection);
+    public MongoStore(final String host, final int port, final String databaseName, final String collectionName) throws UnknownHostException {
+        Mongo mongo = new Mongo(host, port);
+        DB database = mongo.getDB(databaseName);
+        this.collection = database.getCollection(collectionName);
     }
 
     public MongoDocument retrieve(final String id) {
         DBObject queryObject = new BasicDBObject();
         queryObject.put(ID, id);
-        return new MongoDocument(this.collection.findOne(queryObject));
+        DBObject returnObject = this.collection.findOne(queryObject);
+        if(null == returnObject)
+            return null;
+        else
+            return new MongoDocument(returnObject);
     }
 
     public Iterable<MongoDocument> retrieve(final MongoDocument document) {
@@ -47,6 +48,10 @@ public class MongoStore implements Store<MongoDocument> {
 
     public MongoDocument makeDocument(Map map) {
         return new MongoDocument(new BasicDBObject(map));
+    }
+
+    public String toString() {
+        return "mongostore[" + this.collection.getFullName() + "]";
     }
 
     public void shutdown() {

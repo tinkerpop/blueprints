@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm;
 
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailTokens;
+import com.tinkerpop.blueprints.BaseTest;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -98,6 +99,7 @@ public class VertexTestSuite extends ModelTestSuite {
     }
 
     public void testRemoveVertexNullId(final Graph graph) {
+        int vertexCount = 1000;
         Vertex v1 = graph.addVertex(null);
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 1);
@@ -106,28 +108,39 @@ public class VertexTestSuite extends ModelTestSuite {
             assertEquals(count(graph.getVertices()), 0);
 
         Set<Vertex> vertices = new HashSet<Vertex>();
-        for (int i = 0; i < 1000; i++) {
+
+        this.stopWatch();
+        for (int i = 0; i < vertexCount; i++) {
             vertices.add(graph.addVertex(null));
         }
+        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 1000);
+            assertEquals(count(graph.getVertices()), vertexCount);
+
+        this.stopWatch();
         for (Vertex v : vertices) {
             graph.removeVertex(v);
         }
+        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices deleted", this.stopWatch());
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 0);
 
     }
 
     public void testVertexIterator(final Graph graph) {
+        int vertexCount = 5000;
         if (config.supportsVertexIteration) {
+            this.stopWatch();
             Set ids = new HashSet();
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < vertexCount; i++) {
                 ids.add(graph.addVertex(null).getId());
             }
-            assertEquals(count(graph.getVertices()), 1000);
+            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
+            this.stopWatch();
+            assertEquals(count(graph.getVertices()), vertexCount);
+            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
             // must create unique ids
-            assertEquals(ids.size(), 1000);
+            assertEquals(ids.size(), vertexCount);
         }
     }
 
@@ -162,6 +175,7 @@ public class VertexTestSuite extends ModelTestSuite {
     public void testAddManyVertexProperties(final Graph graph) {
         if (!config.isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
+            this.stopWatch();
             for (int i = 0; i < 50; i++) {
                 Vertex vertex = graph.addVertex(null);
                 for (int j = 0; j < 15; j++) {
@@ -169,6 +183,8 @@ public class VertexTestSuite extends ModelTestSuite {
                 }
                 vertices.add(vertex);
             }
+            BaseTest.printPerformance(graph.toString(), 15*50, "vertex properties added (with vertices being added too)", this.stopWatch());
+
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 50);
             assertEquals(vertices.size(), 50);
@@ -177,6 +193,7 @@ public class VertexTestSuite extends ModelTestSuite {
             }
         } else {
             Set<Vertex> vertices = new HashSet<Vertex>();
+            this.stopWatch();
             for (int i = 0; i < 50; i++) {
                 Vertex vertex = graph.addVertex("\"" + UUID.randomUUID().toString() + "\"");
                 for (int j = 0; j < 15; j++) {
@@ -184,6 +201,7 @@ public class VertexTestSuite extends ModelTestSuite {
                 }
                 vertices.add(vertex);
             }
+            BaseTest.printPerformance(graph.toString(), 15*50, "vertex properties added (with vertices being added too)", this.stopWatch());
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 50);
             assertEquals(vertices.size(), 50);

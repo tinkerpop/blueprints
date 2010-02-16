@@ -1,7 +1,7 @@
 Blueprints: Data Models and their Implementations
 "http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
 
-<repository>
+bc. <repository>
   <id>tinkerpop-repository</id>
   <name>TinkerPop Maven2 Repository</name>
   <url>http://tinkerpop.com/maven2</url>
@@ -11,7 +11,7 @@ Blueprints: Data Models and their Implementations
 
 !http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
 
-h3. Version 0.2 (Kermi -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.2 (Kermit -- NOT OFFICIALLY RELEASED YET)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
@@ -19,6 +19,8 @@ bc. <dependency>
   <version>0.2</version>
 </dependency>
 
+* Added performance timing printouts to model test cases
+* Neo4j depedency was changed for 1.0-rc to 1.0
 * Renamed tg package to tinkergraph package
 * Added object document interfaces
 * Added TinkerDoc implementation of the object document interfaces

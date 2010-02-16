@@ -50,18 +50,19 @@ public class BaseTest extends TestCase {
         return list;
     }
 
-    public double stopWatch() {
+    public long stopWatch() {
         if (this.timer == -1l) {
             this.timer = System.currentTimeMillis();
-            return -1.0d;
+            return -1l;
         } else {
-
-            double temp = ((double) System.currentTimeMillis() - (double) this.timer) / 1000.0d;
+            long temp =  System.currentTimeMillis() - this.timer;
             this.timer = -1l;
             return temp;
         }
+    }
 
-
+    public static void printPerformance(String name, int events, String eventName, long timeInMilliseconds) {
+        System.out.println("\t" + name + ": " + events + " " + eventName + " in " + timeInMilliseconds + "ms");
     }
 
 }
