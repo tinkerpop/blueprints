@@ -16,7 +16,7 @@ public class StoreTestSuite extends ModelTestSuite {
         super(config);
     }
 
-    public void testAddingFlatDocuments(final Store<Document> store) {
+    public void testAddingOneLayerDocuments(final Store<Document> store) {
         int total = 2000;
         this.stopWatch();
         List<String> ids = new ArrayList<String>();
@@ -30,7 +30,7 @@ public class StoreTestSuite extends ModelTestSuite {
             map.put("index", i);
             store.save(store.makeDocument(map));
         }
-        BaseTest.printPerformance(store.toString(), total, "flat documents saved", this.stopWatch());
+        BaseTest.printPerformance(store.toString(), total, "1-layer documents saved", this.stopWatch());
         this.stopWatch();
         assertEquals(ids.size(), total);
         for (int i = 0; i < total; i++) {
@@ -42,7 +42,7 @@ public class StoreTestSuite extends ModelTestSuite {
             assertEquals(document.get("name"), "marko");
             assertEquals(document.get("age"), 30);
         }
-        BaseTest.printPerformance(store.toString(), total, "flat documents read", this.stopWatch());
+        BaseTest.printPerformance(store.toString(), total, "1-layer documents read", this.stopWatch());
     }
 
     public void testAddingTwoLayerDocuments(final Store<Document> store) {
@@ -84,7 +84,7 @@ public class StoreTestSuite extends ModelTestSuite {
         BaseTest.printPerformance(store.toString(), total, "2-layer documents read", this.stopWatch());
     }
 
-    public void testRemovingFlatDocuments(Store<Document> store) {
+    public void testRemovingOneLayerDocuments(Store<Document> store) {
         int total = 2000;
         this.stopWatch();
         List<String> ids = new ArrayList<String>();
@@ -98,14 +98,14 @@ public class StoreTestSuite extends ModelTestSuite {
             map.put("index", i);
             store.save(store.makeDocument(map));
         }
-        BaseTest.printPerformance(store.toString(), total, "flat documents saved", this.stopWatch());
+        BaseTest.printPerformance(store.toString(), total, "1-layer documents saved", this.stopWatch());
         assertEquals(ids.size(), total);
 
         this.stopWatch();
         for (int i = 0; i < total; i++) {
             assertEquals(store.retrieve(ids.get(i)).get(config.id), ids.get(i));
         }
-        BaseTest.printPerformance(store.toString(), total, "flat documents read", this.stopWatch());
+        BaseTest.printPerformance(store.toString(), total, "1-layer documents read", this.stopWatch());
 
         this.stopWatch();
         for (int i = 0; i < total; i++) {
@@ -113,13 +113,13 @@ public class StoreTestSuite extends ModelTestSuite {
             map.put(config.id, ids.get(i));
             store.delete(store.makeDocument(map));
         }
-        BaseTest.printPerformance(store.toString(), total, "flat documents deleted", this.stopWatch());
+        BaseTest.printPerformance(store.toString(), total, "1-layer documents deleted", this.stopWatch());
 
         this.stopWatch();
         for (int i = 0; i < total; i++) {
             assertNull(store.retrieve(ids.get(i)));
         }
-        BaseTest.printPerformance(store.toString(), total, "flat deleted documents checked", this.stopWatch());
+        BaseTest.printPerformance(store.toString(), total, "1-layer deleted documents checked", this.stopWatch());
 
 
     }

@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.parser;
 
 
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.BaseTest;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -21,8 +22,11 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
     public void testReadingTinkerGraph(Graph graph) throws Exception {
         if (!config.ignoresSuppliedIds) {
-            InputStream stream = GraphMLReader.class.getResourceAsStream("graph-example-1.xml");
-            GraphMLReader.inputGraph(graph, stream);
+
+            this.stopWatch();
+            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
+
             assertEquals(count(graph.getVertex("1").getOutEdges()), 3);
             assertEquals(count(graph.getVertex("1").getInEdges()), 0);
             Vertex marko = graph.getVertex("1");
@@ -73,7 +77,9 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
     public void testTinkerGraphEdges(Graph graph) throws Exception {
         if (config.supportsEdgeIteration) {
+            this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> edgeIds = new HashSet<String>();
             Set<String> edgeKeys = new HashSet<String>();
             Set<String> edgeValues = new HashSet<String>();
@@ -95,7 +101,9 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
     public void testTinkerGraphVertices(Graph graph) throws Exception {
         if (config.supportsVertexIteration) {
+            this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> vertexNames = new HashSet<String>();
             int count = 0;
             for (Vertex v : graph.getVertices()) {
@@ -116,7 +124,9 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
     public void testTinkerGraphSoftwareVertices(Graph graph) throws Exception {
         if (config.supportsVertexIteration) {
+            this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<Vertex> softwareVertices = new HashSet<Vertex>();
             int count = 0;
             for (Vertex v : graph.getVertices()) {
@@ -136,7 +146,9 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
     public void testTinkerGraphVertexAndEdges(Graph graph) throws Exception {
         if (config.supportsVertexIteration) {
+            this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Vertex marko = null;
             Vertex peter = null;
             Vertex josh = null;
