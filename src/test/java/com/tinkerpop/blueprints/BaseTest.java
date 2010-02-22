@@ -55,17 +55,17 @@ public class BaseTest extends TestCase {
             this.timer = System.currentTimeMillis();
             return -1l;
         } else {
-            long temp =  System.currentTimeMillis() - this.timer;
+            long temp = System.currentTimeMillis() - this.timer;
             this.timer = -1l;
             return temp;
         }
     }
 
     public static void printPerformance(String name, Integer events, String eventName, long timeInMilliseconds) {
-        if(null != events)
+        if (null != events)
             System.out.println("\t" + name + ": " + events + " " + eventName + " in " + timeInMilliseconds + "ms");
         else
-           System.out.println("\t" + name + ": " + eventName + " in " + timeInMilliseconds + "ms");
+            System.out.println("\t" + name + ": " + eventName + " in " + timeInMilliseconds + "ms");
     }
 
 }

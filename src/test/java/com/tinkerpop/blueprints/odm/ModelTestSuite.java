@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.odm;
 
-import junit.framework.TestCase;
 import com.tinkerpop.blueprints.BaseTest;
 
 /**

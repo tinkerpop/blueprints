@@ -1,10 +1,9 @@
 package com.tinkerpop.blueprints.pgm.parser;
 
 
-import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.*;
 
-import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 

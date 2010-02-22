@@ -10,7 +10,6 @@ import org.neo4j.graphdb.*;
 import org.neo4j.index.Isolation;
 import org.neo4j.index.lucene.LuceneIndexService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.neo4j.kernel.impl.core.NodeManager;
 import org.neo4j.kernel.impl.transaction.TransactionFailureException;
 
 import java.io.File;

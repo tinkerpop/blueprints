@@ -6,7 +6,6 @@ import com.tinkerpop.blueprints.odm.Store;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.List;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -27,7 +26,7 @@ public class MongoStore implements Store<MongoDocument> {
         DBObject queryObject = new BasicDBObject();
         queryObject.put(ID, id);
         DBObject returnObject = this.collection.findOne(queryObject);
-        if(null == returnObject)
+        if (null == returnObject)
             return null;
         else
             return new MongoDocument(returnObject);
@@ -46,7 +45,7 @@ public class MongoStore implements Store<MongoDocument> {
         this.collection.remove(document.getRawObject());
     }
 
-    public MongoDocument makeDocument(Map<String,Object> map) {
+    public MongoDocument makeDocument(Map<String, Object> map) {
         return new MongoDocument(new BasicDBObject(map));
     }
 

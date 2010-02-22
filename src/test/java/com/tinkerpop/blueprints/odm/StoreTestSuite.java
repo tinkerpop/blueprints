@@ -77,7 +77,7 @@ public class StoreTestSuite extends ModelTestSuite {
             assertEquals(document.get("index"), i);
             assertEquals(document.get("name"), "marko");
             assertEquals(document.get("age"), 30);
-            Document document2 = (Document)document.get("location");
+            Document document2 = (Document) document.get("location");
             assertEquals(document2.get("state"), "New Mexico");
             assertEquals(document2.get("zipcode"), 87501);
         }

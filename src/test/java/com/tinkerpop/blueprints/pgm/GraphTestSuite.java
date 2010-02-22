@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.BaseTest;
 
 import java.util.*;
 
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -152,16 +153,12 @@ public class GraphTestSuite extends ModelTestSuite {
     }
 
     public void testConnectivityPatterns(final Graph graph) {
-        Random random = new Random();
-        int id1 = Math.abs(random.nextInt() - 4);
-        int id2 = id1 + 1;
-        int id3 = id1 + 2;
-        int id4 = id1 + 3;
+        List<String> ids = generateIds(4);
 
-        Vertex a = graph.addVertex(convertId(id1+""));
-        Vertex b = graph.addVertex(convertId(id2+""));
-        Vertex c = graph.addVertex(convertId(id3+""));
-        Vertex d = graph.addVertex(convertId(id4+""));
+        Vertex a = graph.addVertex(convertId(ids.get(0)));
+        Vertex b = graph.addVertex(convertId(ids.get(1)));
+        Vertex c = graph.addVertex(convertId(ids.get(2)));
+        Vertex d = graph.addVertex(convertId(ids.get(3)));
 
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 4);
@@ -187,10 +184,10 @@ public class GraphTestSuite extends ModelTestSuite {
             }
         }
         if (!config.ignoresSuppliedIds) {
-            a = graph.getVertex(convertId(id1+""));
-            b = graph.getVertex(convertId(id2+""));
-            c = graph.getVertex(convertId(id3+""));
-            d = graph.getVertex(convertId(id4+""));
+            a = graph.getVertex(convertId(ids.get(0)));
+            b = graph.getVertex(convertId(ids.get(1)));
+            c = graph.getVertex(convertId(ids.get(2)));
+            d = graph.getVertex(convertId(ids.get(3)));
 
             assertEquals(count(a.getInEdges()), 1);
             assertEquals(count(a.getOutEdges()), 1);
@@ -218,8 +215,8 @@ public class GraphTestSuite extends ModelTestSuite {
                 assertTrue(x.getLabel().equals(convertId("knows")) || x.getLabel().equals(convertId("hates")));
             }
             assertEquals(i.getLabel(), convertId("hates"));
-            assertEquals(i.getInVertex().getId().toString(), convertId(id2+""));
-            assertEquals(i.getOutVertex().getId().toString(), convertId(id1+""));
+            assertEquals(i.getInVertex().getId().toString(), convertId(ids.get(1)));
+            assertEquals(i.getOutVertex().getId().toString(), convertId(ids.get(0)));
         }
 
         Set<Object> vertexIds = new HashSet<Object>();

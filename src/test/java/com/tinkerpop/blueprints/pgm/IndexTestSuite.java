@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints.pgm;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.Random;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -19,11 +19,9 @@ public class IndexTestSuite extends ModelTestSuite {
 
     public void testVertexIndexRemove(final Graph graph) {
         if (config.supportsVertexIndex) {
-            Random random = new Random();
-            int id1 = Math.abs(random.nextInt() - 1);
-            int id2 = id1 + 1;
-            Vertex v1 = graph.addVertex(""+id1);
-            Vertex v2 = graph.addVertex(""+id2);
+            List<String> ids = generateIds(2);
+            Vertex v1 = graph.addVertex(ids.get(0));
+            Vertex v2 = graph.addVertex(ids.get(1));
 
             v1.setProperty("name", "marko");
             assertEquals(count(graph.getIndex().get("name", "marko")), 1);
