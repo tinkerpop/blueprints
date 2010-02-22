@@ -7,7 +7,7 @@ import java.util.Map;
  */
 public interface Store<T extends Document> {
 
-    public T makeDocument(Map map);
+    public T makeDocument(Map<String, Object> map);
 
     public T retrieve(String id);
 

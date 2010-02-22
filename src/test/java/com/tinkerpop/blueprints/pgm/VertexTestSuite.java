@@ -1,10 +1,11 @@
 package com.tinkerpop.blueprints.pgm;
 
 
-import com.tinkerpop.blueprints.pgm.impls.sail.SailTokens;
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.impls.sail.SailTokens;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,29 +22,42 @@ public class VertexTestSuite extends ModelTestSuite {
     }
 
     public void testVertexEquality(final Graph graph) {
-        Vertex v = graph.addVertex(convertId("1"));
-        Vertex u = graph.getVertex(convertId("1"));
-        assertEquals(v, u);
+        Random random = new Random();
+        String id = "" + Math.abs(random.nextInt());
 
-        v = graph.addVertex(null);
-        u = graph.getVertex(v.getId());
+        if (!config.ignoresSuppliedIds) {
+            Vertex v = graph.addVertex(convertId(id));
+            Vertex u = graph.getVertex(convertId(id));
+            assertEquals(v, u);
+        }
+
+        this.stopWatch();
+        Vertex v = graph.addVertex(null);
+        Vertex u = graph.getVertex(v.getId());
+        BaseTest.printPerformance(graph.toString(), 1, "vertex added and retrieved", this.stopWatch());
+
         assertEquals(v, u);
-        assertEquals(graph.getVertex(convertId("1")), graph.getVertex(convertId("1")));
+        assertEquals(graph.getVertex(u.getId()), graph.getVertex(u.getId()));
+        assertEquals(graph.getVertex(v.getId()), graph.getVertex(u.getId()));
+        assertEquals(graph.getVertex(v.getId()), graph.getVertex(v.getId()));
 
         graph.clear();
-        v = graph.addVertex(convertId("1"));
-        u = graph.getVertex(convertId("1"));
-        Set<Vertex> set = new HashSet<Vertex>();
-        set.add(v);
-        set.add(v);
-        set.add(u);
-        set.add(u);
-        set.add(graph.getVertex(convertId("1")));
-        set.add(graph.getVertex(convertId("1")));
-        if (config.supportsVertexIndex)
-            set.add(graph.getVertices().iterator().next());
 
-        assertEquals(set.size(), 1);
+        if (!config.ignoresSuppliedIds) {
+            v = graph.addVertex(convertId(id));
+            u = graph.getVertex(convertId(id));
+            Set<Vertex> set = new HashSet<Vertex>();
+            set.add(v);
+            set.add(v);
+            set.add(u);
+            set.add(u);
+            set.add(graph.getVertex(convertId(id)));
+            set.add(graph.getVertex(convertId(id)));
+            if (config.supportsVertexIndex)
+                set.add(graph.getVertices().iterator().next());
+            assertEquals(set.size(), 1);
+        }
+
     }
 
     public void testAddVertex(final Graph graph) {
@@ -68,7 +82,10 @@ public class VertexTestSuite extends ModelTestSuite {
     }
 
     public void testRemoveVertex(final Graph graph) {
-        Vertex v1 = graph.addVertex(convertId("1"));
+        Random random = new Random();
+        String id = "" + Math.abs(random.nextInt());
+
+        Vertex v1 = graph.addVertex(convertId(id));
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 1);
         graph.removeVertex(v1);
@@ -146,8 +163,12 @@ public class VertexTestSuite extends ModelTestSuite {
 
     public void testAddVertexProperties(final Graph graph) {
         if (!config.isRDFModel) {
-            Vertex v1 = graph.addVertex(convertId("1"));
-            Vertex v2 = graph.addVertex(convertId("2"));
+            Random random = new Random();
+            int id1 = Math.abs(random.nextInt() - 1);
+            int id2 = id1 + 1;
+
+            Vertex v1 = graph.addVertex(convertId("" + id1));
+            Vertex v2 = graph.addVertex(convertId("" + id2));
 
             v1.setProperty("key1", "value1");
             v1.setProperty("key2", 10);
@@ -183,7 +204,7 @@ public class VertexTestSuite extends ModelTestSuite {
                 }
                 vertices.add(vertex);
             }
-            BaseTest.printPerformance(graph.toString(), 15*50, "vertex properties added (with vertices being added too)", this.stopWatch());
+            BaseTest.printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
 
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 50);
@@ -201,7 +222,7 @@ public class VertexTestSuite extends ModelTestSuite {
                 }
                 vertices.add(vertex);
             }
-            BaseTest.printPerformance(graph.toString(), 15*50, "vertex properties added (with vertices being added too)", this.stopWatch());
+            BaseTest.printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 50);
             assertEquals(vertices.size(), 50);
@@ -218,8 +239,12 @@ public class VertexTestSuite extends ModelTestSuite {
     public void testRemoveVertexProperties(final Graph graph) {
 
         if (!config.isRDFModel) {
-            Vertex v1 = graph.addVertex("1");
-            Vertex v2 = graph.addVertex("2");
+            Random random = new Random();
+            int id1 = Math.abs(random.nextInt() - 1);
+            int id2 = id1 + 1;
+
+            Vertex v1 = graph.addVertex("" + id1);
+            Vertex v2 = graph.addVertex("" + id2);
             v1.setProperty("key1", "value1");
             v1.setProperty("key2", 10);
             v2.setProperty("key2", 20);
@@ -236,31 +261,33 @@ public class VertexTestSuite extends ModelTestSuite {
             v1.setProperty("key2", 10);
             v2.setProperty("key2", 20);
 
-            v1 = graph.getVertex("1");
-            v2 = graph.getVertex("2");
+            if (!config.ignoresSuppliedIds) {
+                v1 = graph.getVertex("" + id1);
+                v2 = graph.getVertex("" + id2);
 
-            assertEquals(v1.removeProperty("key1"), "value1");
-            assertEquals(v1.removeProperty("key2"), 10);
-            assertEquals(v2.removeProperty("key2"), 20);
+                assertEquals(v1.removeProperty("key1"), "value1");
+                assertEquals(v1.removeProperty("key2"), 10);
+                assertEquals(v2.removeProperty("key2"), 20);
 
-            assertNull(v1.removeProperty("key1"));
-            assertNull(v1.removeProperty("key2"));
-            assertNull(v2.removeProperty("key2"));
+                assertNull(v1.removeProperty("key1"));
+                assertNull(v1.removeProperty("key2"));
+                assertNull(v2.removeProperty("key2"));
 
-            v1 = graph.getVertex("1");
-            v2 = graph.getVertex("2");
+                v1 = graph.getVertex("" + id1);
+                v2 = graph.getVertex("" + id2);
 
-            v1.setProperty("key1", "value2");
-            v1.setProperty("key2", 20);
-            v2.setProperty("key2", 30);
+                v1.setProperty("key1", "value2");
+                v1.setProperty("key2", 20);
+                v2.setProperty("key2", 30);
 
-            assertEquals(v1.removeProperty("key1"), "value2");
-            assertEquals(v1.removeProperty("key2"), 20);
-            assertEquals(v2.removeProperty("key2"), 30);
+                assertEquals(v1.removeProperty("key1"), "value2");
+                assertEquals(v1.removeProperty("key2"), 20);
+                assertEquals(v2.removeProperty("key2"), 30);
 
-            assertNull(v1.removeProperty("key1"));
-            assertNull(v1.removeProperty("key2"));
-            assertNull(v2.removeProperty("key2"));
+                assertNull(v1.removeProperty("key1"));
+                assertNull(v1.removeProperty("key2"));
+                assertNull(v2.removeProperty("key2"));
+            }
 
 
         } else {
@@ -280,14 +307,16 @@ public class VertexTestSuite extends ModelTestSuite {
 
     public void testVertexPropertyInconsistency(final Graph graph) {
         if (!config.isRDFModel) {
-            Vertex v1 = graph.addVertex(convertId("1"));
+            Random random = new Random();
+            String id = "" + Math.abs(random.nextInt());
+            Vertex v1 = graph.addVertex(convertId(id));
             v1.setProperty("key1", "value1");
             if (config.supportsVertexIteration) {
                 assertEquals(count(graph.getVertices()), 1);
             }
             assertEquals(v1.getProperty("key1"), "value1");
 
-            Vertex v2 = graph.getVertex(convertId("1"));
+            Vertex v2 = graph.getVertex(v1.getId());
             assertEquals(v2.getProperty("key1"), "value1");
 
             v1.setProperty("key1", "value111");

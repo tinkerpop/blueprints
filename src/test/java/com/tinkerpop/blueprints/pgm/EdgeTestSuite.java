@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm;
 import com.tinkerpop.blueprints.BaseTest;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,8 +20,12 @@ public class EdgeTestSuite extends ModelTestSuite {
     }
 
     public void testEdgeEquality(final Graph graph) {
-        Vertex v = graph.addVertex(convertId("1"));
-        Vertex u = graph.addVertex(convertId("2"));
+        Random random = new Random();
+        int id1 = Math.abs(random.nextInt() - 1);
+        int id2 = id1 + 1;
+
+        Vertex v = graph.addVertex(convertId("" + id1));
+        Vertex u = graph.addVertex(convertId("" + id2));
         Edge e = graph.addEdge(null, v, u, convertId("test_label"));
         assertEquals(v.getOutEdges().iterator().next(), e);
         assertEquals(u.getInEdges().iterator().next(), e);
@@ -39,10 +44,15 @@ public class EdgeTestSuite extends ModelTestSuite {
     }
 
     public void testAddEdges(final Graph graph) {
+        Random random = new Random();
+        int id1 = Math.abs(random.nextInt() - 2);
+        int id2 = id1 + 1;
+        int id3 = id1 + 2;
+
         this.stopWatch();
-        Vertex v1 = graph.addVertex(convertId("1"));
-        Vertex v2 = graph.addVertex(convertId("2"));
-        Vertex v3 = graph.addVertex(convertId("3"));
+        Vertex v1 = graph.addVertex(convertId("" + id1));
+        Vertex v2 = graph.addVertex(convertId("" + id2));
+        Vertex v3 = graph.addVertex(convertId("" + id3));
         graph.addEdge(null, v1, v2, convertId("knows"));
         graph.addEdge(null, v2, v3, convertId("pets"));
         graph.addEdge(null, v2, v3, convertId("cares_for"));
@@ -66,7 +76,7 @@ public class EdgeTestSuite extends ModelTestSuite {
             Vertex in = graph.addVertex(convertId("" + counter++));
             graph.addEdge(null, out, in, convertId(UUID.randomUUID().toString()));
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount+edgeCount, "elements added", this.stopWatch());
+        BaseTest.printPerformance(graph.toString(), vertexCount + edgeCount, "elements added", this.stopWatch());
         if (config.supportsEdgeIteration) {
             this.stopWatch();
             assertEquals(count(graph.getEdges()), edgeCount);
@@ -141,9 +151,14 @@ public class EdgeTestSuite extends ModelTestSuite {
 
     public void testAddingDuplicateEdges(final Graph graph) {
 
-        Vertex v1 = graph.addVertex(convertId("1"));
-        Vertex v2 = graph.addVertex(convertId("2"));
-        Vertex v3 = graph.addVertex(convertId("3"));
+        Random random = new Random();
+        int id1 = Math.abs(random.nextInt() - 2);
+        int id2 = id1 + 1;
+        int id3 = id1 + 2;
+
+        Vertex v1 = graph.addVertex(convertId("" + id1));
+        Vertex v2 = graph.addVertex(convertId("" + id2));
+        Vertex v3 = graph.addVertex(convertId("" + id3));
         graph.addEdge(null, v1, v2, convertId("knows"));
         graph.addEdge(null, v2, v3, convertId("pets"));
         graph.addEdge(null, v2, v3, convertId("pets"));
@@ -178,9 +193,14 @@ public class EdgeTestSuite extends ModelTestSuite {
     }
 
     public void testRemoveEdgesByRemovingVertex(final Graph graph) {
-        Vertex v1 = graph.addVertex(convertId("1"));
-        Vertex v2 = graph.addVertex(convertId("2"));
-        Vertex v3 = graph.addVertex(convertId("3"));
+        Random random = new Random();
+        int id1 = Math.abs(random.nextInt() - 2);
+        int id2 = id1 + 1;
+        int id3 = id1 + 2;
+
+        Vertex v1 = graph.addVertex(convertId("" + id1));
+        Vertex v2 = graph.addVertex(convertId("" + id2));
+        Vertex v3 = graph.addVertex(convertId("" + id3));
         graph.addEdge(null, v1, v2, convertId("knows"));
         graph.addEdge(null, v2, v3, convertId("pets"));
         graph.addEdge(null, v2, v3, convertId("pets"));
@@ -190,14 +210,16 @@ public class EdgeTestSuite extends ModelTestSuite {
         assertEquals(count(v2.getInEdges()), 1);
         assertEquals(count(v3.getOutEdges()), 0);
 
-        v1 = graph.getVertex(convertId("1"));
-        v2 = graph.getVertex(convertId("2"));
-        v3 = graph.getVertex(convertId("3"));
+        if (!config.ignoresSuppliedIds) {
+            v1 = graph.getVertex(convertId("" + id1));
+            v2 = graph.getVertex(convertId("" + id2));
+            v3 = graph.getVertex(convertId("" + id3));
 
-        assertEquals(count(v1.getInEdges()), 0);
-        assertEquals(count(v1.getOutEdges()), 1);
-        assertEquals(count(v2.getInEdges()), 1);
-        assertEquals(count(v3.getOutEdges()), 0);
+            assertEquals(count(v1.getInEdges()), 0);
+            assertEquals(count(v1.getOutEdges()), 1);
+            assertEquals(count(v2.getInEdges()), 1);
+            assertEquals(count(v3.getOutEdges()), 0);
+        }
 
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 3);

@@ -13,7 +13,7 @@ public interface Document<T> {
 
     public Iterable<String> keys();
 
-    public Map asMap();
+    public Map<String, Object> asMap();
 
     public T getRawObject();
 }

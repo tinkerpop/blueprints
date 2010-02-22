@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Random;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -18,8 +19,11 @@ public class IndexTestSuite extends ModelTestSuite {
 
     public void testVertexIndexRemove(final Graph graph) {
         if (config.supportsVertexIndex) {
-            Vertex v1 = graph.addVertex("1");
-            Vertex v2 = graph.addVertex("2");
+            Random random = new Random();
+            int id1 = Math.abs(random.nextInt() - 1);
+            int id2 = id1 + 1;
+            Vertex v1 = graph.addVertex(""+id1);
+            Vertex v2 = graph.addVertex(""+id2);
 
             v1.setProperty("name", "marko");
             assertEquals(count(graph.getIndex().get("name", "marko")), 1);
@@ -98,7 +102,7 @@ public class IndexTestSuite extends ModelTestSuite {
             for (int i = 0; i < 10; i++) {
                 Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test1");
                 edge.setProperty("key1", "value1");
-                edge.setProperty("key2", "key2");
+                edge.setProperty("key2", "value2");
                 edges.add(edge);
             }
             assertEquals(edges.size(), 10);

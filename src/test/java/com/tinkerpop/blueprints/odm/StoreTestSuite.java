@@ -23,7 +23,7 @@ public class StoreTestSuite extends ModelTestSuite {
         for (int i = 0; i < total; i++) {
             String id = UUID.randomUUID().toString();
             ids.add(id);
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put(config.id, id);
             map.put("name", "marko");
             map.put("age", 30);
@@ -34,7 +34,7 @@ public class StoreTestSuite extends ModelTestSuite {
         this.stopWatch();
         assertEquals(ids.size(), total);
         for (int i = 0; i < total; i++) {
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put(config.id, ids.get(i));
             Document document = store.retrieve(store.makeDocument(map)).iterator().next();
             assertEquals(document.get(config.id), ids.get(i));
@@ -52,12 +52,12 @@ public class StoreTestSuite extends ModelTestSuite {
         for (int i = 0; i < total; i++) {
             String id = UUID.randomUUID().toString();
             ids.add(id);
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put(config.id, id);
             map.put("name", "marko");
             map.put("age", 30);
             map.put("index", i);
-            Map map2 = new HashMap();
+            Map<String, Object> map2 = new HashMap<String, Object>();
             map2.put("country", "United States");
             map2.put("state", "New Mexico");
             map2.put("city", "Santa Fe");
@@ -70,7 +70,7 @@ public class StoreTestSuite extends ModelTestSuite {
         this.stopWatch();
         assertEquals(ids.size(), total);
         for (int i = 0; i < total; i++) {
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put(config.id, ids.get(i));
             Document document = store.retrieve(store.makeDocument(map)).iterator().next();
             assertEquals(document.get(config.id), ids.get(i));
@@ -91,7 +91,7 @@ public class StoreTestSuite extends ModelTestSuite {
         for (int i = 0; i < total; i++) {
             String id = UUID.randomUUID().toString();
             ids.add(id);
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put(config.id, id);
             map.put("name", "marko");
             map.put("age", 30);
@@ -109,7 +109,7 @@ public class StoreTestSuite extends ModelTestSuite {
 
         this.stopWatch();
         for (int i = 0; i < total; i++) {
-            Map map = new HashMap();
+            Map<String, Object> map = new HashMap<String, Object>();
             map.put(config.id, ids.get(i));
             store.delete(store.makeDocument(map));
         }

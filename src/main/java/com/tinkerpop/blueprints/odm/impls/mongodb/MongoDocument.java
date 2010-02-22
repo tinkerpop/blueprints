@@ -38,7 +38,7 @@ public class MongoDocument implements Document<DBObject> {
         return this.object.keySet();
     }
 
-    public Map asMap() {
+    public Map<String, Object> asMap() {
         return this.object.toMap();
     }
 

@@ -46,7 +46,7 @@ public class MongoStore implements Store<MongoDocument> {
         this.collection.remove(document.getRawObject());
     }
 
-    public MongoDocument makeDocument(Map map) {
+    public MongoDocument makeDocument(Map<String,Object> map) {
         return new MongoDocument(new BasicDBObject(map));
     }
 
