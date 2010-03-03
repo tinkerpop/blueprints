@@ -119,11 +119,11 @@
             <version>1.0</version>
         </dependency>
         <!-- COUCHDB SUPPORT -->
-        <!--<dependency>
-            <groupId>com.google.code</groupId>
+        <dependency>
+            <groupId>couchdb4j</groupId>
             <artifactId>couchdb4j</artifactId>
-            <version>0.1.2</version>
-        </dependency>-->
+            <version>0.3.0-i386-1</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -159,6 +159,7 @@
             <url>http://m2.neo4j.org</url>
             <snapshots>
                 <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
         <repository>

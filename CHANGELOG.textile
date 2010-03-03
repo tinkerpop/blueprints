@@ -19,6 +19,8 @@ bc. <dependency>
   <version>0.2</version>
 </dependency>
 
+* Changed all the OpenRDF Sesame dependencies to version 2.3.1
+* Added CouchDB4j dependency
 * Added performance timing printouts to model test cases
 * Neo4j depedency was changed for 1.0-rc to 1.0
 * Renamed tg package to tinkergraph package
