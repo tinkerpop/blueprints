@@ -17,6 +17,15 @@ public class GraphTestSuite extends ModelTestSuite {
         super(config);
     }
 
+    public void testStringRepresentation(final Graph graph) {
+        try {
+            this.stopWatch();
+            BaseTest.printPerformance(graph.toString(), 1, "graph string representation generated", this.stopWatch());
+        } catch (Exception e) {
+            assertFalse(true);
+        }
+    }
+
     public void testClear(final Graph graph) {
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 0);
