@@ -3,15 +3,12 @@ package com.tinkerpop.blueprints.pgm.pipes;
 import com.tinkerpop.blueprints.pgm.Edge;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class LabelFilterPipe implements Pipe<Edge, Edge> {
+public class LabelFilterPipe extends AbstractPipe<Edge, Edge> {
 
-    private Iterator<Edge> starts;
-    private Edge nextLegal;
     private final Collection<String> labels;
     private final boolean filter;
 
@@ -20,41 +17,21 @@ public class LabelFilterPipe implements Pipe<Edge, Edge> {
         this.filter = filter;
     }
 
-
-    public void setStarts(Iterator<Edge> starts) {
-        this.starts = starts;
-        this.setNext();
-    }
-
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Edge next() {
-        Edge edge = this.nextLegal;
-        this.setNext();
-        return edge;
-    }
-
-    public boolean hasNext() {
-        return null != this.nextLegal;
-    }
-
-    private void setNext() {
-        while (starts.hasNext()) {
+    protected void setNext() {
+        while (this.starts.hasNext()) {
             Edge edge = this.starts.next();
             if (this.filter) {
-                if (!labels.contains(edge.getLabel())) {
-                    this.nextLegal = edge;
+                if (!this.labels.contains(edge.getLabel())) {
+                    this.nextEnd = edge;
                     return;
                 }
             } else {
-                if (labels.contains(edge.getLabel())) {
-                    this.nextLegal = edge;
+                if (this.labels.contains(edge.getLabel())) {
+                    this.nextEnd = edge;
                     return;
                 }
             }
         }
-        this.nextLegal = null;
+        this.nextEnd = null;
     }
 }

@@ -1,15 +1,12 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ObjectFilterPipe<S> implements Pipe<S, S> {
+public class ObjectFilterPipe<S> extends AbstractPipe<S, S> {
 
-    private Iterator<S> starts;
-    private S nextLegal;
     private final Collection<S> objects;
     private final boolean filter;
 
@@ -18,42 +15,22 @@ public class ObjectFilterPipe<S> implements Pipe<S, S> {
         this.filter = filter;
     }
 
-
-    public void setStarts(Iterator<S> starts) {
-        this.starts = starts;
-        this.setNext();
-    }
-
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
-
-    public S next() {
-        S object = this.nextLegal;
-        this.setNext();
-        return object;
-    }
-
-    public boolean hasNext() {
-        return null != this.nextLegal;
-    }
-
-    private void setNext() {
-        while (starts.hasNext()) {
+    protected void setNext() {
+        while (this.starts.hasNext()) {
             S object = this.starts.next();
             if (this.filter) {
-                if (!objects.contains(object)) {
-                    this.nextLegal = object;
+                if (!this.objects.contains(object)) {
+                    this.nextEnd = object;
                     return;
                 }
             } else {
-                if (objects.contains(object)) {
-                    this.nextLegal = object;
+                if (this.objects.contains(object)) {
+                    this.nextEnd = object;
                     return;
                 }
             }
         }
-        this.nextLegal = null;
+        this.nextEnd = null;
     }
 
 }

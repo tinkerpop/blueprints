@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -9,7 +8,7 @@ import java.util.List;
  */
 public class Pipeline<S, E> implements Pipe<S, E> {
 
-    private List<Pipe> pipes = new ArrayList<Pipe>();
+    private final List<Pipe> pipes;
     private final Pipe endPipe;
 
     public Pipeline(final List<Pipe> pipes) {
@@ -31,6 +30,8 @@ public class Pipeline<S, E> implements Pipe<S, E> {
     public boolean hasNext() {
         return endPipe.hasNext();
     }
+
+    // TODO: implement a validate method to check pipe types?
 
     public E next() {
         return (E) endPipe.next();

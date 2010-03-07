@@ -8,11 +8,9 @@ import java.util.Iterator;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class VertexEdgePipe implements Pipe<Vertex, Edge> {
+public class VertexEdgePipe extends AbstractPipe<Vertex, Edge> {
 
-    private Iterator<Vertex> starts;
-    private Iterator<Edge> nextEdges;
-    private Edge nextEdge;
+    protected Iterator<Edge> nextEnds;
     private final Step step;
 
     public enum Step {
@@ -23,37 +21,18 @@ public class VertexEdgePipe implements Pipe<Vertex, Edge> {
         this.step = step;
     }
 
-    public void setStarts(Iterator<Vertex> starts) {
-        this.starts = starts;
-        this.setNext();
-    }
-
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Edge next() {
-        Edge edge = this.nextEdge;
-        this.setNext();
-        return edge;
-    }
-
-    public boolean hasNext() {
-        return this.nextEdge != null;
-    }
-
-    private void setNext() {
-        if (null != nextEdges && nextEdges.hasNext()) {
-            nextEdge = nextEdges.next();
+    protected void setNext() {
+        if (null != nextEnds && nextEnds.hasNext()) {
+            this.nextEnd = nextEnds.next();
         } else {
-            if (starts.hasNext()) {
+            if (this.starts.hasNext()) {
                 if (this.step.equals(Step.OUT_EDGES))
-                    nextEdges = starts.next().getOutEdges().iterator();
+                    nextEnds = this.starts.next().getOutEdges().iterator();
                 else
-                    nextEdges = starts.next().getInEdges().iterator();
+                    nextEnds = this.starts.next().getInEdges().iterator();
                 this.setNext();
             } else {
-                this.nextEdge = null;
+                this.nextEnd = null;
             }
         }
     }
