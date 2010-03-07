@@ -33,7 +33,7 @@ public class PropertyPipeTest extends TestCase {
         Vertex marko = graph.getVertex("1");
         Pipe evp = new EdgeVertexPipe(EdgeVertexPipe.Step.IN_VERTEX);
         Pipe<Vertex,String> pp = new PropertyPipe<Vertex,String>("name");
-        Pipeline<Edge,String> pipeline = new Pipeline(Arrays.asList(evp, pp));
+        Pipeline<Edge,String> pipeline = new Pipeline<Edge,String>(Arrays.asList(evp, pp));
         pipeline.setStarts(marko.getOutEdges().iterator());
         assertTrue(pipeline.hasNext());
         int counter = 0;

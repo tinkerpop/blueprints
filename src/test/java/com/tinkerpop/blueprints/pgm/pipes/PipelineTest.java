@@ -88,4 +88,11 @@ public class PipelineTest extends TestCase {
         assertEquals(counter, 3);
     }
 
+    public void testValidation() {
+        Pipe vep = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
+        Pipe evp = new EdgeVertexPipe(EdgeVertexPipe.Step.IN_VERTEX);
+        Pipeline<Vertex, Vertex> pipeline = new Pipeline<Vertex, Vertex>(Arrays.asList(vep, evp));
+        
+    }
+
 }

@@ -10,7 +10,7 @@ public abstract class AbstractPipe<S, E> implements Pipe<S, E> {
     protected Iterator<S> starts;
     protected E nextEnd;
 
-    public void setStarts(Iterator<S> starts) {
+    public void setStarts(final Iterator<S> starts) {
         this.starts = starts;
         this.setNext();
     }

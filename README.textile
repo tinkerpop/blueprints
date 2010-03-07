@@ -1,13 +1,20 @@
 !http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
 
-Blueprints is a collection of abstract data models, their implementations, and their test suites. The following data models and implementations are provided in this package:
+Blueprints is a collection of abstract data models, their implementations, their test suites, and supporting extensions. The following data models and implementations are provided in this package:
 
 * Property Graph Model
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
 * Object Document Model
-** "MongoDB":http://mongodb.org document-oriented database (in development)
-** "CouchDB":http://couchdb.apache.org/ document-oriented database (in development)
+** TinkerDoc in-memory document store
+** "MongoDB":http://mongodb.org document-oriented database
+** "CouchDB":http://couchdb.apache.org/ document-oriented database (in design)
+
+The following is a list of extensions for the respective abstract data models:
+
+* Property Graph Model
+** "Blueprints Pipes Traversal Framework":http://wiki.github.com/tinkerpop/blueprints/pipes-traversal-framework
+** "Java Universal/Graph Framework":http://jung.sourceforge.net/ connector
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

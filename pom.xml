@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.1.1</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: Data Models and their Implementations</name>
-    <description>Blueprints is a collection of abstract data models, their implementations, and their test suites.
+    <description>Blueprints is a collection of abstract data models, their implementations, their test suites, and their extensions.
     </description>
     <developers>
         <developer>
@@ -21,12 +21,6 @@
     <inceptionYear>2010</inceptionYear>
     <dependencies>
         <!-- PROPERY GRAPH MODEL IMPLEMENTATION SUPPORT -->
-        <!-- JSON SUPPORT -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
-        </dependency>
         <!-- JUNG SUPPORT -->
         <dependency>
             <groupId>net.sf.jung</groupId>
@@ -112,6 +106,12 @@
             <type>jar</type>
         </dependency>
         <!-- OBJECT DOCUMENT MODEL IMPLEMENTATION SUPPORT -->
+        <!-- JSON SUPPORT -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
         <!-- MONGODB SUPPORT -->
         <dependency>
             <groupId>org.mongodb</groupId>
@@ -119,11 +119,11 @@
             <version>1.0</version>
         </dependency>
         <!-- COUCHDB SUPPORT -->
-        <dependency>
+        <!--<dependency>
             <groupId>couchdb4j</groupId>
             <artifactId>couchdb4j</artifactId>
             <version>0.3.0-i386-1</version>
-        </dependency>
+        </dependency>-->
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
