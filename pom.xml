@@ -5,11 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: Data Models and their Implementations</name>
-    <description>Blueprints is a collection of abstract data models, their implementations, their test suites, and their extensions.
+    <description>Blueprints is a collection of abstract data models, their implementations, their test suites, and their
+        extensions.
     </description>
     <developers>
         <developer>
@@ -168,6 +169,9 @@
             <url>http://tinkerpop.com/maven2</url>
         </repository>
     </repositories>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <build>
         <directory>${basedir}/target</directory>
         <finalName>${artifactId}-${version}
