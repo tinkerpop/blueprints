@@ -14,7 +14,7 @@ import java.util.List;
 public class Pipeline<S, E> implements Pipe<S, E> {
 
     protected List<Pipe> pipes;
-    protected Pipe endPipe;
+    protected Pipe<?, E> endPipe;
 
     public Pipeline(final List<Pipe> pipes) {
         this.setPipes(pipes);
@@ -58,6 +58,6 @@ public class Pipeline<S, E> implements Pipe<S, E> {
     }*/
 
     public E next() {
-        return (E) endPipe.next();
+        return endPipe.next();
     }
 }

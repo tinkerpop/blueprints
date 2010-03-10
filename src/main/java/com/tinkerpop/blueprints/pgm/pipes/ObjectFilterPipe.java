@@ -5,7 +5,7 @@ import java.util.Collection;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ObjectFilterPipe<S> extends AbstractPipe<S, S> {
+public class ObjectFilterPipe<S> extends AbstractFilterPipe<S,S,S> {
 
     private final Collection<S> objects;
     private final boolean filter;
@@ -19,12 +19,12 @@ public class ObjectFilterPipe<S> extends AbstractPipe<S, S> {
         while (this.starts.hasNext()) {
             S object = this.starts.next();
             if (this.filter) {
-                if (!this.objects.contains(object)) {
+                if (!this.doesContain(this.objects,object)) {
                     this.nextEnd = object;
                     return;
                 }
             } else {
-                if (this.objects.contains(object)) {
+                if (this.doesContain(this.objects,object)) {
                     this.nextEnd = object;
                     return;
                 }

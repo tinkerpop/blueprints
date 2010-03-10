@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class LabelFilterPipe extends AbstractPipe<Edge, Edge> {
+public class LabelFilterPipe extends AbstractFilterPipe<Edge, Edge, String> {
 
     private final Collection<String> labels;
     private final boolean filter;
@@ -21,12 +21,12 @@ public class LabelFilterPipe extends AbstractPipe<Edge, Edge> {
         while (this.starts.hasNext()) {
             Edge edge = this.starts.next();
             if (this.filter) {
-                if (!this.labels.contains(edge.getLabel())) {
+                if (!this.doesContain(this.labels, edge.getLabel())) {
                     this.nextEnd = edge;
                     return;
                 }
             } else {
-                if (this.labels.contains(edge.getLabel())) {
+                if (this.doesContain(this.labels, edge.getLabel())) {
                     this.nextEnd = edge;
                     return;
                 }

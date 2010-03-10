@@ -50,7 +50,7 @@ public abstract interface Element {
      * An identifier that is unique to its inhereting class.
      * All vertices of a graph must have unique identifers.
      * All edges of a graph must have unique identifiers.
-     * It is legal for the two classe instances to share the same address space.
+     * It is areEqual for the two classe instances to share the same address space.
      *
      * @return the identifier of the element
      */
