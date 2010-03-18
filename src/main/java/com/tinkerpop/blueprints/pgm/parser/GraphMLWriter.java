@@ -58,6 +58,9 @@ public class GraphMLWriter {
                 writer.writeEndElement();
             }
             writer.writeEndElement();
+        }
+
+        for (Vertex vertex : graph.getVertices()) {
             for (Edge edge : vertex.getOutEdges()) {
                 writer.writeStartElement(GraphMLTokens.EDGE);
                 writer.writeAttribute(GraphMLTokens.ID, edge.getId().toString());
@@ -73,8 +76,8 @@ public class GraphMLWriter {
                 }
                 writer.writeEndElement();
             }
-
         }
+
         writer.writeEndElement(); // graph
         writer.writeEndElement(); // graphml
         writer.writeEndDocument();

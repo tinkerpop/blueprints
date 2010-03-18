@@ -19,6 +19,11 @@ bc. <dependency>
   <version>0.2-SNAPSHOT</version>
 </dependency>
 
+* Updated GraphML writer to write all vertices and then all edges
+* Added @AggregatorPipe@ to aggregate incoming iterator into a collection
+* Added @FilterPipe@ interface to support overrighting comparators in filter-based pipes
+* Added @CountPipe@ that maps an iterator to the number of elements in the iterator
+* Added @PropertyFilterPipe@ that filters graph elements based on their properties
 
 ==<hr/>==
 

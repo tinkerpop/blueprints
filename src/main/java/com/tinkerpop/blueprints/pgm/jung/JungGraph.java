@@ -153,7 +153,7 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
 
     public int getEdgeCount() {
         int count = 0;
-        for (Edge e : this.graph.getEdges()) {
+        for (Edge edge : this.graph.getEdges()) {
             count++;
         }
         return count;
