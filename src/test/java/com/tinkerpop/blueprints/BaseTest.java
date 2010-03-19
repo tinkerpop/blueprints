@@ -2,9 +2,7 @@ package com.tinkerpop.blueprints;
 
 import junit.framework.TestCase;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -17,8 +15,8 @@ public class BaseTest extends TestCase {
         assertTrue(true);
     }
 
-    public static void printList(final List list) {
-        for (Object o : list) {
+    public static void printCollection(final Collection collection) {
+        for (Object o : collection) {
             System.out.println(o);
         }
     }
@@ -67,5 +65,16 @@ public class BaseTest extends TestCase {
         else
             System.out.println("\t" + name + ": " + eventName + " in " + timeInMilliseconds + "ms");
     }
+
+    public static void warmUp(int amount) {
+        List<String> uuids = new ArrayList<String>();
+        for(int i=0; i<amount; i++) {
+            uuids.add(UUID.randomUUID().toString());
+        }
+        for(String uuid : uuids) {
+            uuid.toUpperCase();
+        }
+    }
+
 
 }
