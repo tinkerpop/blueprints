@@ -7,20 +7,10 @@ import java.util.*;
  */
 public class PipeHelper {
 
-    public static <T> List<T> makeList(Iterator<T> iterator) {
-        List<T> list = new ArrayList<T>();
+    public static <T> void fillCollection(Iterator<T> iterator, Collection<T> collection) {
         while (iterator.hasNext()) {
-            list.add(iterator.next());
+            collection.add(iterator.next());
         }
-        return list;
-    }
-
-    public static <T> Set<T> makeSet(Iterator<T> iterator) {
-        Set<T> set = new HashSet<T>();
-        while(iterator.hasNext()) {
-            set.add(iterator.next());
-        }
-        return set;
     }
 
     public static <T> int counter(Iterator<T> iterator) {

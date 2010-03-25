@@ -22,17 +22,17 @@ public class AggregatorPipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 6);
-        assertEquals(pipe1.getAggregate().size(), counter);
+        assertEquals(pipe1.getSideEffect().size(), counter);
         assertEquals(list.size(), counter);
         for (int i = 0; i < counter; i++) {
-            assertEquals(list.get(i), pipe1.getAggregate().toArray()[i]);
+            assertEquals(list.get(i), pipe1.getSideEffect().toArray()[i]);
         }
     }
 
     public void testSelfFilter() {
         List<String> list = Arrays.asList("marko", "antonio", "rodriguez", "was", "here", ".");
         AggregatorPipe<String> pipe1 = new AggregatorPipe<String>(new ArrayList<String>());
-        Pipe pipe2 = new ObjectFilterPipe<String>(pipe1.getAggregate(), false);
+        Pipe pipe2 = new ObjectFilterPipe<String>(pipe1.getSideEffect(), false);
         Pipeline<String,String> pipeline = new Pipeline<String,String>(Arrays.asList(pipe1,pipe2));
         pipeline.setStarts(list.iterator());
         int counter = 0;
@@ -44,7 +44,7 @@ public class AggregatorPipeTest extends TestCase {
         assertEquals(counter,6);
 
         pipe1 = new AggregatorPipe<String>(new ArrayList<String>());
-        pipe2 = new ObjectFilterPipe<String>(pipe1.getAggregate(), true);
+        pipe2 = new ObjectFilterPipe<String>(pipe1.getSideEffect(), true);
         pipeline = new Pipeline<String,String>(Arrays.asList(pipe1,pipe2));
         pipeline.setStarts(list.iterator());
         counter = 0;

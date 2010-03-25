@@ -16,9 +16,14 @@ public class CountPipeTest extends TestCase {
         pipe1.setStarts(list.iterator());
         assertTrue(pipe1.hasNext());
         assertTrue(pipe1.hasNext());
-        assertEquals(pipe1.next(), new Integer(6));
-        assertFalse(pipe1.hasNext());
-        assertNull(pipe1.next());
+        Long counter = 0l;
+        while(pipe1.hasNext()) {
+            String s = pipe1.next();
+            assertTrue(s.equals("marko") || s.equals("antonio")  || s.equals("rodriguez")  || s.equals("was")  || s.equals("here")  || s.equals("."));
+            counter++;
+            assertEquals(pipe1.getSideEffect(), counter);
+        }
+        assertEquals(pipe1.getSideEffect(), new Long(6));
     }
 
 
@@ -26,10 +31,11 @@ public class CountPipeTest extends TestCase {
         List<String> list = Arrays.asList();
         CountPipe<String> pipe1 = new CountPipe<String>();
         pipe1.setStarts(list.iterator());
-        assertTrue(pipe1.hasNext());
-        assertTrue(pipe1.hasNext());
-        assertEquals(pipe1.next(), new Integer(0));
         assertFalse(pipe1.hasNext());
-        assertNull(pipe1.next());
+        assertFalse(pipe1.hasNext());
+        while(pipe1.hasNext()) {
+            pipe1.next();
+        }
+        assertEquals(pipe1.getSideEffect(), new Long(0));
     }
 }

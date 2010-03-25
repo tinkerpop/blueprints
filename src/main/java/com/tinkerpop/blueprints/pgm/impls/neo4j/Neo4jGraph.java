@@ -13,6 +13,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.impl.transaction.TransactionFailureException;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -26,8 +27,15 @@ public class Neo4jGraph implements Graph {
     private boolean automaticTransactions = true;
 
     public Neo4jGraph(final String directory) {
+        this(directory, null);
+    }
+
+    public Neo4jGraph(final String directory, Map<String,String> configuration) {
         this.directory = directory;
-        this.neo = new EmbeddedGraphDatabase(this.directory);
+        if(null != configuration)
+            this.neo = new EmbeddedGraphDatabase(this.directory, configuration);
+        else
+            this.neo = new EmbeddedGraphDatabase(this.directory);
         LuceneIndexService indexService = new LuceneIndexService(neo);
         indexService.setIsolation(Isolation.SAME_TX);
         this.index = new Neo4jIndex(indexService, this);
