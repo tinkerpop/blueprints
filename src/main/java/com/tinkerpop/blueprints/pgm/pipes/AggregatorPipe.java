@@ -6,7 +6,7 @@ import java.util.Iterator;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class AggregatorPipe<S> extends AbstractPipe<S, S> implements SideEffectPipe<S,S,Collection<S>> {
+public class AggregatorPipe<S> extends AbstractPipe<S, S> implements SideEffectPipe<S, S, Collection<S>> {
 
     private final Collection<S> aggregate;
     private Iterator<S> aggregateIterator = null;
@@ -30,7 +30,7 @@ public class AggregatorPipe<S> extends AbstractPipe<S, S> implements SideEffectP
         if (this.aggregateIterator.hasNext()) {
             this.nextEnd = this.aggregateIterator.next();
         } else {
-            this.nextEnd = null;
+            this.done = true;
         }
 
     }

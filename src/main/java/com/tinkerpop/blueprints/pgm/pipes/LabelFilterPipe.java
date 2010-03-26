@@ -32,6 +32,6 @@ public class LabelFilterPipe extends AbstractFilterPipe<Edge, Edge, String> {
                 }
             }
         }
-        this.nextEnd = null;
+        this.done = true;
     }
 }

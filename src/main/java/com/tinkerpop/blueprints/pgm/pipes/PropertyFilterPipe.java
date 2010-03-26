@@ -34,6 +34,6 @@ public class PropertyFilterPipe<S extends Element, T> extends AbstractFilterPipe
                 }
             }
         }
-        this.nextEnd = null;
+        this.done = true;
     }
 }

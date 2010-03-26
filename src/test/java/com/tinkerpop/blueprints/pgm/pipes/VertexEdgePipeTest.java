@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -27,6 +28,12 @@ public class VertexEdgePipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 3);
+        try {
+            vsf.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
 
         Vertex josh = graph.getVertex("4");
         vsf = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
@@ -40,6 +47,12 @@ public class VertexEdgePipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 2);
+        try {
+            vsf.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
 
         Vertex lop = graph.getVertex("3");
         vsf = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
@@ -50,5 +63,11 @@ public class VertexEdgePipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 0);
+        try {
+            vsf.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
     }
 }

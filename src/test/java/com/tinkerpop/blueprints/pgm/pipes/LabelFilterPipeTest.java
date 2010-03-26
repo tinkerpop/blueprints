@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -40,11 +41,11 @@ public class LabelFilterPipeTest extends TestCase {
         }
         assertEquals(counter, 1);
 
-        lfp = new LabelFilterPipe(Arrays.asList("knows","created"), true);
+        lfp = new LabelFilterPipe(Arrays.asList("knows", "created"), true);
         lfp.setStarts(marko.getOutEdges().iterator());
         assertFalse(lfp.hasNext());
 
-        lfp = new LabelFilterPipe(Arrays.asList("knows","created"), false);
+        lfp = new LabelFilterPipe(Arrays.asList("knows", "created"), false);
         lfp.setStarts(marko.getOutEdges().iterator());
         assertTrue(lfp.hasNext());
         counter = 0;
@@ -54,6 +55,12 @@ public class LabelFilterPipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 3);
+        try {
+            lfp.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
 
     }
 }

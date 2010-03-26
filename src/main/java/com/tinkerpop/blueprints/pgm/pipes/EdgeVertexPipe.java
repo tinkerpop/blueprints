@@ -25,7 +25,7 @@ public class EdgeVertexPipe extends AbstractPipe<Edge, Vertex> {
             else
                 this.nextEnd = this.starts.next().getInVertex();
         } else {
-            this.nextEnd = null;
+            this.done = true;
         }
     }
 

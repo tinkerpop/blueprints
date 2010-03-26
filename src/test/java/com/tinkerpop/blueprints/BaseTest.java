@@ -68,10 +68,10 @@ public class BaseTest extends TestCase {
 
     public static void warmUp(int amount) {
         List<String> uuids = new ArrayList<String>();
-        for(int i=0; i<amount; i++) {
+        for (int i = 0; i < amount; i++) {
             uuids.add(UUID.randomUUID().toString());
         }
-        for(String uuid : uuids) {
+        for (String uuid : uuids) {
             uuid.toUpperCase();
         }
     }

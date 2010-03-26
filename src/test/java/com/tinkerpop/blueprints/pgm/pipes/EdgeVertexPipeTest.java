@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import junit.framework.TestCase;
 
+import java.util.NoSuchElementException;
+
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -35,5 +37,11 @@ public class EdgeVertexPipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 2);
+        try {
+            evp.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -9,6 +10,7 @@ public abstract class AbstractPipe<S, E> implements Pipe<S, E> {
 
     protected Iterator<S> starts;
     protected E nextEnd;
+    protected boolean done = false;
 
     public void setStarts(final Iterator<S> starts) {
         this.starts = starts;
@@ -20,13 +22,17 @@ public abstract class AbstractPipe<S, E> implements Pipe<S, E> {
     }
 
     public E next() {
-        E end = this.nextEnd;
-        this.setNext();
-        return end;
+        if (this.done) {
+            throw new NoSuchElementException();
+        } else {
+            E end = this.nextEnd;
+            this.setNext();
+            return end;
+        }
     }
 
     public boolean hasNext() {
-        return this.nextEnd != null;
+        return !done;
     }
 
     protected void setNext() {

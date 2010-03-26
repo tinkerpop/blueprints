@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -31,6 +32,12 @@ public class PropertyFilterPipeTest extends TestCase {
             assertEquals(vertex.getProperty("name"), "lop");
         }
         assertEquals(counter, 1);
+        try {
+            pipeline.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
 
     }
 
@@ -52,6 +59,12 @@ public class PropertyFilterPipeTest extends TestCase {
             assertTrue(vertex.getProperty("age").equals(27) || vertex.getProperty("age").equals(32));
         }
         assertEquals(counter, 2);
+        try {
+            pipeline.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
 
     }
 }

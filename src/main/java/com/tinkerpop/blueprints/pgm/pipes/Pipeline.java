@@ -1,10 +1,5 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,7 +15,8 @@ public class Pipeline<S, E> implements Pipe<S, E> {
         this.setPipes(pipes);
     }
 
-    public Pipeline() {}
+    public Pipeline() {
+    }
 
     protected void setPipes(final List<Pipe> pipes) {
         this.pipes = pipes;
@@ -41,21 +37,6 @@ public class Pipeline<S, E> implements Pipe<S, E> {
     public boolean hasNext() {
         return endPipe.hasNext();
     }
-
-    /*private boolean validateTypes() {
-        if (this.pipes.size() > 1) {
-            Type endType = ((ParameterizedType) pipes.get(0).getClass().getGenericSuperclass()).getActualTypeArguments()[1];
-            for (int i = 1; i < pipes.size(); i++) {
-                Type startType = ((ParameterizedType) pipes.get(i).getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-                if (!endType.equals(startType)) {
-                    System.out.println(endType + "!!" + startType);
-                    return false;
-                } else
-                    endType = ((ParameterizedType) pipes.get(i).getClass().getGenericSuperclass()).getActualTypeArguments()[1];
-            }
-        }
-        return true;
-    }*/
 
     public E next() {
         return endPipe.next();

@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -16,7 +17,7 @@ public class PropertyPipeTest extends TestCase {
     public void testSingleProperty() {
         Graph graph = TinkerGraphFactory.createTinkerGraph();
         Vertex marko = graph.getVertex("1");
-        PropertyPipe<Vertex,String> pp = new PropertyPipe<Vertex,String>("name");
+        PropertyPipe<Vertex, String> pp = new PropertyPipe<Vertex, String>("name");
         pp.setStarts(Arrays.asList(marko).iterator());
         assertTrue(pp.hasNext());
         int counter = 0;
@@ -26,14 +27,20 @@ public class PropertyPipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 1);
+        try {
+            pp.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
     }
 
     public void testMultiProperty() {
         Graph graph = TinkerGraphFactory.createTinkerGraph();
         Vertex marko = graph.getVertex("1");
         Pipe evp = new EdgeVertexPipe(EdgeVertexPipe.Step.IN_VERTEX);
-        Pipe<Vertex,String> pp = new PropertyPipe<Vertex,String>("name");
-        Pipeline<Edge,String> pipeline = new Pipeline<Edge,String>(Arrays.asList(evp, pp));
+        Pipe<Vertex, String> pp = new PropertyPipe<Vertex, String>("name");
+        Pipeline<Edge, String> pipeline = new Pipeline<Edge, String>(Arrays.asList(evp, pp));
         pipeline.setStarts(marko.getOutEdges().iterator());
         assertTrue(pipeline.hasNext());
         int counter = 0;
@@ -43,5 +50,11 @@ public class PropertyPipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 3);
+        try {
+            pipeline.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
     }
 }

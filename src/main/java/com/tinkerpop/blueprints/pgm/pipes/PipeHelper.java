@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -15,7 +16,7 @@ public class PipeHelper {
 
     public static <T> int counter(Iterator<T> iterator) {
         int counter = 0;
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             iterator.next();
             counter++;
         }

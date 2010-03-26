@@ -32,7 +32,7 @@ public class VertexEdgePipe extends AbstractPipe<Vertex, Edge> {
                     nextEnds = this.starts.next().getInEdges().iterator();
                 this.setNext();
             } else {
-                this.nextEnd = null;
+                this.done = true;
             }
         }
     }

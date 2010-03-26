@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -34,6 +35,12 @@ public class ObjectFilterPipeTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 1);
+        try {
+            ofp.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
     }
 
 }

@@ -22,7 +22,7 @@ public class PropertyPipe<S extends Element, E> extends AbstractPipe<S, E> {
             else
                 this.setNext();
         } else {
-            this.nextEnd = null;
+            this.done = true;
         }
     }
 }

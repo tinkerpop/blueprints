@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -60,6 +61,12 @@ public class PipelineTest extends TestCase {
             counter++;
         }
         assertEquals(counter, 2);
+        try {
+            pipeline.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
 
     }
 
@@ -86,13 +93,12 @@ public class PipelineTest extends TestCase {
             pipeline.next();
         }
         assertEquals(counter, 3);
-    }
-
-    public void testValidation() {
-        Pipe vep = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
-        Pipe evp = new EdgeVertexPipe(EdgeVertexPipe.Step.IN_VERTEX);
-        Pipeline<Vertex, Vertex> pipeline = new Pipeline<Vertex, Vertex>(Arrays.asList(vep, evp));
-        
+        try {
+            pipeline.next();
+            assertTrue(false);
+        } catch (NoSuchElementException e) {
+            assertFalse(false);
+        }
     }
 
 }

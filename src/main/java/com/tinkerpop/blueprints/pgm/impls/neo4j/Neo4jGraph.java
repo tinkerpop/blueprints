@@ -30,9 +30,9 @@ public class Neo4jGraph implements Graph {
         this(directory, null);
     }
 
-    public Neo4jGraph(final String directory, Map<String,String> configuration) {
+    public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
-        if(null != configuration)
+        if (null != configuration)
             this.neo = new EmbeddedGraphDatabase(this.directory, configuration);
         else
             this.neo = new EmbeddedGraphDatabase(this.directory);

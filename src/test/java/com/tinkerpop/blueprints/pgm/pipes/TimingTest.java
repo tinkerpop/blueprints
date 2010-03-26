@@ -2,7 +2,10 @@ package com.tinkerpop.blueprints.pgm.pipes;
 
 import com.tinkerpop.blueprints.BaseTest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -72,7 +75,7 @@ public class TimingTest extends BaseTest {
             if (this.starts.hasNext()) {
                 this.nextEnd = this.starts.next().toUpperCase();
             } else {
-                this.nextEnd = null;
+                this.done = true;
             }
         }
     }
@@ -82,7 +85,7 @@ public class TimingTest extends BaseTest {
             if (this.starts.hasNext()) {
                 this.nextEnd = this.starts.next().toLowerCase();
             } else {
-                this.nextEnd = null;
+                this.done = true;
             }
         }
     }
