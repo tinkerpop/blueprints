@@ -30,6 +30,10 @@ public class Neo4jGraph implements Graph {
         this(directory, null);
     }
 
+    public GraphDatabaseService getGraphDatabaseService() {
+        return this.neo;
+    }
+
     public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
         if (null != configuration)
