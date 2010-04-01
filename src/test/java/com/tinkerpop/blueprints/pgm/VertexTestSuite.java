@@ -65,20 +65,20 @@ public class VertexTestSuite extends ModelTestSuite {
             List<String> ids = generateIds(3);
             graph.addVertex(convertId(ids.get(0)));
             graph.addVertex(convertId(ids.get(1)));
-            assertEquals(count(graph.getVertices()), 2);
+            assertEquals(2, count(graph.getVertices()));
             graph.addVertex(convertId(ids.get(2)));
-            assertEquals(count(graph.getVertices()), 3);
+            assertEquals(3, count(graph.getVertices()));
         }
 
         if (config.isRDFModel && config.requiresRDFIds) {
             Vertex v1 = graph.addVertex("http://tinkerpop.com#marko");
-            assertEquals(v1.getId(), "http://tinkerpop.com#marko");
+            assertEquals("http://tinkerpop.com#marko", v1.getId());
             Vertex v2 = graph.addVertex("\"1\"^^<datatype:int>");
-            assertEquals(v2.getId(), "\"1\"^^<datatype:int>");
+            assertEquals("\"1\"^^<datatype:int>", v2.getId());
             Vertex v3 = graph.addVertex("_:ABLANKNODE");
             assertEquals(v3.getId(), "_:ABLANKNODE");
             Vertex v4 = graph.addVertex("\"2.24\"^^<xsd:double>");
-            assertEquals(v4.getId(), "\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>");
+            assertEquals("\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>", v4.getId());
         }
     }
 
@@ -87,22 +87,22 @@ public class VertexTestSuite extends ModelTestSuite {
 
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 1);
+            assertEquals(1, count(graph.getVertices()));
         graph.removeVertex(v1);
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 0);
+            assertEquals(0, count(graph.getVertices()));
 
         Set<Vertex> vertices = new HashSet<Vertex>();
         for (int i = 0; i < 1000; i++) {
             vertices.add(graph.addVertex(null));
         }
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 1000);
+            assertEquals(1000, count(graph.getVertices()));
         for (Vertex v : vertices) {
             graph.removeVertex(v);
         }
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 0);
+            assertEquals(0, count(graph.getVertices()));
     }
 
     public void testGetNonExistantVertices(final Graph graph) {
@@ -119,10 +119,10 @@ public class VertexTestSuite extends ModelTestSuite {
         int vertexCount = 1000;
         Vertex v1 = graph.addVertex(null);
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 1);
+            assertEquals(1, count(graph.getVertices()));
         graph.removeVertex(v1);
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 0);
+            assertEquals(0, count(graph.getVertices()));
 
         Set<Vertex> vertices = new HashSet<Vertex>();
 
@@ -132,7 +132,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
         BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), vertexCount);
+            assertEquals(vertexCount, count(graph.getVertices()));
 
         this.stopWatch();
         for (Vertex v : vertices) {
@@ -140,7 +140,7 @@ public class VertexTestSuite extends ModelTestSuite {
         }
         BaseTest.printPerformance(graph.toString(), vertexCount, "vertices deleted", this.stopWatch());
         if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 0);
+            assertEquals(0, count(graph.getVertices()));
 
     }
 
@@ -154,10 +154,10 @@ public class VertexTestSuite extends ModelTestSuite {
             }
             BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
             this.stopWatch();
-            assertEquals(count(graph.getVertices()), vertexCount);
+            assertEquals(vertexCount, count(graph.getVertices()));
             BaseTest.printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
             // must create unique ids
-            assertEquals(ids.size(), vertexCount);
+            assertEquals(vertexCount, ids.size());
         }
     }
 
@@ -171,20 +171,20 @@ public class VertexTestSuite extends ModelTestSuite {
             v1.setProperty("key2", 10);
             v2.setProperty("key2", 20);
 
-            assertEquals(v1.getProperty("key1"), "value1");
-            assertEquals(v1.getProperty("key2"), 10);
-            assertEquals(v2.getProperty("key2"), 20);
+            assertEquals("value1", v1.getProperty("key1"));
+            assertEquals(10, v1.getProperty("key2"));
+            assertEquals(20, v2.getProperty("key2"));
 
         } else {
             Vertex v1 = graph.addVertex("\"1\"^^<http://www.w3.org/2001/XMLSchema#int>");
-            assertEquals(v1.getProperty(SailTokens.DATATYPE), "http://www.w3.org/2001/XMLSchema#int");
-            assertEquals(v1.getProperty(SailTokens.VALUE), 1);
+            assertEquals("http://www.w3.org/2001/XMLSchema#int", v1.getProperty(SailTokens.DATATYPE));
+            assertEquals(1, v1.getProperty(SailTokens.VALUE));
             assertNull(v1.getProperty(SailTokens.LANGUAGE));
             assertNull(v1.getProperty("random something"));
 
             Vertex v2 = graph.addVertex("\"hello\"@en");
-            assertEquals(v2.getProperty(SailTokens.LANGUAGE), "en");
-            assertEquals(v2.getProperty(SailTokens.VALUE), "hello");
+            assertEquals("en", v2.getProperty(SailTokens.LANGUAGE));
+            assertEquals("hello", v2.getProperty(SailTokens.VALUE));
             assertNull(v2.getProperty(SailTokens.DATATYPE));
             assertNull(v2.getProperty("random something"));
         }
@@ -204,10 +204,10 @@ public class VertexTestSuite extends ModelTestSuite {
             BaseTest.printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
 
             if (config.supportsVertexIteration)
-                assertEquals(count(graph.getVertices()), 50);
-            assertEquals(vertices.size(), 50);
+                assertEquals(50, count(graph.getVertices()));
+            assertEquals(50, vertices.size());
             for (Vertex vertex : vertices) {
-                assertEquals(vertex.getPropertyKeys().size(), 15);
+                assertEquals(15, vertex.getPropertyKeys().size());
             }
         } else {
             Set<Vertex> vertices = new HashSet<Vertex>();
@@ -224,9 +224,9 @@ public class VertexTestSuite extends ModelTestSuite {
                 assertEquals(count(graph.getVertices()), 50);
             assertEquals(vertices.size(), 50);
             for (Vertex vertex : vertices) {
-                assertEquals(vertex.getPropertyKeys().size(), 2);
+                assertEquals(2, vertex.getPropertyKeys().size());
                 assertTrue(vertex.getPropertyKeys().contains(SailTokens.DATATYPE));
-                assertEquals(vertex.getProperty(SailTokens.DATATYPE), "http://www.w3.org/2001/XMLSchema#anyURI");
+                assertEquals("http://www.w3.org/2001/XMLSchema#anyURI", vertex.getProperty(SailTokens.DATATYPE));
                 assertTrue(vertex.getPropertyKeys().contains(SailTokens.VALUE));
 
             }
@@ -244,9 +244,9 @@ public class VertexTestSuite extends ModelTestSuite {
             v1.setProperty("key2", 10);
             v2.setProperty("key2", 20);
 
-            assertEquals(v1.removeProperty("key1"), "value1");
-            assertEquals(v1.removeProperty("key2"), 10);
-            assertEquals(v2.removeProperty("key2"), 20);
+            assertEquals("value1", v1.removeProperty("key1"));
+            assertEquals(10, v1.removeProperty("key2"));
+            assertEquals(20, v2.removeProperty("key2"));
 
             assertNull(v1.removeProperty("key1"));
             assertNull(v1.removeProperty("key2"));
@@ -260,9 +260,9 @@ public class VertexTestSuite extends ModelTestSuite {
                 v1 = graph.getVertex(ids.get(0));
                 v2 = graph.getVertex(ids.get(1));
 
-                assertEquals(v1.removeProperty("key1"), "value1");
-                assertEquals(v1.removeProperty("key2"), 10);
-                assertEquals(v2.removeProperty("key2"), 20);
+                assertEquals("value1", v1.removeProperty("key1"));
+                assertEquals(10, v1.removeProperty("key2"));
+                assertEquals(20, v2.removeProperty("key2"));
 
                 assertNull(v1.removeProperty("key1"));
                 assertNull(v1.removeProperty("key2"));
@@ -275,9 +275,9 @@ public class VertexTestSuite extends ModelTestSuite {
                 v1.setProperty("key2", 20);
                 v2.setProperty("key2", 30);
 
-                assertEquals(v1.removeProperty("key1"), "value2");
-                assertEquals(v1.removeProperty("key2"), 20);
-                assertEquals(v2.removeProperty("key2"), 30);
+                assertEquals("value2", v1.removeProperty("key1"));
+                assertEquals(20, v1.removeProperty("key2"));
+                assertEquals(30, v2.removeProperty("key2"));
 
                 assertNull(v1.removeProperty("key1"));
                 assertNull(v1.removeProperty("key2"));
@@ -287,14 +287,14 @@ public class VertexTestSuite extends ModelTestSuite {
 
         } else {
             Vertex v1 = graph.addVertex("\"1\"^^<http://www.w3.org/2001/XMLSchema#int>");
-            assertEquals(v1.removeProperty("type"), "http://www.w3.org/2001/XMLSchema#int");
-            assertEquals(v1.getProperty("value"), "1");
+            assertEquals("http://www.w3.org/2001/XMLSchema#int", v1.removeProperty("type"));
+            assertEquals("1", v1.getProperty("value"));
             assertNull(v1.getProperty("lang"));
             assertNull(v1.getProperty("random something"));
 
             Vertex v2 = graph.addVertex("\"hello\"@en");
-            assertEquals(v2.removeProperty("lang"), "en");
-            assertEquals(v2.getProperty("value"), "hello");
+            assertEquals("en", v2.removeProperty("lang"));
+            assertEquals("hello", v2.getProperty("value"));
             assertNull(v2.getProperty("type"));
             assertNull(v2.getProperty("random something"));
         }
@@ -308,16 +308,16 @@ public class VertexTestSuite extends ModelTestSuite {
             if (config.supportsVertexIteration) {
                 assertEquals(count(graph.getVertices()), 1);
             }
-            assertEquals(v1.getProperty("key1"), "value1");
+            assertEquals("value1", v1.getProperty("key1"));
 
             Vertex v2 = graph.getVertex(v1.getId());
-            assertEquals(v2.getProperty("key1"), "value1");
+            assertEquals("value1", v2.getProperty("key1"));
 
             v1.setProperty("key1", "value111");
-            assertEquals(v1.getProperty("key1"), "value111");
-            assertEquals(v2.getProperty("key1"), "value111");
+            assertEquals("value111", v1.getProperty("key1"));
+            assertEquals("value111", v2.getProperty("key1"));
 
-            assertEquals(v2.removeProperty("key1"), "value111");
+            assertEquals("value111", v2.removeProperty("key1"));
             assertNull(v2.getProperty("key1"));
             assertNull(v1.getProperty("key1"));
         }
