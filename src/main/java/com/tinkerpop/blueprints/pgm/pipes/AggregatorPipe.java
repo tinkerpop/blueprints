@@ -11,8 +11,8 @@ public class AggregatorPipe<S> extends AbstractPipe<S, S> implements SideEffectP
     private final Collection<S> aggregate;
     private Iterator<S> aggregateIterator = null;
 
-    public AggregatorPipe(final Collection<S> emptyCollection) {
-        this.aggregate = emptyCollection;
+    public AggregatorPipe(final Collection<S> collection) {
+        this.aggregate = collection;
     }
 
     public Collection<S> getSideEffect() {
