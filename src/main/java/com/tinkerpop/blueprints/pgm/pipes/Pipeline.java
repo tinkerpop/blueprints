@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
+import com.tinkerpop.blueprints.pgm.pipes.Pipe;
+
 import java.util.Iterator;
 import java.util.List;
 

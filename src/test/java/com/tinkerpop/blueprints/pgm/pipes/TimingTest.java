@@ -1,6 +1,8 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.pipes.AbstractPipe;
+import com.tinkerpop.blueprints.pgm.pipes.Pipeline;
 
 import java.util.ArrayList;
 import java.util.Arrays;

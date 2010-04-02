@@ -5,7 +5,7 @@ import java.util.Iterator;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class MergePipe<E> extends AbstractPipe<Iterator<E>, E> {
+public class OrderedMergePipe<E> extends AbstractPipe<Iterator<E>, E> {
 
     protected Iterator<E> nextEnds;
 

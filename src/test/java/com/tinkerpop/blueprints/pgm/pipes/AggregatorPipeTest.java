@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
+import com.tinkerpop.blueprints.pgm.pipes.AggregatorPipe;
+import com.tinkerpop.blueprints.pgm.pipes.ObjectFilterPipe;
+import com.tinkerpop.blueprints.pgm.pipes.Pipeline;
 import junit.framework.TestCase;
 
 import java.util.*;

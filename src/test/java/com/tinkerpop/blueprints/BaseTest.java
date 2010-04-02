@@ -15,6 +15,14 @@ public class BaseTest extends TestCase {
         assertTrue(true);
     }
 
+    public static List<String> generateUUIDs(int number) {
+        List<String> uuids = new ArrayList<String>();
+        for(int i=0; i<number; i++) {
+            uuids.add(UUID.randomUUID().toString());
+        }
+        return uuids;
+    }
+
     public static void printCollection(final Collection collection) {
         for (Object o : collection) {
             System.out.println(o);

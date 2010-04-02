@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
+import com.tinkerpop.blueprints.pgm.pipes.FilterPipe;
+
 import java.util.Collection;
 
 /**

@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.pipes;
 
+import com.tinkerpop.blueprints.pgm.pipes.OrderedMergePipe;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -8,13 +9,13 @@ import java.util.List;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class MergePipeTest extends TestCase {
+public class OrderedMergePipeTest extends TestCase {
 
     public void testMergePipe() {
         List<String> marko = Arrays.asList("marko", "antonio", "rodriguez");
         List<String> peter = Arrays.asList("peter", "neubauer");
         List<String> josh = Arrays.asList("joshua", "shinavier");
-        MergePipe<String> pipe = new MergePipe<String>();
+        OrderedMergePipe<String> pipe = new OrderedMergePipe<String>();
         pipe.setStarts(Arrays.asList(marko.iterator(), peter.iterator(), josh.iterator()).iterator());
         assertTrue(pipe.hasNext());
         int counter = 0;
@@ -31,7 +32,7 @@ public class MergePipeTest extends TestCase {
         List<String> marko = Arrays.asList();
         List<String> peter = Arrays.asList("peter", "neubauer");
         List<String> josh = Arrays.asList();
-        MergePipe<String> pipe = new MergePipe<String>();
+        OrderedMergePipe<String> pipe = new OrderedMergePipe<String>();
         pipe.setStarts(Arrays.asList(marko.iterator(), peter.iterator(), josh.iterator()).iterator());
         assertTrue(pipe.hasNext());
         int counter = 0;
@@ -47,7 +48,7 @@ public class MergePipeTest extends TestCase {
         List<String> marko = Arrays.asList();
         List<String> peter = Arrays.asList();
         List<String> josh = Arrays.asList();
-        MergePipe<String> pipe = new MergePipe<String>();
+        OrderedMergePipe<String> pipe = new OrderedMergePipe<String>();
         pipe.setStarts(Arrays.asList(marko.iterator(), peter.iterator(), josh.iterator()).iterator());
         assertFalse(pipe.hasNext());
         int counter = 0;
