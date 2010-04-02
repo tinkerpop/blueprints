@@ -4,10 +4,10 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
-import com.tinkerpop.blueprints.pgm.pipes.EdgeVertexPipe;
-import com.tinkerpop.blueprints.pgm.pipes.LabelFilterPipe;
+import com.tinkerpop.blueprints.pgm.pipes.pgms.EdgeVertexPipe;
+import com.tinkerpop.blueprints.pgm.pipes.pgms.LabelFilterPipe;
 import com.tinkerpop.blueprints.pgm.pipes.Pipeline;
-import com.tinkerpop.blueprints.pgm.pipes.VertexEdgePipe;
+import com.tinkerpop.blueprints.pgm.pipes.pgms.VertexEdgePipe;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
