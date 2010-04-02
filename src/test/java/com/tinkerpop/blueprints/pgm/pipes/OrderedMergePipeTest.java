@@ -22,7 +22,7 @@ public class OrderedMergePipeTest extends TestCase {
         while(pipe.hasNext()) {
             counter++;
             String name = pipe.next();
-            System.out.println(name);
+            //System.out.println(name);
             assertTrue(marko.contains(name) || peter.contains(name) || josh.contains(name));
         }
         assertEquals(counter,7);

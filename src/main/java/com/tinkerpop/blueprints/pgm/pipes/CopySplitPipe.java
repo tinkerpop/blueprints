@@ -12,11 +12,9 @@ public class CopySplitPipe<S> extends AbstractSplitPipe<S> {
     public void fillNext() {
         if (!done && this.hasNext()) {
             S item = this.next();
-            for (int i = 0; i < numberOfSplits; i++) {
+            for (int i = 0; i < this.numberOfSplits; i++) {
                 this.splits[i].add(item);
             }
         }
     }
-
-
 }

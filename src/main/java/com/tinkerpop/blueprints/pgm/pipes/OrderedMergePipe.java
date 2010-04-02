@@ -5,16 +5,16 @@ import java.util.Iterator;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class OrderedMergePipe<E> extends AbstractPipe<Iterator<E>, E> {
+public class OrderedMergePipe<S> extends AbstractPipe<Iterator<S>, S> {
 
-    protected Iterator<E> nextEnds;
+    protected Iterator<S> currentEnds;
 
     protected void setNext() {
-        if (null != nextEnds && nextEnds.hasNext()) {
-            this.nextEnd = this.nextEnds.next();
+        if (null != this.currentEnds && this.currentEnds.hasNext()) {
+            this.nextEnd = this.currentEnds.next();
         } else {
-            if ((null == nextEnds || !this.nextEnds.hasNext()) && this.starts.hasNext()) {
-                this.nextEnds = this.starts.next();
+            if ((null == this.currentEnds || !this.currentEnds.hasNext()) && this.starts.hasNext()) {
+                this.currentEnds = this.starts.next();
                 this.setNext();
             } else {
                 this.done = true;
