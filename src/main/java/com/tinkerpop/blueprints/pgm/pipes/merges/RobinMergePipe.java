@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.pipes.AbstractPipe;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -19,25 +20,23 @@ public class RobinMergePipe<S> extends AbstractPipe<Iterator<S>, S> {
         while (this.starts.hasNext()) {
             allStarts.add(this.starts.next());
         }
-        this.setNext();
 
     }
 
-    protected void setNext() {
-        Iterator<S> starts = this.allStarts.get(this.currentStarts);
-        if (starts.hasNext()) {
-            this.nextEnd = starts.next();
-            this.currentStarts = ++this.currentStarts % this.allStarts.size();
-        } else {
-            this.allStarts.remove(this.currentStarts);
-            int size = allStarts.size();
-            if (0 == size)
-                this.done = true;
-            else {
-                if (size == 1)
+    protected S processNextStart() {
+        if (this.allStarts.size() > 0) {
+            Iterator<S> starts = this.allStarts.get(this.currentStarts);
+            if (starts.hasNext()) {
+                this.currentStarts = ++this.currentStarts % this.allStarts.size();
+                return starts.next();
+            } else {
+                this.allStarts.remove(this.currentStarts);
+                if (this.allStarts.size() == 1)
                     this.currentStarts = 0;
-                this.setNext();
+                return this.processNextStart();
             }
+        } else {
+            throw new NoSuchElementException();
         }
     }
 }

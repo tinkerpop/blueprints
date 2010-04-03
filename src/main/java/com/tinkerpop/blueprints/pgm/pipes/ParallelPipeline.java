@@ -25,15 +25,11 @@ public class ParallelPipeline<S, E> extends AbstractPipe<S, E> {
             parallelPipes.get(i).setStarts(readySplitPipe.getSplit(i));
         }
         this.readyMergePipe.setStarts((Iterator) parallelPipes.iterator());
-        this.setNext();
     }
 
-    public void setNext() {
-        if (this.readyMergePipe.hasNext()) {
-            this.nextEnd = this.readyMergePipe.next();
-        } else {
-            this.done = true;
-        }
+    public E processNextStart() {
+        return this.readyMergePipe.next();
+
     }
 
     public void remove() {

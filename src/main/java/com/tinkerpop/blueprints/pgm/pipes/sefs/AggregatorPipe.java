@@ -17,23 +17,17 @@ public class AggregatorPipe<S> extends AbstractPipe<S, S> implements SideEffectP
         this.aggregate = collection;
     }
 
-    public Collection<S> getSideEffect() {
-        return this.aggregate;
-    }
-
-    protected void setNext() {
+    protected S processNextStart() {
         if (null == this.aggregateIterator) {
             while (this.starts.hasNext()) {
                 aggregate.add(this.starts.next());
             }
             aggregateIterator = aggregate.iterator();
         }
+        return this.aggregateIterator.next();
+    }
 
-        if (this.aggregateIterator.hasNext()) {
-            this.nextEnd = this.aggregateIterator.next();
-        } else {
-            this.done = true;
-        }
-
+    public Collection<S> getSideEffect() {
+        return this.aggregate;
     }
 }

@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.pipes.filters.AbstractFilterPipe;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -18,21 +19,19 @@ public class LabelFilterPipe extends AbstractFilterPipe<Edge, String> {
         this.filter = filter;
     }
 
-    protected void setNext() {
+    protected Edge processNextStart() {
         while (this.starts.hasNext()) {
             Edge edge = this.starts.next();
             if (this.filter) {
                 if (!this.doesContain(this.labels, edge.getLabel())) {
-                    this.nextEnd = edge;
-                    return;
+                    return edge;
                 }
             } else {
                 if (this.doesContain(this.labels, edge.getLabel())) {
-                    this.nextEnd = edge;
-                    return;
+                    return edge;
                 }
             }
         }
-        this.done = true;
+        throw new NoSuchElementException();
     }
 }

@@ -11,23 +11,10 @@ public class CountPipe<S> extends AbstractPipe<S, S> implements SideEffectPipe<S
 
     private Long counter = 0l;
 
-    protected void setNext() {
-        if (this.starts.hasNext()) {
-            this.nextEnd = this.starts.next();
-        } else {
-            this.done = true;
-        }
-    }
-
-    public S next() {
-        if (this.done) {
-            throw new NoSuchElementException();
-        } else {
-            S end = this.nextEnd;
-            this.setNext();
-            counter++;
-            return end;
-        }
+    protected S processNextStart() {
+        S tempEnd = this.starts.next();
+        counter++;
+        return tempEnd;
     }
 
     public Long getSideEffect() {

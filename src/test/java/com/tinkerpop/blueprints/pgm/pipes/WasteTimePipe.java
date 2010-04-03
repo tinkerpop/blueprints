@@ -15,17 +15,12 @@ public class WasteTimePipe extends AbstractPipe<String, String> {
         this(3);
     }
 
-    protected void setNext() {
-        if (this.starts.hasNext()) {
-            this.nextEnd = this.starts.next();
-            try {
-                Thread.sleep(this.sleepTime);
-            } catch (InterruptedException e) {
-
-            }
-        } else {
-            this.done = true;
+    protected String processNextStart() {
+        try {
+            Thread.sleep(this.sleepTime);
+        } catch (InterruptedException e) {
         }
         //System.out.println(Thread.currentThread().getName());
+        return this.starts.next();
     }
 }

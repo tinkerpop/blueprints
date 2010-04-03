@@ -14,16 +14,7 @@ public class PropertyPipe<S extends Element, E> extends AbstractPipe<S, E> {
         this.key = key;
     }
 
-    protected void setNext() {
-        if (this.starts.hasNext()) {
-            Element element = this.starts.next();
-            E property = (E) element.getProperty(this.key);
-            if (null != property)
-                this.nextEnd = property;
-            else
-                this.setNext();
-        } else {
-            this.done = true;
-        }
+    protected E processNextStart() {
+        return (E) this.starts.next().getProperty(this.key);
     }
 }

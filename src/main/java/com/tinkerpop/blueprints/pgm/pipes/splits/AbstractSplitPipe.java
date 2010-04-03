@@ -29,11 +29,7 @@ public abstract class AbstractSplitPipe<S> extends AbstractPipe<S, S> implements
         this.fillNext(0);
     }
 
-    protected void setNext() {
-        if (this.starts.hasNext()) {
-            this.nextEnd = this.starts.next();
-        } else {
-            this.done = true;
-        }
+    protected S processNextStart() {
+        return this.starts.next();
     }
 }

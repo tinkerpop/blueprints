@@ -71,22 +71,15 @@ public class TimingTest extends BaseTest {
 
 
     private class UpperPipe extends AbstractPipe<String, String> {
-        protected void setNext() {
-            if (this.starts.hasNext()) {
-                this.nextEnd = this.starts.next().toUpperCase();
-            } else {
-                this.done = true;
-            }
+        protected String processNextStart() {
+            return this.starts.next().toUpperCase();
+
         }
     }
 
     private class LowerPipe extends AbstractPipe<String, String> {
-        protected void setNext() {
-            if (this.starts.hasNext()) {
-                this.nextEnd = this.starts.next().toLowerCase();
-            } else {
-                this.done = true;
-            }
+        protected String processNextStart() {
+            return this.starts.next().toLowerCase();
         }
     }
 }

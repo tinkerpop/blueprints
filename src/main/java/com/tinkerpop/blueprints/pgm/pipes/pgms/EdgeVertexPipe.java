@@ -19,15 +19,11 @@ public class EdgeVertexPipe extends AbstractPipe<Edge, Vertex> {
         this.step = step;
     }
 
-    protected void setNext() {
-        if (this.starts.hasNext()) {
-            if (this.step.equals(Step.OUT_VERTEX))
-                this.nextEnd = this.starts.next().getOutVertex();
-            else
-                this.nextEnd = this.starts.next().getInVertex();
-        } else {
-            this.done = true;
-        }
+    protected Vertex processNextStart() {
+        if (this.step.equals(Step.OUT_VERTEX))
+            return this.starts.next().getOutVertex();
+        else
+            return this.starts.next().getInVertex();
     }
 
 }

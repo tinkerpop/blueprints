@@ -9,12 +9,11 @@ import java.util.NoSuchElementException;
 public abstract class AbstractPipe<S, E> implements Pipe<S, E> {
 
     protected Iterator<S> starts;
-    protected E nextEnd;
-    protected boolean done = false;
+    private E nextEnd;
+    private boolean available = false;
 
     public void setStarts(final Iterator<S> starts) {
         this.starts = starts;
-        this.setNext();
     }
 
     public void remove() {
@@ -22,20 +21,31 @@ public abstract class AbstractPipe<S, E> implements Pipe<S, E> {
     }
 
     public E next() {
-        if (this.done) {
-            throw new NoSuchElementException();
+        if (this.available) {
+            this.available = false;
+            return this.nextEnd;
         } else {
-            E end = this.nextEnd;
-            this.setNext();
-            return end;
+            this.nextEnd = processNextStart();
+            this.available = true;
+            return this.next();
         }
     }
 
     public boolean hasNext() {
-        return !done;
+        if (this.available)
+            return true;
+        else {
+            try {
+                this.nextEnd = processNextStart();
+                this.available = true;
+                return this.hasNext();
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+        }
     }
 
-    protected void setNext() {
+    protected E processNextStart() throws NoSuchElementException {
         throw new RuntimeException("Override this method in the child class");
     }
 

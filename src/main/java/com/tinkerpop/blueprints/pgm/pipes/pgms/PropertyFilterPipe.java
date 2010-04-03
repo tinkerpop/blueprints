@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.pipes.filters.AbstractFilterPipe;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -20,21 +21,19 @@ public class PropertyFilterPipe<S extends Element, T> extends AbstractFilterPipe
         this.filter = filter;
     }
 
-    protected void setNext() {
+    protected S processNextStart() {
         while (this.starts.hasNext()) {
             S element = this.starts.next();
             if (this.filter) {
                 if (!this.doesContain(this.values, (T) element.getProperty(this.key))) {
-                    this.nextEnd = element;
-                    return;
+                    return element;
                 }
             } else {
                 if (this.doesContain(this.values, (T) element.getProperty(this.key))) {
-                    this.nextEnd = element;
-                    return;
+                   return element;
                 }
             }
         }
-        this.done = true;
+        throw new NoSuchElementException();
     }
 }

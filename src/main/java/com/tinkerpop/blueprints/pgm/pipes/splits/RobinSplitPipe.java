@@ -12,17 +12,13 @@ public class RobinSplitPipe<S> extends AbstractSplitPipe<S> {
     }
 
     public void fillNext(int splitNumber) {
-        if (!done) {
-            for (int i = 0; i < numberOfSplits; i++) {
-                if (this.hasNext()) {
-                    this.splits[currentSplit].add(this.next());
-                    currentSplit = ++currentSplit % numberOfSplits;
-                } else {
-                    break;
-                }
+        for (int i = 0; i < numberOfSplits; i++) {
+            if (this.hasNext()) {
+                this.splits[currentSplit].add(this.next());
+                currentSplit = ++currentSplit % numberOfSplits;
+            } else {
+                break;
             }
         }
     }
-
-
 }

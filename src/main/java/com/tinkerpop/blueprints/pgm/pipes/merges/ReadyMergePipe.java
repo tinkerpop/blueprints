@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.pipes.AbstractPipe;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -23,29 +24,31 @@ public class ReadyMergePipe<S> extends AbstractPipe<Iterator<S>, S> {
             this.threads.add(thread);
             new Thread(thread).start();
         }
-        this.setNext();
     }
 
-    public void setNext() {
+    protected S processNextStart() {
         if (!this.queue.isEmpty()) {
-            this.nextEnd = this.queue.remove();
+            return this.queue.remove();
         } else {
-            this.done = true;
+            boolean allDone = true;
             for (ThreadedPull thread : threads) {
                 if (!thread.isDone()) {
-                    this.done = false;
-                    break;
+                    allDone = false;
                 }
             }
-            if (!this.done) {
+            if (allDone)
+                throw new NoSuchElementException();
+            else {
+
                 try {
                     synchronized (monitor) {
-                        monitor.wait(0,500);
+                        monitor.wait(0, 500);
                     }
                 } catch (InterruptedException e) {
                 }
-                this.setNext();
+                return this.processNextStart();
             }
+
         }
     }
 

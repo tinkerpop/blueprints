@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipes.filters;
 
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -15,22 +16,20 @@ public class ObjectFilterPipe<S> extends AbstractFilterPipe<S, S> {
         this.filter = filter;
     }
 
-    protected void setNext() {
+    protected S processNextStart() {
         while (this.starts.hasNext()) {
-            S object = this.starts.next();
+            S tempEnd = this.starts.next();
             if (this.filter) {
-                if (!this.doesContain(this.objects, object)) {
-                    this.nextEnd = object;
-                    return;
+                if (!this.doesContain(this.objects, tempEnd)) {
+                    return tempEnd;
                 }
             } else {
-                if (this.doesContain(this.objects, object)) {
-                    this.nextEnd = object;
-                    return;
+                if (this.doesContain(this.objects, tempEnd)) {
+                    return tempEnd;
                 }
             }
         }
-        this.done = true;
+        throw new NoSuchElementException();
     }
 
 }
