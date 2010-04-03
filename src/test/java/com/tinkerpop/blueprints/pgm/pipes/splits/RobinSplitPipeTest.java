@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.pipes.splits;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.pipes.PipeHelper;
-import com.tinkerpop.blueprints.pgm.pipes.splits.RobinSplitPipe;
-import com.tinkerpop.blueprints.pgm.pipes.splits.SplitPipe;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,5 @@
 package com.tinkerpop.blueprints.pgm.pipes.splits;
 
-import com.tinkerpop.blueprints.pgm.pipes.splits.SplitPipe;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;

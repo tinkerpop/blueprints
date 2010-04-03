@@ -29,7 +29,7 @@ public class ThreadedPipe<S> extends AbstractPipe<S, S> {
 
     protected void setNext() {
         if (this.buffer.getDead() == this.pipeThreads.size() && !this.buffer.isAvailable())
-           this.done = true;
+            this.done = true;
         else
             this.nextEnd = buffer.get();
     }

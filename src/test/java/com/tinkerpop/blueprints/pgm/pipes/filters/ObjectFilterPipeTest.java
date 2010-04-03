@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.pipes.filters;
 
 import com.tinkerpop.blueprints.pgm.pipes.Pipe;
-import com.tinkerpop.blueprints.pgm.pipes.filters.ObjectFilterPipe;
 import junit.framework.TestCase;
 
 import java.util.Arrays;

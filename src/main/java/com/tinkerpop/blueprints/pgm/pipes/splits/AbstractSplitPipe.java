@@ -1,8 +1,6 @@
 package com.tinkerpop.blueprints.pgm.pipes.splits;
 
 import com.tinkerpop.blueprints.pgm.pipes.AbstractPipe;
-import com.tinkerpop.blueprints.pgm.pipes.splits.SplitPipe;
-import com.tinkerpop.blueprints.pgm.pipes.splits.SplitQueue;
 
 import java.util.Iterator;
 

@@ -1,7 +1,5 @@
 package com.tinkerpop.blueprints.pgm.pipes.splits;
 
-import com.tinkerpop.blueprints.pgm.pipes.splits.AbstractSplitPipe;
-
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */

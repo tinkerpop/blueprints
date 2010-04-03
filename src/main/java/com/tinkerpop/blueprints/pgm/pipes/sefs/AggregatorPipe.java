@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.pipes.sefs;
 
 import com.tinkerpop.blueprints.pgm.pipes.AbstractPipe;
-import com.tinkerpop.blueprints.pgm.pipes.sefs.SideEffectPipe;
 
 import java.util.Collection;
 import java.util.Iterator;

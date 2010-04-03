@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.pipes.sefs;
 
-import com.tinkerpop.blueprints.pgm.pipes.sefs.CountPipe;
 import junit.framework.TestCase;
 
 import java.util.Arrays;

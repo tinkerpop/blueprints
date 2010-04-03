@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.pipes.pgms;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
-import com.tinkerpop.blueprints.pgm.pipes.pgms.EdgeVertexPipe;
 import junit.framework.TestCase;
 
 import java.util.NoSuchElementException;

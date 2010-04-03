@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.pipes.merges;
 
-import com.tinkerpop.blueprints.pgm.pipes.merges.ExhaustiveMergePipe;
 import junit.framework.TestCase;
 
 import java.util.Arrays;
@@ -19,13 +18,13 @@ public class ExhaustiveMergePipeTest extends TestCase {
         pipe.setStarts(Arrays.asList(marko.iterator(), peter.iterator(), josh.iterator()).iterator());
         assertTrue(pipe.hasNext());
         int counter = 0;
-        while(pipe.hasNext()) {
+        while (pipe.hasNext()) {
             counter++;
             String name = pipe.next();
             //System.out.println(name);
             assertTrue(marko.contains(name) || peter.contains(name) || josh.contains(name));
         }
-        assertEquals(counter,7);
+        assertEquals(counter, 7);
     }
 
     public void testMergePipeEmpties() {
@@ -36,12 +35,12 @@ public class ExhaustiveMergePipeTest extends TestCase {
         pipe.setStarts(Arrays.asList(marko.iterator(), peter.iterator(), josh.iterator()).iterator());
         assertTrue(pipe.hasNext());
         int counter = 0;
-        while(pipe.hasNext()) {
+        while (pipe.hasNext()) {
             counter++;
             String name = pipe.next();
             assertTrue(marko.contains(name) || peter.contains(name) || josh.contains(name));
         }
-        assertEquals(counter,2);
+        assertEquals(counter, 2);
     }
 
     public void testMergePipeAllEmpties() {
@@ -52,11 +51,11 @@ public class ExhaustiveMergePipeTest extends TestCase {
         pipe.setStarts(Arrays.asList(marko.iterator(), peter.iterator(), josh.iterator()).iterator());
         assertFalse(pipe.hasNext());
         int counter = 0;
-        while(pipe.hasNext()) {
+        while (pipe.hasNext()) {
             counter++;
             pipe.next();
         }
-        assertEquals(counter,0);
+        assertEquals(counter, 0);
     }
 
 }

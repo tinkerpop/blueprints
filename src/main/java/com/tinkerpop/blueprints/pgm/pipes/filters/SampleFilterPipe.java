@@ -19,7 +19,7 @@ public class SampleFilterPipe<S> extends AbstractPipe<S, S> {
     protected void setNext() {
         if (this.starts.hasNext()) {
             S temp = this.starts.next();
-            if(bias >= RANDOM.nextDouble()) {
+            if (bias >= RANDOM.nextDouble()) {
                 this.nextEnd = temp;
             } else {
                 this.setNext();

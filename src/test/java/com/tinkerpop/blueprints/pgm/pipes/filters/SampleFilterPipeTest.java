@@ -9,10 +9,10 @@ import com.tinkerpop.blueprints.pgm.pipes.Pipe;
 public class SampleFilterPipeTest extends BaseTest {
 
     public void testSampleFilterPipe() {
-        Pipe<String,String> pipe = new SampleFilterPipe<String>(1.0d);
+        Pipe<String, String> pipe = new SampleFilterPipe<String>(1.0d);
         pipe.setStarts(generateUUIDs(100).iterator());
         int counter = 0;
-        while(pipe.hasNext()) {
+        while (pipe.hasNext()) {
             counter++;
             pipe.next();
         }
@@ -21,7 +21,7 @@ public class SampleFilterPipeTest extends BaseTest {
         pipe = new SampleFilterPipe<String>(0.0d);
         pipe.setStarts(generateUUIDs(100).iterator());
         counter = 0;
-        while(pipe.hasNext()) {
+        while (pipe.hasNext()) {
             counter++;
             pipe.next();
         }
@@ -29,10 +29,10 @@ public class SampleFilterPipeTest extends BaseTest {
     }
 
     public void testSampleFilterPipe5050() {
-        Pipe<String,String> pipe = new SampleFilterPipe<String>(0.5d);
+        Pipe<String, String> pipe = new SampleFilterPipe<String>(0.5d);
         pipe.setStarts(generateUUIDs(1000).iterator());
         int counter = 0;
-        while(pipe.hasNext()) {
+        while (pipe.hasNext()) {
             counter++;
             pipe.next();
         }

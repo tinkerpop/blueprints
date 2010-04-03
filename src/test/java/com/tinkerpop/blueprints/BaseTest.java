@@ -17,7 +17,7 @@ public class BaseTest extends TestCase {
 
     public static List<String> generateUUIDs(int number) {
         List<String> uuids = new ArrayList<String>();
-        for(int i=0; i<number; i++) {
+        for (int i = 0; i < number; i++) {
             uuids.add(UUID.randomUUID().toString());
         }
         return uuids;

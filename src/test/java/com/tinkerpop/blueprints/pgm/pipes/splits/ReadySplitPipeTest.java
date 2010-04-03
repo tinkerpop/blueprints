@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.pipes.splits;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.pipes.PipeHelper;
-import com.tinkerpop.blueprints.pgm.pipes.splits.ReadySplitPipe;
-import com.tinkerpop.blueprints.pgm.pipes.splits.SplitPipe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +27,7 @@ public class ReadySplitPipeTest extends BaseTest {
         assertEquals(end2.size(), 0);
         assertEquals(end3.size(), 0);
 
-        for(int i=0; i<starts.size(); i++) {
+        for (int i = 0; i < starts.size(); i++) {
             assertEquals(end1.get(i), starts.get(i));
         }
     }
