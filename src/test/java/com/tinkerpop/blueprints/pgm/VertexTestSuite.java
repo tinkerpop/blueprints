@@ -55,7 +55,7 @@ public class VertexTestSuite extends ModelTestSuite {
             set.add(graph.getVertex(convertId(ids.get(0))));
             if (config.supportsVertexIndex)
                 set.add(graph.getVertices().iterator().next());
-            assertEquals(set.size(), 1);
+            assertEquals(1, set.size());
         }
 
     }
