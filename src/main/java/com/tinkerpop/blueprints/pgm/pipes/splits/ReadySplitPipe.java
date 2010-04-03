@@ -5,17 +5,13 @@ package com.tinkerpop.blueprints.pgm.pipes.splits;
  */
 public class ReadySplitPipe<S> extends AbstractSplitPipe<S> {
 
-    protected int currentSplit = 0;
-
     public ReadySplitPipe(final int numberOfSplits) {
         super(numberOfSplits);
     }
 
     public void fillNext(int splitNumber) {
-        if (!done) {
-            if (this.hasNext()) {
-                this.splits[splitNumber].add(this.next());
-            }
+        if (this.hasNext()) {
+            this.splits[splitNumber].add(this.next());
         }
     }
 }

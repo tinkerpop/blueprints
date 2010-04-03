@@ -23,6 +23,14 @@ public class BaseTest extends TestCase {
         return uuids;
     }
 
+    public static List<String> generateUUIDs(String prefix, int number) {
+        List<String> uuids = new ArrayList<String>();
+        for (int i = 0; i < number; i++) {
+            uuids.add(prefix + UUID.randomUUID().toString());
+        }
+        return uuids;
+    }
+
     public static void printCollection(final Collection collection) {
         for (Object o : collection) {
             System.out.println(o);
