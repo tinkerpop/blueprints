@@ -26,7 +26,6 @@ public abstract class AbstractSplitPipe<S> extends AbstractPipe<S, S> implements
 
     public void setStarts(final Iterator<S> starts) {
         super.setStarts(starts);
-        this.fillNext(0);
     }
 
     protected S processNextStart() {

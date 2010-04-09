@@ -19,6 +19,10 @@ public class ReadySplitPipeTest extends BaseTest {
         List<String> end2 = new ArrayList<String>();
         List<String> end3 = new ArrayList<String>();
 
+        assertTrue(pipe.hasNext());
+        assertTrue(pipe.getSplit(0).hasNext());
+        //assertTrue(pipe.getSplit(1).hasNext());
+        //assertTrue(pipe.getSplit(2).hasNext());
         PipeHelper.fillCollection(pipe.getSplit(0), end1);
         PipeHelper.fillCollection(pipe.getSplit(1), end2);
         PipeHelper.fillCollection(pipe.getSplit(2), end3);

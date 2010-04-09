@@ -27,7 +27,15 @@ public class SplitQueue<S> implements Iterator<S> {
     }
 
     public synchronized boolean hasNext() {
-        return !queue.isEmpty();
+        if (!queue.isEmpty()) {
+            return true;
+        } else {
+            if (this.splitPipe.hasNext()) {
+                this.splitPipe.fillNext(this.splitNumber);
+                return true;
+            } else
+                return false;
+        }
     }
 
     public synchronized S next() {

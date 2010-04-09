@@ -30,7 +30,7 @@ public class PipelineTest extends TestCase {
             assertTrue(e.getInVertex().getId().equals("4") || e.getInVertex().getId().equals("2") || e.getInVertex().getId().equals("3"));
             counter++;
         }
-        assertEquals(counter, 3);
+        assertEquals(3, counter);
 
 
     }
@@ -49,7 +49,7 @@ public class PipelineTest extends TestCase {
             assertEquals(pipeline.next().getId(), "3");
             counter++;
         }
-        assertEquals(counter, 1);
+        assertEquals(1, counter);
 
         vep = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
         lfp = new LabelFilterPipe(Arrays.asList("created"), true);
@@ -63,7 +63,7 @@ public class PipelineTest extends TestCase {
             assertTrue(v.getId().equals("4") || v.getId().equals("2"));
             counter++;
         }
-        assertEquals(counter, 2);
+        assertEquals(2, counter);
         try {
             pipeline.next();
             assertTrue(false);
@@ -73,8 +73,7 @@ public class PipelineTest extends TestCase {
 
     }
 
-    // TODO MAKE THIS WORK!
-    /*public void testPipelineResuse() {
+    public void testPipelineResuse() {
         Graph graph = TinkerGraphFactory.createTinkerGraph();
         Vertex marko = graph.getVertex("1");
         Pipe vep = new VertexEdgePipe(VertexEdgePipe.Step.OUT_EDGES);
@@ -87,7 +86,7 @@ public class PipelineTest extends TestCase {
             counter++;
             pipeline.next();
         }
-        assertEquals(counter, 1);
+        assertEquals(1, counter);
 
         pipeline.setStarts(Arrays.asList(marko).iterator());
         assertTrue(pipeline.hasNext());
@@ -96,13 +95,13 @@ public class PipelineTest extends TestCase {
             counter++;
             pipeline.next();
         }
-        assertEquals(counter, 3);
+        assertEquals(5, counter);
         try {
             pipeline.next();
             assertTrue(false);
         } catch (NoSuchElementException e) {
             assertFalse(false);
         }
-    }*/
+    }
 
 }

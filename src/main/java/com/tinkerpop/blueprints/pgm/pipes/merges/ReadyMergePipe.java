@@ -30,16 +30,18 @@ public class ReadyMergePipe<S> extends AbstractPipe<Iterator<S>, S> {
         if (!this.queue.isEmpty()) {
             return this.queue.remove();
         } else {
+
             boolean allDone = true;
             for (ThreadedPull thread : threads) {
                 if (!thread.isDone()) {
                     allDone = false;
+
                 }
             }
-            if (allDone)
+            if (allDone) {
                 throw new NoSuchElementException();
+            }
             else {
-
                 try {
                     synchronized (monitor) {
                         monitor.wait(0, 500);
@@ -69,6 +71,7 @@ public class ReadyMergePipe<S> extends AbstractPipe<Iterator<S>, S> {
                 synchronized (monitor) {
                     monitor.notify();
                 }
+                Thread.yield();
             }
             this.done = true;
         }

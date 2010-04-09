@@ -8,8 +8,8 @@ import java.util.List;
  */
 public class Pipeline<S, E> implements Pipe<S, E> {
 
-    protected List<Pipe> pipes;
-    protected Pipe<?, E> endPipe;
+    private Pipe<S, ?> startPipe;
+    private Pipe<?, E> endPipe;
 
     public Pipeline(final List<Pipe> pipes) {
         this.setPipes(pipes);
@@ -18,16 +18,16 @@ public class Pipeline<S, E> implements Pipe<S, E> {
     public Pipeline() {
     }
 
-    protected void setPipes(final List<Pipe> pipes) {
-        this.pipes = pipes;
-        this.endPipe = pipes.get(this.pipes.size() - 1);
-    }
-
-    public void setStarts(final Iterator<S> starts) {
-        pipes.get(0).setStarts(starts);
+    public void setPipes(final List<Pipe> pipes) {
+        this.startPipe = pipes.get(0);
+        this.endPipe = pipes.get(pipes.size() - 1);
         for (int i = 1; i < pipes.size(); i++) {
             pipes.get(i).setStarts(pipes.get(i - 1));
         }
+    }
+
+    public void setStarts(final Iterator<S> starts) {
+        startPipe.setStarts(starts);
     }
 
     public void remove() {
