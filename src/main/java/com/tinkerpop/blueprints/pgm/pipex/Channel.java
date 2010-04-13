@@ -6,7 +6,6 @@ package com.tinkerpop.blueprints.pgm.pipex;
 public interface Channel<T> {
 
     public T read();
-    public boolean write(T t);
+    public void write(T t);
     public void close();
-    public boolean isComplete();
 }

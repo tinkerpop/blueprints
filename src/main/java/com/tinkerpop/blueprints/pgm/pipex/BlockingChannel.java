@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.pipex;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -10,6 +9,7 @@ public class BlockingChannel<T> implements Channel<T> {
 
     private final LinkedBlockingQueue<T> queue;
     private boolean open = true;
+    private final Object monitor = new Object();
 
     public BlockingChannel(int capacity) {
         this.queue = new LinkedBlockingQueue<T>(capacity);
@@ -17,7 +17,16 @@ public class BlockingChannel<T> implements Channel<T> {
 
     public T read() {
         try {
-            return this.queue.poll(100, TimeUnit.MILLISECONDS);
+            synchronized (this.monitor) {
+                if (!this.queue.isEmpty())
+                    return this.queue.take();
+                else if (!this.open)
+                    return null;
+                else {
+                    this.monitor.wait();
+                    return this.read();
+                }
+            }
         } catch (InterruptedException e) {
             this.close();
             e.printStackTrace();
@@ -25,22 +34,22 @@ public class BlockingChannel<T> implements Channel<T> {
         }
     }
 
-    public boolean write(T t) {
+    public void write(T t) {
         try {
-            return this.queue.offer(t, 100, TimeUnit.MILLISECONDS);
+            this.queue.put(t);
+            synchronized (this.monitor) {
+                this.monitor.notifyAll();
+            }
         } catch (InterruptedException e) {
             this.close();
             e.printStackTrace();
-            return false;
         }
     }
 
     public void close() {
-        this.open = false;
+        synchronized (this.monitor) {
+            this.open = false;
+            this.monitor.notifyAll();
+        }
     }
-
-    public boolean isComplete() {
-        return !this.open && this.queue.isEmpty();
-    }
-
 }

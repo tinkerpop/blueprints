@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipex.pgm;
 
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.pipex.Channel;
 import com.tinkerpop.blueprints.pgm.pipex.SerialProcess;
 
 import java.util.Collection;
@@ -15,21 +16,31 @@ public class PropertyFilterProcess<T> extends SerialProcess<Element, Element> {
     private final boolean filter;
 
     public PropertyFilterProcess(final String key, final Collection<T> values, final boolean filter) {
+        this(key, values, filter, null, null);
+    }
+
+    public PropertyFilterProcess(final String key, final Collection<T> values, final boolean filter, Channel<Element> inChannel, Channel<Element> outChannel) {
+        super(inChannel, outChannel);
         this.key = key;
         this.values = values;
         this.filter = filter;
     }
 
-    public void step() {
-        Element element = inputChannel.read();
-        if (filter) {
-            if (!this.values.contains(element.getProperty(key))) {
-                this.outputChannel.write(element);
+    public boolean step() {
+        Element element = inChannel.read();
+        if (null != element) {
+            if (filter) {
+                if (!this.values.contains(element.getProperty(key))) {
+                    this.outChannel.write(element);
+                }
+            } else {
+                if (this.values.contains(element.getProperty(key))) {
+                    this.outChannel.write(element);
+                }
             }
+            return true;
         } else {
-            if (this.values.contains(element.getProperty(key))) {
-                this.outputChannel.write(element);
-            }
+            return false;
         }
     }
 

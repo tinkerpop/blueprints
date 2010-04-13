@@ -11,16 +11,16 @@ public class SerialComposition<S, E> extends SerialProcess<S, E> {
     ExecutorService executor;
 
     public SerialComposition(ExecutorService executor, int capacity, Channel inputChannel, Channel outputChannel, SerialProcess... processes) {
-        this.inputChannel = inputChannel;
-        this.outputChannel = outputChannel;
+        this.inChannel = inputChannel;
+        this.outChannel = outputChannel;
         this.processes = processes;
         this.executor = executor;
-        processes[0].setInputChannel(this.inputChannel);
-        processes[processes.length - 1].setOutputChannel(this.outputChannel);
+        processes[0].setInChannel(this.inChannel);
+        processes[processes.length - 1].setOutChannel(this.outChannel);
         for (int i = 1; i < processes.length; i++) {
             Channel channel = new BlockingChannel(capacity);
-            processes[i - 1].setOutputChannel(channel);
-            processes[i].setInputChannel(channel);
+            processes[i - 1].setOutChannel(channel);
+            processes[i].setInChannel(channel);
         }
     }
 

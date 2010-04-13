@@ -6,38 +6,46 @@ package com.tinkerpop.blueprints.pgm.pipex;
  */
 public abstract class SerialProcess<S, E> extends AbstractProcess {
 
-    protected Channel<S> inputChannel;
-    protected Channel<E> outputChannel;
+    protected Channel<S> inChannel;
+    protected Channel<E> outChannel;
 
-    public void setInputChannel(Channel<S> inputChannel) {
-        this.inputChannel = inputChannel;
+    public SerialProcess() {
+
     }
 
-    public void setOutputChannel(Channel<E> outputChannel) {
-        this.outputChannel = outputChannel;
+    public SerialProcess(final Channel<S> inChannel, final Channel<E> outChannel) {
+        this.inChannel = inChannel;
+        this.outChannel = outChannel;
     }
 
-    public Channel<S> getInputChannel() {
-        return this.inputChannel;
+    public void setInChannel(Channel<S> inChannel) {
+        this.inChannel = inChannel;
     }
 
-    public Channel<E> getOutputChannel() {
-        return this.outputChannel;
+    public void setOutChannel(Channel<E> outChannel) {
+        this.outChannel = outChannel;
+    }
+
+    public Channel<S> getInChannel() {
+        return this.inChannel;
+    }
+
+    public Channel<E> getOutChannel() {
+        return this.outChannel;
     }
 
     public void run() {
         this.onStart();
-        while (!this.inputChannel.isComplete()) {
-            this.step();
+        while (this.step()) {
             Thread.yield();
         }
-        this.outputChannel.close();
+        this.outChannel.close();
         this.onStop();
     }
 
 
-    public void step() {
-        throw new UnsupportedOperationException();
+    public boolean step() {
+        throw new UnsupportedOperationException("Implement in all non-abstract extending classes");
     }
 
 }

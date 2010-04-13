@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.pgm.pipex.BlockingChannel;
-import com.tinkerpop.blueprints.pgm.pipex.Channel;
 import junit.framework.TestCase;
 
 import java.util.concurrent.ExecutorService;
@@ -16,52 +15,49 @@ import java.util.concurrent.Executors;
  */
 public class EdgeVertexProcessTest extends TestCase {
 
-    public void testInCommingVertex() {
+    public void testInCommingVertex() throws Exception {
         Graph graph = TinkerGraphFactory.createTinkerGraph();
         Vertex marko = graph.getVertex("1");
-        Channel<Edge> in = new BlockingChannel<Edge>(50);
-        Channel<Vertex> out = new BlockingChannel<Vertex>(50);
-        EdgeVertexProcess evp = new EdgeVertexProcess(EdgeVertexProcess.Step.IN_VERTEX);
-        evp.setInputChannel(in);
-        evp.setOutputChannel(out);
-        for (Edge edge : marko.getOutEdges()) {
-            in.write(edge);
-        }
+        EdgeVertexProcess evp = new EdgeVertexProcess(EdgeVertexProcess.Step.IN_VERTEX, new BlockingChannel<Edge>(1), new BlockingChannel<Vertex>(1));
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(evp);
-        in.close();
-
-        int counter = 0;
-        while (!out.isComplete()) {
-            Vertex v = out.read();
-            if (null != v) {
-                assertTrue(v.getId().equals("2") || v.getId().equals("3") || v.getId().equals("4"));
-                counter++;
-            }
+        for (Edge edge : marko.getOutEdges()) {
+            evp.getInChannel().write(edge);
         }
+        evp.getInChannel().close();
+        int counter = 0;
+        Vertex v = evp.getOutChannel().read();
+        while (null != v) {
+            System.out.println(v);
+            assertTrue(v.getId().equals("2") || v.getId().equals("3") || v.getId().equals("4"));
+            counter++;
+            v = evp.getOutChannel().read();
+        }
+        evp.getOutChannel().close();
+
         assertEquals(counter, 3);
         executor.shutdown();
-
+        System.out.println("---");
         Vertex josh = graph.getVertex("4");
-        in = new BlockingChannel<Edge>(50);
-        out = new BlockingChannel<Vertex>(50);
-        evp = new EdgeVertexProcess(EdgeVertexProcess.Step.IN_VERTEX);
-        evp.setInputChannel(in);
-        evp.setOutputChannel(out);
-        for (Edge edge : josh.getOutEdges()) {
-            in.write(edge);
-        }
-        executor = Executors.newFixedThreadPool(1);
+        evp = new EdgeVertexProcess(EdgeVertexProcess.Step.IN_VERTEX, new BlockingChannel<Edge>(50), new BlockingChannel<Vertex>(50));
+        executor = Executors.newFixedThreadPool(2);
         executor.execute(evp);
-        in.close();
-        counter = 0;
-        while (!out.isComplete()) {
-            Vertex v = out.read();
-            if (null != v) {
-                assertTrue(v.getId().equals("5") || v.getId().equals("3"));
-                counter++;
-            }
+
+        for (Edge edge : josh.getOutEdges()) {
+            evp.getInChannel().write(edge);
         }
+        evp.getInChannel().close();
+
+        counter = 0;
+        v = evp.getOutChannel().read();
+        while (null != v) {
+            System.out.println(v);
+            assertTrue(v.getId().equals("5") || v.getId().equals("3"));
+            counter++;
+            v = evp.getOutChannel().read();
+        }
+        evp.getOutChannel().close();
+
         assertEquals(counter, 2);
         executor.shutdown();
 

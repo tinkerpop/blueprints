@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.pipex.pgm;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.pipex.Channel;
 import com.tinkerpop.blueprints.pgm.pipex.SerialProcess;
 
 /**
@@ -16,19 +17,29 @@ public class VertexEdgeProcess extends SerialProcess<Vertex, Edge> {
     }
 
     public VertexEdgeProcess(final Step step) {
+        this(step, null, null);
+    }
+
+    public VertexEdgeProcess(final Step step, Channel<Vertex> inChannel, Channel<Edge> outChannel) {
+        super(inChannel, outChannel);
         this.step = step;
     }
 
-    public void step() {
-        Vertex vertex = inputChannel.read();
-        Iterable<Edge> edges;
-        if (this.step == Step.OUT_EDGES) {
-            edges = vertex.getOutEdges();
+    public boolean step() {
+        Vertex vertex = inChannel.read();
+        if (null != vertex) {
+            Iterable<Edge> edges;
+            if (this.step == Step.OUT_EDGES) {
+                edges = vertex.getOutEdges();
+            } else {
+                edges = vertex.getInEdges();
+            }
+            for (Edge edge : edges) {
+                this.outChannel.write(edge);
+            }
+            return true;
         } else {
-            edges = vertex.getInEdges();
-        }
-        for (Edge edge : edges) {
-            this.outputChannel.write(edge);
+            return false;
         }
     }
 }
