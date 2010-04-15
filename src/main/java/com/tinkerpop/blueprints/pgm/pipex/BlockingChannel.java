@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipex;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
@@ -8,24 +9,24 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BlockingChannel<T> implements Channel<T> {
 
     private final LinkedBlockingQueue<T> queue;
-    private boolean open = true;
-    private final Object monitor = new Object();
+    volatile private boolean open = true;
+    private final Semaphore semaphore = new Semaphore(1, true);
 
-    public BlockingChannel(int capacity) {
+    public BlockingChannel(final int capacity) {
         this.queue = new LinkedBlockingQueue<T>(capacity);
     }
 
     public T read() {
         try {
-            synchronized (this.monitor) {
-                if (!this.queue.isEmpty())
-                    return this.queue.take();
-                else if (!this.open)
-                    return null;
-                else {
-                    this.monitor.wait();
-                    return this.read();
-                }
+            semaphore.acquire();
+            if (!this.queue.isEmpty()) {
+                return this.queue.take();
+            }
+            else if (!this.open) {
+                return null;
+            }
+            else {
+                return this.read();
             }
         } catch (InterruptedException e) {
             this.close();
@@ -34,12 +35,10 @@ public class BlockingChannel<T> implements Channel<T> {
         }
     }
 
-    public void write(T t) {
+    public void write(final T t) {
         try {
             this.queue.put(t);
-            synchronized (this.monitor) {
-                this.monitor.notifyAll();
-            }
+            this.semaphore.release();
         } catch (InterruptedException e) {
             this.close();
             e.printStackTrace();
@@ -47,9 +46,7 @@ public class BlockingChannel<T> implements Channel<T> {
     }
 
     public void close() {
-        synchronized (this.monitor) {
-            this.open = false;
-            this.monitor.notifyAll();
-        }
+        this.open = false;
+        this.semaphore.release();
     }
 }

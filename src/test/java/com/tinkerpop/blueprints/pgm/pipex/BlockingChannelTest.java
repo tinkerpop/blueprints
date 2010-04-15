@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm.pipex;
 
+import com.tinkerpop.blueprints.pgm.pipex.util.ChannelReader;
+import com.tinkerpop.blueprints.pgm.pipex.util.IdempotentProcess;
 import junit.framework.TestCase;
 
 import java.util.UUID;
@@ -63,40 +65,41 @@ public class BlockingChannelTest extends TestCase {
         }
     }
 
-    public class ChannelReader implements Runnable {
-        private final Channel channel;
-        private int counter = 0;
-        private boolean complete = false;
-        private final Object monitor = new Object();
-
-        public ChannelReader(Channel channel) {
-            this.channel = channel;
+    public void testMultipleReaders() {
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        SerialProcess<String, String> process = new IdempotentProcess<String>(new BlockingChannel<String>(10), new BlockingChannel<String>(10));
+        ChannelReader<String> reader1 = new ChannelReader<String>(process.getOutChannel());
+        ChannelReader<String> reader2 = new ChannelReader<String>(process.getOutChannel());
+        executor.execute(reader1);
+        executor.execute(reader2);
+        executor.execute(process);
+        for (int k = 0; k < 100; k++) {
+            process.getInChannel().write(UUID.randomUUID().toString());
         }
+        process.getInChannel().close();
+        assertEquals(reader1.getCounter() + reader2.getCounter(), 100);
+        executor.shutdown();
 
-        public void run() {
-            while (null != channel.read()) {
-                this.counter++;
-            }
-            channel.close();
-
-            synchronized (this.monitor) {
-                this.complete = true;
-                this.monitor.notifyAll();
-            }
-        }
-
-        public int getCounter() {
-            try {
-                synchronized (this.monitor) {
-                    if (!this.complete) {
-                        this.monitor.wait();
-                    }
-                }
-            } catch (InterruptedException e) {
-
-            }
-            return this.counter;
-        }
     }
 
+    public void testMultipleWriters() {
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        //Channel<String> in = new BlockingChannel<String>(10);
+        Channel<String> out = new BlockingChannel<String>(10);
+        SerialProcess<String, String> process1 = new IdempotentProcess<String>(new BlockingChannel<String>(10), out);
+        SerialProcess<String, String> process2 = new IdempotentProcess<String>(new BlockingChannel<String>(10), out);
+        ChannelReader<String> reader1 = new ChannelReader<String>(out);
+        executor.execute(reader1);
+        executor.execute(process1);
+        executor.execute(process2);
+        for (int k = 0; k < 100; k++) {
+            process1.getInChannel().write(UUID.randomUUID().toString());
+            process2.getInChannel().write(UUID.randomUUID().toString());
+        }
+        process1.getInChannel().close();
+        process2.getInChannel().close();
+        assertEquals(reader1.getCounter(), 200);
+        executor.shutdown();
+
+    }
 }

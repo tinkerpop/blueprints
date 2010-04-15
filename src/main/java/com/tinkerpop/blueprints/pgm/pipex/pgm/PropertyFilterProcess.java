@@ -19,7 +19,7 @@ public class PropertyFilterProcess<T> extends SerialProcess<Element, Element> {
         this(key, values, filter, null, null);
     }
 
-    public PropertyFilterProcess(final String key, final Collection<T> values, final boolean filter, Channel<Element> inChannel, Channel<Element> outChannel) {
+    public PropertyFilterProcess(final String key, final Collection<T> values, final boolean filter, final Channel<Element> inChannel, final Channel<Element> outChannel) {
         super(inChannel, outChannel);
         this.key = key;
         this.values = values;

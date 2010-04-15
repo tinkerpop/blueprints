@@ -18,7 +18,7 @@ public class LabelFilterProcess extends SerialProcess<Edge, Edge> {
         this(labels, filter, null, null);
     }
 
-    public LabelFilterProcess(final Collection<String> labels, final boolean filter, Channel<Edge> inChannel, Channel<Edge> outChannel) {
+    public LabelFilterProcess(final Collection<String> labels, final boolean filter, final Channel<Edge> inChannel, final Channel<Edge> outChannel) {
         super(inChannel, outChannel);
         this.labels = labels;
         this.filter = filter;

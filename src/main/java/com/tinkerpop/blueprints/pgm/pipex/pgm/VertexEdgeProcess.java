@@ -20,7 +20,7 @@ public class VertexEdgeProcess extends SerialProcess<Vertex, Edge> {
         this(step, null, null);
     }
 
-    public VertexEdgeProcess(final Step step, Channel<Vertex> inChannel, Channel<Edge> outChannel) {
+    public VertexEdgeProcess(final Step step, final Channel<Vertex> inChannel, final Channel<Edge> outChannel) {
         super(inChannel, outChannel);
         this.step = step;
     }

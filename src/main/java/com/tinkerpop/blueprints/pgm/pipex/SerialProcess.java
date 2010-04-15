@@ -18,11 +18,11 @@ public abstract class SerialProcess<S, E> extends AbstractProcess {
         this.outChannel = outChannel;
     }
 
-    public void setInChannel(Channel<S> inChannel) {
+    public void setInChannel(final Channel<S> inChannel) {
         this.inChannel = inChannel;
     }
 
-    public void setOutChannel(Channel<E> outChannel) {
+    public void setOutChannel(final Channel<E> outChannel) {
         this.outChannel = outChannel;
     }
 
@@ -37,7 +37,7 @@ public abstract class SerialProcess<S, E> extends AbstractProcess {
     public void run() {
         this.onStart();
         while (this.step()) {
-            Thread.yield();
+            //Thread.yield();
         }
         this.outChannel.close();
         this.onStop();

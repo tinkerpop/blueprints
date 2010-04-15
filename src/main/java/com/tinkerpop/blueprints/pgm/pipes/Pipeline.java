@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * @author: Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Pipeline<S, E> implements Pipe<S, E> {
+public class Pipeline<S, E> implements Pipe<S,E> {
 
     private Pipe<S, ?> startPipe;
     private Pipe<?, E> endPipe;

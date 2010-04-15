@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.pgm.pipex;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -7,26 +10,30 @@ import java.util.concurrent.ExecutorService;
  */
 public class SerialComposition<S, E> extends SerialProcess<S, E> {
 
-    SerialProcess[] processes;
-    ExecutorService executor;
+    private final List<SerialProcess> processes;
+    private final ExecutorService executor;
 
-    public SerialComposition(ExecutorService executor, int capacity, Channel inputChannel, Channel outputChannel, SerialProcess... processes) {
-        this.inChannel = inputChannel;
-        this.outChannel = outputChannel;
+    public SerialComposition(final ExecutorService executor, final int capacity, final Channel<S> inChannel, final Channel<E> outChannel, final List<SerialProcess> processes) {
+        this.inChannel = inChannel;
+        this.outChannel = outChannel;
         this.processes = processes;
         this.executor = executor;
-        processes[0].setInChannel(this.inChannel);
-        processes[processes.length - 1].setOutChannel(this.outChannel);
-        for (int i = 1; i < processes.length; i++) {
+        processes.get(0).setInChannel(this.inChannel);
+        processes.get(processes.size() - 1).setOutChannel(this.outChannel);
+        for (int i = 1; i < processes.size(); i++) {
             Channel channel = new BlockingChannel(capacity);
-            processes[i - 1].setOutChannel(channel);
-            processes[i].setInChannel(channel);
+            processes.get(i - 1).setOutChannel(channel);
+            processes.get(i).setInChannel(channel);
         }
+    }
+
+    public SerialComposition(final ExecutorService executor, final int capacity, final Channel<S> inChannel, final Channel<E> outChannel, final SerialProcess... processes) {
+        this(executor, capacity, inChannel, outChannel, new ArrayList<SerialProcess>(Arrays.asList(processes)));    
     }
 
     public void run() {
         for (Process process : this.processes) {
-            executor.execute(process);
+            this.executor.execute(process);
         }
     }
 
