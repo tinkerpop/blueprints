@@ -20,7 +20,7 @@ bc. <dependency>
 </dependency>
 
 * Updated GraphML writer to write all vertices and then all edges
-* Remove Blueprints Pipes BETA into a separate projected called Pipes
+* Removed Blueprints Pipes BETA and put it into a separate project
 
 ==<hr/>==
 
