@@ -14,7 +14,6 @@ Blueprints is a collection of abstract data models, their implementations, their
 The following is a list of extensions for the respective abstract data models:
 
 * Property Graph Model
-** "Blueprints Pipes Traversal Framework":http://wiki.github.com/tinkerpop/blueprints/pipes-traversal-framework
 ** "Java Universal/Graph Framework":http://jung.sourceforge.net/ connector
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
