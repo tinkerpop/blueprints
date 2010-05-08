@@ -19,8 +19,9 @@ bc. <dependency>
   <version>0.2-SNAPSHOT</version>
 </dependency>
 
-* Updated GraphML writer to write all vertices and then all edges
 * Removed Blueprints Pipes BETA and put it into a separate project
+* Neo4jGraph constructor can be passed in a Neo4j properties map
+* Updated GraphML writer to write all vertices and then all edges
 
 ==<hr/>==
 
