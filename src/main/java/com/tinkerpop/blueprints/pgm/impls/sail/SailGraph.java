@@ -112,7 +112,7 @@ public class SailGraph implements Graph {
 
     public Iterable<Edge> getEdges() {
         try {
-            return new SesameEdgeIterable(this.sailConnection.getStatements(null, null, null, false), this.sailConnection);
+            return new SesameEdgeSequence(this.sailConnection.getStatements(null, null, null, false), this.sailConnection);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -266,28 +266,13 @@ public class SailGraph implements Graph {
         return "sailgraph[" + type + "]";
     }
 
-    private class SesameEdgeIterable implements Iterable<Edge> {
+
+    private class SesameEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
 
         private CloseableIteration<? extends Statement, SailException> statements;
         private SailConnection sailConnection;
 
-        public SesameEdgeIterable(final CloseableIteration<? extends Statement, SailException> statements, final SailConnection sailConnection) {
-            this.statements = statements;
-            this.sailConnection = sailConnection;
-        }
-
-        public Iterator<Edge> iterator() {
-            return new SesameEdgeIterator(statements, sailConnection);
-        }
-
-    }
-
-    private class SesameEdgeIterator implements Iterator<Edge> {
-
-        private CloseableIteration<? extends Statement, SailException> statements;
-        private SailConnection sailConnection;
-
-        public SesameEdgeIterator(final CloseableIteration<? extends Statement, SailException> statements, final SailConnection sailConnection) {
+        public SesameEdgeSequence(final CloseableIteration<? extends Statement, SailException> statements, final SailConnection sailConnection) {
             this.statements = statements;
             this.sailConnection = sailConnection;
         }
@@ -315,6 +300,10 @@ public class SailGraph implements Graph {
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage());
             }
+        }
+
+        public Iterator<Edge> iterator() {
+            return this;
         }
     }
 

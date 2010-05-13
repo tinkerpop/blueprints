@@ -11,12 +11,12 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jVertexIterator implements Iterator<Vertex> {
+public class Neo4jVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
 
     Iterator<Node> nodes;
     Neo4jGraph graph;
 
-    public Neo4jVertexIterator(final Iterable<Node> nodes, final Neo4jGraph graph) {
+    public Neo4jVertexSequence(final Iterable<Node> nodes, final Neo4jGraph graph) {
         this.graph = graph;
         this.nodes = nodes.iterator();
     }
@@ -31,5 +31,9 @@ public class Neo4jVertexIterator implements Iterator<Vertex> {
 
     public boolean hasNext() {
         return this.nodes.hasNext();
+    }
+
+    public Iterator<Vertex> iterator() {
+        return this;
     }
 }

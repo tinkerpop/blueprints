@@ -4,7 +4,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 
@@ -20,11 +20,11 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
     }
 
     public Iterable<Edge> getOutEdges() {
-        return new Neo4jEdgeIterable(((Node) this.element).getRelationships(Direction.OUTGOING), this.graph);
+        return new Neo4jEdgeSequence(((Node) this.element).getRelationships(Direction.OUTGOING), this.graph);
     }
 
     public Iterable<Edge> getInEdges() {
-        return new Neo4jEdgeIterable(((Node) this.element).getRelationships(Direction.INCOMING), this.graph);
+        return new Neo4jEdgeSequence(((Node) this.element).getRelationships(Direction.INCOMING), this.graph);
     }
 
     public boolean equals(final Object object) {

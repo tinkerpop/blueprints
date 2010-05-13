@@ -52,7 +52,7 @@ public class TinkerGraph implements Graph {
     }
 
     public Iterable<Edge> getEdges() {
-        return new TinkerEdgeIterable(this.getVertices());
+        return new TinkerEdgeSequence(this.getVertices());
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -122,29 +122,19 @@ public class TinkerGraph implements Graph {
         return idString;
     }
 
-    private class TinkerEdgeIterable implements Iterable<Edge> {
-
-        private Iterable<Vertex> vertices;
-
-        public TinkerEdgeIterable(Iterable<Vertex> vertices) {
-            this.vertices = vertices;
-        }
-
-        public Iterator<Edge> iterator() {
-            return new TinkerEdgeIterator(this.vertices.iterator());
-        }
-    }
-
-    private class TinkerEdgeIterator implements Iterator<Edge> {
+    private class TinkerEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
 
         private Iterator<Vertex> vertices;
         private Iterator<Edge> currentEdges;
         private boolean complete = false;
 
-        public TinkerEdgeIterator(final Iterator<Vertex> vertices) {
+        public TinkerEdgeSequence(final Iterator<Vertex> vertices) {
             this.vertices = vertices;
             this.complete = this.goToNextEdge();
+        }
 
+        public TinkerEdgeSequence(final Iterable<Vertex> vertices) {
+            this(vertices.iterator());
         }
 
         public Edge next() {
@@ -176,6 +166,10 @@ public class TinkerGraph implements Graph {
                 return this.goToNextEdge();
             }
 
+        }
+
+        public Iterator<Edge> iterator() {
+            return this;
         }
     }
 }

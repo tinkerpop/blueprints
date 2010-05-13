@@ -4,13 +4,12 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeIterable;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexIterable;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.*;
 import org.neo4j.index.Isolation;
 import org.neo4j.index.lucene.LuceneIndexService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.neo4j.kernel.impl.transaction.TransactionFailureException;
 
 import java.io.File;
 import java.util.Map;
@@ -74,11 +73,11 @@ public class Neo4jGraph implements Graph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new Neo4jVertexIterable(this.neo.getAllNodes(), this);
+        return new Neo4jVertexSequence(this.neo.getAllNodes(), this);
     }
 
     public Iterable<Edge> getEdges() {
-        return new Neo4jGraphEdgeIterable(this.neo.getAllNodes(), this);
+        return new Neo4jGraphEdgeSequence(this.neo.getAllNodes(), this);
     }
 
     public void removeVertex(final Vertex vertex) {

@@ -11,12 +11,12 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jEdgeIterator implements Iterator<Edge> {
+public class Neo4jEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
 
     Iterator<Relationship> relationships;
     Neo4jGraph graph;
 
-    public Neo4jEdgeIterator(final Iterable<Relationship> relationships, final Neo4jGraph graph) {
+    public Neo4jEdgeSequence(final Iterable<Relationship> relationships, final Neo4jGraph graph) {
         this.graph = graph;
         this.relationships = relationships.iterator();
     }
@@ -31,5 +31,9 @@ public class Neo4jEdgeIterator implements Iterator<Edge> {
 
     public boolean hasNext() {
         return this.relationships.hasNext();
+    }
+
+    public Iterator<Edge> iterator() {
+        return this;
     }
 }
