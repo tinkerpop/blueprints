@@ -28,6 +28,10 @@ public class Neo4jIndex implements Index {
         this.indexKeys = new HashSet<String>();
     }
 
+    public IndexService getIndexService() {
+        return this.indexService;
+    }
+
     public void put(final String key, final Object value, final Element element) {
         if (this.indexAll || this.indexKeys.contains(key)) {
             if (element instanceof Neo4jVertex) {

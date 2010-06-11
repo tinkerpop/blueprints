@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.*;
-//import org.neo4j.index.Isolation;
 import org.neo4j.index.IndexService;
 import org.neo4j.index.lucene.LuceneIndexService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -34,10 +33,6 @@ public class Neo4jGraph implements Graph {
     public GraphDatabaseService getGraphDatabaseService() {
         return this.neo4j;
     }
-    
-    public IndexService getIndexService() {
-        return indexService;
-    }
 
     public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
@@ -46,7 +41,6 @@ public class Neo4jGraph implements Graph {
         else
             this.neo4j = new EmbeddedGraphDatabase(this.directory);
         indexService = new LuceneIndexService(neo4j);
-        //indexService.setIsolation(Isolation.SAME_TX);
         this.index = new Neo4jIndex(indexService, this);
         if (this.automaticTransactions) {
             this.tx = neo4j.beginTx();
@@ -175,7 +169,6 @@ public class Neo4jGraph implements Graph {
         deleteGraphDirectory(new File(this.directory));
         this.neo4j = new EmbeddedGraphDatabase(this.directory);
         LuceneIndexService indexService = new LuceneIndexService(neo4j);
-        //indexService.setIsolation(Isolation.SAME_TX);
         this.index = new Neo4jIndex(indexService, this);
         this.tx = neo4j.beginTx();
         this.removeVertex(this.getVertex(0));
