@@ -26,7 +26,7 @@ public interface Graph {
      * Return the vertex referenced by the provided object identifier.
      * If no vertex is referenced by that identifier, then return null.
      *
-     * @param id the identifier of the vertex to retreived from the graph
+     * @param id the identifier of the vertex to retrieved from the graph
      * @return the vertex referenced by the provided identifier or null when no such vertex exists
      */
     public Vertex getVertex(Object id);
@@ -41,9 +41,9 @@ public interface Graph {
 
     /**
      * Return an iterable reference to all the vertices in the graph. Thus, what is returned can be subjected to the foreach construct.
-     * If this is not possible for the implementaiton, then an UnsupportedOperationException can be thrown.
+     * If this is not possible for the implementation, then an UnsupportedOperationException can be thrown.
      *
-     * @return an interable reference to all vertices in the graph
+     * @return an iterable reference to all vertices in the graph
      */
     public Iterable<Vertex> getVertices();
 
@@ -89,7 +89,7 @@ public interface Graph {
 
     /**
      * A shtudown function is required to properly close the graph.
-     * This is important for implementations the utilized disk-based serializaitons.
+     * This is important for implementations that utilize disk-based serializations.
      */
     public void shutdown();
 }

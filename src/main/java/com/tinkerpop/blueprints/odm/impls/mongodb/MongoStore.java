@@ -34,7 +34,7 @@ public class MongoStore implements Store<MongoDocument> {
 
     public Iterable<MongoDocument> retrieve(final MongoDocument document) {
         DBCursor cursor = this.collection.find(document.getRawObject());
-        return new MongoIterable(cursor);
+        return new MongoSequence(cursor);
     }
 
     public void save(final MongoDocument document) {
@@ -57,24 +57,11 @@ public class MongoStore implements Store<MongoDocument> {
         // TODO: what is needed to shutdown a connection in MongoDB?
     }
 
-    private class MongoIterable implements Iterable<MongoDocument> {
+    private class MongoSequence implements Iterator<MongoDocument>, Iterable<MongoDocument> {
 
         private final DBCursor cursor;
 
-        public MongoIterable(DBCursor cursor) {
-            this.cursor = cursor;
-        }
-
-        public Iterator<MongoDocument> iterator() {
-            return new MongoIterator(this.cursor);
-        }
-    }
-
-    private class MongoIterator implements Iterator<MongoDocument> {
-
-        private final DBCursor cursor;
-
-        public MongoIterator(DBCursor cursor) {
+        public MongoSequence(DBCursor cursor) {
             this.cursor = cursor;
         }
 
@@ -88,6 +75,10 @@ public class MongoStore implements Store<MongoDocument> {
 
         public MongoDocument next() {
             return new MongoDocument(this.cursor.next());
+        }
+
+        public Iterator<MongoDocument> iterator() {
+            return this;
         }
     }
 }
