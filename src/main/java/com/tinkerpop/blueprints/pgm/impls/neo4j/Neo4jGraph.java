@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.*;
 //import org.neo4j.index.Isolation;
+import org.neo4j.index.IndexService;
 import org.neo4j.index.lucene.LuceneIndexService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
@@ -19,31 +20,36 @@ import java.util.Map;
  */
 public class Neo4jGraph implements Graph {
 
-    private GraphDatabaseService neo;
+    private GraphDatabaseService neo4j;
     private String directory;
     private Neo4jIndex index;
     private Transaction tx;
     private boolean automaticTransactions = true;
+    private IndexService indexService;
 
     public Neo4jGraph(final String directory) {
         this(directory, null);
     }
 
     public GraphDatabaseService getGraphDatabaseService() {
-        return this.neo;
+        return this.neo4j;
+    }
+    
+    public IndexService getIndexService() {
+        return indexService;
     }
 
     public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
         if (null != configuration)
-            this.neo = new EmbeddedGraphDatabase(this.directory, configuration);
+            this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
         else
-            this.neo = new EmbeddedGraphDatabase(this.directory);
-        LuceneIndexService indexService = new LuceneIndexService(neo);
+            this.neo4j = new EmbeddedGraphDatabase(this.directory);
+        indexService = new LuceneIndexService(neo4j);
         //indexService.setIsolation(Isolation.SAME_TX);
         this.index = new Neo4jIndex(indexService, this);
         if (this.automaticTransactions) {
-            this.tx = neo.beginTx();
+            this.tx = neo4j.beginTx();
         }
     }
 
@@ -52,7 +58,7 @@ public class Neo4jGraph implements Graph {
     }
 
     public Vertex addVertex(final Object id) {
-        Vertex vertex = new Neo4jVertex(neo.createNode(), this);
+        Vertex vertex = new Neo4jVertex(neo4j.createNode(), this);
         this.stopStartTransaction();
         return vertex;
     }
@@ -63,7 +69,7 @@ public class Neo4jGraph implements Graph {
 
         try {
             Long longId = Double.valueOf(id.toString()).longValue();
-            Node node = this.neo.getNodeById(longId);
+            Node node = this.neo4j.getNodeById(longId);
             return new Neo4jVertex(node, this);
         } catch (NotFoundException e) {
             return null;
@@ -73,17 +79,17 @@ public class Neo4jGraph implements Graph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new Neo4jVertexSequence(this.neo.getAllNodes(), this);
+        return new Neo4jVertexSequence(this.neo4j.getAllNodes(), this);
     }
 
     public Iterable<Edge> getEdges() {
-        return new Neo4jGraphEdgeSequence(this.neo.getAllNodes(), this);
+        return new Neo4jGraphEdgeSequence(this.neo4j.getAllNodes(), this);
     }
 
     public void removeVertex(final Vertex vertex) {
 
         Long id = (Long) vertex.getId();
-        Node node = neo.getNodeById(id);
+        Node node = neo4j.getNodeById(id);
         if (null != node) {
             for (String key : vertex.getPropertyKeys()) {
                 this.index.remove(key, vertex.getProperty(key), vertex);
@@ -117,7 +123,7 @@ public class Neo4jGraph implements Graph {
             if (null != tx) {
                 this.tx.success();
                 this.tx.finish();
-                this.tx = neo.beginTx();
+                this.tx = neo4j.beginTx();
             } else {
                 throw new RuntimeException("There is no active transaction to stop");
             }
@@ -128,7 +134,7 @@ public class Neo4jGraph implements Graph {
         if (this.automaticTransactions)
             throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
 
-        this.tx = neo.beginTx();
+        this.tx = neo4j.beginTx();
     }
 
     public void stopTransaction(boolean success) {
@@ -159,7 +165,7 @@ public class Neo4jGraph implements Graph {
             } catch (TransactionFailureException e) {
             }
         }
-        this.neo.shutdown();
+        this.neo4j.shutdown();
         this.index.shutdown();
 
     }
@@ -167,11 +173,11 @@ public class Neo4jGraph implements Graph {
     public void clear() {
         this.shutdown();
         deleteGraphDirectory(new File(this.directory));
-        this.neo = new EmbeddedGraphDatabase(this.directory);
-        LuceneIndexService indexService = new LuceneIndexService(neo);
+        this.neo4j = new EmbeddedGraphDatabase(this.directory);
+        LuceneIndexService indexService = new LuceneIndexService(neo4j);
         //indexService.setIsolation(Isolation.SAME_TX);
         this.index = new Neo4jIndex(indexService, this);
-        this.tx = neo.beginTx();
+        this.tx = neo4j.beginTx();
         this.removeVertex(this.getVertex(0));
         this.stopStartTransaction();
     }
