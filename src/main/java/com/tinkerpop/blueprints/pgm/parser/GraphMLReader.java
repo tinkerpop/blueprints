@@ -65,7 +65,7 @@ public class GraphMLReader {
 
                     Vertex inVertex = null;
                     if (null != inObjectId)
-                        inVertex = graph.getVertex(inStringId);
+                        inVertex = graph.getVertex(inObjectId);
 
                     if (null == outVertex) {
                         outVertex = graph.addVertex(outStringId);
