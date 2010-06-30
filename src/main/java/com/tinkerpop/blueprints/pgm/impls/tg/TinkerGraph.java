@@ -6,9 +6,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -56,12 +54,17 @@ public class TinkerGraph implements Graph {
     }
 
     public void removeVertex(final Vertex vertex) {
+        Set<Edge> toRemove = new HashSet<Edge>();
         for (Edge edge : vertex.getInEdges()) {
-            this.removeEdge(edge);
+            toRemove.add(edge);
         }
         for (Edge edge : vertex.getOutEdges()) {
+            toRemove.add(edge);
+        }
+        for (Edge edge : toRemove) {
             this.removeEdge(edge);
         }
+
         for (String key : vertex.getPropertyKeys()) {
             this.index.remove(key, vertex.getProperty(key), vertex);
         }
