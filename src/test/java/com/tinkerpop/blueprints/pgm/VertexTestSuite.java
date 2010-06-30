@@ -105,6 +105,30 @@ public class VertexTestSuite extends ModelTestSuite {
             assertEquals(0, count(graph.getVertices()));
     }
 
+    public void testRemoveVertexWithEdges(final Graph graph) {
+        List<String> ids = generateIds(2);
+        Vertex v1 = graph.addVertex(convertId(ids.get(0)));
+        Vertex v2 = graph.addVertex(convertId(ids.get(1)));
+        graph.addEdge(null, v1, v2, convertId("knows"));
+        if (config.supportsVertexIteration)
+            assertEquals(2, count(graph.getVertices()));
+        if (config.supportsEdgeIteration)
+            assertEquals(1, count(graph.getEdges()));
+
+        graph.removeVertex(v1);
+        if (config.supportsVertexIteration)
+            assertEquals(1, count(graph.getVertices()));
+        if (config.supportsEdgeIteration)
+            assertEquals(0, count(graph.getEdges()));
+
+        graph.removeVertex(v2);
+        if (config.supportsVertexIteration)
+            assertEquals(0, count(graph.getVertices()));
+        if (config.supportsEdgeIteration)
+            assertEquals(0, count(graph.getEdges()));
+
+    }
+
     public void testGetNonExistantVertices(final Graph graph) {
         try {
             assertNull(graph.getVertex("asbv"));
