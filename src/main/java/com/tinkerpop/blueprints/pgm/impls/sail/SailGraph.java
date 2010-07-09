@@ -12,10 +12,14 @@ import org.openrdf.model.impl.BNodeImpl;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
+import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -210,6 +214,23 @@ public class SailGraph implements Graph {
 
     public Index getIndex() {
         throw new UnsupportedOperationException();
+    }
+
+    public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
+        Repository repository = new SailRepository(this.getSail());
+        try {
+
+            RepositoryConnection connection = repository.getConnection();
+            if (null != baseGraph)
+                connection.add(input, baseURI, SailTokens.getFormat(format), new URIImpl(baseGraph));
+            else
+                connection.add(input, baseURI, SailTokens.getFormat(format));
+
+            connection.commit();
+            connection.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     public void clear() {

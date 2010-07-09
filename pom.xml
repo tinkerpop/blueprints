@@ -106,6 +106,24 @@
             <version>2.3.1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryparser-api</artifactId>
+            <version>2.3.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryalgebra-model</artifactId>
+            <version>2.3.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-queryalgebra-evaluation</artifactId>
+            <version>2.3.1</version>
+            <type>jar</type>
+        </dependency>
         <!-- OBJECT DOCUMENT MODEL IMPLEMENTATION SUPPORT -->
         <!-- JSON SUPPORT -->
         <dependency>

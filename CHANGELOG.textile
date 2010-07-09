@@ -11,21 +11,20 @@ bc. <repository>
 
 !http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
 
-h3. Version 0.2 (Kermit -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.1.2 (Kermit -- NOT OFFICIALLY RELEASED YET)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
 </dependency>
 
 * Removed Blueprints Pipes BETA and put it into a separate project
-* Neo4jGraph constructor can be passed in a Neo4j properties map
-* Updated GraphML writer to write all vertices and then all edges
+* @Neo4jGraph@ constructor can be passed in a Neo4j properties map
+* Updated @GraphMLWriter@ to write all vertices and then all edges
+* Added RDF load functionality to @SailGraph@
+* Fixed server @GraphMLReader@ bug
 
-==<hr/>==
-
-!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-bob-the-builder.png!
 
 h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 

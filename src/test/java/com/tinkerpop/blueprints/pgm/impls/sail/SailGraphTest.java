@@ -32,6 +32,11 @@ public class SailGraphTest extends BaseTest {
         config.ignoresSuppliedIds = false;
     }
 
+    public void testSailGraphFactory() {
+        assertTrue(true);
+        SailGraphFactory.createTinkerGraph(new MemoryStore());
+    }
+
     public void testTypeConversion() {
         assertEquals(SailVertex.castLiteral(new LiteralImpl("marko", new URIImpl("http://www.w3.org/2001/XMLSchema#string"))).getClass(), String.class);
         assertEquals(SailVertex.castLiteral(new LiteralImpl("marko")).getClass(), String.class);
