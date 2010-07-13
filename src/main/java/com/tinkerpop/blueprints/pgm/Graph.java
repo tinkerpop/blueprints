@@ -60,6 +60,15 @@ public interface Graph {
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label);
 
     /**
+     * Return the edge referenced by the provided object identifier.
+     * If no edge is referenced by that identifier, then return null.
+     *
+     * @param id the identifier of the edge to retrieved from the graph
+     * @return the edge referenced by the provided identifier or null when no such edge exists
+     */
+    public Edge getEdge(Object id);
+
+    /**
      * Remove the provided edge from the graph.
      *
      * @param edge the edge to remove from the graph
@@ -92,4 +101,6 @@ public interface Graph {
      * This is important for implementations that utilize disk-based serializations.
      */
     public void shutdown();
+
+    //public T getRawGraph();
 }

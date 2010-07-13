@@ -96,6 +96,25 @@ public class EdgeTestSuite extends ModelTestSuite {
         }
     }
 
+    public void testGetEdges(final Graph graph) {
+
+        if (!config.isRDFModel) {
+            Vertex v1 = graph.addVertex(null);
+            Vertex v2 = graph.addVertex(null);
+
+            Edge e1 = graph.addEdge(null, v1, v2, "test1");
+            Edge e2 = graph.addEdge(null, v1, v2, "test2");
+            Edge e3 = graph.addEdge(null, v1, v2, "test3");
+
+            this.stopWatch();
+            assertEquals(graph.getEdge(e1.getId()), e1);
+            assertEquals(graph.getEdge(e2.getId()), e2);
+            assertEquals(graph.getEdge(e3.getId()), e3);
+            BaseTest.printPerformance(graph.toString(), 3, "edges retrieved", this.stopWatch());
+        }
+
+    }
+
     public void testRemoveManyEdges(final Graph graph) {
         long counter = 200000l;
         int edgeCount = 100;

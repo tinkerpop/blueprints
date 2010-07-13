@@ -31,4 +31,6 @@ public interface Edge extends Element {
      */
     public String getLabel();
 
+    //public T getRawEdge();
+
 }

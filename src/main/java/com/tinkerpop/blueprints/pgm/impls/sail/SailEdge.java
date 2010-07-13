@@ -32,6 +32,10 @@ public class SailEdge implements Edge {
         this.sailConnection = sailConnection;
     }
 
+    public Statement getRawEdge() {
+        return this.statement;
+    }
+
     public String getLabel() {
         return this.statement.getPredicate().stringValue();
     }
@@ -96,8 +100,8 @@ public class SailEdge implements Edge {
     }
 
     public String toString() {
-        String outVertex = SailGraph.namespaceToPrefix(this.statement.getSubject().stringValue(), this.sailConnection);
-        String edgeLabel = SailGraph.namespaceToPrefix(this.statement.getPredicate().stringValue(), this.sailConnection);
+        final String outVertex = SailGraph.namespaceToPrefix(this.statement.getSubject().stringValue(), this.sailConnection);
+        final String edgeLabel = SailGraph.namespaceToPrefix(this.statement.getPredicate().stringValue(), this.sailConnection);
         String inVertex;
         if (this.statement.getObject() instanceof Resource)
             inVertex = SailGraph.namespaceToPrefix(this.statement.getObject().stringValue(), this.sailConnection);
@@ -118,8 +122,8 @@ public class SailEdge implements Edge {
     }
 
     private String literalString(final Literal literal) {
-        String language = literal.getLanguage();
-        URI datatype = literal.getDatatype();
+        final String language = literal.getLanguage();
+        final URI datatype = literal.getDatatype();
         if (null != datatype) {
             return "\"" + literal.getLabel() + "\"^^<" + SailGraph.namespaceToPrefix(datatype.stringValue(), this.sailConnection) + ">";
         } else if (null != language) {

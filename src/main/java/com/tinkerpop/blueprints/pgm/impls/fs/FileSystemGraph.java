@@ -36,6 +36,10 @@ public class FileSystemGraph implements Graph {
         throw new UnsupportedOperationException();
     }
 
+    public Edge getEdge(Object id) {
+        throw new UnsupportedOperationException();
+    }
+
     public Iterable<Vertex> getVertices() {
         throw new UnsupportedOperationException();
     }
@@ -61,4 +65,5 @@ public class FileSystemGraph implements Graph {
         roots = roots.substring(1, roots.length() - 1);
         return "filegraph[" + roots + "]";
     }
+
 }

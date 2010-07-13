@@ -44,8 +44,8 @@ public abstract class Neo4jElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        Set<String> keys = new HashSet<String>();
-        for (String key : this.element.getPropertyKeys()) {
+        final Set<String> keys = new HashSet<String>();
+        for (final String key : this.element.getPropertyKeys()) {
             keys.add(key);
         }
         return keys;
@@ -80,5 +80,9 @@ public abstract class Neo4jElement implements Element {
         } else {
             return ((Relationship) this.element).getId();
         }
+    }
+
+    public boolean equals(Object object) {
+        return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
     }
 }

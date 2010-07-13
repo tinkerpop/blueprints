@@ -99,6 +99,10 @@ public class SailGraph implements Graph {
         }
     }
 
+    public Sail getRawGraph() {
+        return this.sail;
+    }
+
     public Vertex addVertex(Object id) {
         if (null == id)
             id = SailTokens.URN_UUID_PREFIX + UUID.randomUUID().toString();
@@ -106,8 +110,12 @@ public class SailGraph implements Graph {
         return createVertex(id.toString());
     }
 
-    public Vertex getVertex(Object id) {
+    public Vertex getVertex(final Object id) {
         return createVertex(id.toString());
+    }
+
+    public Edge getEdge(final Object id) {
+        throw new UnsupportedOperationException();
     }
 
     public Iterable<Vertex> getVertices() {
@@ -123,7 +131,7 @@ public class SailGraph implements Graph {
     }
 
     public void removeVertex(final Vertex vertex) {
-        Value vertexValue = ((SailVertex) vertex).getRawValue();
+        Value vertexValue = ((SailVertex) vertex).getRawVertex();
         try {
             if (vertexValue instanceof Resource) {
                 this.sailConnection.removeStatements((Resource) vertexValue, null, null);
@@ -136,8 +144,8 @@ public class SailGraph implements Graph {
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         try {
-            Value outVertexValue = ((SailVertex) outVertex).getRawValue();
-            Value inVertexValue = ((SailVertex) inVertex).getRawValue();
+            Value outVertexValue = ((SailVertex) outVertex).getRawVertex();
+            Value inVertexValue = ((SailVertex) inVertex).getRawVertex();
 
             if (!(outVertexValue instanceof Resource)) {
                 throw new RuntimeException(outVertex.toString() + " is not a legal URI or blank node");

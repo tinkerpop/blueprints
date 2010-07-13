@@ -13,8 +13,8 @@ import java.util.Iterator;
  */
 public class Neo4jEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
 
-    Iterator<Relationship> relationships;
-    Neo4jGraph graph;
+    final Iterator<Relationship> relationships;
+    final Neo4jGraph graph;
 
     public Neo4jEdgeSequence(final Iterable<Relationship> relationships, final Neo4jGraph graph) {
         this.graph = graph;

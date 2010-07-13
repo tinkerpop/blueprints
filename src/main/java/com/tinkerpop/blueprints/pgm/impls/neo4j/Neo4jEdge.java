@@ -35,4 +35,8 @@ public class Neo4jEdge extends Neo4jElement implements Edge {
     public String toString() {
         return StringFactory.edgeString(this);
     }
+
+    public Relationship getRawEdge() {
+        return (Relationship) this.element;
+    }
 }

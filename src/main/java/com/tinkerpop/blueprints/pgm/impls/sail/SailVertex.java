@@ -43,7 +43,7 @@ public class SailVertex implements Vertex {
         this.sailConnection = sailConnection;
     }
 
-    public Value getRawValue() {
+    public Value getRawVertex() {
         return this.value;
     }
 

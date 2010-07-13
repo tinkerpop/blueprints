@@ -10,7 +10,6 @@ import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
- * @version 0.1
  */
 public class TinkerVertex extends TinkerElement implements Vertex {
 
@@ -19,6 +18,10 @@ public class TinkerVertex extends TinkerElement implements Vertex {
 
     protected TinkerVertex(final String id, final TinkerIndex index) {
         super(id, index);
+    }
+
+    public TinkerVertex getRawVertex() {
+        return this;
     }
 
     public Iterable<Edge> getOutEdges() {

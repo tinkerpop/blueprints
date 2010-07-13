@@ -15,6 +15,7 @@ public class TinkerGraph implements Graph {
 
     private Long currentId = 0l;
     protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();
+    protected Map<String, Edge> edges = new HashMap<String, Edge>();
     private TinkerIndex index = new TinkerIndex();
 
     public Vertex addVertex(final Object id) {
@@ -44,6 +45,16 @@ public class TinkerGraph implements Graph {
             return this.vertices.get(idString);
         }
     }
+
+    public Edge getEdge(final Object id) {
+        if (null == id)
+            return null;
+        else {
+            String idString = id.toString();
+            return this.edges.get(idString);
+        }
+    }
+
 
     public Iterable<Vertex> getVertices() {
         return vertices.values();
@@ -81,10 +92,15 @@ public class TinkerGraph implements Graph {
 
         TinkerVertex out = (TinkerVertex) outVertex;
         TinkerVertex in = (TinkerVertex) inVertex;
-        TinkerEdge edge = new TinkerEdge(idString, outVertex, inVertex, label, this.index);
-        out.outEdges.add(edge);
-        in.inEdges.add(edge);
-        //this.edges.save(edge.getId(), edge);
+        Edge edge = this.edges.get(idString);
+
+        if (null == edge) {
+            edge = new TinkerEdge(idString, outVertex, inVertex, label, this.index);
+            this.edges.put(edge.getId().toString(), edge);
+            out.outEdges.add(edge);
+            in.inEdges.add(edge);
+        }
+
         return edge;
     }
 
@@ -95,7 +111,6 @@ public class TinkerGraph implements Graph {
             outVertex.outEdges.remove(edge);
         if (null != inVertex && null != inVertex.inEdges)
             inVertex.inEdges.remove(edge);
-        //this.edges.delete(edge.getId());
     }
 
     public Index getIndex() {
@@ -108,6 +123,7 @@ public class TinkerGraph implements Graph {
 
     public void clear() {
         this.vertices.clear();
+        this.edges.clear();
     }
 
     public void shutdown() {
@@ -123,6 +139,10 @@ public class TinkerGraph implements Graph {
                 break;
         }
         return idString;
+    }
+
+    public TinkerGraph getRawGraph() {
+        return this;
     }
 
     private class TinkerEdgeSequence implements Iterator<Edge>, Iterable<Edge> {

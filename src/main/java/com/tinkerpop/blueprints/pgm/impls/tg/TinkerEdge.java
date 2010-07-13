@@ -21,6 +21,10 @@ public class TinkerEdge extends TinkerElement implements Edge {
         this.inVertex = inVertex;
     }
 
+    public TinkerEdge getRawEdge() {
+        return this;
+    }
+
     public String getLabel() {
         return this.label;
     }

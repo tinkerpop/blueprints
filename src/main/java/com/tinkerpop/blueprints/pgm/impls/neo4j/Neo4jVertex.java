@@ -34,4 +34,9 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
     public String toString() {
         return StringFactory.vertexString(this);
     }
+
+    public Node getRawVertex() {
+        return (Node) this.element;
+    }
+
 }

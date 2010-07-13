@@ -30,7 +30,7 @@ public class Neo4jGraph implements Graph {
         this(directory, null);
     }
 
-    public GraphDatabaseService getGraphDatabaseService() {
+    public GraphDatabaseService getRawGraph() {
         return this.neo4j;
     }
 
@@ -52,7 +52,7 @@ public class Neo4jGraph implements Graph {
     }
 
     public Vertex addVertex(final Object id) {
-        Vertex vertex = new Neo4jVertex(neo4j.createNode(), this);
+        final Vertex vertex = new Neo4jVertex(neo4j.createNode(), this);
         this.stopStartTransaction();
         return vertex;
     }
@@ -82,16 +82,16 @@ public class Neo4jGraph implements Graph {
 
     public void removeVertex(final Vertex vertex) {
 
-        Long id = (Long) vertex.getId();
-        Node node = neo4j.getNodeById(id);
+        final Long id = (Long) vertex.getId();
+        final Node node = neo4j.getNodeById(id);
         if (null != node) {
-            for (String key : vertex.getPropertyKeys()) {
+            for (final String key : vertex.getPropertyKeys()) {
                 this.index.remove(key, vertex.getProperty(key), vertex);
             }
-            for (Edge edge : vertex.getInEdges()) {
+            for (final Edge edge : vertex.getInEdges()) {
                 this.removeEdge(edge);
             }
-            for (Edge edge : vertex.getOutEdges()) {
+            for (final Edge edge : vertex.getOutEdges()) {
                 this.removeEdge(edge);
             }
             node.delete();
@@ -100,12 +100,28 @@ public class Neo4jGraph implements Graph {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        Node outNode = (Node) ((Neo4jVertex) outVertex).getRawElement();
-        Node inNode = (Node) ((Neo4jVertex) inVertex).getRawElement();
-        Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
+        final Node outNode = (Node) ((Neo4jVertex) outVertex).getRawElement();
+        final Node inNode = (Node) ((Neo4jVertex) inVertex).getRawElement();
+        final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
         this.stopStartTransaction();
         return new Neo4jEdge(relationship, this);
     }
+
+    public Edge getEdge(final Object id) {
+        if (null == id)
+            return null;
+
+        try {
+            final Long longId = Double.valueOf(id.toString()).longValue();
+            final Relationship relationship = this.neo4j.getRelationshipById(longId);
+            return new Neo4jEdge(relationship, this);
+        } catch (NotFoundException e) {
+            return null;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Neo edge ids must be convertible to a long value");
+        }
+    }
+
 
     public void removeEdge(Edge edge) {
         ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
