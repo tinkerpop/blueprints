@@ -101,15 +101,25 @@ public class EdgeTestSuite extends ModelTestSuite {
         if (!config.isRDFModel) {
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
+            Vertex v3 = graph.addVertex(null);
 
             Edge e1 = graph.addEdge(null, v1, v2, "test1");
-            Edge e2 = graph.addEdge(null, v1, v2, "test2");
-            Edge e3 = graph.addEdge(null, v1, v2, "test3");
+            Edge e2 = graph.addEdge(null, v2, v3, "test2");
+            Edge e3 = graph.addEdge(null, v3, v1, "test3");
 
             this.stopWatch();
             assertEquals(graph.getEdge(e1.getId()), e1);
+            assertEquals(graph.getEdge(e1.getId()).getInVertex(), v2);
+            assertEquals(graph.getEdge(e1.getId()).getOutVertex(), v1);
+
             assertEquals(graph.getEdge(e2.getId()), e2);
+            assertEquals(graph.getEdge(e2.getId()).getInVertex(), v3);
+            assertEquals(graph.getEdge(e2.getId()).getOutVertex(), v2);
+
             assertEquals(graph.getEdge(e3.getId()), e3);
+            assertEquals(graph.getEdge(e3.getId()).getInVertex(), v1);
+            assertEquals(graph.getEdge(e3.getId()).getOutVertex(), v3);
+
             BaseTest.printPerformance(graph.toString(), 3, "edges retrieved", this.stopWatch());
         }
 

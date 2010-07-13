@@ -83,20 +83,21 @@ public class TinkerGraph implements Graph {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        String idString;
+        final String idString;
+        Edge edge;
         if (null != id) {
             idString = id.toString();
+            edge = this.edges.get(idString);
         } else {
             idString = this.getNextId();
+            edge = null;
         }
-
-        TinkerVertex out = (TinkerVertex) outVertex;
-        TinkerVertex in = (TinkerVertex) inVertex;
-        Edge edge = this.edges.get(idString);
 
         if (null == edge) {
             edge = new TinkerEdge(idString, outVertex, inVertex, label, this.index);
             this.edges.put(edge.getId().toString(), edge);
+            final TinkerVertex out = (TinkerVertex) outVertex;
+            final TinkerVertex in = (TinkerVertex) inVertex;
             out.outEdges.add(edge);
             in.inEdges.add(edge);
         }
