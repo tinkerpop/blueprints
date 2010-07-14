@@ -99,8 +99,8 @@ public class Neo4jGraph implements Graph {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        final Node outNode = (Node) ((Neo4jVertex) outVertex).getRawElement();
-        final Node inNode = (Node) ((Neo4jVertex) inVertex).getRawElement();
+        final Node outNode = ((Neo4jVertex) outVertex).getRawVertex();
+        final Node inNode = ((Neo4jVertex) inVertex).getRawVertex();
         final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
         this.stopStartTransaction();
         return new Neo4jEdge(relationship, this);
