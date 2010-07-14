@@ -24,7 +24,6 @@ public class Neo4jGraph implements Graph {
     private Neo4jIndex index;
     private Transaction tx;
     private boolean automaticTransactions = true;
-    private IndexService indexService;
 
     public Neo4jGraph(final String directory) {
         this(directory, null);
@@ -40,7 +39,7 @@ public class Neo4jGraph implements Graph {
             this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
         else
             this.neo4j = new EmbeddedGraphDatabase(this.directory);
-        indexService = new LuceneIndexService(neo4j);
+        IndexService indexService = new LuceneIndexService(neo4j);
         this.index = new Neo4jIndex(indexService, this);
         if (this.automaticTransactions) {
             this.tx = neo4j.beginTx();

@@ -41,18 +41,18 @@ public class Neo4jGraphEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     }
 
     private boolean goToNextEdge() {
-        if (this.currentRelationships == null || !this.currentRelationships.hasNext()) {
-            if (nodes.hasNext()) {
-                this.currentRelationships = nodes.next().getRelationships(Direction.OUTGOING).iterator();
-            } else {
-                return true;
+        while (true) {
+            if (this.currentRelationships == null || !this.currentRelationships.hasNext()) {
+                if (nodes.hasNext()) {
+                    this.currentRelationships = nodes.next().getRelationships(Direction.OUTGOING).iterator();
+                } else {
+                    return true;
+                }
             }
-        }
 
-        if (this.currentRelationships.hasNext()) {
-            return false;
-        } else {
-            return this.goToNextEdge();
+            if (this.currentRelationships.hasNext()) {
+                return false;
+            }
         }
     }
 
