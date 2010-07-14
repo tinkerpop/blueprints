@@ -6,7 +6,10 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -61,7 +64,7 @@ public class TinkerGraph implements Graph {
     }
 
     public Iterable<Edge> getEdges() {
-        return new TinkerEdgeSequence(this.getVertices());
+        return edges.values();
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -112,6 +115,7 @@ public class TinkerGraph implements Graph {
             outVertex.outEdges.remove(edge);
         if (null != inVertex && null != inVertex.inEdges)
             inVertex.inEdges.remove(edge);
+        this.edges.remove(edge.getId());
     }
 
     public Index getIndex() {
@@ -144,56 +148,5 @@ public class TinkerGraph implements Graph {
 
     public TinkerGraph getRawGraph() {
         return this;
-    }
-
-    private class TinkerEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
-
-        private Iterator<Vertex> vertices;
-        private Iterator<Edge> currentEdges;
-        private boolean complete = false;
-
-        public TinkerEdgeSequence(final Iterator<Vertex> vertices) {
-            this.vertices = vertices;
-            this.complete = this.goToNextEdge();
-        }
-
-        public TinkerEdgeSequence(final Iterable<Vertex> vertices) {
-            this(vertices.iterator());
-        }
-
-        public Edge next() {
-            Edge edge = currentEdges.next();
-            this.complete = this.goToNextEdge();
-            return edge;
-        }
-
-        public boolean hasNext() {
-            return !complete;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        private boolean goToNextEdge() {
-            if (this.currentEdges == null || !this.currentEdges.hasNext()) {
-                if (vertices.hasNext()) {
-                    this.currentEdges = vertices.next().getOutEdges().iterator();
-                } else {
-                    return true;
-                }
-            }
-
-            if (this.currentEdges.hasNext()) {
-                return false;
-            } else {
-                return this.goToNextEdge();
-            }
-
-        }
-
-        public Iterator<Edge> iterator() {
-            return this;
-        }
     }
 }
