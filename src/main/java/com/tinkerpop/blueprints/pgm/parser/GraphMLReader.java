@@ -23,6 +23,7 @@ public class GraphMLReader {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         XMLStreamReader reader = inputFactory.createXMLStreamReader(graphMLInputStream);
 
+        Map<String, String> keyIdMap = new HashMap<String, String>();
         Map<String, String> keyTypesMaps = new HashMap<String, String>();
         Map<String, Object> vertexIdMap = new HashMap<String, Object>();
 
@@ -35,8 +36,10 @@ public class GraphMLReader {
             if (eventType.equals(XMLEvent.START_ELEMENT)) {
                 String elementName = reader.getName().getLocalPart();
                 if (elementName.equals(GraphMLTokens.KEY)) {
+                    String id = reader.getAttributeValue(null, GraphMLTokens.ID);
                     String attributeName = reader.getAttributeValue(null, GraphMLTokens.ATTR_NAME);
                     String attributeType = reader.getAttributeValue(null, GraphMLTokens.ATTR_TYPE);
+                    keyIdMap.put(id, attributeName);
                     keyTypesMaps.put(attributeName, attributeType);
                 } else if (elementName.equals(GraphMLTokens.NODE)) {
                     String vertexStringId = reader.getAttributeValue(null, GraphMLTokens.ID);
@@ -52,6 +55,7 @@ public class GraphMLReader {
                 } else if (elementName.equals(GraphMLTokens.EDGE)) {
                     String edgeId = reader.getAttributeValue(null, GraphMLTokens.ID);
                     String edgeLabel = reader.getAttributeValue(null, GraphMLTokens.LABEL);
+                    edgeLabel = edgeLabel == null ? edgeId : edgeLabel;  
                     String outStringId = reader.getAttributeValue(null, GraphMLTokens.SOURCE);
                     String inStringId = reader.getAttributeValue(null, GraphMLTokens.TARGET);
 
@@ -81,11 +85,15 @@ public class GraphMLReader {
 
                 } else if (elementName.equals(GraphMLTokens.DATA)) {
                     String key = reader.getAttributeValue(null, GraphMLTokens.KEY);
-                    String value = reader.getElementText();
-                    if (currentVertex != null) {
-                        currentVertex.setProperty(key, typeCastValue(key, value, keyTypesMaps));
-                    } else if (currentEdge != null) {
-                        currentEdge.setProperty(key, typeCastValue(key, value, keyTypesMaps));
+                    String attributeName = keyIdMap.get(key);
+                    if (attributeName != null)
+                    {
+                        String value = reader.getElementText();
+                        if (currentVertex != null) {
+                            currentVertex.setProperty(key, typeCastValue(key, value, keyTypesMaps));
+                        } else if (currentEdge != null) {
+                            currentEdge.setProperty(key, typeCastValue(key, value, keyTypesMaps));
+                        }
                     }
                 }
             } else if (eventType.equals(XMLEvent.END_ELEMENT)) {
