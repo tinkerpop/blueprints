@@ -28,4 +28,6 @@ public class GraphMLTokens {
     protected static final String LONG = "long";
     protected static final String BOOLEAN = "boolean";
     protected static final String INT = "int";
+    protected static final String _DEFAULT = "_default";
+
 }
