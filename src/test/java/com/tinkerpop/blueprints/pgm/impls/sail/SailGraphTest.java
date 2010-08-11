@@ -70,6 +70,8 @@ public class SailGraphTest extends BaseTest {
         assertTrue(SailGraph.isBNode("_:1234"));
         assertTrue(SailGraph.isBNode("_:abcdefghijklmnopqrstuvwxyz"));
         assertFalse(SailGraph.isBNode("_:"));
+        assertFalse(SailGraph.isBNode("http://marko"));
+        assertFalse(SailGraph.isBNode("http://www.w3.org/2001/XMLSchema#string"));
     }
 
     public void testLiterals() {
