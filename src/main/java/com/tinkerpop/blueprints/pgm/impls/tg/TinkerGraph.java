@@ -129,6 +129,7 @@ public class TinkerGraph implements Graph {
     public void clear() {
         this.vertices.clear();
         this.edges.clear();
+        this.currentId = 0l;
     }
 
     public void shutdown() {
@@ -140,7 +141,7 @@ public class TinkerGraph implements Graph {
         while (true) {
             idString = this.currentId.toString();
             this.currentId++;
-            if (null == this.vertices.get(idString) || this.currentId == Long.MAX_VALUE)
+            if (null == this.vertices.get(idString) || null == this.edges.get(idString) || this.currentId == Long.MAX_VALUE)
                 break;
         }
         return idString;
