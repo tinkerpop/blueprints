@@ -1,93 +1,81 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import java.util.Set;
-
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.id.ORID;
 import com.tinkerpop.blueprints.pgm.Element;
 
+import java.util.Set;
+
+/**
+ * @author Luca Garulli (http://www.orientechnologies.com)
+ */
 public abstract class OrientElement implements Element {
-	private static final String	LABEL	= "label";
-	protected OGraphElement			raw;
 
-	protected OrientElement(final OGraphElement iElement) {
-		raw = iElement;
-	}
+    protected static final String LABEL = "label";
+    protected OGraphElement raw;
 
-	public void setProperty(final String key, final Object value) {
-		raw.set(key, value);
-		save();
-	}
+    protected OrientElement(final OGraphElement element) {
+        this.raw = element;
+    }
 
-	public Object removeProperty(final String key) {
-		final Object old = raw.remove(key);
-		save();
-		return old;
-	}
+    public void setProperty(final String key, final Object value) {
+        this.raw.set(key, value);
+        save();
+    }
 
-	public Object getProperty(final String key) {
-		return raw.get(key);
-	}
+    public Object removeProperty(final String key) {
+        final Object old = this.raw.remove(key);
+        this.save();
+        return old;
+    }
 
-	public Set<String> getPropertyKeys() {
-		final Set<String> set = raw.propertyNames();
-		set.remove(LABEL);
-		return set;
-	}
+    public Object getProperty(final String key) {
+        return this.raw.get(key);
+    }
 
-	/**
-	 * Returns the Element Id assuring to save it if it's transient yet.
-	 */
-	public Object getId() {
-		ORID rid = raw.getId();
-		save();
-		return rid;
-	}
+    public Set<String> getPropertyKeys() {
+        final Set<String> set = this.raw.propertyNames();
+        set.remove(LABEL);
+        return set;
+    }
 
-	public void delete() {
-		raw.delete();
-	}
+    /**
+     * Returns the Element Id assuring to save it if it's transient yet.
+     */
+    public Object getId() {
+        ORID rid = this.raw.getId();
+        this.save();
+        return rid;
+    }
 
-	public void save() {
-		raw.save();
-	}
+    protected void delete() {
+        this.raw.delete();
+    }
 
-	public String getLabel() {
-		return (String) raw.get(LABEL);
-	}
+    protected void save() {
+        this.raw.save();
+    }
 
-	public void setLabel(String label) {
-		raw.set(LABEL, label);
-		save();
-	}
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.raw == null) ? 0 : raw.hashCode());
+        return result;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((raw == null) ? 0 : raw.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		OrientElement other = (OrientElement) obj;
-		if (raw == null) {
-			if (other.raw != null)
-				return false;
-		} else if (!raw.equals(other.raw))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return raw != null ? raw.toString() : "";
-	}
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        OrientElement other = (OrientElement) obj;
+        if (this.raw == null) {
+            if (other.raw != null)
+                return false;
+        } else if (!this.raw.equals(other.raw))
+            return false;
+        return true;
+    }
 }

@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import java.io.File;
 import java.lang.reflect.Method;
 
+import com.tinkerpop.blueprints.BaseTest;
 import junit.framework.TestCase;
 
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
@@ -15,7 +16,7 @@ import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraphTest extends TestCase {
+public class OrientGraphTest extends BaseTest {
 
 	private static final SuiteConfiguration	config	= new SuiteConfiguration();
 
@@ -52,9 +53,9 @@ public class OrientGraphTest extends TestCase {
 	}
 
 	private void doSuiteTest(final ModelTestSuite suite) throws Exception {
-		String doTest = System.getProperty("testOrientDBGraph");
+		String doTest = System.getProperty("testOrientGraph");
 		if (doTest == null || doTest.equals("true")) {
-			String url = System.getProperty("orientDirectory");
+			String url = System.getProperty("orientGraphDirectory");
 			if (url == null)
 				url = "/tmp/blueprints_test";
 
@@ -65,7 +66,7 @@ public class OrientGraphTest extends TestCase {
 			for (Method method : suite.getClass().getDeclaredMethods()) {
 				if (method.getName().startsWith("test")) {
 
-					OrientGraph graph = new OrientGraph("local:" + url + "/graph");
+					OrientGraph graph = new OrientGraph("local:" + url);
 					if (graph.exists()) {
 						graph.open("admin", "admin");
 						graph.clear();
@@ -78,6 +79,8 @@ public class OrientGraphTest extends TestCase {
 					graph.shutdown();
 				}
 			}
+
+            deleteGraphDirectory(new File(url));
 		}
 	}
 

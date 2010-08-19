@@ -9,9 +9,7 @@ bc. <repository>
 
 ==<hr/>==
 
-!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
-
-h3. Version 0.1.2 (Kermit -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.1.2 (Bob the Builder -- NOT OFFICIALLY RELEASED YET)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
@@ -24,6 +22,8 @@ bc. <dependency>
 * Updated @GraphMLWriter@ to write all vertices and then all edges
 * Added RDF load functionality to @SailGraph@
 * Fixed server @GraphMLReader@ bug
+* Added OrientDB (OrientGraph) as a property graph implementation
+* Added support for @Graph.getEdge(Object id)@
 
 
 h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)

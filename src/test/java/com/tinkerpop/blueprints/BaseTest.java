@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class BaseTest extends TestCase {
 
-    long timer = -1l;
+    double timer = -1.0d;
 
     public void testTrue() {
         assertTrue(true);
@@ -64,18 +64,18 @@ public class BaseTest extends TestCase {
         return list;
     }
 
-    public long stopWatch() {
-        if (this.timer == -1l) {
-            this.timer = System.currentTimeMillis();
-            return -1l;
+    public double stopWatch() {
+        if (this.timer == -1.0d) {
+            this.timer = System.nanoTime() / 1000000.0d;
+            return -1.0d;
         } else {
-            long temp = System.currentTimeMillis() - this.timer;
-            this.timer = -1l;
+            double temp = (System.nanoTime() / 1000000.0d) - this.timer;
+            this.timer = -1.0d;
             return temp;
         }
     }
 
-    public static void printPerformance(String name, Integer events, String eventName, long timeInMilliseconds) {
+    public static void printPerformance(String name, Integer events, String eventName, double timeInMilliseconds) {
         if (null != events)
             System.out.println("\t" + name + ": " + events + " " + eventName + " in " + timeInMilliseconds + "ms");
         else

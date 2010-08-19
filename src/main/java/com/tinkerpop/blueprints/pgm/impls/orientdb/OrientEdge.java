@@ -1,41 +1,50 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import java.util.Set;
-
 import com.orientechnologies.orient.core.db.graph.OGraphEdge;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
+import java.util.Set;
+
+/**
+ * @author Luca Garulli (http://www.orientechnologies.com)
+ */
 public class OrientEdge extends OrientElement implements Edge {
-	public OrientEdge(final OGraphEdge iRaw) {
-		super(iRaw);
-	}
 
-	public Vertex getOutVertex() {
-		return new OrientVertex(getRaw().getOut());
-	}
+    public OrientEdge(final OGraphEdge edge) {
+        super(edge);
+    }
 
-	public Vertex getInVertex() {
-		return new OrientVertex(getRaw().getIn());
-	}
+    public Vertex getOutVertex() {
+        return new OrientVertex(getRawEdge().getOut());
+    }
 
-	public OGraphEdge getRaw() {
-		return (OGraphEdge) raw;
-	}
+    public Vertex getInVertex() {
+        return new OrientVertex(getRawEdge().getIn());
+    }
 
-	public void delete() {
-		((OGraphEdge) raw).delete();
-	}
+    public OGraphEdge getRawEdge() {
+        return (OGraphEdge) this.raw;
+    }
 
-	public void save() {
-		((OGraphEdge) raw).save();
-	}
+    public String getLabel() {
+        return (String) this.raw.get(LABEL);
+    }
 
-	@Override
-	public Set<String> getPropertyKeys() {
-		final Set<String> set = super.getPropertyKeys();
-		set.remove(OGraphEdge.IN);
-		set.remove(OGraphEdge.OUT);
-		return set;
-	}
+    protected void setLabel(String label) {
+        this.raw.set(LABEL, label);
+        this.save();
+    }
+
+    public Set<String> getPropertyKeys() {
+        final Set<String> set = super.getPropertyKeys();
+        set.remove(OGraphEdge.IN);
+        set.remove(OGraphEdge.OUT);
+        return set;
+    }
+
+    public String toString() {
+        return StringFactory.edgeString(this);
+    }
 }

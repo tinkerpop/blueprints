@@ -124,6 +124,17 @@
             <version>2.3.1</version>
             <type>jar</type>
         </dependency>
+        <!-- ORIENTDB SUPPORT -->
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-core</artifactId>
+            <version>0.9.22</version>
+        </dependency>
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orient-commons</artifactId>
+            <version>0.9.22</version>
+        </dependency>
         <!-- OBJECT DOCUMENT MODEL IMPLEMENTATION SUPPORT -->
         <!-- JSON SUPPORT -->
         <dependency>
@@ -160,16 +171,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.5.5</version>
-        </dependency>
-        <dependency>
-        	<groupId>com.orientechnologies</groupId>
-        	<artifactId>orientdb-core</artifactId>
-        	<version>0.9.22</version>
-        </dependency>
-        <dependency>
-        	<groupId>com.orientechnologies</groupId>
-        	<artifactId>orient-commons</artifactId>
-        	<version>0.9.22</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -297,6 +298,15 @@
                         <property>
                             <name>testSail</name>
                             <value>true</value>
+                        </property>
+                        <!-- ORIENTGRAPH TEST PROPERTIES -->
+                        <property>
+                            <name>testOrientGraph</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>orientGraphDirectory</name>
+                            <value>/tmp/blueprints_test</value>
                         </property>
                         <!--**********************************-->
                         <!-- OBJECT DOCUMENT MODEL TEST SUITE -->
