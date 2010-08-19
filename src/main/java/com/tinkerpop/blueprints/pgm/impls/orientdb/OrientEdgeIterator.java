@@ -4,6 +4,7 @@ import com.orientechnologies.orient.core.db.graph.OGraphEdge;
 import com.tinkerpop.blueprints.pgm.Edge;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -24,7 +25,7 @@ public class OrientEdgeIterator implements Iterator<Edge>, Iterable<Edge> {
         final OGraphEdge e = this.edges.next();
 
         if (e == null)
-            return null;
+           throw new NoSuchElementException();
 
         return new OrientEdge(e);
     }

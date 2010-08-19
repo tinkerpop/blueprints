@@ -4,6 +4,7 @@ import com.orientechnologies.orient.core.db.graph.OGraphVertex;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -23,7 +24,7 @@ public class OrientVertexIterator implements Iterator<Vertex>, Iterable<Vertex> 
         final OGraphVertex v = this.vertices.next();
 
         if (v == null)
-            return null;
+            throw new NoSuchElementException();
 
         return new OrientVertex(v);
     }
