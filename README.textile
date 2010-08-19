@@ -6,10 +6,12 @@ Blueprints is a collection of abstract data models, their implementations, their
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
+** "OrientDB":http://www.orientechnologies.com/ Open Source document-graph database (commercial friendly license)
 * Object Document Model
 ** TinkerDoc in-memory document store
 ** "MongoDB":http://mongodb.org document-oriented database
 ** "CouchDB":http://couchdb.apache.org/ document-oriented database (in design)
+** "OrientDB":http://www.orientechnologies.com/ Open Source document-graph database (commercial friendly license)
 
 The following is a list of extensions for the respective abstract data models:
 
