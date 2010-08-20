@@ -55,7 +55,7 @@ public class GraphMLReader {
                 } else if (elementName.equals(GraphMLTokens.EDGE)) {
                     String edgeId = reader.getAttributeValue(null, GraphMLTokens.ID);
                     String edgeLabel = reader.getAttributeValue(null, GraphMLTokens.LABEL);
-                    edgeLabel = edgeLabel == null ? GraphMLTokens._DEFAULT : edgeLabel;  
+                    edgeLabel = edgeLabel == null ? GraphMLTokens._DEFAULT : edgeLabel;
                     String outStringId = reader.getAttributeValue(null, GraphMLTokens.SOURCE);
                     String inStringId = reader.getAttributeValue(null, GraphMLTokens.TARGET);
 
@@ -86,8 +86,7 @@ public class GraphMLReader {
                 } else if (elementName.equals(GraphMLTokens.DATA)) {
                     String key = reader.getAttributeValue(null, GraphMLTokens.KEY);
                     String attributeName = keyIdMap.get(key);
-                    if (attributeName != null)
-                    {
+                    if (attributeName != null) {
                         String value = reader.getElementText();
                         if (currentVertex != null) {
                             currentVertex.setProperty(key, typeCastValue(key, value, keyTypesMaps));

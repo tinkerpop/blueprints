@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -22,7 +23,11 @@ public class OrientEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     }
 
     public Edge next() {
-        return new OrientEdge(this.edges.next());
+        OGraphEdge edge = this.edges.next();
+        if (null == edge)
+            throw new NoSuchElementException();
+        else
+            return new OrientEdge(edge);
     }
 
     public void remove() {

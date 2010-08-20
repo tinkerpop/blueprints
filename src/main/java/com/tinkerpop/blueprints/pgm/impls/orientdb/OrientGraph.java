@@ -54,7 +54,7 @@ public class OrientGraph implements Graph {
         if (id instanceof ORID)
             rid = (ORID) id;
         else
-            rid = new ORecordId((String) id);
+            rid = new ORecordId(id.toString());
 
         final ODocument doc = this.database.getRecordById(rid);
         if (doc != null) {
@@ -80,7 +80,7 @@ public class OrientGraph implements Graph {
         if (id instanceof ORID)
             rid = (ORID) id;
         else
-            rid = new ORecordId((String) id);
+            rid = new ORecordId(id.toString());
 
         final ODocument doc = this.database.getRecordById(rid);
         if (doc != null) {
