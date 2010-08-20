@@ -1,18 +1,18 @@
-package com.tinkerpop.blueprints.pgm.impls.orientdb;
+package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
 import com.orientechnologies.orient.core.db.graph.OGraphVertex;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientVertex;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientVertexIterator implements Iterator<Vertex>, Iterable<Vertex> {
+public class OrientVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
     private Iterator<OGraphVertex> vertices;
 
-    public OrientVertexIterator(final Iterator<OGraphVertex> vertices) {
+    public OrientVertexSequence(final Iterator<OGraphVertex> vertices) {
         this.vertices = vertices;
     }
 
@@ -21,12 +21,7 @@ public class OrientVertexIterator implements Iterator<Vertex>, Iterable<Vertex> 
     }
 
     public Vertex next() {
-        final OGraphVertex v = this.vertices.next();
-
-        if (v == null)
-            throw new NoSuchElementException();
-
-        return new OrientVertex(v);
+        return new OrientVertex(this.vertices.next());
     }
 
     public void remove() {

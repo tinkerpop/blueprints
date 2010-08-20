@@ -32,7 +32,7 @@ public class OrientEdge extends OrientElement implements Edge {
         return (String) this.raw.get(LABEL);
     }
 
-    protected void setLabel(String label) {
+    protected void setLabel(final String label) {
         this.raw.set(LABEL, label);
         this.save();
     }

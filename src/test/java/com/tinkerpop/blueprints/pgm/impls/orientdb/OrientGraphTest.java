@@ -66,7 +66,7 @@ public class OrientGraphTest extends BaseTest {
 			for (Method method : suite.getClass().getDeclaredMethods()) {
 				if (method.getName().startsWith("test")) {
 
-					OrientGraph graph = new OrientGraph("local:" + url);
+					OrientGraph graph = new OrientGraph("local:" + url + "/graph");
 					if (graph.exists()) {
 						graph.open("admin", "admin");
 						graph.clear();

@@ -1,19 +1,19 @@
-package com.tinkerpop.blueprints.pgm.impls.orientdb;
+package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
 import com.orientechnologies.orient.core.db.graph.OGraphEdge;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientEdgeIterator implements Iterator<Edge>, Iterable<Edge> {
+public class OrientEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     private final Iterator<OGraphEdge> edges;
 
 
-    public OrientEdgeIterator(final Iterator<OGraphEdge> edges) {
+    public OrientEdgeSequence(final Iterator<OGraphEdge> edges) {
         this.edges = edges;
     }
 
@@ -22,16 +22,11 @@ public class OrientEdgeIterator implements Iterator<Edge>, Iterable<Edge> {
     }
 
     public Edge next() {
-        final OGraphEdge e = this.edges.next();
-
-        if (e == null)
-           throw new NoSuchElementException();
-
-        return new OrientEdge(e);
+        return new OrientEdge(this.edges.next());
     }
 
     public void remove() {
-        edges.remove();
+        this.edges.remove();
     }
 
     public Iterator<Edge> iterator() {

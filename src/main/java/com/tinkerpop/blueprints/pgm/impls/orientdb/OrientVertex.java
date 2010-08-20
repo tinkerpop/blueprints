@@ -1,11 +1,15 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
+import com.orientechnologies.orient.core.db.graph.OGraphEdge;
 import com.orientechnologies.orient.core.db.graph.OGraphVertex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientEdgeSequence;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,8 +17,8 @@ import java.util.Set;
  */
 public class OrientVertex extends OrientElement implements Vertex {
 
-    public OrientVertex(final ODatabaseGraphTx iDatabase) {
-        super(new OGraphVertex(iDatabase));
+    public OrientVertex(final ODatabaseGraphTx databaseGraphTx) {
+        super(new OGraphVertex(databaseGraphTx));
         this.raw.save();
     }
 
@@ -23,11 +27,11 @@ public class OrientVertex extends OrientElement implements Vertex {
     }
 
     public Iterable<Edge> getOutEdges() {
-        return new OrientEdgeIterator(((OGraphVertex) this.raw).getOutEdges().iterator());
+        return new OrientEdgeSequence(((OGraphVertex) this.raw).getOutEdges().iterator());
     }
 
     public Iterable<Edge> getInEdges() {
-        return new OrientEdgeIterator(((OGraphVertex) this.raw).getInEdges().iterator());
+        return new OrientEdgeSequence(((OGraphVertex) this.raw).getInEdges().iterator());
     }
 
     public Set<String> getPropertyKeys() {

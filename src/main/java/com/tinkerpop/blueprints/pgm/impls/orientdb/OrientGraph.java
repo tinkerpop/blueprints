@@ -13,6 +13,8 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientVertexSequence;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -66,15 +68,15 @@ public class OrientGraph implements Graph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new OrientVertexIterator(new OGraphVertexIterator(this.database));
+        return new OrientVertexSequence(new OGraphVertexIterator(this.database));
     }
 
     public Iterable<Edge> getEdges() {
-        return new OrientEdgeIterator(new OGraphEdgeIterator(this.database));
+        return new OrientEdgeSequence(new OGraphEdgeIterator(this.database));
     }
 
     public Edge getEdge(final Object id) {
-        ORID rid;
+        final ORID rid;
         if (id instanceof ORID)
             rid = (ORID) id;
         else
@@ -108,7 +110,7 @@ public class OrientGraph implements Graph {
     }
 
     public void shutdown() {
-        database.close();
+        this.database.close();
     }
 
     public boolean exists() {

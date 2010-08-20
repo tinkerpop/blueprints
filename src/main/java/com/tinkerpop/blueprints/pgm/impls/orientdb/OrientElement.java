@@ -20,7 +20,7 @@ public abstract class OrientElement implements Element {
 
     public void setProperty(final String key, final Object value) {
         this.raw.set(key, value);
-        save();
+        this.save();
     }
 
     public Object removeProperty(final String key) {
@@ -59,7 +59,7 @@ public abstract class OrientElement implements Element {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.raw == null) ? 0 : raw.hashCode());
+        result = prime * result + ((this.raw == null) ? 0 : this.raw.hashCode());
         return result;
     }
 
