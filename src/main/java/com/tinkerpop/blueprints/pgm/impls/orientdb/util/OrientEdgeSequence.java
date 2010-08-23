@@ -13,7 +13,6 @@ import java.util.NoSuchElementException;
 public class OrientEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     private final Iterator<OGraphEdge> edges;
 
-
     public OrientEdgeSequence(final Iterator<OGraphEdge> edges) {
         this.edges = edges;
     }

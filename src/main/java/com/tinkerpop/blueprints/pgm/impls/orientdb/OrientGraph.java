@@ -43,8 +43,15 @@ public class OrientGraph implements Graph {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        final OrientEdge edge = new OrientEdge(((OrientVertex) outVertex).getRawVertex().link(((OrientVertex) inVertex).getRawVertex()));
+        final OGraphVertex rawOut = ((OrientVertex) outVertex).getRawVertex();
+        final OGraphVertex rawIn = ((OrientVertex) inVertex).getRawVertex();
+
+        final OrientEdge edge = new OrientEdge(rawOut.link(rawIn));
         edge.setLabel(label);
+
+        rawOut.getDocument().setDirty();
+        rawIn.getDocument().setDirty();
+
         edge.save();
         return edge;
     }

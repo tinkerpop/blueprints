@@ -43,7 +43,7 @@ public class OrientGraphTest extends BaseTest {
     }
 
     public void testGraphMLReaderSuite() throws Exception {
-        //doSuiteTest(new GraphMLReaderTestSuite(config));
+        doSuiteTest(new GraphMLReaderTestSuite(config));
     }
 
     private void doSuiteTest(final ModelTestSuite suite) throws Exception {
