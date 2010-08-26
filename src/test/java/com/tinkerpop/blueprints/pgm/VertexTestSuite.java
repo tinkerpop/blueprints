@@ -248,10 +248,11 @@ public class VertexTestSuite extends ModelTestSuite {
                 assertEquals(count(graph.getVertices()), 50);
             assertEquals(vertices.size(), 50);
             for (Vertex vertex : vertices) {
-                assertEquals(2, vertex.getPropertyKeys().size());
+                assertEquals(3, vertex.getPropertyKeys().size());
                 assertTrue(vertex.getPropertyKeys().contains(SailTokens.DATATYPE));
                 assertEquals("http://www.w3.org/2001/XMLSchema#anyURI", vertex.getProperty(SailTokens.DATATYPE));
                 assertTrue(vertex.getPropertyKeys().contains(SailTokens.VALUE));
+                assertEquals("literal", vertex.getProperty(SailTokens.KIND));
 
             }
         }

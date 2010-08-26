@@ -6,10 +6,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.Value;
+import org.openrdf.model.*;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.sail.SailConnection;
@@ -106,6 +103,15 @@ public class SailVertex implements Vertex {
     }
 
     public Object getProperty(final String key) {
+        if(key.equals(SailTokens.KIND)) {
+            if(this.value instanceof Literal)
+                return SailTokens.LITERAL;
+            else if(this.value instanceof URI)
+                return SailTokens.URI;
+            else
+                return SailTokens.BNODE; 
+        }
+
         if (this.value instanceof Literal) {
             Literal literal = (Literal) value;
             if (key.equals(SailTokens.DATATYPE)) {
@@ -132,6 +138,7 @@ public class SailVertex implements Vertex {
             }
             keys.add(SailTokens.VALUE);
         }
+        keys.add(SailTokens.KIND);
         return keys;
     }
 

@@ -106,16 +106,33 @@ public class SailGraphTest extends BaseTest {
         assertEquals(v.getProperty(SailTokens.VALUE), "java");
         assertEquals(v.getProperty(SailTokens.DATATYPE), "http://www.w3.org/2001/XMLSchema#string");
         assertNull(v.getProperty(SailTokens.LANGUAGE));
+        assertEquals(v.getProperty(SailTokens.KIND), "literal");
 
         v = graph.getVertex("\"10\"^^<http://www.w3.org/2001/XMLSchema#int>");
         assertEquals(v.getProperty(SailTokens.VALUE), 10);
         assertEquals(v.getProperty(SailTokens.DATATYPE), "http://www.w3.org/2001/XMLSchema#int");
         assertNull(v.getProperty(SailTokens.LANGUAGE));
+        assertEquals(v.getProperty(SailTokens.KIND), "literal");
 
         v = graph.getVertex("\"goodbye\"@en");
         assertEquals(v.getProperty(SailTokens.VALUE), "goodbye");
         assertEquals(v.getProperty(SailTokens.LANGUAGE), "en");
         assertNull(v.getProperty(SailTokens.DATATYPE));
+        assertEquals(v.getProperty(SailTokens.KIND), "literal");
+
+    }
+
+    public void testValueKinds() {
+        MemoryStore sail = new MemoryStore();
+        SailGraph graph = new SailGraph(sail);
+        Vertex v = graph.getVertex("\"java\"^^<http://www.w3.org/2001/XMLSchema#string>");
+        assertEquals(v.getProperty(SailTokens.KIND), "literal");
+
+        v = graph.getVertex("http://markorodriguez.com");
+        assertEquals(v.getProperty(SailTokens.KIND), "uri");
+
+        v = graph.getVertex("_:123");
+        assertEquals(v.getProperty(SailTokens.KIND), "bnode");
     }
 
     //// TEST SUITES

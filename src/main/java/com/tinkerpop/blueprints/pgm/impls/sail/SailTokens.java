@@ -28,7 +28,12 @@ public class SailTokens {
     public static final String DATATYPE = "type";
     public static final String LANGUAGE = "lang";
     public static final String VALUE = "value";
+    public static final String KIND = "kind";
     public static final String NAMED_GRAPH = "ng";
+
+    public static final String URI = "uri";
+    public static final String BNODE = "bnode";
+    public static final String LITERAL = "literal";
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
 
