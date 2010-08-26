@@ -10,7 +10,6 @@ import info.aduna.iteration.CloseableIteration;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.BNodeImpl;
-import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
@@ -24,8 +23,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -35,49 +32,22 @@ public class SailGraph implements Graph {
     private Sail sail;
     private SailConnection sailConnection;
 
-    public static final Pattern literalPattern = Pattern.compile("^\"(.*?)\"((\\^\\^<(.+?)>)$|(@(.{2}))$)");
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
-    public static boolean isBNode(final String resource) {
-        return resource.length() > 2 && resource.startsWith(SailTokens.BLANK_NODE_PREFIX);
-    }
-
-    public static boolean isLiteral(final String resource) {
-        return (literalPattern.matcher(resource).matches() || (resource.startsWith("\"") && resource.endsWith("\"") && resource.length() > 1));
-    }
-
-    public static boolean isURI(final String resource) {
-        return !isBNode(resource) && !isLiteral(resource) && (resource.contains(":") || resource.contains("/") || resource.contains("#"));
-    }
-
-    protected Literal makeLiteral(final String resource) {
-        Matcher matcher = literalPattern.matcher(resource);
-        if (matcher.matches()) {
-            if (null != matcher.group(4))
-                return new LiteralImpl(matcher.group(1), new URIImpl(prefixToNamespace(matcher.group(4), this.sailConnection)));
-            else
-                return new LiteralImpl(matcher.group(1), matcher.group(6));
-        } else {
-            if (resource.startsWith("\"") && resource.endsWith("\"") && resource.length() > 1) {
-                return new LiteralImpl(resource.substring(1, resource.length() - 1));
-            } else {
-                return null;
-            }
-        }
-    }
-
-    protected Vertex createVertex(String resource) {
+    private Vertex createVertex(String resource) {
         Literal literal;
-        if (isBNode(resource)) {
+        if (SailHelper.isBNode(resource)) {
             return new SailVertex(new BNodeImpl(resource.substring(2)), this.sailConnection);
-        } else if ((literal = makeLiteral(resource)) != null) {
+        } else if ((literal = SailHelper.makeLiteral(resource, this.sailConnection)) != null) {
             return new SailVertex(literal, this.sailConnection);
-        } else if (resource.contains(":") || resource.contains("/") || resource.contains("#")) {
+        } else if (resource.contains(SailTokens.NAMESPACE_SEPARATOR) || resource.contains(SailTokens.FORWARD_SLASH) || resource.contains(SailTokens.POUND)) {
             resource = prefixToNamespace(resource, this.sailConnection);
             return new SailVertex(new URIImpl(resource), this.sailConnection);
         } else {
             throw new RuntimeException(resource + " is not a valid URI, blank node, or literal value");
         }
+        //return new SailVertex(NTriplesUtil.parseValue(resource, new ValueFactoryImpl()), this.sailConnection);
+
     }
 
     public SailGraph(final Sail sail) {
@@ -162,7 +132,7 @@ public class SailGraph implements Graph {
     }
 
     public void removeEdge(final Edge edge) {
-        Statement statement = ((SailEdge) edge).getRawStatement();
+        Statement statement = ((SailEdge) edge).getRawEdge();
         try {
             SailHelper.removeStatement(statement, this.sailConnection);
             this.sailConnection.commit();

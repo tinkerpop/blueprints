@@ -93,10 +93,6 @@ public class SailEdge implements Edge {
         return new SailVertex(this.statement.getSubject(), this.sailConnection);
     }
 
-    public Statement getRawStatement() {
-        return this.statement;
-    }
-
     public String toString() {
         final String outVertex = SailGraph.namespaceToPrefix(this.statement.getSubject().stringValue(), this.sailConnection);
         final String edgeLabel = SailGraph.namespaceToPrefix(this.statement.getPredicate().stringValue(), this.sailConnection);

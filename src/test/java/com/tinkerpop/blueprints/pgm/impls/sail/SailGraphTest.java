@@ -60,39 +60,39 @@ public class SailGraphTest extends BaseTest {
     }
 
     public void testURIs() {
-        assertFalse(SailGraph.isURI("_:1234"));
-        assertFalse(SailGraph.isURI("_:abcdefghijklmnopqrstuvwxyz"));
-        assertTrue(SailGraph.isURI("http://marko"));
-        assertTrue(SailGraph.isURI("http://www.w3.org/2001/XMLSchema#string"));
+        assertFalse(SailHelper.isURI("_:1234"));
+        assertFalse(SailHelper.isURI("_:abcdefghijklmnopqrstuvwxyz"));
+        assertTrue(SailHelper.isURI("http://marko"));
+        assertTrue(SailHelper.isURI("http://www.w3.org/2001/XMLSchema#string"));
     }
 
     public void testBNodes() {
-        assertTrue(SailGraph.isBNode("_:1234"));
-        assertTrue(SailGraph.isBNode("_:abcdefghijklmnopqrstuvwxyz"));
-        assertFalse(SailGraph.isBNode("_:"));
-        assertFalse(SailGraph.isBNode("http://marko"));
-        assertFalse(SailGraph.isBNode("http://www.w3.org/2001/XMLSchema#string"));
+        assertTrue(SailHelper.isBNode("_:1234"));
+        assertTrue(SailHelper.isBNode("_:abcdefghijklmnopqrstuvwxyz"));
+        assertFalse(SailHelper.isBNode("_:"));
+        assertFalse(SailHelper.isBNode("http://marko"));
+        assertFalse(SailHelper.isBNode("http://www.w3.org/2001/XMLSchema#string"));
     }
 
     public void testLiterals() {
-        assertTrue(SailGraph.isLiteral("\"java\"^^<http://www.w3.org/2001/XMLSchema#string>"));
-        assertFalse(SailGraph.isLiteral("http://www.w3.org/2001/XMLSchema#string"));
-        assertFalse(SailGraph.isLiteral("^^<http://www.w3.org/2001/XMLSchema#string>"));
-        assertTrue(SailGraph.isLiteral("\"\"^^<http://www.w3.org/2001/XMLSchema#string>"));
-        assertTrue(SailGraph.isLiteral("\"\""));
-        assertTrue(SailGraph.isLiteral("\"marko\""));
-        assertFalse(SailGraph.isLiteral("\"marko\"marko"));
-        assertFalse(SailGraph.isLiteral("\""));
+        assertTrue(SailHelper.isLiteral("\"java\"^^<http://www.w3.org/2001/XMLSchema#string>"));
+        assertFalse(SailHelper.isLiteral("http://www.w3.org/2001/XMLSchema#string"));
+        assertFalse(SailHelper.isLiteral("^^<http://www.w3.org/2001/XMLSchema#string>"));
+        assertTrue(SailHelper.isLiteral("\"\"^^<http://www.w3.org/2001/XMLSchema#string>"));
+        assertTrue(SailHelper.isLiteral("\"\""));
+        assertTrue(SailHelper.isLiteral("\"marko\""));
+        assertFalse(SailHelper.isLiteral("\"marko\"marko"));
+        assertFalse(SailHelper.isLiteral("\""));
         // TODO: make this true assertFalse(SesameGraph.isLiteral("\"marko\"marko\""));
 
 
-        Matcher matcher = SailGraph.literalPattern.matcher("\"java\"^^<http://www.w3.org/2001/XMLSchema#string>");
+        Matcher matcher = SailHelper.literalPattern.matcher("\"java\"^^<http://www.w3.org/2001/XMLSchema#string>");
         matcher.matches();
         assertNull(matcher.group(6));
         assertEquals(matcher.group(1), "java");
         assertEquals(matcher.group(4), "http://www.w3.org/2001/XMLSchema#string");
 
-        matcher = SailGraph.literalPattern.matcher("\"java\"@en");
+        matcher = SailHelper.literalPattern.matcher("\"java\"@en");
         matcher.matches();
         assertNull(matcher.group(4));
         assertEquals(matcher.group(1), "java");

@@ -10,6 +10,8 @@ import java.util.Map;
  */
 public class SailTokens {
     public static final String NAMESPACE_SEPARATOR = ":";
+    public static final String FORWARD_SLASH = "/";
+    public static final String POUND = "#";
     public static final String XSD_PREFIX = "xsd";
     public static final String XSD_NS = "http://www.w3.org/2001/XMLSchema#";
     public static final String RDF_PREFIX = "rdf";

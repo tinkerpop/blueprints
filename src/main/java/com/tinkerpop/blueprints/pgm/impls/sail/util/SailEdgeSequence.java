@@ -18,7 +18,7 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
     private final CloseableIteration<? extends Statement, SailException> statements;
     private final SailConnection sailConnection;
 
-    public SailEdgeSequence(CloseableIteration<? extends Statement, SailException> statements, SailConnection sailConnection) {
+    public SailEdgeSequence(final CloseableIteration<? extends Statement, SailException> statements, final SailConnection sailConnection) {
         this.statements = statements;
         this.sailConnection = sailConnection;
     }
