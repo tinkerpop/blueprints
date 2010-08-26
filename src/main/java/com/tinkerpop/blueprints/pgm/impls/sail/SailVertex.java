@@ -4,6 +4,7 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -136,34 +137,22 @@ public class SailVertex implements Vertex {
 
     public Iterable<Edge> getOutEdges() {
         if (this.value instanceof Resource) {
-            Set<Edge> edges = new HashSet<Edge>();
             try {
-                CloseableIteration<? extends Statement, SailException> results = this.sailConnection.getStatements((Resource) this.value, null, null, false);
-                while (results.hasNext()) {
-                    edges.add(new SailEdge(results.next(), this.sailConnection));
-                }
-                results.close();
+                return new SailEdgeSequence(this.sailConnection.getStatements((Resource) this.value, null, null, false), this.sailConnection);
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage());
             }
-            return edges;
         } else {
-            return null;
+            return new SailEdgeSequence();
         }
     }
 
     public Iterable<Edge> getInEdges() {
-        Set<Edge> edges = new HashSet<Edge>();
         try {
-            CloseableIteration<? extends Statement, SailException> results = sailConnection.getStatements(null, null, this.value, false);
-            while (results.hasNext()) {
-                edges.add(new SailEdge(results.next(), this.sailConnection));
-            }
-            results.close();
+            return new SailEdgeSequence(this.sailConnection.getStatements(null, null, this.value, false), this.sailConnection);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
         }
-        return edges;
     }
 
     public String toString() {

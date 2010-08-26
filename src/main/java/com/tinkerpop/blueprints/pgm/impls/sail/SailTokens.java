@@ -26,6 +26,7 @@ public class SailTokens {
     public static final String DATATYPE = "type";
     public static final String LANGUAGE = "lang";
     public static final String VALUE = "value";
+    public static final String NAMED_GRAPH = "ng";
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
 

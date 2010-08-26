@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.model.*;
@@ -21,7 +22,6 @@ import org.openrdf.sail.SailException;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -124,7 +124,7 @@ public class SailGraph implements Graph {
 
     public Iterable<Edge> getEdges() {
         try {
-            return new SesameEdgeSequence(this.sailConnection.getStatements(null, null, null, false), this.sailConnection);
+            return new SailEdgeSequence(this.sailConnection.getStatements(null, null, null, false), this.sailConnection);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -294,47 +294,4 @@ public class SailGraph implements Graph {
         String type = this.sail.getClass().getSimpleName().toLowerCase();
         return "sailgraph[" + type + "]";
     }
-
-
-    private class SesameEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
-
-        private CloseableIteration<? extends Statement, SailException> statements;
-        private SailConnection sailConnection;
-
-        public SesameEdgeSequence(final CloseableIteration<? extends Statement, SailException> statements, final SailConnection sailConnection) {
-            this.statements = statements;
-            this.sailConnection = sailConnection;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext() {
-            try {
-                return this.statements != null && this.statements.hasNext();
-            } catch (SailException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        }
-
-        public Edge next() {
-            try {
-                Edge edge = new SailEdge(this.statements.next(), this.sailConnection);
-                if (!this.statements.hasNext()) {
-                    this.statements.close();
-                    this.statements = null;
-                }
-                return edge;
-            } catch (SailException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        }
-
-        public Iterator<Edge> iterator() {
-            return this;
-        }
-    }
-
-
 }
