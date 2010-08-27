@@ -41,7 +41,12 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
             return false;
 
         try {
-            return this.statements.hasNext();
+            if (this.statements.hasNext())
+                return true;
+            else {
+                this.statements.close();
+                return false;
+            }
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -55,6 +60,13 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
             return new SailEdge(this.statements.next(), this.sailConnection);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
+        } catch (NoSuchElementException e) {
+            try {
+                this.statements.close();
+            } catch (SailException e2) {
+                throw new RuntimeException(e2.getMessage());
+            }
+            throw e;
         }
     }
 }

@@ -24,6 +24,8 @@ bc. <dependency>
 * Fixed server @GraphMLReader@ bug
 * Added OrientDB (OrientGraph) as a property graph implementation
 * Added support for @Graph.getEdge(Object id)@
+* Added support for @kind in the Sail implementation of Blueprints
+* Made iterating edges in @SailGraph@ faster and more memory efficient
 
 
 h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
