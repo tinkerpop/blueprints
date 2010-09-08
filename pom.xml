@@ -21,7 +21,9 @@
     </developers>
     <inceptionYear>2010</inceptionYear>
     <dependencies>
-        <!-- PROPERY GRAPH MODEL IMPLEMENTATION SUPPORT -->
+        <!--
+            PROPERTY GRAPH MODEL IMPLEMENTATION SUPPORT
+        -->
         <!-- JUNG SUPPORT -->
         <dependency>
             <groupId>net.sf.jung</groupId>
@@ -39,11 +41,16 @@
             <artifactId>neo4j-index</artifactId>
             <version>1.1</version>
         </dependency>
-        <!-- LINKED DATA SAIL SUPPORT -->
+        <!-- ORIENTDB SUPPORT -->
         <dependency>
-            <groupId>net.fortytwo</groupId>
-            <artifactId>linked-data-sail</artifactId>
-            <version>0.5</version>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-core</artifactId>
+            <version>0.9.22</version>
+        </dependency>
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orient-commons</artifactId>
+            <version>0.9.22</version>
         </dependency>
         <!-- SESAME SUPPORT -->
         <dependency>
@@ -124,18 +131,9 @@
             <version>2.3.1</version>
             <type>jar</type>
         </dependency>
-        <!-- ORIENTDB SUPPORT -->
-        <dependency>
-            <groupId>com.orientechnologies</groupId>
-            <artifactId>orientdb-core</artifactId>
-            <version>0.9.22</version>
-        </dependency>
-        <dependency>
-            <groupId>com.orientechnologies</groupId>
-            <artifactId>orient-commons</artifactId>
-            <version>0.9.22</version>
-        </dependency>
-        <!-- OBJECT DOCUMENT MODEL IMPLEMENTATION SUPPORT -->
+        <!--
+            OBJECT DOCUMENT MODEL IMPLEMENTATION SUPPORT
+        -->
         <!-- JSON SUPPORT -->
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -159,7 +157,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.5</version>
-            <!--<scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
         <!-- LOGGING -->
         <dependency>
@@ -179,9 +177,9 @@
             <url>http://mvnrepository.com</url>
         </repository>
         <repository>
-            <id>aduna-repo</id>
-            <name>Aduna repository</name>
-            <url>http://repo.aduna-software.org/maven2/releases</url>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>http://tinkerpop.com/maven2</url>
         </repository>
         <repository>
             <id>neo4j-public-repository</id>
@@ -193,14 +191,14 @@
             </snapshots>
         </repository>
         <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>http://tinkerpop.com/maven2</url>
-        </repository>
-        <repository>
             <id>orientechnologies-repository</id>
             <name>Orient Technologies Maven2 Repository</name>
             <url>http://www.orientechnologies.com/listing/m2</url>
+        </repository>
+        <repository>
+            <id>aduna-repo</id>
+            <name>Aduna repository</name>
+            <url>http://repo.aduna-software.org/maven2/releases</url>
         </repository>
     </repositories>
     <properties>
@@ -294,11 +292,6 @@
                             <name>neo4jDirectory</name>
                             <value>/tmp/blueprints_test</value>
                         </property>
-                        <!-- SAIL TEST PROPERTIES -->
-                        <property>
-                            <name>testSail</name>
-                            <value>true</value>
-                        </property>
                         <!-- ORIENTGRAPH TEST PROPERTIES -->
                         <property>
                             <name>testOrientGraph</name>
@@ -307,6 +300,11 @@
                         <property>
                             <name>orientGraphDirectory</name>
                             <value>/tmp/blueprints_test</value>
+                        </property>
+                        <!-- SAIL TEST PROPERTIES -->
+                        <property>
+                            <name>testSail</name>
+                            <value>true</value>
                         </property>
                         <!--**********************************-->
                         <!-- OBJECT DOCUMENT MODEL TEST SUITE -->
