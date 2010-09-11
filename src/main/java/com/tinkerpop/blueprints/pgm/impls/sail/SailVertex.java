@@ -103,13 +103,13 @@ public class SailVertex implements Vertex {
     }
 
     public Object getProperty(final String key) {
-        if(key.equals(SailTokens.KIND)) {
-            if(this.value instanceof Literal)
+        if (key.equals(SailTokens.KIND)) {
+            if (this.value instanceof Literal)
                 return SailTokens.LITERAL;
-            else if(this.value instanceof URI)
+            else if (this.value instanceof URI)
                 return SailTokens.URI;
             else
-                return SailTokens.BNODE; 
+                return SailTokens.BNODE;
         }
 
         if (this.value instanceof Literal) {

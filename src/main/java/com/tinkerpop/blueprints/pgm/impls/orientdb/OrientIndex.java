@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.db.object.OLazyObjectList;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecord;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -48,7 +49,7 @@ public class OrientIndex implements Index {
             try {
                 map.save();
             } catch (IOException e) {
-                throw new OIndexException("Can't save index");
+                throw new OIndexException("Unable to save index");
             }
 
             // CREATE THE CONFIGURATION FOR IT AND SAVE IT INTO THE DICTIONARY
@@ -62,12 +63,11 @@ public class OrientIndex implements Index {
             try {
                 map.load();
             } catch (IOException e) {
-                throw new OIndexException("Can't load index");
+                throw new OIndexException("Unable to load index");
             }
         }
     }
 
-    @Override
     public void put(final String iKey, final Object iValue, final Element iElement) {
         if (!indexAll && !indexedKeys.contains(iKey))
             return;
@@ -87,8 +87,6 @@ public class OrientIndex implements Index {
         map.put(key, values);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    @Override
     public Iterable<Element> get(final String iKey, final Object iValue) {
         final String key = iKey + SEPARATOR + iValue;
 
@@ -97,12 +95,11 @@ public class OrientIndex implements Index {
         if (docList == null || docList.isEmpty())
             return null;
 
-        final OLazyObjectList<Element> list = new OLazyObjectList<Element>(graph.getUnderlying(), docList);
+        final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getUnderlying(), docList);
 
         return new OrientElementSequence(graph, list.iterator());
     }
 
-    @Override
     public void remove(final String iKey, final Object iValue, final Element iElement) {
         if (!indexAll && !indexedKeys.contains(iKey))
             return;
@@ -122,17 +119,14 @@ public class OrientIndex implements Index {
         }
     }
 
-    @Override
     public void addIndexKey(final String iKey) {
         indexedKeys.add(iKey);
     }
 
-    @Override
     public void removeIndexKey(final String iKey) {
         indexedKeys.remove(iKey);
     }
 
-    @Override
     public void indexAll(final boolean iIndexAll) {
         indexAll = iIndexAll;
     }

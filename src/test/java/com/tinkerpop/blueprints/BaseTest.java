@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class BaseTest extends TestCase {
+public abstract class BaseTest extends TestCase {
 
     double timer = -1.0d;
 
