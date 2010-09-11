@@ -23,7 +23,7 @@ import java.util.Set;
 public class SailVertex implements Vertex {
 
     protected Value value;
-    protected SailConnection sailConnection;
+    protected SailGraph graph;
 
     private static final String URI_BLANK_NODE_PROPERTIES = "RDF graph URI and blank node vertices can not have properties";
     private static Map<String, String> dataTypeToClass = new HashMap<String, String>();
@@ -36,9 +36,9 @@ public class SailVertex implements Vertex {
         dataTypeToClass.put(SailTokens.XSD_NS + "double", "java.lang.Double");
     }
 
-    public SailVertex(final Value value, final SailConnection sailConnection) {
+    public SailVertex(final Value value, final SailGraph graph) {
         this.value = value;
-        this.sailConnection = sailConnection;
+        this.graph = graph;
     }
 
     public Value getRawVertex() {
@@ -48,16 +48,16 @@ public class SailVertex implements Vertex {
     private void updateLiteral(final Literal oldLiteral, final Literal newLiteral) {
         try {
             Set<Statement> statements = new HashSet<Statement>();
-            CloseableIteration<? extends Statement, SailException> results = this.sailConnection.getStatements(null, null, oldLiteral, false);
+            CloseableIteration<? extends Statement, SailException> results = this.graph.getSailConnection().getStatements(null, null, oldLiteral, false);
             while (results.hasNext()) {
                 statements.add(results.next());
             }
             results.close();
-            this.sailConnection.removeStatements(null, null, oldLiteral);
+            this.graph.getSailConnection().removeStatements(null, null, oldLiteral);
             for (Statement statement : statements) {
-                SailHelper.addStatement(statement.getSubject(), statement.getPredicate(), newLiteral, statement.getContext(), this.sailConnection);
+                SailHelper.addStatement(statement.getSubject(), statement.getPredicate(), newLiteral, statement.getContext(), this.graph.getSailConnection());
             }
-            this.sailConnection.commit();
+            this.graph.stopStartTransaction();
 
 
         } catch (SailException e) {
@@ -72,7 +72,7 @@ public class SailVertex implements Vertex {
             boolean update = false;
             Literal oldLiteral = (Literal) this.value;
             if (key.equals(SailTokens.DATATYPE)) {
-                this.value = new LiteralImpl(oldLiteral.getLabel(), new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.sailConnection)));
+                this.value = new LiteralImpl(oldLiteral.getLabel(), new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.graph.getSailConnection())));
                 update = true;
             } else if (key.equals(SailTokens.LANGUAGE)) {
                 this.value = new LiteralImpl(oldLiteral.getLabel(), value.toString());
@@ -145,7 +145,7 @@ public class SailVertex implements Vertex {
     public Iterable<Edge> getOutEdges() {
         if (this.value instanceof Resource) {
             try {
-                return new SailEdgeSequence(this.sailConnection.getStatements((Resource) this.value, null, null, false), this.sailConnection);
+                return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.value, null, null, false), this.graph);
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage());
             }
@@ -156,7 +156,7 @@ public class SailVertex implements Vertex {
 
     public Iterable<Edge> getInEdges() {
         try {
-            return new SailEdgeSequence(this.sailConnection.getStatements(null, null, this.value, false), this.sailConnection);
+            return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, null, this.value, false), this.graph);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
         }

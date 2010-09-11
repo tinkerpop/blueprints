@@ -131,7 +131,20 @@ public class OrientGraph implements Graph {
         return "orientgraph[" + this.database.getURL() + "]";
     }
 
-    public ODatabaseGraphTx getUnderlying() {
+    public ODatabaseGraphTx getRawGraph() {
         return database;
+    }
+
+    public void startTransaction() {
+    }
+
+    public void stopTransaction(boolean success) {
+    }
+
+    public void setAutoTransactions(boolean autoTransactions) {
+    }
+
+    public boolean isAutoTransactions() {
+        return true;
     }
 }

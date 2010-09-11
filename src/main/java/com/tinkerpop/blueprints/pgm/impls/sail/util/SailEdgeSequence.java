@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.sail.util;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailEdge;
+import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Statement;
 import org.openrdf.sail.SailConnection;
@@ -16,16 +17,16 @@ import java.util.NoSuchElementException;
 public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
 
     private final CloseableIteration<? extends Statement, SailException> statements;
-    private final SailConnection sailConnection;
+    private final SailGraph graph;
 
-    public SailEdgeSequence(final CloseableIteration<? extends Statement, SailException> statements, final SailConnection sailConnection) {
+    public SailEdgeSequence(final CloseableIteration<? extends Statement, SailException> statements, final SailGraph graph) {
         this.statements = statements;
-        this.sailConnection = sailConnection;
+        this.graph = graph;
     }
 
     public SailEdgeSequence() {
         this.statements = null;
-        this.sailConnection = null;
+        this.graph = null;
     }
 
     public Iterator<Edge> iterator() {
@@ -57,7 +58,7 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
             throw new NoSuchElementException();
 
         try {
-            return new SailEdge(this.statements.next(), this.sailConnection);
+            return new SailEdge(this.statements.next(), this.graph);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
         } catch (NoSuchElementException e) {

@@ -31,18 +31,19 @@ public class SailGraph implements Graph {
 
     private Sail sail;
     private SailConnection sailConnection;
+    private boolean autoTransactions = true;
 
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
     private Vertex createVertex(String resource) {
         Literal literal;
         if (SailHelper.isBNode(resource)) {
-            return new SailVertex(new BNodeImpl(resource.substring(2)), this.sailConnection);
+            return new SailVertex(new BNodeImpl(resource.substring(2)), this);
         } else if ((literal = SailHelper.makeLiteral(resource, this.sailConnection)) != null) {
-            return new SailVertex(literal, this.sailConnection);
+            return new SailVertex(literal, this);
         } else if (resource.contains(SailTokens.NAMESPACE_SEPARATOR) || resource.contains(SailTokens.FORWARD_SLASH) || resource.contains(SailTokens.POUND)) {
             resource = prefixToNamespace(resource, this.sailConnection);
-            return new SailVertex(new URIImpl(resource), this.sailConnection);
+            return new SailVertex(new URIImpl(resource), this);
         } else {
             throw new RuntimeException(resource + " is not a valid URI, blank node, or literal value");
         }
@@ -94,7 +95,7 @@ public class SailGraph implements Graph {
 
     public Iterable<Edge> getEdges() {
         try {
-            return new SailEdgeSequence(this.sailConnection.getStatements(null, null, null, false), this.sailConnection);
+            return new SailEdgeSequence(this.sailConnection.getStatements(null, null, null, false), this);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -113,41 +114,30 @@ public class SailGraph implements Graph {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        try {
-            Value outVertexValue = ((SailVertex) outVertex).getRawVertex();
-            Value inVertexValue = ((SailVertex) inVertex).getRawVertex();
+        Value outVertexValue = ((SailVertex) outVertex).getRawVertex();
+        Value inVertexValue = ((SailVertex) inVertex).getRawVertex();
 
-            if (!(outVertexValue instanceof Resource)) {
-                throw new RuntimeException(outVertex.toString() + " is not a legal URI or blank node");
-            }
-
-            URI labelURI = new URIImpl(prefixToNamespace(label, this.sailConnection));
-            Statement statement = new StatementImpl((Resource) outVertexValue, labelURI, inVertexValue);
-            SailHelper.addStatement(statement, this.sailConnection);
-            this.sailConnection.commit();
-            return new SailEdge(statement, this.sailConnection);
-        } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+        if (!(outVertexValue instanceof Resource)) {
+            throw new RuntimeException(outVertex.toString() + " is not a legal URI or blank node");
         }
+
+        URI labelURI = new URIImpl(prefixToNamespace(label, this.sailConnection));
+        Statement statement = new StatementImpl((Resource) outVertexValue, labelURI, inVertexValue);
+        SailHelper.addStatement(statement, this.sailConnection);
+        this.stopStartTransaction();
+        return new SailEdge(statement, this);
     }
 
     public void removeEdge(final Edge edge) {
         Statement statement = ((SailEdge) edge).getRawEdge();
-        try {
-            SailHelper.removeStatement(statement, this.sailConnection);
-            this.sailConnection.commit();
-        } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        SailHelper.removeStatement(statement, this.sailConnection);
+        this.stopStartTransaction();
     }
 
     public SailConnection getSailConnection() {
         return this.sailConnection;
     }
 
-    public Sail getSail() {
-        return this.sail;
-    }
 
     public void addNamespace(final String prefix, final String namespace) {
         try {
@@ -195,7 +185,7 @@ public class SailGraph implements Graph {
     }
 
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
-        Repository repository = new SailRepository(this.getSail());
+        Repository repository = new SailRepository(this.sail);
         try {
 
             RepositoryConnection connection = repository.getConnection();
@@ -257,6 +247,44 @@ public class SailGraph implements Graph {
             throw new RuntimeException(e.getMessage());
         }
         return uri;
+    }
+
+    protected void stopStartTransaction() {
+        if (this.autoTransactions) {
+            try {
+                this.sailConnection.commit();
+            } catch (SailException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+    }
+
+    public void startTransaction() {
+        if (this.autoTransactions)
+            throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
+    }
+
+    public void stopTransaction(boolean success) {
+        if (this.autoTransactions)
+            throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
+
+        try {
+            if (success) {
+                this.sailConnection.commit();
+            } else {
+                this.sailConnection.rollback();
+            }
+        } catch (SailException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void setAutoTransactions(boolean automatic) {
+        this.autoTransactions = automatic;
+    }
+
+    public boolean isAutoTransactions() {
+        return this.autoTransactions;
     }
 
 

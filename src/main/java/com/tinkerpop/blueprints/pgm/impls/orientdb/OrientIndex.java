@@ -39,11 +39,11 @@ public class OrientIndex implements Index {
         graph = iGraph;
 
         // LOAD THE CONFIGURATION FROM THE DICTIONARY
-        graphIndex = ((ODatabaseDocumentTx) graph.getUnderlying().getUnderlying()).getDictionary().get(GRAPH_INDEX);
+        graphIndex = ((ODatabaseDocumentTx) graph.getRawGraph().getUnderlying()).getDictionary().get(GRAPH_INDEX);
 
         if (graphIndex == null) {
             // CREATE THE MAP
-            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) graph.getUnderlying()
+            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) graph.getRawGraph()
                     .getUnderlying()).getUnderlying(), OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE,
                     OStreamSerializerListRID.INSTANCE);
             try {
@@ -53,12 +53,12 @@ public class OrientIndex implements Index {
             }
 
             // CREATE THE CONFIGURATION FOR IT AND SAVE IT INTO THE DICTIONARY
-            graphIndex = new ODocument((ODatabaseDocumentTx) graph.getUnderlying().getUnderlying());
+            graphIndex = new ODocument((ODatabaseDocumentTx) graph.getRawGraph().getUnderlying());
             graphIndex.field(MAP_RID, map.getRecord().getIdentity().toString());
-            ((ODatabaseDocumentTx) graph.getUnderlying().getUnderlying()).getDictionary().put(GRAPH_INDEX, graphIndex);
+            ((ODatabaseDocumentTx) graph.getRawGraph().getUnderlying()).getDictionary().put(GRAPH_INDEX, graphIndex);
         } else {
             // LOAD THE MAP
-            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) graph.getUnderlying().getUnderlying(),
+            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) graph.getRawGraph().getUnderlying(),
                     new ORecordId((String) graphIndex.field(MAP_RID)));
             try {
                 map.load();
@@ -95,7 +95,7 @@ public class OrientIndex implements Index {
         if (docList == null || docList.isEmpty())
             return null;
 
-        final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getUnderlying(), docList);
+        final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), docList);
 
         return new OrientElementSequence(graph, list.iterator());
     }

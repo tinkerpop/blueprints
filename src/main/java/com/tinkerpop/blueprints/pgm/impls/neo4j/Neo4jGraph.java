@@ -23,7 +23,7 @@ public class Neo4jGraph implements Graph {
     private String directory;
     private Neo4jIndex index;
     private Transaction tx;
-    private boolean automaticTransactions = true;
+    private boolean autoTransactions = true;
 
     public Neo4jGraph(final String directory) {
         this(directory, null);
@@ -41,7 +41,7 @@ public class Neo4jGraph implements Graph {
             this.neo4j = new EmbeddedGraphDatabase(this.directory);
         IndexService indexService = new LuceneIndexService(neo4j);
         this.index = new Neo4jIndex(indexService, this);
-        if (this.automaticTransactions) {
+        if (this.autoTransactions) {
             this.tx = neo4j.beginTx();
         }
     }
@@ -128,7 +128,7 @@ public class Neo4jGraph implements Graph {
     }
 
     protected void stopStartTransaction() {
-        if (this.automaticTransactions) {
+        if (this.autoTransactions) {
             if (null != tx) {
                 this.tx.success();
                 this.tx.finish();
@@ -140,14 +140,14 @@ public class Neo4jGraph implements Graph {
     }
 
     public void startTransaction() {
-        if (this.automaticTransactions)
+        if (this.autoTransactions)
             throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
 
         this.tx = neo4j.beginTx();
     }
 
     public void stopTransaction(boolean success) {
-        if (this.automaticTransactions)
+        if (this.autoTransactions)
             throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
 
         if (success) {
@@ -159,15 +159,19 @@ public class Neo4jGraph implements Graph {
     }
 
     public void setAutoTransactions(boolean automatic) {
-        this.automaticTransactions = automatic;
+        this.autoTransactions = automatic;
         if (null != this.tx) {
             this.tx.success();
             this.tx.finish();
         }
     }
 
+    public boolean isAutoTransactions() {
+        return this.autoTransactions;
+    }
+
     public void shutdown() {
-        if (this.automaticTransactions) {
+        if (this.autoTransactions) {
             try {
                 this.tx.success();
                 this.tx.finish();

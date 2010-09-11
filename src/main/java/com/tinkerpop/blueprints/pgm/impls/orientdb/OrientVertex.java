@@ -14,7 +14,7 @@ import java.util.Set;
 public class OrientVertex extends OrientElement implements Vertex {
 
     public OrientVertex(final OrientGraph iGraph) {
-        super(iGraph, new OGraphVertex(iGraph.getUnderlying()));
+        super(iGraph, new OGraphVertex(iGraph.getRawGraph()));
         this.raw.save();
     }
 
