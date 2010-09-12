@@ -134,17 +134,4 @@ public class OrientGraph implements Graph {
     public ODatabaseGraphTx getRawGraph() {
         return database;
     }
-
-    public void startTransaction() {
-    }
-
-    public void stopTransaction(boolean success) {
-    }
-
-    public void setAutoTransactions(boolean autoTransactions) {
-    }
-
-    public boolean isAutoTransactions() {
-        return true;
-    }
 }

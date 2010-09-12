@@ -24,6 +24,7 @@ public class Neo4jGraphTest extends TestCase {
         config.supportsVertexIndex = true;
         config.supportsEdgeIndex = false;
         config.ignoresSuppliedIds = true;
+        config.supportsTransactions = true;
     }
 
     public void testVertexSuite() throws Exception {
@@ -44,6 +45,10 @@ public class Neo4jGraphTest extends TestCase {
 
     public void testGraphMLReaderSuite() throws Exception {
         doSuiteTest(new GraphMLReaderTestSuite(config));
+    }
+
+    public void testTransactionalGraphTestSuite() throws Exception {
+        doSuiteTest(new TransactionalGraphTestSuite(config));
     }
 
 

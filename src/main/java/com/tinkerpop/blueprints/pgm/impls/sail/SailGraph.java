@@ -2,8 +2,8 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
@@ -27,7 +27,7 @@ import java.util.UUID;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class SailGraph implements Graph {
+public class SailGraph implements TransactionalGraph {
 
     private Sail sail;
     private SailConnection sailConnection;
@@ -261,12 +261,12 @@ public class SailGraph implements Graph {
 
     public void startTransaction() {
         if (this.autoTransactions)
-            throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
+            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
     }
 
     public void stopTransaction(boolean success) {
         if (this.autoTransactions)
-            throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
+            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         try {
             if (success) {

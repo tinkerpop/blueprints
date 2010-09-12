@@ -42,4 +42,9 @@ public class SuiteConfiguration {
      */
     public boolean supportsVertexIteration;
 
+    /**
+     * Does the graph implement TransactionalGraph?
+     */
+    public boolean supportsTransactions;
+
 }

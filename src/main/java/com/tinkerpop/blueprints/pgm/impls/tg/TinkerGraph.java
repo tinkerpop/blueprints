@@ -21,20 +21,6 @@ public class TinkerGraph implements Graph {
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
     private TinkerIndex index = new TinkerIndex();
 
-    public void startTransaction() {
-    }
-
-    public void stopTransaction(boolean success) {
-    }
-
-    public void setAutoTransactions(boolean autoTransactions) {
-    }
-
-    public boolean isAutoTransactions() {
-        return true;
-    }
-
-
     public Vertex addVertex(final Object id) {
         String idString;
         if (null != id) {

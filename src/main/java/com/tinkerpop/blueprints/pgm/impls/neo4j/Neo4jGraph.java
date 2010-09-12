@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraph implements Graph {
+public class Neo4jGraph implements TransactionalGraph {
 
     private GraphDatabaseService neo4j;
     private String directory;
@@ -141,14 +141,14 @@ public class Neo4jGraph implements Graph {
 
     public void startTransaction() {
         if (this.autoTransactions)
-            throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
+            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         this.tx = neo4j.beginTx();
     }
 
     public void stopTransaction(boolean success) {
         if (this.autoTransactions)
-            throw new RuntimeException("Turn off automatic transactions to use manual transaction handling");
+            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         if (success) {
             this.tx.success();

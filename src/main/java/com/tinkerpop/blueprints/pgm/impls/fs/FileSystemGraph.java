@@ -65,18 +65,4 @@ public class FileSystemGraph implements Graph {
         roots = roots.substring(1, roots.length() - 1);
         return "filegraph[" + roots + "]";
     }
-
-    public void startTransaction() {
-    }
-
-    public void stopTransaction(boolean success) {
-    }
-
-    public void setAutoTransactions(boolean autoTransactions) {
-    }
-
-    public boolean isAutoTransactions() {
-        return true;
-    }
-
 }

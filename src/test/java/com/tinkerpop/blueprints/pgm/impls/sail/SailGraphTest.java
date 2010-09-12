@@ -153,6 +153,10 @@ public class SailGraphTest extends BaseTest {
         doSuiteTest(new IndexTestSuite(config));
     }
 
+    /*public void testTransactionalGraphTestSuite() throws Exception {
+        doSuiteTest(new TransactionalGraphTestSuite(config));
+    }*/
+
     private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testSail");
         if (doTest == null || doTest.equals("true")) {

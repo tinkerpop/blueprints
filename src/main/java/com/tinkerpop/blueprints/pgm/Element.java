@@ -4,10 +4,10 @@ import java.util.Set;
 
 /**
  * An element is the base class for both vertices and edges.
- * An element has an identifier that must be unique to its inhereting classes (vertex or edges).
- * An element can maintain a collection of key/value properites.
+ * An element has an identifier that must be unique to its inheriting classes (vertex or edges).
+ * An element can maintain a collection of key/value properties.
  * Keys are always strings and values can be any object.
- * Particular implemenations can reduce the space of objects that can be values.
+ * Particular implementations can reduce the space of objects that can be values.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
