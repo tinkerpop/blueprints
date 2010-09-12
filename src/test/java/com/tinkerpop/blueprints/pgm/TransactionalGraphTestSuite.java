@@ -157,5 +157,43 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
     }
 
+    public void testIndexTransactions(TransactionalGraph graph) {
+        if (!config.isRDFModel && config.supportsVertexIndex) {
+
+            graph.setAutoTransactions(false);
+            graph.startTransaction();
+            Vertex v = graph.addVertex(convertId("1"));
+            Object id = v.getId();
+            v.setProperty("name", "marko");
+            if (config.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 1);
+            graph.stopTransaction(true);
+
+            graph.startTransaction();
+            v = (Vertex) graph.getIndex().get("name", "marko").iterator().next();
+            assertEquals(v.getId(), id);
+            assertEquals(v.getProperty("name"), "marko");
+            if (config.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 1);
+            graph.stopTransaction(true);
+
+            graph.startTransaction();
+            v = graph.addVertex(convertId("2"));
+            v.setProperty("name", "pavel");
+            if (config.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 2);
+            graph.stopTransaction(false);
+
+            graph.startTransaction();
+            if (config.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 1);
+            assertNull(graph.getIndex().get("name", "pavel"));
+            graph.stopTransaction(true);
+
+
+        }
+
+    }
+
 
 }
