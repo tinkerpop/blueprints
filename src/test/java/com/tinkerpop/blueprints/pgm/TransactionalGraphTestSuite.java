@@ -21,23 +21,29 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
             graph.startTransaction();
             try {
-                graph.addVertex(convertId("1"));
+                graph.addVertex(null);
                 assertTrue(true);
             } catch (Exception e) {
                 assertTrue(false);
             }
             graph.stopTransaction(false);
+
             graph.startTransaction();
             assertEquals(count(graph.getVertices()), 1);
+            graph.stopTransaction(true);
+
             graph.startTransaction();
             try {
-                graph.addVertex(convertId("2"));
+                graph.addVertex(null);
                 assertTrue(true);
             } catch (Exception e) {
                 assertTrue(false);
             }
             graph.stopTransaction(true);
+
+            graph.startTransaction();
             assertEquals(count(graph.getVertices()), 2);
+            graph.stopTransaction(true);
 
         }
     }
@@ -48,7 +54,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             graph.setAutoTransactions(false);
             for (int i = 0; i < 100; i++) {
                 graph.startTransaction();
-                graph.addVertex(convertId(i + ""));
+                graph.addVertex(null);
                 graph.stopTransaction(true);
             }
             graph.startTransaction();
@@ -56,7 +62,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             graph.stopTransaction(true);
             for (int i = 100; i < 200; i++) {
                 graph.startTransaction();
-                graph.addVertex(convertId(i + ""));
+                graph.addVertex(null);
                 graph.stopTransaction(false);
             }
             graph.startTransaction();
@@ -67,8 +73,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
     public void testTransactionsForEdges(TransactionalGraph graph) {
 
-        Vertex v = graph.addVertex(convertId("1"));
-        Vertex u = graph.addVertex(convertId("2"));
+        Vertex v = graph.addVertex(null);
+        Vertex u = graph.addVertex(null);
         graph.setAutoTransactions(false);
 
         graph.startTransaction();
@@ -91,6 +97,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             assertTrue(false);
         }
         graph.stopTransaction(true);
+
         graph.startTransaction();
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
@@ -106,8 +113,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         graph.setAutoTransactions(false);
         for (int i = 0; i < 100; i++) {
             graph.startTransaction();
-            Vertex v = graph.addVertex(convertId("" + i));
-            Vertex u = graph.addVertex(convertId("" + (100 + i)));
+            Vertex v = graph.addVertex(null);
+            Vertex u = graph.addVertex(null);
             graph.addEdge(null, v, u, convertId("test"));
             graph.stopTransaction(true);
         }
@@ -135,7 +142,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
     public void testPropertyTransactions(TransactionalGraph graph) {
         graph.setAutoTransactions(false);
         graph.startTransaction();
-        Vertex v = graph.addVertex(convertId("1"));
+        Vertex v = graph.addVertex(null);
         Object id = v.getId();
         v.setProperty("name", "marko");
         graph.stopTransaction(true);
@@ -162,7 +169,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
             graph.setAutoTransactions(false);
             graph.startTransaction();
-            Vertex v = graph.addVertex(convertId("1"));
+            Vertex v = graph.addVertex(null);
             Object id = v.getId();
             v.setProperty("name", "marko");
             if (config.supportsVertexIteration)
@@ -178,7 +185,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             graph.stopTransaction(true);
 
             graph.startTransaction();
-            v = graph.addVertex(convertId("2"));
+            v = graph.addVertex(null);
             v.setProperty("name", "pavel");
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 2);
