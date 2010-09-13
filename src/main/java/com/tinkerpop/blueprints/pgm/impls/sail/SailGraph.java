@@ -35,7 +35,7 @@ public class SailGraph implements TransactionalGraph {
 
     protected Sail sail;
     protected SailConnection sailConnection;
-    private boolean autoTransactions = true;
+    private Mode mode = Mode.AUTOMATIC;
 
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
@@ -262,7 +262,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     protected void stopStartTransaction() {
-        if (this.autoTransactions) {
+        if (Mode.AUTOMATIC == this.mode) {
             try {
                 this.sailConnection.commit();
             } catch (SailException e) {
@@ -272,16 +272,16 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void startTransaction() {
-        if (this.autoTransactions)
+        if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
     }
 
-    public void stopTransaction(boolean success) {
-        if (this.autoTransactions)
+    public void stopTransaction(final Conclusion conclusion) {
+        if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         try {
-            if (success) {
+            if (Conclusion.SUCCESS == conclusion) {
                 this.sailConnection.commit();
             } else {
                 this.sailConnection.rollback();
@@ -291,12 +291,12 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
-    public void setAutoTransactions(boolean automatic) {
-        this.autoTransactions = automatic;
+    public void setTransactionMode(Mode mode) {
+        this.mode = mode;
     }
 
-    public boolean isAutoTransactions() {
-        return this.autoTransactions;
+    public Mode getTransactionMode() {
+        return this.mode;
     }
 
 

@@ -17,7 +17,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
         if (config.supportsVertexIteration) {
             graph.addVertex(null);
-            graph.setAutoTransactions(false);
+            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
 
             graph.startTransaction();
             try {
@@ -26,11 +26,11 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             } catch (Exception e) {
                 assertTrue(false);
             }
-            graph.stopTransaction(false);
+            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
 
             graph.startTransaction();
             assertEquals(count(graph.getVertices()), 1);
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
             graph.startTransaction();
             try {
@@ -39,11 +39,11 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             } catch (Exception e) {
                 assertTrue(false);
             }
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
             graph.startTransaction();
             assertEquals(count(graph.getVertices()), 2);
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         }
     }
@@ -51,23 +51,23 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
     public void testBruteVertexTransactions(final TransactionalGraph graph) {
 
         if (config.supportsVertexIteration) {
-            graph.setAutoTransactions(false);
+            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
             for (int i = 0; i < 100; i++) {
                 graph.startTransaction();
                 graph.addVertex(null);
-                graph.stopTransaction(true);
+                graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             }
             graph.startTransaction();
             assertEquals(count(graph.getVertices()), 100);
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             for (int i = 100; i < 200; i++) {
                 graph.startTransaction();
                 graph.addVertex(null);
-                graph.stopTransaction(false);
+                graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
             }
             graph.startTransaction();
             assertEquals(count(graph.getVertices()), 100);
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         }
     }
 
@@ -75,7 +75,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
         Vertex v = graph.addVertex(null);
         Vertex u = graph.addVertex(null);
-        graph.setAutoTransactions(false);
+        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
 
         graph.startTransaction();
         try {
@@ -84,7 +84,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         } catch (Exception e) {
             assertTrue(false);
         }
-        graph.stopTransaction(false);
+        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         graph.startTransaction();
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
@@ -96,56 +96,56 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         } catch (Exception e) {
             assertTrue(false);
         }
-        graph.stopTransaction(true);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         graph.startTransaction();
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
         if (config.supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 1);
-        graph.stopTransaction(true);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
 
     }
 
     public void testBruteEdgeTransactions(TransactionalGraph graph) {
 
-        graph.setAutoTransactions(false);
+        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
         for (int i = 0; i < 100; i++) {
             graph.startTransaction();
             Vertex v = graph.addVertex(null);
             Vertex u = graph.addVertex(null);
             graph.addEdge(null, v, u, convertId("test"));
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         }
         graph.startTransaction();
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 200);
         if (config.supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 100);
-        graph.stopTransaction(true);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         for (int i = 0; i < 100; i++) {
             graph.startTransaction();
             Vertex v = graph.addVertex(null);
             Vertex u = graph.addVertex(null);
             graph.addEdge(null, v, u, convertId("test"));
-            graph.stopTransaction(false);
+            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         }
         graph.startTransaction();
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 200);
         if (config.supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 100);
-        graph.stopTransaction(true);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     public void testPropertyTransactions(TransactionalGraph graph) {
-        graph.setAutoTransactions(false);
+        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
         graph.startTransaction();
         Vertex v = graph.addVertex(null);
         Object id = v.getId();
         v.setProperty("name", "marko");
-        graph.stopTransaction(true);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         graph.startTransaction();
         v = graph.getVertex(id);
@@ -153,28 +153,28 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         assertEquals(v.getProperty("name"), "marko");
         v.setProperty("age", 30);
         assertEquals(v.getProperty("age"), 30);
-        graph.stopTransaction(false);
+        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
 
         graph.startTransaction();
         v = graph.getVertex(id);
         assertNotNull(v);
         assertEquals(v.getProperty("name"), "marko");
         assertNull(v.getProperty("age"));
-        graph.stopTransaction(true);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
     }
 
     public void testIndexTransactions(TransactionalGraph graph) {
         if (!config.isRDFModel && config.supportsVertexIndex) {
 
-            graph.setAutoTransactions(false);
+            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
             graph.startTransaction();
             Vertex v = graph.addVertex(null);
             Object id = v.getId();
             v.setProperty("name", "marko");
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 1);
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
             graph.startTransaction();
             v = (Vertex) graph.getIndex().get("name", "marko").iterator().next();
@@ -182,20 +182,20 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             assertEquals(v.getProperty("name"), "marko");
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 1);
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
             graph.startTransaction();
             v = graph.addVertex(null);
             v.setProperty("name", "pavel");
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 2);
-            graph.stopTransaction(false);
+            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
 
             graph.startTransaction();
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 1);
             assertNull(graph.getIndex().get("name", "pavel"));
-            graph.stopTransaction(true);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
 
         }

@@ -23,7 +23,7 @@ public class Neo4jGraph implements TransactionalGraph {
     private String directory;
     private Neo4jIndex index;
     private Transaction tx;
-    private boolean autoTransactions = true;
+    private Mode mode = Mode.AUTOMATIC;
 
     public Neo4jGraph(final String directory) {
         this(directory, null);
@@ -41,7 +41,7 @@ public class Neo4jGraph implements TransactionalGraph {
             this.neo4j = new EmbeddedGraphDatabase(this.directory);
         IndexService indexService = new LuceneIndexService(neo4j);
         this.index = new Neo4jIndex(indexService, this);
-        if (this.autoTransactions) {
+        if (Mode.AUTOMATIC == this.mode) {
             this.tx = neo4j.beginTx();
         }
     }
@@ -128,7 +128,7 @@ public class Neo4jGraph implements TransactionalGraph {
     }
 
     protected void stopStartTransaction() {
-        if (this.autoTransactions) {
+        if (Mode.AUTOMATIC == this.mode) {
             if (null != tx) {
                 this.tx.success();
                 this.tx.finish();
@@ -140,17 +140,17 @@ public class Neo4jGraph implements TransactionalGraph {
     }
 
     public void startTransaction() {
-        if (this.autoTransactions)
+        if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         this.tx = neo4j.beginTx();
     }
 
-    public void stopTransaction(boolean success) {
-        if (this.autoTransactions)
+    public void stopTransaction(Conclusion conclusion) {
+        if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
-        if (success) {
+        if (conclusion == Conclusion.SUCCESS) {
             this.tx.success();
         } else {
             this.tx.failure();
@@ -158,20 +158,21 @@ public class Neo4jGraph implements TransactionalGraph {
         this.tx.finish();
     }
 
-    public void setAutoTransactions(boolean automatic) {
-        this.autoTransactions = automatic;
+    public void setTransactionMode(Mode mode) {
+
+        this.mode = mode;
         if (null != this.tx) {
             this.tx.success();
             this.tx.finish();
         }
     }
 
-    public boolean isAutoTransactions() {
-        return this.autoTransactions;
+    public Mode getTransactionMode() {
+        return this.mode;
     }
 
     public void shutdown() {
-        if (this.autoTransactions) {
+        if (Mode.AUTOMATIC == this.mode) {
             try {
                 this.tx.success();
                 this.tx.finish();
