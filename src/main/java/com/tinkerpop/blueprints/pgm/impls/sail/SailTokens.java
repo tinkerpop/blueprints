@@ -35,6 +35,10 @@ public class SailTokens {
     public static final String BNODE = "bnode";
     public static final String LITERAL = "literal";
 
+    public static final String PREFIX_SPACE = "PREFIX ";
+    public static final String COLON_LESSTHAN = ": <";
+    public static final String GREATERTHAN_NEWLINE = ">\n";
+
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
 
     static {

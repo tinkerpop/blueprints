@@ -1,16 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
 import com.tinkerpop.blueprints.pgm.Vertex;
-import org.openrdf.sail.Sail;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class SailGraphFactory {
 
-    public static SailGraph createTinkerGraph(Sail sail) {
-
-        SailGraph graph = new SailGraph(sail);
+    public static void createTinkerGraph(SailGraph graph) {
         graph.addNamespace("tg", "http://tinkerpop.com#");
         Vertex marko = graph.addVertex(graph.expandPrefix("tg:1"));
         Vertex vadas = graph.addVertex(graph.expandPrefix("tg:2"));
@@ -24,8 +21,6 @@ public class SailGraphFactory {
         graph.addEdge(null, josh, lop, graph.expandPrefix("tg:created"));
         graph.addEdge(null, josh, ripple, graph.expandPrefix("tg:created"));
         graph.addEdge(null, peter, lop, graph.expandPrefix("tg:created"));
-        return graph;
-
     }
 
 }

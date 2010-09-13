@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.impls.sail.SailEdge;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Statement;
-import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.util.Iterator;

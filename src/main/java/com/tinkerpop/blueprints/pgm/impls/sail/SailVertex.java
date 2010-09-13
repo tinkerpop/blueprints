@@ -9,7 +9,6 @@ import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.util.HashMap;

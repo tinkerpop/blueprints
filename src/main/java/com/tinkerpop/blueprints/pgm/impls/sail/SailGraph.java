@@ -12,6 +12,12 @@ import org.openrdf.model.*;
 import org.openrdf.model.impl.BNodeImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.query.Binding;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.impl.MapBindingSet;
+import org.openrdf.query.parser.ParsedQuery;
+import org.openrdf.query.parser.sparql.SPARQLParser;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
@@ -20,17 +26,15 @@ import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class SailGraph implements TransactionalGraph {
 
-    private Sail sail;
-    private SailConnection sailConnection;
+    protected Sail sail;
+    protected SailConnection sailConnection;
     private boolean autoTransactions = true;
 
     private static final String LOG4J_PROPERTIES = "log4j.properties";
@@ -52,6 +56,14 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public SailGraph(final Sail sail) {
+        this.startSail(sail);
+    }
+
+    public SailGraph() {
+
+    }
+
+    protected void startSail(final Sail sail) {
         try {
             PropertyConfigurator.configure(SailGraph.class.getResource(LOG4J_PROPERTIES));
         } catch (Exception e) {
@@ -292,4 +304,41 @@ public class SailGraph implements TransactionalGraph {
         String type = this.sail.getClass().getSimpleName().toLowerCase();
         return "sailgraph[" + type + "]";
     }
+
+    private String getPrefixes() {
+        String prefixString = "";
+        Map<String, String> namespaces = this.getNamespaces();
+        for (Map.Entry<String, String> entry : namespaces.entrySet()) {
+            prefixString = prefixString + SailTokens.PREFIX_SPACE + entry.getKey() + SailTokens.COLON_LESSTHAN + entry.getValue() + SailTokens.GREATERTHAN_NEWLINE;
+        }
+        return prefixString;
+    }
+
+    public List<Map<String, Vertex>> executeSparql(String sparqlQuery) throws RuntimeException {
+        try {
+            sparqlQuery = getPrefixes() + sparqlQuery;
+            final SPARQLParser parser = new SPARQLParser();
+            final ParsedQuery query = parser.parseQuery(sparqlQuery, null);
+            boolean includeInferred = false;
+            final CloseableIteration<? extends BindingSet, QueryEvaluationException> results = this.sailConnection.evaluate(query.getTupleExpr(), query.getDataset(), new MapBindingSet(), includeInferred);
+            final List<Map<String, Vertex>> returnList = new ArrayList<Map<String, Vertex>>();
+            try {
+                while (results.hasNext()) {
+                    BindingSet bs = results.next();
+                    Map<String, Vertex> returnMap = new HashMap<String, Vertex>();
+                    for (Binding b : bs) {
+                        returnMap.put(b.getName(), this.getVertex(b.getValue().toString()));
+                    }
+                    returnList.add(returnMap);
+                }
+            } finally {
+                results.close();
+            }
+            return returnList;
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+
 }

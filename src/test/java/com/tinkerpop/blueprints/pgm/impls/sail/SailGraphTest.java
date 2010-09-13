@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.LiteralImpl;
@@ -10,6 +11,8 @@ import org.openrdf.sail.SailException;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 
@@ -34,7 +37,7 @@ public class SailGraphTest extends BaseTest {
 
     public void testSailGraphFactory() {
         assertTrue(true);
-        SailGraphFactory.createTinkerGraph(new MemoryStore());
+        SailGraphFactory.createTinkerGraph(new MemoryStoreSailGraph());
     }
 
     public void testTypeConversion() {
@@ -47,8 +50,7 @@ public class SailGraphTest extends BaseTest {
     }
 
     public void testNamespaceConversion() throws Exception {
-        MemoryStore sail = new MemoryStore();
-        SailGraph graph = new SailGraph(sail);
+        SailGraph graph = new MemoryStoreSailGraph();
         graph.addNamespace("tg", "http://tinkerpop.com#");
         graph.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         assertEquals(SailGraph.prefixToNamespace("tg:name", graph.getSailConnection()), "http://tinkerpop.com#name");
@@ -100,8 +102,7 @@ public class SailGraphTest extends BaseTest {
     }
 
     public void testLiteralProperties() {
-        MemoryStore sail = new MemoryStore();
-        SailGraph graph = new SailGraph(sail);
+        SailGraph graph = new MemoryStoreSailGraph();
         Vertex v = graph.getVertex("\"java\"^^<http://www.w3.org/2001/XMLSchema#string>");
         assertEquals(v.getProperty(SailTokens.VALUE), "java");
         assertEquals(v.getProperty(SailTokens.DATATYPE), "http://www.w3.org/2001/XMLSchema#string");
@@ -123,8 +124,7 @@ public class SailGraphTest extends BaseTest {
     }
 
     public void testValueKinds() {
-        MemoryStore sail = new MemoryStore();
-        SailGraph graph = new SailGraph(sail);
+        SailGraph graph = new MemoryStoreSailGraph();
         Vertex v = graph.getVertex("\"java\"^^<http://www.w3.org/2001/XMLSchema#string>");
         assertEquals(v.getProperty(SailTokens.KIND), "literal");
 
@@ -133,6 +133,22 @@ public class SailGraphTest extends BaseTest {
 
         v = graph.getVertex("_:123");
         assertEquals(v.getProperty(SailTokens.KIND), "bnode");
+    }
+
+    public void testSparql() {
+        SailGraph graph = new MemoryStoreSailGraph();
+        SailGraphFactory.createTinkerGraph(graph);
+
+        String query = "SELECT ?x ?y WHERE { ?x tg:knows ?y }";
+        this.stopWatch();
+
+        List<Map<String, Vertex>> results = graph.executeSparql(query);
+        assertEquals(results.size(), 2);
+        for (Map<String, Vertex> map : results) {
+            assertEquals(map.get("x"), graph.getVertex("tg:1"));
+            assertTrue(map.get("y").equals(graph.getVertex("tg:2")) || map.get("y").equals(graph.getVertex("tg:4")));
+        }
+        graph.shutdown();
     }
 
     //// TEST SUITES
