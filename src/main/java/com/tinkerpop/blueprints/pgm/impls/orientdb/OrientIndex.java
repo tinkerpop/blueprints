@@ -100,6 +100,16 @@ public class OrientIndex implements Index {
         return new OrientElementSequence(this.graph, list.iterator());
     }
 
+    public long count(final String iKey, final Object iValue) {
+        final String key = iKey + SEPARATOR + iValue;
+        final List<ODocument> docList = map.get(key);
+        if (null == docList) {
+            return 0;
+        } else {
+            return docList.size();
+        }
+    }
+
     public void remove(final String key, final Object value, final Element element) {
         if (!indexAll && !indexedKeys.contains(key))
             return;

@@ -45,6 +45,16 @@ public class TinkerIndex implements Index {
 
     }
 
+    public long count(final String key, final Object value) {
+        Iterable<Element> results = this.get(key, value);
+        if (null == results) {
+            return 0;
+        } else {
+            Set<Element> set = (Set<Element>)results;
+            return set.size();
+        }
+    }
+
     public void remove(final String key, final Object value, final Element element) {
         Map<Object, Set<Element>> keyMap = this.indices.get(key);
         if (null != keyMap) {

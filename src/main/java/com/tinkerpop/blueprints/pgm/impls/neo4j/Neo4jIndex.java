@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import org.neo4j.graphdb.Node;
 import org.neo4j.index.IndexService;
+import org.neo4j.index.IndexHits;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexElementSequence;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,18 +44,16 @@ public class Neo4jIndex implements Index {
     }
 
     public Iterable<Element> get(final String key, final Object value) {
-        Iterable<Node> itty = this.indexService.getNodes(key, value);
-        if (null != itty) {
-            Iterator<Node> itty2 = itty.iterator();
-            if (itty2.hasNext()) {
-                Set<Element> elements = new HashSet<Element>();
-                while (itty2.hasNext()) {
-                    elements.add(new Neo4jVertex(itty2.next(), this.graph));
-                }
-                return elements;
-            }
+        IndexHits<Node> itty = this.indexService.getNodes(key, value);
+        if (null != itty && itty.size() > 0) {
+            return new Neo4jVertexElementSequence(itty, this.graph);
         }
         return null;
+    }
+
+    public long count(final String key, final Object value) {
+        IndexHits<Node> itty = this.indexService.getNodes(key, value);
+        return itty.size();
     }
 
     public void remove(final String key, final Object value, final Element element) {
