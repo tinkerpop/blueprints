@@ -2,10 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
-    <artifactId>graphdb-deps</artifactId>
-    <version>0.1</version>
+    <artifactId>graphdb-deps-sail</artifactId>
+    <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>GraphDB Depdencencies</name>
+    <name>GraphDB Dependencies-Sail</name>
+    <url>http://openrdf.org</url>
     <developers>
         <developer>
             <name>Marko A. Rodriguez</name>
@@ -18,29 +19,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <dependencies>
-        <!-- NEO4J SUPPORT -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-index</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <!-- ORIENTDB SUPPORT -->
-        <dependency>
-            <groupId>com.orientechnologies</groupId>
-            <artifactId>orientdb-core</artifactId>
-            <version>0.9.22-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.orientechnologies</groupId>
-            <artifactId>orient-commons</artifactId>
-            <version>0.9.22-SNAPSHOT</version>
-        </dependency>
-        <!-- SAIL SUPPORT -->
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame</artifactId>
@@ -124,57 +102,12 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.5.10</version>
         </dependency>
-        <!-- NEO4J SAIL SUPPORT -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-rdf-sail</artifactId>
-            <version>0.6-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-rdf</artifactId>
-            <version>0.7-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
-        <!-- LINKED DATA SAIL SUPPORT -->
-        <dependency>
-            <groupId>net.fortytwo</groupId>
-            <artifactId>linked-data-sail</artifactId>
-            <version>0.5</version>
-        </dependency>
     </dependencies>
     <repositories>
-        <repository>
-            <id>maven repository</id>
-            <url>http://mvnrepository.com</url>
-        </repository>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>http://tinkerpop.com/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
         <repository>
             <id>aduna-repo</id>
             <name>Aduna repository</name>
             <url>http://repo.aduna-software.org/maven2/releases</url>
-        </repository>
-        <repository>
-            <id>neo4j-public-repository</id>
-            <name>Publicly available Maven 2 repository for Neo4j</name>
-            <url>http://m2.neo4j.org</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>orientechnologies-repository</id>
-            <name>Orient Technologies Maven2 Repository</name>
-            <url>http://www.orientechnologies.com/listing/m2</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
