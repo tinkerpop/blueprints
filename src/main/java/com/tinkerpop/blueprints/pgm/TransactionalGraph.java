@@ -16,13 +16,14 @@ public interface TransactionalGraph extends Graph {
     }
 
     /**
-     * Start a transaction to perform graph manipulation operations within.
+     * Start a transaction in order to manipulate the graph.
+     * This is required for graph manipulations in manual transaction mode.
      */
     public void startTransaction();
 
     /**
      * Stop the current transaction. Specify whether the transaction was successful or not.
-     * An failing transaction will rollback all updates to when the transaction was started.
+     * A failing transaction will rollback all updates to before the transaction was started.
      *
      * @param conclusion whether or not the current transaction was successful or not
      */
@@ -31,9 +32,8 @@ public interface TransactionalGraph extends Graph {
     /**
      * There are two transaction modes: automatic and manual.
      * Automatic transactions commit successfully on every operation.
-     * The benefit of auto transactions is that it requires less method calls in the users code.
-     * The drawback of auto transactions is that it is much slower than manually controlled transactions
-     * as every write/delete operation is committed when complete.
+     * The benefit of auto transactions is that it requires less code.
+     * The drawback of auto transactions is that it is much slower than manually controlled transactions as every write/delete operation is committed when complete.
      *
      * @param mode the transaction mode to use
      */
@@ -42,7 +42,7 @@ public interface TransactionalGraph extends Graph {
     /**
      * Returns the transaction mode the graph is currently in.
      *
-     * @return returns the graphs transaction mode
+     * @return returns the graph's transaction mode
      */
     public Mode getTransactionMode();
 }

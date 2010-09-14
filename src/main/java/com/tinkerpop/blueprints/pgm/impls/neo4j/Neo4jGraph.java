@@ -46,6 +46,14 @@ public class Neo4jGraph implements TransactionalGraph {
         }
     }
 
+    public Neo4jGraph(GraphDatabaseService neo4jInstance, IndexService indexService) {
+        this.neo4j = neo4jInstance;
+        this.index = new Neo4jIndex(indexService, this);
+        if (Mode.AUTOMATIC == this.mode) {
+            this.tx = neo4j.beginTx();
+        }
+    }
+
     public Index getIndex() {
         return this.index;
     }

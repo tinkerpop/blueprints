@@ -13,7 +13,7 @@
         extensions.
     </description>
     <properties>
-        <scope>compile</scope>
+        <scope>provided</scope>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <developers>
