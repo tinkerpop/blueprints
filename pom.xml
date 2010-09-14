@@ -48,12 +48,14 @@
             <artifactId>neo4j-kernel</artifactId>
             <version>1.1</version>
             <scope>${scope}</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-index</artifactId>
             <version>1.1</version>
             <scope>${scope}</scope>
+            <optional>true</optional>
         </dependency>
         <!-- ORIENTDB SUPPORT -->
         <dependency>
@@ -61,12 +63,14 @@
             <artifactId>orientdb-core</artifactId>
             <version>0.9.22-SNAPSHOT</version>
             <scope>${scope}</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orient-commons</artifactId>
             <version>0.9.22-SNAPSHOT</version>
             <scope>${scope}</scope>
+            <optional>true</optional>
         </dependency>
         <!-- SAIL SUPPORT -->
         <dependency>
@@ -228,11 +232,11 @@
             <id>maven repository</id>
             <url>http://mvnrepository.com</url>
         </repository>
-        <repository>
+        <!--<repository>
             <id>tinkerpop-repository</id>
             <name>TinkerPop Maven2 Repository</name>
             <url>http://tinkerpop.com/maven2</url>
-        </repository>
+        </repository>-->
         <repository>
             <id>neo4j-public-repository</id>
             <name>Publically available Maven 2 repository for Neo4j</name>
@@ -246,6 +250,10 @@
             <id>orientechnologies-repository</id>
             <name>Orient Technologies Maven2 Repository</name>
             <url>http://www.orientechnologies.com/listing/m2</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
         </repository>
         <repository>
             <id>aduna-repo</id>
@@ -309,7 +317,6 @@
                 </executions>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/assembly/standalone.xml</descriptor>
                         <descriptor>src/assembly/distribution.xml</descriptor>
                     </descriptors>
                     <finalName>blueprints-${project.version}</finalName>
