@@ -19,13 +19,16 @@ bc. <dependency>
 
 * Removed Blueprints Pipes BETA and put it into a separate project
 * @Neo4jGraph@ constructor can be passed in a Neo4j properties map
+* @Neo4jGraph@ constructor can be passed in a live @GraphDatabaseService@
 * Updated @GraphMLWriter@ to write all vertices and then all edges
 * Added RDF load functionality to @SailGraph@
-* Fixed server @GraphMLReader@ bug
+* Added SPARQL functioanlity to @SailGraph@
+* Fixed sever @GraphMLReader@ bug
 * Added OrientDB (OrientGraph) as a property graph implementation
 * Added support for @Graph.getEdge(Object id)@
-* Added support for @kind in the Sail implementation of Blueprints
+* Added support for @kind@ in the Sail implementation of Blueprints
 * Made iterating edges in @SailGraph@ faster and more memory efficient
+* Support for transactions through @TransactionalGraph@
 
 
 h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)

@@ -11,6 +11,10 @@ import java.util.*;
 
 
 /**
+ * An implementation of the Graph interface provided by the JUNG graph analysis package.
+ * In this way, a Blueprints graph is modeled as a JUNG graph.
+ * This JUNG model can be used with any algorithms/tools that require a JUNG graph.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {

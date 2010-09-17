@@ -6,6 +6,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>GraphDB Dependencies-All</name>
+    <url>http://tinkerpop.com</url>
     <developers>
         <developer>
             <name>Marko A. Rodriguez</name>
