@@ -16,6 +16,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
     public void testTransactionsForVertices(TransactionalGraph graph) {
 
         if (config.supportsVertexIteration) {
+            graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
             graph.addVertex(null);
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
 
@@ -73,6 +74,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
     public void testTransactionsForEdges(TransactionalGraph graph) {
 
+        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         Vertex v = graph.addVertex(null);
         Vertex u = graph.addVertex(null);
         graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
@@ -165,8 +167,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
     }
 
     public void testIndexTransactions(TransactionalGraph graph) {
-        if (!config.isRDFModel && config.supportsVertexIndex) {
 
+        if (!config.supportsVertexIndex && config.supportsVertexIndex) {
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
             graph.startTransaction();
             Vertex v = graph.addVertex(null);
@@ -196,8 +198,6 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
                 assertEquals(count(graph.getVertices()), 1);
             assertNull(graph.getIndex().get("name", "pavel"));
             graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-
-
         }
 
     }

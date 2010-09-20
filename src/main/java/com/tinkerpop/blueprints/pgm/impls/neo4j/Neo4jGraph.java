@@ -168,11 +168,14 @@ public class Neo4jGraph implements TransactionalGraph {
 
     public void setTransactionMode(Mode mode) {
 
-        this.mode = mode;
         if (null != this.tx) {
             this.tx.success();
             this.tx.finish();
         }
+
+        this.mode = mode;
+        if (this.mode == Mode.AUTOMATIC)
+            this.tx = neo4j.beginTx();
     }
 
     public Mode getTransactionMode() {
