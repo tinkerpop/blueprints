@@ -70,7 +70,7 @@
             <groupId>couchdb4j</groupId>
             <artifactId>couchdb4j</artifactId>
             <version>0.3.0-i386-1</version>
-            <scope>${scope}</scope>
+            <scope>provided</scope>
         </dependency>-->
         <!-- TESTING -->
         <dependency>
