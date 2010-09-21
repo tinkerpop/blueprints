@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -65,34 +64,13 @@ public class OrientGraphTest extends BaseTest {
                 if (method.getName().startsWith("test")) {
 
                     OrientGraph graph = new OrientGraph("local:" + url + "/graph");
-                    if (graph.exists()) {
-                        graph.open("admin", "admin");
-                        graph.clear();
-                    } else
-                        graph.create();
-
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(suite, graph);
 
                     graph.shutdown();
+                    deleteDirectory(new File(url));
                 }
             }
-
-            deleteGraphDirectory(new File(url));
         }
     }
-
-    protected static void deleteGraphDirectory(final File directory) {
-        if (directory.exists()) {
-            for (File file : directory.listFiles()) {
-                if (file.isDirectory()) {
-                    deleteGraphDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
-            directory.delete();
-        }
-    }
-
 }

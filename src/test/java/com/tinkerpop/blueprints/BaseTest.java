@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints;
 
 import junit.framework.TestCase;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -89,6 +90,19 @@ public abstract class BaseTest extends TestCase {
         }
         for (String uuid : uuids) {
             uuid.toUpperCase();
+        }
+    }
+
+    protected static void deleteDirectory(final File directory) {
+        if (directory.exists()) {
+            for (File file : directory.listFiles()) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+            directory.delete();
         }
     }
 

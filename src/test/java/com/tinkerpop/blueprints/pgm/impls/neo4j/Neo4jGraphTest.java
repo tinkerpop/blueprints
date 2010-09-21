@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 import junit.framework.TestCase;
@@ -10,7 +11,7 @@ import java.lang.reflect.Method;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraphTest extends TestCase {
+public class Neo4jGraphTest extends BaseTest {
 
     private static final SuiteConfiguration config = new SuiteConfiguration();
 
@@ -65,7 +66,7 @@ public class Neo4jGraphTest extends TestCase {
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(suite, graph);
                     graph.shutdown();
-                    deleteGraphDirectory(new File(directory));
+                    deleteDirectory(new File(directory));
                 }
             }
         }
@@ -110,7 +111,7 @@ public class Neo4jGraphTest extends TestCase {
             String directory = System.getProperty("neo4jDirectory");
             if (directory == null) {
                 directory = "/tmp/blueprints_test";
-                Neo4jGraphTest.deleteGraphDirectory(new File(directory));
+                deleteDirectory(new File(directory));
                 Neo4jGraph graph = new Neo4jGraph(directory);
                 graph.clear();
                 return graph;
@@ -118,19 +119,4 @@ public class Neo4jGraphTest extends TestCase {
         }
         return null;
     }
-
-    protected static void deleteGraphDirectory(final File directory) {
-        if (directory.exists()) {
-            for (File file : directory.listFiles()) {
-                if (file.isDirectory()) {
-                    deleteGraphDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
-            directory.delete();
-        }
-    }
-
-
 }
