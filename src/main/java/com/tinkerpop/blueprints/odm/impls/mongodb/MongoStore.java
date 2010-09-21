@@ -2,9 +2,9 @@ package com.tinkerpop.blueprints.odm.impls.mongodb;
 
 import com.mongodb.*;
 import com.tinkerpop.blueprints.odm.Store;
+import com.tinkerpop.blueprints.odm.impls.mongodb.util.MongoSequence;
 
 import java.net.UnknownHostException;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -55,30 +55,5 @@ public class MongoStore implements Store<MongoDocument> {
 
     public void shutdown() {
         // TODO: what is needed to shutdown a connection in MongoDB?
-    }
-
-    private class MongoSequence implements Iterator<MongoDocument>, Iterable<MongoDocument> {
-
-        private final DBCursor cursor;
-
-        public MongoSequence(DBCursor cursor) {
-            this.cursor = cursor;
-        }
-
-        public boolean hasNext() {
-            return this.cursor.hasNext();
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public MongoDocument next() {
-            return new MongoDocument(this.cursor.next());
-        }
-
-        public Iterator<MongoDocument> iterator() {
-            return this;
-        }
     }
 }
