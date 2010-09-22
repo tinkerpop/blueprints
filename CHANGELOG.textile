@@ -9,7 +9,9 @@ bc. <repository>
 
 ==<hr/>==
 
-h3. Version 0.1.2 (Bob the Builder -- NOT OFFICIALLY RELEASED YET)
+!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
+
+h3. Version 0.2 (Kermit -- September 22, 2010)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
@@ -30,6 +32,9 @@ bc. <dependency>
 * Made iterating edges in @SailGraph@ faster and more memory efficient
 * Support for transactions through @TransactionalGraph@
 
+==<hr/>==
+
+!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-bob-the-builder.png!
 
 h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 

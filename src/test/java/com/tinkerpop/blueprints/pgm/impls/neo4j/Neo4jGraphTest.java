@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
-import junit.framework.TestCase;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -59,6 +58,7 @@ public class Neo4jGraphTest extends BaseTest {
             String directory = System.getProperty("neo4jDirectory");
             if (directory == null)
                 directory = "/tmp/blueprints_test";
+            deleteDirectory(new File(directory));
             for (Method method : suite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     Graph graph = new Neo4jGraph(directory);

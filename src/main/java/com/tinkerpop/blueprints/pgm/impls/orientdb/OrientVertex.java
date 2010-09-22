@@ -13,21 +13,21 @@ import java.util.Set;
  */
 public class OrientVertex extends OrientElement implements Vertex {
 
-    public OrientVertex(final OrientGraph iGraph) {
-        super(iGraph, new OGraphVertex(iGraph.getRawGraph()));
-        this.raw.save();
+    public OrientVertex(final OrientGraph graph) {
+        super(graph, new OGraphVertex(graph.getRawGraph()));
+        this.rawElement.save();
     }
 
-    public OrientVertex(final OrientGraph iGraph, final OGraphVertex vertex) {
-        super(iGraph, vertex);
+    public OrientVertex(final OrientGraph graph, final OGraphVertex rawVertex) {
+        super(graph, rawVertex);
     }
 
     public Iterable<Edge> getOutEdges() {
-        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.raw).getOutEdges().iterator());
+        return new OrientElementSequence<Edge>(this.graph, ((OGraphVertex) this.rawElement).getOutEdges().iterator());
     }
 
     public Iterable<Edge> getInEdges() {
-        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.raw).getInEdges().iterator());
+        return new OrientElementSequence<Edge>(this.graph, ((OGraphVertex) this.rawElement).getInEdges().iterator());
     }
 
     public Set<String> getPropertyKeys() {
@@ -38,7 +38,7 @@ public class OrientVertex extends OrientElement implements Vertex {
     }
 
     public OGraphVertex getRawVertex() {
-        return (OGraphVertex) this.raw;
+        return (OGraphVertex) this.rawElement;
     }
 
     public String toString() {

@@ -15,36 +15,31 @@ import java.util.NoSuchElementException;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientElementSequence<T extends Element> implements Iterator<T>, Iterable<T> {
-    private final Iterator<? extends OGraphElement> elements;
+    private final Iterator<? extends OGraphElement> rawElements;
     private final OrientGraph graph;
 
-    public OrientElementSequence(final OrientGraph iGraph, final Iterator<? extends OGraphElement> edges) {
-        this.graph = iGraph;
-        this.elements = edges;
+    public OrientElementSequence(final OrientGraph graph, final Iterator<? extends OGraphElement> rawElements) {
+        this.graph = graph;
+        this.rawElements = rawElements;
     }
 
     public boolean hasNext() {
-        return this.elements.hasNext();
+        return this.rawElements.hasNext();
     }
 
     public T next() {
-        OGraphElement e = this.elements.next();
-        if (null == e)
+        OGraphElement rawElement = this.rawElements.next();
+        if (null == rawElement)
             throw new NoSuchElementException();
 
-        // TRY IN CACHE
-        final Element el = this.graph.getCachedElement(e.getDocument().getIdentity());
-        if (el != null)
-            return (T) el;
-
-        if (e instanceof OGraphEdge)
-            return (T) new OrientEdge(graph, (OGraphEdge) e);
+        if (rawElement instanceof OGraphEdge)
+            return (T) new OrientEdge(graph, (OGraphEdge) rawElement);
         else
-            return (T) new OrientVertex(graph, (OGraphVertex) e);
+            return (T) new OrientVertex(graph, (OGraphVertex) rawElement);
     }
 
     public void remove() {
-        this.elements.remove();
+        this.rawElements.remove();
     }
 
     public Iterator<T> iterator() {

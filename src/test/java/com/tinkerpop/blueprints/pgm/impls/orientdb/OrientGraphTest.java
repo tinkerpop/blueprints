@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -41,13 +42,9 @@ public class OrientGraphTest extends BaseTest {
         doSuiteTest(new IndexTestSuite(config));
     }
 
-    /*public void testGraphMLReaderSuite() throws Exception {
+    public void testGraphMLReaderSuite() throws Exception {
         doSuiteTest(new GraphMLReaderTestSuite(config));
-    }*/
-
-    /*public void testTransactionalGraphTestSuite() throws Exception {
-        doSuiteTest(new TransactionalGraphTestSuite(config));
-    }*/
+    }
 
     private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testOrientGraph");
@@ -57,6 +54,7 @@ public class OrientGraphTest extends BaseTest {
                 url = "/tmp/blueprints_test";
 
             final File directory = new File(url);
+            deleteDirectory(new File(url));
             if (!directory.exists())
                 directory.mkdirs();
 
