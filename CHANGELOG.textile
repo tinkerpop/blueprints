@@ -11,6 +11,14 @@ bc. <repository>
 
 !http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
 
+h3. Version 0.2.1 (Kermit -- NOT OFFICIALLY RELEASED YET)
+
+bc. <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>blueprints</artifactId>
+  <version>0.2.1-SNAPSHOT</version>
+</dependency>
+
 h3. Version 0.2 (Kermit -- September 22, 2010)
 
 bc. <dependency>
