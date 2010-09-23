@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.2</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: Data Models and their Implementations</name>

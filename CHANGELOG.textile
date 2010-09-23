@@ -16,7 +16,7 @@ h3. Version 0.2 (Kermit -- September 22, 2010)
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.2</version>
 </dependency>
 
 * Removed Blueprints Pipes BETA and put it into a separate project
