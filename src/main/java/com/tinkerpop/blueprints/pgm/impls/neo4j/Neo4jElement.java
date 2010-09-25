@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Element;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
@@ -84,5 +85,9 @@ public abstract class Neo4jElement implements Element {
 
     public boolean equals(Object object) {
         return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+    }
+
+    public Graph getGraph() {
+      return this.graph;
     }
 }

@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
@@ -204,5 +205,9 @@ public class SailVertex implements Vertex {
 
     public Object getId() {
         return this.value.toString();
+    }
+
+    public Graph getGraph() {
+      return this.graph;
     }
 }

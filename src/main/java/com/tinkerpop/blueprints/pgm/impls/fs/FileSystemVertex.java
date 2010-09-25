@@ -27,7 +27,8 @@ public class FileSystemVertex extends FileSystemElement implements Vertex {
         properties.add(FileSystemTokens.MODIFIED);
     }
 
-    public FileSystemVertex(File file) {
+    public FileSystemVertex(File file, final FileSystemGraph graph) {
+        super(graph);
         this.file = file;
     }
 
@@ -35,7 +36,7 @@ public class FileSystemVertex extends FileSystemElement implements Vertex {
         Set<Edge> fileEdges = new HashSet<Edge>();
         File parentFile = this.file.getParentFile();
         if (null != parentFile)
-            fileEdges.add(new FileSystemEdge(parentFile, this.file, "contained_in"));
+            fileEdges.add(new FileSystemEdge(parentFile, this.file, "contained_in", this.graph));
         return fileEdges;
 
     }
@@ -45,7 +46,7 @@ public class FileSystemVertex extends FileSystemElement implements Vertex {
         if (this.file.isDirectory()) {
             File[] files = this.file.listFiles();
             for (File file : files) {
-                fileEdges.add(new FileSystemEdge(this.file, file, "contains"));
+                fileEdges.add(new FileSystemEdge(this.file, file, "contains", this.graph));
             }
         }
         return fileEdges;

@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.openrdf.model.Literal;
@@ -131,5 +132,9 @@ public class SailEdge implements Edge {
             return "(" + this.statement.getSubject() + ", " + this.statement.getPredicate() + ", " + this.statement.getObject() + ") [" + this.statement.getContext() + "]";
         else
             return "(" + this.statement.getSubject() + ", " + this.statement.getPredicate() + ", " + this.statement.getObject() + ")";
+    }
+
+    public Graph getGraph() {
+      return this.graph;
     }
 }

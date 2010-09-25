@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.fs;
 
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.Set;
@@ -8,6 +9,12 @@ import java.util.Set;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public abstract class FileSystemElement implements Element {
+
+    protected final FileSystemGraph graph;
+
+    public FileSystemElement(final FileSystemGraph graph) {
+        this.graph = graph;
+    }
 
     public Set<String> getPropertyKeys() {
         return null;
@@ -25,4 +32,7 @@ public abstract class FileSystemElement implements Element {
         return null;
     }
 
+    public Graph getGraph() {
+      return this.graph;
+    }
 }

@@ -14,8 +14,8 @@ public class TinkerEdge extends TinkerElement implements Edge {
     private final Vertex inVertex;
     private final Vertex outVertex;
 
-    protected TinkerEdge(final String id, final Vertex outVertex, final Vertex inVertex, final String label, final TinkerIndex index) {
-        super(id, index);
+    protected TinkerEdge(final String id, final Vertex outVertex, final Vertex inVertex, final String label, final TinkerIndex index, final TinkerGraph graph) {
+        super(id, index, graph);
         this.label = label;
         this.outVertex = outVertex;
         this.inVertex = inVertex;
@@ -44,5 +44,4 @@ public class TinkerEdge extends TinkerElement implements Edge {
     public boolean equals(final Object object) {
         return object instanceof TinkerEdge && ((TinkerEdge) object).getId().equals(this.getId());
     }
-
 }

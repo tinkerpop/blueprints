@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.id.ORID;
 import com.tinkerpop.blueprints.pgm.Element;
@@ -91,5 +92,9 @@ public abstract class OrientElement implements Element {
         } else if (!this.rawElement.equals(other.rawElement))
             return false;
         return true;
+    }
+
+    public Graph getGraph() {
+      return this.graph;
     }
 }

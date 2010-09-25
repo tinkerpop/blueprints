@@ -56,4 +56,10 @@ public abstract interface Element {
      */
     public Object getId();
 
+    /**
+     * The graph that contains this element.
+     *
+     * @return the graph that contains this element
+     */
+    public Graph getGraph();
 }

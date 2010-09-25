@@ -34,7 +34,7 @@ public class TinkerGraph implements Graph {
         if (null != vertex) {
             throw new RuntimeException("Vertex with id " + id + " already exists");
         } else {
-            vertex = new TinkerVertex(idString, this.index);
+            vertex = new TinkerVertex(idString, this.index, this);
             this.vertices.put(vertex.getId().toString(), vertex);
             return vertex;
         }
@@ -99,7 +99,7 @@ public class TinkerGraph implements Graph {
         if (null != edge) {
             throw new RuntimeException("Vertex with id " + id + " already exists");
         } else {
-            edge = new TinkerEdge(idString, outVertex, inVertex, label, this.index);
+            edge = new TinkerEdge(idString, outVertex, inVertex, label, this.index, this);
             this.edges.put(edge.getId().toString(), edge);
             final TinkerVertex out = (TinkerVertex) outVertex;
             final TinkerVertex in = (TinkerVertex) inVertex;

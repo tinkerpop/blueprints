@@ -41,6 +41,26 @@ public class EdgeTestSuite extends ModelTestSuite {
 
     }
 
+    public void testEdgeGraph(final Graph graph) {
+        List<String> ids = generateIds(2);
+
+        Vertex v = graph.addVertex(convertId(ids.get(0)));
+        Vertex u = graph.addVertex(convertId(ids.get(1)));
+        Edge e = graph.addEdge(null, v, u, convertId("test_label"));
+
+        assertEquals(e.getGraph(), graph);
+        if (!config.isRDFModel) {
+            assertEquals(graph.getEdge(e.getId()).getGraph(), graph);
+            assertEquals(e.getOutVertex().getGraph(), graph);
+            assertEquals(e.getInVertex().getGraph(), graph);
+        }
+        if (config.supportsEdgeIteration) {
+            assertEquals(v.getOutEdges().iterator().next().getGraph(), graph);
+            assertEquals(u.getInEdges().iterator().next().getGraph(), graph);
+        }
+    }
+
+
     public void testAddEdges(final Graph graph) {
         List<String> ids = generateIds(3);
 

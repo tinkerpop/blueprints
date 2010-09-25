@@ -60,6 +60,12 @@ public class VertexTestSuite extends ModelTestSuite {
 
     }
 
+    public void testVertexGraph(final Graph graph) {
+        Vertex v = graph.addVertex(null);
+        assertEquals(v.getGraph(), graph);
+        assertEquals(graph.getVertex(v.getId()).getGraph(), graph);
+    }
+
     public void testAddVertex(final Graph graph) {
         if (config.supportsVertexIteration) {
             List<String> ids = generateIds(3);

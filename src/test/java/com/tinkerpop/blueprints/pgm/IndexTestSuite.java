@@ -28,7 +28,9 @@ public class IndexTestSuite extends ModelTestSuite {
             assertEquals(graph.getIndex().get("name", "marko").iterator().next(), v1);
             v1.setProperty("name", "marko a. rodriguez");
             assertNull(graph.getIndex().get("name", "marko"));
+            assertEquals(graph.getIndex().count("name", "marko"), 0);
             assertEquals(count(graph.getIndex().get("name", "marko a. rodriguez")), 1);
+            assertEquals(graph.getIndex().count("name", "marko a. rodriguez"), 1);
 
             assertNull(graph.getIndex().get("name", "jen"));
             v2.setProperty("name", "jen");

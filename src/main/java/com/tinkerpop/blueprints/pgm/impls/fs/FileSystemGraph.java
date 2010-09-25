@@ -16,7 +16,7 @@ public class FileSystemGraph implements Graph {
 
     public Vertex getVertex(Object id) {
         File file = new File(id.toString());
-        return new FileSystemVertex(file);
+        return new FileSystemVertex(file, this);
     }
 
     public Vertex addVertex(Object id) {

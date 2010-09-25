@@ -15,7 +15,8 @@ public class FileSystemEdge extends FileSystemElement implements Edge {
     private final File inFile;
     private final String label;
 
-    public FileSystemEdge(final File outFile, final File inFile, final String label) {
+    public FileSystemEdge(final File outFile, final File inFile, final String label, final FileSystemGraph graph) {
+        super(graph);
         this.outFile = outFile;
         this.inFile = inFile;
         this.label = label;
@@ -26,11 +27,11 @@ public class FileSystemEdge extends FileSystemElement implements Edge {
     }
 
     public Vertex getInVertex() {
-        return new FileSystemVertex(inFile);
+        return new FileSystemVertex(inFile, this.graph);
     }
 
     public Vertex getOutVertex() {
-        return new FileSystemVertex(outFile);
+        return new FileSystemVertex(outFile, this.graph);
     }
 
     public Object getId() {
