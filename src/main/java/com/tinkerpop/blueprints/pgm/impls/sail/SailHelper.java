@@ -27,7 +27,7 @@ public class SailHelper {
             sailConnection.commit();
         }
         catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -41,7 +41,7 @@ public class SailHelper {
             sailConnection.commit();
         }
         catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

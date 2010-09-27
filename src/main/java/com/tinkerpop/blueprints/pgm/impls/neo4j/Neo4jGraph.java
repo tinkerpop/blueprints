@@ -35,14 +35,22 @@ public class Neo4jGraph implements TransactionalGraph {
 
     public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
-        if (null != configuration)
-            this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
-        else
-            this.neo4j = new EmbeddedGraphDatabase(this.directory);
-        IndexService indexService = new LuceneIndexService(neo4j);
-        this.index = new Neo4jIndex(indexService, this);
-        if (Mode.AUTOMATIC == this.mode) {
-            this.tx = neo4j.beginTx();
+        try {
+            if (null != configuration)
+                this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
+            else
+                this.neo4j = new EmbeddedGraphDatabase(this.directory);
+            IndexService indexService = new LuceneIndexService(neo4j);
+            this.index = new Neo4jIndex(indexService, this);
+            if (Mode.AUTOMATIC == this.mode) {
+                this.tx = neo4j.beginTx();
+            }
+        } catch (Exception e) {
+            if (this.index != null)
+                this.index.shutdown();
+            if (this.neo4j != null)
+                this.neo4j.shutdown();
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -75,7 +83,7 @@ public class Neo4jGraph implements TransactionalGraph {
         } catch (NotFoundException e) {
             return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Neo vertex ids must be convertible to a long value");
+            throw new RuntimeException("Neo vertex ids must be convertible to a long value", e);
         }
     }
 
@@ -125,7 +133,7 @@ public class Neo4jGraph implements TransactionalGraph {
         } catch (NotFoundException e) {
             return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Neo edge ids must be convertible to a long value");
+            throw new RuntimeException("Neo edge ids must be convertible to a long value", e);
         }
     }
 

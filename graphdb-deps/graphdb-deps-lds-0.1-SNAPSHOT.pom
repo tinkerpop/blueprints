@@ -26,7 +26,7 @@
         </dependency>
     </dependencies>
     <repositories>
-    	<repository>
+        <repository>
             <id>neo4j-public-repository</id>
             <name>Publicly available Maven 2 repository for Neo4j</name>
             <url>http://m2.neo4j.org</url>

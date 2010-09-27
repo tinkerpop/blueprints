@@ -78,7 +78,7 @@ public class SailGraph implements TransactionalGraph {
             this.addNamespace(SailTokens.XSD_PREFIX, SailTokens.XSD_NS);
             this.addNamespace(SailTokens.FOAF_PREFIX, SailTokens.FOAF_NS);
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -109,7 +109,7 @@ public class SailGraph implements TransactionalGraph {
         try {
             return new SailEdgeSequence(this.sailConnection.getStatements(null, null, null, false), this);
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -121,7 +121,7 @@ public class SailGraph implements TransactionalGraph {
             }
             this.sailConnection.removeStatements(null, null, vertexValue);
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -156,7 +156,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.setNamespace(prefix, namespace);
             this.sailConnection.commit();
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -165,7 +165,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.removeNamespace(prefix);
             this.sailConnection.commit();
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -179,7 +179,7 @@ public class SailGraph implements TransactionalGraph {
             }
             results.close();
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
         return namespaces;
     }
@@ -209,7 +209,7 @@ public class SailGraph implements TransactionalGraph {
             connection.commit();
             connection.close();
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -218,7 +218,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.clear();
             this.sailConnection.commit();
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -228,7 +228,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.close();
             this.sail.shutDown();
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -240,7 +240,7 @@ public class SailGraph implements TransactionalGraph {
                     uri = namespace + uri.substring(uri.indexOf(SailTokens.NAMESPACE_SEPARATOR) + 1);
             }
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
         return uri;
     }
@@ -256,7 +256,7 @@ public class SailGraph implements TransactionalGraph {
             }
             namespaces.close();
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
         return uri;
     }
@@ -266,7 +266,7 @@ public class SailGraph implements TransactionalGraph {
             try {
                 this.sailConnection.commit();
             } catch (SailException e) {
-                throw new RuntimeException(e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
     }
@@ -287,7 +287,7 @@ public class SailGraph implements TransactionalGraph {
                 this.sailConnection.rollback();
             }
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -336,7 +336,7 @@ public class SailGraph implements TransactionalGraph {
             }
             return returnList;
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

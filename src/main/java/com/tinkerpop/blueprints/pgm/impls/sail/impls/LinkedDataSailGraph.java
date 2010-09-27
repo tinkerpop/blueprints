@@ -17,7 +17,7 @@ public class LinkedDataSailGraph extends SailGraph {
             final Sail sail = new LinkedDataSail(storageGraph.getRawGraph(), new URIMap());
             this.startSail(sail);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }

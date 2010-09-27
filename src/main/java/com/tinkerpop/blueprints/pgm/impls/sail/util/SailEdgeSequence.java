@@ -48,7 +48,7 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
                 return false;
             }
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -64,7 +64,7 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
             try {
                 this.statements.close();
             } catch (SailException e2) {
-                throw new RuntimeException(e2.getMessage());
+                throw new RuntimeException(e2.getMessage(), e2);
             }
             throw e;
         }

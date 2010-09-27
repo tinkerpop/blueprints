@@ -60,7 +60,7 @@ public class SailVertex implements Vertex {
 
 
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -146,7 +146,7 @@ public class SailVertex implements Vertex {
             try {
                 return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.value, null, null, false), this.graph);
             } catch (SailException e) {
-                throw new RuntimeException(e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
             }
         } else {
             return new SailEdgeSequence();
@@ -157,7 +157,7 @@ public class SailVertex implements Vertex {
         try {
             return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, null, this.value, false), this.graph);
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

@@ -2,9 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReader;
-
-import javax.xml.stream.XMLStreamException;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
