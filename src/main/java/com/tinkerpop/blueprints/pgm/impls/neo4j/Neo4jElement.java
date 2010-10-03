@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public abstract class Neo4jElement implements Element {
 
-    protected Neo4jGraph graph;
+    protected final Neo4jGraph graph;
     protected PropertyContainer element;
 
     public Neo4jElement(final Neo4jGraph graph) {

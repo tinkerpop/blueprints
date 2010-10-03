@@ -128,10 +128,6 @@ public class OrientIndex implements Index {
         this.indexAll = indexAll;
     }
 
-    public boolean isIndexAll() {
-        return indexAll;
-    }
-
     public void clear() {
         this.map.clear();
     }

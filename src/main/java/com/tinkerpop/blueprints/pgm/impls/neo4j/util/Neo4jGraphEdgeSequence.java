@@ -14,8 +14,8 @@ import java.util.Iterator;
  */
 public class Neo4jGraphEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
 
-    private Neo4jGraph graph;
-    private Iterator<Node> nodes;
+    private final Neo4jGraph graph;
+    private final Iterator<Node> nodes;
     private Iterator<Relationship> currentRelationships;
     private boolean complete = false;
 

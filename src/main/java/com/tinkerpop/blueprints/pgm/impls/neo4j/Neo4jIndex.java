@@ -3,11 +3,12 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jElementVertexSequence;
 import org.neo4j.graphdb.Node;
+import org.neo4j.index.IndexHits;
 import org.neo4j.index.IndexService;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -15,12 +16,11 @@ import java.util.Set;
  */
 public class Neo4jIndex implements Index {
 
-    private IndexService indexService;
-    private Neo4jGraph graph;
-    public Set<String> indexKeys;
+    private final IndexService indexService;
+    private final Neo4jGraph graph;
+    public final Set<String> indexKeys;
 
     public boolean indexAll = true;
-
 
     public Neo4jIndex(final IndexService indexService, final Neo4jGraph graph) {
         this.indexService = indexService;
@@ -42,18 +42,11 @@ public class Neo4jIndex implements Index {
     }
 
     public Iterable<Element> get(final String key, final Object value) {
-        Iterable<Node> itty = this.indexService.getNodes(key, value);
-        if (null != itty) {
-            Iterator<Node> itty2 = itty.iterator();
-            if (itty2.hasNext()) {
-                Set<Element> elements = new HashSet<Element>();
-                while (itty2.hasNext()) {
-                    elements.add(new Neo4jVertex(itty2.next(), this.graph));
-                }
-                return elements;
-            }
-        }
-        return null;
+        IndexHits<Node> itty = this.indexService.getNodes(key, value);
+        if (null != itty && itty.size() > 0)
+            return new Neo4jElementVertexSequence(itty, this.graph);
+        else
+            return null;
     }
 
     public void remove(final String key, final Object value, final Element element) {

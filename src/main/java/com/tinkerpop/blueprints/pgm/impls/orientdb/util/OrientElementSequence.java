@@ -15,6 +15,7 @@ import java.util.NoSuchElementException;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientElementSequence<T extends Element> implements Iterator<T>, Iterable<T> {
+
     private final Iterator<? extends OGraphElement> rawElements;
     private final OrientGraph graph;
 
