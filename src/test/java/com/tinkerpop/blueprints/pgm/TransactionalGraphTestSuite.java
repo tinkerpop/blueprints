@@ -27,6 +27,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             } catch (Exception e) {
                 assertTrue(false);
             }
+            assertEquals(count(graph.getVertices()), 2);
             graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
 
             graph.startTransaction();
@@ -40,6 +41,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             } catch (Exception e) {
                 assertTrue(false);
             }
+            assertEquals(count(graph.getVertices()), 2);
             graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
             graph.startTransaction();
@@ -86,7 +88,12 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         } catch (Exception e) {
             assertTrue(false);
         }
+        if (config.supportsVertexIteration)
+            assertEquals(count(graph.getVertices()), 2);
+        if (config.supportsEdgeIteration)
+            assertEquals(count(graph.getEdges()), 1);
         graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+
         graph.startTransaction();
         if (config.supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
@@ -98,6 +105,10 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         } catch (Exception e) {
             assertTrue(false);
         }
+         if (config.supportsVertexIteration)
+            assertEquals(count(graph.getVertices()), 2);
+        if (config.supportsEdgeIteration)
+            assertEquals(count(graph.getEdges()), 1);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         graph.startTransaction();
