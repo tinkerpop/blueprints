@@ -12,8 +12,8 @@ import java.util.Set;
  */
 public class OrientEdge extends OrientElement implements Edge {
 
-    public OrientEdge(final OrientGraph iGraph, final OGraphEdge edge) {
-        super(iGraph, edge);
+    public OrientEdge(final OrientGraph graph, final OGraphEdge rawEdge) {
+        super(graph, rawEdge);
     }
 
     public Vertex getOutVertex() {
