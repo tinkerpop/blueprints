@@ -33,7 +33,7 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
 	private final Map<ORID, OrientElement>	rid2Elements;
 
-	private Mode														mode					= Mode.AUTOMATIC;
+	private Mode														mode					= Mode.MANUAL;
 	private boolean													useCache			= true;
 	private final static String							ADMIN					= "admin";
 

@@ -75,7 +75,7 @@ public class OrientGraphTest extends BaseTest {
 
 					System.out.println("Testing " + method.getName() + "...");
 
-					OrientGraph graph = new OrientGraph("memory:" + url + "/graph");
+					OrientGraph graph = new OrientGraph("local:" + url + "/graph");
 					graph.clear();
 
 					method.invoke(suite, graph);
