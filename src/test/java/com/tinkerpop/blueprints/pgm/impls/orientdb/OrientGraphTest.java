@@ -1,74 +1,89 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import com.tinkerpop.blueprints.BaseTest;
-import com.tinkerpop.blueprints.pgm.*;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
-
 import java.io.File;
 import java.lang.reflect.Method;
 
+import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
+import com.tinkerpop.blueprints.pgm.GraphTestSuite;
+import com.tinkerpop.blueprints.pgm.IndexTestSuite;
+import com.tinkerpop.blueprints.pgm.ModelTestSuite;
+import com.tinkerpop.blueprints.pgm.SuiteConfiguration;
+import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
+import com.tinkerpop.blueprints.pgm.VertexTestSuite;
+import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
+
 /**
+ * Test suite for OrientDB graph implementation.
+ * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphTest extends BaseTest {
 
-    private static final SuiteConfiguration config = new SuiteConfiguration();
+	private static final SuiteConfiguration	config	= new SuiteConfiguration();
 
-    static {
-        config.allowsDuplicateEdges = true;
-        config.allowsSelfLoops = true;
-        config.requiresRDFIds = false;
-        config.isRDFModel = false;
-        config.supportsVertexIteration = true;
-        config.supportsEdgeIteration = true;
-        config.supportsVertexIndex = true;
-        config.supportsEdgeIndex = true;
-        config.ignoresSuppliedIds = true;
-    }
+	static {
+		config.allowsDuplicateEdges = true;
+		config.allowsSelfLoops = true;
+		config.requiresRDFIds = false;
+		config.isRDFModel = false;
+		config.supportsVertexIteration = true;
+		config.supportsEdgeIteration = true;
+		config.supportsVertexIndex = true;
+		config.supportsEdgeIndex = true;
+		config.ignoresSuppliedIds = true;
+		config.supportsTransactions = true;
+	}
 
-    public void testVertexSuite() throws Exception {
-        doSuiteTest(new VertexTestSuite(config));
-    }
+	public void testVertexSuite() throws Exception {
+		doSuiteTest(new VertexTestSuite(config));
+	}
 
-    public void testEdgeSuite() throws Exception {
-        doSuiteTest(new EdgeTestSuite(config));
-    }
+	public void testEdgeSuite() throws Exception {
+		doSuiteTest(new EdgeTestSuite(config));
+	}
 
-    public void testGraphSuite() throws Exception {
-        doSuiteTest(new GraphTestSuite(config));
-    }
+	public void testGraphSuite() throws Exception {
+		doSuiteTest(new GraphTestSuite(config));
+	}
 
-    public void testIndexSuite() throws Exception {
-        doSuiteTest(new IndexTestSuite(config));
-    }
+	public void testIndexSuite() throws Exception {
+		doSuiteTest(new IndexTestSuite(config));
+	}
 
-    public void testGraphMLReaderSuite() throws Exception {
-        doSuiteTest(new GraphMLReaderTestSuite(config));
-    }
+	public void testGraphMLReaderSuite() throws Exception {
+		doSuiteTest(new GraphMLReaderTestSuite(config));
+	}
 
-    private void doSuiteTest(final ModelTestSuite suite) throws Exception {
-        String doTest = System.getProperty("testOrientGraph");
-        if (doTest == null || doTest.equals("true")) {
-            String url = System.getProperty("orientGraphDirectory");
-            if (url == null)
-                url = "/tmp/blueprints_test";
+	public void testTransactionalGraphTestSuite() throws Exception {
+		doSuiteTest(new TransactionalGraphTestSuite(config));
+	}
 
-            final File directory = new File(url);
-            deleteDirectory(new File(url));
-            if (!directory.exists())
-                directory.mkdirs();
+	private void doSuiteTest(final ModelTestSuite suite) throws Exception {
+		String doTest = System.getProperty("testOrientGraph");
+		if (doTest == null || doTest.equals("true")) {
+			String url = System.getProperty("orientGraphDirectory");
+			if (url == null)
+				url = "/tmp/blueprints_test";
 
-            for (Method method : suite.getClass().getDeclaredMethods()) {
-                if (method.getName().startsWith("test")) {
+			final File directory = new File(url);
+			if (!directory.exists())
+				directory.mkdirs();
 
-                    OrientGraph graph = new OrientGraph("local:" + url + "/graph");
-                    System.out.println("Testing " + method.getName() + "...");
-                    method.invoke(suite, graph);
+			for (Method method : suite.getClass().getDeclaredMethods()) {
+				if (method.getName().startsWith("test")) {
 
-                    graph.shutdown();
-                    deleteDirectory(new File(url));
-                }
-            }
-        }
-    }
+					System.out.println("Testing " + method.getName() + "...");
+
+					OrientGraph graph = new OrientGraph("memory:" + url + "/graph");
+					graph.clear();
+
+					method.invoke(suite, graph);
+
+					graph.shutdown();
+					deleteDirectory(new File(url));
+				}
+			}
+		}
+	}
 }

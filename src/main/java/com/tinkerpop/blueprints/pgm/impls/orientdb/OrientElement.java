@@ -1,95 +1,129 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.Set;
+
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.id.ORID;
 import com.tinkerpop.blueprints.pgm.Element;
-
-import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public abstract class OrientElement implements Element {
 
-    protected static final String LABEL = "label";
-    protected final OrientGraph graph;
-    protected final OGraphElement rawElement;
+  protected static final String LABEL = "label";
+  protected final OrientGraph   graph;
+  protected final OGraphElement raw;
 
-    protected OrientElement(final OrientGraph graph, final OGraphElement rawElement) {
-        this.graph = graph;
-        this.rawElement = rawElement;
+  protected OrientElement(final OrientGraph iGraph, final OGraphElement iElement) {
+    this.graph = iGraph;
+    this.raw = iElement;
+
+    iGraph.putElementInCache(this);
+  }
+
+  public void setProperty(final String iKey, final Object value) {
+    final Object oldValue = raw.get(iKey);
+
+    graph.beginTransaction();
+
+    try {
+      this.raw.set(iKey, value);
+      this.save();
+
+      if (oldValue != null)
+        // REMOVE OLD INDEXED PROPERTY
+        graph.getIndex().remove(iKey, oldValue, this);
+      graph.getIndex().put(iKey, value, this);
+      
+      graph.commitTransaction();
+
+    } catch (RuntimeException e) {
+
+      graph.rollbackTransaction();
+      throw e;
     }
+  }
 
-    public void setProperty(final String key, final Object value) {
-        final Object oldValue = rawElement.get(key);
+  public Object removeProperty(final String iKey) {
+    graph.beginTransaction();
 
-        this.rawElement.set(key, value);
-        this.save();
+    try {
+      final Object old = this.raw.remove(iKey);
+      this.save();
+      graph.getIndex().remove(iKey, old, this);
+      graph.commitTransaction();
 
-        if (oldValue != null)
-            this.graph.getIndex().remove(key, oldValue, this);
+      return old;
+    } catch (RuntimeException e) {
 
-        this.graph.getIndex().put(key, value, this);
+      graph.rollbackTransaction();
+      throw e;
     }
+  }
 
-    public Object removeProperty(final String key) {
-        final Object old = this.rawElement.remove(key);
-        this.save();
-        this.graph.getIndex().remove(key, old, this);
-        return old;
-    }
+  public Object getProperty(final String key) {
+    return this.raw.get(key);
+  }
 
-    public Object getProperty(final String key) {
-        return this.rawElement.get(key);
-    }
+  public Set<String> getPropertyKeys() {
+    final Set<String> set = this.raw.propertyNames();
+    set.remove(LABEL);
+    return set;
+  }
 
-    public Set<String> getPropertyKeys() {
-        final Set<String> set = this.rawElement.propertyNames();
-        set.remove(LABEL);
-        return set;
-    }
+  /**
+   * Returns the Element Id assuring to save it if it's transient yet.
+   */
+  public Object getId() {
+    ORID rid = this.raw.getId();
+    this.save();
+    return rid;
+  }
 
-    /**
-     * Returns the Element Id assuring to save it if it's transient yet.
-     */
-    public Object getId() {
-        ORID rid = this.rawElement.getId();
-        this.save();
-        return rid;
-    }
+  protected void delete() {
+    graph.beginTransaction();
 
-    protected void delete() {
-        this.rawElement.delete();
-    }
+    try {
+      graph.removeElementFromCache(this.raw.getId());
+      this.raw.delete();
+      graph.commitTransaction();
 
-    protected void save() {
-        this.rawElement.save();
-    }
+    } catch (RuntimeException e) {
 
-    public OGraphElement getRawElement() {
-        return rawElement;
+      graph.rollbackTransaction();
+      throw e;
     }
+  }
 
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.rawElement == null) ? 0 : this.rawElement.hashCode());
-        return result;
-    }
+  protected void save() {
+    this.raw.save();
+  }
 
-    public boolean equals(Object object) {
-        if (this == object)
-            return true;
-        if (object == null)
-            return false;
-        if (getClass() != object.getClass())
-            return false;
-        final OrientElement other = (OrientElement) object;
-        if (this.rawElement == null) {
-            if (other.rawElement != null)
-                return false;
-        } else if (!this.rawElement.equals(other.rawElement))
-            return false;
-        return true;
-    }
+  public OGraphElement getRaw() {
+    return raw;
+  }
+
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.raw == null) ? 0 : this.raw.hashCode());
+    return result;
+  }
+
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    final OrientElement other = (OrientElement) obj;
+    if (this.raw == null) {
+      if (other.raw != null)
+        return false;
+    } else if (!this.raw.equals(other.raw))
+      return false;
+    return true;
+  }
 }

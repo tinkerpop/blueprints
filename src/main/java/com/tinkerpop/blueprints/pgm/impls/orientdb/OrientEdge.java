@@ -12,24 +12,28 @@ import java.util.Set;
  */
 public class OrientEdge extends OrientElement implements Edge {
 
-    public OrientEdge(final OrientGraph graph, final OGraphEdge rawEdge) {
-        super(graph, rawEdge);
+    public OrientEdge(final OrientGraph iGraph, final OGraphEdge edge) {
+        super(iGraph, edge);
     }
 
     public Vertex getOutVertex() {
-        return new OrientVertex(this.graph, getRawEdge().getOut());
+        return new OrientVertex(graph, getRawEdge().getOut());
     }
 
     public Vertex getInVertex() {
-        return new OrientVertex(this.graph, getRawEdge().getIn());
+        return new OrientVertex(graph, getRawEdge().getIn());
     }
 
     public OGraphEdge getRawEdge() {
-        return (OGraphEdge) this.rawElement;
+        return (OGraphEdge) this.raw;
     }
 
     public String getLabel() {
-        return (String) this.rawElement.get(LABEL);
+        return (String) this.raw.get(LABEL);
+    }
+
+    protected void setLabel(final String label) {
+        this.raw.set(LABEL, label);
     }
 
     public Set<String> getPropertyKeys() {
