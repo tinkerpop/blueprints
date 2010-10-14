@@ -49,9 +49,9 @@ public class OrientGraphTest extends BaseTest {
         doSuiteTest(new GraphMLReaderTestSuite(config));
     }
 
-    /*public void testTransactionalGraphTestSuite() throws Exception {
+    public void testTransactionalGraphTestSuite() throws Exception {
         doSuiteTest(new TransactionalGraphTestSuite(config));
-    }*/
+    }
 
     private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testOrientGraph");

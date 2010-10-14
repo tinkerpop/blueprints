@@ -108,9 +108,6 @@ public class OrientIndex implements Index {
 
         if (values != null) {
             values.remove(elementTemp.getRaw().getDocument());
-            // if (values.size() == 0)
-            // map.remove(keyTemp);
-            // else
             map.put(keyTemp, values);
         }
     }
@@ -131,15 +128,16 @@ public class OrientIndex implements Index {
         this.map.clear();
     }
 
-    /*public OTreeMapDatabaseLazySave<String, List<ODocument>> getRaw() {
-         return map;
-     }
+    protected OTreeMapDatabaseLazySave<String, List<ODocument>> getRawIndex() {
+        return map;
+    }
 
-     public boolean isIndexAll() {
-         return indexAll;
-     }
+    /*
+    public boolean isIndexAll() {
+        return indexAll;
+    }
 
-     public void flush() {
-         map.lazySave();
-     }*/
+    public void flush() {
+        map.lazySave();
+    }*/
 }

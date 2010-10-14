@@ -256,9 +256,10 @@ public class OrientGraph implements Graph, TransactionalGraph {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
-        if (conclusion == Conclusion.FAILURE)
+        if (conclusion == Conclusion.FAILURE) {
             database.rollback();
-        else
+            index.getRawIndex().unload();
+        } else
             database.commit();
     }
 
@@ -281,8 +282,11 @@ public class OrientGraph implements Graph, TransactionalGraph {
     }
 
     protected void rollbackTransaction() {
-        if (getTransactionMode() == Mode.AUTOMATIC)
+        if (getTransactionMode() == Mode.AUTOMATIC) {
             database.rollback();
+            index.getRawIndex().unload();
+
+        }
     }
 
     /*public boolean isUseCache() {
