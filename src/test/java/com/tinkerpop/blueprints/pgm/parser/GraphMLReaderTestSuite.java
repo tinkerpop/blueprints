@@ -275,30 +275,43 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
     }
 
     public void testGratefulGraph(Graph graph) throws Exception {
-        this.stopWatch();
-        GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
-        BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded", this.stopWatch());
-        if (config.supportsVertexIteration) {
-            assertEquals(count(graph.getVertices()), 809);
-        }
-        if (config.supportsEdgeIteration) {
-            assertEquals(count(graph.getEdges()), 8049);
-        }
-        assertEquals(count(graph.getIndex().get("name", "Garcia")), 1);
-        assertEquals(count(graph.getIndex().get("name", "Weir")), 1);
-        assertEquals(count(graph.getIndex().get("name", "Lesh")), 1);
-        assertEquals(count(graph.getIndex().get("name", "DARK STAR")), 1);
-        assertEquals(count(graph.getIndex().get("name", "TERRAPIN STATION")), 1);
-        assertEquals(count(graph.getIndex().get("name", "TERRAPIN STATION BAD SPELLING")), 0);
 
-        Vertex garcia = (Vertex) graph.getIndex().get("name", "Garcia").iterator().next();
-        boolean found = false;
-        for (Edge edge : garcia.getInEdges()) {
-            if (edge.getLabel().equals("sung_by")) {
-                if (edge.getOutVertex().getProperty("name").equals("TERRAPIN STATION"))
-                    found = true;
+        for (int i = 200; i < 1002; i = i + 200) {
+            graph.clear();
+            this.stopWatch();
+            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"), i);
+            if(graph instanceof TransactionalGraph)
+                BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded with buffer size equal to " + i + " for transactional graphs", this.stopWatch());
+            else
+                BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded", this.stopWatch());
+
+
+            if (config.supportsVertexIteration) {
+                assertEquals(count(graph.getVertices()), 809);
+            }
+            if (config.supportsEdgeIteration) {
+                assertEquals(count(graph.getEdges()), 8049);
+            }
+            assertEquals(count(graph.getIndex().get("name", "Garcia")), 1);
+            assertEquals(count(graph.getIndex().get("name", "Weir")), 1);
+            assertEquals(count(graph.getIndex().get("name", "Lesh")), 1);
+            assertEquals(count(graph.getIndex().get("name", "DARK STAR")), 1);
+            assertEquals(count(graph.getIndex().get("name", "TERRAPIN STATION")), 1);
+            assertEquals(count(graph.getIndex().get("name", "TERRAPIN STATION BAD SPELLING")), 0);
+
+            Vertex garcia = (Vertex) graph.getIndex().get("name", "Garcia").iterator().next();
+            boolean found = false;
+            for (Edge edge : garcia.getInEdges()) {
+                if (edge.getLabel().equals("sung_by")) {
+                    if (edge.getOutVertex().getProperty("name").equals("TERRAPIN STATION"))
+                        found = true;
+                }
+            }
+            assertTrue(found);
+
+            if (!(graph instanceof TransactionalGraph)) {
+                i = 2000;
             }
         }
-        assertTrue(found);
     }
 }

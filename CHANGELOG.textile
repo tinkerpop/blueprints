@@ -24,7 +24,8 @@ bc. <dependency>
 * Many updates to @TransactionalGraphTestSuite@
 ** Large transactions now tested
 ** Added timing tests to all tests
-* Updated @Index@ semantics where no elements returns an empty iterator, not @null@.
+* Updated @Index@ semantics where no elements returns an empty iterator, not @null@
+* Updated the @toString()@ method of @TinkerGraph@ to display both vertex and edge counts
 
 
 h3. Version 0.2 (Kermit -- September 22, 2010)
