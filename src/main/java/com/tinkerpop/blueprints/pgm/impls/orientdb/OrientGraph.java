@@ -34,8 +34,9 @@ public class OrientGraph implements Graph, TransactionalGraph {
     private final Map<ORID, OrientElement> rid2Elements;
 
     private Mode mode = Mode.AUTOMATIC;
-    private boolean useCache = true;
+    private boolean useCache = false;
     private final static String ADMIN = "admin";
+    private int cacheSize = 500;
 
     public OrientGraph(final String url) {
         this(url, ADMIN, ADMIN);
@@ -51,10 +52,10 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
         this.index = new OrientIndex(this);
 
-        rid2Elements = new LinkedHashMap<ORID, OrientElement>(10000, 0.75f, true) {
+        rid2Elements = new LinkedHashMap<ORID, OrientElement>(cacheSize, 0.75f, true) {
             @Override
             protected boolean removeEldestEntry(java.util.Map.Entry<ORID, OrientElement> iEldest) {
-                return size() > 10000;
+                return size() > cacheSize;
             }
         };
 
