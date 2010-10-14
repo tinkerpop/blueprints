@@ -281,8 +281,14 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
         if (config.supportsVertexIteration) {
             assertEquals(count(graph.getVertices()), 809);
         }
-        if(config.supportsEdgeIteration) {
-            assertEquals(count(graph.getEdges()), 1000);
+        if (config.supportsEdgeIteration) {
+            assertEquals(count(graph.getEdges()), 8049);
         }
+        assertEquals(count(graph.getIndex().get("name","Garcia")), 1);
+        assertEquals(count(graph.getIndex().get("name","Weir")), 1);
+        assertEquals(count(graph.getIndex().get("name","Lesh")), 1);
+        assertEquals(count(graph.getIndex().get("name","DARK STAR")), 1);
+        assertEquals(count(graph.getIndex().get("name","TERRAPIN STATION")), 1);
+        assertEquals(count(graph.getIndex().get("name","TERRAPIN STATION BAD SPELLING")), 0);
     }
 }
