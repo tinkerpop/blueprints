@@ -18,11 +18,11 @@ public class OrientVertex extends OrientElement implements Vertex {
     }
 
     public Iterable<Edge> getOutEdges() {
-        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.raw).getOutEdges().iterator());
+        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getOutEdges().iterator());
     }
 
     public Iterable<Edge> getInEdges() {
-        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.raw).getInEdges().iterator());
+        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getInEdges().iterator());
     }
 
     public Set<String> getPropertyKeys() {
@@ -33,14 +33,10 @@ public class OrientVertex extends OrientElement implements Vertex {
     }
 
     public OGraphVertex getRawVertex() {
-        return (OGraphVertex) this.raw;
+        return (OGraphVertex) this.rawElement;
     }
 
     public String toString() {
         return StringFactory.vertexString(this);
     }
-
-    /*public void setClassName(final String iClassName) {
-         raw.getDocument().setClassName(iClassName);
-     }*/
 }

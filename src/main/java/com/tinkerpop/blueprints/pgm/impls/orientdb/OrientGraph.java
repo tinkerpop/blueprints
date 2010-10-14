@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.orientechnologies.orient.core.db.graph.OGraphEdge;
-import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.db.graph.OGraphVertex;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -16,11 +15,6 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * OrientDB implementation of Graph interface. This implementation is transactional.
  *
@@ -29,14 +23,8 @@ import java.util.Set;
 public class OrientGraph implements Graph, TransactionalGraph {
     private final ODatabaseGraphTx database;
     private OrientIndex index;
-    private Set<String> cachedClasses = new HashSet<String>();
-
-    private final Map<ORID, OrientElement> rid2Elements;
-
     private Mode mode = Mode.AUTOMATIC;
-    private boolean useCache = false;
     private final static String ADMIN = "admin";
-    private int cacheSize = 500;
 
     public OrientGraph(final String url) {
         this(url, ADMIN, ADMIN);
@@ -51,15 +39,6 @@ public class OrientGraph implements Graph, TransactionalGraph {
             this.database.create();
 
         this.index = new OrientIndex(this);
-
-        rid2Elements = new LinkedHashMap<ORID, OrientElement>(cacheSize, 0.75f, true) {
-            @Override
-            protected boolean removeEldestEntry(java.util.Map.Entry<ORID, OrientElement> iEldest) {
-                return size() > cacheSize;
-            }
-        };
-
-        rid2Elements.clear();
     }
 
     public Vertex addVertex(final Object id) {
@@ -68,7 +47,6 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
             final OrientVertex vertex = new OrientVertex(this, this.database.createVertex(null));
             vertex.save();
-            putElementInCache(vertex);
 
             commitTransaction();
             return vertex;
@@ -95,8 +73,6 @@ public class OrientGraph implements Graph, TransactionalGraph {
             ((OrientVertex) inVertex).save();
             edge.save();
 
-            putElementInCache(edge);
-
             commitTransaction();
 
             return edge;
@@ -117,11 +93,6 @@ public class OrientGraph implements Graph, TransactionalGraph {
         if (!rid.isValid())
             return null;
 
-        // TRY IN CACHE
-        final OrientVertex v = (OrientVertex) getCachedElement(rid);
-        if (v != null)
-            return v;
-
         final ODocument doc = this.database.getRecordById(rid);
         if (doc != null) {
             return new OrientVertex(this, (OGraphVertex) this.database.getUserObjectByRecord(doc, null));
@@ -132,11 +103,7 @@ public class OrientGraph implements Graph, TransactionalGraph {
     public void removeVertex(final Vertex vertex) {
         try {
             beginTransaction();
-
-            final OGraphElement e = ((OrientVertex) vertex).getRaw();
-            removeElementFromCache(e.getId());
             ((OrientVertex) vertex).delete();
-
             commitTransaction();
 
         } catch (RuntimeException e) {
@@ -160,11 +127,6 @@ public class OrientGraph implements Graph, TransactionalGraph {
         else
             rid = new ORecordId(id.toString());
 
-        // TRY IN CACHE
-        final OrientEdge e = (OrientEdge) getCachedElement(rid);
-        if (e != null)
-            return e;
-
         final ODocument doc = this.database.getRecordById(rid);
         if (doc != null) {
             return new OrientEdge(this, (OGraphEdge) this.database.getUserObjectByRecord(doc, null));
@@ -176,13 +138,7 @@ public class OrientGraph implements Graph, TransactionalGraph {
         try {
             beginTransaction();
 
-            final OGraphEdge e = (OGraphEdge) ((OrientEdge) edge).getRaw();
-            removeElementFromCache(e.getId());
-
-            // REMOVE FROM CACHE ALSO THE CONNECTED VERTICES
-            removeElementFromCache(e.getIn().getId());
-            removeElementFromCache(e.getOut().getId());
-
+            final OGraphEdge e = (OGraphEdge) ((OrientEdge) edge).getRawElement();
             ((OrientEdge) edge).delete();
 
             commitTransaction();
@@ -205,7 +161,6 @@ public class OrientGraph implements Graph, TransactionalGraph {
         }
 
         this.index.clear();
-        this.rid2Elements.clear();
     }
 
     public OrientIndex getIndex() {
@@ -215,31 +170,10 @@ public class OrientGraph implements Graph, TransactionalGraph {
     public void shutdown() {
         this.database.close();
         this.index = null;
-        rid2Elements.clear();
     }
 
     public String toString() {
         return "orientgraph[" + this.database.getURL() + "]";
-    }
-
-    public OrientElement getCachedElement(final ORID rid) {
-        if (this.useCache && rid.isValid())
-            return this.rid2Elements.get(rid);
-        return null;
-    }
-
-    protected void putElementInCache(final OrientElement element) {
-        final ODocument d = element.getRaw().getDocument();
-
-        if (this.useCache && d.getIdentity().isValid()) {
-            if (cachedClasses.contains(d.getClassName()))
-                this.rid2Elements.put(d.getIdentity(), element);
-        }
-    }
-
-    protected void removeElementFromCache(final ORID rid) {
-        if (this.useCache && rid.isValid())
-            this.rid2Elements.remove(rid);
     }
 
     public ODatabaseGraphTx getRawGraph() {
@@ -289,20 +223,4 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
         }
     }
-
-    /*public boolean isUseCache() {
-         return useCache;
-     }
-
-     public void setUseCache(boolean useCache) {
-         this.useCache = useCache;
-     }
-
-     public void addCachedClass(final String iKey) {
-         cachedClasses.add(iKey);
-     }
-
-     public void removeCachedClass(final String iKey) {
-         cachedClasses.remove(iKey);
-     }*/
 }

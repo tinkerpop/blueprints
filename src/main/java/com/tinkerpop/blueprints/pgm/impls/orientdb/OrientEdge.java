@@ -25,15 +25,15 @@ public class OrientEdge extends OrientElement implements Edge {
     }
 
     public OGraphEdge getRawEdge() {
-        return (OGraphEdge) this.raw;
+        return (OGraphEdge) this.rawElement;
     }
 
     public String getLabel() {
-        return (String) this.raw.get(LABEL);
+        return (String) this.rawElement.get(LABEL);
     }
 
     protected void setLabel(final String label) {
-        this.raw.set(LABEL, label);
+        this.rawElement.set(LABEL, label);
     }
 
     public Set<String> getPropertyKeys() {

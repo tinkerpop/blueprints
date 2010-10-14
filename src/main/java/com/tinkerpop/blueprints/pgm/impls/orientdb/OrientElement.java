@@ -13,33 +13,28 @@ public abstract class OrientElement implements Element {
 
     protected static final String LABEL = "label";
     protected final OrientGraph graph;
-    protected final OGraphElement raw;
+    protected final OGraphElement rawElement;
 
     protected OrientElement(final OrientGraph graph, final OGraphElement rawElement) {
         this.graph = graph;
-        this.raw = rawElement;
-
-        graph.putElementInCache(this);
+        this.rawElement = rawElement;
     }
 
     public void setProperty(final String key, final Object value) {
-        final Object oldValue = raw.get(key);
+        final Object oldValue = rawElement.get(key);
 
         graph.beginTransaction();
 
         try {
-            this.raw.set(key, value);
+            this.rawElement.set(key, value);
             this.save();
 
             if (oldValue != null)
-                // REMOVE OLD INDEXED PROPERTY
                 graph.getIndex().remove(key, oldValue, this);
             graph.getIndex().put(key, value, this);
-
             graph.commitTransaction();
 
         } catch (RuntimeException e) {
-
             graph.rollbackTransaction();
             throw e;
         }
@@ -49,7 +44,7 @@ public abstract class OrientElement implements Element {
         graph.beginTransaction();
 
         try {
-            final Object old = this.raw.remove(key);
+            final Object old = this.rawElement.remove(key);
             this.save();
             graph.getIndex().remove(key, old, this);
             graph.commitTransaction();
@@ -63,11 +58,11 @@ public abstract class OrientElement implements Element {
     }
 
     public Object getProperty(final String key) {
-        return this.raw.get(key);
+        return this.rawElement.get(key);
     }
 
     public Set<String> getPropertyKeys() {
-        final Set<String> set = this.raw.propertyNames();
+        final Set<String> set = this.rawElement.propertyNames();
         set.remove(LABEL);
         return set;
     }
@@ -76,7 +71,7 @@ public abstract class OrientElement implements Element {
      * Returns the Element Id assuring to save it if it's transient yet.
      */
     public Object getId() {
-        ORID rid = this.raw.getId();
+        ORID rid = this.rawElement.getId();
         this.save();
         return rid;
     }
@@ -85,29 +80,26 @@ public abstract class OrientElement implements Element {
         graph.beginTransaction();
 
         try {
-            graph.removeElementFromCache(this.raw.getId());
-            this.raw.delete();
+            this.rawElement.delete();
             graph.commitTransaction();
-
         } catch (RuntimeException e) {
-
             graph.rollbackTransaction();
             throw e;
         }
     }
 
     protected void save() {
-        this.raw.save();
+        this.rawElement.save();
     }
 
-    public OGraphElement getRaw() {
-        return raw;
+    public OGraphElement getRawElement() {
+        return rawElement;
     }
 
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.raw == null) ? 0 : this.raw.hashCode());
+        result = prime * result + ((this.rawElement == null) ? 0 : this.rawElement.hashCode());
         return result;
     }
 
@@ -119,10 +111,10 @@ public abstract class OrientElement implements Element {
         if (getClass() != obj.getClass())
             return false;
         final OrientElement other = (OrientElement) obj;
-        if (this.raw == null) {
-            if (other.raw != null)
+        if (this.rawElement == null) {
+            if (other.rawElement != null)
                 return false;
-        } else if (!this.raw.equals(other.raw))
+        } else if (!this.rawElement.equals(other.rawElement))
             return false;
         return true;
     }

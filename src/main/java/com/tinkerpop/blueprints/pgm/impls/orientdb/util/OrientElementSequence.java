@@ -72,11 +72,6 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
                 throw new OGraphException("Unrecognized class: " + doc.getClassName());
         }
 
-        // TRY IN CACHE
-        final Element el = this.graph.getCachedElement(e.getDocument().getIdentity());
-        if (el != null)
-            return (T) el;
-
         if (e instanceof OGraphEdge)
             return (T) new OrientEdge(graph, (OGraphEdge) e);
         else

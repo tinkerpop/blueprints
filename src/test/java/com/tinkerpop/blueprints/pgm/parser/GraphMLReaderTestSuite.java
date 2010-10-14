@@ -269,9 +269,20 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             }
             assertEquals(vertices.size(), 1);
             assertTrue(vertices.contains(josh));
-
         }
 
 
+    }
+
+    public void testGratefulGraph(Graph graph) throws Exception {
+        this.stopWatch();
+        GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+        BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded", this.stopWatch());
+        if (config.supportsVertexIteration) {
+            assertEquals(count(graph.getVertices()), 809);
+        }
+        if(config.supportsEdgeIteration) {
+            assertEquals(count(graph.getEdges()), 1000);
+        }
     }
 }

@@ -77,9 +77,9 @@ public class OrientIndex implements Index {
         if (values == null)
             values = new ArrayList<ODocument>();
 
-        int pos = values.indexOf(elementTemp.getRaw().getDocument());
+        int pos = values.indexOf(elementTemp.getRawElement().getDocument());
         if (pos == -1)
-            values.add(elementTemp.getRaw().getDocument());
+            values.add(elementTemp.getRawElement().getDocument());
 
         map.put(keyTemp, values);
     }
@@ -107,7 +107,7 @@ public class OrientIndex implements Index {
         List<ODocument> values = map.get(keyTemp);
 
         if (values != null) {
-            values.remove(elementTemp.getRaw().getDocument());
+            values.remove(elementTemp.getRawElement().getDocument());
             map.put(keyTemp, values);
         }
     }
