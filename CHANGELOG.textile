@@ -19,6 +19,14 @@ bc. <dependency>
   <version>0.2.1-SNAPSHOT</version>
 </dependency>
 
+* Moved to @graphdb-deps@ database dependency management model
+* @OrientGraph@ now implements @TransactionalGraph@ interface
+* Many updates to @TransactionalGraphTestSuite@
+** Large transactions now tested
+** Added timing tests to all tests
+* Updated @Index@ semantics where no elements returns an empty iterator, not @null@.
+
+
 h3. Version 0.2 (Kermit -- September 22, 2010)
 
 bc. <dependency>
@@ -34,7 +42,7 @@ bc. <dependency>
 * Added RDF load functionality to @SailGraph@
 * Added SPARQL functioanlity to @SailGraph@
 * Fixed sever @GraphMLReader@ bug
-* Added OrientDB (OrientGraph) as a property graph implementation
+* Added OrientDB (@OrientGraph@) as a property graph implementation
 * Added support for @Graph.getEdge(Object id)@
 * Added support for @kind@ in the Sail implementation of Blueprints
 * Made iterating edges in @SailGraph@ faster and more memory efficient

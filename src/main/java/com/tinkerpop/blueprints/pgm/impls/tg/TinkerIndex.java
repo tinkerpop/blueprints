@@ -38,11 +38,14 @@ public class TinkerIndex implements Index {
     public Iterable<Element> get(final String key, final Object value) {
         Map<Object, Set<Element>> keyMap = this.indices.get(key);
         if (null == keyMap) {
-            return null;
+            return new HashSet<Element>();
         } else {
-            return keyMap.get(value);
+            Set<Element> set = keyMap.get(value);
+            if (null == set)
+                return new HashSet<Element>();
+            else
+                return set;
         }
-
     }
 
     public void remove(final String key, final Object value, final Element element) {

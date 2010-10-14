@@ -27,10 +27,10 @@ public class IndexTestSuite extends ModelTestSuite {
             assertEquals(count(graph.getIndex().get("name", "marko")), 1);
             assertEquals(graph.getIndex().get("name", "marko").iterator().next(), v1);
             v1.setProperty("name", "marko a. rodriguez");
-            assertNull(graph.getIndex().get("name", "marko"));
+            assertEquals(count(graph.getIndex().get("name", "marko")), 0);
             assertEquals(count(graph.getIndex().get("name", "marko a. rodriguez")), 1);
 
-            assertNull(graph.getIndex().get("name", "jen"));
+            assertEquals(count(graph.getIndex().get("name", "jen")), 0);
             v2.setProperty("name", "jen");
             assertEquals(count(graph.getIndex().get("name", "jen")), 1);
             assertEquals(graph.getIndex().get("name", "jen").iterator().next(), v2);
@@ -41,7 +41,7 @@ public class IndexTestSuite extends ModelTestSuite {
             v1.removeProperty("location");
             assertEquals(count(graph.getIndex().get("location", 87501)), 1);
             v2.removeProperty("location");
-            assertNull(graph.getIndex().get("location", 87501));
+            assertEquals(count(graph.getIndex().get("location", 87501)), 0);
         }
     }
 
@@ -60,7 +60,7 @@ public class IndexTestSuite extends ModelTestSuite {
 
             assertEquals(count(graph.getIndex().get("key1", "value1")), 10);
             assertEquals(count(graph.getIndex().get("key2", "value2")), 10);
-            assertNull(graph.getIndex().get("key3", "value3"));
+            assertEquals(count(graph.getIndex().get("key3", "value3")), 0);
 
             for (Element element : graph.getIndex().get("key1", "value1")) {
                 assertTrue(vertices.contains(element));
@@ -116,7 +116,7 @@ public class IndexTestSuite extends ModelTestSuite {
 
             assertEquals(count(graph.getIndex().get("key1", "value1")), 10);
             assertEquals(count(graph.getIndex().get("key2", "value2")), 10);
-            assertNull(graph.getIndex().get("key3", "value3"));
+            assertEquals(count(graph.getIndex().get("key3", "value3")), 0);
 
             for (Element element : graph.getIndex().get("key1", "value1")) {
                 assertTrue(edges.contains(element));

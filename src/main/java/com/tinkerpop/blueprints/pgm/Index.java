@@ -19,6 +19,7 @@ public interface Index {
      * The value need not be a direct object match, but can be,
      * according to the underlying implementation,
      * a text search, regular expression, logical expression, etc.
+     * If not elements match, return an empty iterable.
      *
      * @param key   denoting the sub-index to search
      * @param value the value to search for

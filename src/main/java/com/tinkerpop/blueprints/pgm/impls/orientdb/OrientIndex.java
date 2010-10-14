@@ -16,10 +16,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -93,10 +90,9 @@ public class OrientIndex implements Index {
         final List<ODocument> docList = map.get(keyTemp);
 
         if (docList == null || docList.isEmpty())
-            return null;
+            return new LinkedList<Element>();
 
         final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), docList);
-
         return new OrientElementSequence(graph, list.iterator());
     }
 

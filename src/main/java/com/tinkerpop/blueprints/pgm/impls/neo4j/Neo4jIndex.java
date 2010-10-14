@@ -43,10 +43,7 @@ public class Neo4jIndex implements Index {
 
     public Iterable<Element> get(final String key, final Object value) {
         IndexHits<Node> itty = this.indexService.getNodes(key, value);
-        if (null != itty && itty.size() > 0)
-            return new Neo4jElementVertexSequence(itty, this.graph);
-        else
-            return null;
+        return new Neo4jElementVertexSequence(itty, this.graph);
     }
 
     public void remove(final String key, final Object value, final Element element) {
