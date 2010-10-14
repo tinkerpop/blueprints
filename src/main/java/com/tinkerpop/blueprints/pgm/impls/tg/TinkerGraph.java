@@ -124,7 +124,7 @@ public class TinkerGraph implements Graph {
     }
 
     public String toString() {
-        return "tinkergraph[vertices:" + this.vertices.size() + "]";
+        return "tinkergraph[vertices:" + this.vertices.size() + " edges:" + this.edges.size() + "]";
     }
 
     public void clear() {

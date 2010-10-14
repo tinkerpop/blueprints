@@ -284,11 +284,21 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
         if (config.supportsEdgeIteration) {
             assertEquals(count(graph.getEdges()), 8049);
         }
-        assertEquals(count(graph.getIndex().get("name","Garcia")), 1);
-        assertEquals(count(graph.getIndex().get("name","Weir")), 1);
-        assertEquals(count(graph.getIndex().get("name","Lesh")), 1);
-        assertEquals(count(graph.getIndex().get("name","DARK STAR")), 1);
-        assertEquals(count(graph.getIndex().get("name","TERRAPIN STATION")), 1);
-        assertEquals(count(graph.getIndex().get("name","TERRAPIN STATION BAD SPELLING")), 0);
+        assertEquals(count(graph.getIndex().get("name", "Garcia")), 1);
+        assertEquals(count(graph.getIndex().get("name", "Weir")), 1);
+        assertEquals(count(graph.getIndex().get("name", "Lesh")), 1);
+        assertEquals(count(graph.getIndex().get("name", "DARK STAR")), 1);
+        assertEquals(count(graph.getIndex().get("name", "TERRAPIN STATION")), 1);
+        assertEquals(count(graph.getIndex().get("name", "TERRAPIN STATION BAD SPELLING")), 0);
+
+        Vertex garcia = (Vertex) graph.getIndex().get("name", "Garcia").iterator().next();
+        boolean found = false;
+        for (Edge edge : garcia.getInEdges()) {
+            if (edge.getLabel().equals("sung_by")) {
+                if (edge.getOutVertex().getProperty("name").equals("TERRAPIN STATION"))
+                    found = true;
+            }
+        }
+        assertTrue(found);
     }
 }
