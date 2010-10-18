@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.orientechnologies.orient.core.db.graph.OGraphEdge;
 import com.orientechnologies.orient.core.db.graph.OGraphVertex;
@@ -21,8 +20,13 @@ import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraph implements Graph, TransactionalGraph {
-    private final ODatabaseGraphTx database;
+    private ODatabaseGraphTx database;
     private OrientIndex index;
+
+    private final String url;
+    private final String username;
+    private final String password;
+
     private Mode mode = Mode.AUTOMATIC;
     private final static String ADMIN = "admin";
 
@@ -30,27 +34,20 @@ public class OrientGraph implements Graph, TransactionalGraph {
         this(url, ADMIN, ADMIN);
     }
 
-    @SuppressWarnings("serial")
     public OrientGraph(final String url, final String username, final String password) {
-        this.database = new ODatabaseGraphTx(url);
-        if (this.database.exists())
-            this.database.open(username, password);
-        else
-            this.database.create();
-
-        this.index = new OrientIndex(this);
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        openOrCreate();
     }
 
     public Vertex addVertex(final Object id) {
         try {
             beginTransaction();
-
             final OrientVertex vertex = new OrientVertex(this, this.database.createVertex(null));
             vertex.save();
-
             commitTransaction();
             return vertex;
-
         } catch (RuntimeException e) {
             rollbackTransaction();
             throw e;
@@ -94,9 +91,9 @@ public class OrientGraph implements Graph, TransactionalGraph {
             return null;
 
         final ODocument doc = this.database.getRecordById(rid);
-        if (doc != null) {
+        if (doc != null)
             return new OrientVertex(this, (OGraphVertex) this.database.getUserObjectByRecord(doc, null));
-        } else
+        else
             return new OrientVertex(this, (OGraphVertex) this.database.load(rid));
     }
 
@@ -105,7 +102,6 @@ public class OrientGraph implements Graph, TransactionalGraph {
             beginTransaction();
             ((OrientVertex) vertex).delete();
             commitTransaction();
-
         } catch (RuntimeException e) {
             rollbackTransaction();
             throw e;
@@ -128,21 +124,17 @@ public class OrientGraph implements Graph, TransactionalGraph {
             rid = new ORecordId(id.toString());
 
         final ODocument doc = this.database.getRecordById(rid);
-        if (doc != null) {
+        if (doc != null)
             return new OrientEdge(this, (OGraphEdge) this.database.getUserObjectByRecord(doc, null));
-        } else
+        else
             return new OrientEdge(this, (OGraphEdge) this.database.load(rid));
     }
 
     public void removeEdge(final Edge edge) {
         try {
             beginTransaction();
-
-            final OGraphEdge e = (OGraphEdge) ((OrientEdge) edge).getRawElement();
             ((OrientEdge) edge).delete();
-
             commitTransaction();
-
         } catch (RuntimeException e) {
             rollbackTransaction();
             throw e;
@@ -150,17 +142,10 @@ public class OrientGraph implements Graph, TransactionalGraph {
     }
 
     public void clear() {
-        for (ODocument v : ((ODatabaseDocumentTx) this.database.getUnderlying()).browseClass(OGraphVertex.class.getSimpleName())) {
-            if (v != null)
-                v.delete();
-        }
-
-        for (ODocument e : ((ODatabaseDocumentTx) this.database.getUnderlying()).browseClass(OGraphEdge.class.getSimpleName())) {
-            if (e != null)
-                e.delete();
-        }
-
-        this.index.clear();
+        this.database.delete();
+        this.database = null;
+        this.index = null;
+        openOrCreate();
     }
 
     public OrientIndex getIndex() {
@@ -169,6 +154,7 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
     public void shutdown() {
         this.database.close();
+        this.database = null;
         this.index = null;
     }
 
@@ -177,14 +163,13 @@ public class OrientGraph implements Graph, TransactionalGraph {
     }
 
     public ODatabaseGraphTx getRawGraph() {
-        return database;
+        return this.database;
     }
 
     public void startTransaction() {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-
-        database.begin();
+        this.database.begin();
     }
 
     public void stopTransaction(final Conclusion conclusion) {
@@ -192,10 +177,10 @@ public class OrientGraph implements Graph, TransactionalGraph {
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         if (conclusion == Conclusion.FAILURE) {
-            database.rollback();
-            index.getRawIndex().unload();
+            this.database.rollback();
+            this.index.getRawIndex().unload();
         } else
-            database.commit();
+            this.database.commit();
     }
 
     public void setTransactionMode(final Mode mode) {
@@ -208,19 +193,27 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
     protected void beginTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC)
-            database.begin();
+            this.database.begin();
     }
 
     protected void commitTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC)
-            database.commit();
+            this.database.commit();
     }
 
     protected void rollbackTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC) {
-            database.rollback();
-            index.getRawIndex().unload();
-
+            this.database.rollback();
+            this.index.getRawIndex().unload();
         }
+    }
+
+    private void openOrCreate() {
+        this.database = new ODatabaseGraphTx(url);
+        if (this.database.exists())
+            this.database.open(username, password);
+        else
+            this.database.create();
+        this.index = new OrientIndex(this);
     }
 }

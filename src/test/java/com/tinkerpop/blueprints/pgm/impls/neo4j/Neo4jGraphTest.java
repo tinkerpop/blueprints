@@ -51,7 +51,6 @@ public class Neo4jGraphTest extends BaseTest {
         doSuiteTest(new TransactionalGraphTestSuite(config));
     }
 
-
     private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testNeo4j");
         if (doTest == null || doTest.equals("true")) {
@@ -103,20 +102,5 @@ public class Neo4jGraphTest extends BaseTest {
             assertFalse(false);
         }
 
-    }
-
-    protected static Neo4jGraph doNeo4jGraphTest() {
-        String doTest = System.getProperty("testNeo4j");
-        if (doTest == null || doTest.equals("true")) {
-            String directory = System.getProperty("neo4jDirectory");
-            if (directory == null) {
-                directory = "/tmp/blueprints_test";
-                deleteDirectory(new File(directory));
-                Neo4jGraph graph = new Neo4jGraph(directory);
-                graph.clear();
-                return graph;
-            }
-        }
-        return null;
     }
 }

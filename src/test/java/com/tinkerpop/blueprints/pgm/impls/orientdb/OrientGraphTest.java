@@ -45,9 +45,9 @@ public class OrientGraphTest extends BaseTest {
         doSuiteTest(new IndexTestSuite(config));
     }
 
-    /*public void testGraphMLReaderSuite() throws Exception {
+    public void testGraphMLReaderSuite() throws Exception {
         doSuiteTest(new GraphMLReaderTestSuite(config));
-    }*/
+    }
 
     public void testTransactionalGraphTestSuite() throws Exception {
         doSuiteTest(new TransactionalGraphTestSuite(config));
@@ -66,14 +66,10 @@ public class OrientGraphTest extends BaseTest {
 
             for (Method method : suite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
-
                     System.out.println("Testing " + method.getName() + "...");
-
                     OrientGraph graph = new OrientGraph("local:" + url + "/graph");
                     graph.clear();
-
                     method.invoke(suite, graph);
-
                     graph.shutdown();
                     deleteDirectory(new File(url));
                 }

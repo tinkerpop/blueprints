@@ -41,7 +41,6 @@ public class SuiteConfiguration {
      * Does the graph framework support graph.getVertices()?
      */
     public boolean supportsVertexIteration;
-
     /**
      * Does the graph implement TransactionalGraph?
      */
