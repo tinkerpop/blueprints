@@ -22,12 +22,12 @@
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-core</artifactId>
-            <version>0.9.23-SNAPSHOT</version>
+            <version>0.9.24-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orient-commons</artifactId>
-            <version>0.9.23-SNAPSHOT</version>
+            <version>0.9.24-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <repositories>
