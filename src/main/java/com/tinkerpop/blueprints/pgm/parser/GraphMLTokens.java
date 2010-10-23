@@ -4,30 +4,30 @@ package com.tinkerpop.blueprints.pgm.parser;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class GraphMLTokens {
-    protected static final String GRAPHML = "graphml";
-    protected static final String XMLNS = "xmlns";
-    protected static final String GRAPHML_XMLNS = "http://graphml.graphdrawing.org/xmlns";
-    protected static final String G = "G";
-    protected static final String EDGEDEFAULT = "edgedefault";
-    protected static final String DIRECTED = "directed";
-    protected static final String KEY = "key";
-    protected static final String FOR = "for";
-    protected static final String ID = "id";
-    protected static final String ATTR_NAME = "attr.name";
-    protected static final String ATTR_TYPE = "attr.type";
-    protected static final String GRAPH = "graph";
-    protected static final String NODE = "node";
-    protected static final String EDGE = "edge";
-    protected static final String SOURCE = "source";
-    protected static final String TARGET = "target";
-    protected static final String DATA = "data";
-    protected static final String LABEL = "label";
-    protected static final String STRING = "string";
-    protected static final String FLOAT = "float";
-    protected static final String DOUBLE = "double";
-    protected static final String LONG = "long";
-    protected static final String BOOLEAN = "boolean";
-    protected static final String INT = "int";
-    protected static final String _DEFAULT = "_default";
+    public static final String GRAPHML = "graphml";
+    public static final String XMLNS = "xmlns";
+    public static final String GRAPHML_XMLNS = "http://graphml.graphdrawing.org/xmlns";
+    public static final String G = "G";
+    public static final String EDGEDEFAULT = "edgedefault";
+    public static final String DIRECTED = "directed";
+    public static final String KEY = "key";
+    public static final String FOR = "for";
+    public static final String ID = "id";
+    public static final String ATTR_NAME = "attr.name";
+    public static final String ATTR_TYPE = "attr.type";
+    public static final String GRAPH = "graph";
+    public static final String NODE = "node";
+    public static final String EDGE = "edge";
+    public static final String SOURCE = "source";
+    public static final String TARGET = "target";
+    public static final String DATA = "data";
+    public static final String LABEL = "label";
+    public static final String STRING = "string";
+    public static final String FLOAT = "float";
+    public static final String DOUBLE = "double";
+    public static final String LONG = "long";
+    public static final String BOOLEAN = "boolean";
+    public static final String INT = "int";
+    public static final String _DEFAULT = "_default";
 
 }
