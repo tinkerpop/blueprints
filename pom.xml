@@ -49,12 +49,6 @@
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            <version>1.2.M02</version>
-            <type>pom</type>
-        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -155,9 +149,6 @@
                 <version>2.4.2</version>
                 <configuration>
                     <systemProperties>
-                        <!--********************************-->
-                        <!-- PROPERY GRAPH MODEL TEST SUITE -->
-                        <!--********************************-->
                         <!-- TINKERGRAPH TEST PROPERTIES -->
                         <property>
                             <name>testTinkerGraph</name>
@@ -172,6 +163,11 @@
                             <name>neo4jDirectory</name>
                             <value>/tmp/blueprints_test</value>
                         </property>
+                        <!-- SAIL TEST PROPERTIES -->
+                        <property>
+                            <name>testSail</name>
+                            <value>true</value>
+                        </property>
                         <!-- ORIENTGRAPH TEST PROPERTIES -->
                         <property>
                             <name>testOrientGraph</name>
@@ -180,11 +176,6 @@
                         <property>
                             <name>orientGraphDirectory</name>
                             <value>/tmp/blueprints_test</value>
-                        </property>
-                        <!-- SAIL TEST PROPERTIES -->
-                        <property>
-                            <name>testSail</name>
-                            <value>true</value>
                         </property>
                     </systemProperties>
                 </configuration>

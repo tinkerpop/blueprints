@@ -26,6 +26,11 @@ bc. <dependency>
 ** Added timing tests to all tests
 * Updated @Index@ semantics where no elements returns an empty iterator, not @null@
 * Updated the @toString()@ method of @TinkerGraph@ to display both vertex and edge counts
+* Removed object document model to focus Blueprints specifically on property graphs
+* Added support for multiple indices
+** Added @IndexableGraph@ interface
+** Added support for auto indexing through @AutomaticIndex@
+** Added numerous test cases to the test suite
 
 
 h3. Version 0.2 (Kermit -- September 22, 2010)
