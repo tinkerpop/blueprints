@@ -9,10 +9,10 @@ public interface Index<T extends Element> {
 
     public Class<T> getIndexClass();
 
-    public void put(String key, Object value, T object);
+    public void put(String key, Object value, T element);
 
     public Iterable<T> get(String key, Object value);
 
-    public void remove(String key, Object value, T object);
+    public void remove(String key, Object value, T element);
 
 }

@@ -1,10 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jElement;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jIndex;
-import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -37,8 +33,8 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         }
     }
 
-    public boolean doAutoIndex(String key) {
-        return this.autoIndexKeys == null || this.autoIndexKeys.contains(key);
+    public boolean doAutoIndex(String key, Class classToIndex) {
+        return this.getIndexClass().isAssignableFrom(classToIndex) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key));
     }
 
     public void removeAutoIndexKey(String key) {

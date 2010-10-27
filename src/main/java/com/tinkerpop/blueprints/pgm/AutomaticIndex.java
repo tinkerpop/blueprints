@@ -13,5 +13,5 @@ public interface AutomaticIndex<T extends Element> extends Index<T> {
 
     public Set<String> getAutoIndexKeys();
 
-    public boolean doAutoIndex(String key);
+    public boolean doAutoIndex(String key, Class classToIndex);
 }

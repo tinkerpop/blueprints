@@ -34,8 +34,8 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         }
     }
 
-    public boolean doAutoIndex(String key) {
-        return this.autoIndexKeys == null || this.autoIndexKeys.contains(key);
+    public boolean doAutoIndex(String key, Class classToIndex) {
+        return this.getIndexClass().isAssignableFrom(classToIndex) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key));
     }
 
     public void removeAutoIndexKey(String key) {

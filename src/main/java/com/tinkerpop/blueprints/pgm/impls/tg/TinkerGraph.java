@@ -3,10 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -16,22 +13,26 @@ public class TinkerGraph implements IndexableGraph {
     private Long currentId = 0l;
     protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
-    protected Map<String, Index> indices = new HashMap<String, Index>();
-    protected Map<String, AutomaticIndex> autoIndices = new HashMap<String, AutomaticIndex>();
+    protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
+    protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
 
     public TinkerGraph() {
         this.addIndex(new TinkerAutomaticIndex<TinkerVertex>(IndexableGraph.VERTICES, TinkerVertex.class, null));
         this.addIndex(new TinkerAutomaticIndex<TinkerEdge>(IndexableGraph.EDGES, TinkerEdge.class, null));
     }
 
-    protected Iterable<AutomaticIndex> getAutoIndices() {
+    protected Iterable<TinkerAutomaticIndex> getAutoIndices() {
         return this.autoIndices.values();
     }
 
     public void addIndex(Index index) {
-        this.indices.put(index.getIndexName(), index);
-        if (index instanceof AutomaticIndex)
-            this.autoIndices.put(index.getIndexName(), (AutomaticIndex) index);
+        if (index instanceof TinkerIndex) {
+            this.indices.put(index.getIndexName(), (TinkerIndex) index);
+            if (index instanceof TinkerAutomaticIndex)
+                this.autoIndices.put(index.getIndexName(), (TinkerAutomaticIndex) index);
+        } else {
+            throw new RuntimeException("TinkerGraph only supports TinkerIndex indices.");
+        }
     }
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
@@ -43,7 +44,9 @@ public class TinkerGraph implements IndexableGraph {
     }
 
     public Iterable<Index> getIndices() {
-        return this.indices.values();
+        List<Index> list = new ArrayList<Index>();
+        list.addAll(indices.values());
+        return list;
     }
 
     public void dropIndex(String indexName) {
@@ -111,11 +114,10 @@ public class TinkerGraph implements IndexableGraph {
         }
 
         // removal requires removal from all indices
-        for (String key : vertex.getPropertyKeys()) {
-            for (Index index : this.indices.values()) {
-                index.remove(key, vertex.getProperty(key), vertex);
-            }
+        for (TinkerIndex index : this.indices.values()) {
+            index.remove(vertex);
         }
+
         this.vertices.remove(vertex.getId().toString());
     }
 
@@ -152,10 +154,8 @@ public class TinkerGraph implements IndexableGraph {
             inVertex.inEdges.remove(edge);
 
         // removal requires removal from all indices
-        for (String key : edge.getPropertyKeys()) {
-            for (Index index : this.indices.values()) {
-                index.remove(key, edge.getProperty(key), edge);
-            }
+        for (TinkerIndex index : this.indices.values()) {
+            index.remove(edge);
         }
 
         this.edges.remove(edge.getId().toString());

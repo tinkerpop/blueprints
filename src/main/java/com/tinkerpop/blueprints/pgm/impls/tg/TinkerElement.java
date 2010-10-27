@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.HashMap;
@@ -31,24 +30,19 @@ public abstract class TinkerElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        Object oldValue = this.properties.put(key, value);
-        for (AutomaticIndex index : this.graph.getAutoIndices()) {
-            if (this.getClass().isAssignableFrom(index.getIndexClass()) && index.doAutoIndex(key)) {
-                index.remove(key, oldValue, this);
-                index.put(key, value, this);
-            }
+
+        for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
+            index.autoUpdate(key, value, this);
         }
+        this.properties.put(key, value);
     }
 
     public Object removeProperty(final String key) {
 
-        Object value = this.properties.remove(key);
-        for (AutomaticIndex index : this.graph.getAutoIndices()) {
-            if (this.getClass().isAssignableFrom(index.getIndexClass())  && index.doAutoIndex(key)) {
-                index.remove(key, value, this);
-            }
+        for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
+            index.autoRemove(key, this);
         }
-        return value;
+        return this.properties.remove(key);
     }
 
 

@@ -35,7 +35,7 @@ public abstract class Neo4jElement implements Element {
         Object oldValue = this.getProperty(key);
 
         for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-            if (autoIndex.getIndexClass().isAssignableFrom(this.getClass()) && autoIndex.doAutoIndex(key)) {
+            if (autoIndex.doAutoIndex(key, this.getClass())) {
                 if (null != oldValue)
                     autoIndex.remove(key, oldValue, this);
                 autoIndex.put(key, value, this);
@@ -51,7 +51,7 @@ public abstract class Neo4jElement implements Element {
             Object oldValue = this.getProperty(key);
             if (null != oldValue) {
                 for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-                    if (autoIndex.getIndexClass().isAssignableFrom(this.getClass()) && autoIndex.doAutoIndex(key))
+                    if (autoIndex.doAutoIndex(key, this.getClass()))
                         autoIndex.remove(key, oldValue, this);
                 }
             }
