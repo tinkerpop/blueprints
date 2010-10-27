@@ -1,29 +1,26 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.*;
-import org.neo4j.index.IndexService;
-import org.neo4j.index.lucene.LuceneIndexService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraph implements TransactionalGraph {
+public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     private GraphDatabaseService neo4j;
     private String directory;
-    private Neo4jIndex index;
     private Transaction tx;
     private Mode mode = Mode.AUTOMATIC;
+    protected Map<String, Index> indices = new HashMap<String, Index>();
+    protected Map<String, AutomaticIndex> autoIndices = new HashMap<String, AutomaticIndex>();
 
     public Neo4jGraph(final String directory) {
         this(directory, null);
@@ -40,30 +37,57 @@ public class Neo4jGraph implements TransactionalGraph {
                 this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
             else
                 this.neo4j = new EmbeddedGraphDatabase(this.directory);
-            IndexService indexService = new LuceneIndexService(neo4j);
-            this.index = new Neo4jIndex(indexService, this);
+
+
             if (Mode.AUTOMATIC == this.mode) {
                 this.tx = neo4j.beginTx();
             }
+
+            this.addIndex(new Neo4jAutomaticIndex<Neo4jVertex, Node>(IndexableGraph.VERTICES, Neo4jVertex.class, null, this));
+            this.addIndex(new Neo4jAutomaticIndex<Neo4jEdge, Relationship>(IndexableGraph.EDGES, Neo4jEdge.class, null, this));
+
         } catch (Exception e) {
-            if (this.index != null)
-                this.index.shutdown();
             if (this.neo4j != null)
                 this.neo4j.shutdown();
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    public Neo4jGraph(GraphDatabaseService neo4j, IndexService indexService) {
+    public Neo4jGraph(GraphDatabaseService neo4j) {
         this.neo4j = neo4j;
-        this.index = new Neo4jIndex(indexService, this);
+
         if (Mode.AUTOMATIC == this.mode) {
             this.tx = neo4j.beginTx();
         }
     }
 
-    public Index getIndex() {
-        return this.index;
+    public void addIndex(Index index) {
+        if (index instanceof Neo4jIndex) {
+            this.indices.put(index.getIndexName(), index);
+            if (index instanceof Neo4jAutomaticIndex) {
+                this.autoIndices.put(index.getIndexName(), (AutomaticIndex) index);
+            }
+        } else {
+            throw new RuntimeException("Only Neo4jIndex classes can be used");
+        }
+    }
+
+    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+        return (Index<T>) this.indices.get(indexName);
+    }
+
+    public void dropIndex(String indexName) {
+        this.neo4j.index().forNodes(indexName).delete();
+        this.neo4j.index().forRelationships(indexName).delete();
+        this.stopStartTransaction();
+    }
+
+    protected Iterable<AutomaticIndex> getAutoIndices() {
+        return autoIndices.values();
+    }
+
+    public Iterable<Index> getIndices() {
+        return this.indices.values();
     }
 
     public Vertex addVertex(final Object id) {
@@ -100,9 +124,6 @@ public class Neo4jGraph implements TransactionalGraph {
         final Long id = (Long) vertex.getId();
         final Node node = neo4j.getNodeById(id);
         if (null != node) {
-            for (final String key : vertex.getPropertyKeys()) {
-                this.index.remove(key, vertex.getProperty(key), vertex);
-            }
             for (final Edge edge : vertex.getInEdges()) {
                 this.removeEdge(edge);
             }
@@ -199,7 +220,6 @@ public class Neo4jGraph implements TransactionalGraph {
             }
         }
         this.neo4j.shutdown();
-        this.index.shutdown();
 
     }
 
@@ -207,8 +227,8 @@ public class Neo4jGraph implements TransactionalGraph {
         this.shutdown();
         deleteGraphDirectory(new File(this.directory));
         this.neo4j = new EmbeddedGraphDatabase(this.directory);
-        LuceneIndexService indexService = new LuceneIndexService(neo4j);
-        this.index = new Neo4jIndex(indexService, this);
+        //LuceneIndexService indexService = new LuceneIndexService(neo4j);
+        //this.index = new Neo4jIndex(indexService, this);
         this.tx = neo4j.beginTx();
         this.removeVertex(this.getVertex(0));
         this.stopStartTransaction();

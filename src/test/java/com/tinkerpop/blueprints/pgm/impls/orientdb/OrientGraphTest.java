@@ -41,15 +41,15 @@ public class OrientGraphTest extends BaseTest {
         doSuiteTest(new GraphTestSuite(config));
     }
 
-    public void testIndexSuite() throws Exception {
-        doSuiteTest(new IndexTestSuite(config));
+    public void testIndexableGraphSuite() throws Exception {
+        doSuiteTest(new IndexableGraphTestSuite(config));
     }
 
     public void testGraphMLReaderSuite() throws Exception {
         doSuiteTest(new GraphMLReaderTestSuite(config));
     }
 
-    public void testTransactionalGraphTestSuite() throws Exception {
+    public void testTransactionalGraphSuite() throws Exception {
         doSuiteTest(new TransactionalGraphTestSuite(config));
     }
 

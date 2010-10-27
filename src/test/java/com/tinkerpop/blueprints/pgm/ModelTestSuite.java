@@ -29,7 +29,7 @@ public abstract class ModelTestSuite extends BaseTest {
 
     protected String convertId(final String id) {
         if (this.config.requiresRDFIds) {
-            return "gremlin:" + id;
+            return "blueprints:" + id;
         } else {
             return id;
         }

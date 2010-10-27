@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
@@ -22,25 +23,45 @@ public abstract class Neo4jElement implements Element {
         this.graph = graph;
     }
 
-    public void setProperty(final String key, final Object value) {
-        if (this instanceof Neo4jVertex) {
-            Object value2 = this.getProperty(key);
-            if (null != value2)
-                this.graph.getIndex().remove(key, value2, this);
-        }
-
-        this.element.setProperty(key, value);
-        if (this instanceof Neo4jVertex)
-            this.graph.getIndex().put(key, value, this);
-
-        this.graph.stopStartTransaction();
-    }
-
     public Object getProperty(final String key) {
         if (this.element.hasProperty(key))
             return this.element.getProperty(key);
         else
             return null;
+    }
+
+    public void setProperty(final String key, final Object value) {
+
+        Object oldValue = this.getProperty(key);
+
+        for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+            if (autoIndex.getIndexClass().isAssignableFrom(this.getClass()) && autoIndex.doAutoIndex(key)) {
+                if (null != oldValue)
+                    autoIndex.remove(key, oldValue, this);
+                autoIndex.put(key, value, this);
+            }
+        }
+
+        this.element.setProperty(key, value);
+        this.graph.stopStartTransaction();
+    }
+
+    public Object removeProperty(final String key) {
+        try {
+            Object oldValue = this.getProperty(key);
+            if (null != oldValue) {
+                for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                    if (autoIndex.getIndexClass().isAssignableFrom(this.getClass()) && autoIndex.doAutoIndex(key))
+                        autoIndex.remove(key, oldValue, this);
+                }
+            }
+
+            Object value = this.element.removeProperty(key);
+            this.graph.stopStartTransaction();
+            return value;
+        } catch (NotFoundException e) {
+            return null;
+        }
     }
 
     public Set<String> getPropertyKeys() {
@@ -49,21 +70,6 @@ public abstract class Neo4jElement implements Element {
             keys.add(key);
         }
         return keys;
-    }
-
-    public Object removeProperty(final String key) {
-        try {
-            if (this instanceof Neo4jVertex) {
-                Object value2 = this.getProperty(key);
-                if (null != value2)
-                    this.graph.getIndex().remove(key, value2, this);
-            }
-            Object value = this.element.removeProperty(key);
-            this.graph.stopStartTransaction();
-            return value;
-        } catch (NotFoundException e) {
-            return null;
-        }
     }
 
     public int hashCode() {

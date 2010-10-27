@@ -8,20 +8,20 @@ import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.iterator.OGraphEdgeIterator;
 import com.orientechnologies.orient.core.iterator.OGraphVertexIterator;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * OrientDB implementation of Graph interface. This implementation is transactional.
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraph implements Graph, TransactionalGraph {
+public class OrientGraph implements TransactionalGraph, IndexableGraph {
+
     private ODatabaseGraphTx database;
-    private OrientIndex index;
 
     private final String url;
     private final String username;
@@ -29,6 +29,9 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
     private Mode mode = Mode.AUTOMATIC;
     private final static String ADMIN = "admin";
+
+    protected Map<String, Index> indices = new HashMap<String, Index>();
+    protected Map<String, AutomaticIndex> autoIndices = new HashMap<String, AutomaticIndex>();
 
     public OrientGraph(final String url) {
         this(url, ADMIN, ADMIN);
@@ -39,6 +42,29 @@ public class OrientGraph implements Graph, TransactionalGraph {
         this.username = username;
         this.password = password;
         openOrCreate();
+    }
+
+    public void addIndex(Index index) {
+        this.indices.put(index.getIndexName(), index);
+        if (index instanceof AutomaticIndex)
+            this.autoIndices.put(index.getIndexName(), (AutomaticIndex) index);
+    }
+
+    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+        return (Index<T>) this.indices.get(indexName);
+    }
+
+    public Iterable<Index> getIndices() {
+        return this.indices.values();
+    }
+
+    protected Iterable<AutomaticIndex> getAutoIndices() {
+        return this.autoIndices.values();
+    }
+
+    public void dropIndex(String indexName) {
+        this.indices.remove(indexName);
+        this.autoIndices.remove(indexName);
     }
 
     public Vertex addVertex(final Object id) {
@@ -65,7 +91,7 @@ public class OrientGraph implements Graph, TransactionalGraph {
             ((OrientVertex) outVertex).getRawVertex().getDocument().setDirty();
             ((OrientVertex) inVertex).getRawVertex().getDocument().setDirty();
 
-            // SAVE THE VERTEX TO ASSURE THEY ARE IN TX
+            // SAVE THE VERTICES TO ASSURE THEY ARE IN TX
             ((OrientVertex) outVertex).save();
             ((OrientVertex) inVertex).save();
             edge.save();
@@ -100,6 +126,15 @@ public class OrientGraph implements Graph, TransactionalGraph {
     public void removeVertex(final Vertex vertex) {
         try {
             beginTransaction();
+
+            // removal requires removal from all indices
+            for (String key : vertex.getPropertyKeys()) {
+                for (Index index : this.indices.values()) {
+                    if (vertex.getClass().isAssignableFrom(index.getIndexClass()))
+                        index.remove(key, vertex.getProperty(key), vertex);
+                }
+            }
+
             ((OrientVertex) vertex).delete();
             commitTransaction();
         } catch (RuntimeException e) {
@@ -133,6 +168,15 @@ public class OrientGraph implements Graph, TransactionalGraph {
     public void removeEdge(final Edge edge) {
         try {
             beginTransaction();
+
+            // removal requires removal from all indices
+            for (String key : edge.getPropertyKeys()) {
+                for (Index index : this.indices.values()) {
+                    if (edge.getClass().isAssignableFrom(index.getIndexClass()))
+                        index.remove(key, edge.getProperty(key), edge);
+                }
+            }
+
             ((OrientEdge) edge).delete();
             commitTransaction();
         } catch (RuntimeException e) {
@@ -144,18 +188,14 @@ public class OrientGraph implements Graph, TransactionalGraph {
     public void clear() {
         this.database.delete();
         this.database = null;
-        this.index = null;
+        this.indices.clear();
         openOrCreate();
-    }
-
-    public OrientIndex getIndex() {
-        return this.index;
     }
 
     public void shutdown() {
         this.database.close();
         this.database = null;
-        this.index = null;
+        this.indices.clear();
     }
 
     public String toString() {
@@ -178,7 +218,8 @@ public class OrientGraph implements Graph, TransactionalGraph {
 
         if (conclusion == Conclusion.FAILURE) {
             this.database.rollback();
-            this.index.getRawIndex().unload();
+            for (Index index : this.indices.values())
+                ((OrientIndex) index).getRawIndex().unload();
         } else
             this.database.commit();
     }
@@ -204,7 +245,8 @@ public class OrientGraph implements Graph, TransactionalGraph {
     protected void rollbackTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC) {
             this.database.rollback();
-            this.index.getRawIndex().unload();
+            for (Index index : this.indices.values())
+                ((OrientIndex) index).getRawIndex().unload();
         }
     }
 
@@ -212,8 +254,10 @@ public class OrientGraph implements Graph, TransactionalGraph {
         this.database = new ODatabaseGraphTx(url);
         if (this.database.exists())
             this.database.open(username, password);
-        else
+        else {
             this.database.create();
-        this.index = new OrientIndex(this);
+            this.addIndex(new OrientAutomaticIndex<OrientVertex>(IndexableGraph.VERTICES, OrientVertex.class, null, this));
+            this.addIndex(new OrientAutomaticIndex<OrientEdge>(IndexableGraph.EDGES, OrientEdge.class, null, this));
+        }
     }
 }

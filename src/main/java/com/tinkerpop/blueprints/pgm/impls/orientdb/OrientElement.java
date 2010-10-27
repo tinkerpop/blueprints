@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.id.ORID;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.Set;
@@ -29,9 +30,14 @@ public abstract class OrientElement implements Element {
             this.rawElement.set(key, value);
             this.save();
 
-            if (oldValue != null)
-                graph.getIndex().remove(key, oldValue, this);
-            graph.getIndex().put(key, value, this);
+            for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                if (autoIndex.getIndexClass().isAssignableFrom(this.getClass()) && autoIndex.doAutoIndex(key)) {
+                    if (null != oldValue)
+                        autoIndex.remove(key, oldValue, this);
+                    autoIndex.put(key, value, this);
+                }
+            }
+
             graph.commitTransaction();
 
         } catch (RuntimeException e) {
@@ -44,12 +50,18 @@ public abstract class OrientElement implements Element {
         graph.beginTransaction();
 
         try {
-            final Object old = this.rawElement.remove(key);
+            final Object oldValue = this.rawElement.remove(key);
             this.save();
-            graph.getIndex().remove(key, old, this);
-            graph.commitTransaction();
 
-            return old;
+            if (null != oldValue) {
+                for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                    if (autoIndex.getIndexClass().isAssignableFrom(this.getClass()) && autoIndex.doAutoIndex(key))
+                        autoIndex.remove(key, oldValue, this);
+                }
+            }
+            graph.commitTransaction();
+            return oldValue;
+
         } catch (RuntimeException e) {
 
             graph.rollbackTransaction();

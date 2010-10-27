@@ -268,7 +268,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         BaseTest.printPerformance(graph.toString(), 2, "vertex properties checked in a successful transaction", this.stopWatch());
     }
 
-    public void testIndexTransactions(TransactionalGraph graph) {
+    /*public void testIndexTransactions(TransactionalGraph graph) {
 
         if (config.supportsVertexIndex) {
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
@@ -286,7 +286,7 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
 
             this.stopWatch();
             graph.startTransaction();
-            v = (Vertex) graph.getIndex().get("name", "marko").iterator().next();
+            v = (Vertex) graph.acquireIndex().get("name", "marko").iterator().next();
             assertEquals(v.getId(), id);
             assertEquals(v.getProperty("name"), "marko");
             if (config.supportsVertexIteration)
@@ -307,13 +307,13 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             graph.startTransaction();
             if (config.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 1);
-            assertEquals(count(graph.getIndex().get("name", "pavel")), 0);
+            assertEquals(count(graph.acquireIndex().get("name", "pavel")), 0);
             graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             BaseTest.printPerformance(graph.toString(), 1, "vertex not retrieved in a successful transaction", this.stopWatch());
 
         }
 
-    }
+    }*/
 
 
 }

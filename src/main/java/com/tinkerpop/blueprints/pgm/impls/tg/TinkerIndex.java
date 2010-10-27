@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
-
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 
@@ -12,69 +11,68 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerIndex implements Index {
+public class TinkerIndex<T extends Element> implements Index<T> {
 
-    private Map<String, Map<Object, Set<Element>>> indices = new HashMap<String, Map<Object, Set<Element>>>();
-    private boolean indexAll = true;
-    private Set<String> indexKeys = new HashSet<String>();
+    private Map<String, Map<Object, Set<T>>> index = new HashMap<String, Map<Object, Set<T>>>();
+    private final String indexName;
+    private final Class<T> indexClass;
 
-    public void put(final String key, final Object value, final Element element) {
-        if (this.indexAll || indexKeys.contains(key)) {
-
-            Map<Object, Set<Element>> keyMap = this.indices.get(key);
-            if (keyMap == null) {
-                keyMap = new HashMap<Object, Set<Element>>();
-                this.indices.put(key, keyMap);
-            }
-            Set<Element> elements = keyMap.get(value);
-            if (null == elements) {
-                elements = new HashSet<Element>();
-                keyMap.put(value, elements);
-            }
-            elements.add(element);
-        }
+    public TinkerIndex(String indexName, Class<T> indexClass) {
+        this.indexName = indexName;
+        this.indexClass = indexClass;
     }
 
-    public Iterable<Element> get(final String key, final Object value) {
-        Map<Object, Set<Element>> keyMap = this.indices.get(key);
+    public String getIndexName() {
+        return this.indexName;
+    }
+
+    public Class<T> getIndexClass() {
+        return this.indexClass;
+    }
+
+    public void put(final String key, final Object value, final T element) {
+        Map<Object, Set<T>> keyMap = this.index.get(key);
+        if (keyMap == null) {
+            keyMap = new HashMap<Object, Set<T>>();
+            this.index.put(key, keyMap);
+        }
+        Set<T> objects = keyMap.get(value);
+        if (null == objects) {
+            objects = new HashSet<T>();
+            keyMap.put(value, objects);
+        }
+        objects.add(element);
+
+    }
+
+    public Iterable<T> get(final String key, final Object value) {
+        Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null == keyMap) {
-            return new HashSet<Element>();
+            return new HashSet<T>();
         } else {
-            Set<Element> set = keyMap.get(value);
+            Set<T> set = keyMap.get(value);
             if (null == set)
-                return new HashSet<Element>();
+                return new HashSet<T>();
             else
                 return set;
         }
     }
 
-    public void remove(final String key, final Object value, final Element element) {
-        Map<Object, Set<Element>> keyMap = this.indices.get(key);
+    public void remove(final String key, final Object value, final T element) {
+        Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null != keyMap) {
-            Set<Element> elements = keyMap.get(value);
-            if (null != elements) {
-                elements.remove(element);
-                if (elements.size() == 0) {
+            Set<T> objects = keyMap.get(value);
+            if (null != objects) {
+                objects.remove(element);
+                if (objects.size() == 0) {
                     keyMap.remove(value);
                 }
             }
         }
     }
 
-    public void indexAll(final boolean indexAll) {
-        this.indexAll = indexAll;
-    }
-
-    public void addIndexKey(final String key) {
-        indexKeys.add(key);
-    }
-
-    public void removeIndexKey(final String key) {
-        indexKeys.remove(key);
-    }
-
     public String toString() {
-        return indices.toString();
+        return index.toString();
     }
 
 }

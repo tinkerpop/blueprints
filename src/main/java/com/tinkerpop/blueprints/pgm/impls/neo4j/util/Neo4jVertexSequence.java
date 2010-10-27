@@ -11,7 +11,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
+public class Neo4jVertexSequence<T extends Vertex> implements Iterator<Neo4jVertex>, Iterable<Neo4jVertex> {
 
     private final Iterator<Node> nodes;
     private final Neo4jGraph graph;
@@ -25,7 +25,7 @@ public class Neo4jVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
         throw new UnsupportedOperationException();
     }
 
-    public Vertex next() {
+    public Neo4jVertex next() {
         return new Neo4jVertex(this.nodes.next(), this.graph);
     }
 
@@ -33,7 +33,7 @@ public class Neo4jVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
         return this.nodes.hasNext();
     }
 
-    public Iterator<Vertex> iterator() {
+    public Iterator<Neo4jVertex> iterator() {
         return this;
     }
 }

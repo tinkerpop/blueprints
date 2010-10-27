@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.HashMap;
@@ -14,10 +15,10 @@ public abstract class TinkerElement implements Element {
 
     protected Map<String, Object> properties = new HashMap<String, Object>();
     protected final String id;
-    protected final TinkerIndex index;
+    protected final TinkerGraph graph;
 
-    protected TinkerElement(final String id, final TinkerIndex index) {
-        this.index = index;
+    protected TinkerElement(final String id, final TinkerGraph graph) {
+        this.graph = graph;
         this.id = id;
     }
 
@@ -25,20 +26,31 @@ public abstract class TinkerElement implements Element {
         return this.properties.keySet();
     }
 
-    public void setProperty(final String key, final Object value) {
-        this.index.remove(key, this.getProperty(key), this);
-        this.properties.put(key, value);
-        this.index.put(key, value, this);
-    }
-
     public Object getProperty(final String key) {
         return this.properties.get(key);
     }
 
-    public Object removeProperty(final String key) {
-        this.index.remove(key, this.getProperty(key), this);
-        return this.properties.remove(key);
+    public void setProperty(final String key, final Object value) {
+        Object oldValue = this.properties.put(key, value);
+        for (AutomaticIndex index : this.graph.getAutoIndices()) {
+            if (this.getClass().isAssignableFrom(index.getIndexClass()) && index.doAutoIndex(key)) {
+                index.remove(key, oldValue, this);
+                index.put(key, value, this);
+            }
+        }
     }
+
+    public Object removeProperty(final String key) {
+
+        Object value = this.properties.remove(key);
+        for (AutomaticIndex index : this.graph.getAutoIndices()) {
+            if (this.getClass().isAssignableFrom(index.getIndexClass())  && index.doAutoIndex(key)) {
+                index.remove(key, value, this);
+            }
+        }
+        return value;
+    }
+
 
     public int hashCode() {
         return this.getId().hashCode();

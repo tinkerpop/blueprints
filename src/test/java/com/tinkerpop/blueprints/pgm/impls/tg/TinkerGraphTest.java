@@ -21,7 +21,7 @@ public class TinkerGraphTest extends TestCase {
         config.supportsVertexIteration = true;
         config.supportsEdgeIteration = true;
         config.supportsVertexIndex = true;
-        config.supportsEdgeIndex = false;
+        config.supportsEdgeIndex = true;
         config.ignoresSuppliedIds = false;
     }
 
@@ -37,8 +37,8 @@ public class TinkerGraphTest extends TestCase {
         doSuiteTest(new GraphTestSuite(config));
     }
 
-    public void testIndexSuite() throws Exception {
-        doSuiteTest(new IndexTestSuite(config));
+    public void testIndexableGraphSuite() throws Exception {
+        doSuiteTest(new IndexableGraphTestSuite(config));
     }
 
     public void testGraphMLReaderSuite() throws Exception {

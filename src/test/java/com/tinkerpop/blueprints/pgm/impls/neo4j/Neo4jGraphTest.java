@@ -22,7 +22,7 @@ public class Neo4jGraphTest extends BaseTest {
         config.supportsVertexIteration = true;
         config.supportsEdgeIteration = true;
         config.supportsVertexIndex = true;
-        config.supportsEdgeIndex = false;
+        config.supportsEdgeIndex = true;
         config.ignoresSuppliedIds = true;
         config.supportsTransactions = true;
     }
@@ -39,15 +39,15 @@ public class Neo4jGraphTest extends BaseTest {
         doSuiteTest(new GraphTestSuite(config));
     }
 
-    public void testIndexSuite() throws Exception {
-        doSuiteTest(new IndexTestSuite(config));
-    }
-
     public void testGraphMLReaderSuite() throws Exception {
         doSuiteTest(new GraphMLReaderTestSuite(config));
     }
 
-    public void testTransactionalGraphTestSuite() throws Exception {
+    public void testIndexableGraphSuite() throws Exception {
+        doSuiteTest(new IndexableGraphTestSuite(config));
+    }
+
+    public void testTransactionalGraphSuite() throws Exception {
         doSuiteTest(new TransactionalGraphTestSuite(config));
     }
 
