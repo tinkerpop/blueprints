@@ -55,29 +55,6 @@
             <version>1.2.M02</version>
             <type>pom</type>
         </dependency>
-        <!--
-            OBJECT DOCUMENT MODEL IMPLEMENTATION SUPPORT
-        -->
-        <!-- JSON SUPPORT -->
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <!-- MONGODB SUPPORT -->
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- COUCHDB SUPPORT -->
-        <!--<dependency>
-            <groupId>couchdb4j</groupId>
-            <artifactId>couchdb4j</artifactId>
-            <version>0.3.0-i386-1</version>
-            <scope>provided</scope>
-        </dependency>-->
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -208,31 +185,6 @@
                         <property>
                             <name>testSail</name>
                             <value>true</value>
-                        </property>
-                        <!--**********************************-->
-                        <!-- OBJECT DOCUMENT MODEL TEST SUITE -->
-                        <!--**********************************-->
-                        <!-- TINKERDOC TEST PROPERTIES -->
-                        <property>
-                            <name>testTinkerDoc</name>
-                            <value>true</value>
-                        </property>
-                        <!-- MONGODB TEST PROPERTIES -->
-                        <property>
-                            <name>testMongoDB</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>mongDBHost</name>
-                            <value>localhost</value>
-                        </property>
-                        <property>
-                            <name>mongDBPort</name>
-                            <value>27017</value>
-                        </property>
-                        <property>
-                            <name>mongDBDatabase</name>
-                            <value>blueprints_test</value>
                         </property>
                     </systemProperties>
                 </configuration>
