@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
@@ -34,12 +33,8 @@ public abstract class Neo4jElement implements Element {
 
         Object oldValue = this.getProperty(key);
 
-        for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-            if (autoIndex.doAutoIndex(key, this.getClass())) {
-                if (null != oldValue)
-                    autoIndex.remove(key, oldValue, this);
-                autoIndex.put(key, value, this);
-            }
+        for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+            autoIndex.autoUpdate(key, value, oldValue, this);
         }
 
         this.element.setProperty(key, value);
@@ -48,17 +43,14 @@ public abstract class Neo4jElement implements Element {
 
     public Object removeProperty(final String key) {
         try {
-            Object oldValue = this.getProperty(key);
+            Object oldValue = this.element.removeProperty(key);
             if (null != oldValue) {
-                for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-                    if (autoIndex.doAutoIndex(key, this.getClass()))
-                        autoIndex.remove(key, oldValue, this);
+                for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                    autoIndex.autoRemove(key, oldValue, this);
                 }
             }
-
-            Object value = this.element.removeProperty(key);
             this.graph.stopStartTransaction();
-            return value;
+            return oldValue;
         } catch (NotFoundException e) {
             return null;
         }

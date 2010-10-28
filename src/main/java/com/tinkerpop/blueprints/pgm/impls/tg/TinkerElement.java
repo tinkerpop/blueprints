@@ -31,18 +31,19 @@ public abstract class TinkerElement implements Element {
 
     public void setProperty(final String key, final Object value) {
 
+        Object oldValue = this.properties.put(key, value);
         for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
-            index.autoUpdate(key, value, this);
-        }
-        this.properties.put(key, value);
+            index.autoUpdate(key, value, oldValue, this);
+        }   
     }
 
     public Object removeProperty(final String key) {
 
+        Object oldValue = this.properties.remove(key);
         for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
-            index.autoRemove(key, this);
+            index.autoRemove(key, oldValue, this);
         }
-        return this.properties.remove(key);
+        return oldValue;
     }
 
 

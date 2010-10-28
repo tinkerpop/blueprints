@@ -17,22 +17,6 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
         super(config);
     }
 
-    public void testIndexableGraphConstructionMaintainsAutomaticIndices(IndexableGraph graph) {
-        this.stopWatch();
-        if (config.supportsVertexIndex) {
-            assertNotNull(graph.getIndex(IndexableGraph.VERTICES, Vertex.class));
-        } else {
-            assertNull(graph.getIndex(IndexableGraph.VERTICES, Vertex.class));
-        }
-        if (config.supportsEdgeIndex) {
-            assertNotNull(graph.getIndex(IndexableGraph.EDGES, Edge.class));
-        } else {
-            assertNull(graph.getIndex(IndexableGraph.EDGES, Edge.class));
-        }
-
-        BaseTest.printPerformance(graph.toString(), 2, "automatic indices retrieved", this.stopWatch());
-    }
-
     public void testAutoIndexKeyManagement(IndexableGraph graph) {
         if (config.supportsVertexIndex) {
             AutomaticIndex index = (AutomaticIndex) graph.getIndex(IndexableGraph.VERTICES, Vertex.class);

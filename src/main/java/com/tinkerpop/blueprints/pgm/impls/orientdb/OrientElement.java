@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.id.ORID;
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.Set;
@@ -22,21 +21,16 @@ public abstract class OrientElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        final Object oldValue = rawElement.get(key);
-
         graph.beginTransaction();
 
         try {
+            Object oldValue = this.getProperty(key);
+            for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                autoIndex.autoUpdate(key, value, oldValue, this);
+            }
+
             this.rawElement.set(key, value);
             this.save();
-
-            for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-                if (autoIndex.doAutoIndex(key, this.getClass())) {
-                    if (null != oldValue)
-                        autoIndex.remove(key, oldValue, this);
-                    autoIndex.put(key, value, this);
-                }
-            }
 
             graph.commitTransaction();
 
@@ -50,15 +44,13 @@ public abstract class OrientElement implements Element {
         graph.beginTransaction();
 
         try {
-            final Object oldValue = this.rawElement.remove(key);
-            this.save();
-
+            Object oldValue = this.rawElement.remove(key);
             if (null != oldValue) {
-                for (AutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-                    if (autoIndex.doAutoIndex(key, this.getClass()))
-                        autoIndex.remove(key, oldValue, this);
+                for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                    autoIndex.autoRemove(key, oldValue, this);
                 }
             }
+            this.save();
             graph.commitTransaction();
             return oldValue;
 

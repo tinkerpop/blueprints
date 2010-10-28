@@ -42,20 +42,17 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
         return this.autoIndexKeys;
     }
 
-    protected void autoUpdate(String key, Object value, T element) {
-        if (this.autoIndexKeys == null || this.autoIndexKeys.contains(key)) {
-            this.remove(key, element.getProperty(key), element);
-            this.put(key, value, element);
+    protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+            if (oldValue != null)
+                this.remove(key, oldValue, element);
+            this.put(key, newValue, element);
         }
     }
 
-    protected void autoRemove(String key, T element) {
-        if (doAutoIndex(key, element.getClass())) {
-            this.remove(key, element.getProperty(key), element);
+    protected void autoRemove(String key, Object oldValue, T element) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+            this.remove(key, oldValue, element);
         }
-    }
-
-    public boolean doAutoIndex(String key, Class classToIndex) {
-        return this.getIndexClass().isAssignableFrom(classToIndex) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key));
     }
 }

@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,12 +33,22 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         }
     }
 
-    public boolean doAutoIndex(String key, Class classToIndex) {
-        return this.getIndexClass().isAssignableFrom(classToIndex) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key));
+    protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+            if (oldValue != null)
+                this.remove(key, oldValue, element);
+            this.put(key, newValue, element);
+        }
+    }
+
+    protected void autoRemove(String key, Object oldValue, T element) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+            this.remove(key, oldValue, element);
+        }
     }
 
     public void removeAutoIndexKey(String key) {
-        if (null != autoIndexKeys)
+        if (null != this.autoIndexKeys)
             this.autoIndexKeys.remove(key);
     }
 

@@ -1,7 +1,5 @@
 package com.tinkerpop.blueprints;
 
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -55,12 +53,13 @@ public abstract class BaseTest extends TestCase {
         return count(iterable.iterator());
     }
 
-    public static List asList(final Object x, final int times) {
-        List list = new ArrayList();
-        for (int i = 0; i < times; i++) {
-            list.add(x);
+    public static <T> List<T> asList(Iterable<T> iterable) {
+        List<T> list = new ArrayList<T>();
+        for (T object : iterable) {
+            list.add(object);
         }
         return list;
+
     }
 
     public double stopWatch() {

@@ -76,13 +76,19 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
-        return (Index<T>) this.indices.get(indexName);
+        Index index = this.indices.get(indexName);
+        if (indexClass.isAssignableFrom(index.getIndexClass()))
+            return (Index<T>) index;
+        else
+            throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
     }
 
     public void dropIndex(String indexName) {
         this.neo4j.index().forNodes(indexName).delete();
         this.neo4j.index().forRelationships(indexName).delete();
         this.stopStartTransaction();
+        this.indices.remove(indexName);
+        this.autoIndices.remove(indexName);
     }
 
     protected Iterable<Neo4jAutomaticIndex> getAutoIndices() {

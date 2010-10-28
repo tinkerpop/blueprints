@@ -60,7 +60,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
-        return (Index<T>) this.indices.get(indexName);
+        Index index = this.indices.get(indexName);
+        if (indexClass.isAssignableFrom(index.getIndexClass()))
+            return (Index<T>) index;
+        else
+            throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
     }
 
     public Iterable<Index> getIndices() {
