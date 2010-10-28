@@ -11,7 +11,9 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,8 +32,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private Mode mode = Mode.AUTOMATIC;
     private final static String ADMIN = "admin";
 
-    protected Map<String, Index> indices = new HashMap<String, Index>();
-    protected Map<String, AutomaticIndex> autoIndices = new HashMap<String, AutomaticIndex>();
+    protected Map<String, OrientIndex> indices = new HashMap<String, OrientIndex>();
+    protected Map<String, OrientAutomaticIndex> autoIndices = new HashMap<String, OrientAutomaticIndex>();
 
     public OrientGraph(final String url) {
         this(url, ADMIN, ADMIN);
@@ -44,10 +46,17 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         openOrCreate();
     }
 
-    public void addIndex(Index index) {
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Type type) {
+        OrientIndex index;
+        if (type == Type.MANUAL) {
+            index = new OrientIndex(indexName, indexClass, this);
+        } else {
+            index = new OrientAutomaticIndex(indexName, indexClass, null, this);
+            this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex) index);
+        }
         this.indices.put(index.getIndexName(), index);
-        if (index instanceof AutomaticIndex)
-            this.autoIndices.put(index.getIndexName(), (AutomaticIndex) index);
+        return index;
+
     }
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
@@ -55,10 +64,14 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Iterable<Index> getIndices() {
-        return this.indices.values();
+        List<Index> list = new ArrayList<Index>();
+        for (Index index : this.indices.values()) {
+            list.add(index);
+        }
+        return list;
     }
 
-    protected Iterable<AutomaticIndex> getAutoIndices() {
+    protected Iterable<OrientAutomaticIndex> getAutoIndices() {
         return this.autoIndices.values();
     }
 
@@ -256,8 +269,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.database.open(username, password);
         else {
             this.database.create();
-            this.addIndex(new OrientAutomaticIndex<OrientVertex>(IndexableGraph.VERTICES, OrientVertex.class, null, this));
-            this.addIndex(new OrientAutomaticIndex<OrientEdge>(IndexableGraph.EDGES, OrientEdge.class, null, this));
+            this.createIndex(IndexableGraph.VERTICES, OrientVertex.class, Type.AUTOMATIC);
+            this.createIndex(IndexableGraph.EDGES, OrientEdge.class, Type.AUTOMATIC);
         }
     }
 }

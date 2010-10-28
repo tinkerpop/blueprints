@@ -14,10 +14,6 @@ public abstract class BaseTest extends TestCase {
 
     double timer = -1.0d;
 
-    public void testTrue() {
-        assertTrue(true);
-    }
-
     public static List<String> generateUUIDs(int number) {
         List<String> uuids = new ArrayList<String>();
         for (int i = 0; i < number; i++) {

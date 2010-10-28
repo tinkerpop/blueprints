@@ -33,27 +33,27 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public void put(final String key, final Object value, final T element) {
-        this.createIndex().add((S) element.getRawElement(), key, value);
+        this.generateIndex().add((S) element.getRawElement(), key, value);
         this.graph.stopStartTransaction();
     }
 
     public Iterable<T> get(final String key, final Object value) {
-        IndexHits<S> itty = this.createIndex().get(key, value);
-        if (indexClass == Neo4jVertex.class)
+        IndexHits<S> itty = this.generateIndex().get(key, value);
+        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
         else
             return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
     }
 
     public void remove(final String key, final Object value, final T element) {
-        this.createIndex().remove((S) element.getRawElement(), key, value);
+        this.generateIndex().remove((S) element.getRawElement(), key, value);
         this.graph.stopStartTransaction();
     }
 
-    private org.neo4j.graphdb.index.Index<S> createIndex() {
-        if (indexClass == Neo4jVertex.class)
-            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(indexName);
+    private org.neo4j.graphdb.index.Index<S> generateIndex() {
+        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
+            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
         else
-            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(indexName);
+            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
     }
 }

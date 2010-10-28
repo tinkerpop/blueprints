@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.HashSet;
 import java.util.Set;

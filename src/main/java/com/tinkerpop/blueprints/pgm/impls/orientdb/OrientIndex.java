@@ -21,7 +21,7 @@ import java.util.*;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientIndex<T extends Element> implements Index<T> {
+public class OrientIndex<T extends OrientElement> implements Index<T> {
     private static final String GRAPH_INDEX = "graphIndex";
     private static final String MAP_RID = "mapRid";
     private static final String SEPARATOR = "!=!";

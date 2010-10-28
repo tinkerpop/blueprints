@@ -41,6 +41,14 @@ public class OrientGraphTest extends BaseTest {
         doSuiteTest(new GraphTestSuite(config));
     }
 
+    public void testAutomaticIndexTestSuite() throws Exception {
+        doSuiteTest(new AutomaticIndexTestSuite(config));
+    }
+
+    /*public void testIndexTestSuite() throws Exception {
+        doSuiteTest(new IndexTestSuite(config));
+    }*/
+
     public void testIndexableGraphSuite() throws Exception {
         doSuiteTest(new IndexableGraphTestSuite(config));
     }

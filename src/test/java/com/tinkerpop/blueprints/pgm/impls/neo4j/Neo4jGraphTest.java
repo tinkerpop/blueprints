@@ -43,6 +43,14 @@ public class Neo4jGraphTest extends BaseTest {
         doSuiteTest(new GraphMLReaderTestSuite(config));
     }
 
+    public void testAutomaticIndexTestSuite() throws Exception {
+        doSuiteTest(new AutomaticIndexTestSuite(config));
+    }
+
+    public void testIndexTestSuite() throws Exception {
+        doSuiteTest(new IndexTestSuite(config));
+    }
+
     public void testIndexableGraphSuite() throws Exception {
         doSuiteTest(new IndexableGraphTestSuite(config));
     }

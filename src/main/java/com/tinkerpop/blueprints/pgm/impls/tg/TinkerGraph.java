@@ -17,22 +17,25 @@ public class TinkerGraph implements IndexableGraph {
     protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
 
     public TinkerGraph() {
-        this.addIndex(new TinkerAutomaticIndex<TinkerVertex>(IndexableGraph.VERTICES, TinkerVertex.class, null));
-        this.addIndex(new TinkerAutomaticIndex<TinkerEdge>(IndexableGraph.EDGES, TinkerEdge.class, null));
+        this.createIndex(IndexableGraph.VERTICES, TinkerVertex.class, Type.AUTOMATIC);
+        this.createIndex(IndexableGraph.EDGES, TinkerEdge.class, Type.AUTOMATIC);
     }
 
     protected Iterable<TinkerAutomaticIndex> getAutoIndices() {
         return this.autoIndices.values();
     }
 
-    public void addIndex(Index index) {
-        if (index instanceof TinkerIndex) {
-            this.indices.put(index.getIndexName(), (TinkerIndex) index);
-            if (index instanceof TinkerAutomaticIndex)
-                this.autoIndices.put(index.getIndexName(), (TinkerAutomaticIndex) index);
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Type type) {
+        TinkerIndex index;
+        if (type == Type.MANUAL) {
+            index = new TinkerIndex(indexName, indexClass);
         } else {
-            throw new RuntimeException("TinkerGraph only supports TinkerIndex indices.");
+            index = new TinkerAutomaticIndex(indexName, indexClass, null);
+            this.autoIndices.put(index.getIndexName(), (TinkerAutomaticIndex) index);
         }
+
+        this.indices.put(index.getIndexName(), index);
+        return index;
     }
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {

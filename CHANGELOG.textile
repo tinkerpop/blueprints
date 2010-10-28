@@ -46,7 +46,7 @@ bc. <dependency>
 * @Neo4jGraph@ constructor can be passed in a live @GraphDatabaseService@
 * Updated @GraphMLWriter@ to write all vertices and then all edges
 * Added RDF load functionality to @SailGraph@
-* Added SPARQL functioanlity to @SailGraph@
+* Added SPARQL functionality to @SailGraph@
 * Fixed sever @GraphMLReader@ bug
 * Added OrientDB (@OrientGraph@) as a property graph implementation
 * Added support for @Graph.getEdge(Object id)@

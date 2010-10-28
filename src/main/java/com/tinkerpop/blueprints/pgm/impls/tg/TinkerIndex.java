@@ -73,8 +73,10 @@ public class TinkerIndex<T extends Element> implements Index<T> {
 
     protected void remove(final T element) {
         if (this.indexClass.isAssignableFrom(element.getClass())) {
-            for (String key : element.getPropertyKeys()) {
-                this.remove(key, element.getProperty(key), element);
+            for (Map<Object, Set<T>> map : index.values()) {
+                for (Set<T> set : map.values()) {
+                    set.remove(element);
+                }
             }
         }
     }

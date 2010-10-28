@@ -7,7 +7,9 @@ import org.neo4j.graphdb.*;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,8 +21,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     private String directory;
     private Transaction tx;
     private Mode mode = Mode.AUTOMATIC;
-    protected Map<String, Index> indices = new HashMap<String, Index>();
-    protected Map<String, AutomaticIndex> autoIndices = new HashMap<String, AutomaticIndex>();
+    protected Map<String, Neo4jIndex> indices = new HashMap<String, Neo4jIndex>();
+    protected Map<String, Neo4jAutomaticIndex> autoIndices = new HashMap<String, Neo4jAutomaticIndex>();
 
     public Neo4jGraph(final String directory) {
         this(directory, null);
@@ -43,8 +45,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 this.tx = neo4j.beginTx();
             }
 
-            this.addIndex(new Neo4jAutomaticIndex<Neo4jVertex, Node>(IndexableGraph.VERTICES, Neo4jVertex.class, null, this));
-            this.addIndex(new Neo4jAutomaticIndex<Neo4jEdge, Relationship>(IndexableGraph.EDGES, Neo4jEdge.class, null, this));
+            this.createIndex(IndexableGraph.VERTICES, Neo4jVertex.class, Type.AUTOMATIC);
+            this.createIndex(IndexableGraph.EDGES, Neo4jEdge.class, Type.AUTOMATIC);
 
         } catch (Exception e) {
             if (this.neo4j != null)
@@ -61,15 +63,16 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    public void addIndex(Index index) {
-        if (index instanceof Neo4jIndex) {
-            this.indices.put(index.getIndexName(), index);
-            if (index instanceof Neo4jAutomaticIndex) {
-                this.autoIndices.put(index.getIndexName(), (AutomaticIndex) index);
-            }
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Type type) {
+        Neo4jIndex index;
+        if (type == Type.MANUAL) {
+            index = new Neo4jIndex(indexName, indexClass, this);
         } else {
-            throw new RuntimeException("Only Neo4jIndex classes can be used");
+            index = new Neo4jAutomaticIndex(indexName, indexClass, null, this);
+            this.autoIndices.put(index.getIndexName(), (Neo4jAutomaticIndex) index);
         }
+        this.indices.put(index.getIndexName(), index);
+        return index;
     }
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
@@ -82,13 +85,18 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         this.stopStartTransaction();
     }
 
-    protected Iterable<AutomaticIndex> getAutoIndices() {
+    protected Iterable<Neo4jAutomaticIndex> getAutoIndices() {
         return autoIndices.values();
     }
 
     public Iterable<Index> getIndices() {
-        return this.indices.values();
+        List<Index> list = new ArrayList<Index>();
+        for (Index index : this.indices.values()) {
+            list.add(index);
+        }
+        return list;
     }
+
 
     public Vertex addVertex(final Object id) {
         final Vertex vertex = new Neo4jVertex(neo4j.createNode(), this);

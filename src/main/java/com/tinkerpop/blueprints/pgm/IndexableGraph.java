@@ -8,7 +8,11 @@ public interface IndexableGraph extends Graph {
     public final static String VERTICES = "vertices";
     public final static String EDGES = "edges";
 
-    public void addIndex(Index index);
+    public enum Type {
+        MANUAL, AUTOMATIC
+    }
+
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Type type);
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass);
 
