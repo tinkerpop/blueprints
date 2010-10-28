@@ -80,6 +80,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void dropIndex(String indexName) {
+        OrientIndex index = this.indices.get(indexName);
+        index.clear();
         this.indices.remove(indexName);
         this.autoIndices.remove(indexName);
     }
@@ -203,9 +205,14 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void clear() {
+        for (OrientIndex index : indices.values()) {
+            index.clear();
+        }
         this.database.delete();
+        //this.database.commit();
         this.database = null;
         this.indices.clear();
+        this.autoIndices.clear();
         openOrCreate();
     }
 
@@ -213,6 +220,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         this.database.close();
         this.database = null;
         this.indices.clear();
+        this.autoIndices.clear();
     }
 
     public String toString() {

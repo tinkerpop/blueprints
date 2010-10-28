@@ -172,6 +172,8 @@ public class TinkerGraph implements IndexableGraph {
     public void clear() {
         this.vertices.clear();
         this.edges.clear();
+        this.indices.clear();
+        this.autoIndices.clear();
         this.currentId = 0l;
     }
 

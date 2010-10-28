@@ -69,7 +69,8 @@ public class Neo4jGraphTest extends BaseTest {
             for (Method method : suite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     Graph graph = new Neo4jGraph(directory);
-                    graph.clear();
+                    // removes the "reference node" in Neo4j
+                    graph.removeVertex(graph.getVertex(0));
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(suite, graph);
                     graph.shutdown();

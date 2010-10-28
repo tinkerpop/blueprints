@@ -234,18 +234,17 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             }
         }
         this.neo4j.shutdown();
-
     }
 
     public void clear() {
         this.shutdown();
         deleteGraphDirectory(new File(this.directory));
         this.neo4j = new EmbeddedGraphDatabase(this.directory);
-        //LuceneIndexService indexService = new LuceneIndexService(neo4j);
-        //this.index = new Neo4jIndex(indexService, this);
         this.tx = neo4j.beginTx();
         this.removeVertex(this.getVertex(0));
         this.stopStartTransaction();
+        this.indices.clear();
+        this.autoIndices.clear();
     }
 
     private static void deleteGraphDirectory(final File directory) {
@@ -258,7 +257,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             }
         }
     }
-
 
     public String toString() {
         return "neo4jgraph[" + this.directory + "]";
