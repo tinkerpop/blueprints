@@ -90,7 +90,9 @@ public class GraphMLReader {
 
 				} else if (elementName.equals(GraphMLTokens.NODE)) {
 					vertexId = reader.getAttributeValue(null, GraphMLTokens.ID);
-					vertexMappedIdMap.put(vertexId, vertexId);
+					// TODO
+					if (vertexIdKey != null)
+						vertexMappedIdMap.put(vertexId, vertexId);
 					inVertex = true;
 					vertexProps = new HashMap<String, Object>();
 
@@ -106,10 +108,18 @@ public class GraphMLReader {
 					String inVertexId = reader.getAttributeValue(null,
 							GraphMLTokens.TARGET);
 
-					Object outObjectId = vertexIdMap.get(vertexMappedIdMap
-							.get(outVertexId));
-					Object inObjectId = vertexIdMap.get(vertexMappedIdMap
-							.get(inVertexId));
+					// TODO
+					Object outObjectId = null;
+					Object inObjectId = null;
+					if (vertexIdKey == null) {
+						outObjectId = vertexIdMap.get(outVertexId);
+						inObjectId = vertexIdMap.get(inVertexId);
+					} else {
+						outObjectId = vertexIdMap.get(vertexMappedIdMap
+								.get(outVertexId));
+						inObjectId = vertexIdMap.get(vertexMappedIdMap
+								.get(inVertexId));
+					}
 
 					edgeOutVertex = null;
 					if (null != outObjectId)
@@ -122,13 +132,17 @@ public class GraphMLReader {
 						edgeOutVertex = graph.addVertex(outVertexId);
 						transactionBufferSize++;
 						vertexIdMap.put(outVertexId, edgeOutVertex.getId());
-						vertexMappedIdMap.put(outVertexId, outVertexId);
+						// TODO
+						if (vertexIdKey != null)
+							vertexMappedIdMap.put(outVertexId, outVertexId);
 					}
 					if (null == edgeInVertex) {
 						edgeInVertex = graph.addVertex(inVertexId);
 						transactionBufferSize++;
 						vertexIdMap.put(inVertexId, edgeInVertex.getId());
-						vertexMappedIdMap.put(inVertexId, inVertexId);
+						// TODO
+						if (vertexIdKey != null)
+							vertexMappedIdMap.put(inVertexId, inVertexId);
 					}
 
 					inEdge = true;
