@@ -17,7 +17,7 @@ public class IndexTestSuite extends ModelTestSuite {
     public void testPutGetRemoveVertex(final IndexableGraph graph) {
         if (config.supportsVertexIndex && !config.isRDFModel) {
             this.stopWatch();
-            Index<Vertex> index = graph.createIndex("basic", Vertex.class, IndexableGraph.Type.MANUAL);
+            Index<Vertex> index = graph.createIndex("basic", Vertex.class, Index.Type.MANUAL);
             BaseTest.printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);

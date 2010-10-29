@@ -17,17 +17,17 @@ public class TinkerGraph implements IndexableGraph {
     protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
 
     public TinkerGraph() {
-        this.createIndex(IndexableGraph.VERTICES, TinkerVertex.class, Type.AUTOMATIC);
-        this.createIndex(IndexableGraph.EDGES, TinkerEdge.class, Type.AUTOMATIC);
+        this.createIndex(Index.VERTICES, TinkerVertex.class, Index.Type.AUTOMATIC);
+        this.createIndex(Index.EDGES, TinkerEdge.class, Index.Type.AUTOMATIC);
     }
 
     protected Iterable<TinkerAutomaticIndex> getAutoIndices() {
         return this.autoIndices.values();
     }
 
-    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Type type) {
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
         TinkerIndex index;
-        if (type == Type.MANUAL) {
+        if (type == Index.Type.MANUAL) {
             index = new TinkerIndex(indexName, indexClass);
         } else {
             index = new TinkerAutomaticIndex(indexName, indexClass, null);

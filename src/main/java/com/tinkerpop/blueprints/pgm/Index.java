@@ -5,6 +5,13 @@ package com.tinkerpop.blueprints.pgm;
  */
 public interface Index<T extends Element> {
 
+    public static final String VERTICES = "vertices";
+    public static final String EDGES = "edges";
+
+    enum Type {
+        MANUAL, AUTOMATIC
+    }
+
     public String getIndexName();
 
     public Class<T> getIndexClass();
@@ -14,5 +21,4 @@ public interface Index<T extends Element> {
     public Iterable<T> get(String key, Object value);
 
     public void remove(String key, Object value, T element);
-
 }

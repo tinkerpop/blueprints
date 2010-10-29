@@ -46,9 +46,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         openOrCreate();
     }
 
-    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Type type) {
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
         OrientIndex index;
-        if (type == Type.MANUAL) {
+        if (type == Index.Type.MANUAL) {
             index = new OrientIndex(indexName, indexClass, this);
         } else {
             index = new OrientAutomaticIndex(indexName, indexClass, null, this);
@@ -281,8 +281,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.database.open(username, password);
         else {
             this.database.create();
-            this.createIndex(IndexableGraph.VERTICES, OrientVertex.class, Type.AUTOMATIC);
-            this.createIndex(IndexableGraph.EDGES, OrientEdge.class, Type.AUTOMATIC);
+            this.createIndex(Index.VERTICES, OrientVertex.class, Index.Type.AUTOMATIC);
+            this.createIndex(Index.EDGES, OrientEdge.class, Index.Type.AUTOMATIC);
         }
     }
 }

@@ -45,8 +45,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 this.tx = neo4j.beginTx();
             }
 
-            this.createIndex(IndexableGraph.VERTICES, Neo4jVertex.class, Type.AUTOMATIC);
-            this.createIndex(IndexableGraph.EDGES, Neo4jEdge.class, Type.AUTOMATIC);
+            this.createIndex(Index.VERTICES, Neo4jVertex.class, Index.Type.AUTOMATIC);
+            this.createIndex(Index.EDGES, Neo4jEdge.class, Index.Type.AUTOMATIC);
 
         } catch (Exception e) {
             if (this.neo4j != null)
@@ -63,9 +63,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Type type) {
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
         Neo4jIndex index;
-        if (type == Type.MANUAL) {
+        if (type == Index.Type.MANUAL) {
             index = new Neo4jIndex(indexName, indexClass, this);
         } else {
             index = new Neo4jAutomaticIndex(indexName, indexClass, null, this);

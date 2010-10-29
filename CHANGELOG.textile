@@ -24,13 +24,15 @@ bc. <dependency>
 * Many updates to @TransactionalGraphTestSuite@
 ** Large transactions now tested
 ** Added timing tests to all tests
-* Updated @Index@ semantics where no elements returns an empty iterator, not @null@
+* Updated @Index@ semantics where @get()@ no elements returns an empty iterator, not @null@
 * Updated the @toString()@ method of @TinkerGraph@ to display both vertex and edge counts
 * Removed object document model to focus Blueprints specifically on property graphs
 * Added support for multiple indices
 ** Added @IndexableGraph@ interface
+** Added support for manual indexing through @Index@
 ** Added support for auto indexing through @AutomaticIndex@
 ** Added numerous test cases to the test suite
+* Removed support for TinkerDoc, MongoDB, and CouchDB
 
 
 h3. Version 0.2 (Kermit -- September 22, 2010)
@@ -69,7 +71,7 @@ h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 * Added Blueprints Pipes BETA to the distribution
 * Changed all the OpenRDF Sesame dependencies to version 2.3.1
 * Added performance timing printouts to model test cases
-* Neo4j depedency was changed for 1.0-rc to 1.0
+* Neo4j dependency was changed for 1.0-rc to 1.0
 * Added object document interfaces
 * Added TinkerDoc implementation of the object document interfaces
 * Added MongoDB implementation of the object document interfaces

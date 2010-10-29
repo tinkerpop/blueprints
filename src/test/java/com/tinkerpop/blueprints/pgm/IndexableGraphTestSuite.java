@@ -27,14 +27,14 @@ public class IndexableGraphTestSuite extends ModelTestSuite {
     public void testAutomaticIndicesOnConstruction(IndexableGraph graph) {
         this.stopWatch();
         if (config.supportsVertexIndex) {
-            assertNotNull(graph.getIndex(IndexableGraph.VERTICES, Vertex.class));
+            assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
         } else {
-            assertNull(graph.getIndex(IndexableGraph.VERTICES, Vertex.class));
+            assertNull(graph.getIndex(Index.VERTICES, Vertex.class));
         }
         if (config.supportsEdgeIndex) {
-            assertNotNull(graph.getIndex(IndexableGraph.EDGES, Edge.class));
+            assertNotNull(graph.getIndex(Index.EDGES, Edge.class));
         } else {
-            assertNull(graph.getIndex(IndexableGraph.EDGES, Edge.class));
+            assertNull(graph.getIndex(Index.EDGES, Edge.class));
         }
 
         BaseTest.printPerformance(graph.toString(), 2, "automatic indices retrieved", this.stopWatch());
@@ -51,9 +51,9 @@ public class IndexableGraphTestSuite extends ModelTestSuite {
         assertEquals(count(graph.getIndices()), 0);
 
         this.stopWatch();
-        Index<Vertex> index1 = graph.createIndex("index1", Vertex.class, IndexableGraph.Type.MANUAL);
-        Index<Edge> index2 = graph.createIndex("index2", Edge.class, IndexableGraph.Type.MANUAL);
-        Index<Vertex> index3 = graph.createIndex("index3", Vertex.class, IndexableGraph.Type.AUTOMATIC);
+        Index<Vertex> index1 = graph.createIndex("index1", Vertex.class, Index.Type.MANUAL);
+        Index<Edge> index2 = graph.createIndex("index2", Edge.class, Index.Type.MANUAL);
+        Index<Vertex> index3 = graph.createIndex("index3", Vertex.class, Index.Type.AUTOMATIC);
         BaseTest.printPerformance(graph.toString(), 3, "indices created", this.stopWatch());
 
         assertEquals(count(graph.getIndices()), 3);
