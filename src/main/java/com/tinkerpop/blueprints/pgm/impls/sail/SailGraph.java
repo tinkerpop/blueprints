@@ -192,10 +192,6 @@ public class SailGraph implements TransactionalGraph {
         return SailGraph.namespaceToPrefix(uri, this.sailConnection);
     }
 
-    public Index getIndex() {
-        throw new UnsupportedOperationException();
-    }
-
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
         Repository repository = new SailRepository(this.sail);
         try {

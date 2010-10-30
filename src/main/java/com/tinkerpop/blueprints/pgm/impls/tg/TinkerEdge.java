@@ -14,8 +14,8 @@ public class TinkerEdge extends TinkerElement implements Edge {
     private final Vertex inVertex;
     private final Vertex outVertex;
 
-    protected TinkerEdge(final String id, final Vertex outVertex, final Vertex inVertex, final String label, final TinkerIndex index) {
-        super(id, index);
+    protected TinkerEdge(final String id, final Vertex outVertex, final Vertex inVertex, final String label, final TinkerGraph graph) {
+        super(id, graph);
         this.label = label;
         this.outVertex = outVertex;
         this.inVertex = inVertex;

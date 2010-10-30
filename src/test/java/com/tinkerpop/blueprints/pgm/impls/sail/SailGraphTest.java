@@ -165,10 +165,6 @@ public class SailGraphTest extends BaseTest {
         doSuiteTest(new GraphTestSuite(config));
     }
 
-    public void testIndexSuite() throws Exception {
-        doSuiteTest(new IndexTestSuite(config));
-    }
-
     /*public void testTransactionalGraphTestSuite() throws Exception {
         doSuiteTest(new TransactionalGraphTestSuite(config));
     }*/

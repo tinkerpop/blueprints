@@ -11,32 +11,37 @@ import com.orientechnologies.orient.core.serialization.serializer.stream.OStream
 import com.orientechnologies.orient.core.serialization.serializer.stream.OStreamSerializerString;
 import com.orientechnologies.orient.core.storage.OStorage;
 import com.orientechnologies.orient.core.type.tree.OTreeMapDatabaseLazySave;
-import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientIndex implements Index {
-    private static final String GRAPH_INDEX = "graphIndex";
+public class OrientIndex<T extends OrientElement> implements Index<T> {
+
     private static final String MAP_RID = "mapRid";
     private static final String SEPARATOR = "!=!";
 
     private OrientGraph graph;
-    private boolean indexAll = true;
-    private Set<String> indexedKeys = new HashSet<String>();
     private OTreeMapDatabaseLazySave<String, List<ODocument>> map;
     private ODocument graphIndex;
 
-    public OrientIndex(final OrientGraph graph) {
+    private final String indexName;
+    private final Class<T> indexClass;
+
+    public OrientIndex(final String indexName, final Class<T> indexClass, final OrientGraph graph) {
         this.graph = graph;
 
+        this.indexName = indexName;
+        this.indexClass = indexClass;
+
         // LOAD THE CONFIGURATION FROM THE DICTIONARY
-        graphIndex = ((ODatabaseDocumentTx) this.graph.getRawGraph().getUnderlying()).getDictionary().get(GRAPH_INDEX);
+        graphIndex = ((ODatabaseDocumentTx) this.graph.getRawGraph().getUnderlying()).getDictionary().get("graphIndex");
 
         if (graphIndex == null) {
             // CREATE THE MAP
@@ -52,7 +57,7 @@ public class OrientIndex implements Index {
             // CREATE THE CONFIGURATION FOR IT AND SAVE IT INTO THE DICTIONARY
             graphIndex = new ODocument((ODatabaseDocumentTx) this.graph.getRawGraph().getUnderlying());
             graphIndex.field(MAP_RID, map.getRecord().getIdentity().toString());
-            ((ODatabaseDocumentTx) this.graph.getRawGraph().getUnderlying()).getDictionary().put(GRAPH_INDEX, graphIndex);
+            ((ODatabaseDocumentTx) this.graph.getRawGraph().getUnderlying()).getDictionary().put("graphIndex", graphIndex);
         } else {
             // LOAD THE MAP
             map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph()
@@ -65,9 +70,19 @@ public class OrientIndex implements Index {
         }
     }
 
-    public void put(final String key, final Object value, final Element element) {
-        if (!indexAll && !indexedKeys.contains(key))
-            return;
+    protected OTreeMapDatabaseLazySave<String, List<ODocument>> getRawIndex() {
+        return this.map;
+    }
+
+    public String getIndexName() {
+        return this.indexName;
+    }
+
+    public Class<T> getIndexClass() {
+        return this.indexClass;
+    }
+
+    public void put(final String key, final Object value, final T element) {
 
         final OrientElement elementTemp = (OrientElement) element;
 
@@ -84,21 +99,19 @@ public class OrientIndex implements Index {
         map.put(keyTemp, values);
     }
 
-    public Iterable<Element> get(final String key, final Object value) {
+    public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
 
         final List<ODocument> docList = map.get(keyTemp);
 
         if (docList == null || docList.isEmpty())
-            return new LinkedList<Element>();
+            return new LinkedList<T>();
 
         final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), docList);
         return new OrientElementSequence(graph, list.iterator());
     }
 
-    public void remove(final String key, final Object value, final Element element) {
-        if (!indexAll && !indexedKeys.contains(key))
-            return;
+    public void remove(final String key, final Object value, final T element) {
 
         final OrientElement elementTemp = (OrientElement) element;
 
@@ -112,32 +125,18 @@ public class OrientIndex implements Index {
         }
     }
 
-    public void addIndexKey(final String key) {
-        indexedKeys.add(key);
+    protected void clear() {
+        try {
+            if (null != this.map) {
+                this.map.clear();
+                this.map.save();
+            }
+            if (null != this.graphIndex) {
+                this.graphIndex.clear();
+                this.graphIndex.save();
+            }
+        } catch (Exception e) {
+            //throw new RuntimeException(e.getMessage(), e);
+        }
     }
-
-    public void removeIndexKey(final String key) {
-        indexedKeys.remove(key);
-    }
-
-    public void indexAll(final boolean indexAll) {
-        this.indexAll = indexAll;
-    }
-
-    public void clear() {
-        this.map.clear();
-    }
-
-    protected OTreeMapDatabaseLazySave<String, List<ODocument>> getRawIndex() {
-        return map;
-    }
-
-    /*
-    public boolean isIndexAll() {
-        return indexAll;
-    }
-
-    public void flush() {
-        map.lazySave();
-    }*/
 }

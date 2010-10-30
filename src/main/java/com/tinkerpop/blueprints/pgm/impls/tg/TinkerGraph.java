@@ -1,25 +1,62 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerGraph implements Graph {
+public class TinkerGraph implements IndexableGraph {
 
     private Long currentId = 0l;
     protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
-    private TinkerIndex index = new TinkerIndex();
+    protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
+    protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
+
+    public TinkerGraph() {
+        this.createIndex(Index.VERTICES, TinkerVertex.class, Index.Type.AUTOMATIC);
+        this.createIndex(Index.EDGES, TinkerEdge.class, Index.Type.AUTOMATIC);
+    }
+
+    protected Iterable<TinkerAutomaticIndex> getAutoIndices() {
+        return this.autoIndices.values();
+    }
+
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+        TinkerIndex index;
+        if (type == Index.Type.MANUAL) {
+            index = new TinkerIndex(indexName, indexClass);
+        } else {
+            index = new TinkerAutomaticIndex(indexName, indexClass, null);
+            this.autoIndices.put(index.getIndexName(), (TinkerAutomaticIndex) index);
+        }
+
+        this.indices.put(index.getIndexName(), index);
+        return index;
+    }
+
+    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+        Index index = this.indices.get(indexName);
+        if (!indexClass.isAssignableFrom(index.getIndexClass()))
+            throw new RuntimeException(indexClass + " is not assignable from " + index.getIndexClass());
+        else
+            return (Index<T>) index;
+    }
+
+    public Iterable<Index> getIndices() {
+        List<Index> list = new ArrayList<Index>();
+        list.addAll(indices.values());
+        return list;
+    }
+
+    public void dropIndex(String indexName) {
+        this.indices.remove(indexName);
+        this.autoIndices.remove(indexName);
+    }
+
 
     public Vertex addVertex(final Object id) {
         String idString;
@@ -34,7 +71,7 @@ public class TinkerGraph implements Graph {
         if (null != vertex) {
             throw new RuntimeException("Vertex with id " + id + " already exists");
         } else {
-            vertex = new TinkerVertex(idString, this.index);
+            vertex = new TinkerVertex(idString, this);
             this.vertices.put(vertex.getId().toString(), vertex);
             return vertex;
         }
@@ -79,9 +116,11 @@ public class TinkerGraph implements Graph {
             this.removeEdge(edge);
         }
 
-        for (String key : vertex.getPropertyKeys()) {
-            this.index.remove(key, vertex.getProperty(key), vertex);
+        // removal requires removal from all indices
+        for (TinkerIndex index : this.indices.values()) {
+            index.remove(vertex);
         }
+
         this.vertices.remove(vertex.getId().toString());
     }
 
@@ -99,7 +138,7 @@ public class TinkerGraph implements Graph {
         if (null != edge) {
             throw new RuntimeException("Vertex with id " + id + " already exists");
         } else {
-            edge = new TinkerEdge(idString, outVertex, inVertex, label, this.index);
+            edge = new TinkerEdge(idString, outVertex, inVertex, label, this);
             this.edges.put(edge.getId().toString(), edge);
             final TinkerVertex out = (TinkerVertex) outVertex;
             final TinkerVertex in = (TinkerVertex) inVertex;
@@ -116,12 +155,15 @@ public class TinkerGraph implements Graph {
             outVertex.outEdges.remove(edge);
         if (null != inVertex && null != inVertex.inEdges)
             inVertex.inEdges.remove(edge);
-        this.edges.remove(edge.getId());
+
+        // removal requires removal from all indices
+        for (TinkerIndex index : this.indices.values()) {
+            index.remove(edge);
+        }
+
+        this.edges.remove(edge.getId().toString());
     }
 
-    public Index getIndex() {
-        return this.index;
-    }
 
     public String toString() {
         return "tinkergraph[vertices:" + this.vertices.size() + " edges:" + this.edges.size() + "]";
@@ -130,6 +172,8 @@ public class TinkerGraph implements Graph {
     public void clear() {
         this.vertices.clear();
         this.edges.clear();
+        this.indices.clear();
+        this.autoIndices.clear();
         this.currentId = 0l;
     }
 

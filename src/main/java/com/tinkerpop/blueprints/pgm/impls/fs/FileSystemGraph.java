@@ -48,10 +48,6 @@ public class FileSystemGraph implements Graph {
         throw new UnsupportedOperationException();
     }
 
-    public Index getIndex() {
-        throw new UnsupportedOperationException();
-    }
-
     public void shutdown() {
 
     }

@@ -41,15 +41,23 @@ public class OrientGraphTest extends BaseTest {
         doSuiteTest(new GraphTestSuite(config));
     }
 
-    public void testIndexSuite() throws Exception {
+    public void testAutomaticIndexTestSuite() throws Exception {
+        doSuiteTest(new AutomaticIndexTestSuite(config));
+    }
+
+    /*public void testIndexTestSuite() throws Exception {
         doSuiteTest(new IndexTestSuite(config));
+    }*/
+
+    public void testIndexableGraphSuite() throws Exception {
+        doSuiteTest(new IndexableGraphTestSuite(config));
     }
 
     public void testGraphMLReaderSuite() throws Exception {
         doSuiteTest(new GraphMLReaderTestSuite(config));
     }
 
-    public void testTransactionalGraphTestSuite() throws Exception {
+    public void testTransactionalGraphSuite() throws Exception {
         doSuiteTest(new TransactionalGraphTestSuite(config));
     }
 
@@ -68,7 +76,6 @@ public class OrientGraphTest extends BaseTest {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
                     OrientGraph graph = new OrientGraph("local:" + url + "/graph");
-                    graph.clear();
                     method.invoke(suite, graph);
                     graph.shutdown();
                     deleteDirectory(new File(url));

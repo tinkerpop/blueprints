@@ -11,7 +11,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
+public class Neo4jEdgeSequence<T extends Edge> implements Iterator<Neo4jEdge>, Iterable<Neo4jEdge> {
 
     private final Iterator<Relationship> relationships;
     private final Neo4jGraph graph;
@@ -25,7 +25,7 @@ public class Neo4jEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
         throw new UnsupportedOperationException();
     }
 
-    public Edge next() {
+    public Neo4jEdge next() {
         return new Neo4jEdge(this.relationships.next(), this.graph);
     }
 
@@ -33,7 +33,7 @@ public class Neo4jEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
         return this.relationships.hasNext();
     }
 
-    public Iterator<Edge> iterator() {
+    public Iterator<Neo4jEdge> iterator() {
         return this;
     }
 }

@@ -1,72 +1,59 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
-
-import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jElementVertexSequence;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.Node;
-import org.neo4j.index.IndexHits;
-import org.neo4j.index.IndexService;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.index.IndexHits;
 
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jIndex implements Index {
+public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements Index<T> {
 
-    private final IndexService indexService;
+    private final Class<T> indexClass;
     private final Neo4jGraph graph;
-    public final Set<String> indexKeys;
+    private final String indexName;
 
-    public boolean indexAll = true;
-
-    public Neo4jIndex(final IndexService indexService, final Neo4jGraph graph) {
-        this.indexService = indexService;
+    public Neo4jIndex(final String indexName, Class<T> indexClass, final Neo4jGraph graph) {
+        this.indexClass = indexClass;
         this.graph = graph;
-        this.indexKeys = new HashSet<String>();
+        this.indexName = indexName;
     }
 
-    public IndexService getIndexService() {
-        return this.indexService;
+    public Class<T> getIndexClass() {
+        return indexClass;
     }
 
-    public void put(final String key, final Object value, final Element element) {
-        if (this.indexAll || this.indexKeys.contains(key)) {
-            if (element instanceof Neo4jVertex) {
-                Node node = (Node) ((Neo4jVertex) element).getRawElement();
-                this.indexService.index(node, key, value);
-            }
-        }
+    public String getIndexName() {
+        return this.indexName;
     }
 
-    public Iterable<Element> get(final String key, final Object value) {
-        IndexHits<Node> itty = this.indexService.getNodes(key, value);
-        return new Neo4jElementVertexSequence(itty, this.graph);
+    public void put(final String key, final Object value, final T element) {
+        this.generateIndex().add((S) element.getRawElement(), key, value);
+        this.graph.stopStartTransaction();
     }
 
-    public void remove(final String key, final Object value, final Element element) {
-        if (element instanceof Neo4jVertex) {
-            Node node = (Node) ((Neo4jVertex) element).getRawElement();
-            this.indexService.removeIndex(node, key, value);
-        }
+    public Iterable<T> get(final String key, final Object value) {
+        IndexHits<S> itty = this.generateIndex().get(key, value);
+        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
+            return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
+        else
+            return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
     }
 
-    public void indexAll(final boolean indexAll) {
-        this.indexAll = indexAll;
+    public void remove(final String key, final Object value, final T element) {
+        this.generateIndex().remove((S) element.getRawElement(), key, value);
+        this.graph.stopStartTransaction();
     }
 
-    public void addIndexKey(final String key) {
-        this.indexKeys.add(key);
-    }
-
-    public void removeIndexKey(final String key) {
-        this.indexKeys.remove(key);
-        // TODO: drop index in LuceneIndexService
-    }
-
-    protected void shutdown() {
-        indexService.shutdown();
+    private org.neo4j.graphdb.index.Index<S> generateIndex() {
+        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
+            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
+        else
+            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
     }
 }

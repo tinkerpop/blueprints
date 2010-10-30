@@ -21,17 +21,17 @@ public abstract class OrientElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        final Object oldValue = rawElement.get(key);
-
         graph.beginTransaction();
 
         try {
+            Object oldValue = this.getProperty(key);
+            for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                autoIndex.autoUpdate(key, value, oldValue, this);
+            }
+
             this.rawElement.set(key, value);
             this.save();
 
-            if (oldValue != null)
-                graph.getIndex().remove(key, oldValue, this);
-            graph.getIndex().put(key, value, this);
             graph.commitTransaction();
 
         } catch (RuntimeException e) {
@@ -44,12 +44,16 @@ public abstract class OrientElement implements Element {
         graph.beginTransaction();
 
         try {
-            final Object old = this.rawElement.remove(key);
+            Object oldValue = this.rawElement.remove(key);
+            if (null != oldValue) {
+                for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                    autoIndex.autoRemove(key, oldValue, this);
+                }
+            }
             this.save();
-            graph.getIndex().remove(key, old, this);
             graph.commitTransaction();
+            return oldValue;
 
-            return old;
         } catch (RuntimeException e) {
 
             graph.rollbackTransaction();

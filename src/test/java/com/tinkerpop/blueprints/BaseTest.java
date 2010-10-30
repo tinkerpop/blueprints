@@ -12,10 +12,6 @@ public abstract class BaseTest extends TestCase {
 
     double timer = -1.0d;
 
-    public void testTrue() {
-        assertTrue(true);
-    }
-
     public static List<String> generateUUIDs(int number) {
         List<String> uuids = new ArrayList<String>();
         for (int i = 0; i < number; i++) {
@@ -57,12 +53,13 @@ public abstract class BaseTest extends TestCase {
         return count(iterable.iterator());
     }
 
-    public static List asList(final Object x, final int times) {
-        List list = new ArrayList();
-        for (int i = 0; i < times; i++) {
-            list.add(x);
+    public static <T> List<T> asList(Iterable<T> iterable) {
+        List<T> list = new ArrayList<T>();
+        for (T object : iterable) {
+            list.add(object);
         }
         return list;
+
     }
 
     public double stopWatch() {

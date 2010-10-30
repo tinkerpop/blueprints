@@ -89,14 +89,6 @@ public interface Graph {
     public void clear();
 
     /**
-     * Get the index used to index the vertices and edges in the graph by their properties.
-     * If the implementation does not support indices, then an UnsupportedOperationException can be thrown.
-     *
-     * @return the index associated with the graph
-     */
-    public Index getIndex();
-
-    /**
      * A shtudown function is required to properly close the graph.
      * This is important for implementations that utilize disk-based serializations.
      */

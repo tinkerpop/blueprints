@@ -33,7 +33,6 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
         return this.rawElements.hasNext();
     }
 
-    @SuppressWarnings("unchecked")
     public T next() {
         Object o = this.rawElements.next();
         if (null == o)

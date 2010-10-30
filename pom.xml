@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -197,3 +198,204 @@
         </repository>
     </distributionManagement>
 </project>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tinkerpop</groupId>
+    <artifactId>blueprints</artifactId>
+    <version>0.2.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <url>http://blueprints.tinkerpop.com</url>
+    <name>Blueprints: Data Models and their Implementations</name>
+    <description>Blueprints is a collection of abstract data models, their implementations, their test suites, and their
+        extensions.
+    </description>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <developers>
+        <developer>
+            <name>Marko A. Rodriguez</name>
+            <email>marko@markorodriguez.com</email>
+            <url>http://markorodriguez.com</url>
+        </developer>
+    </developers>
+    <contributors>
+        <contributor>
+            <!-- ORIENTDB PROPERTY GRAPH -->
+            <name>Luca Garulli</name>
+            <email>l.garulli@orientechnologies.com</email>
+            <url>http://zion-city.blogspot.com</url>
+        </contributor>
+    </contributors>
+    <inceptionYear>2010</inceptionYear>
+    <dependencies>
+        <!--
+            PROPERTY GRAPH MODEL IMPLEMENTATION SUPPORT
+        -->
+        <!-- JUNG SUPPORT -->
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-api</artifactId>
+            <version>2.0</version>
+        </dependency>
+        <!-- GRAPHDB SUPPORT -->
+        <dependency>
+            <groupId>com.tinkerpop</groupId>
+            <artifactId>graphdb-deps-all</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+        <!-- TESTING -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.5</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.10</version>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>http://tinkerpop.com/maven2</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    <build>
+        <directory>${basedir}/target</directory>
+        <finalName>${artifactId}-${version}
+        </finalName>
+        <sourceDirectory>${basedir}/src/main/java
+        </sourceDirectory>
+        <testSourceDirectory>${basedir}/src/test/java
+        </testSourceDirectory>
+        <outputDirectory>${basedir}/target/classes
+        </outputDirectory>
+        <testOutputDirectory>${basedir}/target/test-classes
+        </testOutputDirectory>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources
+                </directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/resources
+                </directory>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2-beta-4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/distribution.xml</descriptor>
+                    </descriptors>
+                    <finalName>blueprints-${project.version}</finalName>
+                    <outputDirectory>target</outputDirectory>
+                    <workDirectory>target/assembly/work</workDirectory>
+                    <tarLongFileMode>warn</tarLongFileMode>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <systemProperties>
+                        <!-- TINKERGRAPH TEST PROPERTIES -->
+                        <property>
+                            <name>testTinkerGraph</name>
+                            <value>true</value>
+                        </property>
+                        <!-- NEO4J TEST PROPERTIES -->
+                        <property>
+                            <name>testNeo4j</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>neo4jDirectory</name>
+                            <value>/tmp/blueprints_test</value>
+                        </property>
+                        <!-- SAIL TEST PROPERTIES -->
+                        <property>
+                            <name>testSail</name>
+                            <value>true</value>
+                        </property>
+                        <!-- ORIENTGRAPH TEST PROPERTIES -->
+                        <property>
+                            <name>testOrientGraph</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>orientGraphDirectory</name>
+                            <value>/tmp/blueprints_test</value>
+                        </property>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+        </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>1.0-alpha-6</version>
+            </extension>
+        </extensions>
+    </build>
+    <distributionManagement>
+        <repository>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
+        </repository>
+    </distributionManagement>
+</project>
+>>>>>>> 1b2fdcd0e29db591649d1430f9764fd7548ef55d
