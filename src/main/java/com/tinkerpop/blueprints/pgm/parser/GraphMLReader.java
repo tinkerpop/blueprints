@@ -21,38 +21,26 @@ import java.util.Map.Entry;
  * @author Alex Averbuch (alex.averbuch@gmail.com)
  */
 public class GraphMLReader {
-
 	public static void inputGraph(final Graph graph,
 			final InputStream graphMLInputStream) throws XMLStreamException {
 		int bufferSize = 1000;
-		String eId = null;
-		String eLabel = null;
-		String vId = null;
-		GraphMLReader.inputGraph(graph, graphMLInputStream, bufferSize, eId,
-				eLabel, vId);
+		String edgeLabelKey = null;
+		GraphMLReader.inputGraph(graph, graphMLInputStream, bufferSize,
+				edgeLabelKey);
 	}
 
 	public static void inputGraph(final Graph graph,
 			final InputStream graphMLInputStream, int bufferSize,
-			String edgeIdKey, String edgeLabelKey, String vertexIdKey)
-			throws XMLStreamException {
-
+			String edgeLabelKey) throws XMLStreamException {
 		XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 		XMLStreamReader reader = inputFactory
 				.createXMLStreamReader(graphMLInputStream);
 
 		Map<String, String> keyIdMap = new HashMap<String, String>();
 		Map<String, String> keyTypesMaps = new HashMap<String, String>();
-		// <Mapped ID String, ID Object>
 		Map<String, Object> vertexIdMap = new HashMap<String, Object>();
-		// Mapping between Source/Target IDs and "Property IDs"
-		// <Default ID String, Mapped ID String>
-		Map<String, String> vertexMappedIdMap = new HashMap<String, String>();
 
-		// Buffered Vertex Data
-		String vertexId = null;
-		Map<String, Object> vertexProps = null;
-		boolean inVertex = false;
+		Vertex currentVertex = null;
 
 		// Buffered Edge Data
 		String edgeId = null;
@@ -77,7 +65,6 @@ public class GraphMLReader {
 			Integer eventType = reader.next();
 			if (eventType.equals(XMLEvent.START_ELEMENT)) {
 				String elementName = reader.getName().getLocalPart();
-
 				if (elementName.equals(GraphMLTokens.KEY)) {
 					String id = reader
 							.getAttributeValue(null, GraphMLTokens.ID);
@@ -87,14 +74,18 @@ public class GraphMLReader {
 							GraphMLTokens.ATTR_TYPE);
 					keyIdMap.put(id, attributeName);
 					keyTypesMaps.put(attributeName, attributeType);
-
 				} else if (elementName.equals(GraphMLTokens.NODE)) {
-					vertexId = reader.getAttributeValue(null, GraphMLTokens.ID);
-					// TODO
-					if (vertexIdKey != null)
-						vertexMappedIdMap.put(vertexId, vertexId);
-					inVertex = true;
-					vertexProps = new HashMap<String, Object>();
+					String vertexStringId = reader.getAttributeValue(null,
+							GraphMLTokens.ID);
+
+					Object vertexObjectId = vertexIdMap.get(vertexStringId);
+					if (vertexObjectId != null)
+						currentVertex = graph.getVertex(vertexObjectId);
+					else {
+						currentVertex = graph.addVertex(vertexStringId);
+						transactionBufferSize++;
+						vertexIdMap.put(vertexStringId, currentVertex.getId());
+					}
 
 				} else if (elementName.equals(GraphMLTokens.EDGE)) {
 					edgeId = reader.getAttributeValue(null, GraphMLTokens.ID);
@@ -102,24 +93,14 @@ public class GraphMLReader {
 							GraphMLTokens.LABEL);
 					edgeLabel = edgeLabel == null ? GraphMLTokens._DEFAULT
 							: edgeLabel;
-
-					String outVertexId = reader.getAttributeValue(null,
+					String outStringId = reader.getAttributeValue(null,
 							GraphMLTokens.SOURCE);
-					String inVertexId = reader.getAttributeValue(null,
+					String inStringId = reader.getAttributeValue(null,
 							GraphMLTokens.TARGET);
 
-					// TODO
-					Object outObjectId = null;
-					Object inObjectId = null;
-					if (vertexIdKey == null) {
-						outObjectId = vertexIdMap.get(outVertexId);
-						inObjectId = vertexIdMap.get(inVertexId);
-					} else {
-						outObjectId = vertexIdMap.get(vertexMappedIdMap
-								.get(outVertexId));
-						inObjectId = vertexIdMap.get(vertexMappedIdMap
-								.get(inVertexId));
-					}
+					// TODO: current edge retrieve by id first?
+					Object outObjectId = vertexIdMap.get(outStringId);
+					Object inObjectId = vertexIdMap.get(inStringId);
 
 					edgeOutVertex = null;
 					if (null != outObjectId)
@@ -129,20 +110,14 @@ public class GraphMLReader {
 						edgeInVertex = graph.getVertex(inObjectId);
 
 					if (null == edgeOutVertex) {
-						edgeOutVertex = graph.addVertex(outVertexId);
+						edgeOutVertex = graph.addVertex(outStringId);
 						transactionBufferSize++;
-						vertexIdMap.put(outVertexId, edgeOutVertex.getId());
-						// TODO
-						if (vertexIdKey != null)
-							vertexMappedIdMap.put(outVertexId, outVertexId);
+						vertexIdMap.put(outStringId, edgeOutVertex.getId());
 					}
 					if (null == edgeInVertex) {
-						edgeInVertex = graph.addVertex(inVertexId);
+						edgeInVertex = graph.addVertex(inStringId);
 						transactionBufferSize++;
-						vertexIdMap.put(inVertexId, edgeInVertex.getId());
-						// TODO
-						if (vertexIdKey != null)
-							vertexMappedIdMap.put(inVertexId, inVertexId);
+						vertexIdMap.put(inStringId, edgeInVertex.getId());
 					}
 
 					inEdge = true;
@@ -152,29 +127,22 @@ public class GraphMLReader {
 					String key = reader.getAttributeValue(null,
 							GraphMLTokens.KEY);
 					String attributeName = keyIdMap.get(key);
-
 					if (attributeName != null) {
+
 						String value = reader.getElementText();
 
-						if (inVertex == true) {
-							if ((vertexIdKey != null)
-									&& (key.equals(vertexIdKey))) {
-								// Assumes multiple props, same key not possible
-								vertexMappedIdMap.put(vertexId, value);
-								vertexId = value;
-							} else
-								vertexProps.put(key, typeCastValue(key, value,
-										keyTypesMaps));
+						if (currentVertex != null) {
+							currentVertex.setProperty(key, typeCastValue(key,
+									value, keyTypesMaps));
+							transactionBufferSize++;
 						} else if (inEdge == true) {
 							if ((edgeLabelKey != null)
 									&& (key.equals(edgeLabelKey)))
 								edgeLabel = value;
-							else if ((edgeIdKey != null)
-									&& (key.equals(edgeIdKey)))
-								edgeId = value;
 							else
 								edgeProps.put(key, typeCastValue(key, value,
 										keyTypesMaps));
+
 						}
 					}
 
@@ -183,30 +151,8 @@ public class GraphMLReader {
 				String elementName = reader.getName().getLocalPart();
 
 				if (elementName.equals(GraphMLTokens.NODE)) {
-					Object vertexObjectId = vertexIdMap.get(vertexId);
-					Vertex currentVertex = null;
-					if (vertexObjectId != null)
-						currentVertex = graph.getVertex(vertexObjectId);
-					else {
-						currentVertex = graph.addVertex(vertexId);
-						transactionBufferSize++;
-						vertexIdMap.put(vertexId, currentVertex.getId());
-					}
-					// FIXME I think this is all that's necessary (Alex)
-					// FIXME Reason: IDs should be unique
-					// Vertex currentVertex = graph.addVertex(vertexId);
-					// transactionBufferSize++;
-					// vertexIdMap.put(vertexId, currentVertex.getId());
+					currentVertex = null;
 
-					for (Entry<String, Object> prop : vertexProps.entrySet()) {
-						currentVertex.setProperty(prop.getKey(), prop
-								.getValue());
-						transactionBufferSize++;
-					}
-
-					vertexId = null;
-					vertexProps = null;
-					inVertex = false;
 				} else if (elementName.equals(GraphMLTokens.EDGE)) {
 					Edge currentEdge = graph.addEdge(edgeId, edgeOutVertex,
 							edgeInVertex, edgeLabel);
@@ -242,6 +188,7 @@ public class GraphMLReader {
 			((TransactionalGraph) graph).stopTransaction(Conclusion.SUCCESS);
 			((TransactionalGraph) graph).setTransactionMode(transactionMode);
 		}
+
 	}
 
 	private static Object typeCastValue(String key, String value,

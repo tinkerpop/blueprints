@@ -105,8 +105,7 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 		if (config.supportsEdgeIteration) {
 			this.stopWatch();
 			GraphMLReader.inputGraph(graph, GraphMLReader.class
-					.getResourceAsStream("graph-example-3.xml"), 1000, null,
-					null, null);
+					.getResourceAsStream("graph-example-3.xml"), 1000, null);
 			BaseTest.printPerformance(graph.toString(), null,
 					"graph-example-3 loaded", this.stopWatch());
 
@@ -118,12 +117,6 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 				vertexIds.add(v.getId().toString());
 				for (String key : v.getPropertyKeys())
 					vertexKeys.add(key);
-			}
-			int minVertexId = Integer.MAX_VALUE;
-			int maxVertexId = Integer.MIN_VALUE;
-			for (String vertexId : vertexIds) {
-				minVertexId = Math.min(Integer.parseInt(vertexId), minVertexId);
-				maxVertexId = Math.max(Integer.parseInt(vertexId), maxVertexId);
 			}
 
 			Set<String> edgeIds = new HashSet<String>();
@@ -137,35 +130,26 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 				for (String key : e.getPropertyKeys())
 					edgeKeys.add(key);
 			}
-			int minEdgeId = Integer.MAX_VALUE;
-			int maxEdgeId = Integer.MIN_VALUE;
-			for (String edgeId : edgeIds) {
-				minEdgeId = Math.min(Integer.parseInt(edgeId), minEdgeId);
-				maxEdgeId = Math.max(Integer.parseInt(edgeId), maxEdgeId);
-			}
 
 			assertEquals(vertexCount, 6);
 			assertEquals(vertexIds.size(), 6);
-			assertEquals(vertexKeys.size(), 4);
-			assertEquals(minVertexId, 1);
-			assertEquals(maxVertexId, 6);
+			assertEquals(vertexKeys.size(), 3);
 
 			assertEquals(edgeCount, 6);
 			assertEquals(edgeIds.size(), 6);
-			assertEquals(edgeKeys.size(), 3);
+			assertEquals(edgeKeys.size(), 2);
 			assertEquals(edgeLabels.size(), 2);
 			assertEquals(edgeLabels.contains("has high fived"), false);
-			assertEquals(minEdgeId, 7);
-			assertEquals(maxEdgeId, 12);
 		}
 	}
 
 	public void testTinkerGraphPropertyMappingOn(Graph graph) throws Exception {
 		if (config.supportsEdgeIteration) {
 			this.stopWatch();
-			GraphMLReader.inputGraph(graph, GraphMLReader.class
-					.getResourceAsStream("graph-example-3.xml"), 1000, "_id",
-					"_label", "_id");
+			GraphMLReader
+					.inputGraph(graph, GraphMLReader.class
+							.getResourceAsStream("graph-example-3.xml"), 1000,
+							"_label");
 			BaseTest.printPerformance(graph.toString(), null,
 					"graph-example-3 loaded", this.stopWatch());
 
@@ -177,12 +161,6 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 				vertexIds.add(v.getId().toString());
 				for (String key : v.getPropertyKeys())
 					vertexKeys.add(key);
-			}
-			int minVertexId = Integer.MAX_VALUE;
-			int maxVertexId = Integer.MIN_VALUE;
-			for (String vertexId : vertexIds) {
-				minVertexId = Math.min(Integer.parseInt(vertexId), minVertexId);
-				maxVertexId = Math.max(Integer.parseInt(vertexId), maxVertexId);
 			}
 
 			Set<String> edgeIds = new HashSet<String>();
@@ -196,26 +174,16 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 				for (String key : e.getPropertyKeys())
 					edgeKeys.add(key);
 			}
-			int minEdgeId = Integer.MAX_VALUE;
-			int maxEdgeId = Integer.MIN_VALUE;
-			for (String edgeId : edgeIds) {
-				minEdgeId = Math.min(Integer.parseInt(edgeId), minEdgeId);
-				maxEdgeId = Math.max(Integer.parseInt(edgeId), maxEdgeId);
-			}
 
 			assertEquals(vertexCount, 6);
 			assertEquals(vertexIds.size(), 6);
 			assertEquals(vertexKeys.size(), 3);
-			assertEquals(minVertexId, 2);
-			assertEquals(maxVertexId, 7);
 
 			assertEquals(edgeCount, 6);
 			assertEquals(edgeIds.size(), 6);
 			assertEquals(edgeKeys.size(), 1);
 			assertEquals(edgeLabels.size(), 1);
 			assertEquals(edgeLabels.contains("has high fived"), true);
-			assertEquals(minEdgeId, 8);
-			assertEquals(maxEdgeId, 13);
 		}
 	}
 
@@ -406,8 +374,7 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 			graph.clear();
 			this.stopWatch();
 			GraphMLReader.inputGraph(graph, GraphMLReader.class
-					.getResourceAsStream("graph-example-2.xml"), i, null, null,
-					null);
+					.getResourceAsStream("graph-example-2.xml"), i, null);
 			if (graph instanceof TransactionalGraph)
 				BaseTest
 						.printPerformance(graph.toString(), null,
