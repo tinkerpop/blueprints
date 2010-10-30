@@ -102,7 +102,7 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 	}
 
 	public void testTinkerGraphPropertyMappingOff(Graph graph) throws Exception {
-		if (config.supportsEdgeIteration) {
+		if (config.supportsEdgeIteration && config.supportsVertexIteration) {
 			this.stopWatch();
 			GraphMLReader.inputGraph(graph, GraphMLReader.class
 					.getResourceAsStream("graph-example-3.xml"), 1000, null);
@@ -111,10 +111,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
 			Set<String> vertexIds = new HashSet<String>();
 			Set<String> vertexKeys = new HashSet<String>();
+			Set<String> vertexNames = new HashSet<String>();
 			int vertexCount = 0;
 			for (Vertex v : graph.getVertices()) {
 				vertexCount++;
 				vertexIds.add(v.getId().toString());
+				vertexNames.add(v.getProperty("name").toString());
 				for (String key : v.getPropertyKeys())
 					vertexKeys.add(key);
 			}
@@ -133,18 +135,30 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
 			assertEquals(vertexCount, 6);
 			assertEquals(vertexIds.size(), 6);
+			assertTrue(vertexKeys.contains("name"));
+			assertTrue(vertexKeys.contains("age"));
+			assertTrue(vertexKeys.contains("lang"));
 			assertEquals(vertexKeys.size(), 3);
+			assertTrue(vertexNames.contains("marko"));
+			assertTrue(vertexNames.contains("josh"));
+			assertTrue(vertexNames.contains("peter"));
+			assertTrue(vertexNames.contains("vadas"));
+			assertTrue(vertexNames.contains("ripple"));
+			assertTrue(vertexNames.contains("lop"));
 
 			assertEquals(edgeCount, 6);
 			assertEquals(edgeIds.size(), 6);
 			assertEquals(edgeKeys.size(), 2);
 			assertEquals(edgeLabels.size(), 2);
 			assertEquals(edgeLabels.contains("has high fived"), false);
+			assertEquals(edgeLabels.contains("knows"), true);
+			assertEquals(edgeLabels.contains("created"), true);
+
 		}
 	}
 
 	public void testTinkerGraphPropertyMappingOn(Graph graph) throws Exception {
-		if (config.supportsEdgeIteration) {
+		if (config.supportsEdgeIteration && config.supportsVertexIteration) {
 			this.stopWatch();
 			GraphMLReader
 					.inputGraph(graph, GraphMLReader.class
@@ -155,10 +169,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
 			Set<String> vertexIds = new HashSet<String>();
 			Set<String> vertexKeys = new HashSet<String>();
+			Set<String> vertexNames = new HashSet<String>();
 			int vertexCount = 0;
 			for (Vertex v : graph.getVertices()) {
 				vertexCount++;
 				vertexIds.add(v.getId().toString());
+				vertexNames.add(v.getProperty("name").toString());
 				for (String key : v.getPropertyKeys())
 					vertexKeys.add(key);
 			}
@@ -177,13 +193,24 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
 			assertEquals(vertexCount, 6);
 			assertEquals(vertexIds.size(), 6);
+			assertTrue(vertexKeys.contains("name"));
+			assertTrue(vertexKeys.contains("age"));
+			assertTrue(vertexKeys.contains("lang"));
 			assertEquals(vertexKeys.size(), 3);
+			assertTrue(vertexNames.contains("marko"));
+			assertTrue(vertexNames.contains("josh"));
+			assertTrue(vertexNames.contains("peter"));
+			assertTrue(vertexNames.contains("vadas"));
+			assertTrue(vertexNames.contains("ripple"));
+			assertTrue(vertexNames.contains("lop"));
 
 			assertEquals(edgeCount, 6);
 			assertEquals(edgeIds.size(), 6);
 			assertEquals(edgeKeys.size(), 1);
 			assertEquals(edgeLabels.size(), 1);
 			assertEquals(edgeLabels.contains("has high fived"), true);
+			assertEquals(edgeLabels.contains("knows"), false);
+			assertEquals(edgeLabels.contains("created"), false);
 		}
 	}
 
