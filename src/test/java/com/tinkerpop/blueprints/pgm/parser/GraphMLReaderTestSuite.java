@@ -473,7 +473,129 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 		}
 	}
 
-	public void testReadingTinkerGraphExample3MappingOn(Graph graph)
+	public void testReadingTinkerGraphExample3MappingLabels(Graph graph)
+			throws Exception {
+		if (config.supportsEdgeIteration && config.supportsVertexIteration) {
+			this.stopWatch();
+			GraphMLReader.inputGraph(graph, GraphMLReader.class
+					.getResourceAsStream("graph-example-3.xml"), 1000, null,
+					null, "_label");
+			BaseTest.printPerformance(graph.toString(), null,
+					"graph-example-3 loaded", this.stopWatch());
+
+			Set<String> vertexIds = new HashSet<String>();
+			Set<String> vertexKeys = new HashSet<String>();
+			Set<String> vertexNames = new HashSet<String>();
+			int vertexCount = 0;
+			for (Vertex v : graph.getVertices()) {
+				vertexCount++;
+				vertexIds.add(v.getId().toString());
+				vertexNames.add(v.getProperty("name").toString());
+				for (String key : v.getPropertyKeys())
+					vertexKeys.add(key);
+			}
+
+			Set<String> edgeIds = new HashSet<String>();
+			Set<String> edgeKeys = new HashSet<String>();
+			Set<String> edgeLabels = new HashSet<String>();
+			int edgeCount = 0;
+			for (Edge e : graph.getEdges()) {
+				edgeCount++;
+				edgeIds.add(e.getId().toString());
+				edgeLabels.add(e.getLabel());
+				for (String key : e.getPropertyKeys())
+					edgeKeys.add(key);
+			}
+
+			assertEquals(vertexCount, 6);
+			assertEquals(vertexIds.size(), 6);
+			assertEquals(vertexKeys.contains("name"), true);
+			assertEquals(vertexKeys.contains("age"), true);
+			assertEquals(vertexKeys.contains("lang"), true);
+			assertEquals(vertexKeys.contains("_id"), true);
+			assertEquals(vertexKeys.size(), 4);
+			assertTrue(vertexNames.contains("marko"));
+			assertTrue(vertexNames.contains("josh"));
+			assertTrue(vertexNames.contains("peter"));
+			assertTrue(vertexNames.contains("vadas"));
+			assertTrue(vertexNames.contains("ripple"));
+			assertTrue(vertexNames.contains("lop"));
+
+			assertEquals(edgeCount, 6);
+			assertEquals(edgeIds.size(), 6);
+			assertEquals(edgeKeys.contains("weight"), true);
+			assertEquals(edgeKeys.contains("_id"), true);
+			assertEquals(edgeKeys.contains("_label"), false);
+			assertEquals(edgeKeys.size(), 2);
+			assertEquals(edgeLabels.size(), 2);
+			assertEquals(edgeLabels.contains("has high fived"), true);
+			assertEquals(edgeLabels.contains("knows"), false);
+			assertEquals(edgeLabels.contains("created"), true);
+		}
+	}
+
+	public void testReadingTinkerGraphExample3MappingIDs(Graph graph)
+			throws Exception {
+		if (config.supportsEdgeIteration && config.supportsVertexIteration) {
+			this.stopWatch();
+			GraphMLReader.inputGraph(graph, GraphMLReader.class
+					.getResourceAsStream("graph-example-3.xml"), 1000, "_id",
+					"_id", null);
+			BaseTest.printPerformance(graph.toString(), null,
+					"graph-example-3 loaded", this.stopWatch());
+
+			Set<String> vertexIds = new HashSet<String>();
+			Set<String> vertexKeys = new HashSet<String>();
+			Set<String> vertexNames = new HashSet<String>();
+			int vertexCount = 0;
+			for (Vertex v : graph.getVertices()) {
+				vertexCount++;
+				vertexIds.add(v.getId().toString());
+				vertexNames.add(v.getProperty("name").toString());
+				for (String key : v.getPropertyKeys())
+					vertexKeys.add(key);
+			}
+
+			Set<String> edgeIds = new HashSet<String>();
+			Set<String> edgeKeys = new HashSet<String>();
+			Set<String> edgeLabels = new HashSet<String>();
+			int edgeCount = 0;
+			for (Edge e : graph.getEdges()) {
+				edgeCount++;
+				edgeIds.add(e.getId().toString());
+				edgeLabels.add(e.getLabel());
+				for (String key : e.getPropertyKeys())
+					edgeKeys.add(key);
+			}
+
+			assertEquals(vertexCount, 6);
+			assertEquals(vertexIds.size(), 6);
+			assertEquals(vertexKeys.contains("name"), true);
+			assertEquals(vertexKeys.contains("age"), true);
+			assertEquals(vertexKeys.contains("lang"), true);
+			assertEquals(vertexKeys.contains("_id"), false);
+			assertEquals(vertexKeys.size(), 3);
+			assertTrue(vertexNames.contains("marko"));
+			assertTrue(vertexNames.contains("josh"));
+			assertTrue(vertexNames.contains("peter"));
+			assertTrue(vertexNames.contains("vadas"));
+			assertTrue(vertexNames.contains("ripple"));
+			assertTrue(vertexNames.contains("lop"));
+
+			assertEquals(edgeCount, 6);
+			assertEquals(edgeIds.size(), 6);
+			assertEquals(edgeKeys.contains("weight"), true);
+			assertEquals(edgeKeys.contains("_id"), false);
+			assertEquals(edgeKeys.contains("_label"), true);
+			assertEquals(edgeKeys.size(), 2);
+			assertEquals(edgeLabels.size(), 2);
+			assertEquals(edgeLabels.contains("has high fived"), false);
+			assertEquals(edgeLabels.contains("knows"), true);
+			assertEquals(edgeLabels.contains("created"), true);
+		}
+	}
+
+	public void testReadingTinkerGraphExample3MappingAll(Graph graph)
 			throws Exception {
 		if (config.supportsEdgeIteration && config.supportsVertexIteration) {
 			this.stopWatch();
