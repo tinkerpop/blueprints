@@ -65,12 +65,10 @@ public class OrientGraphTest extends BaseTest {
         String doTest = System.getProperty("testOrientGraph");
         if (doTest == null || doTest.equals("true")) {
             String url = System.getProperty("orientGraphDirectory");
-            if (url == null)
-                url = "/tmp/blueprints_test";
+            if (url == null) url = "/tmp/blueprints_test";
 
             final File directory = new File(url);
-            if (!directory.exists())
-                directory.mkdirs();
+            if (!directory.exists()) directory.mkdirs();
 
             for (Method method : suite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {

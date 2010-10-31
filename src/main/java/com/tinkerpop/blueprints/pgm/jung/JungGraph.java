@@ -30,8 +30,7 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
     }
 
     public boolean addVertex(final Vertex vertex) {
-        if (null != graph.getVertex(vertex.getId()))
-            graph.addVertex(vertex.getId());
+        if (null != graph.getVertex(vertex.getId())) graph.addVertex(vertex.getId());
         return true;
     }
 
@@ -42,8 +41,7 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
 
     public boolean containsVertex(final Vertex vertex) {
         for (Vertex v : this.graph.getVertices()) {
-            if (vertex.equals(v))
-                return true;
+            if (vertex.equals(v)) return true;
         }
         return false;
     }
@@ -83,8 +81,7 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
 
     public boolean containsEdge(final Edge edge) {
         for (Edge e : this.graph.getEdges()) {
-            if (edge.equals(e))
-                return true;
+            if (edge.equals(e)) return true;
         }
         return false;
     }
@@ -136,10 +133,8 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
     }
 
     public int getIncidentCount(final Edge edge) {
-        if (edge.getInVertex().equals(edge.getOutVertex()))
-            return 1;
-        else
-            return 2;
+        if (edge.getInVertex().equals(edge.getOutVertex())) return 1;
+        else return 2;
     }
 
     public int getVertexCount() {
@@ -210,12 +205,10 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
 
     public boolean isNeighbor(final Vertex outVertex, final Vertex inVertex) {
         for (Edge edge : outVertex.getOutEdges()) {
-            if (edge.getInVertex().equals(inVertex))
-                return true;
+            if (edge.getInVertex().equals(inVertex)) return true;
         }
         for (Edge edge : outVertex.getInEdges()) {
-            if (edge.getOutVertex().equals(inVertex))
-                return true;
+            if (edge.getOutVertex().equals(inVertex)) return true;
         }
         return false;
     }
@@ -236,10 +229,8 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
     }
 
     public Vertex getOpposite(final Vertex vertex, final Edge edge) {
-        if (edge.getOutVertex().equals(vertex))
-            return edge.getInVertex();
-        else
-            return edge.getOutVertex();
+        if (edge.getOutVertex().equals(vertex)) return edge.getInVertex();
+        else return edge.getOutVertex();
     }
 
     public Collection<Edge> getOutEdges(final Vertex vertex) {
@@ -334,16 +325,14 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
 
     public boolean isPredecessor(final Vertex outVertex, final Vertex inVertex) {
         for (Edge edge : outVertex.getInEdges()) {
-            if (edge.getOutVertex().equals(inVertex))
-                return true;
+            if (edge.getOutVertex().equals(inVertex)) return true;
         }
         return false;
     }
 
     public boolean isSuccessor(final Vertex outVertex, final Vertex inVertex) {
         for (Edge edge : outVertex.getOutEdges()) {
-            if (edge.getInVertex().equals(inVertex))
-                return true;
+            if (edge.getInVertex().equals(inVertex)) return true;
         }
         return false;
     }

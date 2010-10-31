@@ -25,8 +25,7 @@ public class SailHelper {
                 sailConnection.removeStatements(statement.getSubject(), statement.getPredicate(), statement.getObject());
             }
             sailConnection.commit();
-        }
-        catch (SailException e) {
+        } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -39,8 +38,7 @@ public class SailHelper {
                 sailConnection.addStatement(statement.getSubject(), statement.getPredicate(), statement.getObject());
             }
             sailConnection.commit();
-        }
-        catch (SailException e) {
+        } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -72,8 +70,7 @@ public class SailHelper {
         if (matcher.matches()) {
             if (null != matcher.group(4))
                 return new LiteralImpl(matcher.group(1), new URIImpl(SailGraph.prefixToNamespace(matcher.group(4), sailConnection)));
-            else
-                return new LiteralImpl(matcher.group(1), matcher.group(6));
+            else return new LiteralImpl(matcher.group(1), matcher.group(6));
         } else {
             if (resource.startsWith("\"") && resource.endsWith("\"") && resource.length() > 1) {
                 return new LiteralImpl(resource.substring(1, resource.length() - 1));

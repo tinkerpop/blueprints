@@ -53,8 +53,7 @@ public class VertexTestSuite extends ModelTestSuite {
             set.add(u);
             set.add(graph.getVertex(convertId(ids.get(0))));
             set.add(graph.getVertex(convertId(ids.get(0))));
-            if (config.supportsVertexIndex)
-                set.add(graph.getVertices().iterator().next());
+            if (config.supportsVertexIndex) set.add(graph.getVertices().iterator().next());
             assertEquals(1, set.size());
         }
 
@@ -86,23 +85,19 @@ public class VertexTestSuite extends ModelTestSuite {
         List<String> ids = generateIds(1);
 
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
-        if (config.supportsVertexIteration)
-            assertEquals(1, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(1, count(graph.getVertices()));
         graph.removeVertex(v1);
-        if (config.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(0, count(graph.getVertices()));
 
         Set<Vertex> vertices = new HashSet<Vertex>();
         for (int i = 0; i < 1000; i++) {
             vertices.add(graph.addVertex(null));
         }
-        if (config.supportsVertexIteration)
-            assertEquals(1000, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(1000, count(graph.getVertices()));
         for (Vertex v : vertices) {
             graph.removeVertex(v);
         }
-        if (config.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(0, count(graph.getVertices()));
     }
 
     public void testRemoveVertexWithEdges(final Graph graph) {
@@ -110,22 +105,16 @@ public class VertexTestSuite extends ModelTestSuite {
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
         Vertex v2 = graph.addVertex(convertId(ids.get(1)));
         graph.addEdge(null, v1, v2, convertId("knows"));
-        if (config.supportsVertexIteration)
-            assertEquals(2, count(graph.getVertices()));
-        if (config.supportsEdgeIteration)
-            assertEquals(1, count(graph.getEdges()));
+        if (config.supportsVertexIteration) assertEquals(2, count(graph.getVertices()));
+        if (config.supportsEdgeIteration) assertEquals(1, count(graph.getEdges()));
 
         graph.removeVertex(v1);
-        if (config.supportsVertexIteration)
-            assertEquals(1, count(graph.getVertices()));
-        if (config.supportsEdgeIteration)
-            assertEquals(0, count(graph.getEdges()));
+        if (config.supportsVertexIteration) assertEquals(1, count(graph.getVertices()));
+        if (config.supportsEdgeIteration) assertEquals(0, count(graph.getEdges()));
 
         graph.removeVertex(v2);
-        if (config.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
-        if (config.supportsEdgeIteration)
-            assertEquals(0, count(graph.getEdges()));
+        if (config.supportsVertexIteration) assertEquals(0, count(graph.getVertices()));
+        if (config.supportsEdgeIteration) assertEquals(0, count(graph.getEdges()));
 
     }
 
@@ -142,11 +131,9 @@ public class VertexTestSuite extends ModelTestSuite {
     public void testRemoveVertexNullId(final Graph graph) {
         int vertexCount = 1000;
         Vertex v1 = graph.addVertex(null);
-        if (config.supportsVertexIteration)
-            assertEquals(1, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(1, count(graph.getVertices()));
         graph.removeVertex(v1);
-        if (config.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(0, count(graph.getVertices()));
 
         Set<Vertex> vertices = new HashSet<Vertex>();
 
@@ -155,16 +142,14 @@ public class VertexTestSuite extends ModelTestSuite {
             vertices.add(graph.addVertex(null));
         }
         BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
-        if (config.supportsVertexIteration)
-            assertEquals(vertexCount, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(vertexCount, count(graph.getVertices()));
 
         this.stopWatch();
         for (Vertex v : vertices) {
             graph.removeVertex(v);
         }
         BaseTest.printPerformance(graph.toString(), vertexCount, "vertices deleted", this.stopWatch());
-        if (config.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(0, count(graph.getVertices()));
 
     }
 
@@ -227,8 +212,7 @@ public class VertexTestSuite extends ModelTestSuite {
             }
             BaseTest.printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
 
-            if (config.supportsVertexIteration)
-                assertEquals(50, count(graph.getVertices()));
+            if (config.supportsVertexIteration) assertEquals(50, count(graph.getVertices()));
             assertEquals(50, vertices.size());
             for (Vertex vertex : vertices) {
                 assertEquals(15, vertex.getPropertyKeys().size());
@@ -244,8 +228,7 @@ public class VertexTestSuite extends ModelTestSuite {
                 vertices.add(vertex);
             }
             BaseTest.printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
-            if (config.supportsVertexIteration)
-                assertEquals(count(graph.getVertices()), 50);
+            if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 50);
             assertEquals(vertices.size(), 50);
             for (Vertex vertex : vertices) {
                 assertEquals(3, vertex.getPropertyKeys().size());

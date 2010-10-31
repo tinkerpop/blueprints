@@ -34,7 +34,7 @@ public abstract class TinkerElement implements Element {
         Object oldValue = this.properties.put(key, value);
         for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
             index.autoUpdate(key, value, oldValue, this);
-        }   
+        }
     }
 
     public Object removeProperty(final String key) {

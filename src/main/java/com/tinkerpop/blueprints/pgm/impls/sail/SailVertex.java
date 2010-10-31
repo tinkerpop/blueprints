@@ -103,21 +103,16 @@ public class SailVertex implements Vertex {
 
     public Object getProperty(final String key) {
         if (key.equals(SailTokens.KIND)) {
-            if (this.value instanceof Literal)
-                return SailTokens.LITERAL;
-            else if (this.value instanceof URI)
-                return SailTokens.URI;
-            else
-                return SailTokens.BNODE;
+            if (this.value instanceof Literal) return SailTokens.LITERAL;
+            else if (this.value instanceof URI) return SailTokens.URI;
+            else return SailTokens.BNODE;
         }
 
         if (this.value instanceof Literal) {
             Literal literal = (Literal) value;
             if (key.equals(SailTokens.DATATYPE)) {
-                if (null != literal.getDatatype())
-                    return literal.getDatatype().stringValue();
-                else
-                    return null;
+                if (null != literal.getDatatype()) return literal.getDatatype().stringValue();
+                else return null;
             } else if (key.equals(SailTokens.LANGUAGE)) {
                 return literal.getLanguage();
             } else if (key.equals(SailTokens.VALUE)) {
@@ -168,8 +163,7 @@ public class SailVertex implements Vertex {
     protected static Object castLiteral(final Literal literal) {
         if (null != literal.getDatatype()) {
             String className = dataTypeToClass.get(literal.getDatatype().stringValue());
-            if (null == className)
-                return literal.getLabel();
+            if (null == className) return literal.getLabel();
             else {
                 try {
                     Class c = Class.forName(className);

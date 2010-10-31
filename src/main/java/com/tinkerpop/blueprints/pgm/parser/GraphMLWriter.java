@@ -109,20 +109,13 @@ public class GraphMLWriter {
     }
 
     private static String getStringType(final Object object) {
-        if (object instanceof String)
-            return GraphMLTokens.STRING;
-        else if (object instanceof Integer)
-            return GraphMLTokens.INT;
-        else if (object instanceof Long)
-            return GraphMLTokens.LONG;
-        else if (object instanceof Float)
-            return GraphMLTokens.FLOAT;
-        else if (object instanceof Double)
-            return GraphMLTokens.DOUBLE;
-        else if (object instanceof Boolean)
-            return GraphMLTokens.BOOLEAN;
-        else
-            return GraphMLTokens.STRING;
+        if (object instanceof String) return GraphMLTokens.STRING;
+        else if (object instanceof Integer) return GraphMLTokens.INT;
+        else if (object instanceof Long) return GraphMLTokens.LONG;
+        else if (object instanceof Float) return GraphMLTokens.FLOAT;
+        else if (object instanceof Double) return GraphMLTokens.DOUBLE;
+        else if (object instanceof Boolean) return GraphMLTokens.BOOLEAN;
+        else return GraphMLTokens.STRING;
     }
 
 }

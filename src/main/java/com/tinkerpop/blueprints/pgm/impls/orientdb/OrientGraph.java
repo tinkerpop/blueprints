@@ -61,10 +61,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         Index index = this.indices.get(indexName);
-        if (indexClass.isAssignableFrom(index.getIndexClass()))
-            return (Index<T>) index;
-        else
-            throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
+        if (indexClass.isAssignableFrom(index.getIndexClass())) return (Index<T>) index;
+        else throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
     }
 
     public Iterable<Index> getIndices() {
@@ -103,8 +101,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         try {
             beginTransaction();
 
-            final OrientEdge edge = new OrientEdge(this, ((OrientVertex) outVertex).getRawVertex().link(
-                    ((OrientVertex) inVertex).getRawVertex()));
+            final OrientEdge edge = new OrientEdge(this, ((OrientVertex) outVertex).getRawVertex().link(((OrientVertex) inVertex).getRawVertex()));
             edge.setLabel(label);
 
             ((OrientVertex) outVertex).getRawVertex().getDocument().setDirty();
@@ -127,19 +124,14 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public Vertex getVertex(final Object id) {
         ORID rid;
-        if (id instanceof ORID)
-            rid = (ORID) id;
-        else
-            rid = new ORecordId(id.toString());
+        if (id instanceof ORID) rid = (ORID) id;
+        else rid = new ORecordId(id.toString());
 
-        if (!rid.isValid())
-            return null;
+        if (!rid.isValid()) return null;
 
         final ODocument doc = this.database.getRecordById(rid);
-        if (doc != null)
-            return new OrientVertex(this, (OGraphVertex) this.database.getUserObjectByRecord(doc, null));
-        else
-            return new OrientVertex(this, (OGraphVertex) this.database.load(rid));
+        if (doc != null) return new OrientVertex(this, (OGraphVertex) this.database.getUserObjectByRecord(doc, null));
+        else return new OrientVertex(this, (OGraphVertex) this.database.load(rid));
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -172,16 +164,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public Edge getEdge(final Object id) {
         final ORID rid;
-        if (id instanceof ORID)
-            rid = (ORID) id;
-        else
-            rid = new ORecordId(id.toString());
+        if (id instanceof ORID) rid = (ORID) id;
+        else rid = new ORecordId(id.toString());
 
         final ODocument doc = this.database.getRecordById(rid);
-        if (doc != null)
-            return new OrientEdge(this, (OGraphEdge) this.database.getUserObjectByRecord(doc, null));
-        else
-            return new OrientEdge(this, (OGraphEdge) this.database.load(rid));
+        if (doc != null) return new OrientEdge(this, (OGraphEdge) this.database.getUserObjectByRecord(doc, null));
+        else return new OrientEdge(this, (OGraphEdge) this.database.load(rid));
     }
 
     public void removeEdge(final Edge edge) {
@@ -232,21 +220,18 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == this.mode)
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
+        if (Mode.AUTOMATIC == this.mode) throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         this.database.begin();
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == this.mode)
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
+        if (Mode.AUTOMATIC == this.mode) throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         if (conclusion == Conclusion.FAILURE) {
             this.database.rollback();
             for (Index index : this.indices.values())
                 ((OrientIndex) index).getRawIndex().unload();
-        } else
-            this.database.commit();
+        } else this.database.commit();
     }
 
     public void setTransactionMode(final Mode mode) {
@@ -258,13 +243,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     protected void beginTransaction() {
-        if (getTransactionMode() == Mode.AUTOMATIC)
-            this.database.begin();
+        if (getTransactionMode() == Mode.AUTOMATIC) this.database.begin();
     }
 
     protected void commitTransaction() {
-        if (getTransactionMode() == Mode.AUTOMATIC)
-            this.database.commit();
+        if (getTransactionMode() == Mode.AUTOMATIC) this.database.commit();
     }
 
     protected void rollbackTransaction() {
@@ -277,8 +260,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     private void openOrCreate() {
         this.database = new ODatabaseGraphTx(url);
-        if (this.database.exists())
-            this.database.open(username, password);
+        if (this.database.exists()) this.database.open(username, password);
         else {
             this.database.create();
             this.createIndex(Index.VERTICES, OrientVertex.class, Index.Type.AUTOMATIC);

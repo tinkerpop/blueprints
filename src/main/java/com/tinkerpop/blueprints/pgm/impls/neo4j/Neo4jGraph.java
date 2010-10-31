@@ -35,10 +35,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
         try {
-            if (null != configuration)
-                this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
-            else
-                this.neo4j = new EmbeddedGraphDatabase(this.directory);
+            if (null != configuration) this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
+            else this.neo4j = new EmbeddedGraphDatabase(this.directory);
 
 
             if (Mode.AUTOMATIC == this.mode) {
@@ -49,8 +47,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.createIndex(Index.EDGES, Neo4jEdge.class, Index.Type.AUTOMATIC);
 
         } catch (Exception e) {
-            if (this.neo4j != null)
-                this.neo4j.shutdown();
+            if (this.neo4j != null) this.neo4j.shutdown();
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -77,10 +74,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         Index index = this.indices.get(indexName);
-        if (indexClass.isAssignableFrom(index.getIndexClass()))
-            return (Index<T>) index;
-        else
-            throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
+        if (indexClass.isAssignableFrom(index.getIndexClass())) return (Index<T>) index;
+        else throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
     }
 
     public void dropIndex(String indexName) {
@@ -111,8 +106,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Vertex getVertex(final Object id) {
-        if (null == id)
-            return null;
+        if (null == id) return null;
 
         try {
             Long longId = Double.valueOf(id.toString()).longValue();
@@ -158,8 +152,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Edge getEdge(final Object id) {
-        if (null == id)
-            return null;
+        if (null == id) return null;
 
         try {
             final Long longId = Double.valueOf(id.toString()).longValue();
@@ -191,15 +184,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == this.mode)
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
+        if (Mode.AUTOMATIC == this.mode) throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         this.tx = neo4j.beginTx();
     }
 
     public void stopTransaction(Conclusion conclusion) {
-        if (Mode.AUTOMATIC == this.mode)
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
+        if (Mode.AUTOMATIC == this.mode) throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         if (conclusion == Conclusion.SUCCESS) {
             this.tx.success();
@@ -217,8 +208,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
 
         this.mode = mode;
-        if (this.mode == Mode.AUTOMATIC)
-            this.tx = neo4j.beginTx();
+        if (this.mode == Mode.AUTOMATIC) this.tx = neo4j.beginTx();
     }
 
     public Mode getTransactionMode() {

@@ -12,7 +12,7 @@ public interface TransactionalGraph extends Graph {
     }
 
     public enum Mode {
-        AUTOMATIC, MANUAL 
+        AUTOMATIC, MANUAL
     }
 
     /**

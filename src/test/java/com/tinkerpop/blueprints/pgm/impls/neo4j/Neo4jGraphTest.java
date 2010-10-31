@@ -63,8 +63,7 @@ public class Neo4jGraphTest extends BaseTest {
         String doTest = System.getProperty("testNeo4j");
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("neo4jDirectory");
-            if (directory == null)
-                directory = "/tmp/blueprints_test";
+            if (directory == null) directory = "/tmp/blueprints_test";
             deleteDirectory(new File(directory));
             for (Method method : suite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {

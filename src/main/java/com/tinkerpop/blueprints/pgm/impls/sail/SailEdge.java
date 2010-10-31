@@ -38,16 +38,13 @@ public class SailEdge implements Edge {
 
     public Set<String> getPropertyKeys() {
         Set<String> keys = new HashSet<String>();
-        if (null != this.statement.getContext())
-            keys.add(SailTokens.NAMED_GRAPH);
+        if (null != this.statement.getContext()) keys.add(SailTokens.NAMED_GRAPH);
         return keys;
     }
 
     public Object getProperty(final String key) {
-        if (key.equals(SailTokens.NAMED_GRAPH))
-            return this.statement.getContext().stringValue();
-        else
-            return null;
+        if (key.equals(SailTokens.NAMED_GRAPH)) return this.statement.getContext().stringValue();
+        else return null;
     }
 
     public void setProperty(final String key, final Object value) {
@@ -89,8 +86,7 @@ public class SailEdge implements Edge {
         String inVertex;
         if (this.statement.getObject() instanceof Resource)
             inVertex = SailGraph.namespaceToPrefix(this.statement.getObject().stringValue(), this.graph.getSailConnection());
-        else
-            inVertex = literalString((Literal) this.statement.getObject());
+        else inVertex = literalString((Literal) this.statement.getObject());
 
         String namedGraph = null;
         if (null != this.statement.getContext()) {

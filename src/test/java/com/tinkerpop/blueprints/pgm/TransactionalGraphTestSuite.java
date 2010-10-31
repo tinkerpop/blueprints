@@ -130,38 +130,30 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         } catch (Exception e) {
             assertTrue(false);
         }
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 2);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 1);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 2);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 1);
         graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         BaseTest.printPerformance(graph.toString(), 1, "edge not added in failed transaction (w/ iteration)", this.stopWatch());
 
 
         this.stopWatch();
         graph.startTransaction();
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 2);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 0);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 2);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 0);
         try {
             graph.addEdge(null, u, v, convertId("test"));
             assertTrue(true);
         } catch (Exception e) {
             assertTrue(false);
         }
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 2);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 1);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 2);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 1);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         BaseTest.printPerformance(graph.toString(), 1, "edge added in successful transaction (w/ iteration)", this.stopWatch());
 
         graph.startTransaction();
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 2);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 1);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 2);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 1);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
 
@@ -180,10 +172,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         }
         BaseTest.printPerformance(graph.toString(), 100, "edges added in 100 successful transactions (2 vertices added for each edge)", this.stopWatch());
         graph.startTransaction();
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 200);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 100);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 200);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 100);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         this.stopWatch();
@@ -196,10 +186,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         }
         BaseTest.printPerformance(graph.toString(), 100, "edges not added in 100 failed transactions (2 vertices added for each edge)", this.stopWatch());
         graph.startTransaction();
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 200);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 100);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 200);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 100);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         this.stopWatch();
@@ -212,10 +200,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         BaseTest.printPerformance(graph.toString(), 100, "edges added in 1 successful transactions (2 vertices added for each edge)", this.stopWatch());
         graph.startTransaction();
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 400);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 200);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 400);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 200);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         this.stopWatch();
@@ -228,10 +214,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         BaseTest.printPerformance(graph.toString(), 100, "edges not added in 1 failed transactions (2 vertices added for each edge)", this.stopWatch());
         graph.startTransaction();
-        if (config.supportsVertexIteration)
-            assertEquals(count(graph.getVertices()), 400);
-        if (config.supportsEdgeIteration)
-            assertEquals(count(graph.getEdges()), 200);
+        if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 400);
+        if (config.supportsEdgeIteration) assertEquals(count(graph.getEdges()), 200);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
     }

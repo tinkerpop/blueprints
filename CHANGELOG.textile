@@ -33,6 +33,9 @@ bc. <dependency>
 ** Added support for auto indexing through @AutomaticIndex@
 ** Added numerous test cases to the test suite
 * Removed support for TinkerDoc, MongoDB, and CouchDB
+* Updated of @GraphMLReader@
+** More efficient implementation
+** Can specify ids and labels through @_id@ and @_label@ data properties
 
 
 h3. Version 0.2 (Kermit -- September 22, 2010)

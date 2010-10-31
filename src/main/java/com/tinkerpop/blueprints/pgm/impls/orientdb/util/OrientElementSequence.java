@@ -35,23 +35,18 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
 
     public T next() {
         Object o = this.rawElements.next();
-        if (null == o)
-            throw new NoSuchElementException();
+        if (null == o) throw new NoSuchElementException();
 
         OGraphElement e = null;
-        if (o instanceof OGraphElement)
-            e = (OGraphElement) o;
+        if (o instanceof OGraphElement) e = (OGraphElement) o;
         else {
             final ODocument doc;
-            if (o instanceof ODocument)
-                doc = (ODocument) o;
+            if (o instanceof ODocument) doc = (ODocument) o;
             else if (o instanceof ORID) {
                 doc = new ODocument((ODatabaseRecord<?>) graph.getRawGraph().getUnderlying(), (ORID) o);
-            } else
-                throw new IllegalArgumentException("Not a valid element: " + o);
+            } else throw new IllegalArgumentException("Not a valid element: " + o);
 
-            if (doc.getInternalStatus() == STATUS.NOT_LOADED)
-                doc.load();
+            if (doc.getInternalStatus() == STATUS.NOT_LOADED) doc.load();
 
             if (doc.getClassName().equals(OGraphVertex.class.getSimpleName()))
                 e = new OGraphVertex(graph.getRawGraph(), doc);
@@ -67,14 +62,11 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
                 }
             }
 
-            if (e == null)
-                throw new OGraphException("Unrecognized class: " + doc.getClassName());
+            if (e == null) throw new OGraphException("Unrecognized class: " + doc.getClassName());
         }
 
-        if (e instanceof OGraphEdge)
-            return (T) new OrientEdge(graph, (OGraphEdge) e);
-        else
-            return (T) new OrientVertex(graph, (OGraphVertex) e);
+        if (e instanceof OGraphEdge) return (T) new OrientEdge(graph, (OGraphEdge) e);
+        else return (T) new OrientVertex(graph, (OGraphVertex) e);
     }
 
     public void remove() {

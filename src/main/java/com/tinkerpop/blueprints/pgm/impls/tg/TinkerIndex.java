@@ -51,10 +51,8 @@ public class TinkerIndex<T extends Element> implements Index<T> {
             return new HashSet<T>();
         } else {
             Set<T> set = keyMap.get(value);
-            if (null == set)
-                return new HashSet<T>();
-            else
-                return set;
+            if (null == set) return new HashSet<T>();
+            else return set;
         }
     }
 

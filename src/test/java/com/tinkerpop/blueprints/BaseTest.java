@@ -76,8 +76,7 @@ public abstract class BaseTest extends TestCase {
     public static void printPerformance(String name, Integer events, String eventName, double timeInMilliseconds) {
         if (null != events)
             System.out.println("\t" + name + ": " + events + " " + eventName + " in " + timeInMilliseconds + "ms");
-        else
-            System.out.println("\t" + name + ": " + eventName + " in " + timeInMilliseconds + "ms");
+        else System.out.println("\t" + name + ": " + eventName + " in " + timeInMilliseconds + "ms");
     }
 
     public static void warmUp(int amount) {

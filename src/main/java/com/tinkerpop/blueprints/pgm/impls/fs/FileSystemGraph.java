@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.fs;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
 import java.io.File;

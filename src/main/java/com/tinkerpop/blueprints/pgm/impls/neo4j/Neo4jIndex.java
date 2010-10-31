@@ -41,8 +41,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         IndexHits<S> itty = this.generateIndex().get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
-        else
-            return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
+        else return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
     }
 
     public void remove(final String key, final Object value, final T element) {
@@ -53,7 +52,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     private org.neo4j.graphdb.index.Index<S> generateIndex() {
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
-        else
-            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+        else return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
     }
 }

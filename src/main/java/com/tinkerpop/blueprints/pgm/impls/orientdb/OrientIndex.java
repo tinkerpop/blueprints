@@ -45,9 +45,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         if (graphIndex == null) {
             // CREATE THE MAP
-            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph()
-                    .getUnderlying()).getUnderlying(), OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE,
-                    OStreamSerializerListRID.INSTANCE);
+            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, OStreamSerializerListRID.INSTANCE);
             try {
                 map.save();
             } catch (IOException e) {
@@ -60,8 +58,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             ((ODatabaseDocumentTx) this.graph.getRawGraph().getUnderlying()).getDictionary().put("graphIndex", graphIndex);
         } else {
             // LOAD THE MAP
-            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph()
-                    .getUnderlying()).getUnderlying(), new ORecordId((String) graphIndex.field(MAP_RID)));
+            map = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), new ORecordId((String) graphIndex.field(MAP_RID)));
             try {
                 map.load();
             } catch (IOException e) {
@@ -89,12 +86,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         final String keyTemp = key + SEPARATOR + value;
 
         List<ODocument> values = map.get(keyTemp);
-        if (values == null)
-            values = new ArrayList<ODocument>();
+        if (values == null) values = new ArrayList<ODocument>();
 
         int pos = values.indexOf(elementTemp.getRawElement().getDocument());
-        if (pos == -1)
-            values.add(elementTemp.getRawElement().getDocument());
+        if (pos == -1) values.add(elementTemp.getRawElement().getDocument());
 
         map.put(keyTemp, values);
     }
@@ -104,8 +99,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final List<ODocument> docList = map.get(keyTemp);
 
-        if (docList == null || docList.isEmpty())
-            return new LinkedList<T>();
+        if (docList == null || docList.isEmpty()) return new LinkedList<T>();
 
         final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), docList);
         return new OrientElementSequence(graph, list.iterator());

@@ -187,8 +187,7 @@ public class SailGraphTest extends BaseTest {
         int counter = 0;
         while (itty.hasNext()) {
             Statement s = itty.next();
-            if (print)
-                System.out.println(s);
+            if (print) System.out.println(s);
             counter++;
         }
         itty.close();

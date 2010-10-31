@@ -27,10 +27,8 @@ public class GraphTestSuite extends ModelTestSuite {
     }
 
     public void testClear(final Graph graph) {
-        if (config.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
-        if (config.supportsEdgeIteration)
-            assertEquals(0, count(graph.getEdges()));
+        if (config.supportsVertexIteration) assertEquals(0, count(graph.getVertices()));
+        if (config.supportsEdgeIteration) assertEquals(0, count(graph.getEdges()));
 
         this.stopWatch();
         for (int i = 0; i < 25; i++) {
@@ -40,19 +38,15 @@ public class GraphTestSuite extends ModelTestSuite {
         }
         BaseTest.printPerformance(graph.toString(), 75, "elements added", this.stopWatch());
 
-        if (config.supportsVertexIteration)
-            assertEquals(50, count(graph.getVertices()));
-        if (config.supportsEdgeIteration)
-            assertEquals(25, count(graph.getEdges()));
+        if (config.supportsVertexIteration) assertEquals(50, count(graph.getVertices()));
+        if (config.supportsEdgeIteration) assertEquals(25, count(graph.getEdges()));
 
         this.stopWatch();
         graph.clear();
         BaseTest.printPerformance(graph.toString(), 75, "elements deleted", this.stopWatch());
 
-        if (config.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
-        if (config.supportsEdgeIteration)
-            assertEquals(0, count(graph.getEdges()));
+        if (config.supportsVertexIteration) assertEquals(0, count(graph.getVertices()));
+        if (config.supportsEdgeIteration) assertEquals(0, count(graph.getEdges()));
 
     }
 
@@ -169,16 +163,14 @@ public class GraphTestSuite extends ModelTestSuite {
         Vertex c = graph.addVertex(convertId(ids.get(2)));
         Vertex d = graph.addVertex(convertId(ids.get(3)));
 
-        if (config.supportsVertexIteration)
-            assertEquals(4, count(graph.getVertices()));
+        if (config.supportsVertexIteration) assertEquals(4, count(graph.getVertices()));
 
         Edge e = graph.addEdge(null, a, b, convertId("knows"));
         Edge f = graph.addEdge(null, b, c, convertId("knows"));
         Edge g = graph.addEdge(null, c, d, convertId("knows"));
         Edge h = graph.addEdge(null, d, a, convertId("knows"));
 
-        if (config.supportsEdgeIteration)
-            assertEquals(4, count(graph.getEdges()));
+        if (config.supportsEdgeIteration) assertEquals(4, count(graph.getEdges()));
 
         if (config.supportsVertexIteration) {
             for (Vertex v : graph.getVertices()) {

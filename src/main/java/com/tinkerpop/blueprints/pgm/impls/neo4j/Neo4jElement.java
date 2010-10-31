@@ -23,10 +23,8 @@ public abstract class Neo4jElement implements Element {
     }
 
     public Object getProperty(final String key) {
-        if (this.element.hasProperty(key))
-            return this.element.getProperty(key);
-        else
-            return null;
+        if (this.element.hasProperty(key)) return this.element.getProperty(key);
+        else return null;
     }
 
     public void setProperty(final String key, final Object value) {
