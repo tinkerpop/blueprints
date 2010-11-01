@@ -1,21 +1,16 @@
 !http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
 
-Blueprints is a collection of abstract data models, their implementations, their test suites, and supporting extensions. The following data models and implementations are provided in this package:
+Blueprints is a set "property graph model":http://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph interfaces, their implementations, test suites, and supporting extensions.
+Those graph databases and frameworks that implement the Blueprints interfaces automatically support Blueprints-enabled applications.
+Likewise, application developers that write to Blueprints can plug-and-play different Blueprints-enabled graph backends.
 
-* Property Graph Model
+* Implementations:
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
 ** "OrientDB":http://www.orientechnologies.com/ graph database
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
 **** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "Neo4jSail":http://components.neo4j.org/neo4j-rdf-sail/, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail
-* Object Document Model
-** TinkerDoc in-memory document store
-** "MongoDB":http://mongodb.org document-oriented database
-** "CouchDB":http://couchdb.apache.org/ document-oriented database (in design)
-
-The following is a list of extensions for the respective abstract data models:
-
-* Property Graph Model
+*Supporting extensions:
 ** "Java Universal/Graph Framework":http://jung.sourceforge.net/ connector
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
