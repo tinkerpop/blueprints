@@ -24,7 +24,6 @@ public class SailHelper {
             } else {
                 sailConnection.removeStatements(statement.getSubject(), statement.getPredicate(), statement.getObject());
             }
-            sailConnection.commit();
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -37,7 +36,6 @@ public class SailHelper {
             } else {
                 sailConnection.addStatement(statement.getSubject(), statement.getPredicate(), statement.getObject());
             }
-            sailConnection.commit();
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

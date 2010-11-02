@@ -171,9 +171,11 @@ public class SailGraphTest extends BaseTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    /*public void testTransactionalGraphTestSuite() throws Exception {
+    public void testTransactionalGraphTestSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new TransactionalGraphTestSuite(config));
-    }*/
+        printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
+    }
 
     private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testSail");
@@ -188,17 +190,4 @@ public class SailGraphTest extends BaseTest {
             }
         }
     }
-
-    private static int countStatements(final CloseableIteration<? extends Statement, SailException> itty, final boolean print) throws SailException {
-        int counter = 0;
-        while (itty.hasNext()) {
-            Statement s = itty.next();
-            if (print)
-                System.out.println(s);
-            counter++;
-        }
-        itty.close();
-        return counter;
-    }
-
 }

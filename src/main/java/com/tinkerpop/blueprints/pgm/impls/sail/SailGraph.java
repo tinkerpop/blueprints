@@ -35,24 +35,7 @@ public class SailGraph implements TransactionalGraph {
     protected Sail sail;
     protected SailConnection sailConnection;
     private Mode mode = Mode.AUTOMATIC;
-
     private static final String LOG4J_PROPERTIES = "log4j.properties";
-
-    private Vertex createVertex(String resource) {
-        Literal literal;
-        if (SailHelper.isBNode(resource)) {
-            return new SailVertex(new BNodeImpl(resource.substring(2)), this);
-        } else if ((literal = SailHelper.makeLiteral(resource, this.sailConnection)) != null) {
-            return new SailVertex(literal, this);
-        } else if (resource.contains(SailTokens.NAMESPACE_SEPARATOR) || resource.contains(SailTokens.FORWARD_SLASH) || resource.contains(SailTokens.POUND)) {
-            resource = prefixToNamespace(resource, this.sailConnection);
-            return new SailVertex(new URIImpl(resource), this);
-        } else {
-            throw new RuntimeException(resource + " is not a valid URI, blank node, or literal value");
-        }
-        //return new SailVertex(NTriplesUtil.parseValue(resource, new ValueFactoryImpl()), this.sailConnection);
-
-    }
 
     public SailGraph(final Sail sail) {
         this.startSail(sail);
@@ -85,10 +68,25 @@ public class SailGraph implements TransactionalGraph {
         return this.sail;
     }
 
+    private Vertex createVertex(String resource) {
+        Literal literal;
+        if (SailHelper.isBNode(resource)) {
+            return new SailVertex(new BNodeImpl(resource.substring(2)), this);
+        } else if ((literal = SailHelper.makeLiteral(resource, this.sailConnection)) != null) {
+            return new SailVertex(literal, this);
+        } else if (resource.contains(SailTokens.NAMESPACE_SEPARATOR) || resource.contains(SailTokens.FORWARD_SLASH) || resource.contains(SailTokens.POUND)) {
+            resource = prefixToNamespace(resource, this.sailConnection);
+            return new SailVertex(new URIImpl(resource), this);
+        } else {
+            throw new RuntimeException(resource + " is not a valid URI, blank node, or literal value");
+        }
+        //return new SailVertex(NTriplesUtil.parseValue(resource, new ValueFactoryImpl()), this.sailConnection);
+
+    }
+
     public Vertex addVertex(Object id) {
         if (null == id)
             id = SailTokens.URN_UUID_PREFIX + UUID.randomUUID().toString();
-
         return createVertex(id.toString());
     }
 
@@ -119,6 +117,7 @@ public class SailGraph implements TransactionalGraph {
                 this.sailConnection.removeStatements((Resource) vertexValue, null, null);
             }
             this.sailConnection.removeStatements(null, null, vertexValue);
+            this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -135,14 +134,14 @@ public class SailGraph implements TransactionalGraph {
         URI labelURI = new URIImpl(prefixToNamespace(label, this.sailConnection));
         Statement statement = new StatementImpl((Resource) outVertexValue, labelURI, inVertexValue);
         SailHelper.addStatement(statement, this.sailConnection);
-        this.stopStartTransaction();
+        this.autoStopTransaction(Conclusion.SUCCESS);
         return new SailEdge(statement, this);
     }
 
     public void removeEdge(final Edge edge) {
         Statement statement = ((SailEdge) edge).getRawEdge();
         SailHelper.removeStatement(statement, this.sailConnection);
-        this.stopStartTransaction();
+        this.autoStopTransaction(Conclusion.SUCCESS);
     }
 
     public SailConnection getSailConnection() {
@@ -256,16 +255,6 @@ public class SailGraph implements TransactionalGraph {
         return uri;
     }
 
-    protected void stopStartTransaction() {
-        if (Mode.AUTOMATIC == this.mode) {
-            try {
-                this.sailConnection.commit();
-            } catch (SailException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        }
-    }
-
     public void startTransaction() {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
@@ -286,7 +275,24 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
+    protected void autoStopTransaction(Conclusion conclusion) {
+        if (this.mode == Mode.AUTOMATIC) {
+            try {
+                if (conclusion == Conclusion.SUCCESS)
+                    this.sailConnection.commit();
+                else
+                    this.sailConnection.rollback();
+            } catch (SailException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+    }
+
     public void setTransactionMode(Mode mode) {
+        try {
+            this.sailConnection.commit();
+        } catch (SailException e) {
+        }
         this.mode = mode;
     }
 

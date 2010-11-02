@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -56,7 +57,7 @@ public class SailEdge implements Edge {
             SailHelper.removeStatement(this.statement, this.graph.getSailConnection());
             this.statement = new ContextStatementImpl(this.statement.getSubject(), this.statement.getPredicate(), this.statement.getObject(), namedGraph);
             SailHelper.addStatement(this.statement, this.graph.getSailConnection());
-            this.graph.stopStartTransaction();
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } else {
             throw new RuntimeException(NAMED_GRAPH_PROPERTY);
         }
@@ -68,7 +69,7 @@ public class SailEdge implements Edge {
             SailHelper.removeStatement(this.statement, this.graph.getSailConnection());
             this.statement = new StatementImpl(this.statement.getSubject(), this.statement.getPredicate(), this.statement.getObject());
             SailHelper.addStatement(this.statement, this.graph.getSailConnection());
-            this.graph.stopStartTransaction();
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             return ng;
         } else {
             throw new RuntimeException(NAMED_GRAPH_PROPERTY);
