@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.Node;
@@ -33,25 +34,29 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public void put(final String key, final Object value, final T element) {
+        this.graph.autoStartTransaction();
         this.generateIndex().add((S) element.getRawElement(), key, value);
-        this.graph.stopStartTransaction();
+        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     public Iterable<T> get(final String key, final Object value) {
         IndexHits<S> itty = this.generateIndex().get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
-        else return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
+        else
+            return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
     }
 
     public void remove(final String key, final Object value, final T element) {
+        this.graph.autoStartTransaction();
         this.generateIndex().remove((S) element.getRawElement(), key, value);
-        this.graph.stopStartTransaction();
+        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     private org.neo4j.graphdb.index.Index<S> generateIndex() {
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
-        else return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+        else
+            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
     }
 }

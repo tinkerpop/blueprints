@@ -33,7 +33,7 @@ public class Neo4jGraphEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     }
 
     public boolean hasNext() {
-        return !complete;
+        return !this.complete;
     }
 
     public void remove() {

@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
@@ -23,8 +24,10 @@ public abstract class Neo4jElement implements Element {
     }
 
     public Object getProperty(final String key) {
-        if (this.element.hasProperty(key)) return this.element.getProperty(key);
-        else return null;
+        if (this.element.hasProperty(key))
+            return this.element.getProperty(key);
+        else
+            return null;
     }
 
     public void setProperty(final String key, final Object value) {
@@ -35,19 +38,22 @@ public abstract class Neo4jElement implements Element {
             autoIndex.autoUpdate(key, value, oldValue, this);
         }
 
+        this.graph.autoStartTransaction();
         this.element.setProperty(key, value);
-        this.graph.stopStartTransaction();
+        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
     }
 
     public Object removeProperty(final String key) {
         try {
+            this.graph.autoStartTransaction();
             Object oldValue = this.element.removeProperty(key);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             if (null != oldValue) {
                 for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
                     autoIndex.autoRemove(key, oldValue, this);
                 }
             }
-            this.graph.stopStartTransaction();
             return oldValue;
         } catch (NotFoundException e) {
             return null;
