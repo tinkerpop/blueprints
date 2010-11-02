@@ -20,6 +20,29 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
         BaseTest.printPerformance(graph.toString(), 1, "transaction mode retrieved", this.stopWatch());
     }
 
+    public void testModeErrors(TransactionalGraph graph) {
+        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+
+        try {
+            graph.startTransaction();
+            assertFalse(true);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        }
+
+        try {
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            assertFalse(true);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        }
+    }
+
 
     public void testTransactionsForVertices(TransactionalGraph graph) {
 
@@ -254,6 +277,32 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
             assertEquals(v.getProperty("name"), "marko");
             assertNull(v.getProperty("age"));
             BaseTest.printPerformance(graph.toString(), 2, "vertex properties checked in a successful transaction", this.stopWatch());
+
+            graph.startTransaction();
+            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test");
+            if (config.supportsEdgeIteration)
+                assertEquals(count(graph.getEdges()), 1);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            if (config.supportsEdgeIteration)
+                assertEquals(count(graph.getEdges()), 1);
+
+            this.stopWatch();
+            graph.startTransaction();
+            edge.setProperty("transaction-1", "success");
+            assertEquals(edge.getProperty("transaction-1"), "success");
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            BaseTest.printPerformance(graph.toString(), 1, "edge property added and checked in a successful transaction", this.stopWatch());
+            assertEquals(edge.getProperty("transaction-1"), "success");
+
+            this.stopWatch();
+            graph.startTransaction();
+            edge.setProperty("transaction-2", "failure");
+            assertEquals(edge.getProperty("transaction-1"), "success");
+            assertEquals(edge.getProperty("transaction-2"), "failure");
+            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            BaseTest.printPerformance(graph.toString(), 1, "edge property added and checked in a failed transaction", this.stopWatch());
+            assertEquals(edge.getProperty("transaction-1"), "success");
+            assertNull(edge.getProperty("transaction-2"));
         }
     }
 
