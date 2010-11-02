@@ -55,7 +55,8 @@ public class SailTokens {
         RDFFormat ret = formats.get(format);
         if (null == ret)
             throw new RuntimeException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, turtle, n3, trix, or trig");
-        else return ret;
+        else
+            return ret;
     }
 
 }

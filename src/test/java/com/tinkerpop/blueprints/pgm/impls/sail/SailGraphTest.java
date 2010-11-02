@@ -153,16 +153,22 @@ public class SailGraphTest extends BaseTest {
 
     //// TEST SUITES
 
-    public void testVertexSuite() throws Exception {
+    public void testVertexTestSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new VertexTestSuite(config));
+        printTestPerformance("VertexTestSuite", this.stopWatch());
     }
 
     public void testEdgeSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new EdgeTestSuite(config));
+        printTestPerformance("EdgeTestSuite", this.stopWatch());
     }
 
     public void testGraphSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new GraphTestSuite(config));
+        printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
     /*public void testTransactionalGraphTestSuite() throws Exception {
@@ -187,7 +193,8 @@ public class SailGraphTest extends BaseTest {
         int counter = 0;
         while (itty.hasNext()) {
             Statement s = itty.next();
-            if (print) System.out.println(s);
+            if (print)
+                System.out.println(s);
             counter++;
         }
         itty.close();

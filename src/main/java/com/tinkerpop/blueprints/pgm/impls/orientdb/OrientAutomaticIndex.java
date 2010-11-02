@@ -21,7 +21,8 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     public void addAutoIndexKey(String key) {
-        if (null == key) this.autoIndexKeys = null;
+        if (null == key)
+            this.autoIndexKeys = null;
         else {
             if (autoIndexKeys == null) {
                 this.autoIndexKeys = new HashSet<String>();
@@ -34,7 +35,8 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
-            if (oldValue != null) this.remove(key, oldValue, element);
+            if (oldValue != null)
+                this.remove(key, oldValue, element);
             this.put(key, newValue, element);
         }
     }
@@ -46,7 +48,8 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     public void removeAutoIndexKey(String key) {
-        if (null != this.autoIndexKeys) this.autoIndexKeys.remove(key);
+        if (null != this.autoIndexKeys)
+            this.autoIndexKeys.remove(key);
     }
 
     public Set<String> getAutoIndexKeys() {

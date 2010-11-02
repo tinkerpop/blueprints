@@ -35,19 +35,27 @@ public class JungGraphTest extends TestCase {
                 assertEquals(graph.getNeighborCount(vertex), 3);
                 int count = 0;
                 for (Vertex vertex2 : graph.getNeighbors(vertex)) {
-                    if (vertex2.getId().equals("2")) count++;
-                    else if (vertex2.getId().equals("4")) count++;
-                    else if (vertex2.getId().equals("3")) count++;
-                    else assertTrue(false);
+                    if (vertex2.getId().equals("2"))
+                        count++;
+                    else if (vertex2.getId().equals("4"))
+                        count++;
+                    else if (vertex2.getId().equals("3"))
+                        count++;
+                    else
+                        assertTrue(false);
                 }
                 assertEquals(count, 3);
                 assertEquals(graph.getSuccessorCount(vertex), 3);
                 count = 0;
                 for (Vertex vertex2 : graph.getSuccessors(vertex)) {
-                    if (vertex2.getId().equals("2")) count++;
-                    else if (vertex2.getId().equals("4")) count++;
-                    else if (vertex2.getId().equals("3")) count++;
-                    else assertTrue(false);
+                    if (vertex2.getId().equals("2"))
+                        count++;
+                    else if (vertex2.getId().equals("4"))
+                        count++;
+                    else if (vertex2.getId().equals("3"))
+                        count++;
+                    else
+                        assertTrue(false);
                 }
                 assertEquals(graph.getPredecessorCount(vertex), 0);
             } else if (vertex.getId().equals("2")) {
@@ -57,16 +65,20 @@ public class JungGraphTest extends TestCase {
                 assertEquals(graph.getNeighborCount(vertex), 1);
                 int count = 0;
                 for (Vertex vertex2 : graph.getNeighbors(vertex)) {
-                    if (vertex2.getId().equals("1")) count++;
-                    else assertTrue(false);
+                    if (vertex2.getId().equals("1"))
+                        count++;
+                    else
+                        assertTrue(false);
                 }
                 assertEquals(count, 1);
                 assertEquals(graph.getSuccessorCount(vertex), 0);
                 assertEquals(graph.getPredecessorCount(vertex), 1);
                 count = 0;
                 for (Vertex vertex2 : graph.getPredecessors(vertex)) {
-                    if (vertex2.getId().equals("1")) count++;
-                    else assertTrue(false);
+                    if (vertex2.getId().equals("1"))
+                        count++;
+                    else
+                        assertTrue(false);
                 }
                 assertEquals(count, 1);
             } else if (vertex.getId().equals("4")) {
@@ -76,25 +88,34 @@ public class JungGraphTest extends TestCase {
                 assertEquals(graph.getNeighborCount(vertex), 3);
                 int count = 0;
                 for (Vertex vertex2 : graph.getNeighbors(vertex)) {
-                    if (vertex2.getId().equals("1")) count++;
-                    else if (vertex2.getId().equals("3")) count++;
-                    else if (vertex2.getId().equals("5")) count++;
-                    else assertTrue(false);
+                    if (vertex2.getId().equals("1"))
+                        count++;
+                    else if (vertex2.getId().equals("3"))
+                        count++;
+                    else if (vertex2.getId().equals("5"))
+                        count++;
+                    else
+                        assertTrue(false);
                 }
                 assertEquals(count, 3);
                 assertEquals(graph.getSuccessorCount(vertex), 2);
                 count = 0;
                 for (Vertex vertex2 : graph.getSuccessors(vertex)) {
-                    if (vertex2.getId().equals("3")) count++;
-                    else if (vertex2.getId().equals("5")) count++;
-                    else assertTrue(false);
+                    if (vertex2.getId().equals("3"))
+                        count++;
+                    else if (vertex2.getId().equals("5"))
+                        count++;
+                    else
+                        assertTrue(false);
                 }
                 assertEquals(count, 2);
                 assertEquals(graph.getPredecessorCount(vertex), 1);
                 count = 0;
                 for (Vertex vertex2 : graph.getPredecessors(vertex)) {
-                    if (vertex2.getId().equals("1")) count++;
-                    else assertTrue(false);
+                    if (vertex2.getId().equals("1"))
+                        count++;
+                    else
+                        assertTrue(false);
                 }
                 assertEquals(count, 1);
             }

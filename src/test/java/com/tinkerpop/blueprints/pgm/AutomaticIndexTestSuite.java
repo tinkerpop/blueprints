@@ -51,7 +51,8 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
                 vertices.add(vertex);
             }
             assertEquals(vertices.size(), 10);
-            if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 10);
+            if (config.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 10);
 
             this.stopWatch();
             assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("key1", "value1")), 10);
@@ -132,7 +133,8 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
                 edges.add(edge);
             }
             assertEquals(edges.size(), 10);
-            if (config.supportsVertexIteration) assertEquals(count(graph.getVertices()), 20);
+            if (config.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 20);
             if (config.supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 10);
                 for (Edge edge : graph.getEdges()) {

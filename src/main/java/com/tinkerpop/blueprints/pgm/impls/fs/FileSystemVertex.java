@@ -34,7 +34,8 @@ public class FileSystemVertex extends FileSystemElement implements Vertex {
     public Iterable<Edge> getInEdges() {
         Set<Edge> fileEdges = new HashSet<Edge>();
         File parentFile = this.file.getParentFile();
-        if (null != parentFile) fileEdges.add(new FileSystemEdge(parentFile, this.file, "contained_in"));
+        if (null != parentFile)
+            fileEdges.add(new FileSystemEdge(parentFile, this.file, "contained_in"));
         return fileEdges;
 
     }

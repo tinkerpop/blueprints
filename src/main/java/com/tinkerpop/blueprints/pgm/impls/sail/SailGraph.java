@@ -86,7 +86,8 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public Vertex addVertex(Object id) {
-        if (null == id) id = SailTokens.URN_UUID_PREFIX + UUID.randomUUID().toString();
+        if (null == id)
+            id = SailTokens.URN_UUID_PREFIX + UUID.randomUUID().toString();
 
         return createVertex(id.toString());
     }
@@ -195,8 +196,10 @@ public class SailGraph implements TransactionalGraph {
         try {
 
             RepositoryConnection connection = repository.getConnection();
-            if (null != baseGraph) connection.add(input, baseURI, SailTokens.getFormat(format), new URIImpl(baseGraph));
-            else connection.add(input, baseURI, SailTokens.getFormat(format));
+            if (null != baseGraph)
+                connection.add(input, baseURI, SailTokens.getFormat(format), new URIImpl(baseGraph));
+            else
+                connection.add(input, baseURI, SailTokens.getFormat(format));
 
             connection.commit();
             connection.close();
@@ -228,7 +231,8 @@ public class SailGraph implements TransactionalGraph {
         try {
             if (uri.contains(SailTokens.NAMESPACE_SEPARATOR)) {
                 String namespace = sailConnection.getNamespace(uri.substring(0, uri.indexOf(SailTokens.NAMESPACE_SEPARATOR)));
-                if (null != namespace) uri = namespace + uri.substring(uri.indexOf(SailTokens.NAMESPACE_SEPARATOR) + 1);
+                if (null != namespace)
+                    uri = namespace + uri.substring(uri.indexOf(SailTokens.NAMESPACE_SEPARATOR) + 1);
             }
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -263,11 +267,13 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == this.mode) throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
+        if (Mode.AUTOMATIC == this.mode)
+            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == this.mode) throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
+        if (Mode.AUTOMATIC == this.mode)
+            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         try {
             if (Conclusion.SUCCESS == conclusion) {

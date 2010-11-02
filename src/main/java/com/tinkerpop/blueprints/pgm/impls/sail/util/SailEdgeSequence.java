@@ -37,10 +37,12 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
     }
 
     public boolean hasNext() {
-        if (null == this.statements) return false;
+        if (null == this.statements)
+            return false;
 
         try {
-            if (this.statements.hasNext()) return true;
+            if (this.statements.hasNext())
+                return true;
             else {
                 this.statements.close();
                 return false;
@@ -51,7 +53,8 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
     }
 
     public Edge next() {
-        if (null == this.statements) throw new NoSuchElementException();
+        if (null == this.statements)
+            throw new NoSuchElementException();
 
         try {
             return new SailEdge(this.statements.next(), this.graph);

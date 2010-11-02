@@ -86,10 +86,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         final String keyTemp = key + SEPARATOR + value;
 
         List<ODocument> values = map.get(keyTemp);
-        if (values == null) values = new ArrayList<ODocument>();
+        if (values == null)
+            values = new ArrayList<ODocument>();
 
         int pos = values.indexOf(elementTemp.getRawElement().getDocument());
-        if (pos == -1) values.add(elementTemp.getRawElement().getDocument());
+        if (pos == -1)
+            values.add(elementTemp.getRawElement().getDocument());
 
         map.put(keyTemp, values);
     }
@@ -99,7 +101,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final List<ODocument> docList = map.get(keyTemp);
 
-        if (docList == null || docList.isEmpty()) return new LinkedList<T>();
+        if (docList == null || docList.isEmpty())
+            return new LinkedList<T>();
 
         final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), docList);
         return new OrientElementSequence(graph, list.iterator());

@@ -77,7 +77,8 @@ public class GraphMLReader {
 
                 } else if (elementName.equals(GraphMLTokens.NODE)) {
                     vertexId = reader.getAttributeValue(null, GraphMLTokens.ID);
-                    if (vertexIdKey != null) vertexMappedIdMap.put(vertexId, vertexId);
+                    if (vertexIdKey != null)
+                        vertexMappedIdMap.put(vertexId, vertexId);
                     inVertex = true;
                     vertexProps = new HashMap<String, Object>();
 
@@ -100,9 +101,11 @@ public class GraphMLReader {
                     }
 
                     edgeOutVertex = null;
-                    if (null != outObjectId) edgeOutVertex = graph.getVertex(outObjectId);
+                    if (null != outObjectId)
+                        edgeOutVertex = graph.getVertex(outObjectId);
                     edgeInVertex = null;
-                    if (null != inObjectId) edgeInVertex = graph.getVertex(inObjectId);
+                    if (null != inObjectId)
+                        edgeInVertex = graph.getVertex(inObjectId);
 
                     if (null == edgeOutVertex) {
                         edgeOutVertex = graph.addVertex(outVertexId);
@@ -139,11 +142,15 @@ public class GraphMLReader {
                                 // Assumes single ID prop per Vertex
                                 vertexMappedIdMap.put(vertexId, value);
                                 vertexId = value;
-                            } else vertexProps.put(key, typeCastValue(key, value, keyTypesMaps));
+                            } else
+                                vertexProps.put(key, typeCastValue(key, value, keyTypesMaps));
                         } else if (inEdge == true) {
-                            if ((edgeLabelKey != null) && (key.equals(edgeLabelKey))) edgeLabel = value;
-                            else if ((edgeIdKey != null) && (key.equals(edgeIdKey))) edgeId = value;
-                            else edgeProps.put(key, typeCastValue(key, value, keyTypesMaps));
+                            if ((edgeLabelKey != null) && (key.equals(edgeLabelKey)))
+                                edgeLabel = value;
+                            else if ((edgeIdKey != null) && (key.equals(edgeIdKey)))
+                                edgeId = value;
+                            else
+                                edgeProps.put(key, typeCastValue(key, value, keyTypesMaps));
                         }
                     }
 
@@ -210,12 +217,19 @@ public class GraphMLReader {
 
     private static Object typeCastValue(String key, String value, Map<String, String> keyTypes) {
         String type = keyTypes.get(key);
-        if (null == type || type.equals(GraphMLTokens.STRING)) return value;
-        else if (type.equals(GraphMLTokens.FLOAT)) return Float.valueOf(value);
-        else if (type.equals(GraphMLTokens.INT)) return Integer.valueOf(value);
-        else if (type.equals(GraphMLTokens.DOUBLE)) return Double.valueOf(value);
-        else if (type.equals(GraphMLTokens.BOOLEAN)) return Boolean.valueOf(value);
-        else if (type.equals(GraphMLTokens.LONG)) return Long.valueOf(value);
-        else return value;
+        if (null == type || type.equals(GraphMLTokens.STRING))
+            return value;
+        else if (type.equals(GraphMLTokens.FLOAT))
+            return Float.valueOf(value);
+        else if (type.equals(GraphMLTokens.INT))
+            return Integer.valueOf(value);
+        else if (type.equals(GraphMLTokens.DOUBLE))
+            return Double.valueOf(value);
+        else if (type.equals(GraphMLTokens.BOOLEAN))
+            return Boolean.valueOf(value);
+        else if (type.equals(GraphMLTokens.LONG))
+            return Long.valueOf(value);
+        else
+            return value;
     }
 }

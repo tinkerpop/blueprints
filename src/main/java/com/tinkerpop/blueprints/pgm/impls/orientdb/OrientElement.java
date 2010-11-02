@@ -108,13 +108,18 @@ public abstract class OrientElement implements Element {
     }
 
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
         final OrientElement other = (OrientElement) obj;
         if (this.rawElement == null) {
-            if (other.rawElement != null) return false;
-        } else if (!this.rawElement.equals(other.rawElement)) return false;
+            if (other.rawElement != null)
+                return false;
+        } else if (!this.rawElement.equals(other.rawElement))
+            return false;
         return true;
     }
 }

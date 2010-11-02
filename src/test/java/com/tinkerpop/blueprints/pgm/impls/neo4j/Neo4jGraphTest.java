@@ -27,43 +27,60 @@ public class Neo4jGraphTest extends BaseTest {
         config.supportsTransactions = true;
     }
 
-    public void testVertexSuite() throws Exception {
+    public void testVertexTestSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new VertexTestSuite(config));
+        printTestPerformance("VertexTestSuite", this.stopWatch());
     }
 
-    public void testEdgeSuite() throws Exception {
+    public void testEdgeTestSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new EdgeTestSuite(config));
+        printTestPerformance("EdgeTestSuite", this.stopWatch());
     }
 
-    public void testGraphSuite() throws Exception {
+    public void testGraphTestSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new GraphTestSuite(config));
+        printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testGraphMLReaderSuite() throws Exception {
-        doSuiteTest(new GraphMLReaderTestSuite(config));
-    }
-
-    public void testAutomaticIndexTestSuite() throws Exception {
-        doSuiteTest(new AutomaticIndexTestSuite(config));
+    public void testIndexableGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doSuiteTest(new IndexableGraphTestSuite(config));
+        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
     }
 
     public void testIndexTestSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new IndexTestSuite(config));
+        printTestPerformance("IndexTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphSuite() throws Exception {
-        doSuiteTest(new IndexableGraphTestSuite(config));
+    public void testAutomaticIndexTestSuite() throws Exception {
+        this.stopWatch();
+        doSuiteTest(new AutomaticIndexTestSuite(config));
+        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
-    public void testTransactionalGraphSuite() throws Exception {
+    public void testTransactionalGraphTestSuite() throws Exception {
+        this.stopWatch();
         doSuiteTest(new TransactionalGraphTestSuite(config));
+        printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
+    }
+
+    public void testGraphMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doSuiteTest(new GraphMLReaderTestSuite(config));
+        printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
     private void doSuiteTest(final ModelTestSuite suite) throws Exception {
         String doTest = System.getProperty("testNeo4j");
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("neo4jDirectory");
-            if (directory == null) directory = "/tmp/blueprints_test";
+            if (directory == null)
+                directory = "/tmp/blueprints_test";
             deleteDirectory(new File(directory));
             for (Method method : suite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {

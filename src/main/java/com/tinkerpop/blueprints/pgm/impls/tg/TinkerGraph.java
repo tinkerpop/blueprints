@@ -42,7 +42,8 @@ public class TinkerGraph implements IndexableGraph {
         Index index = this.indices.get(indexName);
         if (!indexClass.isAssignableFrom(index.getIndexClass()))
             throw new RuntimeException(indexClass + " is not assignable from " + index.getIndexClass());
-        else return (Index<T>) index;
+        else
+            return (Index<T>) index;
     }
 
     public Iterable<Index> getIndices() {
@@ -77,7 +78,8 @@ public class TinkerGraph implements IndexableGraph {
     }
 
     public Vertex getVertex(final Object id) {
-        if (null == id) return null;
+        if (null == id)
+            return null;
         else {
             String idString = id.toString();
             return this.vertices.get(idString);
@@ -85,7 +87,8 @@ public class TinkerGraph implements IndexableGraph {
     }
 
     public Edge getEdge(final Object id) {
-        if (null == id) return null;
+        if (null == id)
+            return null;
         else {
             String idString = id.toString();
             return this.edges.get(idString);
@@ -148,8 +151,10 @@ public class TinkerGraph implements IndexableGraph {
     public void removeEdge(final Edge edge) {
         TinkerVertex outVertex = (TinkerVertex) edge.getOutVertex();
         TinkerVertex inVertex = (TinkerVertex) edge.getInVertex();
-        if (null != outVertex && null != outVertex.outEdges) outVertex.outEdges.remove(edge);
-        if (null != inVertex && null != inVertex.inEdges) inVertex.inEdges.remove(edge);
+        if (null != outVertex && null != outVertex.outEdges)
+            outVertex.outEdges.remove(edge);
+        if (null != inVertex && null != inVertex.inEdges)
+            inVertex.inEdges.remove(edge);
 
         // removal requires removal from all indices
         for (TinkerIndex index : this.indices.values()) {
