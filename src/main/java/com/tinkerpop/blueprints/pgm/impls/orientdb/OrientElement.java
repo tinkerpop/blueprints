@@ -81,11 +81,12 @@ public abstract class OrientElement implements Element {
     }
 
     protected void delete() {
-        graph.beginTransaction();
+        final boolean txBegun = graph.beginTransaction();
 
         try {
             this.rawElement.delete();
-            graph.commitTransaction();
+            if( txBegun )
+            	graph.commitTransaction();
         } catch (RuntimeException e) {
             graph.rollbackTransaction();
             throw e;
