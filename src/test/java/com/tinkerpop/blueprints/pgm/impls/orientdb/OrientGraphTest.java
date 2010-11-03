@@ -82,6 +82,9 @@ public class OrientGraphTest extends BaseTest {
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("orientGraphDirectory");
             if (directory == null) {
+            	if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
+            		directory = "C:/temp/blueprints_test";
+            	else
                 directory = "/tmp/blueprints_test";
             }
             deleteDirectory(new File(directory));

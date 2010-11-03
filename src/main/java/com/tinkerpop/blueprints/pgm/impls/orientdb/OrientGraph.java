@@ -30,7 +30,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     static final String DICTIONARY_INDEXES = "graphIndexes";
     static final String FIELD_INDEXES = "indexes";
     static final String FIELD_TYPE = "indexType";
-    static final String FIELD_CLASS = "indexClass";
+    static final String FIELD_CLASSNAME = "indexClass";
     static final String FIELD_TREEMAP_RID = "indexTreeMapRid";
 
     private ODatabaseGraphTx database;
@@ -59,11 +59,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+        final ODocument indexCfg = new ODocument((ODatabaseDocumentTx) database.getUnderlying());
+        
         OrientIndex<? extends OrientElement> index;
         if (type == Index.Type.MANUAL) {
-            index = new OrientIndex(indexName, indexClass, this);
+            index = new OrientIndex(indexName, indexClass, this, indexCfg);
         } else {
-            index = new OrientAutomaticIndex(indexName, indexClass, null, this);
+            index = new OrientAutomaticIndex(indexName, indexClass, null, this, indexCfg);
             this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex<?>) index);
         }
         this.indices.put(index.getIndexName(), index);
@@ -77,8 +79,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             className = indexClass.getName();
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
-        final ODocument indexCfg = new ODocument((ODatabaseDocumentTx) database.getUnderlying());
-        indexCfg.field(FIELD_CLASS, className);
+        indexCfg.field(FIELD_CLASSNAME, className);
         indexCfg.field(FIELD_TYPE, type.toString());
         indexCfg.field(FIELD_TREEMAP_RID, index.getRawIndex().getRecord().getIdentity());
 
@@ -283,6 +284,10 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return indexConfiguration;
     }
 
+    void saveIndexConfiguration() {
+      indexConfiguration.save();
+  }
+
     protected boolean autoStartTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC && (database.getTransaction() instanceof OTransactionNoTx || database.getTransaction().getStatus() != TXSTATUS.BEGUN)) {
             this.database.begin();
@@ -333,29 +338,15 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     @SuppressWarnings("unchecked")
     private OrientIndex<?> loadIndex(final String indexName, final ODocument indexCfg) {
         final String indexType = indexCfg.field("type");
-        final String indexClassName = indexCfg.field("className");
-        final ORecordId indexTreeMapRid = indexCfg.field("treeMap");
-
-        final Class<? extends Element> indexClass;
-        if ("Vertex".equals(indexClassName))
-            indexClass = Vertex.class;
-        else if ("Edge".equals(indexClassName))
-            indexClass = Edge.class;
-        else
-            try {
-                indexClass = (Class<? extends Element>) Class.forName(indexClassName);
-            } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException("Index class '" + indexClassName + "' is not registered. Supported ones: Vertex, Edge and custom class that extends them");
-            }
 
         final OrientIndex<?> index;
 
         switch (Index.Type.valueOf(indexType.toUpperCase())) {
             case MANUAL:
-                index = new OrientIndex(indexName, indexClass, this, indexTreeMapRid);
+                index = new OrientIndex(indexName, null, this, indexCfg);
                 break;
             case AUTOMATIC:
-                index = new OrientAutomaticIndex(indexName, indexClass, null, this, indexTreeMapRid);
+                index = new OrientAutomaticIndex(indexName, null, this, indexCfg);
                 // REGISTER THE INDEX INTO THE AUTOMATIC INDEXES
                 this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex<?>) index);
                 break;

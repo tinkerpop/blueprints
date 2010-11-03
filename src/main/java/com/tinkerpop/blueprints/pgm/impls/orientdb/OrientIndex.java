@@ -1,5 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.db.object.OLazyObjectList;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecord;
@@ -15,52 +20,30 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
+@SuppressWarnings("unchecked")
 public class OrientIndex<T extends OrientElement> implements Index<T> {
 
-    private static final String SEPARATOR = "!=!";
+		protected static final String SEPARATOR = "!=!";
 
-    private OrientGraph graph;
-    private OTreeMapDatabaseLazySave<String, List<ODocument>> treeMap;
+		protected OrientGraph graph;
+		protected OTreeMapDatabaseLazySave<String, List<ODocument>> treeMap;
 
-    private final String indexName;
-    private final Class<T> indexClass;
+		protected final String indexName;
+		protected Class<? extends Element> indexClass;
+		protected final ODocument	indexCfg;
 
-    public OrientIndex(final String indexName, final Class<T> indexClass, final OrientGraph graph) {
+		OrientIndex(final String indexName, final Class<T> indexClass, final OrientGraph graph, final ODocument indexCfg) {
         this.graph = graph;
         this.indexName = indexName;
-        this.indexClass = indexClass;
-
-        // CREATE THE MAP
-        treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, OStreamSerializerListRID.INSTANCE);
-        try {
-            treeMap.save();
-        } catch (IOException e) {
-            throw new OIndexException("Unable to save index");
-        }
-    }
-
-    /**
-     * Load constructor.
-     */
-    public OrientIndex(final String indexName, final Class<T> indexClass, final OrientGraph graph, final ORecordId indexTreeMap) {
-        this.graph = graph;
-        this.indexName = indexName;
-        this.indexClass = indexClass;
-
-        // LOAD THE TREE-MAP
-        treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMap);
-        try {
-            treeMap.load();
-        } catch (IOException e) {
-            throw new OIndexException("Unable to load index");
+        this.indexCfg = indexCfg;
+        
+        if( indexClass == null ){
+        	load(indexCfg);
+        }else{
+          create(indexClass);
         }
     }
 
@@ -73,11 +56,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     public Class<T> getIndexClass() {
-        return this.indexClass;
+        return (Class<T>) this.indexClass;
     }
 
     public void put(final String key, final Object value, final T element) {
-
         final OrientElement elementTemp = (OrientElement) element;
 
         final String keyTemp = key + SEPARATOR + value;
@@ -98,7 +80,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
-    public Iterable<T> get(final String key, final Object value) {
+    @SuppressWarnings("rawtypes")
+		public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
 
         final List<ODocument> docList = treeMap.get(keyTemp);
@@ -166,4 +149,41 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
         return removed;
     }
+
+		private void create(final Class<T> indexClass) {
+			this.indexClass = indexClass;
+
+			// CREATE THE MAP
+			treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, OStreamSerializerListRID.INSTANCE);
+			try {
+			    treeMap.save();
+			} catch (IOException e) {
+			    throw new OIndexException("Unable to save index");
+			}
+		}
+
+		private void load(final ODocument indexCfg) {
+			// LOAD TREEMAP
+			final String indexClassName = indexCfg.field(OrientGraph.FIELD_CLASSNAME);
+			final ORecordId indexTreeMapRid = indexCfg.field(OrientGraph.FIELD_TREEMAP_RID);
+
+			if ("Vertex".equals(indexClassName))
+			    this.indexClass = OrientVertex.class;
+			else if ("Edge".equals(indexClassName))
+			    this.indexClass = OrientEdge.class;
+			else
+			    try {
+			    		this.indexClass = (Class<T>) Class.forName(indexClassName);
+			    } catch (ClassNotFoundException e) {
+			        throw new IllegalArgumentException("Index class '" + indexClassName + "' is not registered. Supported ones: Vertex, Edge and custom class that extends them");
+			    }
+
+			// LOAD THE TREE-MAP
+			treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMapRid);
+			try {
+			    treeMap.load();
+			} catch (IOException e) {
+			    throw new OIndexException("Unable to load index");
+			}
+		}
 }

@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import com.orientechnologies.orient.core.id.ORecordId;
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -13,20 +13,14 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     Set<String> autoIndexKeys = null;
 
-    public OrientAutomaticIndex(String name, Class<T> indexClass, Set<String> autoIndexKeys, OrientGraph graph) {
-        super(name, indexClass, graph);
-        if (null != autoIndexKeys) {
-            this.autoIndexKeys = new HashSet<String>();
-            this.autoIndexKeys.addAll(autoIndexKeys);
-        }
+    public OrientAutomaticIndex(String name, Class<T> indexClass, Set<String> autoIndexKeys, OrientGraph graph, ODocument indexCfg) {
+        super(name, indexClass, graph, indexCfg);
+        init(autoIndexKeys);
     }
 
-    public OrientAutomaticIndex(String name, Class<T> indexClass, Set<String> autoIndexKeys, OrientGraph graph, ORecordId treeMapRid) {
-        super(name, indexClass, graph, treeMapRid);
-        if (null != autoIndexKeys) {
-            this.autoIndexKeys = new HashSet<String>();
-            this.autoIndexKeys.addAll(autoIndexKeys);
-        }
+    public OrientAutomaticIndex(String name, Set<String> autoIndexKeys, OrientGraph graph, ODocument indexCfg) {
+        super(name, null, graph, indexCfg);
+        init(autoIndexKeys);
     }
 
     public void addAutoIndexKey(String key) {
@@ -40,6 +34,8 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
                 this.autoIndexKeys.add(key);
             }
         }
+        
+        saveConfiguration();
     }
 
     protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
@@ -59,9 +55,24 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     public void removeAutoIndexKey(String key) {
         if (null != this.autoIndexKeys)
             this.autoIndexKeys.remove(key);
+
+        saveConfiguration();
     }
 
     public Set<String> getAutoIndexKeys() {
         return this.autoIndexKeys;
     }
+
+		private void init(Set<String> autoIndexKeys) {
+			if (null != autoIndexKeys) {
+			    this.autoIndexKeys = new HashSet<String>();
+			    this.autoIndexKeys.addAll(autoIndexKeys);
+			}
+      indexCfg.field("keys", autoIndexKeys );
+		}
+
+		private void saveConfiguration() {
+			indexCfg.field("keys", autoIndexKeys );
+			graph.saveIndexConfiguration();
+		}
 }
