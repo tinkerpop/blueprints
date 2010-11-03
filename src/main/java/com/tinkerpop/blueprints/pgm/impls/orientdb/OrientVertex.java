@@ -27,8 +27,10 @@ public class OrientVertex extends OrientElement implements Vertex {
 
     public Set<String> getPropertyKeys() {
         final Set<String> set = super.getPropertyKeys();
-        set.remove(OGraphVertex.FIELD_IN_EDGES);
-        set.remove(OGraphVertex.FIELD_OUT_EDGES);
+        if( set.size() > 0 ){
+        	set.remove(OGraphVertex.FIELD_IN_EDGES);
+        	set.remove(OGraphVertex.FIELD_OUT_EDGES);
+        }
         return set;
     }
 
