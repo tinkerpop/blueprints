@@ -40,6 +40,8 @@ public class TinkerGraph implements IndexableGraph {
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         Index index = this.indices.get(indexName);
+        if (null == index)
+            throw new RuntimeException("No such index exists: " + indexName);
         if (!indexClass.isAssignableFrom(index.getIndexClass()))
             throw new RuntimeException(indexClass + " is not assignable from " + index.getIndexClass());
         else

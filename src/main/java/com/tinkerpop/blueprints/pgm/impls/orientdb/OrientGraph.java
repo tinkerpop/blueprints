@@ -92,6 +92,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         Index<?> index = this.indices.get(indexName);
+        if(null == index)
+            throw new RuntimeException("No such index exists: " + indexName);
+
         if (indexClass.isAssignableFrom(index.getIndexClass()))
             return (Index<T>) index;
         else

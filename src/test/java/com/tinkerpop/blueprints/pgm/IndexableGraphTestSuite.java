@@ -86,6 +86,38 @@ public class IndexableGraphTestSuite extends ModelTestSuite {
         BaseTest.printPerformance(graph.toString(), 3, "indices dropped and index iterable checked for consistency", this.stopWatch());
     }
 
+    public void testNonExistentIndices(final IndexableGraph graph) {
+        assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
+        assertNotNull(graph.getIndex(Index.EDGES, Edge.class));
+        this.stopWatch();
+        graph.dropIndex(Index.VERTICES);
+        graph.dropIndex(Index.EDGES);
+        BaseTest.printPerformance(graph.toString(), 2, "indices dropped", this.stopWatch());
+
+        this.stopWatch();
+        try {
+            graph.getIndex(Index.VERTICES, Vertex.class);
+            assertFalse(true);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        }
+
+        try {
+            graph.getIndex(Index.EDGES, Edge.class);
+            assertFalse(true);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        }
+
+        try {
+            graph.getIndex("blah blah", Edge.class);
+            assertFalse(true);
+        } catch (RuntimeException e) {
+            assertTrue(true);
+        }
+        BaseTest.printPerformance(graph.toString(), 2, "non-existent indices retrieved with runtime exceptions", this.stopWatch());
+    }
+
     //public void testCreateIndicesWithDuplicateNames(final IndexableGraph graph) {}
 
 }
