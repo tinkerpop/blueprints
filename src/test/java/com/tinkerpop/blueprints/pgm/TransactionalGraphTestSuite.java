@@ -352,8 +352,8 @@ public class TransactionalGraphTestSuite extends ModelTestSuite {
                 assertEquals(count(graph.getVertices()), 1);
             assertEquals(count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "pavel")), 0);
             BaseTest.printPerformance(graph.toString(), 1, "vertex not retrieved in a successful transaction", this.stopWatch());
-            //v = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next();
-            //assertEquals(v.getProperty("name"), "marko");
+            v = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next();
+            assertEquals(v.getProperty("name"), "marko");
         }
 
     }

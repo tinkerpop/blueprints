@@ -28,10 +28,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         this(directory, null);
     }
 
-    public GraphDatabaseService getRawGraph() {
-        return this.neo4j;
-    }
-
     public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
         try {
@@ -88,8 +84,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         return autoIndices.values();
     }
 
-    public Iterable<Index> getIndices() {
-        List<Index> list = new ArrayList<Index>();
+    public Iterable<Index<?>> getIndices() {
+        List<Index<?>> list = new ArrayList<Index<?>>();
         for (Index index : this.indices.values()) {
             list.add(index);
         }
@@ -253,6 +249,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 file.delete();
             }
         }
+    }
+
+    public GraphDatabaseService getRawGraph() {
+        return this.neo4j;
     }
 
     public String toString() {

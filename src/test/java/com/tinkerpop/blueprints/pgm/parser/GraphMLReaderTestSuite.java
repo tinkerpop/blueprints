@@ -273,7 +273,7 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
     }
 
 
-    /*public void testGratefulGraph(Graph graph) throws Exception {
+    public void testGratefulGraph(Graph graph) throws Exception {
         if (config.supportsVertexIndex) {
             for (int i = 200; i < 1002; i = i + 200) {
                 graph.clear();
@@ -282,7 +282,8 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
                 GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"), i, null, null, null);
                 if (graph instanceof TransactionalGraph)
                     BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded with buffer size equal to " + i + " for transactional graphs", this.stopWatch());
-                else BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded", this.stopWatch());
+                else
+                    BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded", this.stopWatch());
 
 
                 if (config.supportsVertexIteration) {
@@ -302,7 +303,8 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
                 boolean found = false;
                 for (Edge edge : garcia.getInEdges()) {
                     if (edge.getLabel().equals("sung_by")) {
-                        if (edge.getOutVertex().getProperty("name").equals("TERRAPIN STATION")) found = true;
+                        if (edge.getOutVertex().getProperty("name").equals("TERRAPIN STATION"))
+                            found = true;
                     }
                 }
                 assertTrue(found);
@@ -312,7 +314,7 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
                 }
             }
         }
-    }*/
+    }
 
     public void testReadingTinkerGraphExample3(Graph graph) throws Exception {
         if (!config.ignoresSuppliedIds && config.supportsEdgeIteration && config.supportsVertexIteration) {

@@ -88,8 +88,11 @@ public class Neo4jGraphTest extends BaseTest {
                     // removes the "reference node" in Neo4j
                     graph.removeVertex(graph.getVertex(0));
                     System.out.println("Testing " + method.getName() + "...");
-                    method.invoke(suite, graph);
-                    graph.shutdown();
+                    try {
+                        method.invoke(suite, graph);
+                    } finally {
+                        graph.shutdown();
+                    }
                     deleteDirectory(new File(directory));
                 }
             }

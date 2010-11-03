@@ -18,11 +18,13 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     private final Class<T> indexClass;
     private final Neo4jGraph graph;
     private final String indexName;
+    private org.neo4j.graphdb.index.Index<S> neo4jIndex;
 
     public Neo4jIndex(final String indexName, Class<T> indexClass, final Neo4jGraph graph) {
         this.indexClass = indexClass;
         this.graph = graph;
         this.indexName = indexName;
+        this.generateIndex();
     }
 
     public Class<T> getIndexClass() {
@@ -35,12 +37,12 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
 
     public void put(final String key, final Object value, final T element) {
         this.graph.autoStartTransaction();
-        this.generateIndex().add((S) element.getRawElement(), key, value);
+        this.neo4jIndex.add((S) element.getRawElement(), key, value);
         this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     public Iterable<T> get(final String key, final Object value) {
-        IndexHits<S> itty = this.generateIndex().get(key, value);
+        IndexHits<S> itty = this.neo4jIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
         else
@@ -49,14 +51,14 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
 
     public void remove(final String key, final Object value, final T element) {
         this.graph.autoStartTransaction();
-        this.generateIndex().remove((S) element.getRawElement(), key, value);
+        this.neo4jIndex.remove((S) element.getRawElement(), key, value);
         this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
-    private org.neo4j.graphdb.index.Index<S> generateIndex() {
+    private void generateIndex() {
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
+            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
         else
-            return (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
     }
 }

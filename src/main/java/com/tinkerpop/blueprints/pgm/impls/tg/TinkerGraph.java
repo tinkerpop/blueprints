@@ -46,9 +46,11 @@ public class TinkerGraph implements IndexableGraph {
             return (Index<T>) index;
     }
 
-    public Iterable<Index> getIndices() {
-        List<Index> list = new ArrayList<Index>();
-        list.addAll(indices.values());
+    public Iterable<Index<?>> getIndices() {
+        List<Index<?>> list = new ArrayList<Index<?>>();
+        for (Index index : indices.values()) {
+            list.add(index);
+        }
         return list;
     }
 

@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.id.ORID;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public abstract class OrientElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        graph.beginTransaction();
+        graph.autoStartTransaction();
 
         try {
             Object oldValue = this.getProperty(key);
@@ -32,16 +33,16 @@ public abstract class OrientElement implements Element {
             this.rawElement.set(key, value);
             this.save();
 
-            graph.commitTransaction();
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         } catch (RuntimeException e) {
-            graph.rollbackTransaction();
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         }
     }
 
     public Object removeProperty(final String key) {
-        graph.beginTransaction();
+        graph.autoStartTransaction();
 
         try {
             Object oldValue = this.rawElement.remove(key);
@@ -51,12 +52,12 @@ public abstract class OrientElement implements Element {
                 }
             }
             this.save();
-            graph.commitTransaction();
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             return oldValue;
 
         } catch (RuntimeException e) {
 
-            graph.rollbackTransaction();
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         }
     }
@@ -81,14 +82,14 @@ public abstract class OrientElement implements Element {
     }
 
     protected void delete() {
-        final boolean txBegun = graph.beginTransaction();
+        final boolean txBegun = graph.autoStartTransaction();
 
         try {
             this.rawElement.delete();
-            if( txBegun )
-            	graph.commitTransaction();
+            if (txBegun)
+                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            graph.rollbackTransaction();
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         }
     }

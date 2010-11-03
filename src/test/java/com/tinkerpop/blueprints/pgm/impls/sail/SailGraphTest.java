@@ -3,11 +3,8 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
-import info.aduna.iteration.CloseableIteration;
-import org.openrdf.model.Statement;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.sail.SailException;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.lang.reflect.Method;
