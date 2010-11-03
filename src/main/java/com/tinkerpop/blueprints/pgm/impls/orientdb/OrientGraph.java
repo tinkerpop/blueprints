@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * OrientDB implementation of Graph interface. This implementation is transactional.
+ * OrientDB implementation of Graph interface. This implementation is transactional and indexable.
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
@@ -57,10 +57,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         openOrCreate();
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
         final ODocument indexCfg = new ODocument((ODatabaseDocumentTx) database.getUnderlying());
-        
+
         OrientIndex<? extends OrientElement> index;
         if (type == Index.Type.MANUAL) {
             index = new OrientIndex(indexName, indexClass, this, indexCfg);
@@ -93,7 +92,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         Index<?> index = this.indices.get(indexName);
-        if(null == index)
+        if (null == index)
             throw new RuntimeException("No such index exists: " + indexName);
 
         if (indexClass.isAssignableFrom(index.getIndexClass()))
@@ -102,8 +101,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
     }
 
-    public Iterable<Index<?>> getIndices() {
-        List<Index<?>> list = new ArrayList<Index<?>>();
+    public Iterable<Index<? extends Element>> getIndices() {
+        List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
         for (Index<?> index : this.indices.values()) {
             list.add(index);
         }
@@ -280,13 +279,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return this.mode;
     }
 
-    public ODocument getIndexConfiguration() {
-        return indexConfiguration;
+    protected void saveIndexConfiguration() {
+        indexConfiguration.save();
     }
-
-    void saveIndexConfiguration() {
-      indexConfiguration.save();
-  }
 
     protected boolean autoStartTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC && (database.getTransaction() instanceof OTransactionNoTx || database.getTransaction().getStatus() != TXSTATUS.BEGUN)) {

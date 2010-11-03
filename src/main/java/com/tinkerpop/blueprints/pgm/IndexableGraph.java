@@ -9,7 +9,7 @@ public interface IndexableGraph extends Graph {
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass);
 
-    public Iterable<Index<?>> getIndices();
+    public Iterable<Index<? extends Element>> getIndices();
 
     public void dropIndex(String indexName);
 

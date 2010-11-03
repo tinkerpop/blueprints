@@ -3,7 +3,9 @@ package com.tinkerpop.blueprints;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -11,34 +13,6 @@ import java.util.*;
 public abstract class BaseTest extends TestCase {
 
     double timer = -1.0d;
-
-    public static List<String> generateUUIDs(int number) {
-        List<String> uuids = new ArrayList<String>();
-        for (int i = 0; i < number; i++) {
-            uuids.add(UUID.randomUUID().toString());
-        }
-        return uuids;
-    }
-
-    public static List<String> generateUUIDs(String prefix, int number) {
-        List<String> uuids = new ArrayList<String>();
-        for (int i = 0; i < number; i++) {
-            uuids.add(prefix + UUID.randomUUID().toString());
-        }
-        return uuids;
-    }
-
-    public static void printCollection(final Collection collection) {
-        for (Object o : collection) {
-            System.out.println(o);
-        }
-    }
-
-    public static void printIterator(final Iterator itty) {
-        while (itty.hasNext()) {
-            System.out.println(itty.next());
-        }
-    }
 
     public static int count(final Iterator iterator) {
         int counter = 0;
@@ -82,16 +56,6 @@ public abstract class BaseTest extends TestCase {
 
     public static void printTestPerformance(String testName, double timeInMilliseconds) {
         System.out.println("*** TOTAL TIME [" + testName + "]: " + timeInMilliseconds + " ***");
-    }
-
-    public static void warmUp(int amount) {
-        List<String> uuids = new ArrayList<String>();
-        for (int i = 0; i < amount; i++) {
-            uuids.add(UUID.randomUUID().toString());
-        }
-        for (String uuid : uuids) {
-            uuid.toUpperCase();
-        }
     }
 
     protected static void deleteDirectory(final File directory) {

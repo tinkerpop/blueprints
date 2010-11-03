@@ -1,21 +1,22 @@
 package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class ModelTestSuite extends BaseTest {
+public abstract class TestSuite extends BaseTest {
 
-    protected SuiteConfiguration config;
+    protected GraphTest graphTest;
 
-    public ModelTestSuite() {
+    public TestSuite() {
     }
 
-    public ModelTestSuite(final SuiteConfiguration config) {
-        this.config = config;
+    public TestSuite(final GraphTest graphTest) {
+        this.graphTest = graphTest;
     }
 
     protected static List<String> generateIds(int number) {
@@ -28,14 +29,10 @@ public abstract class ModelTestSuite extends BaseTest {
     }
 
     protected String convertId(final String id) {
-        if (this.config.requiresRDFIds) {
+        if (this.graphTest.requiresRDFIds) {
             return "blueprints:" + id;
         } else {
             return id;
         }
-    }
-
-    public void testTrue() {
-        assertTrue(true);
     }
 }

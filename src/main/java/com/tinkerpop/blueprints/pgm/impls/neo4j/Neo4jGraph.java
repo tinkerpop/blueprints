@@ -104,8 +104,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         return autoIndices.values();
     }
 
-    public Iterable<Index<?>> getIndices() {
-        List<Index<?>> list = new ArrayList<Index<?>>();
+    public Iterable<Index<? extends Element>> getIndices() {
+        List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
         for (Index index : this.indices.values()) {
             list.add(index);
         }

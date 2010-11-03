@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
-import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 
 import java.io.File;
@@ -10,89 +10,91 @@ import java.lang.reflect.Method;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraphTest extends BaseTest {
+public class Neo4jGraphTest extends GraphTest {
 
-    private static final SuiteConfiguration config = new SuiteConfiguration();
 
-    static {
-        config.allowsDuplicateEdges = true;
-        config.allowsSelfLoops = false;
-        config.requiresRDFIds = false;
-        config.isRDFModel = false;
-        config.supportsVertexIteration = true;
-        config.supportsEdgeIteration = true;
-        config.supportsVertexIndex = true;
-        config.supportsEdgeIndex = true;
-        config.ignoresSuppliedIds = true;
-        config.supportsTransactions = true;
+    public Neo4jGraphTest() {
+        this.allowsDuplicateEdges = true;
+        this.allowsSelfLoops = false;
+        this.requiresRDFIds = false;
+        this.isRDFModel = false;
+        this.supportsVertexIteration = true;
+        this.supportsEdgeIteration = true;
+        this.supportsVertexIndex = true;
+        this.supportsEdgeIndex = true;
+        this.ignoresSuppliedIds = true;
+        this.supportsTransactions = true;
     }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new VertexTestSuite(config));
+        doTestSuite(new VertexTestSuite(this));
         printTestPerformance("VertexTestSuite", this.stopWatch());
     }
 
     public void testEdgeTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new EdgeTestSuite(config));
+        doTestSuite(new EdgeTestSuite(this));
         printTestPerformance("EdgeTestSuite", this.stopWatch());
     }
 
     public void testGraphTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new GraphTestSuite(config));
+        doTestSuite(new GraphTestSuite(this));
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
     public void testIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new IndexableGraphTestSuite(config));
+        doTestSuite(new IndexableGraphTestSuite(this));
         printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
     }
 
     public void testIndexTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new IndexTestSuite(config));
+        doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
     }
 
     public void testAutomaticIndexTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new AutomaticIndexTestSuite(config));
+        doTestSuite(new AutomaticIndexTestSuite(this));
         printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
     public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new TransactionalGraphTestSuite(config));
+        doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
     }
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new GraphMLReaderTestSuite(config));
+        doTestSuite(new GraphMLReaderTestSuite(this));
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    private void doSuiteTest(final ModelTestSuite suite) throws Exception {
+    public Graph getGraphInstance() {
+        String directory = System.getProperty("neo4jDirectory");
+        if (directory == null)
+            directory = "/tmp/blueprints_test";
+        Graph graph = new Neo4jGraph(directory);
+        // removes the "reference node" in Neo4j
+        graph.removeVertex(graph.getVertex(0));
+        return graph;
+    }
+
+    public void doTestSuite(final TestSuite testSuite) throws Exception {
         String doTest = System.getProperty("testNeo4j");
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("neo4jDirectory");
             if (directory == null)
                 directory = "/tmp/blueprints_test";
             deleteDirectory(new File(directory));
-            for (Method method : suite.getClass().getDeclaredMethods()) {
+            for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
-                    Graph graph = new Neo4jGraph(directory);
-                    // removes the "reference node" in Neo4j
-                    graph.removeVertex(graph.getVertex(0));
                     System.out.println("Testing " + method.getName() + "...");
-                    try {
-                        method.invoke(suite, graph);
-                    } finally {
-                        graph.shutdown();
-                    }
+                    method.invoke(testSuite);
                     deleteDirectory(new File(directory));
                 }
             }

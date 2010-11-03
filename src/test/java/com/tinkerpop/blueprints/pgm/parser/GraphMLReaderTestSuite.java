@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.parser;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 
 import java.util.HashSet;
@@ -10,18 +11,18 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class GraphMLReaderTestSuite extends ModelTestSuite {
+public class GraphMLReaderTestSuite extends TestSuite {
 
     public GraphMLReaderTestSuite() {
     }
 
-    public GraphMLReaderTestSuite(SuiteConfiguration config) {
-        super(config);
+    public GraphMLReaderTestSuite(GraphTest graphTest) {
+        super(graphTest);
     }
 
-    public void testReadingTinkerGraph(Graph graph) throws Exception {
-        if (!config.ignoresSuppliedIds) {
-
+    public void testReadingTinkerGraph() throws Exception {
+        Graph graph = graphTest.getGraphInstance();
+        if (!graphTest.ignoresSuppliedIds) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -72,10 +73,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
             assertEquals(counter, 5);
         }
+        graph.shutdown();
     }
 
-    public void testTinkerGraphEdges(Graph graph) throws Exception {
-        if (config.supportsEdgeIteration) {
+    public void testTinkerGraphEdges() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsEdgeIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -96,10 +99,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertEquals(edgeKeys.size(), 1);
             assertEquals(edgeValues.size(), 4);
         }
+        graph.shutdown();
     }
 
-    public void testTinkerGraphVertices(Graph graph) throws Exception {
-        if (config.supportsVertexIteration) {
+    public void testTinkerGraphVertices() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -119,10 +124,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertTrue(vertexNames.contains("ripple"));
             assertTrue(vertexNames.contains("lop"));
         }
+        graph.shutdown();
     }
 
-    public void testTinkerGraphSoftwareVertices(Graph graph) throws Exception {
-        if (config.supportsVertexIteration) {
+    public void testTinkerGraphSoftwareVertices() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -141,10 +148,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
                 assertEquals(v.getProperty("lang"), "java");
             }
         }
+        graph.shutdown();
     }
 
-    public void testTinkerGraphVertexAndEdges(Graph graph) throws Exception {
-        if (config.supportsVertexIteration) {
+    public void testTinkerGraphVertexAndEdges() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             BaseTest.printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -182,7 +191,7 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertTrue(null != lop);
             assertTrue(null != ripple);
 
-            if (config.supportsEdgeIteration) {
+            if (graphTest.supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 6);
             }
 
@@ -270,11 +279,13 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertEquals(vertices.size(), 1);
             assertTrue(vertices.contains(josh));
         }
+        graph.shutdown();
     }
 
 
-    public void testGratefulGraph(Graph graph) throws Exception {
-        if (config.supportsVertexIndex) {
+    public void testGratefulGraph() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIndex) {
             for (int i = 200; i < 1002; i = i + 200) {
                 graph.clear();
                 ((IndexableGraph) graph).createIndex(Index.VERTICES, Vertex.class, Index.Type.AUTOMATIC);
@@ -286,10 +297,10 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
                     BaseTest.printPerformance(graph.toString(), null, "graph-example-2 loaded", this.stopWatch());
 
 
-                if (config.supportsVertexIteration) {
+                if (graphTest.supportsVertexIteration) {
                     assertEquals(count(graph.getVertices()), 809);
                 }
-                if (config.supportsEdgeIteration) {
+                if (graphTest.supportsEdgeIteration) {
                     assertEquals(count(graph.getEdges()), 8049);
                 }
                 assertEquals(count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "Garcia")), 1);
@@ -314,10 +325,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
                 }
             }
         }
+        graph.shutdown();
     }
 
-    public void testReadingTinkerGraphExample3(Graph graph) throws Exception {
-        if (!config.ignoresSuppliedIds && config.supportsEdgeIteration && config.supportsVertexIteration) {
+    public void testReadingTinkerGraphExample3() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
 
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, null, null, null);
@@ -459,10 +472,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertEquals(edgeKeys.contains("_label"), true);
             assertEquals(edgeKeys.size(), 3);
         }
+        graph.shutdown();
     }
 
-    public void testReadingTinkerGraphExample3MappingLabels(Graph graph) throws Exception {
-        if (config.supportsEdgeIteration && config.supportsVertexIteration) {
+    public void testReadingTinkerGraphExample3MappingLabels() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, null, null, "_label");
             BaseTest.printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
@@ -516,10 +531,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertEquals(edgeLabels.contains("knows"), false);
             assertEquals(edgeLabels.contains("created"), true);
         }
+        graph.shutdown();
     }
 
-    public void testReadingTinkerGraphExample3MappingIDs(Graph graph) throws Exception {
-        if (config.supportsEdgeIteration && config.supportsVertexIteration) {
+    public void testReadingTinkerGraphExample3MappingIDs() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, "_id", "_id", null);
             BaseTest.printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
@@ -573,10 +590,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertEquals(edgeLabels.contains("knows"), true);
             assertEquals(edgeLabels.contains("created"), true);
         }
+        graph.shutdown();
     }
 
-    public void testReadingTinkerGraphExample3MappingAll(Graph graph) throws Exception {
-        if (config.supportsEdgeIteration && config.supportsVertexIteration) {
+    public void testReadingTinkerGraphExample3MappingAll() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, "_id", "_id", "_label");
             BaseTest.printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
@@ -630,10 +649,12 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertEquals(edgeLabels.contains("knows"), false);
             assertEquals(edgeLabels.contains("created"), true);
         }
+        graph.shutdown();
     }
 
-    public void testMigratingTinkerGraphExample3(Graph graph) throws Exception {
-        if (!config.ignoresSuppliedIds && config.supportsEdgeIteration && config.supportsVertexIteration) {
+    public void testMigratingTinkerGraphExample3() throws Exception {
+        Graph graph = this.graphTest.getGraphInstance();
+        if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
 
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, null, null, null);
@@ -747,12 +768,10 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
 
             Set<String> vertexIds = new HashSet<String>();
             Set<String> vertexKeys = new HashSet<String>();
-            Set<String> vertexNames = new HashSet<String>();
             int vertexCount = 0;
             for (Vertex v : toGraph.getVertices()) {
                 vertexCount++;
                 vertexIds.add(v.getId().toString());
-                vertexNames.add(v.getProperty("name").toString());
                 for (String key : v.getPropertyKeys())
                     vertexKeys.add(key);
             }
@@ -782,6 +801,7 @@ public class GraphMLReaderTestSuite extends ModelTestSuite {
             assertEquals(edgeKeys.contains("_label"), true);
             assertEquals(edgeKeys.size(), 3);
         }
+        graph.shutdown();
     }
 
 }

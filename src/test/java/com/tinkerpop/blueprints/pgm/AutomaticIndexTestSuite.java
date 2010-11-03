@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -8,17 +9,18 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class AutomaticIndexTestSuite extends ModelTestSuite {
+public class AutomaticIndexTestSuite extends TestSuite {
 
     public AutomaticIndexTestSuite() {
     }
 
-    public AutomaticIndexTestSuite(final SuiteConfiguration config) {
-        super(config);
+    public AutomaticIndexTestSuite(final GraphTest graphTest) {
+        super(graphTest);
     }
 
-    public void testAutoIndexKeyManagement(IndexableGraph graph) {
-        if (config.supportsVertexIndex) {
+    public void testAutoIndexKeyManagement() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIndex) {
             AutomaticIndex index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
             assertNull(index.getAutoIndexKeys());
 
@@ -39,10 +41,12 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
             assertTrue(index.getAutoIndexKeys().contains("location"));
             BaseTest.printPerformance(graph.toString(), 2, "automatic index keys retrieved", this.stopWatch());
         }
+        graph.shutdown();
     }
 
-    public void testAutoIndexPutGetRemoveVertex(IndexableGraph graph) {
-        if (config.supportsVertexIndex && !config.isRDFModel) {
+    public void testAutoIndexPutGetRemoveVertex() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             for (int i = 0; i < 10; i++) {
                 Vertex vertex = graph.addVertex(null);
@@ -51,7 +55,7 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
                 vertices.add(vertex);
             }
             assertEquals(vertices.size(), 10);
-            if (config.supportsVertexIteration)
+            if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 10);
 
             this.stopWatch();
@@ -121,10 +125,12 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
             assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("key3", "value3")), 0);
             BaseTest.printPerformance(graph.toString(), 0, "vertices retrieved from automatic index", this.stopWatch());
         }
+        graph.shutdown();
     }
 
-    public void testAutoIndexPutGetRemoveEdge(final IndexableGraph graph) {
-        if (config.supportsEdgeIndex && !config.isRDFModel) {
+    public void testAutoIndexPutGetRemoveEdge() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             Set<Edge> edges = new HashSet<Edge>();
             for (int i = 0; i < 10; i++) {
                 Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test1");
@@ -133,9 +139,9 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
                 edges.add(edge);
             }
             assertEquals(edges.size(), 10);
-            if (config.supportsVertexIteration)
+            if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 20);
-            if (config.supportsEdgeIteration) {
+            if (graphTest.supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 10);
                 for (Edge edge : graph.getEdges()) {
                     assertEquals(edge.getLabel(), "test1");
@@ -209,10 +215,12 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
             assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("key3", "value3")), 0);
             BaseTest.printPerformance(graph.toString(), 0, "edges retrieved from automatic index", this.stopWatch());
         }
+        graph.shutdown();
     }
 
-    public void testAutoIndexSpecificKeysVertex(final IndexableGraph graph) {
-        if (config.supportsVertexIndex && !config.isRDFModel) {
+    public void testAutoIndexSpecificKeysVertex() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             Vertex v1 = graph.addVertex(null);
             ((AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class)).addAutoIndexKey("name");
             this.stopWatch();
@@ -239,10 +247,12 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
             assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "luca")), 0);
             assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("location", 87506)), 0);
         }
+        graph.shutdown();
     }
 
-    public void testAutoIndexSpecificKeysEdge(final IndexableGraph graph) {
-        if (config.supportsEdgeIndex && !config.isRDFModel) {
+    public void testAutoIndexSpecificKeysEdge() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test");
             ((AutomaticIndex) graph.getIndex(Index.EDGES, Edge.class)).addAutoIndexKey("name");
             this.stopWatch();
@@ -269,7 +279,6 @@ public class AutomaticIndexTestSuite extends ModelTestSuite {
             assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("name", "luca")), 0);
             assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("location", 87506)), 0);
         }
+        graph.shutdown();
     }
-
-
 }

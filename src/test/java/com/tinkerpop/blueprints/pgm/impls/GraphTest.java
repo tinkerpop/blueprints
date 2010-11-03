@@ -1,9 +1,13 @@
-package com.tinkerpop.blueprints.pgm;
+package com.tinkerpop.blueprints.pgm.impls;
+
+import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.TestSuite;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class SuiteConfiguration {
+public abstract class GraphTest extends BaseTest {
 
     /**
      * Does the graph framework allow for two edges with the same vertices and edge label to exist?
@@ -45,5 +49,9 @@ public class SuiteConfiguration {
      * Does the graph implement TransactionalGraph?
      */
     public boolean supportsTransactions;
+
+    public abstract Graph getGraphInstance();
+
+    public abstract void doTestSuite(final TestSuite testSuite) throws Exception;
 
 }

@@ -1,27 +1,29 @@
 package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class IndexTestSuite extends ModelTestSuite {
+public class IndexTestSuite extends TestSuite {
 
     public IndexTestSuite() {
     }
 
-    public IndexTestSuite(final SuiteConfiguration config) {
-        super(config);
+    public IndexTestSuite(final GraphTest graphTest) {
+        super(graphTest);
     }
 
-    public void testPutGetRemoveVertex(final IndexableGraph graph) {
-        if (config.supportsVertexIndex && !config.isRDFModel) {
+    public void testPutGetRemoveVertex() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             this.stopWatch();
             Index<Vertex> index = graph.createIndex("basic", Vertex.class, Index.Type.MANUAL);
             BaseTest.printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
-            if (config.supportsVertexIteration)
+            if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 2);
 
             this.stopWatch();
@@ -40,7 +42,7 @@ public class IndexTestSuite extends ModelTestSuite {
             BaseTest.printPerformance(graph.toString(), 1, "vertex removed and automatically removed from index", this.stopWatch());
             assertEquals(count(index.get("dog", "puppy")), 0);
             assertEquals(v2, index.get("dog", "mama").iterator().next());
-            if (config.supportsVertexIteration)
+            if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 1);
 
             v2.setProperty("dog", "mama2");
@@ -50,13 +52,15 @@ public class IndexTestSuite extends ModelTestSuite {
             BaseTest.printPerformance(graph.toString(), 1, "vertex removed and automatically removed from index", this.stopWatch());
             assertEquals(count(index.get("dog", "puppy")), 0);
             assertEquals(count(index.get("dog", "mama")), 0);
-            if (config.supportsVertexIteration)
+            if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 0);
         }
+        graph.shutdown();
     }
 
-    public void testPutGetRemoveEdge(final IndexableGraph graph) {
-        if (config.supportsEdgeIndex && !config.isRDFModel) {
+    public void testPutGetRemoveEdge() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             this.stopWatch();
             Index<Edge> index = graph.createIndex("basic", Edge.class, Index.Type.MANUAL);
             BaseTest.printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
@@ -64,7 +68,7 @@ public class IndexTestSuite extends ModelTestSuite {
             Vertex v2 = graph.addVertex(null);
             Edge e1 = graph.addEdge(null, v1, v2, "test1");
             Edge e2 = graph.addEdge(null, v1, v2, "test2");
-            if (config.supportsEdgeIteration)
+            if (graphTest.supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 2);
 
             this.stopWatch();
@@ -83,7 +87,7 @@ public class IndexTestSuite extends ModelTestSuite {
             BaseTest.printPerformance(graph.toString(), 1, "edge removed and automatically removed from index", this.stopWatch());
             assertEquals(count(index.get("dog", "puppy")), 0);
             assertEquals(e2, index.get("dog", "mama").iterator().next());
-            if (config.supportsEdgeIteration)
+            if (graphTest.supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 1);
 
             v2.setProperty("dog", "mama2");
@@ -93,9 +97,10 @@ public class IndexTestSuite extends ModelTestSuite {
             BaseTest.printPerformance(graph.toString(), 1, "edge removed and automatically removed from index", this.stopWatch());
             assertEquals(count(index.get("dog", "puppy")), 0);
             assertEquals(count(index.get("dog", "mama")), 0);
-            if (config.supportsEdgeIteration)
+            if (graphTest.supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 0);
         }
+        graph.shutdown();
     }
 
 }

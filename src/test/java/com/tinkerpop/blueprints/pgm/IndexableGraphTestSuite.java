@@ -1,20 +1,22 @@
 package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class IndexableGraphTestSuite extends ModelTestSuite {
+public class IndexableGraphTestSuite extends TestSuite {
 
     public IndexableGraphTestSuite() {
     }
 
-    public IndexableGraphTestSuite(final SuiteConfiguration config) {
-        super(config);
+    public IndexableGraphTestSuite(final GraphTest graphTest) {
+        super(graphTest);
     }
 
-    public void testNoManualIndicesOnConstruction(final IndexableGraph graph) {
+    public void testNoManualIndicesOnConstruction() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         int count = 0;
         this.stopWatch();
         for (Index index : graph.getIndices()) {
@@ -22,25 +24,29 @@ public class IndexableGraphTestSuite extends ModelTestSuite {
             assertTrue(index instanceof AutomaticIndex);
         }
         BaseTest.printPerformance(graph.toString(), count, "indices iterated through", this.stopWatch());
+        graph.shutdown();
     }
 
-    public void testAutomaticIndicesOnConstruction(IndexableGraph graph) {
+    public void testAutomaticIndicesOnConstruction() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         this.stopWatch();
-        if (config.supportsVertexIndex) {
+        if (graphTest.supportsVertexIndex) {
             assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
         } else {
             assertNull(graph.getIndex(Index.VERTICES, Vertex.class));
         }
-        if (config.supportsEdgeIndex) {
+        if (graphTest.supportsEdgeIndex) {
             assertNotNull(graph.getIndex(Index.EDGES, Edge.class));
         } else {
             assertNull(graph.getIndex(Index.EDGES, Edge.class));
         }
 
         BaseTest.printPerformance(graph.toString(), 2, "automatic indices retrieved", this.stopWatch());
+        graph.shutdown();
     }
 
-    public void testCreateDropIndices(final IndexableGraph graph) {
+    public void testCreateDropIndices() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         int count = 0;
         this.stopWatch();
         for (Index index : graph.getIndices()) {
@@ -84,9 +90,11 @@ public class IndexableGraphTestSuite extends ModelTestSuite {
         graph.dropIndex(index3.getIndexName());
         assertEquals(count(graph.getIndices()), 0);
         BaseTest.printPerformance(graph.toString(), 3, "indices dropped and index iterable checked for consistency", this.stopWatch());
+        graph.shutdown();
     }
 
-    public void testNonExistentIndices(final IndexableGraph graph) {
+    public void testNonExistentIndices() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
         assertNotNull(graph.getIndex(Index.EDGES, Edge.class));
         this.stopWatch();
@@ -116,8 +124,9 @@ public class IndexableGraphTestSuite extends ModelTestSuite {
             assertTrue(true);
         }
         BaseTest.printPerformance(graph.toString(), 2, "non-existent indices retrieved with runtime exceptions", this.stopWatch());
+        graph.shutdown();
     }
 
-    //public void testCreateIndicesWithDuplicateNames(final IndexableGraph graph) {}
+    //public void testCreateIndicesWithDuplicateNames() {}
 
 }

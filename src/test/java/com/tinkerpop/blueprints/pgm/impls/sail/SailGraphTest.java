@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
-import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.sail.impls.MemoryStoreSailGraph;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.URIImpl;
@@ -16,20 +16,18 @@ import java.util.regex.Matcher;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class SailGraphTest extends BaseTest {
+public class SailGraphTest extends GraphTest {
 
-    private static final SuiteConfiguration config = new SuiteConfiguration();
-
-    static {
-        config.allowsDuplicateEdges = false;
-        config.allowsSelfLoops = true;
-        config.requiresRDFIds = true;
-        config.isRDFModel = true;
-        config.supportsVertexIteration = false;
-        config.supportsEdgeIteration = true;
-        config.supportsVertexIndex = false;
-        config.supportsEdgeIndex = false;
-        config.ignoresSuppliedIds = false;
+    public SailGraphTest() {
+        this.allowsDuplicateEdges = false;
+        this.allowsSelfLoops = true;
+        this.requiresRDFIds = true;
+        this.isRDFModel = true;
+        this.supportsVertexIteration = false;
+        this.supportsEdgeIteration = true;
+        this.supportsVertexIndex = false;
+        this.supportsEdgeIndex = false;
+        this.ignoresSuppliedIds = false;
     }
 
     public void testSailGraphFactory() {
@@ -152,36 +150,40 @@ public class SailGraphTest extends BaseTest {
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new VertexTestSuite(config));
+        doTestSuite(new VertexTestSuite(this));
         printTestPerformance("VertexTestSuite", this.stopWatch());
     }
 
     public void testEdgeSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new EdgeTestSuite(config));
+        doTestSuite(new EdgeTestSuite(this));
         printTestPerformance("EdgeTestSuite", this.stopWatch());
     }
 
     public void testGraphSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new GraphTestSuite(config));
+        doTestSuite(new GraphTestSuite(this));
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
     public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
-        doSuiteTest(new TransactionalGraphTestSuite(config));
+        doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
     }
 
-    private void doSuiteTest(final ModelTestSuite suite) throws Exception {
+    public Graph getGraphInstance() {
+        return new SailGraph(new MemoryStore());
+    }
+
+    public void doTestSuite(final TestSuite testSuite) throws Exception {
         String doTest = System.getProperty("testSail");
         if (doTest == null || doTest.equals("true")) {
-            for (Method method : suite.getClass().getDeclaredMethods()) {
+            for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
-                    SailGraph graph = new SailGraph(new MemoryStore());
-                    method.invoke(suite, graph);
+                    Graph graph = this.getGraphInstance();
+                    method.invoke(testSuite);
                     graph.shutdown();
                 }
             }
