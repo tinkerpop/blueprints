@@ -89,7 +89,7 @@ public class OrientGraphTest extends BaseTest {
                 if (method.getName().startsWith("test")) {
                     OrientGraph graph = new OrientGraph("local:" + new File(directory) + "/graph");
                     graph.clear();
-                    
+
                     System.out.println("Testing " + method.getName() + "...");
                     try {
                         method.invoke(suite, graph);
