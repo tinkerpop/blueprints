@@ -76,16 +76,14 @@ public class OrientGraphTest extends GraphTest {
     }
 
     public Graph getGraphInstance() {
-        String directory = System.getProperty("orientGraphDirectory");
-        directory = getWorkingDirectory(directory);
+        String directory = getWorkingDirectory();
         return new OrientGraph("local:" + directory + "/graph");
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         String doTest = System.getProperty("testOrientGraph");
         if (doTest == null || doTest.equals("true")) {
-            String directory = System.getProperty("orientGraphDirectory");
-            directory = getWorkingDirectory(directory);
+            String directory = getWorkingDirectory();
             deleteDirectory(new File(directory));
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
@@ -97,13 +95,14 @@ public class OrientGraphTest extends GraphTest {
         }
     }
 
-		private String getWorkingDirectory(String directory) {
-			if (directory == null) {
-			    if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-			        directory = "C:/temp/blueprints_test";
-			    else
-			        directory = "/tmp/blueprints_test";
-			}
-			return directory;
-		}
+    private String getWorkingDirectory() {
+        String directory = System.getProperty("orientGraphDirectory");
+        if (directory == null) {
+            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
+                directory = "C:/temp/blueprints_test";
+            else
+                directory = "/tmp/blueprints_test";
+        }
+        return directory;
+    }
 }
