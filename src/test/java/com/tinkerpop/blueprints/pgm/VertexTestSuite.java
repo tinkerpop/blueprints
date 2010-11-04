@@ -72,7 +72,7 @@ public class VertexTestSuite extends TestSuite {
             assertEquals(3, count(graph.getVertices()));
         }
 
-        if (graphTest.isRDFModel && graphTest.requiresRDFIds) {
+        if (graphTest.isRDFModel) {
             Vertex v1 = graph.addVertex("http://tinkerpop.com#marko");
             assertEquals("http://tinkerpop.com#marko", v1.getId());
             Vertex v2 = graph.addVertex("\"1\"^^<datatype:int>");

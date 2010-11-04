@@ -128,38 +128,63 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     /*public void testIndicesExistAfterShutdown() {
-        IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
-        graph.dropIndex(Index.VERTICES);
-        graph.dropIndex(Index.EDGES);
-        this.stopWatch();
-        graph.createIndex("testIndex", Vertex.class, Index.Type.MANUAL);
-        Index<Vertex> index = graph.getIndex("testIndex", Vertex.class);
-        Vertex vertex = graph.addVertex(null);
-        Object id = vertex.getId();
-        index.put("key", "value", vertex);
-        assertEquals(count(index.get("key", "value")), 1);
-        assertEquals(index.get("key", "value").iterator().next().getId(), id);
-        BaseTest.printPerformance(graph.toString(), 1, "index created and 1 vertex added and checked", this.stopWatch());
-        graph.shutdown();
+        if (this.graphTest.isPersistent) {
+            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph.dropIndex(Index.EDGES);
+            graph.dropIndex(Index.VERTICES);
 
-        graph = (IndexableGraph) this.graphTest.getGraphInstance();
-        index = graph.getIndex("testIndex", Vertex.class);
-        assertTrue(!(index instanceof AutomaticIndex));
-        assertEquals(count(index.get("key", "value")), 1);
-        assertEquals(index.get("key", "value").iterator().next().getId(), id);
-        graph.shutdown();
+            this.stopWatch();
+            graph.createIndex("testIndex", Vertex.class, Index.Type.MANUAL);
+            graph.createIndex(Index.VERTICES, Vertex.class, Index.Type.AUTOMATIC);
+            Index<Vertex> manualIndex = graph.getIndex("testIndex", Vertex.class);
+            Index<Vertex> autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
+            Vertex vertex = graph.addVertex(null);
+            vertex.setProperty("name", "marko");
+            Object id = vertex.getId();
+            manualIndex.put("key", "value", vertex);
+            assertEquals(count(manualIndex.get("key", "value")), 1);
+            assertEquals(manualIndex.get("key", "value").iterator().next().getId(), id);
+            assertEquals(count(autoIndex.get("name", "marko")), 1);
+            assertEquals(autoIndex.get("name", "marko").iterator().next().getId(), id);
+            BaseTest.printPerformance(graph.toString(), 2, "indices created and 1 vertex added and checked", this.stopWatch());
+            graph.shutdown();
 
-        graph = (IndexableGraph) this.graphTest.getGraphInstance();
-        index = graph.getIndex("testIndex", Vertex.class);
-        vertex = index.get("key", "value").iterator().next();
-        assertEquals(vertex.getId(), id);
-        graph.removeVertex(vertex);
-        graph.shutdown();
+            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            this.stopWatch();
+            manualIndex = graph.getIndex("testIndex", Vertex.class);
+            autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
+            assertTrue(!(manualIndex instanceof AutomaticIndex));
+            assertTrue(autoIndex instanceof AutomaticIndex);
+            assertEquals(count(manualIndex.get("key", "value")), 1);
+            assertEquals(manualIndex.get("key", "value").iterator().next().getId(), id);
+            assertEquals(count(autoIndex.get("name", "marko")), 1);
+            assertEquals(autoIndex.get("name", "marko").iterator().next().getId(), id);
+            BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked", this.stopWatch());
+            graph.shutdown();
 
-        graph = (IndexableGraph) this.graphTest.getGraphInstance();
-        index = graph.getIndex("testIndex", Vertex.class);
-        assertEquals(count(index.get("key", "value")), 0);
-        graph.shutdown();
+            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            this.stopWatch();
+            manualIndex = graph.getIndex("testIndex", Vertex.class);
+            autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
+            vertex = manualIndex.get("key", "value").iterator().next();
+            assertEquals(vertex.getId(), id);
+            vertex = autoIndex.get("name", "marko").iterator().next();
+            assertEquals(vertex.getId(), id);
+            graph.removeVertex(vertex);
+            assertEquals(count(manualIndex.get("key", "value")), 0);
+            assertEquals(count(autoIndex.get("key", "value")), 0);
+            BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked and then removed", this.stopWatch());
+            graph.shutdown();
+
+            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            this.stopWatch();
+            manualIndex = graph.getIndex("testIndex", Vertex.class);
+            autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
+            assertEquals(count(manualIndex.get("key", "value")), 0);
+            assertEquals(count(autoIndex.get("key", "value")), 0);
+            BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and checked to ensure empty", this.stopWatch());
+            graph.shutdown();
+        }
     }*/
 
 }

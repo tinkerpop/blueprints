@@ -14,7 +14,7 @@ public class TinkerGraphTest extends GraphTest {
     public TinkerGraphTest() {
         this.allowsDuplicateEdges = true;
         this.allowsSelfLoops = true;
-        this.requiresRDFIds = false;
+        this.isPersistent = false;
         this.isRDFModel = false;
         this.supportsVertexIteration = true;
         this.supportsEdgeIteration = true;

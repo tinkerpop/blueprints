@@ -21,7 +21,7 @@ public class SailGraphTest extends GraphTest {
     public SailGraphTest() {
         this.allowsDuplicateEdges = false;
         this.allowsSelfLoops = true;
-        this.requiresRDFIds = true;
+        this.isPersistent = false;
         this.isRDFModel = true;
         this.supportsVertexIteration = false;
         this.supportsEdgeIteration = true;

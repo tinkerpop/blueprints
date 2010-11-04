@@ -22,13 +22,13 @@ public abstract class GraphTest extends BaseTest {
      */
     public boolean ignoresSuppliedIds;
     /**
+     * Does the graph framework persist the graph to disk after shutdown?
+     */
+    public boolean isPersistent;
+    /**
      * Is the graph framework an RDF framework?
      */
     public boolean isRDFModel;
-    /**
-     * Is the graph framework's id address space that of URIs, blank nodes, and literals?
-     */
-    public boolean requiresRDFIds;
     /**
      * Does the graph framework support the indexing of edges by their properties?
      */

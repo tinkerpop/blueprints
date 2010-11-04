@@ -281,4 +281,6 @@ public class AutomaticIndexTestSuite extends TestSuite {
         }
         graph.shutdown();
     }
+
+    /// public void testAutomaticIndexKeysPersistent();
 }

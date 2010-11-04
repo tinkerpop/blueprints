@@ -29,7 +29,7 @@ public abstract class TestSuite extends BaseTest {
     }
 
     protected String convertId(final String id) {
-        if (this.graphTest.requiresRDFIds) {
+        if (this.graphTest.isRDFModel) {
             return "blueprints:" + id;
         } else {
             return id;

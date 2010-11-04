@@ -64,7 +64,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         configuration.put(Neo4jTokens.PROVIDER, Neo4jTokens.LUCENE);
         configuration.put(Neo4jTokens.TYPE, Neo4jTokens.EXACT);
         if (this instanceof AutomaticIndex) {
-
             configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
         } else {
             configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());

@@ -17,7 +17,7 @@ public class OrientGraphTest extends GraphTest {
     public OrientGraphTest() {
         this.allowsDuplicateEdges = true;
         this.allowsSelfLoops = true;
-        this.requiresRDFIds = false;
+        this.isPersistent = true;
         this.isRDFModel = false;
         this.supportsVertexIteration = true;
         this.supportsEdgeIteration = true;
