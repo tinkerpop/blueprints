@@ -30,14 +30,19 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Neo4jGraph(final String directory, Map<String, String> configuration) {
         this.directory = directory;
+        boolean fresh = !new File(this.directory).exists();
         try {
             if (null != configuration)
                 this.neo4j = new EmbeddedGraphDatabase(this.directory, configuration);
             else
                 this.neo4j = new EmbeddedGraphDatabase(this.directory);
 
-            this.createIndex(Index.VERTICES, Neo4jVertex.class, Index.Type.AUTOMATIC);
-            this.createIndex(Index.EDGES, Neo4jEdge.class, Index.Type.AUTOMATIC);
+            if (fresh) {
+                this.createIndex(Index.VERTICES, Neo4jVertex.class, Index.Type.AUTOMATIC);
+                this.createIndex(Index.EDGES, Neo4jEdge.class, Index.Type.AUTOMATIC);
+            } else {
+                this.loadIndices();
+            }
 
         } catch (Exception e) {
             if (this.neo4j != null)
@@ -48,6 +53,25 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Neo4jGraph(GraphDatabaseService neo4j) {
         this.neo4j = neo4j;
+        this.loadIndices();
+    }
+
+    private void loadIndices() {
+        for (String indexName : this.neo4j.index().nodeIndexNames()) {
+            org.neo4j.graphdb.index.Index<Node> neo4jIndex = this.neo4j.index().forNodes(indexName);
+            if (neo4jIndex.getConfiguration().get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
+                this.createIndex(indexName, Neo4jVertex.class, Index.Type.AUTOMATIC);
+            else
+                this.createIndex(indexName, Neo4jVertex.class, Index.Type.MANUAL);
+        }
+
+        for (String indexName : this.neo4j.index().relationshipIndexNames()) {
+            org.neo4j.graphdb.index.Index<Relationship> neo4jIndex = this.neo4j.index().forRelationships(indexName);
+            if (neo4jIndex.getConfiguration().get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
+                this.createIndex(indexName, Neo4jEdge.class, Index.Type.AUTOMATIC);
+            else
+                this.createIndex(indexName, Neo4jEdge.class, Index.Type.MANUAL);
+        }
     }
 
     public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
@@ -65,7 +89,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         Index index = this.indices.get(indexName);
         if (null == index) {
-            if (Vertex.class.isAssignableFrom(indexClass) && this.neo4j.index().existsForNodes(indexName)) {
+            throw new RuntimeException("No such index exists: " + indexName);
+            /* MAY BE NEEDED WHEN MULTIPLE THREADS ARE TALKING TO NEO4J
+              if (Vertex.class.isAssignableFrom(indexClass) && this.neo4j.index().existsForNodes(indexName)) {
                 if (indexName.equals(Index.VERTICES)) {
                     index = new Neo4jAutomaticIndex(indexName, indexClass, null, this);
                     this.autoIndices.put(indexName, (Neo4jAutomaticIndex) index);
@@ -83,7 +109,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 return (Index<T>) index;
             } else {
                 throw new RuntimeException("No such index exists: " + indexName);
-            }
+            }*/
         } else if (indexClass.isAssignableFrom(index.getIndexClass()))
             return (Index<T>) index;
         else
@@ -144,7 +170,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void removeVertex(final Vertex vertex) {
-
         final Long id = (Long) vertex.getId();
         final Node node = this.neo4j.getNodeById(id);
         if (null != node) {
@@ -237,12 +262,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void clear() {
-        this.shutdown();
-        deleteGraphDirectory(new File(this.directory));
-        this.neo4j = new EmbeddedGraphDatabase(this.directory);
-        this.removeVertex(this.getVertex(0));
-        this.indices.clear();
-        this.autoIndices.clear();
+        for (Vertex vertex : this.getVertices()) {
+            this.removeVertex(vertex);
+        }
+        for (Index index : this.getIndices()) {
+            this.dropIndex(index.getIndexName());
+        }
     }
 
     protected void autoStartTransaction() {

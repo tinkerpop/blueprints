@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
@@ -8,6 +9,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -56,9 +60,19 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     private void generateIndex() {
+        Map<String, String> configuration = new HashMap<String, String>();
+        configuration.put(Neo4jTokens.PROVIDER, Neo4jTokens.LUCENE);
+        configuration.put(Neo4jTokens.TYPE, Neo4jTokens.EXACT);
+        if (this instanceof AutomaticIndex) {
+
+            configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
+        } else {
+            configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
+        }
+
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
+            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName, configuration);
         else
-            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName, configuration);
     }
 }

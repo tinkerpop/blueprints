@@ -128,7 +128,7 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     /*public void testIndicesExistAfterShutdown() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
         graph.dropIndex(Index.VERTICES);
         graph.dropIndex(Index.EDGES);
         this.stopWatch();
@@ -142,12 +142,24 @@ public class IndexableGraphTestSuite extends TestSuite {
         BaseTest.printPerformance(graph.toString(), 1, "index created and 1 vertex added and checked", this.stopWatch());
         graph.shutdown();
 
-        graph = (IndexableGraph) graphTest.getGraphInstance();
-        assertNotNull(graph.getIndex("testIndex", Vertex.class));
+        graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        index = graph.getIndex("testIndex", Vertex.class);
+        assertTrue(!(index instanceof AutomaticIndex));
         assertEquals(count(index.get("key", "value")), 1);
         assertEquals(index.get("key", "value").iterator().next().getId(), id);
         graph.shutdown();
 
+        graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        index = graph.getIndex("testIndex", Vertex.class);
+        vertex = index.get("key", "value").iterator().next();
+        assertEquals(vertex.getId(), id);
+        graph.removeVertex(vertex);
+        graph.shutdown();
+
+        graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        index = graph.getIndex("testIndex", Vertex.class);
+        assertEquals(count(index.get("key", "value")), 0);
+        graph.shutdown();
     }*/
 
 }

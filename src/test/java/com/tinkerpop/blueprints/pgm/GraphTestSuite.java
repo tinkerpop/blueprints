@@ -58,7 +58,6 @@ public class GraphTestSuite extends TestSuite {
         if (graphTest.supportsEdgeIteration)
             assertEquals(0, count(graph.getEdges()));
         graph.shutdown();
-
     }
 
     public void testAddingVerticesAndEdges() {

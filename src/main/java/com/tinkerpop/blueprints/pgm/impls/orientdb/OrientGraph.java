@@ -227,13 +227,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void clear() {
-        for (OrientIndex<?> index : indices.values()) {
-            index.clear();
+        for (Index index : this.getIndices()) {
+            this.dropIndex(index.getIndexName());
         }
         this.database.delete();
         this.database = null;
-        this.indices.clear();
-        this.autoIndices.clear();
         openOrCreate();
     }
 
