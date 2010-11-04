@@ -80,7 +80,10 @@ public class Neo4jGraphTest extends GraphTest {
             directory = "/tmp/blueprints_test";
         Graph graph = new Neo4jGraph(directory);
         // removes the "reference node" in Neo4j
-        graph.removeVertex(graph.getVertex(0));
+        try {
+            graph.removeVertex(graph.getVertex(0));
+        } catch (Exception e) {
+        }
         return graph;
     }
 

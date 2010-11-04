@@ -127,6 +127,27 @@ public class IndexableGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    //public void testCreateIndicesWithDuplicateNames() {}
+    /*public void testIndicesExistAfterShutdown() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        graph.dropIndex(Index.VERTICES);
+        graph.dropIndex(Index.EDGES);
+        this.stopWatch();
+        graph.createIndex("testIndex", Vertex.class, Index.Type.MANUAL);
+        Index<Vertex> index = graph.getIndex("testIndex", Vertex.class);
+        Vertex vertex = graph.addVertex(null);
+        Object id = vertex.getId();
+        index.put("key", "value", vertex);
+        assertEquals(count(index.get("key", "value")), 1);
+        assertEquals(index.get("key", "value").iterator().next().getId(), id);
+        BaseTest.printPerformance(graph.toString(), 1, "index created and 1 vertex added and checked", this.stopWatch());
+        graph.shutdown();
+
+        graph = (IndexableGraph) graphTest.getGraphInstance();
+        assertNotNull(graph.getIndex("testIndex", Vertex.class));
+        assertEquals(count(index.get("key", "value")), 1);
+        assertEquals(index.get("key", "value").iterator().next().getId(), id);
+        graph.shutdown();
+
+    }*/
 
 }

@@ -86,7 +86,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         Map<String, ODocument> indexes = indexConfiguration.field(OrientGraph.FIELD_INDEXES);
         indexes.put(indexName, indexCfg);
         indexConfiguration.save();
-
         return (Index<T>) index;
     }
 
