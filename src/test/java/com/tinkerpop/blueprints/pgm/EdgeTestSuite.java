@@ -21,7 +21,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testEdgeEquality() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         List<String> ids = generateIds(2);
 
         Vertex v = graph.addVertex(convertId(ids.get(0)));
@@ -44,7 +44,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testAddEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         List<String> ids = generateIds(3);
 
         this.stopWatch();
@@ -65,7 +65,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testAddManyEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         int edgeCount = 1000;
         int vertexCount = 2000;
         long counter = 0l;
@@ -102,7 +102,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testGetEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         if (!graphTest.isRDFModel) {
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
@@ -131,7 +131,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testRemoveManyEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         long counter = 200000l;
         int edgeCount = 100;
         Set<Edge> edges = new HashSet<Edge>();
@@ -181,7 +181,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testAddingDuplicateEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         List<String> ids = generateIds(3);
 
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
@@ -222,7 +222,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testRemoveEdgesByRemovingVertex() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         List<String> ids = generateIds(3);
 
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
@@ -273,7 +273,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testRemoveEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         List<String> ids = generateIds(3);
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
         Vertex v2 = graph.addVertex(convertId(ids.get(1)));
@@ -346,7 +346,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testAddingSelfLoops() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         if (graphTest.allowsSelfLoops) {
             List<String> ids = generateIds(3);
             Vertex v1 = graph.addVertex(convertId(ids.get(0)));
@@ -373,7 +373,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testRemoveSelfLoops() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         if (graphTest.allowsSelfLoops) {
             List<String> ids = generateIds(3);
             Vertex v1 = graph.addVertex(convertId(ids.get(0)));
@@ -420,7 +420,7 @@ public class EdgeTestSuite extends TestSuite {
     }
 
     public void testEdgeIterator() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         if (graphTest.supportsEdgeIteration) {
             List<String> ids = generateIds(3);
             Vertex v1 = graph.addVertex(convertId(ids.get(0)));

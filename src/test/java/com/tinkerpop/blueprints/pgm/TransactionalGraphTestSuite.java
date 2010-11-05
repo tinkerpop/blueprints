@@ -16,7 +16,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testConstructionAutomatic() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         this.stopWatch();
         assertEquals(graph.getTransactionMode(), TransactionalGraph.Mode.AUTOMATIC);
         BaseTest.printPerformance(graph.toString(), 1, "transaction mode retrieved", this.stopWatch());
@@ -24,7 +24,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testModeErrors() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
@@ -50,7 +50,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
 
     public void testTransactionsForVertices() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIteration) {
             graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
             graph.addVertex(null);
@@ -87,7 +87,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testBruteVertexTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIteration) {
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
 
@@ -138,7 +138,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testTransactionsForEdges() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         Vertex v = graph.addVertex(null);
         Vertex u = graph.addVertex(null);
@@ -188,7 +188,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testBruteEdgeTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
         this.stopWatch();
         for (int i = 0; i < 100; i++) {
@@ -258,7 +258,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testPropertyTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         if (!graphTest.isRDFModel) {
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
 
@@ -318,7 +318,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testIndexTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        TransactionalGraph graph = (TransactionalGraph) graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIndex) {
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
 

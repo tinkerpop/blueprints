@@ -21,7 +21,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraph() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         if (!graphTest.ignoresSuppliedIds) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
@@ -77,7 +77,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphEdges() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsEdgeIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
@@ -103,7 +103,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphVertices() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
@@ -128,7 +128,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphSoftwareVertices() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
@@ -152,7 +152,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphVertexAndEdges() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
@@ -284,7 +284,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
 
 
     public void testGratefulGraph() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIndex) {
             for (int i = 200; i < 1002; i = i + 200) {
                 graph.clear();
@@ -329,7 +329,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
 
             this.stopWatch();
@@ -476,7 +476,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3MappingLabels() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, null, null, "_label");
@@ -535,7 +535,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3MappingIDs() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, "_id", "_id", null);
@@ -594,7 +594,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3MappingAll() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
             GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, "_id", "_id", "_label");
@@ -653,7 +653,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
     public void testMigratingTinkerGraphExample3() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
+        Graph graph = this.graphTest.createGraphDatabase();
         if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
 
             this.stopWatch();

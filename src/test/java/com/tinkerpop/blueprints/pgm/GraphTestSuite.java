@@ -19,7 +19,7 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testStringRepresentation() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         try {
             this.stopWatch();
             BaseTest.printPerformance(graph.toString(), 1, "graph string representation generated", this.stopWatch());
@@ -30,7 +30,7 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testClear() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIteration)
             assertEquals(0, count(graph.getVertices()));
         if (graphTest.supportsEdgeIteration)
@@ -61,7 +61,7 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testAddingVerticesAndEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
         Edge edge = graph.addEdge(null, a, b, convertId("knows"));
@@ -93,7 +93,7 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testRemovingEdges() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         int vertexCount = 500;
         int edgeCount = 1000;
         List<Vertex> vertices = new ArrayList<Vertex>();
@@ -131,7 +131,7 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testRemovingVertices() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         int vertexCount = 500;
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Edge> edges = new ArrayList<Edge>();
@@ -171,7 +171,7 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testConnectivityPatterns() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         List<String> ids = generateIds(4);
 
         Vertex a = graph.addVertex(convertId(ids.get(0)));
@@ -253,7 +253,7 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testTreeConnectivity() {
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.createGraphDatabase();
         this.stopWatch();
         int branchSize = 11;
         Vertex start = graph.addVertex(null);

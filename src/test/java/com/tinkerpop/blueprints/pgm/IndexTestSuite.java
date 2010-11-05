@@ -16,7 +16,7 @@ public class IndexTestSuite extends TestSuite {
     }
 
     public void testPutGetRemoveVertex() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             this.stopWatch();
             Index<Vertex> index = graph.createIndex("basic", Vertex.class, Index.Type.MANUAL);
@@ -59,7 +59,7 @@ public class IndexTestSuite extends TestSuite {
     }
 
     public void testPutGetRemoveEdge() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
         if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             this.stopWatch();
             Index<Edge> index = graph.createIndex("basic", Edge.class, Index.Type.MANUAL);

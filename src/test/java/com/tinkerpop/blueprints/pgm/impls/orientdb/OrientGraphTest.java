@@ -75,7 +75,7 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
+    public Graph loadGraphDatabase() {
         String directory = getWorkingDirectory();
         return new OrientGraph("local:" + directory + "/graph");
     }

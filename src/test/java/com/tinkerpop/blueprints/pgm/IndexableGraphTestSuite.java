@@ -16,7 +16,7 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     public void testNoManualIndicesOnConstruction() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
         int count = 0;
         this.stopWatch();
         for (Index index : graph.getIndices()) {
@@ -28,7 +28,7 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     public void testAutomaticIndicesOnConstruction() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
         this.stopWatch();
         if (graphTest.supportsVertexIndex) {
             assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
@@ -46,7 +46,7 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     public void testCreateDropIndices() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
         int count = 0;
         this.stopWatch();
         for (Index index : graph.getIndices()) {
@@ -94,7 +94,7 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     public void testNonExistentIndices() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
         assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
         assertNotNull(graph.getIndex(Index.EDGES, Edge.class));
         this.stopWatch();
@@ -127,9 +127,9 @@ public class IndexableGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /*public void testIndicesExistAfterShutdown() {
+    public void testIndicesExistAfterShutdown() {
         if (this.graphTest.isPersistent) {
-            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            IndexableGraph graph = (IndexableGraph) this.graphTest.loadGraphDatabase();
             graph.dropIndex(Index.EDGES);
             graph.dropIndex(Index.VERTICES);
 
@@ -149,7 +149,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             BaseTest.printPerformance(graph.toString(), 2, "indices created and 1 vertex added and checked", this.stopWatch());
             graph.shutdown();
 
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph = (IndexableGraph) this.graphTest.loadGraphDatabase();
             this.stopWatch();
             manualIndex = graph.getIndex("testIndex", Vertex.class);
             autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
@@ -162,7 +162,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked", this.stopWatch());
             graph.shutdown();
 
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph = (IndexableGraph) this.graphTest.loadGraphDatabase();
             this.stopWatch();
             manualIndex = graph.getIndex("testIndex", Vertex.class);
             autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
@@ -176,7 +176,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked and then removed", this.stopWatch());
             graph.shutdown();
 
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph = (IndexableGraph) this.graphTest.loadGraphDatabase();
             this.stopWatch();
             manualIndex = graph.getIndex("testIndex", Vertex.class);
             autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
@@ -185,6 +185,6 @@ public class IndexableGraphTestSuite extends TestSuite {
             BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and checked to ensure empty", this.stopWatch());
             graph.shutdown();
         }
-    }*/
+    }
 
 }
