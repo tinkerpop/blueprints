@@ -4,6 +4,7 @@ import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.db.object.OLazyObjectList;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecord;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndexException;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.serializer.stream.OStreamSerializerListRID;
@@ -60,7 +61,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     public void put(final String key, final Object value, final T element) {
-        final OrientElement elementTemp = (OrientElement) element;
 
         final String keyTemp = key + SEPARATOR + value;
 
@@ -68,9 +68,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         if (values == null)
             values = new ArrayList<ODocument>();
 
-        int pos = values.indexOf(elementTemp.getRawElement().getDocument());
+        int pos = values.indexOf(element.getRawElement().getDocument());
         if (pos == -1)
-            values.add(elementTemp.getRawElement().getDocument());
+            values.add(element.getRawElement().getDocument());
 
         final boolean txBegun = graph.autoStartTransaction();
 
@@ -83,28 +83,23 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-
         final List<ODocument> docList = treeMap.get(keyTemp);
 
         if (docList == null || docList.isEmpty())
             return new LinkedList<T>();
 
-        final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), docList);
+        final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), null, docList);
         return new OrientElementSequence(graph, list.iterator());
     }
 
     public void remove(final String key, final Object value, final T element) {
-
-        final OrientElement elementTemp = (OrientElement) element;
-
         final String keyTemp = key + SEPARATOR + value;
-
         final List<ODocument> values = treeMap.get(keyTemp);
 
         if (values != null) {
             final boolean txBegun = graph.autoStartTransaction();
 
-            values.remove(elementTemp.getRawElement().getDocument());
+            values.remove(element.getRawElement().getDocument());
             treeMap.put(keyTemp, values);
 
             if (txBegun)
@@ -165,7 +160,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     private void load(final ODocument indexCfg) {
         // LOAD TREEMAP
         final String indexClassName = indexCfg.field(OrientGraph.FIELD_CLASSNAME);
-        final ORID indexTreeMapRid = (ORID) indexCfg.field(OrientGraph.FIELD_TREEMAP_RID, ORID.class);
+        final ORecordId indexTreeMapRid = indexCfg.field(OrientGraph.FIELD_TREEMAP_RID, ORID.class);
 
         if ("Vertex".equals(indexClassName))
             this.indexClass = OrientVertex.class;
@@ -186,4 +181,5 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             throw new OIndexException("Unable to load index");
         }
     }
+
 }

@@ -15,7 +15,10 @@ import com.orientechnologies.orient.core.tx.OTransactionNoTx;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -344,6 +347,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         final String indexType = indexCfg.field(FIELD_TYPE);
 
         final OrientIndex<?> index;
+
         switch (Index.Type.valueOf(indexType.toUpperCase())) {
             case MANUAL:
                 index = new OrientIndex(indexName, null, this, indexCfg);
@@ -362,4 +366,5 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
         return index;
     }
+
 }
