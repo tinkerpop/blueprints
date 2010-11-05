@@ -74,7 +74,7 @@ public class Neo4jGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph loadGraphDatabase() {
+    public Graph getGraphInstance() {
         String directory = System.getProperty("neo4jDirectory");
         if (directory == null)
             directory = "/tmp/blueprints_test";

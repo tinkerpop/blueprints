@@ -65,7 +65,7 @@ public class TinkerGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph loadGraphDatabase() {
+    public Graph getGraphInstance() {
         return new TinkerGraph();
     }
 
@@ -75,7 +75,7 @@ public class TinkerGraphTest extends GraphTest {
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
-                    Graph graph = this.createGraphDatabase();
+                    Graph graph = this.getGraphInstance();
                     method.invoke(testSuite);
                     graph.shutdown();
                 }

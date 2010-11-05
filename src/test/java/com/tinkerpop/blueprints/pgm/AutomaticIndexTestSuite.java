@@ -19,7 +19,7 @@ public class AutomaticIndexTestSuite extends TestSuite {
     }
 
     public void testAutoIndexKeyManagement() {
-        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex) {
             AutomaticIndex index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
             assertNull(index.getAutoIndexKeys());
@@ -45,7 +45,7 @@ public class AutomaticIndexTestSuite extends TestSuite {
     }
 
     public void testAutoIndexPutGetRemoveVertex() {
-        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             for (int i = 0; i < 10; i++) {
@@ -129,7 +129,7 @@ public class AutomaticIndexTestSuite extends TestSuite {
     }
 
     public void testAutoIndexPutGetRemoveEdge() {
-        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             Set<Edge> edges = new HashSet<Edge>();
             for (int i = 0; i < 10; i++) {
@@ -219,7 +219,7 @@ public class AutomaticIndexTestSuite extends TestSuite {
     }
 
     public void testAutoIndexSpecificKeysVertex() {
-        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             Vertex v1 = graph.addVertex(null);
             ((AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class)).addAutoIndexKey("name");
@@ -251,7 +251,7 @@ public class AutomaticIndexTestSuite extends TestSuite {
     }
 
     public void testAutoIndexSpecificKeysEdge() {
-        IndexableGraph graph = (IndexableGraph) graphTest.createGraphDatabase();
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test");
             ((AutomaticIndex) graph.getIndex(Index.EDGES, Edge.class)).addAutoIndexKey("name");

@@ -23,7 +23,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testVertexEquality() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         List<String> ids = generateIds(1);
 
         if (!graphTest.ignoresSuppliedIds) {
@@ -62,7 +62,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testAddVertex() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         if (graphTest.supportsVertexIteration) {
             List<String> ids = generateIds(3);
             graph.addVertex(convertId(ids.get(0)));
@@ -86,7 +86,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testRemoveVertex() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         List<String> ids = generateIds(1);
 
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
@@ -111,7 +111,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testRemoveVertexWithEdges() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         List<String> ids = generateIds(2);
         Vertex v1 = graph.addVertex(convertId(ids.get(0)));
         Vertex v2 = graph.addVertex(convertId(ids.get(1)));
@@ -137,7 +137,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testGetNonExistantVertices() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         try {
             assertNull(graph.getVertex("asbv"));
             assertNull(graph.getVertex(12.0d));
@@ -149,7 +149,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testRemoveVertexNullId() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         int vertexCount = 1000;
         Vertex v1 = graph.addVertex(null);
         if (graphTest.supportsVertexIteration)
@@ -179,7 +179,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testVertexIterator() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         int vertexCount = 5000;
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
@@ -198,7 +198,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testAddVertexProperties() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {
             List<String> ids = generateIds(3);
             Vertex v1 = graph.addVertex(convertId(ids.get(0)));
@@ -229,7 +229,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testAddManyVertexProperties() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             this.stopWatch();
@@ -275,7 +275,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testRemoveVertexProperties() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {
             List<String> ids = generateIds(2);
 
@@ -343,7 +343,7 @@ public class VertexTestSuite extends TestSuite {
     }
 
     public void testVertexPropertyInconsistency() {
-        Graph graph = graphTest.createGraphDatabase();
+        Graph graph = graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {
             List<String> ids = generateIds(1);
             Vertex v1 = graph.addVertex(convertId(ids.get(0)));

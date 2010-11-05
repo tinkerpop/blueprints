@@ -50,14 +50,8 @@ public abstract class GraphTest extends BaseTest {
      */
     public boolean supportsTransactions;
 
-    public Graph createGraphDatabase() {
-      Graph graph = loadGraphDatabase();
-      graph.clear();
-      return graph;
-    }
+    public abstract Graph getGraphInstance();
 
-    public abstract Graph loadGraphDatabase();
-    
     public abstract void doTestSuite(final TestSuite testSuite) throws Exception;
 
 }

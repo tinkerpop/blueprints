@@ -172,7 +172,7 @@ public class SailGraphTest extends GraphTest {
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
     }
 
-    public Graph loadGraphDatabase() {
+    public Graph getGraphInstance() {
         return new SailGraph(new MemoryStore());
     }
 
@@ -182,7 +182,7 @@ public class SailGraphTest extends GraphTest {
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
-                    Graph graph = this.createGraphDatabase();
+                    Graph graph = this.getGraphInstance();
                     method.invoke(testSuite);
                     graph.shutdown();
                 }
