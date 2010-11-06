@@ -127,7 +127,7 @@ public class IndexableGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void testIndicesExistAfterShutdown() {
+    public void testIndexPersistence() {
         if (graphTest.isPersistent && graphTest.supportsVertexIndex) {
             IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
             graph.dropIndex(Index.EDGES);
