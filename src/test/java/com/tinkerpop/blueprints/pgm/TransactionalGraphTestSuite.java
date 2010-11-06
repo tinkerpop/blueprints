@@ -369,5 +369,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    // public void testAutomaticIndexTransactions() {} 
+
 
 }

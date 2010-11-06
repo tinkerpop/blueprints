@@ -353,7 +353,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
                 index = new OrientIndex(indexName, null, this, indexCfg);
                 break;
             case AUTOMATIC:
-                index = new OrientAutomaticIndex(indexName, null, this, indexCfg);
+                //index = new OrientAutomaticIndex(indexName, null, this, indexCfg);
+                index = new OrientAutomaticIndex(indexName, this, indexCfg);
                 // REGISTER THE INDEX INTO THE AUTOMATIC INDEXES
                 this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex<?>) index);
                 break;

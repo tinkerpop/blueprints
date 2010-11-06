@@ -127,8 +127,8 @@ public class IndexableGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /*public void testIndicesExistAfterShutdown() {
-        if (this.graphTest.isPersistent) {
+    public void testIndicesExistAfterShutdown() {
+        if (graphTest.isPersistent && graphTest.supportsVertexIndex) {
             IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
             graph.dropIndex(Index.EDGES);
             graph.dropIndex(Index.VERTICES);
@@ -185,6 +185,6 @@ public class IndexableGraphTestSuite extends TestSuite {
             BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and checked to ensure empty", this.stopWatch());
             graph.shutdown();
         }
-    }*/
+    }
 
 }

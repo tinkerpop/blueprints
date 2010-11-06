@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import com.orientechnologies.orient.core.db.record.ORecordTrackedList;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 
@@ -12,15 +13,17 @@ import java.util.Set;
 public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T> implements AutomaticIndex<T> {
 
     Set<String> autoIndexKeys = null;
+    private static final String KEYS = "keys";
 
     public OrientAutomaticIndex(String name, Class<T> indexClass, Set<String> autoIndexKeys, OrientGraph graph, ODocument indexCfg) {
         super(name, indexClass, graph, indexCfg);
         init(autoIndexKeys);
     }
 
-    public OrientAutomaticIndex(String name, Set<String> autoIndexKeys, OrientGraph graph, ODocument indexCfg) {
+    public OrientAutomaticIndex(String name, OrientGraph graph, ODocument indexCfg) {
         super(name, null, graph, indexCfg);
-        init(autoIndexKeys);
+        init();
+
     }
 
     public void addAutoIndexKey(String key) {
@@ -35,7 +38,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
             }
         }
 
-        saveConfiguration();
+        this.saveConfiguration();
     }
 
     protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
@@ -56,7 +59,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         if (null != this.autoIndexKeys)
             this.autoIndexKeys.remove(key);
 
-        saveConfiguration();
+        this.saveConfiguration();
     }
 
     public Set<String> getAutoIndexKeys() {
@@ -68,11 +71,23 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
             this.autoIndexKeys = new HashSet<String>();
             this.autoIndexKeys.addAll(autoIndexKeys);
         }
-        indexCfg.field("keys", autoIndexKeys);
+        indexCfg.field(KEYS, autoIndexKeys);
+    }
+
+    private void init() {
+        ORecordTrackedList field = indexCfg.field(KEYS);
+        if (null == field)
+            this.autoIndexKeys = null;
+        else {
+            this.autoIndexKeys = new HashSet<String>();
+            for (Object key : field) {
+                this.autoIndexKeys.add((String) key);
+            }
+        }
     }
 
     private void saveConfiguration() {
-        indexCfg.field("keys", autoIndexKeys);
+        indexCfg.field(KEYS, this.autoIndexKeys);
         graph.saveIndexConfiguration();
     }
 }

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -129,7 +130,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         int removed = 0;
 
-        for (List<ODocument> docs : getRawIndex().values()) {
+        List<ODocument> docs;
+        for (Entry<String, List<ODocument>> entries : getRawIndex().entrySet()) {
+            docs = entries.getValue();
+
             if (docs != null) {
                 ODocument doc;
                 for (int i = 0; i < docs.size(); ++i) {
@@ -137,6 +141,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
                     if (doc.getIdentity().equals(vertex.getId())) {
                         docs.remove(i);
+                        getRawIndex().put(entries.getKey(), docs);
                         ++removed;
                     }
                 }
@@ -148,8 +153,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     private void create(final Class<T> indexClass) {
         this.indexClass = indexClass;
 
+        final ODatabaseRecord<?> db = (ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying();
+
         // CREATE THE MAP
-        treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, OStreamSerializerListRID.INSTANCE);
+        treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>(db, OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, new OStreamSerializerListRID(db));
         try {
             treeMap.save();
         } catch (IOException e) {

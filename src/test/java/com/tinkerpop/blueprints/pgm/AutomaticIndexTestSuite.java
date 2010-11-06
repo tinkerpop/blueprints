@@ -282,5 +282,38 @@ public class AutomaticIndexTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /// public void testAutomaticIndexKeysPersistent();
+    /*public void testAutomaticIndexKeysPersistent() {
+        if (graphTest.isPersistent && graphTest.supportsVertexIndex) {
+            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+            graph.dropIndex(Index.EDGES);
+            AutomaticIndex<Vertex> index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+            assertNull(index.getAutoIndexKeys());
+            graph.shutdown();
+
+            graph = (IndexableGraph) graphTest.getGraphInstance();
+            index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+            assertNull(index.getAutoIndexKeys());
+            index.addAutoIndexKey("name");
+            assertEquals(index.getAutoIndexKeys().size(), 1);
+            assertTrue(index.getAutoIndexKeys().contains("name"));
+            graph.shutdown();
+
+            graph = (IndexableGraph) graphTest.getGraphInstance();
+            index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+            assertEquals(index.getAutoIndexKeys().size(), 1);
+            assertTrue(index.getAutoIndexKeys().contains("name"));
+            Vertex vertex = graph.addVertex(null);
+            vertex.setProperty("name", "marko");
+            vertex.setProperty("location", "santa fe");
+            graph.shutdown();
+
+            graph = (IndexableGraph) graphTest.getGraphInstance();
+            index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+            assertEquals(index.getAutoIndexKeys().size(), 1);
+            assertTrue(index.getAutoIndexKeys().contains("name"));
+            assertEquals(count(index.get("name", "marko")), 1);
+            assertEquals(count(index.get("location", "santa fe")), 0);
+            graph.shutdown();
+        }
+    }*/
 }
