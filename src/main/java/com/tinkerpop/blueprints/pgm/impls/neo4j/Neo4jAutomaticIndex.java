@@ -58,7 +58,8 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     }
 
     /*public void updateConfiguration() {
-        String ... this.neo4jIndex.getConfiguration()
+        //
     }*/
+
 
 }

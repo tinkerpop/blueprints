@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import java.io.File;
@@ -57,17 +58,18 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private void loadIndices() {
-        for (String indexName : this.neo4j.index().nodeIndexNames()) {
-            org.neo4j.graphdb.index.Index<Node> neo4jIndex = this.neo4j.index().forNodes(indexName);
-            if (neo4jIndex.getConfiguration().get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
+        IndexManager manager = this.neo4j.index();
+        for (String indexName : manager.nodeIndexNames()) {
+            org.neo4j.graphdb.index.Index<Node> neo4jIndex = manager.forNodes(indexName);
+            if (manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
                 this.createIndex(indexName, Neo4jVertex.class, Index.Type.AUTOMATIC);
             else
                 this.createIndex(indexName, Neo4jVertex.class, Index.Type.MANUAL);
         }
 
-        for (String indexName : this.neo4j.index().relationshipIndexNames()) {
-            org.neo4j.graphdb.index.Index<Relationship> neo4jIndex = this.neo4j.index().forRelationships(indexName);
-            if (neo4jIndex.getConfiguration().get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
+        for (String indexName : manager.relationshipIndexNames()) {
+            org.neo4j.graphdb.index.Index<Relationship> neo4jIndex = manager.forRelationships(indexName);
+            if (manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
                 this.createIndex(indexName, Neo4jEdge.class, Index.Type.AUTOMATIC);
             else
                 this.createIndex(indexName, Neo4jEdge.class, Index.Type.MANUAL);
