@@ -9,7 +9,7 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
 **** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "Neo4jSail":http://components.neo4j.org/neo4j-rdf-sail/, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail
 * Supporting extensions:
-** "GraphML Reader/Writer Framework":http://graphml.graphdrawing.org/
-** "Java Universal/Graph Framework":http://jung.sourceforge.net/ connector
+** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ library
+** "Java Universal/Graph":http://jung.sourceforge.net/ framework
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.
