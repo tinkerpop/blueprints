@@ -47,7 +47,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public Iterable<T> get(final String key, final Object value) {
-        System.out.println("!!!" + this.neo4jIndex.get(key, value).size());
+        //System.out.println("!!!" + this.neo4jIndex.get(key, value).size());
         IndexHits<S> itty = this.neo4jIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
