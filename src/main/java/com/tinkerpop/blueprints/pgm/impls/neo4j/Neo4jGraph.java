@@ -39,6 +39,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 this.neo4j = new EmbeddedGraphDatabase(this.directory);
 
             if (fresh) {
+                // remove reference node
+                try {
+                    this.removeVertex(this.getVertex(0));
+                } catch (Exception e) {
+                }
                 this.createIndex(Index.VERTICES, Neo4jVertex.class, Index.Type.AUTOMATIC);
                 this.createIndex(Index.EDGES, Neo4jEdge.class, Index.Type.AUTOMATIC);
             } else {

@@ -18,6 +18,15 @@ public class GraphTestSuite extends TestSuite {
         super(graphTest);
     }
 
+    public void testEmptyOnConstruction() {
+        Graph graph = graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIteration)
+            assertEquals(0, count(graph.getVertices()));
+        if (graphTest.supportsEdgeIteration)
+            assertEquals(0, count(graph.getEdges()));
+        graph.shutdown();
+    }
+
     public void testStringRepresentation() {
         Graph graph = graphTest.getGraphInstance();
         try {
@@ -31,11 +40,6 @@ public class GraphTestSuite extends TestSuite {
 
     public void testClear() {
         Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
-        if (graphTest.supportsEdgeIteration)
-            assertEquals(0, count(graph.getEdges()));
-
         this.stopWatch();
         for (int i = 0; i < 25; i++) {
             Vertex a = graph.addVertex(null);
