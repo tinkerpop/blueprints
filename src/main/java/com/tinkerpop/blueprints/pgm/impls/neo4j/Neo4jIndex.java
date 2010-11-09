@@ -9,6 +9,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.index.IndexManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,9 +21,9 @@ import java.util.Map;
 public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements Index<T> {
 
     private final Class<T> indexClass;
-    private final Neo4jGraph graph;
+    protected final Neo4jGraph graph;
     private final String indexName;
-    private org.neo4j.graphdb.index.Index<S> neo4jIndex;
+    protected org.neo4j.graphdb.index.Index<S> neo4jIndex;
 
     public Neo4jIndex(final String indexName, Class<T> indexClass, final Neo4jGraph graph) {
         this.indexClass = indexClass;
@@ -46,6 +47,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public Iterable<T> get(final String key, final Object value) {
+        System.out.println("!!!" + this.neo4jIndex.get(key, value).size());
         IndexHits<S> itty = this.neo4jIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
@@ -60,18 +62,33 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     private void generateIndex() {
-        Map<String, String> configuration = new HashMap<String, String>();
+        /*Map<String, String> configuration = new HashMap<String, String>();
         configuration.put(Neo4jTokens.PROVIDER, Neo4jTokens.LUCENE);
         configuration.put(Neo4jTokens.TYPE, Neo4jTokens.EXACT);
         if (this instanceof AutomaticIndex) {
             configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
         } else {
             configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
-        }
+        }*/
 
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName, configuration);
+            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
         else
-            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName, configuration);
+            this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+
+        if (this instanceof AutomaticIndex) {
+            this.getIndexManager().setConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
+        } else {
+            this.getIndexManager().setConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
+        }
+
+        //System.out.println(this.getIndexManager().getConfiguration(this.neo4jIndex));
+        /*if(null != this.neo4jIndex.get("name","marko").getSingle()) {
+            System.out.println(this.neo4jIndex.get("name","marko").getSingle().getProperty("name"));
+        }*/
+    }
+
+    protected IndexManager getIndexManager() {
+        return this.graph.getRawGraph().index();
     }
 }

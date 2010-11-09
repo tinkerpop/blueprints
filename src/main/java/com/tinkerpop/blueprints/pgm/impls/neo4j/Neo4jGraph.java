@@ -81,7 +81,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         if (type == Index.Type.MANUAL) {
             index = new Neo4jIndex(indexName, indexClass, this);
         } else {
-            index = new Neo4jAutomaticIndex(indexName, indexClass, null, this);
+            index = new Neo4jAutomaticIndex(indexName, indexClass, this);
             this.autoIndices.put(index.getIndexName(), (Neo4jAutomaticIndex) index);
         }
         this.indices.put(index.getIndexName(), index);
@@ -284,17 +284,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             else
                 this.tx.failure();
             this.tx.finish();
-        }
-    }
-
-    private static void deleteGraphDirectory(final File directory) {
-        if (directory.exists()) {
-            for (File file : directory.listFiles()) {
-                if (file.isDirectory()) {
-                    deleteGraphDirectory(file);
-                }
-                file.delete();
-            }
         }
     }
 

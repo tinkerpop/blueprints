@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.HashSet;
@@ -13,12 +14,9 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
 
     Set<String> autoIndexKeys = null;
 
-    public Neo4jAutomaticIndex(String name, Class<T> indexClass, Set<String> autoIndexKeys, Neo4jGraph graph) {
+    public Neo4jAutomaticIndex(String name, Class<T> indexClass, Neo4jGraph graph) {
         super(name, indexClass, graph);
-        if (null != autoIndexKeys) {
-            this.autoIndexKeys = new HashSet<String>();
-            this.autoIndexKeys.addAll(autoIndexKeys);
-        }
+        this.loadKeyField();
     }
 
     public void addAutoIndexKey(String key) {
@@ -32,6 +30,7 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
                 this.autoIndexKeys.add(key);
             }
         }
+        this.saveKeyField();
     }
 
     protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
@@ -51,15 +50,43 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     public void removeAutoIndexKey(String key) {
         if (null != autoIndexKeys)
             this.autoIndexKeys.remove(key);
+        this.saveKeyField();
     }
 
     public Set<String> getAutoIndexKeys() {
         return this.autoIndexKeys;
     }
 
-    /*public void updateConfiguration() {
-        //
-    }*/
+    private void saveKeyField() {
+        this.graph.autoStartTransaction();
+        if (this.autoIndexKeys == null)
+            this.getIndexManager().removeConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS);
+        else {
+            String field = "";
+            for (String key : autoIndexKeys) {
+                field = field + Neo4jTokens.KEY_SEPARATOR + key;
+            }
+            this.getIndexManager().setConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS, field);
+        }
+        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+    }
+
+    private void loadKeyField() {
+        String keysString = this.getIndexManager().getConfiguration(this.neo4jIndex).get(Neo4jTokens.BLUEPRINTS_AUTOKEYS);
+        if (null == keysString)
+            this.autoIndexKeys = null;
+        else {
+            this.autoIndexKeys = new HashSet<String>();
+            String[] keys = keysString.split(Neo4jTokens.KEY_SEPARATOR);
+            for (String key : keys) {
+                if (key.length() > 0) {
+                    this.autoIndexKeys.add(key);
+                }
+            }
+            if (this.autoIndexKeys.size() == 0)
+                this.autoIndexKeys = null;
+        }
+    }
 
 
 }

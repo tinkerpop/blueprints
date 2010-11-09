@@ -10,4 +10,6 @@ public class Neo4jTokens {
     public static final String EXACT = "exact";
     public static final String TYPE = "type";
     public static final String BLUEPRINTS_TYPE = "_blueprints:type";
+    public static final String BLUEPRINTS_AUTOKEYS = "_blueprints:autokeys";
+    public static final String KEY_SEPARATOR = "!=!";
 }

@@ -305,6 +305,8 @@ public class AutomaticIndexTestSuite extends TestSuite {
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
             vertex.setProperty("location", "santa fe");
+            assertEquals(count(index.get("name", "marko")), 1);
+            assertEquals(count(index.get("location", "santa fe")), 0);
             graph.shutdown();
 
             graph = (IndexableGraph) graphTest.getGraphInstance();

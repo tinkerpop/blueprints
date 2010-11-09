@@ -316,4 +316,40 @@ public class GraphTestSuite extends TestSuite {
         graph.shutdown();
 
     }
+
+    public void testGraphDataPersists() {
+        if (graphTest.isPersistent) {
+            Graph graph = graphTest.getGraphInstance();
+            Vertex v = graph.addVertex(null);
+            Vertex u = graph.addVertex(null);
+            v.setProperty("name", "marko");
+            u.setProperty("name", "pavel");
+            graph.addEdge(null, v, u, "collaborator");
+            if (graphTest.supportsVertexIteration) {
+                assertEquals(count(graph.getVertices()), 2);
+            }
+            if (graphTest.supportsEdgeIteration) {
+                assertEquals(count(graph.getEdges()), 1);
+            }
+
+            graph.shutdown();
+
+            this.stopWatch();
+            graph = graphTest.getGraphInstance();
+            BaseTest.printPerformance(graph.toString(), 1, "graph loaded", this.stopWatch());
+            if (graphTest.supportsVertexIteration) {
+                assertEquals(count(graph.getVertices()), 2);
+                for (Vertex vertex : graph.getVertices()) {
+                    assertTrue(vertex.getProperty("name").equals("marko") || vertex.getProperty("name").equals("pavel"));
+                }
+            }
+            if (graphTest.supportsEdgeIteration) {
+                assertEquals(count(graph.getEdges()), 1);
+                for (Edge edge : graph.getEdges()) {
+                    assertEquals(edge.getLabel(), "collaborator");
+                }
+            }
+            graph.shutdown();
+        }
+    }
 }
