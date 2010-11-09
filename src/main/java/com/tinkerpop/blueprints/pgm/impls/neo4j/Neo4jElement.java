@@ -32,13 +32,13 @@ public abstract class Neo4jElement implements Element {
 
     public void setProperty(final String key, final Object value) {
 
+        this.graph.autoStartTransaction();
         Object oldValue = this.getProperty(key);
 
         for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
             autoIndex.autoUpdate(key, value, oldValue, this);
         }
 
-        this.graph.autoStartTransaction();
         this.element.setProperty(key, value);
         this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
@@ -48,12 +48,13 @@ public abstract class Neo4jElement implements Element {
         try {
             this.graph.autoStartTransaction();
             Object oldValue = this.element.removeProperty(key);
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             if (null != oldValue) {
                 for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
                     autoIndex.autoRemove(key, oldValue, this);
                 }
             }
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
             return oldValue;
         } catch (NotFoundException e) {
             return null;

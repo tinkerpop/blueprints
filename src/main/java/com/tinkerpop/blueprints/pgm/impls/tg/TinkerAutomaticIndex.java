@@ -12,12 +12,12 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
 
     Set<String> autoIndexKeys = null;
 
-    public TinkerAutomaticIndex(String name, Class<T> indexClass, Set<String> autoIndexKeys) {
+    public TinkerAutomaticIndex(String name, Class<T> indexClass) {
         super(name, indexClass);
-        if (null != autoIndexKeys) {
-            this.autoIndexKeys = new HashSet<String>();
-            this.autoIndexKeys.addAll(autoIndexKeys);
-        }
+    }
+
+    public Type getIndexType() {
+        return Type.AUTOMATIC;
     }
 
     public void addAutoIndexKey(String key) {

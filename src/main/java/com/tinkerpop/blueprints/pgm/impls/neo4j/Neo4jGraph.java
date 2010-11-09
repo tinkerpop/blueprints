@@ -90,29 +90,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         Index index = this.indices.get(indexName);
-        if (null == index) {
+        // todo: be sure to do code for multiple connections interacting with db
+        if (null == index)
             throw new RuntimeException("No such index exists: " + indexName);
-            /* MAY BE NEEDED WHEN MULTIPLE THREADS ARE TALKING TO NEO4J
-              if (Vertex.class.isAssignableFrom(indexClass) && this.neo4j.index().existsForNodes(indexName)) {
-                if (indexName.equals(Index.VERTICES)) {
-                    index = new Neo4jAutomaticIndex(indexName, indexClass, null, this);
-                    this.autoIndices.put(indexName, (Neo4jAutomaticIndex) index);
-                } else
-                    index = new Neo4jIndex(indexName, indexClass, this);
-                this.indices.put(indexName, (Neo4jIndex) index);
-                return (Index<T>) index;
-            } else if (Edge.class.isAssignableFrom(indexClass) && this.neo4j.index().existsForRelationships(indexName)) {
-                if (indexName.equals(Index.EDGES)) {
-                    index = new Neo4jAutomaticIndex(indexName, indexClass, null, this);
-                    this.autoIndices.put(indexName, (Neo4jAutomaticIndex) index);
-                } else
-                    index = new Neo4jIndex(indexName, indexClass, this);
-                this.indices.put(indexName, (Neo4jIndex) index);
-                return (Index<T>) index;
-            } else {
-                throw new RuntimeException("No such index exists: " + indexName);
-            }*/
-        } else if (indexClass.isAssignableFrom(index.getIndexClass()))
+        else if (indexClass.isAssignableFrom(index.getIndexClass()))
             return (Index<T>) index;
         else
             throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
@@ -253,7 +234,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void shutdown() {
-        if (Mode.AUTOMATIC == this.mode && null != this.tx) {
+        if (null != this.tx) {
             try {
                 this.tx.success();
                 this.tx.finish();

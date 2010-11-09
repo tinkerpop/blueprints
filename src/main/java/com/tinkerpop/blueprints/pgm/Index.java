@@ -16,6 +16,8 @@ public interface Index<T extends Element> {
 
     public Class<T> getIndexClass();
 
+    public Type getIndexType();
+
     public void put(String key, Object value, T element);
 
     public Iterable<T> get(String key, Object value);

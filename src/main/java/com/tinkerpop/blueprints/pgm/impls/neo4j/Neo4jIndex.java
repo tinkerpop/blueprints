@@ -11,9 +11,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -32,6 +29,10 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         this.generateIndex();
     }
 
+    public Type getIndexType() {
+        return Type.MANUAL;
+    }
+
     public Class<T> getIndexClass() {
         return indexClass;
     }
@@ -47,7 +48,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public Iterable<T> get(final String key, final Object value) {
-        //System.out.println("!!!" + this.neo4jIndex.get(key, value).size());
         IndexHits<S> itty = this.neo4jIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
@@ -61,31 +61,30 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
-    private void generateIndex() {
-        /*Map<String, String> configuration = new HashMap<String, String>();
-        configuration.put(Neo4jTokens.PROVIDER, Neo4jTokens.LUCENE);
-        configuration.put(Neo4jTokens.TYPE, Neo4jTokens.EXACT);
-        if (this instanceof AutomaticIndex) {
-            configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
-        } else {
-            configuration.put(Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
-        }*/
+    protected void removeBasic(final String key, final Object value, final T element) {
+        this.neo4jIndex.remove((S) element.getRawElement(), key, value);
+    }
 
+    protected void putBasic(final String key, final Object value, final T element) {
+        this.neo4jIndex.add((S) element.getRawElement(), key, value);
+    }
+
+    private void generateIndex() {
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
         else
             this.neo4jIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
 
-        if (this instanceof AutomaticIndex) {
-            this.getIndexManager().setConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
-        } else {
-            this.getIndexManager().setConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
-        }
-
-        //System.out.println(this.getIndexManager().getConfiguration(this.neo4jIndex));
-        /*if(null != this.neo4jIndex.get("name","marko").getSingle()) {
-            System.out.println(this.neo4jIndex.get("name","marko").getSingle().getProperty("name"));
-        }*/
+        IndexManager manager = this.getIndexManager();
+        String storedType = manager.getConfiguration(this.neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
+        if (null == storedType) {
+            if (this instanceof AutomaticIndex) {
+                this.getIndexManager().setConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
+            } else {
+                this.getIndexManager().setConfiguration(this.neo4jIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
+            }
+        } else if (this.getIndexType() != Type.valueOf(storedType))
+            throw new RuntimeException("Stored index is " + storedType + " and is being loaded as a " + this.getIndexType() + " index");
     }
 
     protected IndexManager getIndexManager() {

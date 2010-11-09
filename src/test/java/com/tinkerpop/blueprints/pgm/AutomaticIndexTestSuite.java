@@ -282,8 +282,8 @@ public class AutomaticIndexTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /*public void testAutomaticIndexKeysPersistent() {
-        if (graphTest.isPersistent && graphTest.supportsVertexIndex) {
+    public void testAutomaticIndexKeysPersistent() {
+        if (graphTest.isPersistent && graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
             graph.dropIndex(Index.EDGES);
             AutomaticIndex<Vertex> index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
@@ -305,11 +305,17 @@ public class AutomaticIndexTestSuite extends TestSuite {
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
             vertex.setProperty("location", "santa fe");
+            if (graphTest.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 1);
             assertEquals(count(index.get("name", "marko")), 1);
             assertEquals(count(index.get("location", "santa fe")), 0);
+            if (graphTest.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 1);
             graph.shutdown();
 
             graph = (IndexableGraph) graphTest.getGraphInstance();
+            if (graphTest.supportsVertexIteration)
+                assertEquals(count(graph.getVertices()), 1);
             index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
             assertEquals(index.getAutoIndexKeys().size(), 1);
             assertTrue(index.getAutoIndexKeys().contains("name"));
@@ -317,5 +323,5 @@ public class AutomaticIndexTestSuite extends TestSuite {
             assertEquals(count(index.get("location", "santa fe")), 0);
             graph.shutdown();
         }
-    }*/
+    }
 }

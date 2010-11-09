@@ -322,9 +322,14 @@ public class GraphTestSuite extends TestSuite {
             Graph graph = graphTest.getGraphInstance();
             Vertex v = graph.addVertex(null);
             Vertex u = graph.addVertex(null);
-            v.setProperty("name", "marko");
-            u.setProperty("name", "pavel");
-            graph.addEdge(null, v, u, "collaborator");
+            if (!graphTest.isRDFModel) {
+                v.setProperty("name", "marko");
+                u.setProperty("name", "pavel");
+            }
+            Edge e = graph.addEdge(null, v, u, convertId("collaborator"));
+            if (!graphTest.isRDFModel)
+                e.setProperty("location", "internet");
+
             if (graphTest.supportsVertexIteration) {
                 assertEquals(count(graph.getVertices()), 2);
             }
@@ -339,14 +344,18 @@ public class GraphTestSuite extends TestSuite {
             BaseTest.printPerformance(graph.toString(), 1, "graph loaded", this.stopWatch());
             if (graphTest.supportsVertexIteration) {
                 assertEquals(count(graph.getVertices()), 2);
-                for (Vertex vertex : graph.getVertices()) {
-                    assertTrue(vertex.getProperty("name").equals("marko") || vertex.getProperty("name").equals("pavel"));
+                if (!graphTest.isRDFModel) {
+                    for (Vertex vertex : graph.getVertices()) {
+                        assertTrue(vertex.getProperty("name").equals("marko") || vertex.getProperty("name").equals("pavel"));
+                    }
                 }
             }
             if (graphTest.supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 1);
                 for (Edge edge : graph.getEdges()) {
-                    assertEquals(edge.getLabel(), "collaborator");
+                    assertEquals(edge.getLabel(), convertId("collaborator"));
+                    if (!graphTest.isRDFModel)
+                        assertEquals(edge.getProperty("location"), "internet");
                 }
             }
             graph.shutdown();

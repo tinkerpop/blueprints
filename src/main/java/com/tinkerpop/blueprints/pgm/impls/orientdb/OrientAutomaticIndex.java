@@ -15,15 +15,19 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     Set<String> autoIndexKeys = null;
     private static final String KEYS = "keys";
 
-    public OrientAutomaticIndex(String name, Class<T> indexClass, Set<String> autoIndexKeys, OrientGraph graph, ODocument indexCfg) {
+    public OrientAutomaticIndex(String name, Class<T> indexClass, OrientGraph graph, ODocument indexCfg) {
         super(name, indexClass, graph, indexCfg);
-        init(autoIndexKeys);
+        init();
     }
 
     public OrientAutomaticIndex(String name, OrientGraph graph, ODocument indexCfg) {
         super(name, null, graph, indexCfg);
         init();
 
+    }
+
+    public Type getIndexType() {
+        return Type.AUTOMATIC;
     }
 
     public void addAutoIndexKey(String key) {
@@ -66,13 +70,13 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         return this.autoIndexKeys;
     }
 
-    private void init(Set<String> autoIndexKeys) {
+    /*private void init(Set<String> autoIndexKeys) {
         if (null != autoIndexKeys) {
             this.autoIndexKeys = new HashSet<String>();
             this.autoIndexKeys.addAll(autoIndexKeys);
         }
         indexCfg.field(KEYS, autoIndexKeys);
-    }
+    }*/
 
     private void init() {
         ORecordTrackedList field = indexCfg.field(KEYS);

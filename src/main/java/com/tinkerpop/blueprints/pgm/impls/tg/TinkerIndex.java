@@ -30,6 +30,10 @@ public class TinkerIndex<T extends Element> implements Index<T> {
         return this.indexClass;
     }
 
+    public Type getIndexType() {
+        return Type.MANUAL;
+    }
+
     public void put(final String key, final Object value, final T element) {
         Map<Object, Set<T>> keyMap = this.index.get(key);
         if (keyMap == null) {

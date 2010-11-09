@@ -128,7 +128,7 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     public void testIndexPersistence() {
-        if (graphTest.isPersistent && graphTest.supportsVertexIndex) {
+        if (graphTest.isPersistent && graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
             graph.dropIndex(Index.EDGES);
             graph.dropIndex(Index.VERTICES);

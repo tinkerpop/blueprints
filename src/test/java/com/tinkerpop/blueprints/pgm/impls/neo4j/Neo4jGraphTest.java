@@ -78,10 +78,12 @@ public class Neo4jGraphTest extends GraphTest {
         String directory = System.getProperty("neo4jDirectory");
         if (directory == null)
             directory = "/tmp/blueprints_test";
+        boolean fresh = !(new File(directory).exists());
         Graph graph = new Neo4jGraph(directory);
         // removes the "reference node" in Neo4j
         try {
-            graph.removeVertex(graph.getVertex(0));
+            if (fresh)
+                graph.removeVertex(graph.getVertex(0));
         } catch (Exception e) {
         }
         return graph;

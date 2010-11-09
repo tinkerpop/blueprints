@@ -61,6 +61,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         return (Class<T>) this.indexClass;
     }
 
+    public Type getIndexType() {
+        return Type.MANUAL;
+    }
+
     public void put(final String key, final Object value, final T element) {
 
         final String keyTemp = key + SEPARATOR + value;

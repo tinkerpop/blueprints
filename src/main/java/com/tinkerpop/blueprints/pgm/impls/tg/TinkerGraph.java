@@ -30,7 +30,7 @@ public class TinkerGraph implements IndexableGraph {
         if (type == Index.Type.MANUAL) {
             index = new TinkerIndex(indexName, indexClass);
         } else {
-            index = new TinkerAutomaticIndex(indexName, indexClass, null);
+            index = new TinkerAutomaticIndex(indexName, indexClass);
             this.autoIndices.put(index.getIndexName(), (TinkerAutomaticIndex) index);
         }
 
