@@ -1,16 +1,28 @@
 package com.tinkerpop.blueprints.pgm;
 
 /**
+ * A transactional graph supports the notion of transactions.
+ * Once a transaction is started, all write operations can either be committed or rolled back.
+ * Read operations are not required to be in a transaction.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface TransactionalGraph extends Graph {
 
     public static final String TURN_OFF_MESSAGE = "Turn off automatic transactions to use manual transaction handling";
 
+    /**
+     * Whether the transaction being stopped was successful (commit) or a failure (rollback).
+     */
     public enum Conclusion {
         SUCCESS, FAILURE
     }
 
+    /**
+     * Transactions in a transactional graph can either be handled automatically or manually.
+     * If the graph is in automatic mode, then every mutation to the graph will committed at the time of mutation.
+     * If the graph is in manual model, then the user is responsible for starting and stopping transactions.
+     */
     public enum Mode {
         AUTOMATIC, MANUAL
     }

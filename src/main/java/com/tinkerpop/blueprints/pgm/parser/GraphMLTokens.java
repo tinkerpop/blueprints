@@ -1,6 +1,8 @@
 package com.tinkerpop.blueprints.pgm.parser;
 
 /**
+ * A collection of tokens used for GraphML related data.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class GraphMLTokens {

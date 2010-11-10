@@ -17,15 +17,37 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
+ * GraphMLReader writes the data from a GraphML stream to a graph.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Alex Averbuch (alex.averbuch@gmail.com)
  */
 public class GraphMLReader {
 
+    /**
+     * Input the GraphML stream data into the graph.
+     * In practice, usually the provided graph is empty.
+     *
+     * @param graph              the graph to populate with the GraphML data
+     * @param graphMLInputStream an InputStream of GraphML data
+     * @throws XMLStreamException thrown when the GraphML data is not correctly formatted
+     */
     public static void inputGraph(final Graph graph, final InputStream graphMLInputStream) throws XMLStreamException {
         GraphMLReader.inputGraph(graph, graphMLInputStream, 1000, null, null, null);
     }
 
+    /**
+     * Input the GraphML stream data into the graph.
+     * More control over how data is streamed is provided by this method.
+     *
+     * @param graph              the graph to populate with the GraphML data
+     * @param graphMLInputStream an InputStream of GraphML data
+     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param vertexIdKey        if the id of a vertex is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeIdKey          if the id of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeLabelKey       if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @throws XMLStreamException thrown when the GraphML data is not correctly formatted
+     */
     public static void inputGraph(final Graph graph, final InputStream graphMLInputStream, int bufferSize, String vertexIdKey, String edgeIdKey, String edgeLabelKey) throws XMLStreamException {
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -160,7 +182,7 @@ public class GraphMLReader {
 
                 if (elementName.equals(GraphMLTokens.NODE)) {
                     Object vertexObjectId = vertexIdMap.get(vertexId);
-                    Vertex currentVertex = null;
+                    Vertex currentVertex;
                     if (vertexObjectId != null)
                         // Duplicate vertices with same ID?
                         // TODO Alex: Shouldn't this throw an Exception?

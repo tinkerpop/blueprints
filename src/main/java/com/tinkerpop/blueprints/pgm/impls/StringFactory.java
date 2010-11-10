@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 
 
 /**
+ * A collection of helpful methods for creating standard toString() representations of Graph-related objects.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class StringFactory {

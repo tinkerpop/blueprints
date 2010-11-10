@@ -35,11 +35,13 @@ public class IndexableGraphTestSuite extends TestSuite {
         this.stopWatch();
         if (graphTest.supportsVertexIndex) {
             assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
+            assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).getIndexType(), Index.Type.AUTOMATIC);
         } else {
             assertNull(graph.getIndex(Index.VERTICES, Vertex.class));
         }
         if (graphTest.supportsEdgeIndex) {
             assertNotNull(graph.getIndex(Index.EDGES, Edge.class));
+            assertEquals(graph.getIndex(Index.EDGES, Edge.class).getIndexType(), Index.Type.AUTOMATIC);
         } else {
             assertNull(graph.getIndex(Index.EDGES, Edge.class));
         }
@@ -140,7 +142,9 @@ public class IndexableGraphTestSuite extends TestSuite {
             graph.createIndex("testIndex", Vertex.class, Index.Type.MANUAL);
             graph.createIndex(Index.VERTICES, Vertex.class, Index.Type.AUTOMATIC);
             Index<Vertex> manualIndex = graph.getIndex("testIndex", Vertex.class);
+            assertEquals(graph.getIndex("testIndex", Vertex.class).getIndexType(), Index.Type.MANUAL);
             Index<Vertex> autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
+            assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).getIndexType(), Index.Type.AUTOMATIC);
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
             Object id = vertex.getId();

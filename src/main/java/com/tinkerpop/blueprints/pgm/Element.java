@@ -7,7 +7,7 @@ import java.util.Set;
  * An element has an identifier that must be unique to its inheriting classes (vertex or edges).
  * An element can maintain a collection of key/value properties.
  * Keys are always strings and values can be any object.
- * Particular implementations can reduce the space of objects that can be values.
+ * Particular implementations can reduce the space of objects that can be used as values.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

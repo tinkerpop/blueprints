@@ -13,12 +13,50 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * GraphMLWriter writes a Graph to a GraphML OutputStream.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class GraphMLWriter {
 
-    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream, final Map<String, String> vertexKeyTypes, final Map<String, String> edgeKeyTypes) throws XMLStreamException {
+    /**
+     * Write the data in a Graph to a GraphML OutputStream.
+     *
+     * @param graph               the Graph to pull the data from
+     * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
+     * @throws XMLStreamException thrown if there is an error generating the GraphML data
+     */
+    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream) throws XMLStreamException {
+        Map<String, String> vertexKeyTypes = new HashMap<String, String>();
+        Map<String, String> edgeKeyTypes = new HashMap<String, String>();
 
+        for (Vertex vertex : graph.getVertices()) {
+            for (String key : vertex.getPropertyKeys()) {
+                if (!vertexKeyTypes.containsKey(key)) {
+                    vertexKeyTypes.put(key, GraphMLWriter.getStringType(vertex.getProperty(key)));
+                }
+            }
+            for (Edge edge : vertex.getOutEdges()) {
+                for (String key : edge.getPropertyKeys()) {
+                    if (!edgeKeyTypes.containsKey(key)) {
+                        edgeKeyTypes.put(key, GraphMLWriter.getStringType(edge.getProperty(key)));
+                    }
+                }
+            }
+        }
+        GraphMLWriter.outputGraph(graph, graphMLOutputStream, vertexKeyTypes, edgeKeyTypes);
+    }
+
+    /**
+     * Write the data in a Graph to a GraphML OutputStream.
+     *
+     * @param graph               the Graph to pull the data from
+     * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
+     * @param vertexKeyTypes      a Map of the data types of the vertex keys
+     * @param edgeKeyTypes        a Map of the data types of the edge keys
+     * @throws XMLStreamException thrown if there is an error generating the GraphML data
+     */
+    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream, final Map<String, String> vertexKeyTypes, final Map<String, String> edgeKeyTypes) throws XMLStreamException {
         XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
         XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream);
 
@@ -85,27 +123,6 @@ public class GraphMLWriter {
         writer.flush();
         writer.close();
 
-    }
-
-    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream) throws XMLStreamException {
-        Map<String, String> vertexKeyTypes = new HashMap<String, String>();
-        Map<String, String> edgeKeyTypes = new HashMap<String, String>();
-
-        for (Vertex vertex : graph.getVertices()) {
-            for (String key : vertex.getPropertyKeys()) {
-                if (!vertexKeyTypes.containsKey(key)) {
-                    vertexKeyTypes.put(key, GraphMLWriter.getStringType(vertex.getProperty(key)));
-                }
-            }
-            for (Edge edge : vertex.getOutEdges()) {
-                for (String key : edge.getPropertyKeys()) {
-                    if (!edgeKeyTypes.containsKey(key)) {
-                        edgeKeyTypes.put(key, GraphMLWriter.getStringType(edge.getProperty(key)));
-                    }
-                }
-            }
-        }
-        GraphMLWriter.outputGraph(graph, graphMLOutputStream, vertexKeyTypes, edgeKeyTypes);
     }
 
     private static String getStringType(final Object object) {
