@@ -1,5 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.orientechnologies.orient.core.db.graph.OGraphEdge;
@@ -12,14 +18,13 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * OrientDB implementation of Graph interface. This implementation is transactional.
@@ -54,7 +59,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         this.url = url;
         this.username = username;
         this.password = password;
-        openOrCreate();
+        openOrCreate(true);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -119,6 +124,10 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         index.clear();
         this.indices.remove(indexName);
         this.autoIndices.remove(indexName);
+
+        final Map<String, ODocument> indexes = indexConfiguration.field(OrientGraph.FIELD_INDEXES);
+        indexes.remove(indexName);
+        saveIndexConfiguration();
     }
 
     public Vertex addVertex(final Object id) {
@@ -229,12 +238,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void clear() {
-        for (Index index : this.getIndices()) {
-            this.dropIndex(index.getIndexName());
-        }
+    	  this.indices.clear();
+        this.autoIndices.clear();
         this.database.delete();
         this.database = null;
-        openOrCreate();
+        openOrCreate(false);
     }
 
     public void shutdown() {
@@ -304,7 +312,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    private void openOrCreate() {
+    private void openOrCreate(final boolean createDefaultIndices) {
         this.database = new ODatabaseGraphTx(url);
         if (this.database.exists()) {
             this.database.open(username, password);
@@ -312,7 +320,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             // LOAD THE INDEX CONFIGURATION FROM INTO THE DICTIONARY
             indexConfiguration = ((ODatabaseDocumentTx) database.getUnderlying()).getDictionary().get(DICTIONARY_INDEXES);
             if (indexConfiguration == null)
-                createIndexConfiguration();
+                createIndexConfiguration(createDefaultIndices);
             else {
                 final Map<String, ODocument> indexes = indexConfiguration.field(FIELD_INDEXES);
                 // LOAD THE INDEXES
@@ -324,16 +332,18 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.database.create();
 
             // CREATE THE INDEX CONFIGURATION FOR IT AND SAVE IT INTO THE DICTIONARY
-            createIndexConfiguration();
+            createIndexConfiguration(createDefaultIndices);
         }
     }
 
-    private void createIndexConfiguration() {
+    private void createIndexConfiguration(final boolean createDefaultIndices) {
         indexConfiguration = new ODocument((ODatabaseDocumentTx) database.getUnderlying());
         indexConfiguration.field(FIELD_INDEXES, new HashMap<String, ORecordId>(), OType.EMBEDDEDMAP);
 
-        this.createIndex(Index.VERTICES, OrientVertex.class, Index.Type.AUTOMATIC);
-        this.createIndex(Index.EDGES, OrientEdge.class, Index.Type.AUTOMATIC);
+        if( createDefaultIndices ){
+        		this.createIndex(Index.VERTICES, OrientVertex.class, Index.Type.AUTOMATIC);
+        		this.createIndex(Index.EDGES, OrientEdge.class, Index.Type.AUTOMATIC);
+        }
 
         ((ODatabaseDocumentTx) database.getUnderlying()).getDictionary().put(DICTIONARY_INDEXES, indexConfiguration);
     }
@@ -364,4 +374,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return index;
     }
 
+    public static void delete(final String url) {
+  		new ODatabaseGraphTx(url).delete();
+  	}
 }
