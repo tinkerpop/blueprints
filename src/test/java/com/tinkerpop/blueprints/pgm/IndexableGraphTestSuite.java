@@ -3,6 +3,9 @@ package com.tinkerpop.blueprints.pgm;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -186,5 +189,42 @@ public class IndexableGraphTestSuite extends TestSuite {
             graph.shutdown();
         }
     }
+
+    /*public void testIndicesDroppedOnClear() {
+        IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        int count = 0;
+        if (graphTest.supportsVertexIndex)
+            count++;
+        if (graphTest.supportsEdgeIndex)
+            count++;
+        assertEquals(count(graph.getIndices()), count);
+
+        graph.clear();
+        assertEquals(count(graph.getIndices()), 0);
+        graph.shutdown();
+    }
+
+    public void testIndexDropPersistence() {
+        if (graphTest.isPersistent) {
+            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            Set<String> indexNames = new HashSet<String>();
+            for (Index index : graph.getIndices()) {
+                indexNames.add(index.getIndexName());
+            }
+            assertEquals(count(graph.getIndices()), indexNames.size());
+            this.stopWatch();
+            for (String indexName : indexNames) {
+                graph.dropIndex(indexName);
+            }
+            BaseTest.printPerformance(graph.toString(), indexNames.size(), "indices dropped", this.stopWatch());
+            assertEquals(count(graph.getIndices()), 0);
+            graph.shutdown();
+
+            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            assertEquals(count(graph.getIndices()), 0);
+            graph.shutdown();
+
+        }
+    }*/
 
 }

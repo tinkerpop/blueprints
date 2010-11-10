@@ -278,10 +278,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return this.mode;
     }
 
-    public ODocument getIndexConfiguration() {
-        return indexConfiguration;
-    }
-
     void saveIndexConfiguration() {
         indexConfiguration.setDirty();
         indexConfiguration.save();
