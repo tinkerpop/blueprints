@@ -31,7 +31,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected static final String SEPARATOR = "!=!";
 
     protected OrientGraph graph;
-    protected OTreeMapDatabaseLazySave<String, List<ODocument>> treeMap;
+    protected OTreeMapDatabaseLazySave<String, List<ODocument>> rawIndex;
 
     protected final String indexName;
     protected Class<? extends Element> indexClass;
@@ -50,7 +50,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     protected OTreeMapDatabaseLazySave<String, List<ODocument>> getRawIndex() {
-        return this.treeMap;
+        return this.rawIndex;
     }
 
     public String getIndexName() {
@@ -69,7 +69,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final String keyTemp = key + SEPARATOR + value;
 
-        List<ODocument> values = treeMap.get(keyTemp);
+        List<ODocument> values = rawIndex.get(keyTemp);
         if (values == null)
             values = new ArrayList<ODocument>();
 
@@ -79,7 +79,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final boolean txBegun = graph.autoStartTransaction();
 
-        treeMap.put(keyTemp, values);
+        rawIndex.put(keyTemp, values);
 
         if (txBegun)
             graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -88,7 +88,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final List<ODocument> docList = treeMap.get(keyTemp);
+        final List<ODocument> docList = rawIndex.get(keyTemp);
 
         if (docList == null || docList.isEmpty())
             return new LinkedList<T>();
@@ -99,13 +99,13 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public void remove(final String key, final Object value, final T element) {
         final String keyTemp = key + SEPARATOR + value;
-        final List<ODocument> values = treeMap.get(keyTemp);
+        final List<ODocument> values = rawIndex.get(keyTemp);
 
         if (values != null) {
             final boolean txBegun = graph.autoStartTransaction();
 
             values.remove(element.getRawElement().getDocument());
-            treeMap.put(keyTemp, values);
+            rawIndex.put(keyTemp, values);
 
             if (txBegun)
                 graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -114,11 +114,11 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected void clear() {
         try {
-            if (null != this.treeMap) {
+            if (null != this.rawIndex) {
                 final boolean txBegun = graph.autoStartTransaction();
 
-                this.treeMap.clear();
-                this.treeMap.save();
+                this.rawIndex.clear();
+                this.rawIndex.save();
 
                 if (txBegun)
                     graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -160,9 +160,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         final ODatabaseRecord<?> db = (ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying();
 
         // CREATE THE MAP
-        treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>(db, OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, new OStreamSerializerListRID(db));
+        rawIndex = new OTreeMapDatabaseLazySave<String, List<ODocument>>(db, OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, new OStreamSerializerListRID(db));
         try {
-            treeMap.save();
+            rawIndex.save();
         } catch (IOException e) {
             throw new OIndexException("Unable to save index");
         }
@@ -185,9 +185,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             }
 
         // LOAD THE TREE-MAP
-        treeMap = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMapRid);
+        rawIndex = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMapRid);
         try {
-            treeMap.load();
+            rawIndex.load();
         } catch (IOException e) {
             throw new OIndexException("Unable to load index");
         }

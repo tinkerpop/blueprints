@@ -190,7 +190,7 @@ public class IndexableGraphTestSuite extends TestSuite {
         }
     }
 
-    /*public void testIndicesDroppedOnClear() {
+    public void testIndicesDroppedOnClear() {
         IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
         int count = 0;
         if (graphTest.supportsVertexIndex)
@@ -225,6 +225,6 @@ public class IndexableGraphTestSuite extends TestSuite {
             graph.shutdown();
 
         }
-    }*/
+    }
 
 }

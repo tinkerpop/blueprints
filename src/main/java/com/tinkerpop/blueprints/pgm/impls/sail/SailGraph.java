@@ -32,13 +32,13 @@ import java.util.*;
  */
 public class SailGraph implements TransactionalGraph {
 
-    protected Sail sail;
+    protected Sail rawGraph;
     protected SailConnection sailConnection;
     private Mode mode = Mode.AUTOMATIC;
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
-    public SailGraph(final Sail sail) {
-        this.startSail(sail);
+    public SailGraph(final Sail rawGraph) {
+        this.startSail(rawGraph);
     }
 
     public SailGraph() {
@@ -51,8 +51,8 @@ public class SailGraph implements TransactionalGraph {
         } catch (Exception e) {
         }
         try {
-            this.sail = sail;
-            this.sail.initialize();
+            this.rawGraph = sail;
+            this.rawGraph.initialize();
             this.sailConnection = sail.getConnection();
             this.addNamespace(SailTokens.RDF_PREFIX, SailTokens.RDF_NS);
             this.addNamespace(SailTokens.RDFS_PREFIX, SailTokens.RDFS_NS);
@@ -65,7 +65,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public Sail getRawGraph() {
-        return this.sail;
+        return this.rawGraph;
     }
 
     private Vertex createVertex(String resource) {
@@ -191,7 +191,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
-        Repository repository = new SailRepository(this.sail);
+        Repository repository = new SailRepository(this.rawGraph);
         try {
 
             RepositoryConnection connection = repository.getConnection();
@@ -220,7 +220,7 @@ public class SailGraph implements TransactionalGraph {
         try {
             this.sailConnection.commit();
             this.sailConnection.close();
-            this.sail.shutDown();
+            this.rawGraph.shutDown();
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -302,7 +302,7 @@ public class SailGraph implements TransactionalGraph {
 
 
     public String toString() {
-        String type = this.sail.getClass().getSimpleName().toLowerCase();
+        String type = this.rawGraph.getClass().getSimpleName().toLowerCase();
         return "sailgraph[" + type + "]";
     }
 

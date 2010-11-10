@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
@@ -89,7 +90,7 @@ public class OrientGraphTest extends GraphTest {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(testSuite);
-                    deleteDirectory(new File(directory));
+                    new ODatabaseGraphTx("local:" + directory + "/graph").delete();
                 }
             }
         }

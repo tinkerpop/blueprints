@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class SailVertex implements Vertex {
 
-    protected Value value;
+    protected Value rawVertex;
     protected SailGraph graph;
 
     private static final String URI_BLANK_NODE_PROPERTIES = "RDF graph URI and blank node vertices can not have properties";
@@ -36,13 +36,13 @@ public class SailVertex implements Vertex {
         dataTypeToClass.put(SailTokens.XSD_NS + "double", "java.lang.Double");
     }
 
-    public SailVertex(final Value value, final SailGraph graph) {
-        this.value = value;
+    public SailVertex(final Value rawVertex, final SailGraph graph) {
+        this.rawVertex = rawVertex;
         this.graph = graph;
     }
 
     public Value getRawVertex() {
-        return this.value;
+        return this.rawVertex;
     }
 
     private void updateLiteral(final Literal oldLiteral, final Literal newLiteral) {
@@ -66,32 +66,32 @@ public class SailVertex implements Vertex {
     }
 
     public void setProperty(final String key, final Object value) {
-        if (this.value instanceof Resource) {
+        if (this.rawVertex instanceof Resource) {
             throw new RuntimeException(URI_BLANK_NODE_PROPERTIES);
         } else {
             boolean update = false;
-            Literal oldLiteral = (Literal) this.value;
+            Literal oldLiteral = (Literal) this.rawVertex;
             if (key.equals(SailTokens.DATATYPE)) {
-                this.value = new LiteralImpl(oldLiteral.getLabel(), new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.graph.getSailConnection())));
+                this.rawVertex = new LiteralImpl(oldLiteral.getLabel(), new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.graph.getSailConnection())));
                 update = true;
             } else if (key.equals(SailTokens.LANGUAGE)) {
-                this.value = new LiteralImpl(oldLiteral.getLabel(), value.toString());
+                this.rawVertex = new LiteralImpl(oldLiteral.getLabel(), value.toString());
                 update = true;
             }
             if (update) {
-                this.updateLiteral(oldLiteral, (Literal) this.value);
+                this.updateLiteral(oldLiteral, (Literal) this.rawVertex);
             }
         }
     }
 
     public Object removeProperty(final String key) {
-        if (this.value instanceof Resource) {
+        if (this.rawVertex instanceof Resource) {
             throw new RuntimeException(URI_BLANK_NODE_PROPERTIES);
         } else {
-            Literal oldLiteral = (Literal) this.value;
+            Literal oldLiteral = (Literal) this.rawVertex;
             if (key.equals(SailTokens.DATATYPE) || key.equals(SailTokens.LANGUAGE)) {
-                this.value = new LiteralImpl(oldLiteral.getLabel());
-                this.updateLiteral(oldLiteral, (Literal) this.value);
+                this.rawVertex = new LiteralImpl(oldLiteral.getLabel());
+                this.updateLiteral(oldLiteral, (Literal) this.rawVertex);
             }
             if (key.equals(SailTokens.DATATYPE)) {
                 return oldLiteral.getDatatype().toString();
@@ -104,16 +104,16 @@ public class SailVertex implements Vertex {
 
     public Object getProperty(final String key) {
         if (key.equals(SailTokens.KIND)) {
-            if (this.value instanceof Literal)
+            if (this.rawVertex instanceof Literal)
                 return SailTokens.LITERAL;
-            else if (this.value instanceof URI)
+            else if (this.rawVertex instanceof URI)
                 return SailTokens.URI;
             else
                 return SailTokens.BNODE;
         }
 
-        if (this.value instanceof Literal) {
-            Literal literal = (Literal) value;
+        if (this.rawVertex instanceof Literal) {
+            Literal literal = (Literal) rawVertex;
             if (key.equals(SailTokens.DATATYPE)) {
                 if (null != literal.getDatatype())
                     return literal.getDatatype().stringValue();
@@ -130,7 +130,7 @@ public class SailVertex implements Vertex {
 
     public Set<String> getPropertyKeys() {
         Set<String> keys = new HashSet<String>();
-        if (this.value instanceof Literal) {
+        if (this.rawVertex instanceof Literal) {
             if (null != this.getProperty(SailTokens.DATATYPE)) {
                 keys.add(SailTokens.DATATYPE);
             } else if (null != this.getProperty(SailTokens.LANGUAGE)) {
@@ -143,9 +143,9 @@ public class SailVertex implements Vertex {
     }
 
     public Iterable<Edge> getOutEdges() {
-        if (this.value instanceof Resource) {
+        if (this.rawVertex instanceof Resource) {
             try {
-                return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.value, null, null, false), this.graph);
+                return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.rawVertex, null, null, false), this.graph);
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -156,7 +156,7 @@ public class SailVertex implements Vertex {
 
     public Iterable<Edge> getInEdges() {
         try {
-            return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, null, this.value, false), this.graph);
+            return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, null, this.rawVertex, false), this.graph);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -204,6 +204,6 @@ public class SailVertex implements Vertex {
     }
 
     public Object getId() {
-        return this.value.toString();
+        return this.rawVertex.toString();
     }
 }

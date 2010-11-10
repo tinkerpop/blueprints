@@ -15,16 +15,16 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
 
     public Neo4jVertex(final Node node, final Neo4jGraph graph) {
         super(graph);
-        this.element = node;
+        this.rawElement = node;
 
     }
 
     public Iterable<Edge> getOutEdges() {
-        return new Neo4jEdgeSequence(((Node) this.element).getRelationships(Direction.OUTGOING), this.graph);
+        return new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.OUTGOING), this.graph);
     }
 
     public Iterable<Edge> getInEdges() {
-        return new Neo4jEdgeSequence(((Node) this.element).getRelationships(Direction.INCOMING), this.graph);
+        return new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.INCOMING), this.graph);
     }
 
     public boolean equals(final Object object) {
@@ -36,7 +36,7 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
     }
 
     public Node getRawVertex() {
-        return (Node) this.element;
+        return (Node) this.rawElement;
     }
 
 }

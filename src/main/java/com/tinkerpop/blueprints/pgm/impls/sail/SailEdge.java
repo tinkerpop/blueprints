@@ -19,34 +19,34 @@ import java.util.Set;
  */
 public class SailEdge implements Edge {
 
-    protected Statement statement;
+    protected Statement rawEdge;
     protected SailGraph graph;
 
     private static final String NAMED_GRAPH_PROPERTY = "RDF graph edges can only have named graph (ng) properties";
 
-    public SailEdge(final Statement statement, final SailGraph graph) {
-        this.statement = statement;
+    public SailEdge(final Statement rawEdge, final SailGraph graph) {
+        this.rawEdge = rawEdge;
         this.graph = graph;
     }
 
     public Statement getRawEdge() {
-        return this.statement;
+        return this.rawEdge;
     }
 
     public String getLabel() {
-        return this.statement.getPredicate().stringValue();
+        return this.rawEdge.getPredicate().stringValue();
     }
 
     public Set<String> getPropertyKeys() {
         Set<String> keys = new HashSet<String>();
-        if (null != this.statement.getContext())
+        if (null != this.rawEdge.getContext())
             keys.add(SailTokens.NAMED_GRAPH);
         return keys;
     }
 
     public Object getProperty(final String key) {
         if (key.equals(SailTokens.NAMED_GRAPH))
-            return this.statement.getContext().stringValue();
+            return this.rawEdge.getContext().stringValue();
         else
             return null;
     }
@@ -54,9 +54,9 @@ public class SailEdge implements Edge {
     public void setProperty(final String key, final Object value) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
             URI namedGraph = new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.graph.getSailConnection()));
-            SailHelper.removeStatement(this.statement, this.graph.getSailConnection());
-            this.statement = new ContextStatementImpl(this.statement.getSubject(), this.statement.getPredicate(), this.statement.getObject(), namedGraph);
-            SailHelper.addStatement(this.statement, this.graph.getSailConnection());
+            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection());
+            this.rawEdge = new ContextStatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject(), namedGraph);
+            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection());
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } else {
             throw new RuntimeException(NAMED_GRAPH_PROPERTY);
@@ -65,10 +65,10 @@ public class SailEdge implements Edge {
 
     public Object removeProperty(final String key) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
-            Resource ng = this.statement.getContext();
-            SailHelper.removeStatement(this.statement, this.graph.getSailConnection());
-            this.statement = new StatementImpl(this.statement.getSubject(), this.statement.getPredicate(), this.statement.getObject());
-            SailHelper.addStatement(this.statement, this.graph.getSailConnection());
+            Resource ng = this.rawEdge.getContext();
+            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection());
+            this.rawEdge = new StatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject());
+            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection());
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             return ng;
         } else {
@@ -77,25 +77,25 @@ public class SailEdge implements Edge {
     }
 
     public Vertex getInVertex() {
-        return new SailVertex(this.statement.getObject(), this.graph);
+        return new SailVertex(this.rawEdge.getObject(), this.graph);
     }
 
     public Vertex getOutVertex() {
-        return new SailVertex(this.statement.getSubject(), this.graph);
+        return new SailVertex(this.rawEdge.getSubject(), this.graph);
     }
 
     public String toString() {
-        final String outVertex = SailGraph.namespaceToPrefix(this.statement.getSubject().stringValue(), this.graph.getSailConnection());
-        final String edgeLabel = SailGraph.namespaceToPrefix(this.statement.getPredicate().stringValue(), this.graph.getSailConnection());
+        final String outVertex = SailGraph.namespaceToPrefix(this.rawEdge.getSubject().stringValue(), this.graph.getSailConnection());
+        final String edgeLabel = SailGraph.namespaceToPrefix(this.rawEdge.getPredicate().stringValue(), this.graph.getSailConnection());
         String inVertex;
-        if (this.statement.getObject() instanceof Resource)
-            inVertex = SailGraph.namespaceToPrefix(this.statement.getObject().stringValue(), this.graph.getSailConnection());
+        if (this.rawEdge.getObject() instanceof Resource)
+            inVertex = SailGraph.namespaceToPrefix(this.rawEdge.getObject().stringValue(), this.graph.getSailConnection());
         else
-            inVertex = literalString((Literal) this.statement.getObject());
+            inVertex = literalString((Literal) this.rawEdge.getObject());
 
         String namedGraph = null;
-        if (null != this.statement.getContext()) {
-            namedGraph = SailGraph.namespaceToPrefix(this.statement.getContext().stringValue(), this.graph.getSailConnection());
+        if (null != this.rawEdge.getContext()) {
+            namedGraph = SailGraph.namespaceToPrefix(this.rawEdge.getContext().stringValue(), this.graph.getSailConnection());
         }
 
         String edgeString = "e[" + outVertex + " - " + edgeLabel + " -> " + inVertex + "]";
@@ -128,9 +128,9 @@ public class SailEdge implements Edge {
 
     public Object getId() {
         //return this.statement.hashCode();
-        if (null != this.statement.getContext())
-            return "(" + this.statement.getSubject() + ", " + this.statement.getPredicate() + ", " + this.statement.getObject() + ") [" + this.statement.getContext() + "]";
+        if (null != this.rawEdge.getContext())
+            return "(" + this.rawEdge.getSubject() + ", " + this.rawEdge.getPredicate() + ", " + this.rawEdge.getObject() + ") [" + this.rawEdge.getContext() + "]";
         else
-            return "(" + this.statement.getSubject() + ", " + this.statement.getPredicate() + ", " + this.statement.getObject() + ")";
+            return "(" + this.rawEdge.getSubject() + ", " + this.rawEdge.getPredicate() + ", " + this.rawEdge.getObject() + ")";
     }
 }

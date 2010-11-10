@@ -17,15 +17,15 @@ import java.util.Set;
 public abstract class Neo4jElement implements Element {
 
     protected final Neo4jGraph graph;
-    protected PropertyContainer element;
+    protected PropertyContainer rawElement;
 
     public Neo4jElement(final Neo4jGraph graph) {
         this.graph = graph;
     }
 
     public Object getProperty(final String key) {
-        if (this.element.hasProperty(key))
-            return this.element.getProperty(key);
+        if (this.rawElement.hasProperty(key))
+            return this.rawElement.getProperty(key);
         else
             return null;
     }
@@ -39,7 +39,7 @@ public abstract class Neo4jElement implements Element {
             autoIndex.autoUpdate(key, value, oldValue, this);
         }
 
-        this.element.setProperty(key, value);
+        this.rawElement.setProperty(key, value);
         this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
     }
@@ -47,7 +47,7 @@ public abstract class Neo4jElement implements Element {
     public Object removeProperty(final String key) {
         try {
             this.graph.autoStartTransaction();
-            Object oldValue = this.element.removeProperty(key);
+            Object oldValue = this.rawElement.removeProperty(key);
             if (null != oldValue) {
                 for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
                     autoIndex.autoRemove(key, oldValue, this);
@@ -63,7 +63,7 @@ public abstract class Neo4jElement implements Element {
 
     public Set<String> getPropertyKeys() {
         final Set<String> keys = new HashSet<String>();
-        for (final String key : this.element.getPropertyKeys()) {
+        for (final String key : this.rawElement.getPropertyKeys()) {
             keys.add(key);
         }
         return keys;
@@ -74,14 +74,14 @@ public abstract class Neo4jElement implements Element {
     }
 
     public PropertyContainer getRawElement() {
-        return this.element;
+        return this.rawElement;
     }
 
     public Object getId() {
-        if (this.element instanceof Node) {
-            return ((Node) this.element).getId();
+        if (this.rawElement instanceof Node) {
+            return ((Node) this.rawElement).getId();
         } else {
-            return ((Relationship) this.element).getId();
+            return ((Relationship) this.rawElement).getId();
         }
     }
 

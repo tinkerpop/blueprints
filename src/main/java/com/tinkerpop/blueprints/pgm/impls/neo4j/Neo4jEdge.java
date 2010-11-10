@@ -13,19 +13,19 @@ public class Neo4jEdge extends Neo4jElement implements Edge {
 
     public Neo4jEdge(final Relationship relationship, final Neo4jGraph graph) {
         super(graph);
-        this.element = relationship;
+        this.rawElement = relationship;
     }
 
     public String getLabel() {
-        return ((Relationship) this.element).getType().name();
+        return ((Relationship) this.rawElement).getType().name();
     }
 
     public Vertex getOutVertex() {
-        return new Neo4jVertex(((Relationship) this.element).getStartNode(), this.graph);
+        return new Neo4jVertex(((Relationship) this.rawElement).getStartNode(), this.graph);
     }
 
     public Vertex getInVertex() {
-        return new Neo4jVertex(((Relationship) this.element).getEndNode(), this.graph);
+        return new Neo4jVertex(((Relationship) this.rawElement).getEndNode(), this.graph);
     }
 
     public boolean equals(final Object object) {
@@ -37,6 +37,6 @@ public class Neo4jEdge extends Neo4jElement implements Edge {
     }
 
     public Relationship getRawEdge() {
-        return (Relationship) this.element;
+        return (Relationship) this.rawElement;
     }
 }
