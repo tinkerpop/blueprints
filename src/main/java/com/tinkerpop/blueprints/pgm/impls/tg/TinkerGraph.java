@@ -6,6 +6,8 @@ import com.tinkerpop.blueprints.pgm.*;
 import java.util.*;
 
 /**
+ * A in-memory, reference implementation of the property graph interfaces provided by Blueprints.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class TinkerGraph implements IndexableGraph {

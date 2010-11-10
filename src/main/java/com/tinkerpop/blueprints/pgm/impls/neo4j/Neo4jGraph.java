@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A Blueprints implementation of the graph database Neo4j (http://neo4j.org)
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class Neo4jGraph implements TransactionalGraph, IndexableGraph {

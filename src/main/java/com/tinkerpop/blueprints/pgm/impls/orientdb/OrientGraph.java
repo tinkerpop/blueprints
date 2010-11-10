@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * OrientDB implementation of Graph interface. This implementation is transactional.
+ * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */

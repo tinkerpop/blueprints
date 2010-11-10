@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.util.*;
 
 /**
+ * A Blueprints implementation of the RDF-based Sail interfaces by Aduna (http://openrdf.org).
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class SailGraph implements TransactionalGraph {
