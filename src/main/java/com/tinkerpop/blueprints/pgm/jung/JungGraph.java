@@ -148,7 +148,7 @@ public class JungGraph implements edu.uci.ics.jung.graph.Graph<Vertex, Edge> {
             return ((Collection) itty).size();
         } else {
             int count = 0;
-            for (Vertex v : itty) {
+            for (Vertex vertex : itty) {
                 count++;
             }
             return count;

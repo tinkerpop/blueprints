@@ -60,6 +60,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
+        if(this.indices.containsKey(indexName))
+            throw new RuntimeException("Index already exists: " + indexName);
+
         final ODocument indexCfg = new ODocument((ODatabaseDocumentTx) rawGraph.getUnderlying());
 
         OrientIndex<? extends OrientElement> index;

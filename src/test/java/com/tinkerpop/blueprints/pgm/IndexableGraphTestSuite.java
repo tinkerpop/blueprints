@@ -231,4 +231,32 @@ public class IndexableGraphTestSuite extends TestSuite {
         }
     }
 
+    public void testExceptionOnIndexOverwrite() {
+        int loop = 1;
+        if (graphTest.isPersistent)
+            loop = 5;
+
+        this.stopWatch();
+        String graphName = "";
+        for (int i = 0; i < loop; i++) {
+            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graphName = graph.toString();
+            int counter = 0;
+            int exceptionCounter = 0;
+            for (Index index : graph.getIndices()) {
+                try {
+                    counter++;
+                    graph.createIndex(index.getIndexName(), index.getIndexClass(), index.getIndexType());
+                } catch (RuntimeException e) {
+                    exceptionCounter++;
+                }
+            }
+            assertEquals(counter, exceptionCounter);
+            graph.shutdown();
+        }
+        BaseTest.printPerformance(graphName, loop, "attempt(s) to overwrite existing indices", this.stopWatch());
+
+
+    }
+
 }

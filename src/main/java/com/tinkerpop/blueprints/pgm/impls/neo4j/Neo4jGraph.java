@@ -84,6 +84,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+        if (this.indices.containsKey(indexName))
+            throw new RuntimeException("Index already exists: " + indexName);
+
         Neo4jIndex index;
         if (type == Index.Type.MANUAL) {
             index = new Neo4jIndex(indexName, indexClass, this);

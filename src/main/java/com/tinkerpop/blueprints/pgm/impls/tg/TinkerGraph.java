@@ -28,6 +28,9 @@ public class TinkerGraph implements IndexableGraph {
     }
 
     public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+        if (this.indices.containsKey(indexName))
+            throw new RuntimeException("Index already exists: " + indexName);
+
         TinkerIndex index;
         if (type == Index.Type.MANUAL) {
             index = new TinkerIndex(indexName, indexClass);
