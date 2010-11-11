@@ -14,13 +14,13 @@ public class TinkerGraphTest extends GraphTest {
     public TinkerGraphTest() {
         this.allowsDuplicateEdges = true;
         this.allowsSelfLoops = true;
+        this.ignoresSuppliedIds = false;
         this.isPersistent = false;
         this.isRDFModel = false;
         this.supportsVertexIteration = true;
         this.supportsEdgeIteration = true;
         this.supportsVertexIndex = true;
         this.supportsEdgeIndex = true;
-        this.ignoresSuppliedIds = false;
     }
 
     public void testVertexTestSuite() throws Exception {
@@ -75,9 +75,7 @@ public class TinkerGraphTest extends GraphTest {
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
-                    Graph graph = this.getGraphInstance();
                     method.invoke(testSuite);
-                    graph.shutdown();
                 }
             }
         }
