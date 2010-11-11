@@ -9,9 +9,9 @@ bc. <repository>
 
 ==<hr/>==
 
-!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
+!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-smurf.png!
 
-h3. Version 0.2.1 (Kermit -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.3 (Smurf -- NOT OFFICIALLY RELEASED YET)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
@@ -36,7 +36,11 @@ bc. <dependency>
 * Updated of @GraphMLReader@
 ** More efficient implementation
 ** Can specify ids and labels through @_id@ and @_label@ data properties
+* Added @GraphMigrator@ to stream the data in on graph to another
 
+==<hr/>==
+
+!http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-kermi.png!
 
 h3. Version 0.2 (Kermit -- September 22, 2010)
 
