@@ -20,17 +20,15 @@ bc. <dependency>
 </dependency>
 
 * Moved to @graphdb-deps@ database dependency management model
+* Removed object document model to focus Blueprints specifically on property graphs
 * @OrientGraph@ now implements @TransactionalGraph@ interface
 * Many updates to @TransactionalGraphTestSuite@
 ** Large transactions now tested
 ** Added timing tests to all tests
 * Updated @Index@ semantics where @get()@ no elements returns an empty iterator, not @null@
 * Updated the @toString()@ method of @TinkerGraph@ to display both vertex and edge counts
-* Removed object document model to focus Blueprints specifically on property graphs
 * Added support for multiple indices
-** Added @IndexableGraph@ interface
-** Added support for manual indexing through @Index@
-** Added support for auto indexing through @AutomaticIndex@
+** Added @IndexableGraph@, @Index@, and @AutomaticIndex@ interfaces
 ** Added numerous test cases to the test suite
 * Removed support for TinkerDoc, MongoDB, and CouchDB
 * Updated of @GraphMLReader@

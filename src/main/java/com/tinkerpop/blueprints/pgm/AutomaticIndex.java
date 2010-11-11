@@ -11,6 +11,7 @@ public interface AutomaticIndex<T extends Element> extends Index<T> {
 
     /**
      * Add an element property key that should be indexed.
+     * If null is provided as the key, then all properties are indexed (i.e. null is wildcard)
      *
      * @param key the element property key to be indexed
      */
@@ -24,7 +25,8 @@ public interface AutomaticIndex<T extends Element> extends Index<T> {
     public void removeAutoIndexKey(String key);
 
     /**
-     * Get all the element property keys currently being indexed
+     * Get all the element property keys currently being indexed.
+     * If what is returned is null, then all keys are currently being indexed (i.e. null is wildcard)
      *
      * @return the set of element property keys being indexed
      */
