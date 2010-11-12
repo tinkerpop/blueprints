@@ -60,7 +60,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
-        if(this.indices.containsKey(indexName))
+        if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
         final ODocument indexCfg = new ODocument((ODatabaseDocumentTx) rawGraph.getUnderlying());
@@ -298,7 +298,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return false;
     }
 
-    protected void autoStopTransaction(Conclusion conclusion) {
+    protected void autoStopTransaction(final Conclusion conclusion) {
         if (getTransactionMode() == Mode.AUTOMATIC) {
             if (conclusion == Conclusion.SUCCESS)
                 this.rawGraph.commit();
@@ -372,8 +372,4 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
         return index;
     }
-
-    /*public static void delete(final String url) {
-        new ODatabaseGraphTx(url).delete();
-    }*/
 }

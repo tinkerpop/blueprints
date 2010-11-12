@@ -31,7 +31,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         this(directory, null);
     }
 
-    public Neo4jGraph(final String directory, Map<String, String> configuration) {
+    public Neo4jGraph(final String directory, final Map<String, String> configuration) {
         this.directory = directory;
         boolean fresh = !new File(this.directory).exists();
         try {
@@ -59,7 +59,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    public Neo4jGraph(GraphDatabaseService rawGraph) {
+    public Neo4jGraph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
         this.loadIndices();
     }
@@ -83,7 +83,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
@@ -98,7 +98,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         return index;
     }
 
-    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
         Index index = this.indices.get(indexName);
         // todo: be sure to do code for multiple connections interacting with db
         if (null == index)
@@ -109,7 +109,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
     }
 
-    public void dropIndex(String indexName) {
+    public void dropIndex(final String indexName) {
         this.autoStartTransaction();
         this.rawGraph.index().forNodes(indexName).delete();
         this.rawGraph.index().forRelationships(indexName).delete();
@@ -203,7 +203,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
 
-    public void removeEdge(Edge edge) {
+    public void removeEdge(final Edge edge) {
         this.autoStartTransaction();
         ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
         this.autoStopTransaction(Conclusion.SUCCESS);
@@ -216,7 +216,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         this.tx = this.rawGraph.beginTx();
     }
 
-    public void stopTransaction(Conclusion conclusion) {
+    public void stopTransaction(final Conclusion conclusion) {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
@@ -231,7 +231,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         this.tx.finish();
     }
 
-    public void setTransactionMode(Mode mode) {
+    public void setTransactionMode(final Mode mode) {
         if (null != this.tx) {
             this.tx.success();
             this.tx.finish();
@@ -268,7 +268,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.tx = this.rawGraph.beginTx();
     }
 
-    protected void autoStopTransaction(Conclusion conclusion) {
+    protected void autoStopTransaction(final Conclusion conclusion) {
         if (getTransactionMode() == Mode.AUTOMATIC) {
             if (conclusion == Conclusion.SUCCESS)
                 this.tx.success();

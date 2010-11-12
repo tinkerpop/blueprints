@@ -27,7 +27,7 @@ public class TinkerGraph implements IndexableGraph {
         return this.autoIndices.values();
     }
 
-    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
@@ -43,7 +43,7 @@ public class TinkerGraph implements IndexableGraph {
         return index;
     }
 
-    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
         Index index = this.indices.get(indexName);
         if (null == index)
             throw new RuntimeException("No such index exists: " + indexName);
@@ -61,7 +61,7 @@ public class TinkerGraph implements IndexableGraph {
         return list;
     }
 
-    public void dropIndex(String indexName) {
+    public void dropIndex(final String indexName) {
         this.indices.remove(indexName);
         this.autoIndices.remove(indexName);
     }

@@ -22,7 +22,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     private final String indexName;
     protected org.neo4j.graphdb.index.Index<S> rawIndex;
 
-    public Neo4jIndex(final String indexName, Class<T> indexClass, final Neo4jGraph graph) {
+    public Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph) {
         this.indexClass = indexClass;
         this.graph = graph;
         this.indexName = indexName;

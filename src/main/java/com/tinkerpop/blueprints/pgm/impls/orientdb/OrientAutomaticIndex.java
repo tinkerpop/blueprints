@@ -15,12 +15,12 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     Set<String> autoIndexKeys = null;
     private static final String KEYS = "keys";
 
-    public OrientAutomaticIndex(String name, Class<T> indexClass, OrientGraph graph, ODocument indexCfg) {
+    public OrientAutomaticIndex(final String name, final Class<T> indexClass, final OrientGraph graph, final ODocument indexCfg) {
         super(name, indexClass, graph, indexCfg);
         init();
     }
 
-    public OrientAutomaticIndex(String name, OrientGraph graph, ODocument indexCfg) {
+    public OrientAutomaticIndex(final String name, final OrientGraph graph, final ODocument indexCfg) {
         super(name, null, graph, indexCfg);
         init();
 
@@ -30,7 +30,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         return Type.AUTOMATIC;
     }
 
-    public void addAutoIndexKey(String key) {
+    public void addAutoIndexKey(final String key) {
         if (null == key)
             this.autoIndexKeys = null;
         else {
@@ -45,7 +45,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         this.saveConfiguration();
     }
 
-    protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
+    protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             if (oldValue != null)
                 this.remove(key, oldValue, element);
@@ -53,13 +53,13 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         }
     }
 
-    protected void autoRemove(String key, Object oldValue, T element) {
+    protected void autoRemove(final String key, final Object oldValue, final T element) {
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             this.remove(key, oldValue, element);
         }
     }
 
-    public void removeAutoIndexKey(String key) {
+    public void removeAutoIndexKey(final String key) {
         if (null != this.autoIndexKeys)
             this.autoIndexKeys.remove(key);
 

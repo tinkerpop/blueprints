@@ -14,7 +14,7 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
 
     Set<String> autoIndexKeys = null;
 
-    public Neo4jAutomaticIndex(String name, Class<T> indexClass, Neo4jGraph graph) {
+    public Neo4jAutomaticIndex(final String name, final Class<T> indexClass, final Neo4jGraph graph) {
         super(name, indexClass, graph);
         this.loadKeyField();
     }
@@ -23,7 +23,7 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         return Type.AUTOMATIC;
     }
 
-    public void addAutoIndexKey(String key) {
+    public void addAutoIndexKey(final String key) {
         if (null == key)
             this.autoIndexKeys = null;
         else {
@@ -37,7 +37,7 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         this.saveKeyField();
     }
 
-    protected void autoUpdate(String key, Object newValue, Object oldValue, T element) {
+    protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             if (oldValue != null)
                 this.removeBasic(key, oldValue, element);
@@ -45,13 +45,13 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         }
     }
 
-    protected void autoRemove(String key, Object oldValue, T element) {
+    protected void autoRemove(final String key, final Object oldValue, final T element) {
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             this.removeBasic(key, oldValue, element);
         }
     }
 
-    public void removeAutoIndexKey(String key) {
+    public void removeAutoIndexKey(final String key) {
         if (null != autoIndexKeys)
             this.autoIndexKeys.remove(key);
         this.saveKeyField();

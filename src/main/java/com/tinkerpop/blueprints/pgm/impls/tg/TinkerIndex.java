@@ -17,7 +17,7 @@ public class TinkerIndex<T extends Element> implements Index<T> {
     private final String indexName;
     private final Class<T> indexClass;
 
-    public TinkerIndex(String indexName, Class<T> indexClass) {
+    public TinkerIndex(final String indexName, final Class<T> indexClass) {
         this.indexName = indexName;
         this.indexClass = indexClass;
     }
