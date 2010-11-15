@@ -133,4 +133,35 @@ public class JungGraphTest extends TestCase {
         }
 
     }
+
+    /*public static void main(String[] args) {
+        JungGraph graph = new JungGraph(TinkerGraphFactory.createTinkerGraph());
+        Layout<Vertex, Edge> layout = new CircleLayout<Vertex, Edge>(graph);
+        layout.setSize(new Dimension(300, 300));
+        BasicVisualizationServer<Vertex, Edge> viz = new BasicVisualizationServer<Vertex, Edge>(layout);
+        viz.setPreferredSize(new Dimension(350, 350));
+
+        Transformer<Vertex, String> vertexLabelTransformer = new Transformer<Vertex, String>() {
+            public String transform(Vertex vertex) {
+                return (String) vertex.getProperty("name");
+            }
+        };
+
+        Transformer<Edge, String> edgeLabelTransformer = new Transformer<Edge, String>() {
+            public String transform(Edge edge) {
+                return edge.getLabel();
+            }
+        };
+
+        viz.getRenderContext().setEdgeLabelTransformer(edgeLabelTransformer);
+        viz.getRenderContext().setVertexLabelTransformer(vertexLabelTransformer);
+
+        JFrame frame = new JFrame("TinkerPop");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(viz);
+        frame.pack();
+        frame.setVisible(true);
+
+
+    }*/
 }
