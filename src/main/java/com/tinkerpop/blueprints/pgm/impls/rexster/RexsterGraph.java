@@ -1,0 +1,84 @@
+package com.tinkerpop.blueprints.pgm.impls.rexster;
+
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
+import org.json.simple.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ */
+public class RexsterGraph implements Graph {
+
+    private final String graphURI;
+
+    public RexsterGraph(String graphURI) {
+        this.graphURI = graphURI;
+    }
+
+    protected String getGraphURI() {
+        return this.graphURI;
+    }
+
+    public void shutdown() {
+
+    }
+
+    public void clear() {
+        //throw new UnsupportedOperationException("Unable to clear a ReXster graph");
+    }
+
+    public Iterable<Vertex> getVertices() {
+        List<Vertex> vertices = new ArrayList<Vertex>();
+        for (Object vertex : RestHelper.parseResultArray(graphURI + RexsterTokens.SLASH_VERTICES)) {
+            JSONObject raw = (JSONObject) vertex;
+            vertices.add(new RexsterVertex(RestHelper.parseResultObject(graphURI + RexsterTokens.SLASH_VERTICES_SLASH + raw.get(RexsterTokens._ID)), this));
+        }
+        return vertices;
+    }
+
+    public Vertex addVertex(Object id) {
+        return null;
+    }
+
+    public Vertex getVertex(Object id) {
+        return new RexsterVertex(RestHelper.parseResultObject(graphURI + RexsterTokens.SLASH_VERTICES_SLASH + id), this);
+
+    }
+
+    public Edge getEdge(Object id) {
+        return null;
+    }
+
+    public Iterable<Edge> getEdges() {
+        List<Edge> edges = new ArrayList<Edge>();
+        for (Object edge : RestHelper.parseResultArray(graphURI + RexsterTokens.SLASH_EDGES)) {
+            JSONObject raw = (JSONObject) edge;
+            edges.add(new RexsterEdge(RestHelper.parseResultObject(graphURI + RexsterTokens.SLASH_EDGES_SLASH + raw.get(RexsterTokens._ID)), this));
+        }
+        return edges;
+    }
+
+    public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
+        return null;
+    }
+
+    public void removeEdge(Edge edge) {
+
+    }
+
+    public void removeVertex(Vertex vertex) {
+
+    }
+
+
+    public static void main(String[] args) {
+        Graph graph = new RexsterGraph("http://localhost:8182/gratefulgraph");
+        System.out.println(graph.getVertex(89).getOutEdges());
+    }
+
+}
