@@ -64,6 +64,19 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
         }
     }
 
+    public long count(final String key, final Object value) {
+        Map<Object, Set<T>> keyMap = this.index.get(key);
+        if (null == keyMap) {
+            return 0;
+        } else {
+            Set<T> set = keyMap.get(value);
+            if (null == set)
+                0;
+            else
+                return set.size();
+        }
+    }
+
     public void remove(final String key, final Object value, final T element) {
         Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null != keyMap) {
