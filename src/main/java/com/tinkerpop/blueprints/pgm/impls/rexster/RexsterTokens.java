@@ -23,6 +23,9 @@ public class RexsterTokens {
     public static final String SLASH_EDGES_SLASH = "/edges/";
 
     public static final String SLASH_OUTE = "/outE";
-    public static final String SLASH_INE = "/outE";
+    public static final String SLASH_INE = "/inE";
+
+    public static final String AND = "&";
+    public static final String EQUALS = "=";
 
 }

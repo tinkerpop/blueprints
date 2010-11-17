@@ -16,11 +16,11 @@ public class RexsterEdge extends RexsterElement implements Edge {
     }
 
     public Vertex getOutVertex() {
-        return new RexsterVertex(RestHelper.parseResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.rawElement.get(RexsterTokens._OUTV)), this.graph);
+        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.rawElement.get(RexsterTokens._OUTV)), this.graph);
     }
 
     public Vertex getInVertex() {
-        return new RexsterVertex(RestHelper.parseResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.rawElement.get(RexsterTokens._INV)), this.graph);
+        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.rawElement.get(RexsterTokens._INV)), this.graph);
 
     }
 

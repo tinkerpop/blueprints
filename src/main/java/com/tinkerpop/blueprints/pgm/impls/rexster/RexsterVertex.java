@@ -20,7 +20,7 @@ public class RexsterVertex extends RexsterElement implements Vertex {
 
     public Iterable<Edge> getInEdges() {
         List<Edge> edges = new ArrayList<Edge>();
-        for (Object edge : RestHelper.parseResultArray(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_INE)) {
+        for (Object edge : RestHelper.getResultArray(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_INE)) {
             JSONObject rawEdge = (JSONObject) edge;
             edges.add(new RexsterEdge(rawEdge, this.graph));
         }
@@ -29,7 +29,7 @@ public class RexsterVertex extends RexsterElement implements Vertex {
 
     public Iterable<Edge> getOutEdges() {
         List<Edge> edges = new ArrayList<Edge>();
-        for (Object edge : RestHelper.parseResultArray(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_OUTE)) {
+        for (Object edge : RestHelper.getResultArray(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_OUTE)) {
             JSONObject rawEdge = (JSONObject) edge;
             edges.add(new RexsterEdge(rawEdge, this.graph));
         }

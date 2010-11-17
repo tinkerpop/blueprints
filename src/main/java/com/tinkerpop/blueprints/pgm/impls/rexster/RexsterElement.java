@@ -1,6 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import org.json.simple.JSONObject;
 
 import java.util.HashSet;
@@ -11,7 +13,7 @@ import java.util.Set;
  */
 public abstract class RexsterElement implements Element {
 
-    protected final JSONObject rawElement;
+    protected JSONObject rawElement;
     protected final RexsterGraph graph;
 
     public RexsterElement(JSONObject rawElement, RexsterGraph graph) {
@@ -37,11 +39,16 @@ public abstract class RexsterElement implements Element {
     }
 
     public Object getProperty(String key) {
-        return rawElement.get(key);
+        //this.rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
+        return this.rawElement.get(key);
     }
 
     public void setProperty(String key, Object value) {
-
+        if (this instanceof Vertex) {
+            RestHelper.postObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId(), key + RexsterTokens.EQUALS + value);
+        } else {
+            RestHelper.postObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId(), key + RexsterTokens.EQUALS + value);
+        }
     }
 
     public Object removeProperty(String key) {
