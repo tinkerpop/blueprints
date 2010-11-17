@@ -31,4 +31,8 @@ public class RexsterEdge extends RexsterElement implements Edge {
     public String toString() {
         return StringFactory.edgeString(this);
     }
+
+    public boolean equals(final Object object) {
+        return object instanceof RexsterEdge && ((RexsterEdge) object).getId().equals(this.getId());
+    }
 }

@@ -7,6 +7,10 @@ import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -27,7 +31,14 @@ public class RexsterGraph implements Graph {
     }
 
     public void clear() {
-        throw new UnsupportedOperationException("Unable to clear a RexsterGraph");
+        // todo: this is very bad..very very bad :) Add clear() method to ReXster?
+        List<Object> ids = new ArrayList<Object>();
+        for (Vertex vertex : this.getVertices()) {
+            ids.add(vertex.getId());
+        }
+        for (Object id : ids) {
+            this.removeVertex(this.getVertex(id));
+        }
     }
 
     public Iterable<Vertex> getVertices() {
@@ -35,6 +46,8 @@ public class RexsterGraph implements Graph {
     }
 
     public Vertex addVertex(Object id) {
+        if (null == id)
+            id = UUID.randomUUID().toString();
         return new RexsterVertex(RestHelper.postResultObject(graphURI + RexsterTokens.SLASH_VERTICES_SLASH + id), this);
     }
 
@@ -52,6 +65,8 @@ public class RexsterGraph implements Graph {
     }
 
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
+        if (null == id)
+            id = UUID.randomUUID().toString();
         return new RexsterEdge(RestHelper.postResultObjectForm(graphURI + RexsterTokens.SLASH_EDGES_SLASH + id, RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
     }
 
@@ -66,42 +81,4 @@ public class RexsterGraph implements Graph {
     public String toString() {
         return "rexstergraph[" + this.graphURI + "]";
     }
-
-
-    public static void main(String[] args) {
-        Graph graph = new RexsterGraph("http://localhost:8182/gratefulgraph");
-        System.out.println(graph);
-        int counter = 0;
-        for (Vertex vertex : graph.getVertices()) {
-            counter++;
-            System.out.println(vertex);
-        }
-        System.out.println("TOTAL SIZE: " + counter);
-
-        /*for (Edge edge : graph.getEdges()) {
-            counter++;
-            System.out.println(edge);
-        }
-        System.out.println("TOTAL SIZE: " + counter);*/
-        counter = 0;
-        for (Edge e : graph.getVertex(89).getOutEdges()) {
-            System.out.println(e);
-            counter++;
-        }
-        System.out.println("TOTAL SIZE: " + counter);
-        /*Vertex a = graph.addVertex(100001);
-        System.out.println(a.getPropertyKeys());
-        Vertex b = graph.addVertex(100002);
-        System.out.println(a + "---" + b);
-        Edge e = graph.addEdge(101012, a, b, "hello_there");
-        System.out.println(e);
-        a.setProperty("blah", "marko");
-        System.out.println(a.getProperty("blah"));
-        System.out.println(a.getOutEdges());
-        graph.removeEdge(e);
-        System.out.println(a.getOutEdges());*/
-
-
-    }
-
 }

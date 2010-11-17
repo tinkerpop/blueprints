@@ -186,6 +186,15 @@
                             <name>orientGraphDirectory</name>
                             <value>/tmp/blueprints_test</value>
                         </property>
+                        <!-- REXSTERGRAPH TEST PROPERTIES -->
+                        <property>
+                            <name>testRexsterGraph</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>rexsterGraphURI</name>
+                            <value>http://localhost:8182/emptygraph</value>
+                        </property>
                     </systemProperties>
                 </configuration>
             </plugin>

@@ -17,9 +17,10 @@ import java.util.Queue;
  */
 public class RexsterVertexSequence implements Iterable<Vertex>, Iterator<Vertex> {
 
+    private final int bufferSize = 100;
     private int start = 0;
-    private int end = 25;
-    private final int bufferSize = 25;
+    private int end = bufferSize;
+
     private final Queue<Vertex> queue = new LinkedList<Vertex>();
     private final RexsterGraph graph;
     private final String uri;

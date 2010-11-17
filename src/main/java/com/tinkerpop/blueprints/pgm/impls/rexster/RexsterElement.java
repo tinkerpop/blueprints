@@ -57,6 +57,10 @@ public abstract class RexsterElement implements Element {
         }
     }
 
+    public int hashCode() {
+        return this.getId().hashCode();
+    }
+
     public Object removeProperty(String key) {
         return null;
     }

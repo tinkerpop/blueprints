@@ -17,9 +17,10 @@ import java.util.Queue;
  */
 public class RexsterEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
 
+    private final int bufferSize = 100;
     private int start = 0;
-    private int end = 25;
-    private final int bufferSize = 25;
+    private int end = bufferSize;
+
     private final Queue<Edge> queue = new LinkedList<Edge>();
     private final RexsterGraph graph;
     private final String uri;
