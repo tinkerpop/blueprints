@@ -189,7 +189,7 @@
                         <!-- REXSTERGRAPH TEST PROPERTIES -->
                         <property>
                             <name>testRexsterGraph</name>
-                            <value>true</value>
+                            <value>false</value>
                         </property>
                         <property>
                             <name>rexsterGraphURI</name>

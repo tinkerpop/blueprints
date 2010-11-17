@@ -1,6 +1,9 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.GraphTestSuite;
+import com.tinkerpop.blueprints.pgm.TestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.lang.reflect.Method;
@@ -23,11 +26,11 @@ public class RexsterGraphTest extends GraphTest {
         this.supportsEdgeIndex = true;
     }
 
-    public void testVertexTestSuite() throws Exception {
+    /*public void testVertexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new VertexTestSuite(this));
         printTestPerformance("VertexTestSuite", this.stopWatch());
-    }
+    }*/
 
     public void testEdgeTestSuite() throws Exception {
         this.stopWatch();
