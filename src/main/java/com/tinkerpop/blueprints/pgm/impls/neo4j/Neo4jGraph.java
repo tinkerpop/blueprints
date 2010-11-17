@@ -283,6 +283,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public String toString() {
-        return "neo4jgraph[" + this.directory + "]";
+        return "neo4jgraph[" + this.rawGraph + "]";
     }
 }
