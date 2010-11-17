@@ -71,7 +71,7 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
         } else {
             Set<T> set = keyMap.get(value);
             if (null == set)
-                0;
+                return 0;
             else
                 return set.size();
         }

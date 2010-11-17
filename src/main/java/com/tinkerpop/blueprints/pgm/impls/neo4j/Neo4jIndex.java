@@ -70,7 +70,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public long count(final String key, final Object value) {
-        IndexHits<Node> itty = this.indexService.getNodes(key, value);
+        IndexHits<S> itty = this.rawIndex.get(key, value);
         return itty.size();
     }
 
