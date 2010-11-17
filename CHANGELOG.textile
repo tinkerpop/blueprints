@@ -35,6 +35,9 @@ bc. <dependency>
 ** More efficient implementation
 ** Can specify ids and labels through @_id@ and @_label@ data properties
 * Added @GraphMigrator@ to stream the data in one graph to another
+* Added @RexsterGraph@ to connect to remote graphs over HTTP-REST
+* Added JavaDoc to all property graph model interfaces
+
 
 ==<hr/>==
 

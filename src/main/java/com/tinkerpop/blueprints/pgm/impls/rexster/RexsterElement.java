@@ -39,15 +39,21 @@ public abstract class RexsterElement implements Element {
     }
 
     public Object getProperty(String key) {
-        //this.rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
+        if (this instanceof Vertex)
+            this.rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId());
+        else
+            this.rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
         return this.rawElement.get(key);
     }
 
     public void setProperty(String key, Object value) {
+        if (key.startsWith(RexsterTokens.UNDERSCORE))
+            throw new RuntimeException("RexsterGraph does not support property keys that start with underscore");
+
         if (this instanceof Vertex) {
-            RestHelper.postObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId(), key + RexsterTokens.EQUALS + value);
+            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId(), key + RexsterTokens.EQUALS + value);
         } else {
-            RestHelper.postObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId(), key + RexsterTokens.EQUALS + value);
+            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId(), key + RexsterTokens.EQUALS + value);
         }
     }
 

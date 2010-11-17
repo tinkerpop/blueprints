@@ -1,12 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster.util;
 
 import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterTokens;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -15,72 +14,59 @@ import java.net.URLConnection;
  */
 public class RestHelper {
 
-    public static JSONParser parser = new JSONParser();
+    private static final JSONParser parser = new JSONParser();
+    private static final String POST = "POST";
+    private static final String DELETE = "DELETE";
 
-    public static JSONArray getResultArray(String uri) {
+    public static JSONObject get(final String uri) {
         try {
-
             URL url = new URL(uri);
             URLConnection connection = url.openConnection();
             connection.connect();
             InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            JSONArray retArray = (JSONArray) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
+            JSONObject object = (JSONObject) parser.parse(reader);
             reader.close();
-            return retArray;
+            return object;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    public static JSONObject getResultObject(String uri) {
-        try {
-            URL url = new URL(uri);
-            URLConnection conn = url.openConnection();
-            conn.connect();
-            InputStreamReader reader = new InputStreamReader(conn.getInputStream());
-            JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
-            reader.close();
-            return retObject;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+    /*public static JSONArray getResultArray(final String uri) {
+        return (JSONArray) RestHelper.get(uri).get(RexsterTokens.RESULTS);
+    }*/
+
+    public static JSONObject getResultObject(final String uri) {
+        return (JSONObject) RestHelper.get(uri).get(RexsterTokens.RESULTS);
     }
 
-    public static JSONObject postObject(String uri) {
+    public static JSONObject postResultObject(final String uri) {
         try {
             URL url = new URL(uri);
-            URLConnection connection = url.openConnection();
-            connection.setDoOutput(true);
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            // Get the response
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(POST);
             InputStreamReader reader = new InputStreamReader(connection.getInputStream());
             JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
             reader.close();
-            writer.close();
             return retObject;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
     }
 
-    public static JSONObject postObjectForm(String uri, String formData) {
+    public static JSONObject postResultObjectForm(final String uri, final String formData) {
+        return RestHelper.postResultObject(uri + RexsterTokens.QUESTION + formData);
+    }
+
+    public static void delete(final String uri) {
         try {
             URL url = new URL(uri);
-            URLConnection connection = url.openConnection();
-            connection.setDoOutput(true);
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(formData);
-            writer.flush();
-            // Get the response
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(DELETE);
             InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
             reader.close();
-            writer.close();
-            return retObject;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
     }
 }

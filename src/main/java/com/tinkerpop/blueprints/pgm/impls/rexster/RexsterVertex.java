@@ -3,11 +3,8 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import org.json.simple.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -19,21 +16,11 @@ public class RexsterVertex extends RexsterElement implements Vertex {
     }
 
     public Iterable<Edge> getInEdges() {
-        List<Edge> edges = new ArrayList<Edge>();
-        for (Object edge : RestHelper.getResultArray(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_INE)) {
-            JSONObject rawEdge = (JSONObject) edge;
-            edges.add(new RexsterEdge(rawEdge, this.graph));
-        }
-        return edges;
+        return new RexsterEdgeSequence(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_INE, this.graph);
     }
 
     public Iterable<Edge> getOutEdges() {
-        List<Edge> edges = new ArrayList<Edge>();
-        for (Object edge : RestHelper.getResultArray(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_OUTE)) {
-            JSONObject rawEdge = (JSONObject) edge;
-            edges.add(new RexsterEdge(rawEdge, this.graph));
-        }
-        return edges;
+        return new RexsterEdgeSequence(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_OUTE, this.graph);
     }
 
     public String toString() {

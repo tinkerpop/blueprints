@@ -13,6 +13,7 @@ public class RexsterTokens {
     public static final String _INE = "_inE";
     public static final String _OUTV = "_outV";
     public static final String _INV = "_inV";
+    public static final String UNDERSCORE = "_";
 
     public static final String VERTICES = "vertices";
     public static final String EDGES = "edges";
@@ -27,5 +28,10 @@ public class RexsterTokens {
 
     public static final String AND = "&";
     public static final String EQUALS = "=";
+    public static final String QUESTION = "?";
+
+    public static final String TOTAL_SIZE = "total_size";
+    public static final String REXSTER_OFFSET_END = "rexster.offset.end";
+    public static final String REXSTER_OFFSET_START = "rexster.offset.start";
 
 }
