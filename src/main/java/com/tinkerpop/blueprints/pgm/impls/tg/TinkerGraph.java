@@ -145,7 +145,7 @@ public class TinkerGraph implements IndexableGraph {
         }
 
         if (null != edge) {
-            throw new RuntimeException("Vertex with id " + id + " already exists");
+            throw new RuntimeException("Edge with id " + id + " already exists");
         } else {
             edge = new TinkerEdge(idString, outVertex, inVertex, label, this);
             this.edges.put(edge.getId().toString(), edge);
