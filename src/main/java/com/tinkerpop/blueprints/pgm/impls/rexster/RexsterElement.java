@@ -62,6 +62,6 @@ public abstract class RexsterElement implements Element {
     }
 
     public Object removeProperty(String key) {
-        return null;
+        throw new UnsupportedOperationException("Removing properties is currently unsupported");
     }
 }

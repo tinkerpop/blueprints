@@ -11,12 +11,12 @@ import com.tinkerpop.blueprints.pgm.Vertex;
  */
 public class StringFactory {
 
-    private static final String V = "v";
-    private static final String E = "e";
-    private static final String L_BRACKET = "[";
-    private static final String R_BRACKET = "]";
-    private static final String DASH = "-";
-    private static final String ARROW = "->";
+    public static final String V = "v";
+    public static final String E = "e";
+    public static final String L_BRACKET = "[";
+    public static final String R_BRACKET = "]";
+    public static final String DASH = "-";
+    public static final String ARROW = "->";
 
     public static String vertexString(final Vertex vertex) {
         return V + L_BRACKET + vertex.getId() + R_BRACKET;

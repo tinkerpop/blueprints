@@ -20,11 +20,11 @@ public class RestHelper {
 
     public static JSONObject get(final String uri) {
         try {
-            URL url = new URL(uri);
-            URLConnection connection = url.openConnection();
+            final URL url = new URL(uri);
+            final URLConnection connection = url.openConnection();
             connection.connect();
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            JSONObject object = (JSONObject) parser.parse(reader);
+            final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+            final JSONObject object = (JSONObject) parser.parse(reader);
             reader.close();
             return object;
         } catch (Exception e) {
@@ -42,11 +42,11 @@ public class RestHelper {
 
     public static JSONObject postResultObject(final String uri) {
         try {
-            URL url = new URL(uri);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            final URL url = new URL(uri);
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(POST);
             InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
+            final JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
             reader.close();
             return retObject;
         } catch (Exception e) {
@@ -60,10 +60,10 @@ public class RestHelper {
 
     public static void delete(final String uri) {
         try {
-            URL url = new URL(uri);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            final URL url = new URL(uri);
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(DELETE);
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+            final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
             reader.close();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);

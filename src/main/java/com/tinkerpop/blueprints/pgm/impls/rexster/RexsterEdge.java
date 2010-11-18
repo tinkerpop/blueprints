@@ -29,7 +29,7 @@ public class RexsterEdge extends RexsterElement implements Edge {
     }
 
     public String toString() {
-        return StringFactory.edgeString(this);
+        return StringFactory.E + StringFactory.L_BRACKET + this.getId() + StringFactory.R_BRACKET + StringFactory.L_BRACKET + this.rawElement.get(RexsterTokens._OUTV) + StringFactory.DASH + this.getLabel() + StringFactory.ARROW + this.rawElement.get(RexsterTokens._INV) + StringFactory.R_BRACKET;
     }
 
     public boolean equals(final Object object) {

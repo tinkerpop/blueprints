@@ -70,14 +70,6 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         return this.autoIndexKeys;
     }
 
-    /*private void init(Set<String> autoIndexKeys) {
-        if (null != autoIndexKeys) {
-            this.autoIndexKeys = new HashSet<String>();
-            this.autoIndexKeys.addAll(autoIndexKeys);
-        }
-        indexCfg.field(KEYS, autoIndexKeys);
-    }*/
-
     private void init() {
         ORecordTrackedList field = indexCfg.field(KEYS);
         if (null == field)

@@ -21,6 +21,7 @@ bc. <dependency>
 
 * Moved to @graphdb-deps@ database dependency management model
 * Removed object document model to focus Blueprints specifically on property graphs
+** Removed support for TinkerDoc, MongoDB, and CouchDB
 * @OrientGraph@ now implements @TransactionalGraph@ interface
 * Many updates to @TransactionalGraphTestSuite@
 ** Large transactions now tested
@@ -30,7 +31,6 @@ bc. <dependency>
 * Added support for multiple indices
 ** Added @IndexableGraph@, @Index@, and @AutomaticIndex@ interfaces
 ** Added numerous test cases to the test suite
-* Removed support for TinkerDoc, MongoDB, and CouchDB
 * Updated @GraphMLReader@
 ** More efficient implementation
 ** Can specify ids and labels through @_id@ and @_label@ data properties
