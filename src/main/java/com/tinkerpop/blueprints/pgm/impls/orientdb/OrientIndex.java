@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.db.object.OLazyObjectList;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecord;
+import com.orientechnologies.orient.core.db.record.ORecordLazyList;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndexException;
@@ -10,16 +11,14 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.serializer.stream.OStreamSerializerListRID;
 import com.orientechnologies.orient.core.serialization.serializer.stream.OStreamSerializerString;
 import com.orientechnologies.orient.core.storage.OStorage;
-import com.orientechnologies.orient.core.type.tree.OTreeMapDatabaseLazySave;
+import com.orientechnologies.orient.core.type.tree.OMVRBTreeDatabaseLazySave;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -31,7 +30,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected static final String SEPARATOR = "!=!";
 
     protected OrientGraph graph;
-    protected OTreeMapDatabaseLazySave<String, List<ODocument>> rawIndex;
+    protected OMVRBTreeDatabaseLazySave<String, ORecordLazyList> treeMap;
 
     protected final String indexName;
     protected Class<? extends Element> indexClass;
@@ -49,8 +48,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
-    protected OTreeMapDatabaseLazySave<String, List<ODocument>> getRawIndex() {
-        return this.rawIndex;
+    protected OMVRBTreeDatabaseLazySave<String, ORecordLazyList> getRawIndex() {
+        return this.treeMap;
     }
 
     public String getIndexName() {
@@ -69,9 +68,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final String keyTemp = key + SEPARATOR + value;
 
-        List<ODocument> values = rawIndex.get(keyTemp);
+        ORecordLazyList values = treeMap.get(keyTemp);
         if (values == null)
-            values = new ArrayList<ODocument>();
+            values = new ORecordLazyList((ODatabaseRecord<?>) graph.getRawGraph().getUnderlying(), ODocument.RECORD_TYPE);
 
         int pos = values.indexOf(element.getRawElement().getDocument());
         if (pos == -1)
@@ -79,7 +78,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final boolean txBegun = graph.autoStartTransaction();
 
-        rawIndex.put(keyTemp, values);
+        treeMap.put(keyTemp, values);
 
         if (txBegun)
             graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -88,7 +87,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final List<ODocument> docList = rawIndex.get(keyTemp);
+        final ORecordLazyList docList = treeMap.get(keyTemp);
 
         if (docList == null || docList.isEmpty())
             return new LinkedList<T>();
@@ -99,13 +98,13 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public void remove(final String key, final Object value, final T element) {
         final String keyTemp = key + SEPARATOR + value;
-        final List<ODocument> values = rawIndex.get(keyTemp);
+        final ORecordLazyList values = treeMap.get(keyTemp);
 
         if (values != null) {
             final boolean txBegun = graph.autoStartTransaction();
 
             values.remove(element.getRawElement().getDocument());
-            rawIndex.put(keyTemp, values);
+            treeMap.put(keyTemp, values);
 
             if (txBegun)
                 graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -114,11 +113,11 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected void clear() {
         try {
-            if (null != this.rawIndex) {
+            if (null != this.treeMap) {
                 final boolean txBegun = graph.autoStartTransaction();
 
-                this.rawIndex.clear();
-                this.rawIndex.save();
+                this.treeMap.clear();
+                this.treeMap.save();
 
                 if (txBegun)
                     graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -134,14 +133,14 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         int removed = 0;
 
-        List<ODocument> docs;
-        for (Entry<String, List<ODocument>> entries : getRawIndex().entrySet()) {
+        ORecordLazyList docs;
+        for (Entry<String, ORecordLazyList> entries : getRawIndex().entrySet()) {
             docs = entries.getValue();
 
             if (docs != null) {
                 ODocument doc;
                 for (int i = 0; i < docs.size(); ++i) {
-                    doc = docs.get(i);
+                    doc = (ODocument) docs.get(i);
 
                     if (doc.getIdentity().equals(vertex.getId())) {
                         docs.remove(i);
@@ -160,9 +159,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         final ODatabaseRecord<?> db = (ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying();
 
         // CREATE THE MAP
-        rawIndex = new OTreeMapDatabaseLazySave<String, List<ODocument>>(db, OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, new OStreamSerializerListRID(db));
+        treeMap = new OMVRBTreeDatabaseLazySave<String, ORecordLazyList>(db, OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, OStreamSerializerListRID.INSTANCE);
         try {
-            rawIndex.save();
+            treeMap.save();
         } catch (IOException e) {
             throw new OIndexException("Unable to save index");
         }
@@ -185,12 +184,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             }
 
         // LOAD THE TREE-MAP
-        rawIndex = new OTreeMapDatabaseLazySave<String, List<ODocument>>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMapRid);
-        try {
-            rawIndex.load();
-        } catch (IOException e) {
-            throw new OIndexException("Unable to load index");
-        }
+        treeMap = new OMVRBTreeDatabaseLazySave<String, ORecordLazyList>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMapRid);
+        treeMap.load();
     }
 
 }
