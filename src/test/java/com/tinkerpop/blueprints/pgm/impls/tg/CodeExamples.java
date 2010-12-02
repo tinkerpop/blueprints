@@ -16,9 +16,23 @@ public class CodeExamples extends TestCase {
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
         a.setProperty("name", "marko");
-        a.setProperty("name", "peter");
+        b.setProperty("name", "peter");
         Edge e = graph.addEdge(null, a, b, "knows");
-        graph.shutdown();
+        System.out.println(e.getOutVertex().getProperty("name") + "--" + e.getLabel() + "-->" + e.getInVertex().getProperty("name"));
+    }
+
+    public void testIteratingGraph() {
+        // creates the graph diagrammed here
+        //  https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model
+        Graph graph = TinkerGraphFactory.createTinkerGraph();
+        System.out.println("Vertices of " + graph);
+        for (Vertex vertex : graph.getVertices()) {
+            System.out.println(vertex);
+        }
+        System.out.println("Edges of " + graph);
+        for (Edge edge : graph.getEdges()) {
+            System.out.println(edge);
+        }
     }
 
     public void testIterateThroughEdges() {
@@ -36,7 +50,7 @@ public class CodeExamples extends TestCase {
         // creates the graph diagrammed here
         //  https://github.com/tinkerpop/blueprints/wiki/Property-Graph-Model
         Graph graph = TinkerGraphFactory.createTinkerGraph();
-        Vertex a = ((IndexableGraph)graph).getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next();
+        Vertex a = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next();
         System.out.println("vertex " + a.getId() + " has age " + a.getProperty("age"));
     }
 }
