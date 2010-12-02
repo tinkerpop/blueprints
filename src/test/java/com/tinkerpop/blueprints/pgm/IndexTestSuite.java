@@ -65,7 +65,7 @@ public class IndexTestSuite extends TestSuite {
             Index<Vertex> index = graph.createIndex("basic", Vertex.class, Index.Type.MANUAL);
             for (int i = 0; i < 10; i++) {
                 Vertex v = graph.addVertex(null);
-                index.put("dog", "puppy");
+                index.put("dog", "puppy", v);
             }
             assertEquals(10, index.count("dog", "puppy"));
             Vertex v = index.get("dog", "puppy").iterator().next();

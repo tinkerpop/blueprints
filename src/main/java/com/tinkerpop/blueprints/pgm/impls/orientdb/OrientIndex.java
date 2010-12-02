@@ -97,7 +97,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public long count(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final List<ODocument> docList = rawIndex.get(keyTemp);
+        final ORecordLazyList docList = treeMap.get(keyTemp);
         if (null == docList) {
             return 0;
         } else {
