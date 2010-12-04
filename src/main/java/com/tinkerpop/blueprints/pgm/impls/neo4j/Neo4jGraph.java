@@ -52,6 +52,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 this.loadIndices();
             }
 
+        } catch (RuntimeException e) {
+            if (this.rawGraph != null)
+                this.rawGraph.shutdown();
+            throw e;
         } catch (Exception e) {
             if (this.rawGraph != null)
                 this.rawGraph.shutdown();
