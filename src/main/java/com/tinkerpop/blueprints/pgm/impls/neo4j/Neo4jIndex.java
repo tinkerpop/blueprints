@@ -42,9 +42,14 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public void put(final String key, final Object value, final T element) {
-        this.graph.autoStartTransaction();
-        this.rawIndex.add((S) element.getRawElement(), key, value);
-        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        try {
+            this.graph.autoStartTransaction();
+            this.rawIndex.add((S) element.getRawElement(), key, value);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        } catch (RuntimeException e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
+        }
     }
 
     public Iterable<T> get(final String key, final Object value) {
@@ -56,9 +61,14 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public void remove(final String key, final Object value, final T element) {
-        this.graph.autoStartTransaction();
-        this.rawIndex.remove((S) element.getRawElement(), key, value);
-        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        try {
+            this.graph.autoStartTransaction();
+            this.rawIndex.remove((S) element.getRawElement(), key, value);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        } catch (RuntimeException e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
+        }
     }
 
     protected void removeBasic(final String key, final Object value, final T element) {

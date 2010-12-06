@@ -77,11 +77,16 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             values.add(element.getRawElement().getDocument());
 
         final boolean txBegun = graph.autoStartTransaction();
+        try {
+            treeMap.put(keyTemp, values);
 
-        treeMap.put(keyTemp, values);
-
-        if (txBegun)
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            if (txBegun)
+                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        } catch (RuntimeException e) {
+            if (txBegun)
+                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
+        }
     }
 
     @SuppressWarnings("rawtypes")
@@ -102,12 +107,17 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         if (values != null) {
             final boolean txBegun = graph.autoStartTransaction();
+            try {
+                values.remove(element.getRawElement().getDocument());
+                treeMap.put(keyTemp, values);
 
-            values.remove(element.getRawElement().getDocument());
-            treeMap.put(keyTemp, values);
-
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                if (txBegun)
+                    graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            } catch (RuntimeException e) {
+                if (txBegun)
+                    graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                throw e;
+            }
         }
     }
 
@@ -115,14 +125,20 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         try {
             if (null != this.treeMap) {
                 final boolean txBegun = graph.autoStartTransaction();
+                try {
+                    this.treeMap.clear();
+                    this.treeMap.save();
 
-                this.treeMap.clear();
-                this.treeMap.save();
-
-                if (txBegun)
-                    graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                    if (txBegun)
+                        graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                } catch (RuntimeException e) {
+                    if (txBegun)
+                        graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                    throw e;
+                }
             }
         } catch (Exception e) {
+            // FIXME: is there a reason this exception is gobbled? (dw 2010-Dec-6)
             // throw new RuntimeException(e.getMessage(), e);
         }
     }

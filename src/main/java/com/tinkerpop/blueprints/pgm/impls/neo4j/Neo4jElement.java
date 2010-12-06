@@ -31,17 +31,20 @@ public abstract class Neo4jElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
+        try {
+            this.graph.autoStartTransaction();
+            Object oldValue = this.getProperty(key);
 
-        this.graph.autoStartTransaction();
-        Object oldValue = this.getProperty(key);
+            for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                autoIndex.autoUpdate(key, value, oldValue, this);
+            }
 
-        for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-            autoIndex.autoUpdate(key, value, oldValue, this);
+            this.rawElement.setProperty(key, value);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        } catch (RuntimeException e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
         }
-
-        this.rawElement.setProperty(key, value);
-        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-
     }
 
     public Object removeProperty(final String key) {
@@ -57,7 +60,11 @@ public abstract class Neo4jElement implements Element {
 
             return oldValue;
         } catch (NotFoundException e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             return null;
+        } catch (RuntimeException e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
         }
     }
 

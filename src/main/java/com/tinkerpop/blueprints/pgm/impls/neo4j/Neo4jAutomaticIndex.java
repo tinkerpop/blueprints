@@ -62,17 +62,22 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     }
 
     private void saveKeyField() {
-        this.graph.autoStartTransaction();
-        if (this.autoIndexKeys == null)
-            this.getIndexManager().removeConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS);
-        else {
-            String field = "";
-            for (String key : autoIndexKeys) {
-                field = field + Neo4jTokens.KEY_SEPARATOR + key;
+        try {
+            this.graph.autoStartTransaction();
+            if (this.autoIndexKeys == null)
+                this.getIndexManager().removeConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS);
+            else {
+                String field = "";
+                for (String key : autoIndexKeys) {
+                    field = field + Neo4jTokens.KEY_SEPARATOR + key;
+                }
+                this.getIndexManager().setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS, field);
             }
-            this.getIndexManager().setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS, field);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        } catch (RuntimeException e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
         }
-        this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     private void loadKeyField() {

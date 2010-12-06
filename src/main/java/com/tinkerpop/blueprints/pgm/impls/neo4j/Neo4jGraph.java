@@ -114,10 +114,15 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void dropIndex(final String indexName) {
-        this.autoStartTransaction();
-        this.rawGraph.index().forNodes(indexName).delete();
-        this.rawGraph.index().forRelationships(indexName).delete();
-        this.autoStopTransaction(Conclusion.SUCCESS);
+        try {
+            this.autoStartTransaction();
+            this.rawGraph.index().forNodes(indexName).delete();
+            this.rawGraph.index().forRelationships(indexName).delete();
+            this.autoStopTransaction(Conclusion.SUCCESS);
+        } catch (RuntimeException e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
+        }
 
         this.indices.remove(indexName);
         this.autoIndices.remove(indexName);
@@ -137,10 +142,15 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
 
     public Vertex addVertex(final Object id) {
-        this.autoStartTransaction();
-        final Vertex vertex = new Neo4jVertex(this.rawGraph.createNode(), this);
-        this.autoStopTransaction(Conclusion.SUCCESS);
-        return vertex;
+        try {
+            this.autoStartTransaction();
+            final Vertex vertex = new Neo4jVertex(this.rawGraph.createNode(), this);
+            this.autoStopTransaction(Conclusion.SUCCESS);
+            return vertex;
+        } catch (RuntimeException e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
+        }
     }
 
     public Vertex getVertex(final Object id) {
@@ -170,25 +180,35 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         final Long id = (Long) vertex.getId();
         final Node node = this.rawGraph.getNodeById(id);
         if (null != node) {
-            this.autoStartTransaction();
-            for (final Edge edge : vertex.getInEdges()) {
-                ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
+            try {
+                this.autoStartTransaction();
+                for (final Edge edge : vertex.getInEdges()) {
+                    ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
+                }
+                for (final Edge edge : vertex.getOutEdges()) {
+                    ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
+                }
+                node.delete();
+                this.autoStopTransaction(Conclusion.SUCCESS);
+            } catch (RuntimeException e) {
+                this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                throw e;
             }
-            for (final Edge edge : vertex.getOutEdges()) {
-                ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
-            }
-            node.delete();
-            this.autoStopTransaction(Conclusion.SUCCESS);
         }
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         final Node outNode = ((Neo4jVertex) outVertex).getRawVertex();
         final Node inNode = ((Neo4jVertex) inVertex).getRawVertex();
-        this.autoStartTransaction();
-        final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
-        this.autoStopTransaction(Conclusion.SUCCESS);
-        return new Neo4jEdge(relationship, this);
+        try {
+            this.autoStartTransaction();
+            final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
+            this.autoStopTransaction(Conclusion.SUCCESS);
+            return new Neo4jEdge(relationship, this);
+        } catch (RuntimeException e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
+        }
     }
 
     public Edge getEdge(final Object id) {
@@ -208,9 +228,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
 
     public void removeEdge(final Edge edge) {
-        this.autoStartTransaction();
-        ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
-        this.autoStopTransaction(Conclusion.SUCCESS);
+        try {
+            this.autoStartTransaction();
+            ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
+            this.autoStopTransaction(Conclusion.SUCCESS);
+        } catch (RuntimeException e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw e;
+        }
     }
 
     public void startTransaction() {
