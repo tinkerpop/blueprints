@@ -463,4 +463,28 @@ public class EdgeTestSuite extends TestSuite {
         }
         graph.shutdown();
     }
+
+    public void testAddingRemovingEdgeProperties() {
+        if (!graphTest.isRDFModel) {
+            Graph graph = graphTest.getGraphInstance();
+            Vertex a = graph.addVertex(convertId("1"));
+            Vertex b = graph.addVertex(convertId("2"));
+            Edge edge = graph.addEdge(convertId("3"), a, b, "knows");
+            assertEquals(edge.getPropertyKeys().size(), 0);
+            assertNull(edge.getProperty("weight"));
+            edge.setProperty("weight", 0.5);
+            assertEquals(edge.getPropertyKeys().size(), 1);
+            assertEquals(edge.getProperty("weight"), 0.5);
+
+            edge.setProperty("weight", 0.6);
+            assertEquals(edge.getPropertyKeys().size(), 1);
+            assertEquals(edge.getProperty("weight"), 0.6);
+            assertEquals(edge.removeProperty("weight"), 0.6);
+            assertNull(edge.getProperty("weight"));
+            assertEquals(edge.getPropertyKeys().size(), 0);
+            edge.setProperty("blah", "marko");
+            edge.setProperty("blah2", "josh");
+            assertEquals(edge.getPropertyKeys().size(), 2);
+        }
+    }
 }

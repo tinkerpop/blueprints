@@ -11,25 +11,33 @@ import org.json.simple.JSONObject;
  */
 public class RexsterEdge extends RexsterElement implements Edge {
 
+    private final String label;
+    private final Object outVertex;
+    private final Object inVertex;
+
+
     public RexsterEdge(JSONObject rawEdge, RexsterGraph graph) {
         super(rawEdge, graph);
+        this.label = (String) rawEdge.get(RexsterTokens._LABEL);
+        this.outVertex = rawEdge.get(RexsterTokens._OUTV);
+        this.inVertex = rawEdge.get(RexsterTokens._INV);
     }
 
     public Vertex getOutVertex() {
-        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.rawElement.get(RexsterTokens._OUTV)), this.graph);
+        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.outVertex), this.graph);
     }
 
     public Vertex getInVertex() {
-        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.rawElement.get(RexsterTokens._INV)), this.graph);
+        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.inVertex), this.graph);
 
     }
 
     public String getLabel() {
-        return (String) this.rawElement.get(RexsterTokens._LABEL);
+        return this.label;
     }
 
     public String toString() {
-        return StringFactory.E + StringFactory.L_BRACKET + this.getId() + StringFactory.R_BRACKET + StringFactory.L_BRACKET + this.rawElement.get(RexsterTokens._OUTV) + StringFactory.DASH + this.getLabel() + StringFactory.ARROW + this.rawElement.get(RexsterTokens._INV) + StringFactory.R_BRACKET;
+        return StringFactory.E + StringFactory.L_BRACKET + this.getId() + StringFactory.R_BRACKET + StringFactory.L_BRACKET + this.outVertex + StringFactory.DASH + this.getLabel() + StringFactory.ARROW + this.inVertex + StringFactory.R_BRACKET;
     }
 
     public boolean equals(final Object object) {

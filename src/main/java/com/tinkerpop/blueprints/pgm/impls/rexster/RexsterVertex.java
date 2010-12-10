@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
  */
 public class RexsterVertex extends RexsterElement implements Vertex {
 
-    public RexsterVertex(JSONObject rawVertex, RexsterGraph graph) {
+    public RexsterVertex(final JSONObject rawVertex, final RexsterGraph graph) {
         super(rawVertex, graph);
     }
 
