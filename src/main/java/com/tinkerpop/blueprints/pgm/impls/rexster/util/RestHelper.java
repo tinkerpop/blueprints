@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster.util;
 
 import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterTokens;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -32,9 +33,9 @@ public class RestHelper {
         }
     }
 
-    /*public static JSONArray getResultArray(final String uri) {
+    public static JSONArray getResultArray(final String uri) {
         return (JSONArray) RestHelper.get(uri).get(RexsterTokens.RESULTS);
-    }*/
+    }
 
     public static JSONObject getResultObject(final String uri) {
         return (JSONObject) RestHelper.get(uri).get(RexsterTokens.RESULTS);
@@ -68,5 +69,36 @@ public class RestHelper {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    public static Object typeCast(final String type, final Object value) {
+        if (type.equals(RexsterTokens.STRING))
+            return value;
+        else if (type.equals(RexsterTokens.INTEGER))
+            return Integer.valueOf(value.toString());
+        else if (type.equals(RexsterTokens.LONG))
+            return Long.valueOf(value.toString());
+        else if (type.equals(RexsterTokens.DOUBLE))
+            return Double.valueOf(value.toString());
+        else if (type.equals(RexsterTokens.FLOAT))
+            return Float.valueOf(value.toString());
+        else
+            return value;
+    }
+
+    public static String uriCast(final Object value) {
+        if (value instanceof String)
+            return value.toString();
+        else if (value instanceof Integer)
+            return "(" + RexsterTokens.INTEGER + "," + value + ")";
+        else if (value instanceof Long)
+            return "(" + RexsterTokens.LONG + "," + value + ")";
+        else if (value instanceof Double)
+            return "(" + RexsterTokens.DOUBLE + "," + value + ")";
+        else if (value instanceof Float)
+            return "(" + RexsterTokens.FLOAT + "," + value + ")";
+        else
+            return value.toString();
+
     }
 }

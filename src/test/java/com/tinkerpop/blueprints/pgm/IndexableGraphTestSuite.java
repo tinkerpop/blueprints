@@ -24,7 +24,7 @@ public class IndexableGraphTestSuite extends TestSuite {
         this.stopWatch();
         for (Index index : graph.getIndices()) {
             count++;
-            assertTrue(index instanceof AutomaticIndex);
+            assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
         }
         BaseTest.printPerformance(graph.toString(), count, "indices iterated through", this.stopWatch());
         graph.shutdown();

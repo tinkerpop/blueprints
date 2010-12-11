@@ -54,7 +54,7 @@ public abstract class RexsterElement implements Element {
 
         JSONObject typedProperty = (JSONObject) rawElement.get(key);
         if (null != typedProperty)
-            return typeCast((String) typedProperty.get("type"), typedProperty.get("value"));
+            return RestHelper.typeCast((String) typedProperty.get("type"), typedProperty.get("value"));
         else
             return null;
 
@@ -65,9 +65,9 @@ public abstract class RexsterElement implements Element {
             throw new RuntimeException("RexsterGraph does not support property keys that start with underscore");
 
         if (this instanceof Vertex) {
-            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId(), key + RexsterTokens.EQUALS + uriCast(value));
+            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId(), key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
         } else {
-            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId(), key + RexsterTokens.EQUALS + uriCast(value));
+            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId(), key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
         }
     }
 
@@ -86,34 +86,5 @@ public abstract class RexsterElement implements Element {
         return object;
     }
 
-    private Object typeCast(final String type, final Object value) {
-        if (type.equals(RexsterTokens.STRING))
-            return value;
-        else if (type.equals(RexsterTokens.INTEGER))
-            return Integer.valueOf(value.toString());
-        else if (type.equals(RexsterTokens.LONG))
-            return Long.valueOf(value.toString());
-        else if (type.equals(RexsterTokens.DOUBLE))
-            return Double.valueOf(value.toString());
-        else if (type.equals(RexsterTokens.FLOAT))
-            return Float.valueOf(value.toString());
-        else
-            return value;
-    }
 
-    private String uriCast(final Object value) {
-        if (value instanceof String)
-            return value.toString();
-        else if (value instanceof Integer)
-            return "(" + RexsterTokens.INTEGER + "," + value + ")";
-        else if (value instanceof Long)
-            return "(" + RexsterTokens.LONG + "," + value + ")";
-        else if (value instanceof Double)
-            return "(" + RexsterTokens.DOUBLE + "," + value + ")";
-        else if (value instanceof Float)
-            return "(" + RexsterTokens.FLOAT + "," + value + ")";
-        else
-            return value.toString();
-
-    }
 }

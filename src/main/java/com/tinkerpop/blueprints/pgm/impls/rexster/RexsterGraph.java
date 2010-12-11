@@ -1,18 +1,20 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterGraph implements Graph {
+public class RexsterGraph implements IndexableGraph {
 
     private final String graphURI;
 
@@ -70,6 +72,39 @@ public class RexsterGraph implements Graph {
 
     public void removeVertex(final Vertex vertex) {
         RestHelper.delete(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + vertex.getId());
+    }
+
+    public void dropIndex(final String indexName) {
+        RestHelper.delete(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName);
+    }
+
+    public Iterable<Index<? extends Element>> getIndices() {
+        List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
+        JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
+        for (JSONObject index : (List<JSONObject>) json) {
+            if (((String) index.get("class")).contains("Vertex"))
+                indices.add(new RexsterIndex(this, (String) index.get("name"), Vertex.class));
+            else
+                indices.add(new RexsterIndex(this, (String) index.get("name"), Edge.class));
+        }
+        return indices;
+    }
+
+    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+        JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
+        for (JSONObject index : (List<JSONObject>) json) {
+            if (index.get("name").equals(indexName)) {
+                if (((String) index.get("class")).contains("Vertex"))
+                    return new RexsterIndex(this, (String) index.get("name"), Vertex.class);
+                else
+                    return new RexsterIndex(this, (String) index.get("name"), Edge.class);
+            }
+        }
+        throw new RuntimeException("No index with name " + indexName + " exists");
+    }
+
+    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+        throw new UnsupportedOperationException();
     }
 
     public String toString() {

@@ -46,9 +46,9 @@ public class RexsterGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexableGraphTestSuite(this));
         printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
+    }*/
 
-    public void testIndexTestSuite() throws Exception {
+    /*public void testIndexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
