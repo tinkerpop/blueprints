@@ -58,6 +58,10 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
         throw new UnsupportedOperationException();
     }
 
+    public long size() {
+        return queue.size();
+    }
+
     protected abstract void fillBuffer();
 
     protected String createSeparator() {
