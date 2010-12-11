@@ -139,6 +139,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             autoStopTransaction(Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -164,6 +167,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             autoStopTransaction(Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -196,6 +202,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             autoStopTransaction(Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -233,6 +242,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             autoStopTransaction(Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

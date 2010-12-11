@@ -122,6 +122,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
         this.indices.remove(indexName);
@@ -150,6 +153,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -193,6 +199,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             } catch (RuntimeException e) {
                 this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
                 throw e;
+            } catch (Exception e) {
+                this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
     }
@@ -208,6 +217,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -235,6 +247,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

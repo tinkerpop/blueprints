@@ -77,6 +77,9 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         } catch (RuntimeException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

@@ -49,6 +49,9 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         } catch (RuntimeException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -68,6 +71,9 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         } catch (RuntimeException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

@@ -44,6 +44,9 @@ public abstract class Neo4jElement implements Element {
         } catch (RuntimeException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -65,6 +68,9 @@ public abstract class Neo4jElement implements Element {
         } catch (RuntimeException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

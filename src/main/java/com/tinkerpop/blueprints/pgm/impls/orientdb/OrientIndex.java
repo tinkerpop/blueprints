@@ -86,6 +86,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             if (txBegun)
                 graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
+        } catch (Exception e) {
+            if (txBegun)
+                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -117,6 +121,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
                 if (txBegun)
                     graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
                 throw e;
+            } catch (Exception e) {
+                if (txBegun)
+                    graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
     }
@@ -135,6 +143,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
                     if (txBegun)
                         graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
                     throw e;
+                } catch (Exception e) {
+                    if (txBegun)
+                        graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         } catch (Exception e) {
