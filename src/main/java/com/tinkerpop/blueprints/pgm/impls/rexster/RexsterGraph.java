@@ -16,13 +16,11 @@ import java.util.List;
 public class RexsterGraph implements IndexableGraph {
 
     private final String graphURI;
-    private final String graphName;
 
     public RexsterGraph(final String graphURI) {
         this.graphURI = graphURI;
         // test to make sure its a valid, accessible url
-        JSONObject object = RestHelper.get(graphURI);
-        graphName = (String) object.get(RexsterTokens.GRAPH);
+        RestHelper.get(graphURI);
     }
 
     public String getGraphURI() {
@@ -134,6 +132,8 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public String toString() {
-        return "rexstergraph[" + this.graphURI + "][" + this.graphName + "]";
+        JSONObject object = RestHelper.get(graphURI);
+        String graphName = (String) object.get(RexsterTokens.GRAPH);
+        return "rexstergraph[" + this.graphURI + "][" + graphName + "]";
     }
 }
