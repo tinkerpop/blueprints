@@ -283,7 +283,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
     }
 
 
-    public void testGratefulGraph() throws Exception {
+    public void donttestGratefulGraph() throws Exception {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex) {
             for (int i = 200; i < 1002; i = i + 200) {
