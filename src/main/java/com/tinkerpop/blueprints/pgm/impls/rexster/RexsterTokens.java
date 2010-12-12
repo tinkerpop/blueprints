@@ -16,6 +16,7 @@ public class RexsterTokens {
     public static final String UNDERSCORE = "_";
     public static final String NULL = "null";
 
+    public static final String GRAPH = "graph";
     public static final String VERTEX = "vertex";
     public static final String VERTICES = "vertices";
     public static final String EDGE = "edge";

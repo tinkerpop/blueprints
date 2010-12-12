@@ -16,11 +16,13 @@ import java.util.List;
 public class RexsterGraph implements IndexableGraph {
 
     private final String graphURI;
+    private final String graphName;
 
     public RexsterGraph(final String graphURI) {
         this.graphURI = graphURI;
         // test to make sure its a valid, accessible url
-        RestHelper.get(graphURI);
+        JSONObject object = RestHelper.get(graphURI);
+        graphName = (String) object.get(RexsterTokens.GRAPH);
     }
 
     public String getGraphURI() {
@@ -58,8 +60,11 @@ public class RexsterGraph implements IndexableGraph {
         return new RexsterEdgeSequence(this.graphURI + RexsterTokens.SLASH_EDGES, this);
     }
 
-    public Edge addEdge(Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (null == id)
+            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
+        else
+            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + id + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
     }
 
     public void removeEdge(final Edge edge) {
@@ -129,6 +134,6 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public String toString() {
-        return "rexstergraph[" + this.graphURI + "]";
+        return "rexstergraph[" + this.graphURI + "][" + this.graphName + "]";
     }
 }
