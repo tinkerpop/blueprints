@@ -16,7 +16,7 @@ public class RexsterEdge extends RexsterElement implements Edge {
     private final Object inVertex;
 
 
-    public RexsterEdge(JSONObject rawEdge, RexsterGraph graph) {
+    public RexsterEdge(final JSONObject rawEdge, final RexsterGraph graph) {
         super(rawEdge, graph);
         this.label = (String) rawEdge.get(RexsterTokens._LABEL);
         this.outVertex = rawEdge.get(RexsterTokens._OUTV);

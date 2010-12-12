@@ -97,7 +97,7 @@ public class RexsterGraph implements IndexableGraph {
         return indices;
     }
 
-    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
         JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
         for (JSONObject index : (List<JSONObject>) json) {
             if (index.get(RexsterTokens.NAME).equals(indexName)) {
@@ -119,7 +119,7 @@ public class RexsterGraph implements IndexableGraph {
         throw new RuntimeException("No index with name " + indexName + " exists");
     }
 
-    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
         String c;
         if (Vertex.class.isAssignableFrom(indexClass))
             c = RexsterTokens.VERTEX;

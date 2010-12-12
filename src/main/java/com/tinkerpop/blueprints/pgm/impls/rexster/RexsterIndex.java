@@ -16,13 +16,13 @@ public class RexsterIndex<T extends Element> implements Index<T> {
     protected final Class<T> indexClass;
     protected final RexsterGraph graph;
 
-    public RexsterIndex(RexsterGraph graph, String indexName, Class<T> indexClass) {
+    public RexsterIndex(final RexsterGraph graph, final String indexName, final Class<T> indexClass) {
         this.graph = graph;
         this.indexName = indexName;
         this.indexClass = indexClass;
     }
 
-    public void remove(String key, Object value, T element) {
+    public void remove(final String key, final Object value, final T element) {
         String clazz;
         if (element instanceof Vertex)
             clazz = RexsterTokens.VERTEX;
@@ -32,7 +32,7 @@ public class RexsterIndex<T extends Element> implements Index<T> {
 
     }
 
-    public void put(String key, Object value, T element) {
+    public void put(final String key, final Object value, final T element) {
         String clazz;
         if (element instanceof Vertex)
             clazz = RexsterTokens.VERTEX;
@@ -53,14 +53,14 @@ public class RexsterIndex<T extends Element> implements Index<T> {
         return this.indexClass;
     }
 
-    public Iterable<T> get(String key, Object value) {
+    public Iterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.indexClass))
             return (Iterable<T>) new RexsterVertexSequence(graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
         else
             return (Iterable<T>) new RexsterEdgeSequence(graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
     }
 
-    public boolean equals(Object object) {
+    public boolean equals(final Object object) {
         if (object.getClass().equals(this.getClass())) {
             Index other = (Index) object;
             return other.getIndexClass().equals(this.getIndexClass()) && other.getIndexName().equals(this.getIndexName()) && other.getIndexType().equals(this.getIndexType());
