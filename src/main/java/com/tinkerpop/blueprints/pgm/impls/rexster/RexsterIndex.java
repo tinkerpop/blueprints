@@ -10,7 +10,7 @@ import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterIndex<T extends RexsterElement> implements Index<T> {
+public class RexsterIndex<T extends Element> implements Index<T> {
 
     protected final String indexName;
     protected final Class<T> indexClass;

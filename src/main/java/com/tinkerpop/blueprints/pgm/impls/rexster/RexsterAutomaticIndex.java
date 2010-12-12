@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import org.json.simple.JSONArray;
 
@@ -10,7 +11,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterAutomaticIndex<T extends RexsterElement> extends RexsterIndex<T> implements AutomaticIndex<T> {
+public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> implements AutomaticIndex<T> {
 
     public RexsterAutomaticIndex(RexsterGraph graph, String name, Class<T> indexClass) {
         super(graph, name, indexClass);
