@@ -9,7 +9,6 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -60,10 +59,7 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public Edge addEdge(Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        // todo: this needs to use http://localhost/graph/edges/null (coming soon to rexster)
-        if (null == id)
-            id = UUID.randomUUID().toString();
-        return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + id + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
+        return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
     }
 
     public void removeEdge(final Edge edge) {

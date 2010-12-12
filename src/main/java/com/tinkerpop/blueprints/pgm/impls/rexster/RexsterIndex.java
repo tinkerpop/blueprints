@@ -23,22 +23,22 @@ public class RexsterIndex<T extends Element> implements Index<T> {
     }
 
     public void remove(String key, Object value, T element) {
-        String type;
+        String clazz;
         if (element instanceof Vertex)
-            type = "vertex";
+            clazz = RexsterTokens.VERTEX;
         else
-            type = "edge";
-        RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.TYPE_EQUALS + type + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
+            clazz = RexsterTokens.EDGE;
+        RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + clazz + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
 
     }
 
     public void put(String key, Object value, T element) {
-        String type;
+        String clazz;
         if (element instanceof Vertex)
-            type = "vertex";
+            clazz = RexsterTokens.VERTEX;
         else
-            type = "edge";
-        RestHelper.post(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.TYPE_EQUALS + type + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
+            clazz = RexsterTokens.EDGE;
+        RestHelper.post(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + clazz + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
     }
 
     public String getIndexName() {
