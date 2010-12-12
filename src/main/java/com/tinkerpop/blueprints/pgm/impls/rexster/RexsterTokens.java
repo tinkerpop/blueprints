@@ -14,8 +14,11 @@ public class RexsterTokens {
     public static final String _OUTV = "_outV";
     public static final String _INV = "_inV";
     public static final String UNDERSCORE = "_";
+    public static final String NULL = "null";
 
+    public static final String VERTEX = "vertex";
     public static final String VERTICES = "vertices";
+    public static final String EDGE = "edge";
     public static final String EDGES = "edges";
 
     public static final String SLASH_VERTICES = "/vertices";
@@ -24,6 +27,8 @@ public class RexsterTokens {
     public static final String SLASH_EDGES_SLASH = "/edges/";
     public static final String SLASH_INDICES = "/indices";
     public static final String SLASH_INDICES_SLASH = "/indices/";
+    public static final String SLASH_KEYS = "/keys";
+    public static final String SLASH_KEYS_SLASH = "/keys/";
 
     public static final String SLASH_OUTE = "/outE";
     public static final String SLASH_INE = "/inE";
@@ -31,6 +36,18 @@ public class RexsterTokens {
     public static final String AND = "&";
     public static final String EQUALS = "=";
     public static final String QUESTION = "?";
+
+    public static final String KEY = "key";
+    public static final String KEY_EQUALS = "key=";
+    public static final String VALUE = "value";
+    public static final String VALUE_EQUALS = "value=";
+    public static final String TYPE = "type";
+    public static final String TYPE_EQUALS = "type=";
+    public static final String ID_EQUALS = "id=";
+    public static final String CLASS = "class";
+    public static final String CLASS_EQUALS = "class=";
+    public static final String NAME = "name";
+
 
     public static final String TOTAL_SIZE = "total_size";
     public static final String REXSTER_OFFSET_END = "rexster.offset.end";

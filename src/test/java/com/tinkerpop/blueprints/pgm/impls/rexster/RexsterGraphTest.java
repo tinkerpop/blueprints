@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
 
 import java.lang.reflect.Method;
 
@@ -42,13 +41,13 @@ public class RexsterGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    /*public void testIndexableGraphTestSuite() throws Exception {
+    public void testIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexableGraphTestSuite(this));
         printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }*/
+    }
 
-    /*public void testIndexTestSuite() throws Exception {
+    public void testIndexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
@@ -58,7 +57,7 @@ public class RexsterGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new AutomaticIndexTestSuite(this));
         printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
-    }*/
+    }
 
     /*public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
@@ -68,21 +67,28 @@ public class RexsterGraphTest extends GraphTest {
 
 
     public Graph getGraphInstance() {
-        Graph graph = new RexsterGraph(this.getWorkingUri());
-        graph.clear();
-        return graph;
+        return new RexsterGraph(this.getWorkingUri());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         String doTest = System.getProperty("testRexsterGraph");
         if (doTest == null || doTest.equals("true")) {
+            this.resetGraph();
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(testSuite);
+                    this.resetGraph();
                 }
             }
         }
+    }
+
+    private void resetGraph() {
+        IndexableGraph graph = new RexsterGraph(this.getWorkingUri());
+        graph.clear();
+        graph.createIndex(Index.VERTICES, Vertex.class, Index.Type.AUTOMATIC);
+        graph.createIndex(Index.EDGES, Edge.class, Index.Type.AUTOMATIC);
     }
 
     private String getWorkingUri() {

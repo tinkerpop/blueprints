@@ -1,7 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
+import org.json.simple.JSONArray;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,9 +10,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> implements AutomaticIndex<T> {
-
-    Set<String> autoIndexKeys = null;
+public class RexsterAutomaticIndex<T extends RexsterElement> extends RexsterIndex<T> implements AutomaticIndex<T> {
 
     public RexsterAutomaticIndex(RexsterGraph graph, String name, Class<T> indexClass) {
         super(graph, name, indexClass);
@@ -22,24 +21,24 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
     }
 
     public void addAutoIndexKey(final String key) {
-        if (null == key)
-            this.autoIndexKeys = null;
-        else {
-            if (autoIndexKeys == null) {
-                this.autoIndexKeys = new HashSet<String>();
-                this.autoIndexKeys.add(key);
-            } else {
-                this.autoIndexKeys.add(key);
-            }
-        }
+        RestHelper.post(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS_SLASH + RexsterTokens.QUESTION + key);
     }
 
-    public void removeAutoIndexKey(final String key) {
-        if (null != autoIndexKeys)
-            this.autoIndexKeys.remove(key);
+    public void removeAutoIndexKey(String key) {
+        if (null == key)
+            key = RexsterTokens.NULL;
+        RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS_SLASH + RexsterTokens.QUESTION + key);
     }
 
     public Set<String> getAutoIndexKeys() {
-        return this.autoIndexKeys;
+        Set<String> keys = new HashSet<String>();
+        JSONArray array = RestHelper.getResultArray(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS);
+        for (Object key : array) {
+            keys.add((String) key);
+        }
+        if (keys.size() == 1 && null == keys.iterator().next())
+            return null;
+        else
+            return keys;
     }
 }

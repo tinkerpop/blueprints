@@ -21,7 +21,7 @@ public class RestHelper {
 
     public static JSONObject get(final String uri) {
         try {
-            final URL url = new URL(uri);
+            final URL url = new URL(safeUri(uri));
             final URLConnection connection = url.openConnection();
             connection.connect();
             final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
@@ -34,16 +34,16 @@ public class RestHelper {
     }
 
     public static JSONArray getResultArray(final String uri) {
-        return (JSONArray) RestHelper.get(uri).get(RexsterTokens.RESULTS);
+        return (JSONArray) RestHelper.get(safeUri(uri)).get(RexsterTokens.RESULTS);
     }
 
     public static JSONObject getResultObject(final String uri) {
-        return (JSONObject) RestHelper.get(uri).get(RexsterTokens.RESULTS);
+        return (JSONObject) RestHelper.get(safeUri(uri)).get(RexsterTokens.RESULTS);
     }
 
     public static JSONObject postResultObject(final String uri) {
         try {
-            final URL url = new URL(uri);
+            final URL url = new URL(safeUri(uri));
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(POST);
             InputStreamReader reader = new InputStreamReader(connection.getInputStream());
@@ -55,9 +55,18 @@ public class RestHelper {
         }
     }
 
-    public static JSONObject postResultObjectForm(final String uri, final String formData) {
-        return RestHelper.postResultObject(uri + RexsterTokens.QUESTION + formData);
+    public static void post(final String uri) {
+        try {
+            final URL url = new URL(safeUri(uri));
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(POST);
+            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+            reader.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
+
 
     public static void delete(final String uri) {
         try {
@@ -100,5 +109,10 @@ public class RestHelper {
         else
             return value.toString();
 
+    }
+
+    private static String safeUri(String uri) {
+        // todo: make this way more safe
+        return uri.replace(" ", "%20");
     }
 }

@@ -26,8 +26,4 @@ public class RexsterVertex extends RexsterElement implements Vertex {
     public String toString() {
         return StringFactory.vertexString(this);
     }
-
-    public boolean equals(final Object object) {
-        return object instanceof RexsterVertex && ((RexsterVertex) object).getId().equals(this.getId());
-    }
 }

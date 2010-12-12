@@ -39,8 +39,4 @@ public class RexsterEdge extends RexsterElement implements Edge {
     public String toString() {
         return StringFactory.E + StringFactory.L_BRACKET + this.getId() + StringFactory.R_BRACKET + StringFactory.L_BRACKET + this.outVertex + StringFactory.DASH + this.getLabel() + StringFactory.ARROW + this.inVertex + StringFactory.R_BRACKET;
     }
-
-    public boolean equals(final Object object) {
-        return object instanceof RexsterEdge && ((RexsterEdge) object).getId().equals(this.getId());
-    }
 }

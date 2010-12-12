@@ -63,7 +63,7 @@ public class RexsterGraph implements IndexableGraph {
         // todo: this needs to use http://localhost/graph/edges/null (coming soon to rexster)
         if (null == id)
             id = UUID.randomUUID().toString();
-        return new RexsterEdge(RestHelper.postResultObjectForm(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + id, RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
+        return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + id + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
     }
 
     public void removeEdge(final Edge edge) {
@@ -82,10 +82,16 @@ public class RexsterGraph implements IndexableGraph {
         List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
         JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
         for (JSONObject index : (List<JSONObject>) json) {
-            if (((String) index.get("class")).contains("Vertex"))
-                indices.add(new RexsterIndex(this, (String) index.get("name"), Vertex.class));
+            Class c;
+            if (((String) index.get(RexsterTokens.CLASS)).contains("Vertex"))
+                c = Vertex.class;
             else
-                indices.add(new RexsterIndex(this, (String) index.get("name"), Edge.class));
+                c = Edge.class;
+            if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
+                indices.add(new RexsterAutomaticIndex(this, (String) index.get(RexsterTokens.NAME), c));
+            else
+                indices.add(new RexsterIndex(this, (String) index.get(RexsterTokens.NAME), c));
+
         }
         return indices;
     }
@@ -93,18 +99,37 @@ public class RexsterGraph implements IndexableGraph {
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
         JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
         for (JSONObject index : (List<JSONObject>) json) {
-            if (index.get("name").equals(indexName)) {
-                if (((String) index.get("class")).contains("Vertex"))
-                    return new RexsterIndex(this, (String) index.get("name"), Vertex.class);
+            if (index.get(RexsterTokens.NAME).equals(indexName)) {
+                Class c;
+                if (((String) index.get(RexsterTokens.CLASS)).contains("Vertex"))
+                    c = Vertex.class;
                 else
-                    return new RexsterIndex(this, (String) index.get("name"), Edge.class);
+                    c = Edge.class;
+
+                if (!c.isAssignableFrom(indexClass))
+                    throw new RuntimeException("Stored index is " + c + " and is being loaded as a " + indexClass + " index");
+
+                if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
+                    return new RexsterAutomaticIndex(this, (String) index.get(RexsterTokens.NAME), c);
+                else
+                    return new RexsterIndex(this, (String) index.get(RexsterTokens.NAME), c);
             }
         }
         throw new RuntimeException("No index with name " + indexName + " exists");
     }
 
     public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type) {
-        throw new UnsupportedOperationException();
+        String c;
+        if (Vertex.class.isAssignableFrom(indexClass))
+            c = RexsterTokens.VERTEX;
+        else
+            c = RexsterTokens.EDGE;
+
+        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + type.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        if (type.equals(Index.Type.AUTOMATIC))
+            return new RexsterAutomaticIndex(this, indexName, indexClass);
+        else
+            return new RexsterIndex(this, indexName, indexClass);
     }
 
     public String toString() {

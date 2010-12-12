@@ -17,7 +17,7 @@ public class RexsterEdgeSequence extends RexsterElementSequence<Edge> {
     }
 
     protected void fillBuffer() {
-        final JSONObject object = RestHelper.get(this.uri + RexsterTokens.QUESTION + RexsterTokens.REXSTER_OFFSET_START + RexsterTokens.EQUALS + this.start + RexsterTokens.AND + RexsterTokens.REXSTER_OFFSET_END + RexsterTokens.EQUALS + this.end);
+        final JSONObject object = RestHelper.get(this.uri + this.createSeperator() + RexsterTokens.REXSTER_OFFSET_START + RexsterTokens.EQUALS + this.start + RexsterTokens.AND + RexsterTokens.REXSTER_OFFSET_END + RexsterTokens.EQUALS + this.end);
         for (final Object edge : (JSONArray) object.get(RexsterTokens.RESULTS)) {
             this.queue.add(new RexsterEdge(RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + ((JSONObject) edge).get(RexsterTokens._ID)), this.graph));
         }

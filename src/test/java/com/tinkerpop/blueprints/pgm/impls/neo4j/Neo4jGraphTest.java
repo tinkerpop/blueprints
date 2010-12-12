@@ -77,7 +77,7 @@ public class Neo4jGraphTest extends GraphTest {
     public Graph getGraphInstance() {
         String directory = System.getProperty("neo4jDirectory");
         if (directory == null)
-            directory = "/tmp/blueprints_test";
+            directory = this.getWorkingDirectory();
         return new Neo4jGraph(directory);
     }
 
@@ -86,7 +86,7 @@ public class Neo4jGraphTest extends GraphTest {
         if (doTest == null || doTest.equals("true")) {
             String directory = System.getProperty("neo4jDirectory");
             if (directory == null)
-                directory = "/tmp/blueprints_test";
+                directory = this.getWorkingDirectory();
             deleteDirectory(new File(directory));
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
@@ -96,6 +96,17 @@ public class Neo4jGraphTest extends GraphTest {
                 }
             }
         }
+    }
+
+    private String getWorkingDirectory() {
+        String directory = System.getProperty("neo4jDirectory");
+        if (directory == null) {
+            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
+                directory = "C:/temp/blueprints_test";
+            else
+                directory = "/tmp/blueprints_test";
+        }
+        return directory;
     }
 
     public void testLongIdConversions() {

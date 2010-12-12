@@ -54,7 +54,7 @@ public abstract class RexsterElement implements Element {
 
         JSONObject typedProperty = (JSONObject) rawElement.get(key);
         if (null != typedProperty)
-            return RestHelper.typeCast((String) typedProperty.get("type"), typedProperty.get("value"));
+            return RestHelper.typeCast((String) typedProperty.get(RexsterTokens.TYPE), typedProperty.get(RexsterTokens.VALUE));
         else
             return null;
 
@@ -65,9 +65,9 @@ public abstract class RexsterElement implements Element {
             throw new RuntimeException("RexsterGraph does not support property keys that start with underscore");
 
         if (this instanceof Vertex) {
-            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId(), key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
+            RestHelper.postResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.QUESTION + key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
         } else {
-            RestHelper.postResultObjectForm(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId(), key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
+            RestHelper.postResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId() + RexsterTokens.QUESTION + key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
         }
     }
 
@@ -86,5 +86,8 @@ public abstract class RexsterElement implements Element {
         return object;
     }
 
+    public boolean equals(Object object) {
+        return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+    }
 
 }

@@ -10,11 +10,11 @@ import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterIndex<T extends Element> implements Index<T> {
+public class RexsterIndex<T extends RexsterElement> implements Index<T> {
 
-    private final String indexName;
-    private final Class<T> indexClass;
-    private final RexsterGraph graph;
+    protected final String indexName;
+    protected final Class<T> indexClass;
+    protected final RexsterGraph graph;
 
     public RexsterIndex(RexsterGraph graph, String indexName, Class<T> indexClass) {
         this.graph = graph;
@@ -23,11 +23,22 @@ public class RexsterIndex<T extends Element> implements Index<T> {
     }
 
     public void remove(String key, Object value, T element) {
-        throw new UnsupportedOperationException();
+        String type;
+        if (element instanceof Vertex)
+            type = "vertex";
+        else
+            type = "edge";
+        RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.TYPE_EQUALS + type + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
+
     }
 
     public void put(String key, Object value, T element) {
-        throw new UnsupportedOperationException();
+        String type;
+        if (element instanceof Vertex)
+            type = "vertex";
+        else
+            type = "edge";
+        RestHelper.post(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.TYPE_EQUALS + type + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
     }
 
     public String getIndexName() {
@@ -44,10 +55,18 @@ public class RexsterIndex<T extends Element> implements Index<T> {
 
     public Iterable<T> get(String key, Object value) {
         if (Vertex.class.isAssignableFrom(this.indexClass))
-            return (Iterable<T>) new RexsterVertexSequence(graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + key + RexsterTokens.EQUALS + RestHelper.uriCast(value), this.graph);
+            return (Iterable<T>) new RexsterVertexSequence(graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
         else
-            return (Iterable<T>) new RexsterEdgeSequence(graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + key + RexsterTokens.EQUALS + RestHelper.uriCast(value), this.graph);
+            return (Iterable<T>) new RexsterEdgeSequence(graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
+    }
 
+    public boolean equals(Object object) {
+        if (object.getClass().equals(this.getClass())) {
+            Index other = (Index) object;
+            return other.getIndexClass().equals(this.getIndexClass()) && other.getIndexName().equals(this.getIndexName()) && other.getIndexType().equals(this.getIndexType());
+        } else {
+            return false;
+        }
     }
 
 }

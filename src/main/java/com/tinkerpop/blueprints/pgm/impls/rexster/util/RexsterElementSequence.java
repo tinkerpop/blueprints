@@ -1,7 +1,9 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster.util;
 
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterElement;
 import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterGraph;
+import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterTokens;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -57,4 +59,11 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
     }
 
     protected abstract void fillBuffer();
+
+    protected String createSeperator() {
+        if (this.uri.contains(RexsterTokens.QUESTION))
+            return RexsterTokens.AND;
+        else
+            return RexsterTokens.QUESTION;
+    }
 }
