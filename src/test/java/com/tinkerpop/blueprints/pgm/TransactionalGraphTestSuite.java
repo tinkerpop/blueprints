@@ -372,7 +372,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     // public void testAutomaticIndexTransactions() {} 
 
     public void testAutomaticIndexExceptionRollback() {
-        if (graphTest.isPersistent) {
+        if (graphTest.isPersistent && !graphTest.isRDFModel) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
             Vertex v = graph.addVertex(null);
             Object id = v.getId();
@@ -387,7 +387,23 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph = (TransactionalGraph) graphTest.getGraphInstance();
             Vertex reloadedV = graph.getVertex(id);
             assertEquals("2", reloadedV.getProperty("count"));
+            graph.shutdown();
         }
+    }
+
+    public void testNestedManualTransactions() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        graph.startTransaction();
+        RuntimeException ex = null;
+        try {
+            graph.startTransaction();
+        } catch (RuntimeException e) {
+            ex = e;
+        }
+        assertNotNull(ex);
+        assertEquals("Nested transactions are not supported", ex.getMessage());
+        graph.shutdown();
     }
 
 }
