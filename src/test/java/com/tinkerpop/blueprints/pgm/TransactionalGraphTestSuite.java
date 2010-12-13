@@ -372,7 +372,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     // public void testAutomaticIndexTransactions() {} 
 
     public void testAutomaticIndexExceptionRollback() {
-        if (graphTest.isPersistent) {
+        if (graphTest.isPersistent && !graphTest.isRDFModel) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
             Vertex v = graph.addVertex(null);
             Object id = v.getId();
@@ -392,7 +392,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testNestedManualTransactions() {
-        if (graphTest.isPersistent) {
+        if (graphTest.isPersistent && !graphTest.isRDFModel) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
             Vertex v = graph.addVertex(null);
             Object id = v.getId();
