@@ -99,18 +99,18 @@ public class GraphTestSuite extends TestSuite {
 
     public void testRemovingEdges() {
         Graph graph = graphTest.getGraphInstance();
-        int vertexCount = 500;
-        int edgeCount = 1000;
+        int vertexCount = 100;
+        int edgeCount = 200;
         List<Vertex> vertices = new ArrayList<Vertex>();
         List<Edge> edges = new ArrayList<Edge>();
         Random random = new Random();
         this.stopWatch();
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < vertexCount; i++) {
             vertices.add(graph.addVertex(null));
         }
         BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
         this.stopWatch();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < edgeCount; i++) {
             Vertex a = vertices.get(random.nextInt(vertices.size()));
             Vertex b = vertices.get(random.nextInt(vertices.size()));
             if (a != b) {
