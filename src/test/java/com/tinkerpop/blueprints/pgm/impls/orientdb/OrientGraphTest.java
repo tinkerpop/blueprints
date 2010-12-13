@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphTest extends GraphTest {
+    private OrientGraph currentGraph;
 
     public OrientGraphTest() {
         this.allowsDuplicateEdges = true;
@@ -78,7 +79,8 @@ public class OrientGraphTest extends GraphTest {
 
     public Graph getGraphInstance() {
         String directory = getWorkingDirectory();
-        return new OrientGraph("local:" + directory + "/graph");
+        this.currentGraph = new OrientGraph("local:" + directory + "/graph");
+        return this.currentGraph;
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
@@ -90,6 +92,10 @@ public class OrientGraphTest extends GraphTest {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(testSuite);
+                    try {
+                        if (this.currentGraph != null)
+                            this.currentGraph.shutdown();
+                    } catch (Exception e) {  }
                     new ODatabaseGraphTx("local:" + directory + "/graph").delete();
                 }
             }
