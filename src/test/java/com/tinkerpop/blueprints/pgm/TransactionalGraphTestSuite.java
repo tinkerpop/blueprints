@@ -392,21 +392,21 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testNestedManualTransactions() {
-        if (graphTest.isPersistent && !graphTest.isRDFModel) {
+        if (graphTest.isPersistent) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-            Vertex v = graph.addVertex(null);
-            Object id = v.getId();
-            v.setProperty("thing", "original value");
+            Object v1id = graph.addVertex(null).getId();
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
             graph.startTransaction();
             graph.startTransaction();
-            v.setProperty("thing", "new value");
+            Object v2id = graph.addVertex(null).getId();
             graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            Object v3id = graph.addVertex(null).getId();
             graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             graph.shutdown();
             graph = (TransactionalGraph) graphTest.getGraphInstance();
-            Vertex reloadedV = graph.getVertex(id);
-            assertEquals("new value", reloadedV.getProperty("thing"));
+            assertNotNull(graph.getVertex(v1id));
+            assertNotNull(graph.getVertex(v2id));
+            assertNotNull(graph.getVertex(v3id));
             graph.shutdown();
         }
     }
