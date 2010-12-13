@@ -387,6 +387,27 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph = (TransactionalGraph) graphTest.getGraphInstance();
             Vertex reloadedV = graph.getVertex(id);
             assertEquals("2", reloadedV.getProperty("count"));
+            graph.shutdown();
+        }
+    }
+
+    public void testNestedManualTransactions() {
+        if (graphTest.isPersistent) {
+            TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+            Vertex v = graph.addVertex(null);
+            Object id = v.getId();
+            v.setProperty("thing", "original value");
+            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+            graph.startTransaction();
+            graph.startTransaction();
+            v.setProperty("thing", "new value");
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.shutdown();
+            graph = (TransactionalGraph) graphTest.getGraphInstance();
+            Vertex reloadedV = graph.getVertex(id);
+            assertEquals("new value", reloadedV.getProperty("thing"));
+            graph.shutdown();
         }
     }
 
