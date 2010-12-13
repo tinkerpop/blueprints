@@ -256,8 +256,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     public void startTransaction() {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-
-        this.tx = this.rawGraph.beginTx();
+        if (this.tx == null)
+            this.tx = this.rawGraph.beginTx();
+        else
+            throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
@@ -273,12 +275,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.tx.failure();
         }
         this.tx.finish();
+        this.tx = null;
     }
 
     public void setTransactionMode(final Mode mode) {
         if (null != this.tx) {
             this.tx.success();
             this.tx.finish();
+            this.tx = null;
         }
         this.mode = mode;
     }
@@ -292,6 +296,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             try {
                 this.tx.success();
                 this.tx.finish();
+                this.tx = null;
             } catch (TransactionFailureException e) {
             }
         }
@@ -308,8 +313,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     protected void autoStartTransaction() {
-        if (getTransactionMode() == Mode.AUTOMATIC)
-            this.tx = this.rawGraph.beginTx();
+        if (getTransactionMode() == Mode.AUTOMATIC) {
+            if (this.tx == null)
+                this.tx = this.rawGraph.beginTx();
+            else
+                throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
+        }
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
@@ -319,6 +328,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             else
                 this.tx.failure();
             this.tx.finish();
+            this.tx = null;
         }
     }
 
