@@ -371,5 +371,23 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
     // public void testAutomaticIndexTransactions() {} 
 
+    public void testAutomaticIndexExceptionRollback() {
+        if (graphTest.isPersistent) {
+            TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+            Vertex v = graph.addVertex(null);
+            Object id = v.getId();
+            v.setProperty("count", "1");
+            try {
+                // This raises an exception in Neo4j
+                v.setProperty("count", null);
+            } catch (Exception e) {
+            }
+            v.setProperty("count", "2");
+            graph.shutdown();
+            graph = (TransactionalGraph) graphTest.getGraphInstance();
+            Vertex reloadedV = graph.getVertex(id);
+            assertEquals("2", reloadedV.getProperty("count"));
+        }
+    }
 
 }
