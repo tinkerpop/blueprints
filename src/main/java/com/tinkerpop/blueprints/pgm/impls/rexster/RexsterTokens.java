@@ -6,6 +6,7 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 public class RexsterTokens {
 
     public static final String RESULTS = "results";
+    public static final String MESSAGE = "message";
     public static final String _ID = "_id";
     public static final String _TYPE = "_type";
     public static final String _LABEL = "_label";

@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> implements AutomaticIndex<T> {
 
-    public RexsterAutomaticIndex(RexsterGraph graph, String name, Class<T> indexClass) {
+    public RexsterAutomaticIndex(final RexsterGraph graph, final String name, final Class<T> indexClass) {
         super(graph, name, indexClass);
     }
 

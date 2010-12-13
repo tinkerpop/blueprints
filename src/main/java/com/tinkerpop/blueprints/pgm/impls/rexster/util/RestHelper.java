@@ -82,7 +82,7 @@ public class RestHelper {
 
     public static Object typeCast(final String type, final Object value) {
         if (type.equals(RexsterTokens.STRING))
-            return value;
+            return value.toString();
         else if (type.equals(RexsterTokens.INTEGER))
             return Integer.valueOf(value.toString());
         else if (type.equals(RexsterTokens.LONG))

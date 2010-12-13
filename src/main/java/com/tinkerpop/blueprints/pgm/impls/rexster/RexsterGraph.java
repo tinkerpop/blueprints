@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A Blueprints implementation of the RESTful API of Rexster (http://rexster.tinkerpop.com)
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterGraph implements IndexableGraph {
@@ -82,10 +84,14 @@ public class RexsterGraph implements IndexableGraph {
         JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
         for (JSONObject index : (List<JSONObject>) json) {
             Class c;
-            if (((String) index.get(RexsterTokens.CLASS)).contains("Vertex"))
+            String clazz = (String) index.get(RexsterTokens.CLASS);
+            if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
                 c = Vertex.class;
-            else
+            else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
                 c = Edge.class;
+            else
+                throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
+
             if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
                 indices.add(new RexsterAutomaticIndex(this, (String) index.get(RexsterTokens.NAME), c));
             else
@@ -100,18 +106,22 @@ public class RexsterGraph implements IndexableGraph {
         for (JSONObject index : (List<JSONObject>) json) {
             if (index.get(RexsterTokens.NAME).equals(indexName)) {
                 Class c;
-                if (((String) index.get(RexsterTokens.CLASS)).contains("Vertex"))
+                String clazz = (String) index.get(RexsterTokens.CLASS);
+                if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
                     c = Vertex.class;
-                else
+                else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
                     c = Edge.class;
+                else
+                    throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
+
 
                 if (!c.isAssignableFrom(indexClass))
                     throw new RuntimeException("Stored index is " + c + " and is being loaded as a " + indexClass + " index");
 
                 if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
-                    return new RexsterAutomaticIndex(this, (String) index.get(RexsterTokens.NAME), c);
+                    return new RexsterAutomaticIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
                 else
-                    return new RexsterIndex(this, (String) index.get(RexsterTokens.NAME), c);
+                    return new RexsterIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
             }
         }
         throw new RuntimeException("No index with name " + indexName + " exists");
@@ -125,15 +135,22 @@ public class RexsterGraph implements IndexableGraph {
             c = RexsterTokens.EDGE;
 
         JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + type.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        if (!index.get(RexsterTokens.NAME).equals(indexName))
+            throw new RuntimeException("Could not create index: " + index.get(RexsterTokens.MESSAGE));
+
         if (type.equals(Index.Type.AUTOMATIC))
-            return new RexsterAutomaticIndex(this, indexName, indexClass);
+            return new RexsterAutomaticIndex<T>(this, indexName, indexClass);
         else
-            return new RexsterIndex(this, indexName, indexClass);
+            return new RexsterIndex<T>(this, indexName, indexClass);
     }
 
     public String toString() {
         JSONObject object = RestHelper.get(graphURI);
         String graphName = (String) object.get(RexsterTokens.GRAPH);
         return "rexstergraph[" + this.graphURI + "][" + graphName + "]";
+    }
+
+    public JSONObject getRawGraph() {
+        return RestHelper.getResultObject(this.graphURI);
     }
 }

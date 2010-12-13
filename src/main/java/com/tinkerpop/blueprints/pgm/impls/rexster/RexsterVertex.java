@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import org.json.simple.JSONObject;
 
@@ -25,5 +26,9 @@ public class RexsterVertex extends RexsterElement implements Vertex {
 
     public String toString() {
         return StringFactory.vertexString(this);
+    }
+
+    public JSONObject getRawVertex() {
+        return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId());
     }
 }

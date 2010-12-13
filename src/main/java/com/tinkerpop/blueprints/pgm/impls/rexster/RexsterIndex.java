@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -26,8 +27,10 @@ public class RexsterIndex<T extends Element> implements Index<T> {
         String clazz;
         if (element instanceof Vertex)
             clazz = RexsterTokens.VERTEX;
-        else
+        else if (element instanceof Edge)
             clazz = RexsterTokens.EDGE;
+        else
+            throw new RuntimeException("The provided element is not a legal vertex or edge: " + element);
         RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + clazz + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
 
     }
@@ -36,8 +39,10 @@ public class RexsterIndex<T extends Element> implements Index<T> {
         String clazz;
         if (element instanceof Vertex)
             clazz = RexsterTokens.VERTEX;
-        else
+        else if (element instanceof Edge)
             clazz = RexsterTokens.EDGE;
+        else
+            throw new RuntimeException("The provided element is not a legal vertex or edge: " + element);
         RestHelper.post(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + clazz + RexsterTokens.AND + RexsterTokens.ID_EQUALS + element.getId());
     }
 
