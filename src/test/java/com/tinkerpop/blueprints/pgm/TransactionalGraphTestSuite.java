@@ -392,23 +392,18 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testNestedManualTransactions() {
-        if (graphTest.isPersistent) {
-            TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-            Object v1id = graph.addVertex(null).getId();
-            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        graph.startTransaction();
+        RuntimeException ex = null;
+        try {
             graph.startTransaction();
-            graph.startTransaction();
-            Object v2id = graph.addVertex(null).getId();
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            Object v3id = graph.addVertex(null).getId();
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            graph.shutdown();
-            graph = (TransactionalGraph) graphTest.getGraphInstance();
-            assertNotNull(graph.getVertex(v1id));
-            assertNotNull(graph.getVertex(v2id));
-            assertNotNull(graph.getVertex(v3id));
-            graph.shutdown();
+        } catch (RuntimeException e) {
+            ex = e;
         }
+        assertNotNull(ex);
+        assertEquals("Nested transactions are not supported", ex.getMessage());
+        graph.shutdown();
     }
 
 }
