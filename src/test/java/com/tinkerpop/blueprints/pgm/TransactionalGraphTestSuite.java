@@ -407,18 +407,16 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testRollbackOpenTxOnGraphClose() {
-        if (graphTest.isPersistent && !graphTest.isRDFModel) {
+        if (graphTest.isPersistent) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-            Vertex v = graph.addVertex(null);
-            Object id = v.getId();
-            v.setProperty("thing", "original value");
+            Object v1id = graph.addVertex(null).getId();
             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
             graph.startTransaction();
-            v.setProperty("thing", "new value");
+            Object v2id = graph.addVertex(null).getId();
             graph.shutdown();
             graph = (TransactionalGraph) graphTest.getGraphInstance();
-            Vertex reloadedV = graph.getVertex(id);
-            assertEquals("original value", reloadedV.getProperty("thing"));
+            assertNotNull(graph.getVertex(v1id));
+            assertNull(graph.getVertex(v2id));
             graph.shutdown();
         }
     }
