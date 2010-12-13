@@ -278,7 +278,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public void shutdown() {
         // TODO: rollback on shutdown with open transactions.
-        unwindTransactionStack(Conclusion.SUCCESS);
+        unwindTransactionStack(Conclusion.FAILURE);
         this.rawGraph.shutdown();
     }
 
