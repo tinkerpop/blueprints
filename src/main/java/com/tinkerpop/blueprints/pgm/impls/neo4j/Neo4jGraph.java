@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * A Blueprints implementation of the graph database Neo4j (http://neo4j.org)
@@ -22,7 +23,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     private GraphDatabaseService rawGraph;
     private String directory;
-    private Transaction tx;
+    private Stack<Transaction> transactions = new Stack<Transaction>();
     private Mode mode = Mode.AUTOMATIC;
     protected Map<String, Neo4jIndex> indices = new HashMap<String, Neo4jIndex>();
     protected Map<String, Neo4jAutomaticIndex> autoIndices = new HashMap<String, Neo4jAutomaticIndex>();
@@ -257,29 +258,17 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
-        this.tx = this.rawGraph.beginTx();
+        this.transactions.push(this.rawGraph.beginTx());
     }
 
     public void stopTransaction(final Conclusion conclusion) {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-
-        if (null == this.tx)
-            throw new RuntimeException("There is no active transaction to stop");
-
-        if (conclusion == Conclusion.SUCCESS) {
-            this.tx.success();
-        } else {
-            this.tx.failure();
-        }
-        this.tx.finish();
+        concludeTransaction(conclusion);
     }
 
     public void setTransactionMode(final Mode mode) {
-        if (null != this.tx) {
-            this.tx.success();
-            this.tx.finish();
-        }
+        unwindTransactionStack(Conclusion.SUCCESS);
         this.mode = mode;
     }
 
@@ -288,13 +277,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void shutdown() {
-        if (null != this.tx) {
-            try {
-                this.tx.success();
-                this.tx.finish();
-            } catch (TransactionFailureException e) {
-            }
-        }
+        // TODO: rollback on shutdown with open transactions.
+        unwindTransactionStack(Conclusion.SUCCESS);
         this.rawGraph.shutdown();
     }
 
@@ -309,17 +293,30 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     protected void autoStartTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC)
-            this.tx = this.rawGraph.beginTx();
+            this.transactions.push(this.rawGraph.beginTx());
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
         if (getTransactionMode() == Mode.AUTOMATIC) {
-            if (conclusion == Conclusion.SUCCESS)
-                this.tx.success();
-            else
-                this.tx.failure();
-            this.tx.finish();
+            concludeTransaction(conclusion);
         }
+    }
+
+    protected void unwindTransactionStack(final Conclusion conclusion) {
+        while (this.transactions.size() > 0) {
+            concludeTransaction(conclusion);
+        }
+    }
+
+    private void concludeTransaction(final Conclusion conclusion) {
+        if (this.transactions.size() == 0)
+            throw new RuntimeException("There is no active transaction to stop");
+        Transaction tx = this.transactions.pop();
+        if (conclusion == Conclusion.SUCCESS)
+            tx.success();
+        else
+            tx.failure();
+        tx.finish();
     }
 
     public GraphDatabaseService getRawGraph() {
