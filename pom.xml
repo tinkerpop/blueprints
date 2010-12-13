@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-all</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.3</version>
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
