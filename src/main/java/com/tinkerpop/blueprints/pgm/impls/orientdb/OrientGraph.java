@@ -274,9 +274,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     public void startTransaction() {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-        if (rawGraph.getTransaction() instanceof OTransactionNoTx)
+        if (rawGraph.getTransaction() instanceof OTransactionNoTx || rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             this.rawGraph.begin();
-        else if (rawGraph.getTransaction().getStatus() == TXSTATUS.BEGUN)
+        } else
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
     }
 
