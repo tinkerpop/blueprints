@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm;
 
 /**
  * A graph is a container object for a collection of vertices and a collection edges.
- * A graph can maintain an index which can be used to index vertices and edges by their key/value properties.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

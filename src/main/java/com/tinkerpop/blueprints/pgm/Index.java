@@ -2,6 +2,8 @@ package com.tinkerpop.blueprints.pgm;
 
 /**
  * An index maintains a mapping between some key/value pair and an element.
+ * A manual index requires that the developers code explicitly put elements of the graph into the index.
+ * A the key/value pair need not be specific to the element properties.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

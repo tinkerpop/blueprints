@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm;
 /**
  * An indexable graph is a graph that supports the indexing of its elements.
  * An index is typically some sort of tree structure that allows for the fast lookup of elements by key/value pairs.
+ * All indexable graphs are initially constructed with two automatic indices called "vertices" and "edges."
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

@@ -4,6 +4,7 @@ import java.util.Set;
 
 /**
  * An automatic index will automatically maintain an index of element properties as the element properties mutate.
+ * The key/value pairs that are automatically monitored are element properties and their values.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
