@@ -128,7 +128,7 @@ public class IndexableGraphTestSuite extends TestSuite {
         } catch (RuntimeException e) {
             assertTrue(true);
         }
-        BaseTest.printPerformance(graph.toString(), 2, "non-existent indices retrieved with runtime exceptions", this.stopWatch());
+        BaseTest.printPerformance(graph.toString(), 3, "non-existent indices retrieved with runtime exceptions", this.stopWatch());
         graph.shutdown();
     }
 
