@@ -88,7 +88,7 @@ public interface Graph {
     public void clear();
 
     /**
-     * A shtudown function is required to properly close the graph.
+     * A shutdown function is required to properly close the graph.
      * This is important for implementations that utilize disk-based serializations.
      */
     public void shutdown();

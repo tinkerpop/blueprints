@@ -11,15 +11,19 @@ bc. <repository>
 
 !http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-smurf.png!
 
-h3. Version 0.3 (Smurf -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.3 (Smurf -- December 14, 2010)
 
 bc. <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
-  <version>0.2.1-SNAPSHOT</version>
+  <version>0.3</version>
 </dependency>
 
 * Moved to @graphdb-deps-*@ database dependency management model
+** Neo4j 1.2.M05
+** OrientDB 0.9.24.1
+** Sail 2.3.1
+** Rexster 0.1
 * Removed object document model to focus Blueprints specifically on property graphs
 ** Removed support for TinkerDoc, MongoDB, and CouchDB
 * @OrientGraph@ now implements @TransactionalGraph@ interface
@@ -37,7 +41,6 @@ bc. <dependency>
 * Added @GraphMigrator@ to stream the data in one graph to another
 * Added @RexsterGraph@ to connect to remote graphs over HTTP-REST
 * Added JavaDoc to all property graph model interfaces
-
 
 ==<hr/>==
 

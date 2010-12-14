@@ -10,11 +10,11 @@ package com.tinkerpop.blueprints.pgm;
 public interface Index<T extends Element> {
 
     /**
-     * For IndexableGraphs that support vertex indexing, an AutomaticIndex must exist named "vertices."
+     * For IndexableGraphs that support vertex indexing, an AutomaticIndex must exist at construction named "vertices."
      */
     public static final String VERTICES = "vertices";
     /**
-     * For IndexableGraphs that support edge indexing, an AutomaticIndex must exist named "edges."
+     * For IndexableGraphs that support edge indexing, an AutomaticIndex must exist at construction named "edges."
      */
     public static final String EDGES = "edges";
 

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>graphdb-deps-lds</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>pom</packaging>
     <name>GraphDB Dependencies-LinkedDataSail</name>
     <url>http://code.google.com/p/ripple/wiki/LinkedDataSail</url>
