@@ -32,7 +32,7 @@ public interface Graph {
 
     /**
      * Remove the provided vertex from the graph.
-     * Upon removing the vertex, all the edges by which the vertex is associated must be removed as well.
+     * Upon removing the vertex, all the edges by which the vertex is connected will be removed as well.
      *
      * @param vertex the vertex to remove from the graph
      */

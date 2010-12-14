@@ -13,9 +13,9 @@ public interface IndexableGraph extends Graph {
      * Generate an index with a particular name, for a particular class, and of a particular type.
      *
      * @param indexName  the name of the index
-     * @param indexClass the element class that this index is indexing
+     * @param indexClass the element class that this index is indexing (can be base class)
      * @param type       whether the index is a manual or automatic index
-     * @param <T>        the element class that this index is indexing
+     * @param <T>        the element class that this index is indexing (can be base class)
      * @return the index created
      */
     public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type);
@@ -24,8 +24,8 @@ public interface IndexableGraph extends Graph {
      * Get an index from the graph by its name and index class. An index is unique up to name.
      *
      * @param indexName  the name of the index to retrieve
-     * @param indexClass the class of the elements being indexed
-     * @param <T>        the class of the elements being indexed
+     * @param indexClass the class of the elements being indexed (can be base class)
+     * @param <T>        the class of the elements being indexed (can be base class)
      * @return the retrieved index
      */
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass);

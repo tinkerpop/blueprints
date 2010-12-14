@@ -3,7 +3,8 @@ package com.tinkerpop.blueprints.pgm;
 import java.util.Set;
 
 /**
- * An automatic index will automatically maintain an index of element properties as the element properties mutate.
+ * An automatic index will automatically maintain an index of element properties as element properties mutate.
+ * If an element is removed from the graph, then it is also automatically removed from the automatic index.
  * The key/value pairs that are automatically monitored are element properties and their values.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
