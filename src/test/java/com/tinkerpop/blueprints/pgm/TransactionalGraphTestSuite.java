@@ -415,10 +415,9 @@ public class TransactionalGraphTestSuite extends TestSuite {
             Object v2id = graph.addVertex(null).getId();
             graph.shutdown();
             graph = (TransactionalGraph) graphTest.getGraphInstance();
-            assertNotNull(graph.getVertex(v1id));
-            assertNull(graph.getVertex(v2id));
+            assertNotNull("Vertex 1 should be persisted", graph.getVertex(v1id));
+            assertNull("Vertex 2 should not be persisted", graph.getVertex(v2id));
             graph.shutdown();
         }
     }
-
 }
