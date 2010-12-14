@@ -60,8 +60,8 @@ public class IndexTestSuite extends TestSuite {
     }
 
     public void testIndexCount() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
+            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
             Index<Vertex> index = graph.createIndex("basic", Vertex.class, Index.Type.MANUAL);
             for (int i = 0; i < 10; i++) {
                 Vertex v = graph.addVertex(null);
@@ -70,9 +70,10 @@ public class IndexTestSuite extends TestSuite {
             assertEquals(10, index.count("dog", "puppy"));
             Vertex v = index.get("dog", "puppy").iterator().next();
             graph.removeVertex(v);
+            index.remove("dog", "puppy", v);
             assertEquals(9, index.count("dog", "puppy"));
+            graph.shutdown();
         }
-        graph.shutdown();
     }
 
     public void testPutGetRemoveEdge() {
