@@ -186,8 +186,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         final ODocument doc = this.rawGraph.getRecordById(rid);
         if (doc != null)
             return new OrientVertex(this, (OGraphVertex) this.rawGraph.getUserObjectByRecord(doc, null));
-        else
-            return new OrientVertex(this, (OGraphVertex) this.rawGraph.load(rid));
+        else {
+            OGraphVertex v = (OGraphVertex) this.rawGraph.load(rid);
+            if (v != null)
+                return new OrientVertex(this, (OGraphVertex) this.rawGraph.load(rid));
+            else
+                return null;
+        }
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -226,8 +231,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         final ODocument doc = this.rawGraph.getRecordById(rid);
         if (doc != null)
             return new OrientEdge(this, (OGraphEdge) this.rawGraph.getUserObjectByRecord(doc, null));
-        else
-            return new OrientEdge(this, (OGraphEdge) this.rawGraph.load(rid));
+        else {
+            OGraphEdge edge = (OGraphEdge) this.rawGraph.load(rid);
+            if (edge != null)
+                return new OrientEdge(this, edge);
+            else
+                return null;
+        }
     }
 
     public void removeEdge(final Edge edge) {
@@ -257,6 +267,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void shutdown() {
+        this.rawGraph.rollback();
         this.rawGraph.close();
         this.rawGraph = null;
         this.indices.clear();

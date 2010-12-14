@@ -294,7 +294,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     public void shutdown() {
         if (null != this.tx) {
             try {
-                this.tx.success();
+                this.tx.failure();
                 this.tx.finish();
                 this.tx = null;
             } catch (TransactionFailureException e) {
