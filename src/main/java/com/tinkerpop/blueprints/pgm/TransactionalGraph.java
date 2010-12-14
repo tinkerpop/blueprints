@@ -5,6 +5,7 @@ package com.tinkerpop.blueprints.pgm;
  * Once a transaction is started, all write operations can either be committed or rolled back.
  * Read operations are not required to be in a transaction.
  * A transactional graph can be in two modes: automatic or manual.
+ * All constructed transactional graphs begin in automatic transaction mode.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -26,6 +27,7 @@ public interface TransactionalGraph extends Graph {
     /**
      * Transactions in a transactional graph can either be handled automatically or manually.
      * If the graph is in automatic mode, then every mutation to the graph will committed at the time of mutation.
+     * A mutation is atomic up to the write methods of graph/element/index.
      * If the graph is in manual model, then the user is responsible for starting and stopping transactions.
      */
     public enum Mode {

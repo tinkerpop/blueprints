@@ -369,7 +369,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    // public void testAutomaticIndexTransactions() {} 
+    // public void testAutomaticIndexKeysRollback()
 
     public void testAutomaticIndexExceptionRollback() {
         if (graphTest.isPersistent && !graphTest.isRDFModel) {

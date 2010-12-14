@@ -95,7 +95,8 @@ public class OrientGraphTest extends GraphTest {
                     try {
                         if (this.currentGraph != null)
                             this.currentGraph.shutdown();
-                    } catch (Exception e) {  }
+                    } catch (Exception e) {
+                    }
                     new ODatabaseGraphTx("local:" + directory + "/graph").delete();
                 }
             }
