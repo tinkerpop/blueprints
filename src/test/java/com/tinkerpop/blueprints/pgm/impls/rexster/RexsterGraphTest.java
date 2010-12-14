@@ -60,7 +60,7 @@ public class RexsterGraphTest extends GraphTest {
     }
 
     /*
-    Todo: Create a respective test case that doesn't require underscore prefixed properties
+    TODO: Create a respective test case that doesn't require underscore prefixed properties
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
