@@ -19,7 +19,7 @@ bc. <dependency>
   <version>0.2.1-SNAPSHOT</version>
 </dependency>
 
-* Moved to @graphdb-deps@ database dependency management model
+* Moved to @graphdb-deps-*@ database dependency management model
 * Removed object document model to focus Blueprints specifically on property graphs
 ** Removed support for TinkerDoc, MongoDB, and CouchDB
 * @OrientGraph@ now implements @TransactionalGraph@ interface
