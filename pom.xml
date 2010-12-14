@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
@@ -28,18 +28,15 @@
             <email>l.garulli@orientechnologies.com</email>
             <url>http://zion-city.blogspot.com</url>
         </contributor>
+        <contributor>
+            <!-- SOME TRANSACTION WORK -->
+            <name>Darrick Wiebe</name>
+            <email>darrick@innatesoftware.com</email>
+            <url>http://github.com/pangloss</url>
+        </contributor>
     </contributors>
     <inceptionYear>2010</inceptionYear>
     <dependencies>
-        <!--
-            PROPERTY GRAPH MODEL IMPLEMENTATION SUPPORT
-        -->
-        <!-- JUNG SUPPORT -->
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-api</artifactId>
-            <version>2.0</version>
-        </dependency>
         <!-- GRAPHDB SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>
@@ -52,6 +49,12 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
+        </dependency>
+        <!-- JUNG SUPPORT -->
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-api</artifactId>
+            <version>2.0</version>
         </dependency>
         <!-- TESTING -->
         <dependency>

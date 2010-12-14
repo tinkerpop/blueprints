@@ -261,9 +261,9 @@ public class SailGraph implements TransactionalGraph {
     public void startTransaction() {
         if (Mode.AUTOMATIC == this.mode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-        if (inTransaction)
+        if (this.inTransaction)
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
-        inTransaction = true;
+        this.inTransaction = true;
     }
 
     public void stopTransaction(final Conclusion conclusion) {
@@ -271,7 +271,7 @@ public class SailGraph implements TransactionalGraph {
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         try {
-            inTransaction = false;
+            this.inTransaction = false;
             if (Conclusion.SUCCESS == conclusion) {
                 this.sailConnection.commit();
             } else {
@@ -285,7 +285,7 @@ public class SailGraph implements TransactionalGraph {
     protected void autoStopTransaction(Conclusion conclusion) {
         if (this.mode == Mode.AUTOMATIC) {
             try {
-                inTransaction = false;
+                this.inTransaction = false;
                 if (conclusion == Conclusion.SUCCESS)
                     this.sailConnection.commit();
                 else
@@ -301,7 +301,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.commit();
         } catch (SailException e) {
         }
-        inTransaction = false;
+        this.inTransaction = false;
         this.mode = mode;
     }
 

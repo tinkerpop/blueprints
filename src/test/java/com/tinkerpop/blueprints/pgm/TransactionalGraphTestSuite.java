@@ -402,7 +402,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             ex = e;
         }
         assertNotNull(ex);
-        assertEquals("Nested transactions are not supported", ex.getMessage());
+        assertEquals(TransactionalGraph.NESTED_MESSAGE, ex.getMessage());
         graph.shutdown();
     }
 

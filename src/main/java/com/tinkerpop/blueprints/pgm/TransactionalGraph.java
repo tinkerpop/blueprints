@@ -14,7 +14,7 @@ public interface TransactionalGraph extends Graph {
      * Error message to use when code is trying to stop/stop a transaction in automatic transaction mode.
      */
     public static final String TURN_OFF_MESSAGE = "Turn off automatic transactions to use manual transaction handling";
-    public static final String NESTED_MESSAGE = "Nested transactions are not supported";
+    public static final String NESTED_MESSAGE = "Stop current transaction before starting another";
 
     /**
      * Whether the transaction being stopped was successful (commit) or a failure (rollback).
