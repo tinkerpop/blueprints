@@ -9,6 +9,21 @@ bc. <repository>
 
 ==<hr/>==
 
+
+h3. Version 0.4 (Elmo -- NOT OFFICIALLY RELEASED YET)
+
+bc. <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>blueprints</artifactId>
+  <version>0.4-SNAPSHOT</version>
+</dependency>
+
+* Added edge label indexing to @AutomaticIndex@
+* Added concept of "ouplementation"
+** Repackaged JUNG implementation as @GraphJung@
+
+==<hr/>==
+
 !http://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-smurf.png!
 
 h3. Version 0.3 (Smurf -- December 14, 2010)
