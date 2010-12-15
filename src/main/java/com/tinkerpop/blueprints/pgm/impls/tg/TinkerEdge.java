@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
@@ -19,6 +20,9 @@ public class TinkerEdge extends TinkerElement implements Edge {
         this.label = label;
         this.outVertex = outVertex;
         this.inVertex = inVertex;
+        for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
+            index.autoUpdate(AutomaticIndex.LABEL, this.label, null, this);
+        }
     }
 
     public TinkerEdge getRawEdge() {

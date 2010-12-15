@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -323,5 +324,71 @@ public class AutomaticIndexTestSuite extends TestSuite {
             assertEquals(count(index.get("location", "santa fe")), 0);
             graph.shutdown();
         }
+    }
+
+    public void testEdgeLabelIndexing() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        AutomaticIndex<Edge> edgeIndex = (AutomaticIndex<Edge>) graph.getIndex(Index.EDGES, Edge.class);
+        Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+        assertEquals(edge.getId(), edgeIndex.get(AutomaticIndex.LABEL, "knows").iterator().next().getId());
+
+        Set<Object> edgeKnowsIds = new HashSet<Object>();
+        edgeKnowsIds.add(edge.getId());
+        for (int i = 0; i < 9; i++) {
+            edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            edgeKnowsIds.add(edge.getId());
+        }
+
+        Set<Object> edgeHatesIds = new HashSet<Object>();
+        for (int i = 0; i < 10; i++) {
+            edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "hates");
+            edgeHatesIds.add(edge.getId());
+        }
+
+        int counter = 0;
+        for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "knows")) {
+            assertTrue(edgeKnowsIds.contains(e.getId()));
+            counter++;
+        }
+        assertEquals(counter, 10);
+
+        counter = 0;
+        for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "hates")) {
+            assertTrue(edgeHatesIds.contains(e.getId()));
+            counter++;
+        }
+        assertEquals(counter, 10);
+
+        Random random = new Random();
+        Set<Object> edgeRemoveKnowsIds = new HashSet<Object>();
+        for (Object id : edgeKnowsIds) {
+            if (random.nextBoolean()) {
+                edgeRemoveKnowsIds.add(id);
+                graph.removeEdge(graph.getEdge(id));
+            }
+        }
+        Set<Object> edgeRemoveHatesIds = new HashSet<Object>();
+        for (Object id : edgeHatesIds) {
+            if (random.nextBoolean()) {
+                edgeRemoveHatesIds.add(id);
+                graph.removeEdge(graph.getEdge(id));
+            }
+        }
+
+        counter = 0;
+        for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "knows")) {
+            assertTrue(edgeKnowsIds.contains(e.getId()) && !edgeRemoveKnowsIds.contains(e.getId()));
+            counter++;
+        }
+        assertEquals(counter, edgeKnowsIds.size() - edgeRemoveKnowsIds.size());
+
+        counter = 0;
+        for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "hates")) {
+            assertTrue(edgeHatesIds.contains(e.getId()) && !edgeRemoveHatesIds.contains(e.getId()));
+            counter++;
+        }
+        assertEquals(counter, edgeHatesIds.size() - edgeRemoveHatesIds.size());
+
+        graph.shutdown();
     }
 }
