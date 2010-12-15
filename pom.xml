@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.3</version>
+    <version>0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
