@@ -1,7 +1,7 @@
-package com.tinkerpop.blueprints.pgm.jung.util;
+package com.tinkerpop.blueprints.pgm.oupls.jung.util;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.jung.JungHelper;
+import com.tinkerpop.blueprints.pgm.oupls.jung.JungHelper;
 import org.apache.commons.collections15.Transformer;
 
 import java.util.List;

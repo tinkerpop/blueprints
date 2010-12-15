@@ -1,18 +1,19 @@
-package com.tinkerpop.blueprints.pgm.jung;
+package com.tinkerpop.blueprints.pgm.oupls.jung;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
+import com.tinkerpop.blueprints.pgm.oupls.jung.GraphJung;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import junit.framework.TestCase;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class JungGraphTest extends TestCase {
+public class GraphJungTest extends TestCase {
 
     public void testTinkerGraph() {
-        JungGraph graph = new JungGraph(TinkerGraphFactory.createTinkerGraph());
+        GraphJung graph = new GraphJung(TinkerGraphFactory.createTinkerGraph());
         assertEquals(graph.getVertices().size(), 6);
         assertEquals(graph.getEdges().size(), 6);
         assertEquals(graph.getVertexCount(), 6);
