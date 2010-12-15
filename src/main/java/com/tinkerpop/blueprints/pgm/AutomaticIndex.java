@@ -12,6 +12,11 @@ import java.util.Set;
 public interface AutomaticIndex<T extends Element> extends Index<T> {
 
     /**
+     * The automatic index key for edge labels is _label
+     */
+    public static final String LABEL = "_label";
+
+    /**
      * Add an element property key that should be indexed.
      * If null is provided as the key, then all properties are indexed (i.e. null is wildcard)
      *

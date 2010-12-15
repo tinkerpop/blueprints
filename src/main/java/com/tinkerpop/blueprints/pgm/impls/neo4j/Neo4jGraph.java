@@ -212,8 +212,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         try {
             this.autoStartTransaction();
             final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
+            final Edge edge = new Neo4jEdge(relationship, this, true);
             this.autoStopTransaction(Conclusion.SUCCESS);
-            return new Neo4jEdge(relationship, this);
+            return edge;
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
