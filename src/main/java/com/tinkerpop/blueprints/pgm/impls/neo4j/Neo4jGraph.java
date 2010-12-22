@@ -248,12 +248,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     public void removeEdge(final Edge edge) {
         try {
             this.autoStartTransaction();
-            ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
             for (Neo4jAutomaticIndex idx : this.getAutoIndices()) {
                 if (Edge.class.isAssignableFrom(idx.getIndexClass())) {
                     idx.removeElement((Neo4jEdge) edge);
                 }
             }
+            ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
