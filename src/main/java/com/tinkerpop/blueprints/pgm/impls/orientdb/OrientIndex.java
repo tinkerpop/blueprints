@@ -155,12 +155,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
-    public int removeElement(final Element vertex) {
-        if (!getIndexClass().isAssignableFrom(vertex.getClass()))
-            return 0;
-
-        int removed = 0;
-
+    public void removeElement(final T vertex) {
         ORecordLazyList docs;
         for (Entry<String, ORecordLazyList> entries : getRawIndex().entrySet()) {
             docs = entries.getValue();
@@ -173,12 +168,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
                     if (doc.getIdentity().equals(vertex.getId())) {
                         docs.remove(i);
                         getRawIndex().put(entries.getKey(), docs);
-                        ++removed;
                     }
                 }
             }
         }
-        return removed;
     }
 
     private void create(final Class<T> indexClass) {

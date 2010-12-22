@@ -199,8 +199,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         try {
             autoStartTransaction();
 
-            for (OrientIndex<?> index : indices.values())
-                index.removeElement(vertex);
+            for (OrientIndex<?> index : indices.values()) {
+                if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
+                    OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;
+                    idx.removeElement((OrientVertex) vertex);
+                }
+            }
 
             ((OrientVertex) vertex).delete();
             autoStopTransaction(Conclusion.SUCCESS);
@@ -244,8 +248,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         try {
             autoStartTransaction();
 
-            for (OrientIndex<?> index : indices.values())
-                index.removeElement(edge);
+            for (OrientIndex<?> index : indices.values()) {
+                if (Edge.class.isAssignableFrom(index.getIndexClass())) {
+                    OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
+                    idx.removeElement((OrientEdge) edge);
+                }
+            }
 
             ((OrientEdge) edge).delete();
             autoStopTransaction(Conclusion.SUCCESS);

@@ -50,7 +50,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         for (String key : autoIndexKeys) {
             Object value = element.getProperty(key);
             if (value != null) {
-                this.removeBasic(key, value, element);
+                this.remove(key, value, element);
             }
         }
     }
@@ -60,7 +60,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         for (String key: autoIndexKeys) {
             Object value = element.getProperty(key);
             if (value != null) {
-                this.putBasic(key, value, element);
+                this.put(key, value, element);
             }
         }
     }

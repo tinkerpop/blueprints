@@ -77,6 +77,10 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         }
     }
 
+    public void removeElement(final T element) {
+        // Elements can not be removed from this type of index
+    }
+
     protected void removeBasic(final String key, final Object value, final T element) {
         this.rawIndex.remove((S) element.getRawElement(), key, value);
     }

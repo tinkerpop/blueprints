@@ -72,4 +72,6 @@ public interface Index<T extends Element> {
      * @param element the element to remove given the key/value pair
      */
     public void remove(String key, Object value, T element);
+
+    public void removeElement(T element);
 }

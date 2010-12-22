@@ -127,7 +127,9 @@ public class TinkerGraph implements IndexableGraph {
 
         // removal requires removal from all indices
         for (TinkerIndex index : this.indices.values()) {
-            index.remove(vertex);
+            if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
+                index.removeElement(vertex);
+            }
         }
 
         this.vertices.remove(vertex.getId().toString());
@@ -167,7 +169,9 @@ public class TinkerGraph implements IndexableGraph {
 
         // removal requires removal from all indices
         for (TinkerIndex index : this.indices.values()) {
-            index.remove(edge);
+            if (Edge.class.isAssignableFrom(index.getIndexClass())) {
+                index.removeElement(edge);
+            }
         }
 
         this.edges.remove(edge.getId().toString());
