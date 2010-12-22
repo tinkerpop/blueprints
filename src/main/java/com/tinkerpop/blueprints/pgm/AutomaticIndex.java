@@ -39,4 +39,18 @@ public interface AutomaticIndex<T extends Element> extends Index<T> {
      */
     public Set<String> getAutoIndexKeys();
 
+
+    /**
+     * Add each indexed property of an element to this index.
+     *
+     * @param element the element to be indexed
+     */
+    public void addElement(T element);
+
+    /**
+     * Remove each indexed property of an element from this index.
+     *
+     * @param element the element to be deindexed
+     */
+    public void removeElement(T element);
 }
