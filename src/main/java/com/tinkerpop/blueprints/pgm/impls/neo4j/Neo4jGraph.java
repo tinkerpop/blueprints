@@ -195,7 +195,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                     ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
                 }
                 for (Neo4jAutomaticIndex idx : this.getAutoIndices()) {
-                    idx.removeElement((Neo4jVertex) vertex);
+                    if (Vertex.class.isAssignableFrom(idx.getIndexClass())) {
+                        idx.removeElement((Neo4jVertex) vertex);
+                    }
                 }
                 node.delete();
                 this.autoStopTransaction(Conclusion.SUCCESS);
@@ -247,6 +249,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         try {
             this.autoStartTransaction();
             ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
+            for (Neo4jAutomaticIndex idx : this.getAutoIndices()) {
+                if (Edge.class.isAssignableFrom(idx.getIndexClass())) {
+                    idx.removeElement((Neo4jEdge) edge);
+                }
+            }
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
