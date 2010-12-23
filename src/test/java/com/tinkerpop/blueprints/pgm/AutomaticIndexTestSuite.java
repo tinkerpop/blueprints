@@ -26,7 +26,6 @@ public class AutomaticIndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex) {
             AutomaticIndex index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
-            assertNull(index.getAutoIndexKeys());
 
             this.stopWatch();
             index.addAutoIndexKey("name");
@@ -49,8 +48,8 @@ public class AutomaticIndexTestSuite extends TestSuite {
     }
 
     public void testAutoIndexPutGetRemoveVertex() {
-        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
+            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
             Set<Vertex> vertices = new HashSet<Vertex>();
             for (int i = 0; i < 10; i++) {
                 Vertex vertex = graph.addVertex(null);
@@ -62,14 +61,18 @@ public class AutomaticIndexTestSuite extends TestSuite {
             if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 10);
 
+            AutomaticIndex<Vertex> index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+
+            assertThat(index.getAutoIndexKeys(), hasItems("key1", "key2"));
+            assertThat(index.getAutoIndexKeys(), not(hasItem("key3")));
             this.stopWatch();
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("key1", "value1")), 10);
+            assertEquals(10, count(index.get("key1", "value1")));
             BaseTest.printPerformance(graph.toString(), 10, "vertices retrieved from automatic index", this.stopWatch());
             this.stopWatch();
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("key2", "value2")), 10);
+            assertEquals(10, count(index.get("key2", "value2")));
             BaseTest.printPerformance(graph.toString(), 10, "vertices retrieved from automatic index", this.stopWatch());
             this.stopWatch();
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("key3", "value3")), 0);
+            assertEquals(0, count(index.get("key3", "value3")));
             BaseTest.printPerformance(graph.toString(), 0, "vertices retrieved from automatic index", this.stopWatch());
 
             for (Vertex vertex : graph.getIndex(Index.VERTICES, Vertex.class).get("key1", "value1")) {
@@ -128,8 +131,8 @@ public class AutomaticIndexTestSuite extends TestSuite {
             this.stopWatch();
             assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("key3", "value3")), 0);
             BaseTest.printPerformance(graph.toString(), 0, "vertices retrieved from automatic index", this.stopWatch());
+            graph.shutdown();
         }
-        graph.shutdown();
     }
 
     public void testAutoIndexPutGetRemoveEdge() {
@@ -291,28 +294,27 @@ public class AutomaticIndexTestSuite extends TestSuite {
             IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
             graph.dropIndex(Index.EDGES);
             AutomaticIndex<Vertex> index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
-            assertNull(index.getAutoIndexKeys());
             graph.shutdown();
 
             graph = (IndexableGraph) graphTest.getGraphInstance();
             index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
-            assertNull(index.getAutoIndexKeys());
             index.addAutoIndexKey("name");
             assertEquals(index.getAutoIndexKeys().size(), 1);
-            assertTrue(index.getAutoIndexKeys().contains("name"));
+            assertThat(index.getAutoIndexKeys(), hasItem("name"));
             graph.shutdown();
 
             graph = (IndexableGraph) graphTest.getGraphInstance();
             index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
-            assertEquals(index.getAutoIndexKeys().size(), 1);
-            assertTrue(index.getAutoIndexKeys().contains("name"));
+            assertEquals(1, index.getAutoIndexKeys().size());
+            assertThat(index.getAutoIndexKeys(), hasItem("name"));
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
             vertex.setProperty("location", "santa fe");
+            assertThat(index.getAutoIndexKeys(), not(hasItem("location")));
             if (graphTest.supportsVertexIteration)
-                assertEquals(count(graph.getVertices()), 1);
-            assertEquals(count(index.get("name", "marko")), 1);
-            assertEquals(count(index.get("location", "santa fe")), 0);
+                assertEquals(1, count(graph.getVertices()));
+            assertEquals(1, count(index.get("name", "marko")));
+            assertEquals(0, count(index.get("location", "santa fe")));
             if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 1);
             graph.shutdown();
@@ -333,7 +335,8 @@ public class AutomaticIndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         AutomaticIndex<Edge> edgeIndex = (AutomaticIndex<Edge>) graph.getIndex(Index.EDGES, Edge.class);
         Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
-        assertEquals(edge.getId(), edgeIndex.get(AutomaticIndex.LABEL, "knows").iterator().next().getId());
+        assertThat(edgeIndex.getAutoIndexKeys(), hasItem(AutomaticIndex.LABEL));
+        assertThat(asList(edgeIndex.get(AutomaticIndex.LABEL, "knows")), hasItem(edge));
 
         Set<Object> edgeKnowsIds = new HashSet<Object>();
         edgeKnowsIds.add(edge.getId());
@@ -382,9 +385,6 @@ public class AutomaticIndexTestSuite extends TestSuite {
         }
 
         counter = 0;
-        for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "knows")) {
-            System.out.println(e);
-        }
         for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "knows")) {
             assertThat(edgeKnowsIds, hasItem(e.getId()));
             assertThat(edgeRemoveKnowsIds, not(hasItem(e.getId())));

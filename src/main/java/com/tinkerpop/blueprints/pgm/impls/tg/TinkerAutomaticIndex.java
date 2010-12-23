@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,8 @@ import java.util.Set;
  */
 public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements AutomaticIndex<T> {
 
-    Set<String> autoIndexKeys = null;
+    boolean indexEverything = true;
+    Set<String> autoIndexKeys = new HashSet<String>();
 
     public TinkerAutomaticIndex(String name, Class<T> indexClass) {
         super(name, indexClass);
@@ -22,20 +24,16 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
 
     public void addAutoIndexKey(final String key) {
         if (null == key)
-            this.autoIndexKeys = null;
+            this.indexEverything = true;
         else {
-            if (autoIndexKeys == null) {
-                this.autoIndexKeys = new HashSet<String>();
-                this.autoIndexKeys.add(key);
-            } else {
-                this.autoIndexKeys.add(key);
-            }
+            this.indexEverything = false;
+            this.autoIndexKeys.add(key);
         }
     }
 
     public void removeAutoIndexKey(final String key) {
-        if (null != autoIndexKeys)
-            this.autoIndexKeys.remove(key);
+        this.indexEverything = false;
+        this.autoIndexKeys.remove(key);
     }
 
     public Set<String> getAutoIndexKeys() {
@@ -43,10 +41,9 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     }
 
     public void removeElement(final T element) {
-        if (autoIndexKeys == null) return;
         for (String key : autoIndexKeys) {
             Object value;
-            if (key == AutomaticIndex.LABEL)
+            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
                 value = ((TinkerEdge) element).getLabel();
             else
                 value = element.getProperty(key);
@@ -57,10 +54,9 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     }
 
     public void addElement(final T element) {
-        if (autoIndexKeys == null) return;
         for (String key: autoIndexKeys) {
             Object value;
-            if (key == AutomaticIndex.LABEL)
+            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
                 value = ((TinkerEdge) element).getLabel();
             else
                 value = element.getProperty(key);
@@ -71,7 +67,9 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+        if (this.indexEverything && !this.autoIndexKeys.contains(key))
+            this.autoIndexKeys.add(key);
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && this.autoIndexKeys.contains(key)) {
             if (oldValue != null)
                 this.remove(key, oldValue, element);
             this.put(key, newValue, element);
@@ -79,7 +77,7 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     }
 
     protected void autoRemove(final String key, final Object oldValue, final T element) {
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && this.autoIndexKeys.contains(key)) {
             this.remove(key, oldValue, element);
         }
     }

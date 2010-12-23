@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.record.ORecordTrackedList;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +13,9 @@ import java.util.Set;
  */
 public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T> implements AutomaticIndex<T> {
 
-    Set<String> autoIndexKeys = null;
+    Set<String> autoIndexKeys = new HashSet<String>();
+    private static final String INDEX_EVERYTHING = "index_everything";
+    private String indexEverything = "default_index_everything";
     private static final String KEYS = "keys";
 
     public OrientAutomaticIndex(final String name, final Class<T> indexClass, final OrientGraph graph, final ODocument indexCfg) {
@@ -32,24 +35,19 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     public void addAutoIndexKey(final String key) {
         if (null == key)
-            this.autoIndexKeys = null;
+            this.indexEverything = INDEX_EVERYTHING;
         else {
-            if (autoIndexKeys == null) {
-                this.autoIndexKeys = new HashSet<String>();
-                this.autoIndexKeys.add(key);
-            } else {
-                this.autoIndexKeys.add(key);
-            }
+            this.indexEverything = null;
+            this.autoIndexKeys.add(key);
         }
 
         this.saveConfiguration();
     }
 
     public void removeElement(final T element) {
-        if (autoIndexKeys == null) return;
         for (String key : autoIndexKeys) {
             Object value;
-            if (key == AutomaticIndex.LABEL)
+            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
                 value = ((OrientEdge) element).getLabel();
             else
                 value = element.getProperty(key);
@@ -60,10 +58,9 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     public void addElement(final T element) {
-        if (autoIndexKeys == null) return;
         for (String key : autoIndexKeys) {
             Object value;
-            if (key == AutomaticIndex.LABEL)
+            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
                 value = ((OrientEdge) element).getLabel();
             else
                 value = element.getProperty(key);
@@ -74,7 +71,11 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+        if (this.indexEverything != null && !this.autoIndexKeys.contains(key)) {
+            this.autoIndexKeys.add(key);
+            this.saveConfiguration();
+        }
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys.contains(key))) {
             if (oldValue != null)
                 this.remove(key, oldValue, element);
             this.put(key, newValue, element);
@@ -82,15 +83,13 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     protected void autoRemove(final String key, final Object oldValue, final T element) {
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && this.autoIndexKeys.contains(key)) {
             this.remove(key, oldValue, element);
         }
     }
 
     public void removeAutoIndexKey(final String key) {
-        if (null != this.autoIndexKeys)
-            this.autoIndexKeys.remove(key);
-
+        this.autoIndexKeys.remove(key);
         this.saveConfiguration();
     }
 
@@ -100,10 +99,8 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     private void init() {
         ORecordTrackedList field = indexCfg.field(KEYS);
-        if (null == field)
-            this.autoIndexKeys = null;
-        else {
-            this.autoIndexKeys = new HashSet<String>();
+        if (null != field) {
+            this.indexEverything = indexCfg.field(INDEX_EVERYTHING);
             for (Object key : field) {
                 this.autoIndexKeys.add((String) key);
             }
@@ -112,6 +109,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     private void saveConfiguration() {
         indexCfg.field(KEYS, this.autoIndexKeys);
+        indexCfg.field(INDEX_EVERYTHING, this.indexEverything);
         graph.saveIndexConfiguration();
     }
 }
