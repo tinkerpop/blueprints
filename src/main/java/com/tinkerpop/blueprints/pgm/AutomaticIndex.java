@@ -12,9 +12,9 @@ import java.util.Set;
 public interface AutomaticIndex<T extends Element> extends Index<T> {
 
     /**
-     * The automatic index key for edge labels is "label"
+     * The automatic index key for edge labels is "$label$"
      */
-    public static final String LABEL = "label";
+    public static final String LABEL = "$label$";
 
     /**
      * Add an element property key that should be indexed.

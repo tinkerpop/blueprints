@@ -1,10 +1,13 @@
 package com.tinkerpop.blueprints.pgm;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.matchers.JUnitMatchers.*;
+import static org.junit.Assert.assertThat;
+
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -359,35 +362,43 @@ public class AutomaticIndexTestSuite extends TestSuite {
         }
         assertEquals(counter, 10);
 
-        Random random = new Random();
         Set<Object> edgeRemoveKnowsIds = new HashSet<Object>();
+        counter = 0;
         for (Object id : edgeKnowsIds) {
-            if (random.nextBoolean()) {
+            if (counter % 2 == 0) {
                 edgeRemoveKnowsIds.add(id);
                 graph.removeEdge(graph.getEdge(id));
             }
+            counter++;
         }
         Set<Object> edgeRemoveHatesIds = new HashSet<Object>();
+        counter = 0;
         for (Object id : edgeHatesIds) {
-            if (random.nextBoolean()) {
+            if (counter % 2 == 0) {
                 edgeRemoveHatesIds.add(id);
                 graph.removeEdge(graph.getEdge(id));
             }
+            counter++;
         }
 
         counter = 0;
         for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "knows")) {
-            assertTrue(edgeKnowsIds.contains(e.getId()) && !edgeRemoveKnowsIds.contains(e.getId()));
+            System.out.println(e);
+        }
+        for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "knows")) {
+            assertThat(edgeKnowsIds, hasItem(e.getId()));
+            assertThat(edgeRemoveKnowsIds, not(hasItem(e.getId())));
             counter++;
         }
-        assertEquals(counter, edgeKnowsIds.size() - edgeRemoveKnowsIds.size());
+        assertThat(counter, is(5));
 
         counter = 0;
         for (Edge e : edgeIndex.get(AutomaticIndex.LABEL, "hates")) {
-            assertTrue(edgeHatesIds.contains(e.getId()) && !edgeRemoveHatesIds.contains(e.getId()));
+            assertThat(edgeHatesIds, hasItem(e.getId()));
+            assertThat(edgeRemoveHatesIds, not(hasItem(e.getId())));
             counter++;
         }
-        assertEquals(counter, edgeHatesIds.size() - edgeRemoveHatesIds.size());
+        assertThat(counter, is(5));
 
         graph.shutdown();
     }

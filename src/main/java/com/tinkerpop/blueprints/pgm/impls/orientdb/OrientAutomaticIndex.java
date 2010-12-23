@@ -48,7 +48,11 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     public void removeElement(final T element) {
         if (autoIndexKeys == null) return;
         for (String key : autoIndexKeys) {
-            Object value = element.getProperty(key);
+            Object value;
+            if (key == AutomaticIndex.LABEL)
+                value = ((OrientEdge) element).getLabel();
+            else
+                value = element.getProperty(key);
             if (value != null) {
                 this.remove(key, value, element);
             }
@@ -57,8 +61,12 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     public void addElement(final T element) {
         if (autoIndexKeys == null) return;
-        for (String key: autoIndexKeys) {
-            Object value = element.getProperty(key);
+        for (String key : autoIndexKeys) {
+            Object value;
+            if (key == AutomaticIndex.LABEL)
+                value = ((OrientEdge) element).getLabel();
+            else
+                value = element.getProperty(key);
             if (value != null) {
                 this.put(key, value, element);
             }

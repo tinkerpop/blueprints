@@ -40,7 +40,11 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     public void removeElement(final T element) {
         if (autoIndexKeys == null) return;
         for (String key : autoIndexKeys) {
-            Object value = element.getProperty(key);
+            Object value;
+            if (key == AutomaticIndex.LABEL)
+                value = ((Neo4jEdge) element).getLabel();
+            else
+                value = element.getProperty(key);
             if (value != null) {
                 this.removeBasic(key, value, element);
             }
@@ -50,7 +54,11 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     public void addElement(final T element) {
         if (autoIndexKeys == null) return;
         for (String key: autoIndexKeys) {
-            Object value = element.getProperty(key);
+            Object value;
+            if (key == AutomaticIndex.LABEL)
+                value = ((Neo4jEdge) element).getLabel();
+            else
+                value = element.getProperty(key);
             if (value != null) {
                 this.putBasic(key, value, element);
             }

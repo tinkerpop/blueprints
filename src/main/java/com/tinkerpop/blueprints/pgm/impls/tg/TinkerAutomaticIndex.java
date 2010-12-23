@@ -45,7 +45,11 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     public void removeElement(final T element) {
         if (autoIndexKeys == null) return;
         for (String key : autoIndexKeys) {
-            Object value = element.getProperty(key);
+            Object value;
+            if (key == AutomaticIndex.LABEL)
+                value = ((TinkerEdge) element).getLabel();
+            else
+                value = element.getProperty(key);
             if (value != null) {
                 this.remove(key, value, element);
             }
@@ -55,7 +59,11 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     public void addElement(final T element) {
         if (autoIndexKeys == null) return;
         for (String key: autoIndexKeys) {
-            Object value = element.getProperty(key);
+            Object value;
+            if (key == AutomaticIndex.LABEL)
+                value = ((TinkerEdge) element).getLabel();
+            else
+                value = element.getProperty(key);
             if (value != null) {
                 this.put(key, value, element);
             }
