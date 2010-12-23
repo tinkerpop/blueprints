@@ -214,11 +214,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new OrientElementSequence<Vertex>(this, new OGraphVertexIterator(this.rawGraph));
+        return new OrientElementSequence<Vertex>(this, new OGraphVertexIterator(this.rawGraph, true));
     }
 
     public Iterable<Edge> getEdges() {
-        return new OrientElementSequence<Edge>(this, new OGraphEdgeIterator(this.rawGraph));
+        return new OrientElementSequence<Edge>(this, new OGraphEdgeIterator(this.rawGraph, true));
     }
 
     public Edge getEdge(final Object id) {
