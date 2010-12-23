@@ -414,6 +414,8 @@ public class AutomaticIndexTestSuite extends TestSuite {
             }
             assertEquals(10, index.count("dog", "puppy"));
             Vertex v = index.get("dog", "puppy").iterator().next();
+            graph.removeVertex(v);
+            assertEquals(9, index.count("dog", "puppy"));
             graph.shutdown();
         }
     }
