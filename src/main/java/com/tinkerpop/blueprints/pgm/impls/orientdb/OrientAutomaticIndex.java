@@ -15,7 +15,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     Set<String> autoIndexKeys = new HashSet<String>();
     private static final String INDEX_EVERYTHING = "index_everything";
-    private String indexEverything = "default_index_everything";
+    private String indexEverything = INDEX_EVERYTHING;
     private static final String KEYS = "keys";
 
     public OrientAutomaticIndex(final String name, final Class<T> indexClass, final OrientGraph graph, final ODocument indexCfg) {
@@ -44,32 +44,6 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         this.saveConfiguration();
     }
 
-    public void removeElement(final T element) {
-        for (String key : autoIndexKeys) {
-            Object value;
-            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
-                value = ((OrientEdge) element).getLabel();
-            else
-                value = element.getProperty(key);
-            if (value != null) {
-                this.remove(key, value, element);
-            }
-        }
-    }
-
-    public void addElement(final T element) {
-        for (String key : autoIndexKeys) {
-            Object value;
-            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
-                value = ((OrientEdge) element).getLabel();
-            else
-                value = element.getProperty(key);
-            if (value != null) {
-                this.put(key, value, element);
-            }
-        }
-    }
-
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
         if (this.indexEverything != null && !this.autoIndexKeys.contains(key)) {
             this.autoIndexKeys.add(key);
@@ -94,6 +68,12 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     public Set<String> getAutoIndexKeys() {
+        if (this.indexEverything == INDEX_EVERYTHING)
+            return null;
+        return this.autoIndexKeys;
+    }
+
+    public Set<String> getAutoIndexKeysInUse() {
         return this.autoIndexKeys;
     }
 

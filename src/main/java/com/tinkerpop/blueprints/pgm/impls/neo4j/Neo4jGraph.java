@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
+import com.tinkerpop.blueprints.pgm.util.IndexHelper;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -187,17 +188,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         final Node node = this.rawGraph.getNodeById(id);
         if (null != node) {
             try {
+                IndexHelper.unIndexElement(this, vertex);
                 this.autoStartTransaction();
                 for (final Edge edge : vertex.getInEdges()) {
                     ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
                 }
                 for (final Edge edge : vertex.getOutEdges()) {
                     ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
-                }
-                for (Neo4jAutomaticIndex idx : this.getAutoIndices()) {
-                    if (Vertex.class.isAssignableFrom(idx.getIndexClass())) {
-                        idx.removeElement((Neo4jVertex) vertex);
-                    }
                 }
                 node.delete();
                 this.autoStopTransaction(Conclusion.SUCCESS);
@@ -247,12 +244,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeEdge(final Edge edge) {
         try {
+            IndexHelper.unIndexElement(this, edge);
             this.autoStartTransaction();
-            for (Neo4jAutomaticIndex idx : this.getAutoIndices()) {
-                if (Edge.class.isAssignableFrom(idx.getIndexClass())) {
-                    idx.removeElement((Neo4jEdge) edge);
-                }
-            }
             ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {

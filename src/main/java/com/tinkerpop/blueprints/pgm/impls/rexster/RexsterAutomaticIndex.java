@@ -42,13 +42,4 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
         else
             return keys;
     }
-
-    public void removeElement(final T element) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void addElement(final T element) {
-        throw new UnsupportedOperationException();
-    }
-
 }

@@ -12,6 +12,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
+import com.tinkerpop.blueprints.pgm.util.IndexHelper;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
@@ -197,14 +198,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeVertex(final Vertex vertex) {
         try {
-            autoStartTransaction();
+            IndexHelper.unIndexElement(this, vertex);
 
-            for (OrientIndex<?> index : indices.values()) {
-                if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
-                    OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;
-                    idx.removeElement((OrientVertex) vertex);
-                }
-            }
+            autoStartTransaction();
 
             ((OrientVertex) vertex).delete();
             autoStopTransaction(Conclusion.SUCCESS);
@@ -246,14 +242,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeEdge(final Edge edge) {
         try {
-            autoStartTransaction();
+            IndexHelper.unIndexElement(this, edge);
 
-            for (OrientIndex<?> index : indices.values()) {
-                if (Edge.class.isAssignableFrom(index.getIndexClass())) {
-                    OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
-                    idx.removeElement((OrientEdge) edge);
-                }
-            }
+            autoStartTransaction();
 
             ((OrientEdge) edge).delete();
             autoStopTransaction(Conclusion.SUCCESS);

@@ -35,32 +35,6 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         this.saveKeyField(false);
     }
 
-    public void removeElement(final T element) {
-        for (String key : autoIndexKeys) {
-            Object value;
-            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
-                value = ((Neo4jEdge) element).getLabel();
-            else
-                value = element.getProperty(key);
-            if (value != null) {
-                this.removeBasic(key, value, element);
-            }
-        }
-    }
-
-    public void addElement(final T element) {
-        for (String key: autoIndexKeys) {
-            Object value;
-            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
-                value = ((Neo4jEdge) element).getLabel();
-            else
-                value = element.getProperty(key);
-            if (value != null) {
-                this.putBasic(key, value, element);
-            }
-        }
-    }
-
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
         if (this.indexEverything && !this.autoIndexKeys.contains(key)) {
             this.autoIndexKeys.add(key);
@@ -85,6 +59,12 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     }
 
     public Set<String> getAutoIndexKeys() {
+        if (this.indexEverything)
+            return null;
+        return this.autoIndexKeys;
+    }
+
+    public Set<String> getAutoIndexKeysInUse() {
         return this.autoIndexKeys;
     }
 

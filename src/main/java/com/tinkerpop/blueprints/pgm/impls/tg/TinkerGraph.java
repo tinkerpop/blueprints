@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.util.IndexHelper;
 
 import java.util.*;
 
@@ -125,12 +126,7 @@ public class TinkerGraph implements IndexableGraph {
             this.removeEdge(edge);
         }
 
-        // removal requires removal from all indices
-        for (TinkerIndex index : this.indices.values()) {
-            if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
-                index.removeElement(vertex);
-            }
-        }
+        IndexHelper.unIndexElement(this, vertex);
 
         this.vertices.remove(vertex.getId().toString());
     }
@@ -167,12 +163,7 @@ public class TinkerGraph implements IndexableGraph {
         if (null != inVertex && null != inVertex.inEdges)
             inVertex.inEdges.remove(edge);
 
-        // removal requires removal from all indices
-        for (TinkerIndex index : this.indices.values()) {
-            if (Edge.class.isAssignableFrom(index.getIndexClass())) {
-                index.removeElement(edge);
-            }
-        }
+        IndexHelper.unIndexElement(this, edge);
 
         this.edges.remove(edge.getId().toString());
     }

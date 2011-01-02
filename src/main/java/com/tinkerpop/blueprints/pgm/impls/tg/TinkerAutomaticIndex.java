@@ -37,33 +37,13 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     }
 
     public Set<String> getAutoIndexKeys() {
+        if (this.indexEverything)
+            return null;
         return this.autoIndexKeys;
     }
 
-    public void removeElement(final T element) {
-        for (String key : autoIndexKeys) {
-            Object value;
-            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
-                value = ((TinkerEdge) element).getLabel();
-            else
-                value = element.getProperty(key);
-            if (value != null) {
-                this.remove(key, value, element);
-            }
-        }
-    }
-
-    public void addElement(final T element) {
-        for (String key: autoIndexKeys) {
-            Object value;
-            if (Edge.class.isAssignableFrom(this.getIndexClass()) && key == AutomaticIndex.LABEL)
-                value = ((TinkerEdge) element).getLabel();
-            else
-                value = element.getProperty(key);
-            if (value != null) {
-                this.put(key, value, element);
-            }
-        }
+    public Set<String> getAutoIndexKeysInUse() {
+        return this.autoIndexKeys;
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
