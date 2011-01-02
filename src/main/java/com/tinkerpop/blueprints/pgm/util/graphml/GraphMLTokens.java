@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.parser;
+package com.tinkerpop.blueprints.pgm.util.graphml;
 
 /**
  * A collection of tokens used for GraphML related data.

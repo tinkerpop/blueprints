@@ -21,6 +21,8 @@ bc. <dependency>
 * Added edge label indexing to @AutomaticIndex@
 * Added concept of "ouplementation"
 ** Repackaged JUNG implementation as @GraphJung@
+* Created @util@ utility package
+** Repackaged GraphML library in @util.graphml@
 
 ==<hr/>==
 

@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.parser;
+package com.tinkerpop.blueprints.pgm.util.graphml;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;

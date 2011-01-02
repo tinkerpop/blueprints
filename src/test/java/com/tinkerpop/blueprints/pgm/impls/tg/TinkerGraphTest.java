@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
-import com.tinkerpop.blueprints.pgm.parser.GraphMLReaderTestSuite;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.lang.reflect.Method;
 

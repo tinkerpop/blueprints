@@ -1,6 +1,8 @@
-package com.tinkerpop.blueprints.pgm.parser;
+package com.tinkerpop.blueprints.pgm.util.graphml;
 
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLWriter;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
