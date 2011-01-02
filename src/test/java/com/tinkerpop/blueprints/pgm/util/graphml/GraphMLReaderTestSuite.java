@@ -4,8 +4,6 @@ import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
-import com.tinkerpop.blueprints.pgm.util.graphml.GraphMigrator;
 
 import java.util.HashSet;
 import java.util.Set;
