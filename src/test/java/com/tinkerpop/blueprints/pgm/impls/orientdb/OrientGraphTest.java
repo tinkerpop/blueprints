@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+import com.tinkerpop.blueprints.pgm.util.IndexHelperTestSuite;
 import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.io.File;
@@ -51,6 +52,12 @@ public class OrientGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexableGraphTestSuite(this));
         printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
+    }
+
+    public void testIndexHelperTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new IndexHelperTestSuite(this));
+        printTestPerformance("IndexHelperTestSuite", this.stopWatch());
     }
 
     public void testIndexTestSuite() throws Exception {

@@ -1,84 +1,114 @@
 package com.tinkerpop.blueprints.pgm.util;
 
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import java.util.Set;
+import com.tinkerpop.blueprints.pgm.*;
+
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Darrick Wiebe (http://ofallpossibleworlds.wordpress.com)
+ * @author Marko Rodriguez (http://markorodriguez.com)
  */
 public class IndexHelper {
-    /*
+
+    /**
      * Add an element to an automatic index.
      *
-     * @param index The automatic index to add the element to
-     * @param element The element to be added
+     * @param autoIndex automatic index to add the element to
+     * @param element   element to be added
      */
-    public static void indexElement(AutomaticIndex index, Element element) {
-        for (String key: IndexHelper.indexKeys(index, element)) {
-            Object value = IndexHelper.indexKeyValue(index, element, key);
+    public static void autoIndexElement(AutomaticIndex autoIndex, Element element) {
+        for (String key : IndexHelper.indexKeys(autoIndex, element)) {
+            Object value = IndexHelper.indexKeyValue(autoIndex, element, key);
             if (value != null) {
-                index.put(key, value, element);
+                autoIndex.put(key, value, element);
             }
         }
     }
 
-    /*
-     * Remove an element from an automatic index.
+    /**
+     * Add an element to the automatic indicies of an indexable graph.
      *
-     * @param index The automatic index to remove the element from
-     * @param element The element to be removed
+     * @param graph   the indexable graph maintaining the element
+     * @param element element to be indexed in all automatic indices
      */
-    public static void unIndexElement(AutomaticIndex index, Element element) {
-        for (String key: IndexHelper.indexKeys(index, element)) {
-            Object value = IndexHelper.indexKeyValue(index, element, key);
-            if (value != null) {
-                index.remove(key, value, element);
-            }
-        }
-    }
-
-    /*
-     * Remove an element from all of its automatic indices.
-     *
-     * @param graph The element's graph
-     * @param element The element that should be unindexed
-     */
-    public static void unIndexElement(IndexableGraph graph, Element element) {
+    public static void autoIndexElement(IndexableGraph graph, Element element) {
         for (Index index : graph.getIndices()) {
             if (index instanceof AutomaticIndex) {
-                if (element.getClass().isAssignableFrom(index.getIndexClass())) {
-                    IndexHelper.unIndexElement((AutomaticIndex) index, element);
+                if (index.getIndexClass().isAssignableFrom(element.getClass())) {
+                    IndexHelper.autoIndexElement((AutomaticIndex) index, element);
                 }
             }
         }
     }
 
-    /*
-     * Return the keys for this element that are indexed in an automatic index
+    /**
+     * Remove an element from an automatic index.
      *
-     * @param The index to check
-     * @param The element whose keys may be indexed
+     * @param autoIndex automatic index to remove the element from
+     * @param element   element to be removed
      */
-    public static Set<String> indexKeys(AutomaticIndex index, Element element) {
-        Set<String> keys = index.getAutoIndexKeys();
+
+    public static void unAutoIndexElement(AutomaticIndex autoIndex, Element element) {
+        for (String key : IndexHelper.indexKeys(autoIndex, element)) {
+            Object value = IndexHelper.indexKeyValue(autoIndex, element, key);
+            if (value != null) {
+                autoIndex.remove(key, value, element);
+            }
+        }
+    }
+
+    /**
+     * Remove an element from the automatic indices of an indexable graph.
+     *
+     * @param graph   the indexable graph maintaining the element
+     * @param element element to be unidexed in all automatic indices
+     */
+    public static void unAutoIndexElement(IndexableGraph graph, Element element) {
+        for (Index index : graph.getIndices()) {
+            if (index instanceof AutomaticIndex) {
+                if (index.getIndexClass().isAssignableFrom(element.getClass())) {
+                    IndexHelper.unAutoIndexElement((AutomaticIndex) index, element);
+                }
+            }
+        }
+    }
+
+    /**
+     * Reindex the provided elements in the automatic indicies of the indexable graph.
+     * The elements are first removed from the indices and then added to the indices.
+     * The properties indexed are determined by the automatic index keys at the moment of reindex.
+     *
+     * @param graph    the indexeable graph to reindex
+     * @param elements the elements to reindex
+     */
+    public static void reAutoIndex(IndexableGraph graph, Iterable<Element> elements) {
+        for (Element element : elements) {
+            IndexHelper.unAutoIndexElement(graph, element);
+            IndexHelper.autoIndexElement(graph, element);
+        }
+    }
+
+    private static Set<String> indexKeys(AutomaticIndex autoIndex, Element element) {
+        Set<String> keys = autoIndex.getAutoIndexKeys();
         if (keys == null) {
             keys = new HashSet<String>(element.getPropertyKeys());
-            if (Edge.class.isAssignableFrom(index.getIndexClass()))
+            if (Edge.class.isAssignableFrom(autoIndex.getIndexClass()))
+                keys.add(AutomaticIndex.LABEL);
+        } else {
+            boolean addBackLabel = keys.contains(AutomaticIndex.LABEL);
+            keys.retainAll(element.getPropertyKeys());
+            if (addBackLabel)
                 keys.add(AutomaticIndex.LABEL);
         }
         return keys;
     }
 
-    public static Object indexKeyValue(AutomaticIndex index, Element element, String key) {
-        if (Edge.class.isAssignableFrom(index.getIndexClass()) && (key == AutomaticIndex.LABEL))
+    private static Object indexKeyValue(AutomaticIndex autoIndex, Element element, String key) {
+        if (Edge.class.isAssignableFrom(autoIndex.getIndexClass()) && (key.equals(AutomaticIndex.LABEL)))
             return ((Edge) element).getLabel();
         else
             return element.getProperty(key);
     }
+
 }

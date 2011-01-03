@@ -132,7 +132,7 @@ public class TinkerGraph implements IndexableGraph {
             this.removeEdge(edge);
         }
 
-        IndexHelper.unIndexElement(this, vertex);
+        IndexHelper.unAutoIndexElement(this, vertex);
         for (Index index : this.getManualIndices()) {
             if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>)index;
@@ -175,7 +175,7 @@ public class TinkerGraph implements IndexableGraph {
         if (null != inVertex && null != inVertex.inEdges)
             inVertex.inEdges.remove(edge);
 
-        IndexHelper.unIndexElement(this, edge);
+        IndexHelper.unAutoIndexElement(this, edge);
         for (Index index : this.getManualIndices()) {
             if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>)index;

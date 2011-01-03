@@ -205,7 +205,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeVertex(final Vertex vertex) {
         try {
-            IndexHelper.unIndexElement(this, vertex);
+            IndexHelper.unAutoIndexElement(this, vertex);
 
             autoStartTransaction();
 
@@ -256,7 +256,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeEdge(final Edge edge) {
         try {
-            IndexHelper.unIndexElement(this, edge);
+            IndexHelper.unAutoIndexElement(this, edge);
             autoStartTransaction();
 
             for (Index index : this.getManualIndices()) {
