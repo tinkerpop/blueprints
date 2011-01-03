@@ -7,11 +7,18 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * @author Darrick Wiebe (http://ofallpossibleworlds.wordpress.com)
  */
 public class IndexHelper {
+    /*
+     * Add an element to an automatic index.
+     *
+     * @param index The automatic index to add the element to
+     * @param element The element to be added
+     */
     public static void indexElement(AutomaticIndex index, Element element) {
         for (String key: IndexHelper.indexKeys(index, element)) {
             Object value = IndexHelper.indexKeyValue(index, element, key);
@@ -21,6 +28,12 @@ public class IndexHelper {
         }
     }
 
+    /*
+     * Remove an element from an automatic index.
+     *
+     * @param index The automatic index to remove the element from
+     * @param element The element to be removed
+     */
     public static void unIndexElement(AutomaticIndex index, Element element) {
         for (String key: IndexHelper.indexKeys(index, element)) {
             Object value = IndexHelper.indexKeyValue(index, element, key);
@@ -30,6 +43,12 @@ public class IndexHelper {
         }
     }
 
+    /*
+     * Remove an element from all of its automatic indices.
+     *
+     * @param graph The element's graph
+     * @param element The element that should be unindexed
+     */
     public static void unIndexElement(IndexableGraph graph, Element element) {
         for (Index index : graph.getIndices()) {
             if (index instanceof AutomaticIndex) {
@@ -40,10 +59,16 @@ public class IndexHelper {
         }
     }
 
+    /*
+     * Return the keys for this element that are indexed in an automatic index
+     *
+     * @param The index to check
+     * @param The element whose keys may be indexed
+     */
     public static Set<String> indexKeys(AutomaticIndex index, Element element) {
         Set<String> keys = index.getAutoIndexKeys();
         if (keys == null) {
-            keys = element.getPropertyKeys();
+            keys = new HashSet<String>(element.getPropertyKeys());
             if (Edge.class.isAssignableFrom(index.getIndexClass()))
                 keys.add(AutomaticIndex.LABEL);
         }

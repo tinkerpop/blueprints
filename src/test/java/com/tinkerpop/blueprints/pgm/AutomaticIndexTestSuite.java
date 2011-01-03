@@ -63,8 +63,6 @@ public class AutomaticIndexTestSuite extends TestSuite {
 
             AutomaticIndex<Vertex> index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
 
-            assertThat(index.getAutoIndexKeys(), hasItems("key1", "key2"));
-            assertThat(index.getAutoIndexKeys(), not(hasItem("key3")));
             this.stopWatch();
             assertEquals(10, count(index.get("key1", "value1")));
             BaseTest.printPerformance(graph.toString(), 10, "vertices retrieved from automatic index", this.stopWatch());
@@ -335,7 +333,6 @@ public class AutomaticIndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         AutomaticIndex<Edge> edgeIndex = (AutomaticIndex<Edge>) graph.getIndex(Index.EDGES, Edge.class);
         Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
-        assertThat(edgeIndex.getAutoIndexKeys(), hasItem(AutomaticIndex.LABEL));
         assertThat(asList(edgeIndex.get(AutomaticIndex.LABEL, "knows")), hasItem(edge));
 
         Set<Object> edgeKnowsIds = new HashSet<Object>();

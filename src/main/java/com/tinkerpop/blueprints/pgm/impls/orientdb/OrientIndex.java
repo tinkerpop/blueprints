@@ -155,7 +155,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
-    public void removeElement(final T vertex) {
+    protected void removeElement(final T vertex) {
         ORecordLazyList docs;
         for (Entry<String, ORecordLazyList> entries : getRawIndex().entrySet()) {
             docs = entries.getValue();
