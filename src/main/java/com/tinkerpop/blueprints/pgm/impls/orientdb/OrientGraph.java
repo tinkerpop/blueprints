@@ -12,11 +12,13 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
+import com.tinkerpop.blueprints.pgm.util.IndexHelper;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -114,6 +116,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return list;
     }
 
+    protected Iterable<OrientIndex> getManualIndices() {
+        HashSet<OrientIndex> indices = new HashSet<OrientIndex>(this.indices.values());
+        indices.removeAll(this.autoIndices.values());
+        return indices;
+    }
+
     protected Iterable<OrientAutomaticIndex> getAutoIndices() {
         return this.autoIndices.values();
     }
@@ -197,10 +205,16 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeVertex(final Vertex vertex) {
         try {
+            IndexHelper.unIndexElement(this, vertex);
+
             autoStartTransaction();
 
-            for (OrientIndex<?> index : indices.values())
-                index.removeElement(vertex);
+            for (Index index : this.getManualIndices()) {
+                if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
+                    OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>)index;
+                    idx.removeElement((OrientVertex) vertex);
+                }
+            }
 
             ((OrientVertex) vertex).delete();
             autoStopTransaction(Conclusion.SUCCESS);
@@ -242,10 +256,15 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeEdge(final Edge edge) {
         try {
+            IndexHelper.unIndexElement(this, edge);
             autoStartTransaction();
 
-            for (OrientIndex<?> index : indices.values())
-                index.removeElement(edge);
+            for (Index index : this.getManualIndices()) {
+                if (Edge.class.isAssignableFrom(index.getIndexClass())) {
+                    OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>)index;
+                    idx.removeElement((OrientEdge) edge);
+                }
+            }
 
             ((OrientEdge) edge).delete();
             autoStopTransaction(Conclusion.SUCCESS);

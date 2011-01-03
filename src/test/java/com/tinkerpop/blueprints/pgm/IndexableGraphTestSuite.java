@@ -178,8 +178,8 @@ public class IndexableGraphTestSuite extends TestSuite {
             vertex = autoIndex.get("name", "marko").iterator().next();
             assertEquals(vertex.getId(), id);
             graph.removeVertex(vertex);
-            assertEquals(count(manualIndex.get("key", "value")), 0);
-            assertEquals(count(autoIndex.get("key", "value")), 0);
+            assertEquals(0, count(manualIndex.get("key", "value")));
+            assertEquals(0, count(autoIndex.get("key", "value")));
             BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked and then removed", this.stopWatch());
             graph.shutdown();
 

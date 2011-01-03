@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.util.IndexHelper;
 
 import java.util.*;
 
@@ -25,6 +26,12 @@ public class TinkerGraph implements IndexableGraph {
 
     protected Iterable<TinkerAutomaticIndex> getAutoIndices() {
         return this.autoIndices.values();
+    }
+
+    protected Iterable<TinkerIndex> getManualIndices() {
+        HashSet<TinkerIndex> indices = new HashSet<TinkerIndex>(this.indices.values());
+        indices.removeAll(this.autoIndices.values());
+        return indices;
     }
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
@@ -125,9 +132,12 @@ public class TinkerGraph implements IndexableGraph {
             this.removeEdge(edge);
         }
 
-        // removal requires removal from all indices
-        for (TinkerIndex index : this.indices.values()) {
-            index.remove(vertex);
+        IndexHelper.unIndexElement(this, vertex);
+        for (Index index : this.getManualIndices()) {
+            if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
+                TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>)index;
+                idx.removeElement((TinkerVertex) vertex);
+            }
         }
 
         this.vertices.remove(vertex.getId().toString());
@@ -165,9 +175,12 @@ public class TinkerGraph implements IndexableGraph {
         if (null != inVertex && null != inVertex.inEdges)
             inVertex.inEdges.remove(edge);
 
-        // removal requires removal from all indices
-        for (TinkerIndex index : this.indices.values()) {
-            index.remove(edge);
+        IndexHelper.unIndexElement(this, edge);
+        for (Index index : this.getManualIndices()) {
+            if (Edge.class.isAssignableFrom(index.getIndexClass())) {
+                TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>)index;
+                idx.removeElement((TinkerEdge) edge);
+            }
         }
 
         this.edges.remove(edge.getId().toString());

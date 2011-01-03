@@ -38,5 +38,4 @@ public interface AutomaticIndex<T extends Element> extends Index<T> {
      * @return the set of element property keys being indexed
      */
     public Set<String> getAutoIndexKeys();
-
 }
