@@ -35,10 +35,6 @@ public class RexsterIndex<T extends Element> implements Index<T> {
 
     }
 
-    public void removeElement(final T element) {
-        throw new UnsupportedOperationException();
-    }
-
     public void put(final String key, final Object value, final T element) {
         String clazz;
         if (element instanceof Vertex)
