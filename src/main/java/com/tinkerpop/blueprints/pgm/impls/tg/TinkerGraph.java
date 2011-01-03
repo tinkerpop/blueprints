@@ -28,6 +28,12 @@ public class TinkerGraph implements IndexableGraph {
         return this.autoIndices.values();
     }
 
+    protected Iterable<TinkerIndex> getManualIndices() {
+        HashSet<TinkerIndex> indices = new HashSet<TinkerIndex>(this.indices.values());
+        indices.removeAll(this.autoIndices.values());
+        return indices;
+    }
+
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
@@ -127,6 +133,12 @@ public class TinkerGraph implements IndexableGraph {
         }
 
         IndexHelper.unIndexElement(this, vertex);
+        for (Index index : this.getManualIndices()) {
+            if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
+                TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>)index;
+                idx.removeElement((TinkerVertex) vertex);
+            }
+        }
 
         this.vertices.remove(vertex.getId().toString());
     }
@@ -164,6 +176,12 @@ public class TinkerGraph implements IndexableGraph {
             inVertex.inEdges.remove(edge);
 
         IndexHelper.unIndexElement(this, edge);
+        for (Index index : this.getManualIndices()) {
+            if (Edge.class.isAssignableFrom(index.getIndexClass())) {
+                TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>)index;
+                idx.removeElement((TinkerEdge) edge);
+            }
+        }
 
         this.edges.remove(edge.getId().toString());
     }
