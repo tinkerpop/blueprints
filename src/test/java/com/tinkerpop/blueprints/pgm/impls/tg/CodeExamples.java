@@ -53,4 +53,10 @@ public class CodeExamples extends TestCase {
         Vertex a = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next();
         System.out.println("vertex " + a.getId() + " has age " + a.getProperty("age"));
     }
+
+    /*public void testPlay() {
+        TinkerGraph graph = new TinkerGraph();
+        graph.addVertex("0");
+        graph.addVertex(null);
+    }*/
 }

@@ -75,22 +75,28 @@ public class TinkerGraph implements IndexableGraph {
 
 
     public Vertex addVertex(final Object id) {
-        String idString;
+        String idString = null;
+        Vertex vertex;
         if (null != id) {
             idString = id.toString();
+            vertex = this.vertices.get(idString);
+            if (null != vertex) {
+                throw new RuntimeException("Vertex with id " + idString + " already exists");
+            }
         } else {
-            idString = this.getNextId();
+            boolean done = false;
+            while (!done) {
+                idString = this.getNextId();
+                vertex = this.vertices.get(idString);
+                if (null == vertex)
+                    done = true;
+            }
         }
 
-        Vertex vertex = this.vertices.get(idString);
+        vertex = new TinkerVertex(idString, this);
+        this.vertices.put(vertex.getId().toString(), vertex);
+        return vertex;
 
-        if (null != vertex) {
-            throw new RuntimeException("Vertex with id " + id + " already exists");
-        } else {
-            vertex = new TinkerVertex(idString, this);
-            this.vertices.put(vertex.getId().toString(), vertex);
-            return vertex;
-        }
     }
 
     public Vertex getVertex(final Object id) {
@@ -135,7 +141,7 @@ public class TinkerGraph implements IndexableGraph {
         IndexHelper.unAutoIndexElement(this, vertex);
         for (Index index : this.getManualIndices()) {
             if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
-                TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>)index;
+                TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>) index;
                 idx.removeElement((TinkerVertex) vertex);
             }
         }
@@ -144,27 +150,32 @@ public class TinkerGraph implements IndexableGraph {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        final String idString;
+        String idString = null;
         Edge edge;
         if (null != id) {
             idString = id.toString();
             edge = this.edges.get(idString);
+            if (null != edge) {
+                throw new RuntimeException("Edge with id " + id + " already exists");
+            }
         } else {
-            idString = this.getNextId();
-            edge = null;
+            boolean done = false;
+            while (!done) {
+                idString = this.getNextId();
+                edge = this.edges.get(idString);
+                if (null == edge)
+                    done = true;
+            }
         }
 
-        if (null != edge) {
-            throw new RuntimeException("Edge with id " + id + " already exists");
-        } else {
-            edge = new TinkerEdge(idString, outVertex, inVertex, label, this);
-            this.edges.put(edge.getId().toString(), edge);
-            final TinkerVertex out = (TinkerVertex) outVertex;
-            final TinkerVertex in = (TinkerVertex) inVertex;
-            out.outEdges.add(edge);
-            in.inEdges.add(edge);
-            return edge;
-        }
+        edge = new TinkerEdge(idString, outVertex, inVertex, label, this);
+        this.edges.put(edge.getId().toString(), edge);
+        final TinkerVertex out = (TinkerVertex) outVertex;
+        final TinkerVertex in = (TinkerVertex) inVertex;
+        out.outEdges.add(edge);
+        in.inEdges.add(edge);
+        return edge;
+
     }
 
     public void removeEdge(final Edge edge) {
@@ -178,7 +189,7 @@ public class TinkerGraph implements IndexableGraph {
         IndexHelper.unAutoIndexElement(this, edge);
         for (Index index : this.getManualIndices()) {
             if (Edge.class.isAssignableFrom(index.getIndexClass())) {
-                TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>)index;
+                TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>) index;
                 idx.removeElement((TinkerEdge) edge);
             }
         }
