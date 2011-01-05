@@ -83,6 +83,12 @@ public class IndexHelper {
      * @param elements the elements to reindex
      */
     public static void reAutoIndex(IndexableGraph graph, Iterable<Element> elements) {
+        /*for (Index index : graph.getIndices()) {
+            if (index instanceof AutomaticIndex) {
+                graph.dropIndex(index.getIndexName());
+                graph.createIndex(index.getIndexName(), index.getIndexClass(), index.getIndexType());
+            }
+        }*/
         for (Element element : elements) {
             IndexHelper.unAutoIndexElement(graph, element);
             IndexHelper.autoIndexElement(graph, element);

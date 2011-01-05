@@ -55,7 +55,7 @@ public class SailGraph implements TransactionalGraph {
         }
         try {
             this.rawGraph = sail;
-            this.rawGraph.initialize();
+            //this.rawGraph.initialize();
             this.sailConnection = sail.getConnection();
             this.addNamespace(SailTokens.RDF_PREFIX, SailTokens.RDF_NS);
             this.addNamespace(SailTokens.RDFS_PREFIX, SailTokens.RDFS_NS);

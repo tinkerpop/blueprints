@@ -23,10 +23,16 @@
     </developers>
     <contributors>
         <contributor>
-            <!-- ORIENTDB PROPERTY GRAPH -->
+            <!-- ORIENTDB GRAPH -->
             <name>Luca Garulli</name>
             <email>l.garulli@orientechnologies.com</email>
             <url>http://zion-city.blogspot.com</url>
+        </contributor>
+        <contributor>
+            <!-- BLUEPRINTS SAIL -->
+            <name>Joshua Shinavier</name>
+            <email>josh@fortytwo.net</email>
+            <url>http://fortytwo.net</url>
         </contributor>
         <contributor>
             <!-- SOME TRANSACTION WORK -->
@@ -56,12 +62,7 @@
             <artifactId>jung-api</artifactId>
             <version>2.0</version>
         </dependency>
-        <!-- Blueprints Sail -->
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-sail-api</artifactId>
-            <version>2.3.2</version>
-        </dependency>
+        <!-- SAIL SUPPORT -->
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>
             <artifactId>common</artifactId>
