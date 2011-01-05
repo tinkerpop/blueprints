@@ -56,6 +56,17 @@
             <artifactId>jung-api</artifactId>
             <version>2.0</version>
         </dependency>
+        <!-- Blueprints Sail -->
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-sail-api</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.fortytwo.sesametools</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
@@ -90,14 +101,10 @@
         <directory>${basedir}/target</directory>
         <finalName>${artifactId}-${version}
         </finalName>
-        <sourceDirectory>${basedir}/src/main/java
-        </sourceDirectory>
-        <testSourceDirectory>${basedir}/src/test/java
-        </testSourceDirectory>
-        <outputDirectory>${basedir}/target/classes
-        </outputDirectory>
-        <testOutputDirectory>${basedir}/target/test-classes
-        </testOutputDirectory>
+        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+        <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+        <outputDirectory>${basedir}/target/classes</outputDirectory>
+        <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources

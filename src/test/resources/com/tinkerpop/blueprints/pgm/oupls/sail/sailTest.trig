@@ -1,0 +1,43 @@
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix : <urn:com.tinkerpop.blueprints.sail.test/>.
+
+{
+#    :arthur a foaf:Person;
+#    	rdfs:comment "he's a jerk".
+}
+
+:ctx1
+{
+	:ford a foaf:Person;
+		foaf:knows :arthur, :zaphod;
+		rdfs:comment "he really knows where his towel is".
+		
+	:zaphod a foaf:Person;
+		foaf:knows :ford;
+		rdfs:comment "so cool you could keep a side of meat in him for a month".
+
+    :thor a foaf:God;
+        foaf:name "Thor"@en;
+        foaf:name "?—r"@is;
+        foaf:msnChatID "Thorster123"^^xsd:string.
+
+    :stringValue :hasValue "foo"^^xsd:string.
+    :byteValue :hasValue "99"^^xsd:byte.
+    :booleanValue :hasValue "false"^^xsd:boolean.
+    :intValue :hasValue "42"^^xsd:int.
+    :shortValue :hasValue "42"^^xsd:short.
+    :longValue :hasValue "42"^^xsd:long.
+#    :decimalValue :hasValue "+100000.00"^^xsd:decimal.
+    :floatValue :hasValue "3.1415926"^^xsd:float.
+    :doubleValue :hasValue "3.1415926"^^xsd:double.
+    :dateTimeValue :hasValue "2002-10-10T12:00:00-05:00"^^xsd:dateTime.
+
+    :classA a rdfs:Class.
+
+    :classB a rdfs:Class;
+        rdfs:subClassOf :classA.
+
+    :instance1 a :classB.
+}
