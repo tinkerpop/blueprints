@@ -40,13 +40,13 @@
             <version>0.4-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
-        <!-- NEO4J SAIL SUPPORT -->
+        <!-- NEO4J SAIL SUPPORT
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-neo4jsail</artifactId>
             <version>0.4-SNAPSHOT</version>
             <type>pom</type>
-        </dependency>
+        </dependency>  -->
         <!-- LINKED DATA SAIL SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>

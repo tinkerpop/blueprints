@@ -8,6 +8,8 @@ import org.openrdf.model.impl.URIImpl;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 
@@ -128,9 +130,7 @@ public class SailGraphTest extends GraphTest {
         assertEquals(v.getProperty(SailTokens.KIND), "bnode");
     }
 
-    /*
-    //TODO DEPENDENCY ISSUE WITH OPENRDF 2.3.2 BUMP
-    public void testSparql() {
+    /*public void testSparql() {
         SailGraph graph = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(graph);
 
