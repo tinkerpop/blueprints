@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.record.ORecordTrackedList;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Edge;
 
 import java.util.HashSet;
 import java.util.Set;

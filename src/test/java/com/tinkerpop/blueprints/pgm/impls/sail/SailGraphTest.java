@@ -8,8 +8,6 @@ import org.openrdf.model.impl.URIImpl;
 import org.openrdf.sail.memory.MemoryStore;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 
 

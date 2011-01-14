@@ -1,10 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.sail.Sail;
@@ -12,11 +8,7 @@ import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -47,41 +39,17 @@ import java.util.regex.Pattern;
 public class GraphSail implements Sail {
     public static final String SEPARATOR = " ";
 
-    public static final String
-            PREDICATE_PROP = "p",
-            CONTEXT_PROP = "c";
+    public static final String PREDICATE_PROP = "p", CONTEXT_PROP = "c";
 
-    public static final char
-            URI_PREFIX = 'U',
-            BLANK_NODE_PREFIX = 'B',
-            PLAIN_LITERAL_PREFIX = 'P',
-            TYPED_LITERAL_PREFIX = 'T',
-            LANGUAGE_TAG_LITERAL_PREFIX = 'L',
-            NULL_CONTEXT_PREFIX = 'N';
+    public static final char URI_PREFIX = 'U', BLANK_NODE_PREFIX = 'B', PLAIN_LITERAL_PREFIX = 'P', TYPED_LITERAL_PREFIX = 'T', LANGUAGE_TAG_LITERAL_PREFIX = 'L', NULL_CONTEXT_PREFIX = 'N';
 
     public static final Pattern INDEX_PATTERN = Pattern.compile("s?p?o?c?");
 
     // Allow for OrientDB, in which manual vertex IDs are not possible.
     private static boolean FAKE_VERTEX_IDS = true;
     private static final String ID = "id";
- 
-    private static final String[][] ALTERNATIVES = {
-            {"s", ""},
-            {"p", ""},
-            {"o", ""},
-            {"c", ""},
-            {"sp", "s", "p"},
-            {"so", "s", "o"},
-            {"sc", "s", "c"},
-            {"po", "o", "p"},
-            {"pc", "p", "c"},
-            {"oc", "o", "c"},
-            {"spo", "so", "sp", "po"},
-            {"spc", "sc", "sp", "pc"},
-            {"soc", "so", "sc", "oc"},
-            {"poc", "po", "oc", "pc"},
-            {"spoc", "spo", "soc", "spc", "poc"},
-    };
+
+    private static final String[][] ALTERNATIVES = {{"s", ""}, {"p", ""}, {"o", ""}, {"c", ""}, {"sp", "s", "p"}, {"so", "s", "o"}, {"sc", "s", "c"}, {"po", "o", "p"}, {"pc", "p", "c"}, {"oc", "o", "c"}, {"spo", "so", "sp", "po"}, {"spc", "sc", "sp", "pc"}, {"soc", "so", "sc", "oc"}, {"poc", "po", "oc", "pc"}, {"spoc", "spo", "soc", "spc", "poc"},};
 
     private static final String NAMESPACES_VERTEX_ID = "urn:com.tinkerpop.blueprints.sail:namespaces";
 
@@ -107,8 +75,7 @@ public class GraphSail implements Sail {
      * @param indexedPatterns a comma-delimited list of triple patterns for index-based statement matching.  Only p,c are required,
      *                        while the default patterns are p,c,pc.
      */
-    public GraphSail(final IndexableGraph graph,
-                     final String indexedPatterns) {
+    public GraphSail(final IndexableGraph graph, final String indexedPatterns) {
         store.graph = graph;
 
         // For now, use the default EDGES and VERTICES indices, which *must exist* in Blueprints and are automatically indexed.
@@ -127,8 +94,7 @@ public class GraphSail implements Sail {
         parseTripleIndices(indexedPatterns);
         assignUnassignedTriplePatterns();
 
-        store.manualTransactions = store.graph instanceof TransactionalGraph
-                && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
+        store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
 
         //for (int i = 0; i < 16; i++) {
         //    System.out.println("matcher " + i + ": " + indexes.matchers[i]);
@@ -248,14 +214,8 @@ public class GraphSail implements Sail {
         // subject and/or object) not already assigned to indexing matchers,
         // with graph-based matchers.
         for (int i = 0; i < 16; i++) {
-            if (null == store.matchers[i]
-                    && ((0 != (i & 0x1)) || (0 != (i & 0x4)))) {
-                store.matchers[i] = new GraphBasedMatcher(
-                        (0 != (i & 0x1)),
-                        (0 != (i & 0x2)),
-                        (0 != (i & 0x4)),
-                        (0 != (i & 0x8)),
-                        store);
+            if (null == store.matchers[i] && ((0 != (i & 0x1)) || (0 != (i & 0x4)))) {
+                store.matchers[i] = new GraphBasedMatcher((0 != (i & 0x1)), (0 != (i & 0x2)), (0 != (i & 0x4)), (0 != (i & 0x8)), store);
             }
         }
 
@@ -290,10 +250,7 @@ public class GraphSail implements Sail {
         System.arraycopy(n, 0, store.matchers, 0, 16);
     }
 
-    private int indexFor(final boolean s,
-                         final boolean p,
-                         final boolean o,
-                         final boolean c) {
+    private int indexFor(final boolean s, final boolean p, final boolean o, final boolean c) {
         int index = 0;
 
         if (s) {

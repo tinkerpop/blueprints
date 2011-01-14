@@ -18,25 +18,18 @@ public class GraphBasedMatcher extends Matcher {
     /**
      * Create a new graph-based matcher with the given triple pattern.
      *
-     * @param s whether the subject is specified
-     * @param p whether the predicate is specified
-     * @param o whether the object is specified
-     * @param c whether the context is specified
+     * @param s     whether the subject is specified
+     * @param p     whether the predicate is specified
+     * @param o     whether the object is specified
+     * @param c     whether the context is specified
      * @param store the Blueprints data store
      */
-    public GraphBasedMatcher(final boolean s,
-                             final boolean p,
-                             final boolean o,
-                             final boolean c,
-                             final GraphSail.DataStore store) {
+    public GraphBasedMatcher(final boolean s, final boolean p, final boolean o, final boolean c, final GraphSail.DataStore store) {
         super(s, p, o, c);
         this.store = store;
     }
 
-    public Iterator<Edge> match(final String subject,
-                                final String predicate,
-                                final String object,
-                                final String context) {
+    public Iterator<Edge> match(final String subject, final String predicate, final String object, final String context) {
         //System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
 
@@ -49,37 +42,26 @@ public class GraphBasedMatcher extends Matcher {
             } else {
                 // TODO: use a simple heuristic (e.g. based on the value type of the vertices) to choose either subject or object.
                 // Right now, we arbitrarily choose the subject as the starting point.
-                return new FilteredIterator<Edge>(vs.getOutEdges().iterator(),
-                        new FilteredIterator.Criterion<Edge>() {
-                            public boolean fulfilledBy(final Edge edge) {
-                                return store.getIdOf(edge.getInVertex()).equals(object)
-                                        && (!p || edge.getLabel().equals(predicate))
-                                        && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
-                            }
-                        });
+                return new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
+                    public boolean fulfilledBy(final Edge edge) {
+                        return store.getIdOf(edge.getInVertex()).equals(object) && (!p || edge.getLabel().equals(predicate)) && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
+                    }
+                });
             }
         } else if (s) {
             Vertex vs = store.getVertex(subject);
-            return null == vs
-                    ? new EmptyIterator<Edge>()
-                    : new FilteredIterator<Edge>(vs.getOutEdges().iterator(),
-                    new FilteredIterator.Criterion<Edge>() {
-                        public boolean fulfilledBy(final Edge edge) {
-                            return (!p || edge.getLabel().equals(predicate))
-                                    && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
-                        }
-                    });
+            return null == vs ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
+                public boolean fulfilledBy(final Edge edge) {
+                    return (!p || edge.getLabel().equals(predicate)) && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
+                }
+            });
         } else {
             Vertex vo = store.getVertex(object);
-            return null == vo
-                    ? new EmptyIterator<Edge>()
-                    : new FilteredIterator<Edge>(vo.getInEdges().iterator(),
-                    new FilteredIterator.Criterion<Edge>() {
-                        public boolean fulfilledBy(final Edge edge) {
-                            return (!p || edge.getLabel().equals(predicate))
-                                    && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
-                        }
-                    });
+            return null == vo ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vo.getInEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
+                public boolean fulfilledBy(final Edge edge) {
+                    return (!p || edge.getLabel().equals(predicate)) && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
+                }
+            });
         }
     }
 

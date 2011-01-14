@@ -22,18 +22,14 @@ public class IndexingMatcher extends Matcher {
 
     /**
      * Create a new indexing matcher based on the given triple pattern.
-     * 
-     * @param s whether the subject is specified
-     * @param p whether the predicate is specified
-     * @param o whether the object is specified
-     * @param c whether the context is specified
+     *
+     * @param s     whether the subject is specified
+     * @param p     whether the predicate is specified
+     * @param o     whether the object is specified
+     * @param c     whether the context is specified
      * @param store the Blueprints data store
      */
-    public IndexingMatcher(final boolean s,
-                           final boolean p,
-                           final boolean o,
-                           final boolean c,
-                           final GraphSail.DataStore store) {
+    public IndexingMatcher(final boolean s, final boolean p, final boolean o, final boolean c, final GraphSail.DataStore store) {
         super(s, p, o, c);
 
         this.store = store;
@@ -54,10 +50,7 @@ public class IndexingMatcher extends Matcher {
         propertyName = sb.toString();
     }
 
-    public Iterator<Edge> match(final String subject,
-                                final String predicate,
-                                final String object,
-                                final String context) {
+    public Iterator<Edge> match(final String subject, final String predicate, final String object, final String context) {
         // FIXME: the temporary linked list is a little wasty
         List<PartOfSpeechCriterion> criteria = new LinkedList<PartOfSpeechCriterion>();
 
@@ -109,11 +102,7 @@ public class IndexingMatcher extends Matcher {
      * @param object    the object of the statement
      * @param context   the context of the statement
      */
-    public void indexStatement(final Edge statement,
-                               final String subject,
-                               final String predicate,
-                               final String object,
-                               final String context) {
+    public void indexStatement(final Edge statement, final String subject, final String predicate, final String object, final String context) {
         StringBuilder sb = new StringBuilder();
 
         if (c) {
@@ -142,9 +131,7 @@ public class IndexingMatcher extends Matcher {
         private final PartOfSpeech partOfSpeech;
         private final String value;
 
-        public PartOfSpeechCriterion(
-                final PartOfSpeech partOfSpeech,
-                final String value) {
+        public PartOfSpeechCriterion(final PartOfSpeech partOfSpeech, final String value) {
             this.partOfSpeech = partOfSpeech;
             this.value = value;
         }

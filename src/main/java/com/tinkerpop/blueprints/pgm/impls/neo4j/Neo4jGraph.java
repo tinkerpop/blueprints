@@ -1,9 +1,9 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
-import com.tinkerpop.blueprints.pgm.util.IndexHelper;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
@@ -188,7 +188,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         final Node node = this.rawGraph.getNodeById(id);
         if (null != node) {
             try {
-                IndexHelper.unAutoIndexElement(this, vertex);
+                AutomaticIndexHelper.unIndexElement(this, vertex);
                 this.autoStartTransaction();
                 for (final Edge edge : vertex.getInEdges()) {
                     ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
@@ -244,7 +244,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeEdge(final Edge edge) {
         try {
-            IndexHelper.unAutoIndexElement(this, edge);
+            AutomaticIndexHelper.unIndexElement(this, edge);
             this.autoStartTransaction();
             ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
             this.autoStopTransaction(Conclusion.SUCCESS);

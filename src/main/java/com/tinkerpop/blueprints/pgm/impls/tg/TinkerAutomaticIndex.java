@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Edge;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,10 +38,6 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     public Set<String> getAutoIndexKeys() {
         if (this.indexEverything)
             return null;
-        return this.autoIndexKeys;
-    }
-
-    public Set<String> getAutoIndexKeysInUse() {
         return this.autoIndexKeys;
     }
 

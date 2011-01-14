@@ -12,15 +12,11 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
-import com.tinkerpop.blueprints.pgm.util.IndexHelper;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
+import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -205,13 +201,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeVertex(final Vertex vertex) {
         try {
-            IndexHelper.unAutoIndexElement(this, vertex);
+            AutomaticIndexHelper.unIndexElement(this, vertex);
 
             autoStartTransaction();
 
             for (Index index : this.getManualIndices()) {
                 if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
-                    OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>)index;
+                    OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;
                     idx.removeElement((OrientVertex) vertex);
                 }
             }
@@ -256,12 +252,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void removeEdge(final Edge edge) {
         try {
-            IndexHelper.unAutoIndexElement(this, edge);
+            AutomaticIndexHelper.unIndexElement(this, edge);
             autoStartTransaction();
 
             for (Index index : this.getManualIndices()) {
                 if (Edge.class.isAssignableFrom(index.getIndexClass())) {
-                    OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>)index;
+                    OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
                     idx.removeElement((OrientEdge) edge);
                 }
             }

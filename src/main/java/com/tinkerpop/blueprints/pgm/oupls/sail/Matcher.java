@@ -23,10 +23,7 @@ public abstract class Matcher {
      * @param o whether the object is specified
      * @param c whether the context is specified
      */
-    public Matcher(final boolean s,
-                   final boolean p,
-                   final boolean o,
-                   final boolean c) {
+    public Matcher(final boolean s, final boolean p, final boolean o, final boolean c) {
         this.s = s;
         this.p = p;
         this.o = o;
@@ -44,10 +41,7 @@ public abstract class Matcher {
      * @param context   the context of matching statements
      * @return an iterator over all matching statements
      */
-    public abstract Iterator<Edge> match(final String subject,
-                                         final String predicate,
-                                         final String object,
-                                         final String context);
+    public abstract Iterator<Edge> match(final String subject, final String predicate, final String object, final String context);
 
     public String toString() {
         StringBuilder sb = new StringBuilder("matcher[");

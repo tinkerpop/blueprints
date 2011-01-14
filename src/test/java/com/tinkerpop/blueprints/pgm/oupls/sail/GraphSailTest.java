@@ -17,8 +17,7 @@ public class GraphSailTest extends SailTest {
         assertTriplePattern("sspo", false);
     }
 
-    private void assertTriplePattern(final String pattern,
-                                     final boolean isValid) {
+    private void assertTriplePattern(final String pattern, final boolean isValid) {
         boolean m = GraphSail.INDEX_PATTERN.matcher(pattern).matches();
         assertTrue(isValid ? m : !m);
     }

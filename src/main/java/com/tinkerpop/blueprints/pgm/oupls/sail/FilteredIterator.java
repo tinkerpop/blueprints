@@ -16,10 +16,9 @@ class FilteredIterator<T> implements Iterator<T> {
      * Create a new iterator which is constrained by the given criterion.
      *
      * @param baseIterator a lower-level iterator of untested values
-     * @param criterion only values which pass this criterion will be accessible through the iterator
+     * @param criterion    only values which pass this criterion will be accessible through the iterator
      */
-    public FilteredIterator(final Iterator<T> baseIterator,
-                            final Criterion<T> criterion) {
+    public FilteredIterator(final Iterator<T> baseIterator, final Criterion<T> criterion) {
         this.baseIterator = baseIterator;
         this.criterion = criterion;
         advanceToNext();

@@ -1,14 +1,15 @@
 package com.tinkerpop.blueprints.pgm;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.matchers.JUnitMatchers.*;
-import static org.junit.Assert.assertThat;
-
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertThat;
+import static org.junit.matchers.JUnitMatchers.hasItem;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
