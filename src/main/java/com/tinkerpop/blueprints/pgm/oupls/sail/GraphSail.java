@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.sail.Sail;
@@ -36,7 +37,7 @@ import java.util.regex.Pattern;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSail implements Sail {
+public class GraphSail implements Sail, GraphSource {
     public static final String SEPARATOR = " ";
 
     public static final String PREDICATE_PROP = "p", CONTEXT_PROP = "c";
@@ -47,11 +48,11 @@ public class GraphSail implements Sail {
 
     // Allow for OrientDB, in which manual vertex IDs are not possible.
     private static boolean FAKE_VERTEX_IDS = true;
-    private static final String ID = "id";
+    private static final String VALUE = "value";
 
     private static final String[][] ALTERNATIVES = {{"s", ""}, {"p", ""}, {"o", ""}, {"c", ""}, {"sp", "s", "p"}, {"so", "s", "o"}, {"sc", "s", "c"}, {"po", "o", "p"}, {"pc", "p", "c"}, {"oc", "o", "c"}, {"spo", "so", "sp", "po"}, {"spc", "sc", "sp", "pc"}, {"soc", "so", "sc", "oc"}, {"poc", "po", "oc", "pc"}, {"spoc", "spo", "soc", "spc", "poc"},};
 
-    private static final String NAMESPACES_VERTEX_ID = "urn:com.tinkerpop.blueprints.sail:namespaces";
+    private static final String NAMESPACES_VERTEX_ID = "urn:com.tinkerpop.blueprints.pgm.oupls.sail:namespaces";
 
     private final DataStore store = new DataStore();
 
@@ -99,6 +100,10 @@ public class GraphSail implements Sail {
         //for (int i = 0; i < 16; i++) {
         //    System.out.println("matcher " + i + ": " + indexes.matchers[i]);
         //}
+    }
+
+    public Graph getGraph() {
+        return this.store.getGraph();
     }
 
     public void setDataDir(final File file) {
@@ -155,33 +160,37 @@ public class GraphSail implements Sail {
 
         public Vertex namespaces;
 
-        public Vertex getVertex(final String id) {
+        public Vertex getVertex(final String value) {
             if (FAKE_VERTEX_IDS) {
-                //System.out.println("id = " + id);
-                Iterator<Vertex> i = vertices.get(ID, id).iterator();
+                //System.out.println("value = " + value);
+                Iterator<Vertex> i = vertices.get(VALUE, value).iterator();
                 return i.hasNext() ? i.next() : null;
             } else {
-                return graph.getVertex(id);
+                return graph.getVertex(value);
             }
         }
 
         public Vertex addVertex(final String id) {
             if (FAKE_VERTEX_IDS) {
                 Vertex v = graph.addVertex(null);
-                //vertices.put(ID, id, store.namespaces);
-                v.setProperty(ID, id);
+                //vertices.put(VALUE, id, store.namespaces);
+                v.setProperty(VALUE, id);
                 return v;
             } else {
                 return graph.addVertex(id);
             }
         }
 
-        public String getIdOf(final Vertex v) {
+        public String getValueOf(final Vertex v) {
             if (FAKE_VERTEX_IDS) {
-                return (String) v.getProperty(ID);
+                return (String) v.getProperty(VALUE);
             } else {
                 return (String) v.getId();
             }
+        }
+
+        public IndexableGraph getGraph() {
+            return this.graph;
         }
     }
 

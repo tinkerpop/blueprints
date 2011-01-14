@@ -325,9 +325,9 @@ public class GraphSailConnection implements SailConnection {
         public Statement next() throws SailException {
             Edge e = iterator.next();
 
-            Resource subject = (Resource) toSesame(store.getIdOf(e.getOutVertex()));
+            Resource subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
             URI predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-            Value object = toSesame(store.getIdOf(e.getInVertex()));
+            Value object = toSesame(store.getValueOf(e.getInVertex()));
             Resource context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
 
             return store.valueFactory.createStatement(subject, predicate, object, context);

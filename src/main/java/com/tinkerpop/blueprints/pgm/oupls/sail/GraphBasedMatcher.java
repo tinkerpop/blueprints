@@ -44,7 +44,7 @@ public class GraphBasedMatcher extends Matcher {
                 // Right now, we arbitrarily choose the subject as the starting point.
                 return new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                     public boolean fulfilledBy(final Edge edge) {
-                        return store.getIdOf(edge.getInVertex()).equals(object) && (!p || edge.getLabel().equals(predicate)) && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
+                        return store.getValueOf(edge.getInVertex()).equals(object) && (!p || edge.getLabel().equals(predicate)) && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
                     }
                 });
             }

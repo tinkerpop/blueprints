@@ -144,11 +144,11 @@ public class IndexingMatcher extends Matcher {
                 case CONTEXT:
                     return value.equals(edge.getProperty(GraphSail.CONTEXT_PROP));
                 case OBJECT:
-                    return value.equals(store.getIdOf(edge.getInVertex()));
+                    return value.equals(store.getValueOf(edge.getInVertex()));
                 case PREDICATE:
                     return value.equals(edge.getProperty(GraphSail.PREDICATE_PROP));
                 case SUBJECT:
-                    return value.equals(store.getIdOf(edge.getOutVertex()));
+                    return value.equals(store.getValueOf(edge.getOutVertex()));
                 default:
                     throw new IllegalStateException();
             }
