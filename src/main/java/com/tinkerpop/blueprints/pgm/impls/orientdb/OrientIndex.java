@@ -70,7 +70,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         ORecordLazyList values = treeMap.get(keyTemp);
         if (values == null)
-            values = new ORecordLazyList((ODatabaseRecord<?>) graph.getRawGraph().getUnderlying(), ODocument.RECORD_TYPE);
+            values = new ORecordLazyList((ODatabaseRecord) graph.getRawGraph().getUnderlying(), ODocument.RECORD_TYPE);
 
         int pos = values.indexOf(element.getRawElement().getDocument());
         if (pos == -1)
@@ -177,7 +177,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     private void create(final Class<T> indexClass) {
         this.indexClass = indexClass;
 
-        final ODatabaseRecord<?> db = (ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying();
+        final ODatabaseRecord db = ((ODatabaseRecord) this.graph.getRawGraph().getUnderlying()).getUnderlying();
 
         // CREATE THE MAP
         treeMap = new OMVRBTreeDatabaseLazySave<String, ORecordLazyList>(db, OStorage.CLUSTER_INDEX_NAME, OStreamSerializerString.INSTANCE, OStreamSerializerListRID.INSTANCE);
@@ -205,7 +205,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             }
 
         // LOAD THE TREE-MAP
-        treeMap = new OMVRBTreeDatabaseLazySave<String, ORecordLazyList>((ODatabaseRecord<?>) ((ODatabaseRecord<?>) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMapRid);
+        treeMap = new OMVRBTreeDatabaseLazySave<String, ORecordLazyList>((ODatabaseRecord) ((ODatabaseRecord) this.graph.getRawGraph().getUnderlying()).getUnderlying(), indexTreeMapRid);
         treeMap.load();
     }
 
