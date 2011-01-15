@@ -68,6 +68,11 @@
             <artifactId>common</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>info.aduna.commons</groupId>
+            <artifactId>aduna-commons-iteration</artifactId>
+            <version>2.8.0</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>

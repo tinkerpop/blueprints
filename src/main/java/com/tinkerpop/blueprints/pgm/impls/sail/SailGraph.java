@@ -55,8 +55,8 @@ public class SailGraph implements TransactionalGraph {
         }
         try {
             this.rawGraph = sail;
-            //this.rawGraph.initialize();
             this.sailConnection = sail.getConnection();
+
             this.addNamespace(SailTokens.RDF_PREFIX, SailTokens.RDF_NS);
             this.addNamespace(SailTokens.RDFS_PREFIX, SailTokens.RDFS_NS);
             this.addNamespace(SailTokens.OWL_PREFIX, SailTokens.OWL_NS);
@@ -155,7 +155,7 @@ public class SailGraph implements TransactionalGraph {
     public void addNamespace(final String prefix, final String namespace) {
         try {
             this.sailConnection.setNamespace(prefix, namespace);
-            this.sailConnection.commit();
+            this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -164,7 +164,7 @@ public class SailGraph implements TransactionalGraph {
     public void removeNamespace(final String prefix) {
         try {
             this.sailConnection.removeNamespace(prefix);
-            this.sailConnection.commit();
+            this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

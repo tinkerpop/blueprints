@@ -17,6 +17,6 @@ import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 
 public class Neo4jSailGraph extends SailGraph {
     public Neo4jSailGraph() {
-        throw new RuntimeException("Neo4jSail is no longer available");
+        throw new RuntimeException("Neo4jSail is no longer supported");
     }
 }
