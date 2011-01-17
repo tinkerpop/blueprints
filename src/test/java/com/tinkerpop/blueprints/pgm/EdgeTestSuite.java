@@ -485,6 +485,7 @@ public class EdgeTestSuite extends TestSuite {
             edge.setProperty("blah", "marko");
             edge.setProperty("blah2", "josh");
             assertEquals(edge.getPropertyKeys().size(), 2);
+            graph.shutdown();
         }
     }
 }
