@@ -137,7 +137,7 @@ public class IndexingMatcher extends Matcher {
         }
 
         public boolean fulfilledBy(final Edge edge) {
-            GraphSail.debugEdge(edge);
+            //GraphSail.debugEdge(edge);
             //System.out.println("pos: " + partOfSpeech + ", value: " + value);
 
             switch (partOfSpeech) {

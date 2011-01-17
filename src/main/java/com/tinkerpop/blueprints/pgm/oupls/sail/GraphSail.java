@@ -77,6 +77,9 @@ public class GraphSail implements Sail, GraphSource {
      *                        while the default patterns are p,c,pc.
      */
     public GraphSail(final IndexableGraph graph, final String indexedPatterns) {
+        if (graph instanceof TransactionalGraph)
+            ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
+
         store.graph = graph;
 
         // For now, use the default EDGES and VERTICES indices, which *must exist* in Blueprints and are automatically indexed.
@@ -329,7 +332,7 @@ public class GraphSail implements Sail, GraphSource {
         store.indexers.add(m);
     }
 
-    public static void debugEdge(final Edge e) {
+    private static void debugEdge(final Edge e) {
         System.out.println("edge " + e + ":");
         for (String key : e.getPropertyKeys()) {
             System.out.println("\t" + key + ":\t'" + e.getProperty(key) + "'");
@@ -338,7 +341,7 @@ public class GraphSail implements Sail, GraphSource {
         System.out.println("\t[out vertex]: " + e.getOutVertex());
     }
 
-    public static void debugVertex(final Vertex v) {
+    private static void debugVertex(final Vertex v) {
         System.out.println("vertex " + v + ":");
         for (String key : v.getPropertyKeys()) {
             System.out.println("\t" + key + ":\t'" + v.getProperty(key) + "'");
