@@ -9,6 +9,6 @@ public class NativeStoreSailGraphTest extends TestCase {
 
     public void testConstructNativeStore() {
         assertTrue(true);
-        //new NativeStoreSailGraph("/tmp/blueprints");
+        new NativeStoreSailGraph("/tmp/blueprints");
     }
 }

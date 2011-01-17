@@ -40,6 +40,10 @@ public class SailGraph implements TransactionalGraph {
     private Mode mode = Mode.AUTOMATIC;
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
+    /**
+     *
+     * @param rawGraph a not-yet-initialized Sail instance
+     */
     public SailGraph(final Sail rawGraph) {
         this.startSail(rawGraph);
     }
@@ -55,6 +59,7 @@ public class SailGraph implements TransactionalGraph {
         }
         try {
             this.rawGraph = sail;
+            sail.initialize();
             this.sailConnection = sail.getConnection();
 
             this.addNamespace(SailTokens.RDF_PREFIX, SailTokens.RDF_NS);

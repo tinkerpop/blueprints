@@ -66,7 +66,7 @@
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>
             <artifactId>common</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>info.aduna.commons</groupId>
@@ -91,15 +91,20 @@
                 <updatePolicy>always</updatePolicy>
             </snapshots>
         </repository>
+        <repository>
+            <id>aduna-repo</id>
+            <name>Aduna repository</name>
+            <url>http://repo.aduna-software.org/maven2/releases</url>
+        </repository>
     </repositories>
     <build>
         <directory>${basedir}/target</directory>
         <finalName>${artifactId}-${version}
         </finalName>
-        <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+        <!--<sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
         <outputDirectory>${basedir}/target/classes</outputDirectory>
-        <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
+        <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>-->
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources
