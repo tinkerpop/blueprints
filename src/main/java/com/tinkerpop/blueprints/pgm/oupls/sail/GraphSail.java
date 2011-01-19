@@ -78,15 +78,15 @@ public class GraphSail implements Sail, GraphSource {
      */
     public GraphSail(final IndexableGraph graph, final String indexedPatterns) {
         if (graph instanceof TransactionalGraph)
-            ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
+            ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
 
         store.graph = graph;
 
         // For now, use the default EDGES and VERTICES indices, which *must exist* in Blueprints and are automatically indexed.
         // Think harder about collision issues (if someone hands a non-empty, non-Sail graph to this constructor) later on.
         store.edges = graph.getIndex(Index.EDGES, Edge.class);
-
         store.vertices = graph.getIndex(Index.VERTICES, Vertex.class);
+
 
         store.namespaces = store.getVertex(NAMESPACES_VERTEX_ID);
         if (null == store.namespaces) {
@@ -98,6 +98,8 @@ public class GraphSail implements Sail, GraphSource {
         parseTripleIndices(indexedPatterns);
         assignUnassignedTriplePatterns();
 
+        if (graph instanceof TransactionalGraph)
+            ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
         store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
 
         //for (int i = 0; i < 16; i++) {
@@ -122,7 +124,7 @@ public class GraphSail implements Sail, GraphSource {
     }
 
     public void shutDown() throws SailException {
-        // Do nothing.
+        store.graph.shutdown();
     }
 
     public boolean isWritable() throws SailException {
@@ -131,13 +133,16 @@ public class GraphSail implements Sail, GraphSource {
     }
 
     public SailConnection getConnection() throws SailException {
-
-
         return new GraphSailConnection(store);
     }
 
     public ValueFactory getValueFactory() {
         return store.valueFactory;
+    }
+
+    public String toString() {
+        String type = store.graph.getClass().getSimpleName().toLowerCase();
+        return "graphsail[" + type + "]";
     }
 
     ////////////////////////////////////////////////////////////////////////////
