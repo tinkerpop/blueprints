@@ -2,11 +2,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
-    <artifactId>graphdb-deps-neo4jsail</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <artifactId>graphdb-deps-lds</artifactId>
+    <version>0.4</version>
     <packaging>pom</packaging>
-    <name>GraphDB Dependencies-Neo4jSail</name>
-    <url>http://components.neo4j.org/neo4j-rdf-sail/</url>
+    <name>GraphDB Dependencies-LinkedDataSail</name>
+    <url>http://code.google.com/p/ripple/wiki/LinkedDataSail</url>
     <developers>
         <developer>
             <name>Marko A. Rodriguez</name>
@@ -20,15 +20,9 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-rdf-sail</artifactId>
-            <version>0.6-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-rdf</artifactId>
-            <version>0.7-SNAPSHOT</version>
-            <type>jar</type>
+            <groupId>net.fortytwo</groupId>
+            <artifactId>linked-data-sail</artifactId>
+            <version>0.5</version>
         </dependency>
     </dependencies>
     <repositories>

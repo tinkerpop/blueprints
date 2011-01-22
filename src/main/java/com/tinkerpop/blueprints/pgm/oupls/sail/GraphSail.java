@@ -89,8 +89,7 @@ public class GraphSail implements Sail, GraphSource {
 
         store.namespaces = store.getVertex(NAMESPACES_VERTEX_ID);
         if (null == store.namespaces) {
-            boolean trans = graph instanceof TransactionalGraph
-                    && ((TransactionalGraph) graph).getTransactionMode() == TransactionalGraph.Mode.MANUAL;
+            boolean trans = graph instanceof TransactionalGraph && ((TransactionalGraph) graph).getTransactionMode() == TransactionalGraph.Mode.MANUAL;
             if (trans) {
                 ((TransactionalGraph) graph).startTransaction();
             }

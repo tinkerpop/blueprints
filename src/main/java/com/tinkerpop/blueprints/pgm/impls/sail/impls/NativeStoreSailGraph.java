@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.sail.impls;
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailException;
 import org.openrdf.sail.nativerdf.NativeStore;
 
 import java.io.File;

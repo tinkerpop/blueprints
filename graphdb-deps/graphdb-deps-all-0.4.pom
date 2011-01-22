@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>graphdb-deps-all</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.4</version>
     <packaging>pom</packaging>
     <name>GraphDB Dependencies-All</name>
     <url>http://tinkerpop.com</url>
@@ -23,35 +23,28 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-neo4j</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
             <type>pom</type>
         </dependency>
         <!-- ORIENTDB SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-orientdb</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
             <type>pom</type>
         </dependency>
         <!-- SAIL SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-sail</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
             <type>pom</type>
         </dependency>
-        <!-- NEO4J SAIL SUPPORT
-        <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>graphdb-deps-neo4jsail</artifactId>
-            <version>0.4-SNAPSHOT</version>
-            <type>pom</type>
-        </dependency>  -->
         <!-- LINKED DATA SAIL SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-lds</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.4</version>
             <type>pom</type>
         </dependency>
     </dependencies>

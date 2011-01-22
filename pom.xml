@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.4</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
-    <description>Blueprints is a property graph model interface. It also provides implementations, test suites, and
+    <description>Blueprints is a property graph model interface. It also provides implementations, ouplementations, test suites, and
         supporting extensions.
     </description>
     <properties>

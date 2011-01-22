@@ -21,8 +21,6 @@ public class Neo4jGraphSailTest extends GraphSailTest {
     }
 
     private String getWorkingDirectory() {
-        return System.getProperty("os.name").toUpperCase().contains("WINDOWS")
-                ? "C:/temp/blueprints_test/graphsail/neo4jgraph"
-                : "/tmp/blueprints_test/graphsail/neo4jgraph";
+        return System.getProperty("os.name").toUpperCase().contains("WINDOWS") ? "C:/temp/blueprints_test/graphsail/neo4jgraph" : "/tmp/blueprints_test/graphsail/neo4jgraph";
     }
 }

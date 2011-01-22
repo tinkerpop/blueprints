@@ -41,7 +41,6 @@ public class SailGraph implements TransactionalGraph {
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
     /**
-     *
      * @param rawGraph a not-yet-initialized Sail instance
      */
     public SailGraph(final Sail rawGraph) {

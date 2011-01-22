@@ -1,11 +1,12 @@
-Blueprints: Data Models and their Implementations
-"http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
+All releases can be accessed through the TinkerPop Maven2 repository identified below.
 
-bc. <repository>
+```xml
+<repository>
   <id>tinkerpop-repository</id>
   <name>TinkerPop Maven2 Repository</name>
   <url>http://tinkerpop.com/maven2</url>
 </repository>
+```
 
 ==<hr/>==
 
@@ -13,11 +14,15 @@ bc. <repository>
 
 h3. Version 0.4 (Elmo -- January 22, 2011)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.4</version>
 </dependency>
+```
+
+Blueprints 0.4 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.4/api/
 
 * Added Support for Neo4j 1.2
 * Added edge label indexing to @AutomaticIndex@
@@ -33,11 +38,15 @@ bc. <dependency>
 
 h3. Version 0.3 (Smurf -- December 14, 2010)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.3</version>
 </dependency>
+```
+
+Blueprints 0.3 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.3/api/
 
 * Moved to @graphdb-deps-*@ database dependency management model
 ** Neo4j 1.2.M05
@@ -68,20 +77,24 @@ bc. <dependency>
 
 h3. Version 0.2 (Kermit -- September 22, 2010)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.2</version>
 </dependency>
+```
+
+Blueprints 0.2 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.2/api/
 
 * Removed Blueprints Pipes BETA and put it into a separate project
 * @Neo4jGraph@ constructor can be passed in a Neo4j properties map
 * @Neo4jGraph@ constructor can be passed in a live @GraphDatabaseService@
 * Updated @GraphMLWriter@ to write all vertices and then all edges
 * Added RDF load functionality to @SailGraph@
-* Added SPARQL functionality to @SailGraph@
+* Added SPARQL functioanlity to @SailGraph@
 * Fixed sever @GraphMLReader@ bug
-* Added OrientDB (@OrientGraph@) as a property graph implementation
+* Added OrientDB (OrientGraph) as a property graph implementation
 * Added support for @Graph.getEdge(Object id)@
 * Added support for @kind@ in the Sail implementation of Blueprints
 * Made iterating edges in @SailGraph@ faster and more memory efficient
@@ -93,27 +106,35 @@ bc. <dependency>
 
 h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 
+```xml
 <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.1.1</version>
 </dependency>
+```
+
+Blueprints 0.1.1 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1.1/api/
 
 * Added Blueprints Pipes BETA to the distribution
 * Changed all the OpenRDF Sesame dependencies to version 2.3.1
 * Added performance timing printouts to model test cases
-* Neo4j dependency was changed for 1.0-rc to 1.0
+* Neo4j depedency was changed for 1.0-rc to 1.0
 * Added object document interfaces
 * Added TinkerDoc implementation of the object document interfaces
 * Added MongoDB implementation of the object document interfaces
 
 h3. Version 0.1 (Bob the Builder -- February 9, 2010)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.1</version>
 </dependency>
+```
+
+Blueprints 0.1 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1/api/
 
 * Initial release providing the property graph model
 * Code originally packaged with "Gremlin":http://gremlin.tinkerpop.com

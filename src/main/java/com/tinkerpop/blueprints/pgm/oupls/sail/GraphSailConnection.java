@@ -309,7 +309,7 @@ public class GraphSailConnection implements SailConnection {
     }
 
     public void clearNamespaces() throws SailException {
-        throw new UnsupportedOperationException("the clearNamespaces operation is not yet supported");
+        throw new UnsupportedOperationException("The clearNamespaces operation is not yet supported");
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -376,7 +376,7 @@ public class GraphSailConnection implements SailConnection {
         } else if (value instanceof Literal) {
             return literalToNative((Literal) value);
         } else {
-            throw new IllegalStateException("value has unfamiliar type: " + value);
+            throw new IllegalStateException("Value has unfamiliar type: " + value);
         }
     }
 
@@ -386,7 +386,7 @@ public class GraphSailConnection implements SailConnection {
         } else if (value instanceof BNode) {
             return bnodeToNative((BNode) value);
         } else {
-            throw new IllegalStateException("resource has unfamiliar type: " + value);
+            throw new IllegalStateException("Resource has unfamiliar type: " + value);
         }
     }
 
