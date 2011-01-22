@@ -252,7 +252,14 @@ public class GraphSailConnection implements SailConnection {
     private void deleteEdgesInIterator(final Iterator<Edge> i) {
         while (i.hasNext()) {
             Edge e = i.next();
-            i.remove();
+            try {
+                i.remove();
+            } catch (UnsupportedOperationException x) {
+                // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
+                // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
+                // delete an edge in an iterator currently being traversed.  So for now, just ignore the
+                // UnsupportedOperationException and proceed to delete the edge from the graph.
+            }
             Vertex h = e.getInVertex();
             Vertex t = e.getOutVertex();
             store.graph.removeEdge(e);

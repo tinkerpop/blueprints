@@ -364,8 +364,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             else {
                 final Map<String, ODocument> indexes = indexConfiguration.field(FIELD_INDEXES);
                 // LOAD THE INDEXES
-                for (Entry<String, ODocument> idx : indexes.entrySet())
-                    loadIndex(idx.getKey(), idx.getValue());
+                if (null != indexes) {
+                    for (Entry<String, ODocument> idx : indexes.entrySet()) {
+                        loadIndex(idx.getKey(), idx.getValue());
+                    }
+                } else {
+                    throw new IllegalStateException("no indexes found");
+                }
             }
 
         } else {

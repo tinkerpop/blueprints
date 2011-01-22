@@ -2,7 +2,9 @@ package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Statement;
@@ -19,7 +21,13 @@ import org.openrdf.sail.SailException;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSailTest extends SailTest {
+public abstract class GraphSailTest extends SailTest {
+    protected abstract IndexableGraph createGraph();
+
+    protected Sail createSail() throws Exception {
+        return new GraphSail(createGraph());
+    }
+
     public void testIndexPatterns() throws Exception {
         assertTriplePattern("spoc", true);
         assertTriplePattern("poc", true);
@@ -41,15 +49,6 @@ public class GraphSailTest extends SailTest {
 
     protected void after() throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    protected void clear() throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    protected Sail createSail() throws Exception {
-        TinkerGraph g = new TinkerGraph();
-        return new GraphSail(g);
     }
 
     public void testCodePlay() throws Exception {

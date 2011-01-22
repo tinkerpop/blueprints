@@ -77,8 +77,8 @@ public class GraphSail implements Sail, GraphSource {
      *                        while the default patterns are p,c,pc.
      */
     public GraphSail(final IndexableGraph graph, final String indexedPatterns) {
-        if (graph instanceof TransactionalGraph)
-            ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        //if (graph instanceof TransactionalGraph)
+        //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
 
         store.graph = graph;
 
@@ -87,10 +87,22 @@ public class GraphSail implements Sail, GraphSource {
         store.edges = graph.getIndex(Index.EDGES, Edge.class);
         store.vertices = graph.getIndex(Index.VERTICES, Vertex.class);
 
-
         store.namespaces = store.getVertex(NAMESPACES_VERTEX_ID);
         if (null == store.namespaces) {
-            store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
+            boolean trans = graph instanceof TransactionalGraph
+                    && ((TransactionalGraph) graph).getTransactionMode() == TransactionalGraph.Mode.MANUAL;
+            if (trans) {
+                ((TransactionalGraph) graph).startTransaction();
+            }
+            try {
+                // FIXME: with FAKE_VERTEX_IDS, an extra "namespace" called "value" is present.  Perhaps namespaces
+                // should be given individual nodes, rather than being encapsulated in properties of the namespaces node.
+                store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
+            } finally {
+                if (trans) {
+                    ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                }
+            }
         }
 
         store.matchers[0] = new TrivialMatcher(graph);
@@ -98,8 +110,8 @@ public class GraphSail implements Sail, GraphSource {
         parseTripleIndices(indexedPatterns);
         assignUnassignedTriplePatterns();
 
-        if (graph instanceof TransactionalGraph)
-            ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        //if (graph instanceof TransactionalGraph)
+        //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
         store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
 
         //for (int i = 0; i < 16; i++) {
