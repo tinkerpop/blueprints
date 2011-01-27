@@ -43,11 +43,14 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
         if (o instanceof OGraphElement)
             e = (OGraphElement) o;
         else {
-            final ODocument doc;
+            ODocument doc;
             if (o instanceof ODocument)
                 doc = (ODocument) o;
             else if (o instanceof ORID) {
-                doc = new ODocument((ODatabaseRecord) graph.getRawGraph().getUnderlying(), (ORID) o);
+            	// SEARCH IN CACHE/TX
+            		doc = graph.getRawGraph().getRecordById( (ORID) o );
+            		if( doc == null )
+            			doc = new ODocument((ODatabaseRecord) graph.getRawGraph().getUnderlying(), (ORID) o);
             } else
                 throw new IllegalArgumentException("Not a valid element: " + o);
 
