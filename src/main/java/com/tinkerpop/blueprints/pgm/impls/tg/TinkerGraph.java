@@ -20,8 +20,8 @@ public class TinkerGraph implements IndexableGraph {
     protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
 
     public TinkerGraph() {
-        this.createIndex(Index.VERTICES, TinkerVertex.class, Index.Type.AUTOMATIC);
-        this.createIndex(Index.EDGES, TinkerEdge.class, Index.Type.AUTOMATIC);
+        this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
+        this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
     }
 
     protected Iterable<TinkerAutomaticIndex> getAutoIndices() {
@@ -34,18 +34,21 @@ public class TinkerGraph implements IndexableGraph {
         return indices;
     }
 
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
-        TinkerIndex index;
-        if (type == Index.Type.MANUAL) {
-            index = new TinkerIndex(indexName, indexClass);
-        } else {
-            index = new TinkerAutomaticIndex(indexName, indexClass);
-            this.autoIndices.put(index.getIndexName(), (TinkerAutomaticIndex) index);
-        }
+        TinkerAutomaticIndex index = new TinkerAutomaticIndex(indexName, indexClass, keys);
+        this.autoIndices.put(index.getIndexName(), index);
+        this.indices.put(index.getIndexName(), index);
+        return index;
+    }
 
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+        if (this.indices.containsKey(indexName))
+            throw new RuntimeException("Index already exists: " + indexName);
+
+        TinkerIndex index = new TinkerIndex(indexName, indexClass);
         this.indices.put(index.getIndexName(), index);
         return index;
     }

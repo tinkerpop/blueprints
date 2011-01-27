@@ -89,8 +89,8 @@ public class RexsterGraphTest extends GraphTest {
     private void resetGraph() {
         IndexableGraph graph = new RexsterGraph(this.getWorkingUri());
         graph.clear();
-        graph.createIndex(Index.VERTICES, Vertex.class, Index.Type.AUTOMATIC);
-        graph.createIndex(Index.EDGES, Edge.class, Index.Type.AUTOMATIC);
+        graph.createAutomaticIndex(Index.VERTICES, Vertex.class, null);
+        graph.createAutomaticIndex(Index.EDGES, Edge.class, null);
     }
 
     private String getWorkingUri() {

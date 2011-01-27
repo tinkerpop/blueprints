@@ -288,7 +288,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         if (graphTest.supportsVertexIndex) {
             for (int i = 200; i < 1002; i = i + 200) {
                 graph.clear();
-                ((IndexableGraph) graph).createIndex(Index.VERTICES, Vertex.class, Index.Type.AUTOMATIC);
+                ((IndexableGraph) graph).createAutomaticIndex(Index.VERTICES, Vertex.class, null);
                 this.stopWatch();
                 GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"), i, null, null, null);
                 if (graph instanceof TransactionalGraph)

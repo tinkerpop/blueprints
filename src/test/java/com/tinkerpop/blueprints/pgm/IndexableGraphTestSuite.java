@@ -62,9 +62,9 @@ public class IndexableGraphTestSuite extends TestSuite {
         assertEquals(count(graph.getIndices()), 0);
 
         this.stopWatch();
-        Index<Vertex> index1 = graph.createIndex("index1", Vertex.class, Index.Type.MANUAL);
-        Index<Edge> index2 = graph.createIndex("index2", Edge.class, Index.Type.MANUAL);
-        Index<Vertex> index3 = graph.createIndex("index3", Vertex.class, Index.Type.AUTOMATIC);
+        Index<Vertex> index1 = graph.createManualIndex("index1", Vertex.class);
+        Index<Edge> index2 = graph.createManualIndex("index2", Edge.class);
+        Index<Vertex> index3 = graph.createAutomaticIndex("index3", Vertex.class, null);
         BaseTest.printPerformance(graph.toString(), 3, "indices created", this.stopWatch());
 
         assertEquals(count(graph.getIndices()), 3);
@@ -139,8 +139,8 @@ public class IndexableGraphTestSuite extends TestSuite {
             graph.dropIndex(Index.VERTICES);
 
             this.stopWatch();
-            graph.createIndex("testIndex", Vertex.class, Index.Type.MANUAL);
-            graph.createIndex(Index.VERTICES, Vertex.class, Index.Type.AUTOMATIC);
+            graph.createManualIndex("testIndex", Vertex.class);
+            graph.createAutomaticIndex(Index.VERTICES, Vertex.class, null);
             Index<Vertex> manualIndex = graph.getIndex("testIndex", Vertex.class);
             assertEquals(graph.getIndex("testIndex", Vertex.class).getIndexType(), Index.Type.MANUAL);
             Index<Vertex> autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
@@ -246,7 +246,10 @@ public class IndexableGraphTestSuite extends TestSuite {
             for (Index index : graph.getIndices()) {
                 try {
                     counter++;
-                    graph.createIndex(index.getIndexName(), index.getIndexClass(), index.getIndexType());
+                    if (index.getIndexType().equals(Index.Type.MANUAL))
+                        graph.createManualIndex(index.getIndexName(), index.getIndexClass());
+                    else
+                        graph.createAutomaticIndex(index.getIndexName(), index.getIndexClass(), null);
                 } catch (RuntimeException e) {
                     exceptionCounter++;
                 }

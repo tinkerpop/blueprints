@@ -21,16 +21,6 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
         return Type.AUTOMATIC;
     }
 
-    public void addAutoIndexKey(final String key) {
-        RestHelper.post(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS_SLASH + RexsterTokens.QUESTION + key);
-    }
-
-    public void removeAutoIndexKey(String key) {
-        if (null == key)
-            key = RexsterTokens.NULL;
-        RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS_SLASH + RexsterTokens.QUESTION + key);
-    }
-
     public Set<String> getAutoIndexKeys() {
         Set<String> keys = new HashSet<String>();
         JSONArray array = RestHelper.getResultArray(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS);

@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
+import java.util.Set;
+
 /**
  * An indexable graph is a graph that supports the indexing of its elements.
  * An index is typically some sort of tree structure that allows for the fast lookup of elements by key/value pairs.
@@ -10,15 +12,25 @@ package com.tinkerpop.blueprints.pgm;
 public interface IndexableGraph extends Graph {
 
     /**
-     * Generate an index with a particular name, for a particular class, and of a particular type.
+     * Generate a manual index with a particular name for a particular class.
      *
-     * @param indexName  the name of the index
+     * @param indexName  the name of the manual index
      * @param indexClass the element class that this index is indexing (can be base class)
-     * @param type       whether the index is a manual or automatic index
      * @param <T>        the element class that this index is indexing (can be base class)
      * @return the index created
      */
-    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Index.Type type);
+    public <T extends Element> Index<T> createManualIndex(String indexName, Class<T> indexClass);
+
+    /**
+     * Generate an automatic index with a particular name, for a particular class, and of a particular type.
+     *
+     * @param indexName  the name of the automatic index
+     * @param indexClass the element class that this index is indexing (can be base class)
+     * @param indexKeys  the keys to automatically index
+     * @param <T>        the element class that this index is indexing (can be base class)
+     * @return the index created
+     */
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(String indexName, Class<T> indexClass, Set<String> indexKeys);
 
     /**
      * Get an index from the graph by its name and index class. An index is unique up to name.

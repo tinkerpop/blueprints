@@ -57,19 +57,14 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         this.openOrCreate(true);
     }
 
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
         final ODocument indexCfg = new ODocument((ODatabaseDocumentTx) rawGraph.getUnderlying());
 
-        OrientIndex<? extends OrientElement> index;
-        if (type == Index.Type.MANUAL) {
-            index = new OrientIndex(indexName, indexClass, this, indexCfg);
-        } else {
-            index = new OrientAutomaticIndex(indexName, indexClass, this, indexCfg);
-            this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex<?>) index);
-        }
+        OrientAutomaticIndex index = new OrientAutomaticIndex(indexName, indexClass, indexKeys, this, indexCfg);
+        this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex<?>) index);
         this.indices.put(index.getIndexName(), index);
 
         final String className;
@@ -82,7 +77,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
         indexCfg.field(FIELD_CLASSNAME, className);
-        indexCfg.field(FIELD_TYPE, type.toString());
+        indexCfg.field(FIELD_TYPE, Index.Type.AUTOMATIC.toString());
         indexCfg.field(FIELD_TREEMAP_RID, index.getRawIndex().getRecord().getIdentity());
 
         // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
@@ -90,7 +85,37 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         indexes.put(indexName, indexCfg);
         saveIndexConfiguration();
 
-        return (Index<T>) index;
+        return index;
+    }
+
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+        if (this.indices.containsKey(indexName))
+            throw new RuntimeException("Index already exists: " + indexName);
+
+        final ODocument indexCfg = new ODocument((ODatabaseDocumentTx) rawGraph.getUnderlying());
+
+        OrientIndex index = new OrientIndex(indexName, indexClass, this, indexCfg);
+        this.indices.put(index.getIndexName(), index);
+
+        final String className;
+        if (Vertex.class.isAssignableFrom(indexClass))
+            className = VERTEX;
+        else if (Edge.class.isAssignableFrom(indexClass))
+            className = EDGE;
+        else
+            className = indexClass.getName();
+
+        // CREATE THE CONFIGURATION FOR THE NEW INDEX
+        indexCfg.field(FIELD_CLASSNAME, className);
+        indexCfg.field(FIELD_TYPE, Index.Type.MANUAL.toString());
+        indexCfg.field(FIELD_TREEMAP_RID, index.getRawIndex().getRecord().getIdentity());
+
+        // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
+        Map<String, ODocument> indexes = indexConfiguration.field(OrientGraph.FIELD_INDEXES);
+        indexes.put(indexName, indexCfg);
+        saveIndexConfiguration();
+
+        return index;
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
@@ -386,8 +411,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         indexConfiguration.field(FIELD_INDEXES, new HashMap<String, ORecordId>(), OType.EMBEDDEDMAP);
 
         if (createDefaultIndices) {
-            this.createIndex(Index.VERTICES, OrientVertex.class, Index.Type.AUTOMATIC);
-            this.createIndex(Index.EDGES, OrientEdge.class, Index.Type.AUTOMATIC);
+            this.createAutomaticIndex(Index.VERTICES, OrientVertex.class, null);
+            this.createAutomaticIndex(Index.EDGES, OrientEdge.class, null);
         }
 
         ((ODatabaseDocumentTx) rawGraph.getUnderlying()).getDictionary().put(DICTIONARY_INDEXES, indexConfiguration);

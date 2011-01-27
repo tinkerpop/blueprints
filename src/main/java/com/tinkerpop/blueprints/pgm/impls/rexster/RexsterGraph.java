@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A Blueprints implementation of the RESTful API of Rexster (http://rexster.tinkerpop.com)
@@ -127,21 +128,41 @@ public class RexsterGraph implements IndexableGraph {
         throw new RuntimeException("No index with name " + indexName + " exists");
     }
 
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
         String c;
         if (Vertex.class.isAssignableFrom(indexClass))
             c = RexsterTokens.VERTEX;
         else
             c = RexsterTokens.EDGE;
 
-        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + type.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        JSONObject index;
+        if (null != indexKeys) {
+            List<String> keys = new ArrayList<String>();
+            keys.addAll(indexKeys);
+            index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.AUTOMATIC.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c + RexsterTokens.AND + RexsterTokens.KEYS_EQUALS + keys);
+        } else {
+            index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.AUTOMATIC.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        }
         if (!index.get(RexsterTokens.NAME).equals(indexName))
             throw new RuntimeException("Could not create index: " + index.get(RexsterTokens.MESSAGE));
 
-        if (type.equals(Index.Type.AUTOMATIC))
-            return new RexsterAutomaticIndex<T>(this, indexName, indexClass);
+
+        return new RexsterAutomaticIndex<T>(this, indexName, indexClass);
+
+    }
+
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+        String c;
+        if (Vertex.class.isAssignableFrom(indexClass))
+            c = RexsterTokens.VERTEX;
         else
-            return new RexsterIndex<T>(this, indexName, indexClass);
+            c = RexsterTokens.EDGE;
+
+        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.MANUAL.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        if (!index.get(RexsterTokens.NAME).equals(indexName))
+            throw new RuntimeException("Could not create index: " + index.get(RexsterTokens.MESSAGE));
+
+        return new RexsterIndex<T>(this, indexName, indexClass);
     }
 
     public String toString() {

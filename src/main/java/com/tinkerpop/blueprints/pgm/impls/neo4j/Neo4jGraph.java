@@ -9,10 +9,7 @@ import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A Blueprints implementation of the graph database Neo4j (http://neo4j.org)
@@ -47,8 +44,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                     this.removeVertex(this.getVertex(0));
                 } catch (Exception e) {
                 }
-                this.createIndex(Index.VERTICES, Neo4jVertex.class, Index.Type.AUTOMATIC);
-                this.createIndex(Index.EDGES, Neo4jEdge.class, Index.Type.AUTOMATIC);
+                this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
+                this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
             } else {
                 this.loadIndices();
             }
@@ -74,31 +71,35 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         for (String indexName : manager.nodeIndexNames()) {
             org.neo4j.graphdb.index.Index<Node> neo4jIndex = manager.forNodes(indexName);
             if (manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
-                this.createIndex(indexName, Neo4jVertex.class, Index.Type.AUTOMATIC);
+                this.createAutomaticIndex(indexName, Neo4jVertex.class, null);
             else
-                this.createIndex(indexName, Neo4jVertex.class, Index.Type.MANUAL);
+                this.createManualIndex(indexName, Neo4jVertex.class);
         }
 
         for (String indexName : manager.relationshipIndexNames()) {
             org.neo4j.graphdb.index.Index<Relationship> neo4jIndex = manager.forRelationships(indexName);
             if (manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
-                this.createIndex(indexName, Neo4jEdge.class, Index.Type.AUTOMATIC);
+                this.createAutomaticIndex(indexName, Neo4jEdge.class, null);
             else
-                this.createIndex(indexName, Neo4jEdge.class, Index.Type.MANUAL);
+                this.createManualIndex(indexName, Neo4jEdge.class);
         }
     }
 
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Index.Type type) {
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
-        Neo4jIndex index;
-        if (type == Index.Type.MANUAL) {
-            index = new Neo4jIndex(indexName, indexClass, this);
-        } else {
-            index = new Neo4jAutomaticIndex(indexName, indexClass, this);
-            this.autoIndices.put(index.getIndexName(), (Neo4jAutomaticIndex) index);
-        }
+        Neo4jIndex index = new Neo4jIndex(indexName, indexClass, this);
+        this.indices.put(index.getIndexName(), index);
+        return index;
+    }
+
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys) {
+        if (this.indices.containsKey(indexName))
+            throw new RuntimeException("Index already exists: " + indexName);
+
+        Neo4jAutomaticIndex index = new Neo4jAutomaticIndex(indexName, indexClass, this, keys);
+        this.autoIndices.put(index.getIndexName(), index);
         this.indices.put(index.getIndexName(), index);
         return index;
     }

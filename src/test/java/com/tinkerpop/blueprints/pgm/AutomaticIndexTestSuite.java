@@ -25,19 +25,14 @@ public class AutomaticIndexTestSuite extends TestSuite {
 
     public void testAutoIndexKeyManagement() {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIndex) {
-            AutomaticIndex index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
+            Set<String> keys = new HashSet<String>();
+            keys.add("name");
+            keys.add("location");
+            AutomaticIndex index = graph.createAutomaticIndex("test", Vertex.class, keys);
 
             this.stopWatch();
-            index.addAutoIndexKey("name");
-            index.addAutoIndexKey("location");
             BaseTest.printPerformance(graph.toString(), 2, "automatic index keys added", this.stopWatch());
-            assertEquals(index.getAutoIndexKeys().size(), 2);
-
-            this.stopWatch();
-            index.addAutoIndexKey("name");
-            index.addAutoIndexKey("location");
-            BaseTest.printPerformance(graph.toString(), 2, "same automatic index keys added", this.stopWatch());
             assertEquals(index.getAutoIndexKeys().size(), 2);
 
             this.stopWatch();
@@ -227,31 +222,34 @@ public class AutomaticIndexTestSuite extends TestSuite {
     public void testAutoIndexSpecificKeysVertex() {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
+            Set<String> keys = new HashSet<String>();
+            keys.add("name");
+            graph.createAutomaticIndex("test", Vertex.class, keys);
+
             Vertex v1 = graph.addVertex(null);
-            ((AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class)).addAutoIndexKey("name");
             this.stopWatch();
             v1.setProperty("name", "marko");
             v1.setProperty("location", 87506);
             BaseTest.printPerformance(graph.toString(), 2, "properties added to vertex and automatic index", this.stopWatch());
 
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 1);
-            assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next(), v1);
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("location", 87506)), 0);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("name", "marko")), 1);
+            assertEquals(graph.getIndex("test", Vertex.class).get("name", "marko").iterator().next(), v1);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("location", 87506)), 0);
 
             this.stopWatch();
             v1.setProperty("name", "luca");
             BaseTest.printPerformance(graph.toString(), 1, "properties updated on vertex and automatic index", this.stopWatch());
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 0);
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "luca")), 1);
-            assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "luca").iterator().next(), v1);
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("location", 87506)), 0);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("name", "marko")), 0);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("name", "luca")), 1);
+            assertEquals(graph.getIndex("test", Vertex.class).get("name", "luca").iterator().next(), v1);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("location", 87506)), 0);
 
             this.stopWatch();
             graph.removeVertex(v1);
             BaseTest.printPerformance(graph.toString(), 1, "vertex removed and from automatic index", this.stopWatch());
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 0);
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "luca")), 0);
-            assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("location", 87506)), 0);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("name", "marko")), 0);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("name", "luca")), 0);
+            assertEquals(count(graph.getIndex("test", Vertex.class).get("location", 87506)), 0);
         }
         graph.shutdown();
     }
@@ -259,31 +257,34 @@ public class AutomaticIndexTestSuite extends TestSuite {
     public void testAutoIndexSpecificKeysEdge() {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
+            Set<String> keys = new HashSet<String>();
+            keys.add("name");
+            graph.createAutomaticIndex("test", Edge.class, keys);
+
             Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test");
-            ((AutomaticIndex) graph.getIndex(Index.EDGES, Edge.class)).addAutoIndexKey("name");
             this.stopWatch();
             e1.setProperty("name", "marko");
             e1.setProperty("location", 87506);
             BaseTest.printPerformance(graph.toString(), 2, "properties added to edge and automatic index", this.stopWatch());
 
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("name", "marko")), 1);
-            assertEquals(graph.getIndex(Index.EDGES, Edge.class).get("name", "marko").iterator().next(), e1);
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("location", 87506)), 0);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("name", "marko")), 1);
+            assertEquals(graph.getIndex("test", Edge.class).get("name", "marko").iterator().next(), e1);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("location", 87506)), 0);
 
             this.stopWatch();
             e1.setProperty("name", "luca");
             BaseTest.printPerformance(graph.toString(), 1, "properties updated on edge and automatic index", this.stopWatch());
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("name", "marko")), 0);
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("name", "luca")), 1);
-            assertEquals(graph.getIndex(Index.EDGES, Edge.class).get("name", "luca").iterator().next(), e1);
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("location", 87506)), 0);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("name", "marko")), 0);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("name", "luca")), 1);
+            assertEquals(graph.getIndex("test", Edge.class).get("name", "luca").iterator().next(), e1);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("location", 87506)), 0);
 
             this.stopWatch();
             graph.removeEdge(e1);
             BaseTest.printPerformance(graph.toString(), 1, "edge removed and from automatic index", this.stopWatch());
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("name", "marko")), 0);
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("name", "luca")), 0);
-            assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("location", 87506)), 0);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("name", "marko")), 0);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("name", "luca")), 0);
+            assertEquals(count(graph.getIndex("test", Edge.class).get("location", 87506)), 0);
         }
         graph.shutdown();
     }
@@ -292,24 +293,25 @@ public class AutomaticIndexTestSuite extends TestSuite {
         if (graphTest.isPersistent && graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
             graph.dropIndex(Index.EDGES);
-            AutomaticIndex<Vertex> index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
             graph.shutdown();
 
             graph = (IndexableGraph) graphTest.getGraphInstance();
-            index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
-            index.addAutoIndexKey("name");
+            Set<String> keys = new HashSet<String>();
+            keys.add("name");
+            AutomaticIndex index = graph.createAutomaticIndex("test", Vertex.class, keys);
+
             assertEquals(index.getAutoIndexKeys().size(), 1);
-            assertThat(index.getAutoIndexKeys(), hasItem("name"));
+            assertTrue(index.getAutoIndexKeys().contains("name"));
             graph.shutdown();
 
             graph = (IndexableGraph) graphTest.getGraphInstance();
-            index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+            index = (AutomaticIndex) graph.getIndex("test", Vertex.class);
             assertEquals(1, index.getAutoIndexKeys().size());
-            assertThat(index.getAutoIndexKeys(), hasItem("name"));
+            assertTrue(index.getAutoIndexKeys().contains("name"));
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
             vertex.setProperty("location", "santa fe");
-            assertThat(index.getAutoIndexKeys(), not(hasItem("location")));
+            assertFalse(index.getAutoIndexKeys().contains("location"));
             if (graphTest.supportsVertexIteration)
                 assertEquals(1, count(graph.getVertices()));
             assertEquals(1, count(index.get("name", "marko")));
@@ -321,7 +323,7 @@ public class AutomaticIndexTestSuite extends TestSuite {
             graph = (IndexableGraph) graphTest.getGraphInstance();
             if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 1);
-            index = (AutomaticIndex) graph.getIndex(Index.VERTICES, Vertex.class);
+            index = (AutomaticIndex) graph.getIndex("test", Vertex.class);
             assertEquals(index.getAutoIndexKeys().size(), 1);
             assertTrue(index.getAutoIndexKeys().contains("name"));
             assertEquals(count(index.get("name", "marko")), 1);
