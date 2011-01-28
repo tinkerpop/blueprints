@@ -16,7 +16,7 @@ import java.util.Map;
 public class JSONWriter {
 
     private static JSONArray createJSONList(final List list) {
-        JSONArray jsonList = new JSONArray();
+        final JSONArray jsonList = new JSONArray();
         for (Object item : list) {
             if (item instanceof Element) {
                 jsonList.add(createJSONElement((Element) item));
@@ -32,7 +32,7 @@ public class JSONWriter {
     }
 
     private static JSONObject createJSONMap(final Map map) {
-        JSONObject jsonMap = new JSONObject();
+        final JSONObject jsonMap = new JSONObject();
         for (Object key : map.keySet()) {
             Object value = map.get(key);
             if (value instanceof List) {
@@ -57,24 +57,24 @@ public class JSONWriter {
     }
 
     public static JSONObject createJSONElement(final Element element) {
-        JSONObject jsonElement = new JSONObject();
+        final JSONObject jsonElement = new JSONObject();
         jsonElement.put(JSONTokens._ID, element.getId());
         jsonElement.put(JSONTokens._PROPERTIES, createJSONMap(createPropertyMap(element)));
         if (element instanceof Vertex) {
-            Vertex vertex = (Vertex) element;
+            final Vertex vertex = (Vertex) element;
             jsonElement.put(JSONTokens._TYPE, JSONTokens.VERTEX);
             JSONArray jsonArrayOut = new JSONArray();
             for (Edge edge : vertex.getOutEdges()) {
                 jsonArrayOut.add(edge.getId());
             }
             jsonElement.put(JSONTokens.OUT_E, jsonArrayOut);
-            JSONArray jsonArrayIn = new JSONArray();
+            final JSONArray jsonArrayIn = new JSONArray();
             for (Edge edge : vertex.getInEdges()) {
                 jsonArrayIn.add(edge.getId());
             }
             jsonElement.put(JSONTokens.IN_E, jsonArrayIn);
         } else if (element instanceof Edge) {
-            Edge edge = (Edge) element;
+            final Edge edge = (Edge) element;
             jsonElement.put(JSONTokens._TYPE, JSONTokens.EDGE);
             jsonElement.put(JSONTokens.OUT_V, edge.getOutVertex().getId());
             jsonElement.put(JSONTokens.IN_V, edge.getInVertex().getId());
@@ -84,7 +84,7 @@ public class JSONWriter {
     }
 
     private static Map createPropertyMap(final Element element) {
-        Map map = new HashMap();
+        final Map map = new HashMap<String, Object>();
         for (String key : element.getPropertyKeys()) {
             map.put(key, element.getProperty(key));
         }
