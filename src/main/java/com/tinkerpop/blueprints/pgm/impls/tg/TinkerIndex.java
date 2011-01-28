@@ -84,8 +84,4 @@ public class TinkerIndex<T extends Element> implements Index<T> {
             }
         }
     }
-
-    public String toString() {
-        return index.toString();
-    }
 }

@@ -50,7 +50,6 @@ public class AutomaticIndexHelper {
      * @param index   automatic index to remove the element from
      * @param element element to be removed
      */
-
     public static void unindexElement(final AutomaticIndex index, final Element element) {
         for (String key : AutomaticIndexHelper.indexKeys(index, element)) {
             Object value = AutomaticIndexHelper.indexKeyValue(index, element, key);
@@ -81,16 +80,10 @@ public class AutomaticIndexHelper {
      * The elements are first removed from the indices and then added to the indices.
      * The properties indexed are determined by the automatic index keys at the moment of reindex.
      *
-     * @param graph    the indexeable graph to reindex
+     * @param graph    the indexable graph to reindex
      * @param elements the elements to reindex
      */
     public static void reIndex(final IndexableGraph graph, final Iterable<Element> elements) {
-        /*for (Index index : graph.getIndices()) {
-            if (index instanceof AutomaticIndex) {
-                graph.dropIndex(index.getIndexName());
-                graph.createIndex(index.getIndexName(), index.getIndexClass(), index.getIndexType());
-            }
-        }*/
         for (Element element : elements) {
             AutomaticIndexHelper.unIndexElement(graph, element);
             AutomaticIndexHelper.indexElement(graph, element);

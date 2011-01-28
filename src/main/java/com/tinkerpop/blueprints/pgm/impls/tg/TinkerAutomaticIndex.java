@@ -10,41 +10,28 @@ import java.util.Set;
  */
 public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements AutomaticIndex<T> {
 
-    boolean indexEverything = true;
-    Set<String> autoIndexKeys = new HashSet<String>();
+    Set<String> autoIndexKeys;
 
-    public TinkerAutomaticIndex(String name, Class<T> indexClass) {
+    public TinkerAutomaticIndex(String name, Class<T> indexClass, Set<String> keys) {
         super(name, indexClass);
+        if (keys == null)
+            this.autoIndexKeys = null;
+        else {
+            this.autoIndexKeys = new HashSet<String>();
+            this.autoIndexKeys.addAll(keys);
+        }
     }
 
     public Type getIndexType() {
         return Type.AUTOMATIC;
     }
 
-    public void addAutoIndexKey(final String key) {
-        if (null == key)
-            this.indexEverything = true;
-        else {
-            this.indexEverything = false;
-            this.autoIndexKeys.add(key);
-        }
-    }
-
-    public void removeAutoIndexKey(final String key) {
-        this.indexEverything = false;
-        this.autoIndexKeys.remove(key);
-    }
-
     public Set<String> getAutoIndexKeys() {
-        if (this.indexEverything)
-            return null;
         return this.autoIndexKeys;
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
-        if (this.indexEverything && !this.autoIndexKeys.contains(key))
-            this.autoIndexKeys.add(key);
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && this.autoIndexKeys.contains(key)) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             if (oldValue != null)
                 this.remove(key, oldValue, element);
             this.put(key, newValue, element);
@@ -52,7 +39,7 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     }
 
     protected void autoRemove(final String key, final Object oldValue, final T element) {
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && this.autoIndexKeys.contains(key)) {
+        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             this.remove(key, oldValue, element);
         }
     }

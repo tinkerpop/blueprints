@@ -17,7 +17,7 @@ public class AutomaticIndexHelperTest extends BaseTest {
         graph.dropIndex(Index.EDGES);
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
-        Index index = graph.createIndex("vertices", Vertex.class, Index.Type.AUTOMATIC);
+        Index index = graph.createAutomaticIndex("vertices", Vertex.class, null);
         assertEquals(count(index.get("name", "marko")), 0);
         AutomaticIndexHelper.reIndex(graph, (Iterable) graph.getVertices());
         assertEquals(count(index.get("name", "marko")), 1);

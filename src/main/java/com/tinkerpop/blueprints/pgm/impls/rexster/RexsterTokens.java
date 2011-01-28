@@ -41,6 +41,7 @@ public class RexsterTokens {
 
     public static final String KEY = "key";
     public static final String KEY_EQUALS = "key=";
+    public static final String KEYS_EQUALS = "keys=";
     public static final String VALUE = "value";
     public static final String VALUE_EQUALS = "value=";
     public static final String TYPE = "type";

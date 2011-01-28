@@ -19,7 +19,7 @@ public class IndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             this.stopWatch();
-            Index<Vertex> index = graph.createIndex("basic", Vertex.class, Index.Type.MANUAL);
+            Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
             BaseTest.printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
@@ -62,7 +62,7 @@ public class IndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             this.stopWatch();
-            Index<Edge> index = graph.createIndex("basic", Edge.class, Index.Type.MANUAL);
+            Index<Edge> index = graph.createManualIndex("basic", Edge.class);
             BaseTest.printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
