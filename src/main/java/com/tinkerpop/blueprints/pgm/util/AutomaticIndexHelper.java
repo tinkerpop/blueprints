@@ -51,8 +51,8 @@ public class AutomaticIndexHelper {
      * @param element element to be removed
      */
     public static void unindexElement(final AutomaticIndex index, final Element element) {
-        for (String key : AutomaticIndexHelper.indexKeys(index, element)) {
-            Object value = AutomaticIndexHelper.indexKeyValue(index, element, key);
+        for (final String key : AutomaticIndexHelper.indexKeys(index, element)) {
+            final Object value = AutomaticIndexHelper.indexKeyValue(index, element, key);
             if (value != null) {
                 index.remove(key, value, element);
             }
@@ -66,7 +66,7 @@ public class AutomaticIndexHelper {
      * @param element element to be unidexed in all automatic indices
      */
     public static void unIndexElement(final IndexableGraph graph, final Element element) {
-        for (Index index : graph.getIndices()) {
+        for (final Index index : graph.getIndices()) {
             if (index instanceof AutomaticIndex) {
                 if (index.getIndexClass().isAssignableFrom(element.getClass())) {
                     AutomaticIndexHelper.unindexElement((AutomaticIndex) index, element);
@@ -84,7 +84,7 @@ public class AutomaticIndexHelper {
      * @param elements the elements to reindex
      */
     public static void reIndex(final IndexableGraph graph, final Iterable<Element> elements) {
-        for (Element element : elements) {
+        for (final Element element : elements) {
             AutomaticIndexHelper.unIndexElement(graph, element);
             AutomaticIndexHelper.indexElement(graph, element);
         }

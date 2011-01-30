@@ -20,7 +20,7 @@ public class GraphHelper {
     public static Vertex addVertex(final Graph graph, final Object id, final Object... properties) {
         if ((properties.length % 2) != 0)
             throw new RuntimeException("There must be an equal number of keys and values");
-        Vertex vertex = graph.addVertex(id);
+        final Vertex vertex = graph.addVertex(id);
         for (int i = 0; i < properties.length; i = i + 2) {
             vertex.setProperty((String) properties[i], properties[i + 1]);
         }
@@ -41,7 +41,7 @@ public class GraphHelper {
     public static Edge addEdge(final Graph graph, final Object id, final Vertex outVertex, final Vertex inVertex, final String label, final Object... properties) {
         if ((properties.length % 2) != 0)
             throw new RuntimeException("There must be an equal number of keys and values");
-        Edge edge = graph.addEdge(id, outVertex, inVertex, label);
+        final Edge edge = graph.addEdge(id, outVertex, inVertex, label);
         for (int i = 0; i < properties.length; i = i + 2) {
             edge.setProperty((String) properties[i], properties[i + 1]);
         }

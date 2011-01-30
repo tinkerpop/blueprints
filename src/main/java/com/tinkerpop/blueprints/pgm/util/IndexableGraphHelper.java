@@ -23,11 +23,11 @@ public class IndexableGraphHelper {
      * @return the newly created vertex or the vertex that satisfies the uniqueness criteria
      */
     public static Vertex addUniqueVertex(final IndexableGraph graph, final Object id, final Index<Vertex> index, final String uniqueKey, final Object uniqueValue) {
-        Iterator<Vertex> results = index.get(uniqueKey, uniqueValue).iterator();
+        final Iterator<Vertex> results = index.get(uniqueKey, uniqueValue).iterator();
         if (results.hasNext()) {
             return results.next();
         } else {
-            Vertex vertex = graph.addVertex(id);
+            final Vertex vertex = graph.addVertex(id);
             vertex.setProperty(uniqueKey, uniqueValue);
             return vertex;
         }
