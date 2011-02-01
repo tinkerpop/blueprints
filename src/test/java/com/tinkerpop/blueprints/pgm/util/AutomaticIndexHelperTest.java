@@ -11,7 +11,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
  */
 public class AutomaticIndexHelperTest extends BaseTest {
 
-    public void testRegenerateIndex() {
+    public void testReIndexElements() {
         IndexableGraph graph = new TinkerGraph();
         graph.dropIndex(Index.VERTICES);
         graph.dropIndex(Index.EDGES);
@@ -19,7 +19,7 @@ public class AutomaticIndexHelperTest extends BaseTest {
         a.setProperty("name", "marko");
         Index index = graph.createAutomaticIndex("vertices", Vertex.class, null);
         assertEquals(count(index.get("name", "marko")), 0);
-        AutomaticIndexHelper.rebuildIndices(graph, (Iterable) graph.getVertices());
+        AutomaticIndexHelper.reIndexElements(graph, (Iterable) graph.getVertices());
         assertEquals(count(index.get("name", "marko")), 1);
         assertEquals(index.get("name", "marko").iterator().next(), a);
     }

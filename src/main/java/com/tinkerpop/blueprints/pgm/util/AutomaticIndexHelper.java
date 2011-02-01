@@ -83,7 +83,7 @@ public class AutomaticIndexHelper {
      * @param graph    the indexable graph to reindex
      * @param elements the elements to reindex
      */
-    public static void rebuildIndices(final IndexableGraph graph, final Iterable<Element> elements) {
+    public static void reIndexElements(final IndexableGraph graph, final Iterable<Element> elements) {
         for (final Element element : elements) {
             AutomaticIndexHelper.removeElement(graph, element);
             AutomaticIndexHelper.addElement(graph, element);
