@@ -78,7 +78,7 @@ public class AutomaticIndexHelper {
     /**
      * Reindex the provided elements in the automatic indicies of the indexable graph.
      * The elements are first removed from the indices and then added to the indices.
-     * The properties indexed are determined by the automatic index keys at the moment of reindex.
+     * The properties indexed are determined by the automatic index keys of the index.
      *
      * @param graph    the indexable graph to reindex
      * @param elements the elements to reindex
@@ -87,6 +87,21 @@ public class AutomaticIndexHelper {
         for (final Element element : elements) {
             AutomaticIndexHelper.removeElement(graph, element);
             AutomaticIndexHelper.addElement(graph, element);
+        }
+    }
+
+    /**
+     * Reindex the provided elements in the provided automatic index.
+     * The elements are first removed from the index and then added to the index.
+     * The properties indexed are determined by the automatic index keys of the index.
+     *
+     * @param index    the automatic index to reindex
+     * @param elements the elements to reindex
+     */
+    public static void reIndexElements(final AutomaticIndex index, final Iterable<Element> elements) {
+        for (final Element element : elements) {
+            AutomaticIndexHelper.removeElement(index, element);
+            AutomaticIndexHelper.addElement(index, element);
         }
     }
 

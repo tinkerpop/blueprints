@@ -1,10 +1,14 @@
 package com.tinkerpop.blueprints.pgm.util;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -17,10 +21,25 @@ public class AutomaticIndexHelperTest extends BaseTest {
         graph.dropIndex(Index.EDGES);
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
-        Index index = graph.createAutomaticIndex("vertices", Vertex.class, null);
+        a.setProperty("age", 31);
+        AutomaticIndex index = graph.createAutomaticIndex(Index.VERTICES, Vertex.class, null);
         assertEquals(count(index.get("name", "marko")), 0);
+        assertEquals(count(index.get("age", 31)), 0);
         AutomaticIndexHelper.reIndexElements(graph, (Iterable) graph.getVertices());
         assertEquals(count(index.get("name", "marko")), 1);
         assertEquals(index.get("name", "marko").iterator().next(), a);
+        assertEquals(count(index.get("age", 31)), 1);
+        assertEquals(index.get("age", 31).iterator().next(), a);
+
+        graph.dropIndex(Index.VERTICES);
+        Set<String> indexKeys = new HashSet<String>();
+        indexKeys.add("name");
+        index = graph.createAutomaticIndex(Index.VERTICES, Vertex.class, indexKeys);
+        assertEquals(count(index.get("name", "marko")), 0);
+        assertEquals(count(index.get("age", 31)), 0);
+        AutomaticIndexHelper.reIndexElements(index, (Iterable) graph.getVertices());
+        assertEquals(count(index.get("name", "marko")), 1);
+        assertEquals(index.get("name", "marko").iterator().next(), a);
+        assertEquals(count(index.get("age", 31)), 0);
     }
 }
