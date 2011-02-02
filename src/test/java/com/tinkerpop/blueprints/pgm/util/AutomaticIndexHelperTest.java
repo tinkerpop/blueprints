@@ -26,14 +26,14 @@ public class AutomaticIndexHelperTest extends BaseTest {
         assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get(AutomaticIndex.LABEL, "friend")), 0);
 
         AutomaticIndexHelper.addElement(idxVertex, a);
-        AutomaticIndexHelper.addElement(idxEdge, b);
+        AutomaticIndexHelper.addElement(graph, b);
 
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 1);
         assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next(), a);
         assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get(AutomaticIndex.LABEL, "friend")), 1);
         assertEquals(graph.getIndex(Index.EDGES, Edge.class).get("label", "friend").iterator().next(), b);
 
-        AutomaticIndexHelper.removeElement(idxVertex, a);
+        AutomaticIndexHelper.removeElement(graph, a);
         AutomaticIndexHelper.removeElement(idxEdge, b);
 
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 0);
