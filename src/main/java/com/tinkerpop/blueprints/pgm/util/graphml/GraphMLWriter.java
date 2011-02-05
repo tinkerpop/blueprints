@@ -92,7 +92,9 @@ public class GraphMLWriter {
             for (String key : vertex.getPropertyKeys()) {
                 writer.writeStartElement(GraphMLTokens.DATA);
                 writer.writeAttribute(GraphMLTokens.KEY, key);
-                writer.writeCharacters(vertex.getProperty(key).toString());
+                Object value = vertex.getProperty(key);
+                if (null != value)
+                    writer.writeCharacters(value.toString());
                 writer.writeEndElement();
             }
             writer.writeEndElement();
@@ -109,7 +111,9 @@ public class GraphMLWriter {
                 for (String key : edge.getPropertyKeys()) {
                     writer.writeStartElement(GraphMLTokens.DATA);
                     writer.writeAttribute(GraphMLTokens.KEY, key);
-                    writer.writeCharacters(edge.getProperty(key).toString());
+                    Object value = edge.getProperty(key);
+                    if (null != value)
+                        writer.writeCharacters(value.toString());
                     writer.writeEndElement();
                 }
                 writer.writeEndElement();
