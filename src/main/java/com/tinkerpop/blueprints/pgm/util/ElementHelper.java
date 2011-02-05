@@ -53,6 +53,7 @@ public class ElementHelper {
 
     /**
      * Renames a property by removing the old key and adding the stored value to the new key.
+     * If property does not exist, nothing occurs.
      *
      * @param oldKey   the key to rename
      * @param newKey   the key to rename to
@@ -60,7 +61,9 @@ public class ElementHelper {
      */
     public static void renameProperty(final String oldKey, final String newKey, final Iterable<Element> elements) {
         for (final Element element : elements) {
-            element.setProperty(newKey, element.removeProperty(oldKey));
+            Object value = element.removeProperty(oldKey);
+            if (null != value)
+                element.setProperty(newKey, value);
         }
     }
 }

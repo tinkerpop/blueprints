@@ -58,7 +58,7 @@ public class GraphMLWriter {
      */
     public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream, final Map<String, String> vertexKeyTypes, final Map<String, String> edgeKeyTypes) throws XMLStreamException {
         XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
-        XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream);
+        XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream, "UTF8");
 
         writer.writeStartDocument();
         writer.writeStartElement(GraphMLTokens.GRAPHML);
