@@ -66,4 +66,26 @@ public class ElementHelper {
                 element.setProperty(newKey, value);
         }
     }
+
+    /**
+     * Typecasts a property value. This only works for casting to a class that has a constructor of the for new X(String).
+     * If no such constructor exists, a RuntimeException is thrown and the original element property is left unchanged.
+     *
+     * @param key       the key for the property value to typecast
+     * @param classCast the class to typecast to
+     * @param elements  the elements to have their property typecasted
+     */
+    public static void typecastProperty(final String key, final Class classCast, final Iterable<Element> elements) {
+        for (final Element element : elements) {
+            final Object value = element.removeProperty(key);
+            if (null != value) {
+                try {
+                    element.setProperty(key, classCast.getConstructor(String.class).newInstance(value.toString()));
+                } catch (Exception e) {
+                    element.setProperty(key, value);
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        }
+    }
 }

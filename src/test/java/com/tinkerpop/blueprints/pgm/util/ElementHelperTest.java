@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.util;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -61,6 +62,17 @@ public class ElementHelperTest extends BaseTest {
             assertNotNull(v.getProperty("name2"));
             String name2 = (String) v.getProperty("name2");
             assertTrue(name2.equals("marko") || name2.equals("josh") || name2.equals("vadas") || name2.equals("ripple") || name2.equals("lop") || name2.equals("peter"));
+        }
+    }
+
+    public void testTypecastProperty() {
+        Graph graph = TinkerGraphFactory.createTinkerGraph();
+        for(Edge e : graph.getEdges()) {
+            assertTrue(e.getProperty("weight") instanceof Float);
+        }
+        ElementHelper.typecastProperty("weight", Double.class, (Iterable)graph.getEdges());
+        for(Edge e : graph.getEdges()) {
+            assertTrue(e.getProperty("weight") instanceof Double);
         }
     }
 }
