@@ -11,6 +11,22 @@ bc. <repository>
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-elmo.png!
 
+h3. Version 0.4.5 (Elmo -- NOT OFFICIALLY RELEASED YET)
+
+bc. <dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>blueprints</artifactId>
+  <version>0.4.5</version>
+</dependency>
+
+* Updated index model
+** Changed the API and semantics of @AutomaticIndex@
+** Changed the API of @IndexableGraph@
+* Fixed index related bug in @RexsterGraph@
+* Added numerous utilities to @util@ package
+* Added UTF-8 writer to @GraphMLWriter@
+* Updates to @OrientGraph@ implementation
+
 h3. Version 0.4 (Elmo -- January 22, 2011)
 
 bc. <dependency>

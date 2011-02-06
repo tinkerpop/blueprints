@@ -47,4 +47,25 @@ public class GraphHelper {
         }
         return edge;
     }
+
+    /**
+     * Copy the vertex/edges of one graph over to another graph.
+     * The id of the elements in the from graph are attempted to be used in the to graph.
+     * This method only works for graphs where the user can control the element ids.
+     *
+     * @param from the graph to copy from
+     * @param to   the graph to copy to
+     */
+    public static void copyGraph(final Graph from, final Graph to) {
+        for (final Vertex fromVertex : from.getVertices()) {
+            final Vertex toVertex = to.addVertex(fromVertex.getId());
+            ElementHelper.copyElementProperties(fromVertex, toVertex);
+        }
+        for (final Edge fromEdge : from.getEdges()) {
+            final Vertex outVertex = to.getVertex(fromEdge.getOutVertex().getId());
+            final Vertex inVertex = to.getVertex(fromEdge.getInVertex().getId());
+            final Edge toEdge = to.addEdge(fromEdge.getId(), outVertex, inVertex, fromEdge.getLabel());
+            ElementHelper.copyElementProperties(fromEdge, toEdge);
+        }
+    }
 }
