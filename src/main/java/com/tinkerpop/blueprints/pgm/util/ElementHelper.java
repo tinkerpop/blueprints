@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -18,7 +19,7 @@ public class ElementHelper {
      * @param from the element to copy properties from
      * @param to   the element to copy properties to
      */
-    public static void copyElementProperties(final Element from, final Element to) {
+    public static void copyProperties(final Element from, final Element to) {
         for (final String key : from.getPropertyKeys()) {
             to.setProperty(key, from.getProperty(key));
         }
@@ -86,6 +87,29 @@ public class ElementHelper {
                     throw new RuntimeException(e.getMessage(), e);
                 }
             }
+        }
+    }
+
+    /**
+     * Determines whether two elements have the same properties.
+     * To be true, both must have the same property keys and respective values must be equals().
+     *
+     * @param a an element
+     * @param b an element
+     * @return whether the two elements have equal properties
+     */
+    public static boolean haveEqualProperties(final Element a, final Element b) {
+        final Set<String> aKeys = a.getPropertyKeys();
+        final Set<String> bKeys = b.getPropertyKeys();
+
+        if (aKeys.containsAll(bKeys) && bKeys.containsAll(aKeys)) {
+            for (String key : aKeys) {
+                if (!a.getProperty(key).equals(b.getProperty(key)))
+                    return false;
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 }

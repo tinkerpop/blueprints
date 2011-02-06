@@ -23,7 +23,7 @@ public class EdgeHelper {
         final Vertex outVertex = oldEdge.getOutVertex();
         final Vertex inVertex = oldEdge.getInVertex();
         final Edge newEdge = graph.addEdge(newId, outVertex, inVertex, newLabel);
-        ElementHelper.copyElementProperties(oldEdge, newEdge);
+        ElementHelper.copyProperties(oldEdge, newEdge);
         graph.removeEdge(oldEdge);
         return newEdge;
     }
@@ -41,7 +41,7 @@ public class EdgeHelper {
             final Vertex outVertex = oldEdge.getOutVertex();
             final Vertex inVertex = oldEdge.getInVertex();
             final Edge newEdge = graph.addEdge(null, outVertex, inVertex, newLabel);
-            ElementHelper.copyElementProperties(oldEdge, newEdge);
+            ElementHelper.copyProperties(oldEdge, newEdge);
             graph.removeEdge(oldEdge);
         }
     }

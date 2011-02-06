@@ -59,13 +59,13 @@ public class GraphHelper {
     public static void copyGraph(final Graph from, final Graph to) {
         for (final Vertex fromVertex : from.getVertices()) {
             final Vertex toVertex = to.addVertex(fromVertex.getId());
-            ElementHelper.copyElementProperties(fromVertex, toVertex);
+            ElementHelper.copyProperties(fromVertex, toVertex);
         }
         for (final Edge fromEdge : from.getEdges()) {
             final Vertex outVertex = to.getVertex(fromEdge.getOutVertex().getId());
             final Vertex inVertex = to.getVertex(fromEdge.getInVertex().getId());
             final Edge toEdge = to.addEdge(fromEdge.getId(), outVertex, inVertex, fromEdge.getLabel());
-            ElementHelper.copyElementProperties(fromEdge, toEdge);
+            ElementHelper.copyProperties(fromEdge, toEdge);
         }
     }
 }

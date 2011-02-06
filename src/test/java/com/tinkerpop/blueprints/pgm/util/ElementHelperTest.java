@@ -22,7 +22,7 @@ public class ElementHelperTest extends BaseTest {
         v.setProperty("age", 31);
         Vertex u = graph.addVertex(null);
         assertEquals(u.getPropertyKeys().size(), 0);
-        ElementHelper.copyElementProperties(v, u);
+        ElementHelper.copyProperties(v, u);
         assertEquals(u.getPropertyKeys().size(), 2);
         assertEquals(u.getProperty("name"), "marko");
         assertEquals(u.getProperty("age"), 31);
@@ -67,12 +67,36 @@ public class ElementHelperTest extends BaseTest {
 
     public void testTypecastProperty() {
         Graph graph = TinkerGraphFactory.createTinkerGraph();
-        for(Edge e : graph.getEdges()) {
+        for (Edge e : graph.getEdges()) {
             assertTrue(e.getProperty("weight") instanceof Float);
         }
-        ElementHelper.typecastProperty("weight", Double.class, (Iterable)graph.getEdges());
-        for(Edge e : graph.getEdges()) {
+        ElementHelper.typecastProperty("weight", Double.class, (Iterable) graph.getEdges());
+        for (Edge e : graph.getEdges()) {
             assertTrue(e.getProperty("weight") instanceof Double);
         }
+    }
+
+    public void testHaveEqualProperties() {
+        Graph graph = new TinkerGraph();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        Vertex c = graph.addVertex(null);
+        Vertex d = graph.addVertex(null);
+
+        a.setProperty("name", "marko");
+        a.setProperty("age", 31);
+        b.setProperty("name", "marko");
+        b.setProperty("age", 31);
+        c.setProperty("name", "marko");
+        d.setProperty("name", "pavel");
+        d.setProperty("age", 31);
+
+        assertTrue(ElementHelper.haveEqualProperties(a, b));
+        assertTrue(ElementHelper.haveEqualProperties(a, a));
+        assertFalse(ElementHelper.haveEqualProperties(a, c));
+        assertFalse(ElementHelper.haveEqualProperties(c, a));
+        assertFalse(ElementHelper.haveEqualProperties(a, d));
+        assertFalse(ElementHelper.haveEqualProperties(a, c));
+
     }
 }
