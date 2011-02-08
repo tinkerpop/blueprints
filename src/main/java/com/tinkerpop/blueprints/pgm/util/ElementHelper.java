@@ -119,7 +119,7 @@ public class ElementHelper {
      * @return a clone of the properties of the element
      */
     public static Map<String, Object> getProperties(final Element element) {
-        Map<String, Object> properties = new HashMap<String, Object>();
+        final Map<String, Object> properties = new HashMap<String, Object>();
         for (final String key : element.getPropertyKeys()) {
             properties.put(key, element.getProperty(key));
         }
