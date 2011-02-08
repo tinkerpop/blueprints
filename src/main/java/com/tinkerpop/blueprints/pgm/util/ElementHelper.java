@@ -2,9 +2,7 @@ package com.tinkerpop.blueprints.pgm.util;
 
 import com.tinkerpop.blueprints.pgm.Element;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -112,4 +110,20 @@ public class ElementHelper {
             return false;
         }
     }
+
+    /**
+     * Get a clone of the properties of the provided element.
+     * In other words, a HashMap is created and filled with the key/values of the element's properties.
+     *
+     * @param element the element to get the properties of
+     * @return a clone of the properties of the element
+     */
+    public static Map<String, Object> getProperties(final Element element) {
+        Map<String, Object> properties = new HashMap<String, Object>();
+        for (final String key : element.getPropertyKeys()) {
+            properties.put(key, element.getProperty(key));
+        }
+        return properties;
+    }
+
 }

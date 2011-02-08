@@ -9,6 +9,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -98,5 +99,19 @@ public class ElementHelperTest extends BaseTest {
         assertFalse(ElementHelper.haveEqualProperties(a, d));
         assertFalse(ElementHelper.haveEqualProperties(a, c));
 
+    }
+
+    public void testGetProperties() {
+        Graph graph = TinkerGraphFactory.createTinkerGraph();
+        Vertex vertex = graph.getVertex(1);
+        Map<String, Object> map = ElementHelper.getProperties(vertex);
+        assertEquals(map.size(), 2);
+        assertEquals(map.get("name"), "marko");
+        assertEquals(map.get("age"), 29);
+
+        map.put("name", "pavel");
+        assertEquals(map.get("name"), "pavel");
+
+        assertEquals(vertex.getProperty("name"), "marko");
     }
 }
