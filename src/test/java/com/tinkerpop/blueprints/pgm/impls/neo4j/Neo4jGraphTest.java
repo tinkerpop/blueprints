@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -139,6 +140,22 @@ public class Neo4jGraphTest extends GraphTest {
         } catch (NumberFormatException e) {
             assertFalse(false);
         }
+    }
 
+    public void testQueryIndex() throws Exception {
+        String directory = System.getProperty("neo4jDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        IndexableGraph graph = new Neo4jGraph(directory);
+        Vertex vertex = graph.addVertex(null);
+        vertex.setProperty("name", "marko");
+        Iterator<Vertex> itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        int counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), vertex);
+        }
+        assertEquals(counter, 1);
+        deleteDirectory(new File(directory));
     }
 }

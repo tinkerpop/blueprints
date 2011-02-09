@@ -56,7 +56,12 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public Iterable<T> get(final String key, final Object value) {
-        IndexHits<S> itty = this.rawIndex.get(key, value);
+        final IndexHits<S> itty;
+        if (value instanceof String && ((String) value).startsWith(Neo4jTokens.QUERY_HEADER)) {
+            itty = this.rawIndex.query(key, ((String) value).substring(Neo4jTokens.QUERY_HEADER.length()));
+        } else {
+            itty = this.rawIndex.get(key, value);
+        }
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
         else
