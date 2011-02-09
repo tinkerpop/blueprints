@@ -147,15 +147,37 @@ public class Neo4jGraphTest extends GraphTest {
         if (directory == null)
             directory = this.getWorkingDirectory();
         IndexableGraph graph = new Neo4jGraph(directory);
-        Vertex vertex = graph.addVertex(null);
-        vertex.setProperty("name", "marko");
-        Iterator<Vertex> itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        Vertex a = graph.addVertex(null);
+        a.setProperty("name", "marko");
+        Iterator itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
         int counter = 0;
         while (itty.hasNext()) {
             counter++;
-            assertEquals(itty.next(), vertex);
+            assertEquals(itty.next(), a);
         }
         assertEquals(counter, 1);
+
+        Vertex b = graph.addVertex(null);
+        Edge edge = graph.addEdge(null, a, b, "knows");
+        edge.setProperty("weight", 0.75);
+        itty = graph.getIndex(Index.EDGES, Edge.class).get("label", Neo4jTokens.QUERY_HEADER + "k?ows").iterator();
+        counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), edge);
+        }
+        assertEquals(counter, 1);
+        itty = graph.getIndex(Index.EDGES, Edge.class).get("weight", Neo4jTokens.QUERY_HEADER + "[0.5 TO 1.0]").iterator();
+        counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), edge);
+        }
+        assertEquals(counter, 1);
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("weight", Neo4jTokens.QUERY_HEADER + "[0.1 TO 0.5]")), 0);
+
+
+        graph.shutdown();
         deleteDirectory(new File(directory));
     }
 }
