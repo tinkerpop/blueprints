@@ -32,4 +32,13 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
         else
             return keys;
     }
+
+    /**
+     * Object instance notation with the auto index keys appended to it.
+     *
+     * @return a string representation of the automatic index.
+     */
+    public String toString() {
+        return super.toString() + " [autoIndexKeys:" + this.getAutoIndexKeys() + "]";
+    }
 }
