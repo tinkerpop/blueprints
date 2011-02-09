@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.HashSet;
@@ -92,13 +93,8 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         }
     }
 
-    /**
-     * Object instance notation with the auto index keys appended to it.
-     *
-     * @return a string representation of the automatic index.
-     */
     public String toString() {
-        return super.toString() + " [autoIndexKeys:" + this.autoIndexKeys + "]";
+        return StringFactory.indexString(this);
     }
 
 

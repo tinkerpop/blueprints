@@ -4,6 +4,7 @@ import com.orientechnologies.orient.core.db.record.ORecordTrackedList;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -66,12 +67,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         graph.saveIndexConfiguration();
     }
 
-    /**
-     * Object instance notation with the auto index keys appended to it.
-     *
-     * @return a string representation of the automatic index.
-     */
     public String toString() {
-        return super.toString() + " [autoIndexKeys:" + this.autoIndexKeys + "]";
+        return StringFactory.indexString(this);
     }
 }

@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import org.json.simple.JSONArray;
 
@@ -33,12 +34,7 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
             return keys;
     }
 
-    /**
-     * Object instance notation with the auto index keys appended to it.
-     *
-     * @return a string representation of the automatic index.
-     */
     public String toString() {
-        return super.toString() + " [autoIndexKeys:" + this.getAutoIndexKeys() + "]";
+        return StringFactory.indexString(this);
     }
 }
