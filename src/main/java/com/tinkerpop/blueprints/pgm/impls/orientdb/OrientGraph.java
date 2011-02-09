@@ -372,18 +372,19 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     @SuppressWarnings("rawtypes")
-    private OrientIndex<?> loadIndex(final OIndex iIndex) {
-        final String indexType = iIndex.getConfiguration().field(OrientIndex.CONFIG_TYPE);
-
+    private OrientIndex<?> loadIndex(final OIndex rawIndex) {
+        String indexType = rawIndex.getConfiguration().field(OrientIndex.CONFIG_TYPE);
+        if (null == indexType)
+            indexType = "MANUAL";
         final OrientIndex<?> index;
 
         switch (Index.Type.valueOf(indexType.toUpperCase())) {
             case MANUAL:
-                index = new OrientIndex(this, iIndex);
+                index = new OrientIndex(this, rawIndex);
                 break;
             case AUTOMATIC:
                 // index = new OrientAutomaticIndex(indexName, null, this, indexCfg);
-                index = new OrientAutomaticIndex(this, iIndex);
+                index = new OrientAutomaticIndex(this, rawIndex);
                 // REGISTER THE INDEX INTO THE AUTOMATIC INDEXES
                 this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex<?>) index);
                 break;

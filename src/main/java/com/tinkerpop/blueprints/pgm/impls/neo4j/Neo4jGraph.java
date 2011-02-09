@@ -67,18 +67,20 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private void loadIndices() {
-        IndexManager manager = this.rawGraph.index();
-        for (String indexName : manager.nodeIndexNames()) {
-            org.neo4j.graphdb.index.Index<Node> neo4jIndex = manager.forNodes(indexName);
-            if (manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
+        final IndexManager manager = this.rawGraph.index();
+        for (final String indexName : manager.nodeIndexNames()) {
+            final org.neo4j.graphdb.index.Index<Node> neo4jIndex = manager.forNodes(indexName);
+            final String type = manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
+            if (null != type && type.equals(Index.Type.AUTOMATIC.toString()))
                 this.createAutomaticIndex(indexName, Neo4jVertex.class, null);
             else
                 this.createManualIndex(indexName, Neo4jVertex.class);
         }
 
-        for (String indexName : manager.relationshipIndexNames()) {
-            org.neo4j.graphdb.index.Index<Relationship> neo4jIndex = manager.forRelationships(indexName);
-            if (manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE).equals(Index.Type.AUTOMATIC.toString()))
+        for (final String indexName : manager.relationshipIndexNames()) {
+            final org.neo4j.graphdb.index.Index<Relationship> neo4jIndex = manager.forRelationships(indexName);
+            final String type = manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
+            if (null != type && type.equals(Index.Type.AUTOMATIC.toString()))
                 this.createAutomaticIndex(indexName, Neo4jEdge.class, null);
             else
                 this.createManualIndex(indexName, Neo4jEdge.class);

@@ -17,16 +17,16 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     Set<String> autoIndexKeys = null;
     private static final String KEYS = "keys";
 
-    public OrientAutomaticIndex(final OrientGraph iGraph, final String indexName, final Class<T> iIndexClass, Set<String> indexKeys) {
-        super(iGraph, indexName, iIndexClass, Index.Type.AUTOMATIC);
+    public OrientAutomaticIndex(final OrientGraph graph, final String indexName, final Class<T> indexClass, Set<String> indexKeys) {
+        super(graph, indexName, indexClass, Index.Type.AUTOMATIC);
         if (indexKeys != null)
             autoIndexKeys = new HashSet<String>(indexKeys);
         init();
         saveConfiguration();
     }
 
-    public OrientAutomaticIndex(OrientGraph iGraph, OIndex iIndex) {
-        super(iGraph, iIndex);
+    public OrientAutomaticIndex(OrientGraph graph, OIndex index) {
+        super(graph, index);
         init();
     }
 
