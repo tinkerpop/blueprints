@@ -27,6 +27,12 @@ public class Neo4jGraphTest extends GraphTest {
         this.supportsTransactions = true;
     }
 
+    /*public void testNeo4jBenchmarkTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new Neo4jBenchmarkTestSuite(this));
+        printTestPerformance("Neo4jBenchmarkTestSuite", this.stopWatch());
+    }*/
+
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new VertexTestSuite(this));

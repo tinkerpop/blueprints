@@ -148,7 +148,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected void removeElement(final T vertex) {
         final ORecord<?> vertexDoc = (ORecord<?>) vertex.getRawElement().getDocument();
         List<ORecord<?>> rids;
-        for (Entry<String, List<ORecord<?>>> entries : getRawIndex()) {
+        for (Entry<Object, List<ORecord<?>>> entries : getRawIndex()) {
             rids = entries.getValue();
 
             if (rids != null) {
