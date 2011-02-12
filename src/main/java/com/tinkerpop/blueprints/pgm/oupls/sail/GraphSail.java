@@ -79,6 +79,7 @@ public class GraphSail implements Sail, GraphSource {
     public GraphSail(final IndexableGraph graph, final String indexedPatterns) {
         //if (graph instanceof TransactionalGraph)
         //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        //printGraphInfo(graph);
 
         store.graph = graph;
 
@@ -87,10 +88,12 @@ public class GraphSail implements Sail, GraphSource {
         store.edges = graph.getIndex(Index.EDGES, Edge.class);
         store.vertices = graph.getIndex(Index.VERTICES, Vertex.class);
 
+        store.manualTransactions = store.graph instanceof TransactionalGraph
+                && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
+
         store.namespaces = store.getVertex(NAMESPACES_VERTEX_ID);
         if (null == store.namespaces) {
-            boolean trans = graph instanceof TransactionalGraph && ((TransactionalGraph) graph).getTransactionMode() == TransactionalGraph.Mode.MANUAL;
-            if (trans) {
+            if (store.manualTransactions) {
                 ((TransactionalGraph) graph).startTransaction();
             }
             try {
@@ -98,7 +101,7 @@ public class GraphSail implements Sail, GraphSource {
                 // should be given individual nodes, rather than being encapsulated in properties of the namespaces node.
                 store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
             } finally {
-                if (trans) {
+                if (store.manualTransactions) {
                     ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
                 }
             }
@@ -111,11 +114,22 @@ public class GraphSail implements Sail, GraphSource {
 
         //if (graph instanceof TransactionalGraph)
         //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
-        store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
 
         //for (int i = 0; i < 16; i++) {
         //    System.out.println("matcher " + i + ": " + indexes.matchers[i]);
         //}
+    }
+
+    private void printGraphInfo(final IndexableGraph graph) {
+        boolean trans = graph instanceof TransactionalGraph;
+
+        StringBuilder sb = new StringBuilder("graph ").append(graph).append("\n");
+        sb.append("\ttransactional: ").append(trans).append("\n");
+        if (trans) {
+            sb.append("\tmode: ").append(((TransactionalGraph) graph).getTransactionMode()).append("\n");
+        }
+
+        System.out.println(sb.toString());
     }
 
     public Graph getGraph() {
