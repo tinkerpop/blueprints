@@ -9,15 +9,17 @@ bc. <repository>
 
 ==<hr/>==
 
-!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-elmo.png!
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-scooby.png!
 
-h3. Version 0.4.5 (Elmo -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.5 (Scooby -- NOT OFFICIALLY RELEASED YET)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.4.5</version>
 </dependency>
+```
 
 * Updated index model
 ** Changed the API and semantics of @AutomaticIndex@
@@ -34,13 +36,19 @@ bc. <dependency>
 * Added performance benchmark for Neo4j @GraphDatabaseService@ vs. Blueprints @Neo4jGraph@
 * Added @Vertex.getOutEdges(String label)@ and @Vertex.getInEdges(String label)@
 
+==<hr/>==
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-elmo.png!
+
 h3. Version 0.4 (Elmo -- January 22, 2011)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.4</version>
 </dependency>
+```
 
 * Added support for Neo4j 1.2
 * Added edge label indexing to @AutomaticIndex@
@@ -57,11 +65,13 @@ bc. <dependency>
 
 h3. Version 0.3 (Smurf -- December 14, 2010)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.3</version>
 </dependency>
+```
 
 * Moved to @graphdb-deps-*@ database dependency management model
 ** Neo4j 1.2.M05
@@ -92,11 +102,13 @@ bc. <dependency>
 
 h3. Version 0.2 (Kermit -- September 22, 2010)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.2</version>
 </dependency>
+```
 
 * Removed Blueprints Pipes BETA and put it into a separate project
 * @Neo4jGraph@ constructor can be passed in a Neo4j properties map
@@ -117,11 +129,13 @@ bc. <dependency>
 
 h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 
+```xml
 <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.1.1</version>
 </dependency>
+```
 
 * Added Blueprints Pipes BETA to the distribution
 * Changed all the OpenRDF Sesame dependencies to version 2.3.1
@@ -133,11 +147,13 @@ h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 
 h3. Version 0.1 (Bob the Builder -- February 9, 2010)
 
-bc. <dependency>
+```xml
+<dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
   <version>0.1</version>
 </dependency>
+```
 
 * Initial release providing the property graph model
 * Code originally packaged with "Gremlin":http://gremlin.tinkerpop.com
