@@ -50,6 +50,7 @@ public class RexsterTokens {
     public static final String CLASS = "class";
     public static final String CLASS_EQUALS = "class=";
     public static final String NAME = "name";
+    public static final String _LABEL_EQUALS = "_label=";
 
 
     public static final String TOTAL_SIZE = "total_size";

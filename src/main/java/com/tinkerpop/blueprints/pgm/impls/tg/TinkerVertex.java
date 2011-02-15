@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.tg.util.TinkerEdgeSequence;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +31,14 @@ public class TinkerVertex extends TinkerElement implements Vertex {
 
     public Iterable<Edge> getInEdges() {
         return this.inEdges;
+    }
+
+    public Iterable<Edge> getOutEdges(final String label) {
+        return new TinkerEdgeSequence(this.outEdges.iterator(), label);
+    }
+
+    public Iterable<Edge> getInEdges(final String label) {
+        return new TinkerEdgeSequence(this.inEdges.iterator(), label);
     }
 
     public String toString() {

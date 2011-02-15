@@ -61,7 +61,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         final String keyTemp = key + SEPARATOR + value;
 
         final ODocument doc = element.getRawElement().getDocument();
-        if (doc.getIdentity().isTemporary())
+        if (!doc.getIdentity().isValid())
             doc.save();
 
         final boolean txBegun = graph.autoStartTransaction();
@@ -85,6 +85,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
+        //final Set<ORecord<?>> recList = underlying.get(keyTemp);
         final List<ORecord<?>> recList = underlying.get(keyTemp);
 
         if (recList.isEmpty())
@@ -146,7 +147,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     protected void removeElement(final T vertex) {
-        final ORecord<?> vertexDoc = (ORecord<?>) vertex.getRawElement().getDocument();
+        final ORecord<?> vertexDoc = vertex.getRawElement().getDocument();
+        /*
+        Set<ORecord<?>> rids;
+        for (Entry<Object, Set<ORecord<?>>> entries : getRawIndex()) {
+         */
+
         List<ORecord<?>> rids;
         for (Entry<Object, List<ORecord<?>>> entries : getRawIndex()) {
             rids = entries.getValue();
@@ -155,7 +161,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
                 ORecord<?> rec;
                 for (int i = 0; i < rids.size(); ++i) {
                     rec = rids.get(i);
-
                     if (rec.equals(vertexDoc)) {
                         underlying.remove(entries.getKey(), vertexDoc);
                     }

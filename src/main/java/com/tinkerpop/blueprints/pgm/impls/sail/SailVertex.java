@@ -154,11 +154,35 @@ public class SailVertex implements Vertex {
         }
     }
 
+    public Iterable<Edge> getOutEdges(final String label) {
+        if (this.rawVertex instanceof Resource) {
+            try {
+                return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.rawVertex, new URIImpl(SailGraph.prefixToNamespace(label, this.graph.getSailConnection())), null, false), this.graph);
+            } catch (SailException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        } else {
+            return new SailEdgeSequence();
+        }
+    }
+
     public Iterable<Edge> getInEdges() {
         try {
             return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, null, this.rawVertex, false), this.graph);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public Iterable<Edge> getInEdges(final String label) {
+        if (this.rawVertex instanceof Resource) {
+            try {
+                return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, new URIImpl(SailGraph.prefixToNamespace(label, this.graph.getSailConnection())), (Resource) this.rawVertex, false), this.graph);
+            } catch (SailException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        } else {
+            return new SailEdgeSequence();
         }
     }
 

@@ -24,5 +24,9 @@ public interface Vertex extends Element {
      */
     public Iterable<Edge> getInEdges();
 
+    public Iterable<Edge> getOutEdges(String label);
+
+    public Iterable<Edge> getInEdges(String label);
+
     //public T getRawVertex();
 }

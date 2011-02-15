@@ -300,6 +300,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.rawGraph.rollback();
             for (Index<?> index : this.manualIndices.values())
                 ((OrientIndex<?>) index).getRawIndex().unload();
+            for (Index<?> index : this.autoIndices.values())
+                ((OrientIndex<?>) index).getRawIndex().unload();
         } else
             this.rawGraph.commit();
     }

@@ -5,6 +5,7 @@ import com.orientechnologies.orient.core.db.graph.OGraphVertex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.util.Set;
@@ -24,6 +25,16 @@ public class OrientVertex extends OrientElement implements Vertex {
 
     public Iterable<Edge> getInEdges() {
         return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getInEdges().iterator());
+    }
+
+    public Iterable<Edge> getOutEdges(final String label) {
+        return new OrientEdgeSequence(new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getOutEdges().iterator()), label);
+        //return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getOutEdges(label).iterator());
+    }
+
+    public Iterable<Edge> getInEdges(final String label) {
+        return new OrientEdgeSequence(new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getInEdges().iterator()), label);
+        //return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getInEdges(label).iterator());
     }
 
     public Set<String> getPropertyKeys() {

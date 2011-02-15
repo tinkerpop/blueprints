@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphTest extends GraphTest {
+
     private OrientGraph currentGraph;
 
     public OrientGraphTest() {

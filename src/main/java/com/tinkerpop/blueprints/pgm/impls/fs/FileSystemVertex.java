@@ -95,4 +95,13 @@ public class FileSystemVertex extends FileSystemElement implements Vertex {
         return this.getId().hashCode();
     }
 
+    public Iterable<Edge> getOutEdges(final String label) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    public Iterable<Edge> getInEdges(final String label) {
+        throw new UnsupportedOperationException();
+    }
+
 }
