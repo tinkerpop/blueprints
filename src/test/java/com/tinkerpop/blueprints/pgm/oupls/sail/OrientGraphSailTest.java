@@ -11,7 +11,11 @@ import junit.framework.TestCase;
  * Date: 1/18/11
  * Time: 10:54 AM
  */
-public class OrientGraphSailTest {//extends GraphSailTest {
+public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
+
+    public void testTrue() {
+        assertTrue(true);
+    }
 
     protected IndexableGraph createGraph() {
         /*try {
@@ -33,9 +37,7 @@ public class OrientGraphSailTest {//extends GraphSailTest {
     }
 
     private String getWorkingDirectory() {
-        return System.getProperty("os.name").toUpperCase().contains("WINDOWS")
-                ? "C:/temp/blueprints_test/graphsail/orientgraph"
-                : "/tmp/blueprints_test/graphsail/orientgraph";
+        return System.getProperty("os.name").toUpperCase().contains("WINDOWS") ? "C:/temp/blueprints_test/graphsail/orientgraph" : "/tmp/blueprints_test/graphsail/orientgraph";
     }
 
     /*
