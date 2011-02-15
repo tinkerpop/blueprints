@@ -11,8 +11,8 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -85,8 +85,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        //final Set<ORecord<?>> recList = underlying.get(keyTemp);
-        final List<ORecord<?>> recList = underlying.get(keyTemp);
+        final Set<ORecord<?>> recList = underlying.get(keyTemp);
 
         if (recList.isEmpty())
             return new LinkedList<T>();
@@ -148,19 +147,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected void removeElement(final T vertex) {
         final ORecord<?> vertexDoc = vertex.getRawElement().getDocument();
-        /*
+
         Set<ORecord<?>> rids;
         for (Entry<Object, Set<ORecord<?>>> entries : getRawIndex()) {
-         */
-
-        List<ORecord<?>> rids;
-        for (Entry<Object, List<ORecord<?>>> entries : getRawIndex()) {
             rids = entries.getValue();
-
             if (rids != null) {
-                ORecord<?> rec;
-                for (int i = 0; i < rids.size(); ++i) {
-                    rec = rids.get(i);
+                for (ORecord<?> rec : rids) {
                     if (rec.equals(vertexDoc)) {
                         underlying.remove(entries.getKey(), vertexDoc);
                     }
