@@ -1,91 +1,76 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
-import com.orientechnologies.orient.core.db.graph.OGraphEdge;
-import com.orientechnologies.orient.core.db.graph.OGraphElement;
-import com.orientechnologies.orient.core.db.graph.OGraphVertex;
-import com.orientechnologies.orient.core.db.record.ODatabaseRecord;
-import com.orientechnologies.orient.core.exception.OGraphException;
-import com.orientechnologies.orient.core.id.ORID;
-import com.orientechnologies.orient.core.metadata.schema.OClass;
-import com.orientechnologies.orient.core.record.ORecord.STATUS;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientVertex;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.record.ORecord.STATUS;
+import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientElement;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientVertex;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientElementSequence<T extends Element> implements Iterator<T>, Iterable<T> {
-    private final Iterator<? extends OGraphElement> rawElements;
-    private final OrientGraph graph;
+	private final Iterator<?>	underlying;
+	private final OrientGraph	graph;
+	private ODocument					currentDocument;
+	private OrientElement			currentElement;
 
-    public OrientElementSequence(final OrientGraph graph, final Iterator<? extends OGraphElement> rawElements) {
-        this.graph = graph;
-        this.rawElements = rawElements;
-    }
+	public OrientElementSequence(final OrientGraph graph, final Iterator<?> iUnderlying) {
+		this.graph = graph;
+		this.underlying = iUnderlying;
+	}
 
-    public boolean hasNext() {
-        return this.rawElements.hasNext();
-    }
+	public boolean hasNext() {
+		return this.underlying.hasNext();
+	}
 
-    @SuppressWarnings("unchecked")
-    public T next() {
-        Object o = this.rawElements.next();
-        if (null == o)
-            throw new NoSuchElementException();
+	@SuppressWarnings("unchecked")
+	public T next() {
+		currentDocument = (ODocument) this.underlying.next();
+		if (null == currentDocument)
+			throw new NoSuchElementException();
 
-        OGraphElement e = null;
-        if (o instanceof OGraphElement)
-            e = (OGraphElement) o;
-        else {
-            ODocument doc;
-            if (o instanceof ODocument)
-                doc = (ODocument) o;
-            else if (o instanceof ORID) {
-                // SEARCH IN CACHE/TX
-                doc = graph.getRawGraph().getRecordById((ORID) o);
-                if (doc == null)
-                    doc = new ODocument((ODatabaseRecord) graph.getRawGraph().getUnderlying(), (ORID) o);
-            } else
-                throw new IllegalArgumentException("Not a valid element: " + o);
+		if (currentDocument.getInternalStatus() == STATUS.NOT_LOADED)
+			currentDocument.load();
 
-            if (doc.getInternalStatus() == STATUS.NOT_LOADED)
-                doc.load();
+		currentElement = this.graph.getCache().get(currentDocument.getIdentity());
+		if (currentElement != null)
+			return (T) currentElement;
 
-            if (doc.getClassName().equals(OGraphVertex.class.getSimpleName()))
-                e = new OGraphVertex(graph.getRawGraph(), doc);
-            else if (doc.getClassName().equals(OGraphEdge.class.getSimpleName()))
-                e = new OGraphEdge(graph.getRawGraph(), doc);
-            else {
-                final OClass cls = graph.getRawGraph().getMetadata().getSchema().getClass(doc.getClassName());
-                if (cls != null && cls.getSuperClass() != null) {
-                    if (cls.getSuperClass().getName().equals(OGraphVertex.class.getSimpleName()))
-                        e = new OGraphVertex(graph.getRawGraph(), doc.getClassName());
-                    else if (cls.getSuperClass().getName().equals(OGraphEdge.class.getSimpleName()))
-                        e = new OGraphEdge(graph.getRawGraph(), doc.getClassName());
-                }
-            }
+		currentElement = graph.getCache().get(currentDocument.getIdentity());
 
-            if (e == null)
-                throw new OGraphException("Unrecognized class: " + doc.getClassName());
-        }
+		if (currentElement == null) {
+			if (currentDocument.getSchemaClass().isSubClassOf(graph.getRawGraph().getEdgeBaseClass()))
+				currentElement = new OrientEdge(graph, currentDocument);
+			else
+				currentElement = new OrientVertex(graph, currentDocument);
 
-        if (e instanceof OGraphEdge)
-            return (T) new OrientEdge(graph, (OGraphEdge) e);
-        else
-            return (T) new OrientVertex(graph, (OGraphVertex) e);
-    }
+			this.graph.getCache().put((ORecordId) currentElement.getId(), currentElement);
+		}
 
-    public void remove() {
-        this.rawElements.remove();
-    }
+		return (T) currentElement;
+	}
 
-    public Iterator<T> iterator() {
-        return this;
-    }
+	public void remove() {
+		if (currentElement != null) {
+			if (currentElement instanceof Edge)
+				graph.removeEdge((Edge) currentElement);
+			else
+				graph.removeVertex((Vertex) currentElement);
+			currentElement = null;
+			currentDocument = null;
+		}
+	}
+
+	public Iterator<T> iterator() {
+		return this;
+	}
 }
