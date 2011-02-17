@@ -17,6 +17,8 @@ import java.util.Set;
  */
 @SuppressWarnings("unchecked")
 public class OrientIndex<T extends OrientElement> implements Index<T> {
+    private static final String VERTEX = "Vertex";
+    private static final String EDGE = "Edge";
     protected static final String CONFIG_TYPE = "blueprintsIndexType";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
 
@@ -116,7 +118,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         return underlying != null ? underlying.toString() : "?";
     }
 
-    protected void clear() {
+    /*private void clear() {
         try {
             if (null != this.underlying) {
                 final boolean txBegun = graph.autoStartTransaction();
@@ -140,7 +142,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             // FIXME: is there a reason this exception is gobbled? (dw 2010-Dec-6)
             // throw new RuntimeException(e.getMessage(), e);
         }
-    }
+    }*/
 
     protected void removeElement(final T vertex) {
         final ORecord<?> vertexDoc = vertex.getRawElement();
@@ -164,9 +166,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))
-            className = OrientGraph.VERTEX;
+            className = VERTEX;
         else if (Edge.class.isAssignableFrom(indexClass))
-            className = OrientGraph.EDGE;
+            className = EDGE;
         else
             className = indexClass.getName();
 

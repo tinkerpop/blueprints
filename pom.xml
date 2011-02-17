@@ -8,9 +8,7 @@
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
-    <description>Blueprints is a property graph model interface. It also provides implementations, ouplementations, test
-        suites, and
-        supporting extensions.
+    <description>Blueprints is a property graph model interface. It also provides implementations, ouplementations, test suites, and supporting utilities.
     </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

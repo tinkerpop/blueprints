@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
-import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.ORecord.STATUS;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.Edge;
@@ -41,16 +40,10 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
         if (currentDocument.getInternalStatus() == STATUS.NOT_LOADED)
             currentDocument.load();
 
-        currentElement = this.graph.getCache().get(currentDocument.getIdentity());
-        if (currentElement != null)
-            return (T) currentElement;
-
         if (currentDocument.getSchemaClass().isSubClassOf(graph.getRawGraph().getEdgeBaseClass()))
             currentElement = new OrientEdge(graph, currentDocument);
         else
             currentElement = new OrientVertex(graph, currentDocument);
-
-        this.graph.getCache().put((ORecordId) currentElement.getId(), currentElement);
 
         return (T) currentElement;
     }

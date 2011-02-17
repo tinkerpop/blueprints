@@ -37,17 +37,17 @@ public class Neo4jBenchmarkTestSuite extends TestSuite {
             GraphDatabaseService neo4j = ((Neo4jGraph) graph).getRawGraph();
             int counter = 0;
             this.stopWatch();
-            for (Node node : neo4j.getAllNodes()) {
+            for (final Node node : neo4j.getAllNodes()) {
                 counter++;
-                for (Relationship relationship : node.getRelationships(Direction.OUTGOING)) {
+                for (final Relationship relationship : node.getRelationships(Direction.OUTGOING)) {
                     counter++;
-                    Node node2 = relationship.getEndNode();
+                    final Node node2 = relationship.getEndNode();
                     counter++;
-                    for (Relationship relationship2 : node2.getRelationships(Direction.OUTGOING)) {
+                    for (final Relationship relationship2 : node2.getRelationships(Direction.OUTGOING)) {
                         counter++;
-                        Node node3 = relationship2.getEndNode();
+                        final Node node3 = relationship2.getEndNode();
                         counter++;
-                        for (Relationship relationship3 : node3.getRelationships(Direction.OUTGOING)) {
+                        for (final Relationship relationship3 : node3.getRelationships(Direction.OUTGOING)) {
                             counter++;
                             relationship3.getEndNode();
                             counter++;
@@ -73,17 +73,17 @@ public class Neo4jBenchmarkTestSuite extends TestSuite {
             graph = graphTest.getGraphInstance();
             this.stopWatch();
             int counter = 0;
-            for (Vertex vertex : graph.getVertices()) {
+            for (final Vertex vertex : graph.getVertices()) {
                 counter++;
-                for (Edge edge : vertex.getOutEdges()) {
+                for (final Edge edge : vertex.getOutEdges()) {
                     counter++;
-                    Vertex vertex2 = edge.getInVertex();
+                    final Vertex vertex2 = edge.getInVertex();
                     counter++;
-                    for (Edge edge2 : vertex2.getOutEdges()) {
+                    for (final Edge edge2 : vertex2.getOutEdges()) {
                         counter++;
-                        Vertex vertex3 = edge2.getInVertex();
+                        final Vertex vertex3 = edge2.getInVertex();
                         counter++;
-                        for (Edge edge3 : vertex3.getOutEdges()) {
+                        for (final Edge edge3 : vertex3.getOutEdges()) {
                             counter++;
                             edge3.getOutVertex();
                             counter++;

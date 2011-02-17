@@ -35,6 +35,7 @@ h3. Version 0.5 (Scooby -- NOT OFFICIALLY RELEASED YET)
 * Bumped version support to Neo4j 1.3.M02
 * Added performance benchmark for Neo4j @GraphDatabaseService@ vs. Blueprints @Neo4jGraph@
 * Added @Vertex.getOutEdges(String label)@ and @Vertex.getInEdges(String label)@
+* Rewrote OrientDB implementation from scratch (significant reduction in code)
 
 ==<hr/>==
 
