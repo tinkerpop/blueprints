@@ -17,7 +17,7 @@ public class ReadOnlyVertexSequence implements Iterator<Vertex>, Iterable<Vertex
     }
 
     public void remove() {
-        throw new UnsupportedOperationException();
+        this.itty.remove();
     }
 
     public Iterator<Vertex> iterator() {

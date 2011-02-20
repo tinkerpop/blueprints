@@ -7,6 +7,9 @@ import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyVertexSequence;
 
 /**
+ * A ReadOnlyGraph wraps a Graph and overrides the underlying graph's mutating methods.
+ * In this way, a ReadOnlyGraph can only be read from, not written to.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class ReadOnlyGraph implements Graph {
@@ -17,11 +20,17 @@ public class ReadOnlyGraph implements Graph {
         this.graph = graph;
     }
 
-    public void removeVertex(final Vertex vertex) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public void removeVertex(final Vertex vertex) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
@@ -33,7 +42,10 @@ public class ReadOnlyGraph implements Graph {
             return new ReadOnlyVertex(vertex);
     }
 
-    public void removeEdge(final Edge edge) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public void removeEdge(final Edge edge) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
@@ -53,15 +65,24 @@ public class ReadOnlyGraph implements Graph {
         return new ReadOnlyVertexSequence(this.graph.getVertices().iterator());
     }
 
-    public Vertex addVertex(final Object id) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public Vertex addVertex(final Object id) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public void clear() {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public void clear() throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public void shutdown() {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public void shutdown() throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 

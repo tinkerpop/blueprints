@@ -33,7 +33,11 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException();
+        try {
+            this.statements.remove();
+        } catch (SailException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public boolean hasNext() {

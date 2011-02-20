@@ -23,7 +23,10 @@ public class ReadOnlyElement implements Element {
         return this.element.getId();
     }
 
-    public Object removeProperty(final String key) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public Object removeProperty(final String key) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
@@ -31,7 +34,10 @@ public class ReadOnlyElement implements Element {
         return this.element.getProperty(key);
     }
 
-    public void setProperty(final String key, final Object value) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public void setProperty(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 

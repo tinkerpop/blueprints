@@ -17,7 +17,7 @@ public class ReadOnlyEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException();
+        this.itty.remove();
     }
 
     public Iterator<Edge> iterator() {

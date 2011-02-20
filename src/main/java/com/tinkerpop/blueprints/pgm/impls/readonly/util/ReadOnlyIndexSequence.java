@@ -20,7 +20,7 @@ public class ReadOnlyIndexSequence<T extends Element> implements Iterator<Index<
     }
 
     public void remove() {
-        throw new UnsupportedOperationException();
+        this.itty.remove();
     }
 
     public Iterator<Index<T>> iterator() {

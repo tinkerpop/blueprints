@@ -50,7 +50,7 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
     }
 
     public void remove() {
-        throw new UnsupportedOperationException();
+        this.queue.remove();
     }
 
     public Iterator<T> iterator() {

@@ -9,6 +9,9 @@ import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyIndexSequence;
 import java.util.Set;
 
 /**
+ * A ReadOnlyIndexableGraph wraps an IndexableGraph and overrides the underlying graph's mutating methods.
+ * In this way, a ReadOnlyIndexableGraph can only be read from, not written to.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class ReadOnlyIndexableGraph extends ReadOnlyGraph implements IndexableGraph {
@@ -17,15 +20,24 @@ public class ReadOnlyIndexableGraph extends ReadOnlyGraph implements IndexableGr
         super(graph);
     }
 
-    public void dropIndex(final String name) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public void dropIndex(final String name) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys) {
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
