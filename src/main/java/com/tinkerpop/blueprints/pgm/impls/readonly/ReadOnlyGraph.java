@@ -26,7 +26,11 @@ public class ReadOnlyGraph implements Graph {
     }
 
     public Vertex getVertex(final Object id) {
-        return new ReadOnlyVertex(this.graph.getVertex(id));
+        final Vertex vertex = this.graph.getVertex(id);
+        if (null == vertex)
+            return null;
+        else
+            return new ReadOnlyVertex(vertex);
     }
 
     public void removeEdge(final Edge edge) {
@@ -38,7 +42,11 @@ public class ReadOnlyGraph implements Graph {
     }
 
     public Edge getEdge(final Object id) {
-        return new ReadOnlyEdge(this.graph.getEdge(id));
+        final Edge edge = this.graph.getEdge(id);
+        if (null == edge)
+            return null;
+        else
+            return new ReadOnlyEdge(edge);
     }
 
     public Iterable<Vertex> getVertices() {
