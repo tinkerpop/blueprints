@@ -14,7 +14,8 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "Sesame 2.0":http://www.openrdf.org Sail interface
 * Supporting utilities:
 ** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ library
-** Blueprints Helper Utilities
+** Blueprints helper utilities
+** ReadOnlyGraph wrapper
 
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

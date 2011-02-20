@@ -40,4 +40,8 @@ public class ReadOnlyIndexableGraph extends ReadOnlyGraph implements IndexableGr
     public Iterable<Index<? extends Element>> getIndices() {
         return new ReadOnlyIndexSequence(((IndexableGraph) this.graph).getIndices().iterator());
     }
+
+    public IndexableGraph getRawGraph() {
+        return (IndexableGraph) this.graph;
+    }
 }

@@ -61,4 +61,8 @@ public class ReadOnlyGraph implements Graph {
         return "(readonly)" + this.graph.toString();
     }
 
+    public Graph getRawGraph() {
+        return this.graph;
+    }
+
 }
