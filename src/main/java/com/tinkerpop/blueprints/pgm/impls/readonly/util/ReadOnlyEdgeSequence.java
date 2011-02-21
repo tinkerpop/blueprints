@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.readonly.util;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyEdge;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyTokens;
 
 import java.util.Iterator;
 
@@ -17,7 +18,7 @@ public class ReadOnlyEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     }
 
     public void remove() {
-        this.itty.remove();
+        throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
     public Iterator<Edge> iterator() {

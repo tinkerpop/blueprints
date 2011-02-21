@@ -29,7 +29,7 @@ h3. Version 0.5 (Scooby -- NOT OFFICIALLY RELEASED YET)
 ** Added support for bulk processing with @CommitManager@
 * Added UTF-8 writer to @GraphMLWriter@
 * Updates to @OrientGraph@ implementation
-* Fixed a bug in @Neo4jGraph@ index loader
+* Fixed bug in @Neo4jGraph@ index loader
 * Added @toString()@ method to indices
 * Added experimental Lucene query syntax support for @Neo4jGraph@
 * Bumped version support to Neo4j 1.3.M02

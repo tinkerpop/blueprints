@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyAutomaticIndex;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndex;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyTokens;
 
 import java.util.Iterator;
 
@@ -20,7 +21,7 @@ public class ReadOnlyIndexSequence<T extends Element> implements Iterator<Index<
     }
 
     public void remove() {
-        this.itty.remove();
+        throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
     public Iterator<Index<T>> iterator() {

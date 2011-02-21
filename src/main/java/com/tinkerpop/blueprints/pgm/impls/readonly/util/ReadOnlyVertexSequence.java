@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.readonly.util;
 
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyTokens;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyVertex;
 
 import java.util.Iterator;
@@ -17,7 +18,7 @@ public class ReadOnlyVertexSequence implements Iterator<Vertex>, Iterable<Vertex
     }
 
     public void remove() {
-        this.itty.remove();
+        throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
     public Iterator<Vertex> iterator() {

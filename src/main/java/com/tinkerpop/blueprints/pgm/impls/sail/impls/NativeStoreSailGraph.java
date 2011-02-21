@@ -11,11 +11,11 @@ import java.io.File;
  */
 public class NativeStoreSailGraph extends SailGraph {
 
-    public NativeStoreSailGraph(String directory) {
+    public NativeStoreSailGraph(final String directory) {
         super(createNativeStore(new File(directory), null));
     }
 
-    public NativeStoreSailGraph(String directory, String tripleIndices) {
+    public NativeStoreSailGraph(final String directory, final String tripleIndices) {
         super(createNativeStore(new File(directory), tripleIndices));
     }
 

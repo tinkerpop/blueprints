@@ -55,7 +55,6 @@ public class SailEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
     public Edge next() {
         if (null == this.statements)
             throw new NoSuchElementException();
-
         try {
             return new SailEdge(this.statements.next(), this.graph);
         } catch (SailException e) {
