@@ -2,7 +2,9 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
 import com.orientechnologies.orient.core.record.ORecord.STATUS;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientElement;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
@@ -17,6 +19,8 @@ import java.util.NoSuchElementException;
 public class OrientElementSequence<T extends Element> implements Iterator<T>, Iterable<T> {
     private final Iterator<?> underlying;
     private final OrientGraph graph;
+    private ODocument currentDocument;
+    private OrientElement currentElement;
 
     public OrientElementSequence(final OrientGraph graph, final Iterator<?> iUnderlying) {
         this.graph = graph;
@@ -29,8 +33,7 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
 
     @SuppressWarnings("unchecked")
     public T next() {
-        final OrientElement currentElement;
-        final ODocument currentDocument = (ODocument) this.underlying.next();
+        currentDocument = (ODocument) this.underlying.next();
         if (null == currentDocument)
             throw new NoSuchElementException();
 
@@ -46,7 +49,14 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
     }
 
     public void remove() {
-        this.underlying.remove();
+        if (currentElement != null) {
+            if (currentElement instanceof Edge)
+                graph.removeEdge((Edge) currentElement);
+            else
+                graph.removeVertex((Vertex) currentElement);
+            currentElement = null;
+            currentDocument = null;
+        }
     }
 
     public Iterator<T> iterator() {

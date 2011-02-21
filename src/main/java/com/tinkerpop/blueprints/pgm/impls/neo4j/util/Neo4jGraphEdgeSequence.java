@@ -37,7 +37,7 @@ public class Neo4jGraphEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     }
 
     public void remove() {
-        this.currentRelationships.remove();
+       throw new UnsupportedOperationException();
     }
 
     private boolean goToNextEdge() {

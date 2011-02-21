@@ -55,6 +55,6 @@ public class TinkerEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
     }
 
     public void remove() {
-        this.iterator().remove();
+        throw new UnsupportedOperationException();
     }
 }

@@ -22,7 +22,7 @@ public class Neo4jEdgeSequence<T extends Edge> implements Iterator<Neo4jEdge>, I
     }
 
     public void remove() {
-        this.relationships.remove();
+        throw new UnsupportedOperationException();
     }
 
     public Neo4jEdge next() {
