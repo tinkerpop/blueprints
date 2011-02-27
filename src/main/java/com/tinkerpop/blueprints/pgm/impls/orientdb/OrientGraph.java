@@ -193,8 +193,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
                 }
             }
 
-            //cache.remove(oVertex.getId());
-
             rawGraph.removeVertex(oVertex.rawElement);
 
             autoStopTransaction(Conclusion.SUCCESS);
@@ -229,10 +227,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             rid = (ORID) id;
         else
             rid = new ORecordId(id.toString());
-
-        /*final OrientElement e = cache.get(rid);
-        if (e != null)
-            return (Edge) e;*/
 
         final ODocument doc = this.rawGraph.load(rid);
         if (doc != null) {
@@ -321,6 +315,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void setTransactionMode(final Mode mode) {
+    	  this.rawGraph.commit();
         this.mode = mode;
     }
 
@@ -367,7 +362,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
                 createIndexConfiguration(createDefaultIndices);
 
             for (OIndex idx : rawGraph.getMetadata().getIndexManager().getIndexes()) {
-                if (idx.getConfiguration().field(OrientIndex.CONFIG_TYPE) != null)
+                if (idx.updateConfiguration().field(OrientIndex.CONFIG_TYPE) != null)
                     // LOAD THE INDEXES
                     loadIndex(idx);
             }
@@ -389,7 +384,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     @SuppressWarnings("rawtypes")
     private OrientIndex<?> loadIndex(final OIndex rawIndex) {
-        String indexType = rawIndex.getConfiguration().field(OrientIndex.CONFIG_TYPE);
+        String indexType = rawIndex.updateConfiguration().field(OrientIndex.CONFIG_TYPE);
         final OrientIndex<?> index;
 
         switch (Index.Type.valueOf(indexType.toUpperCase())) {

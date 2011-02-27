@@ -1,16 +1,20 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.Collections;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexNotUnique;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
-
-import java.util.LinkedList;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -38,10 +42,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     public OrientIndex(OrientGraph orientGraph, OIndex iIndex) {
         this.graph = orientGraph;
         this.underlying = iIndex;
-        load(iIndex.getConfiguration());
+        load(iIndex.updateConfiguration());
     }
 
-    protected OIndex getRawIndex() {
+    public OIndex getRawIndex() {
         return this.underlying;
     }
 
@@ -88,7 +92,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         final Set<ORecord<?>> records = underlying.get(keyTemp);
 
         if (records.isEmpty())
-            return new LinkedList<T>();
+            return Collections.emptySet();
 
         return new OrientElementSequence(graph, records.iterator());
     }
@@ -117,32 +121,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     public String toString() {
         return underlying != null ? underlying.toString() : "?";
     }
-
-    /*private void clear() {
-        try {
-            if (null != this.underlying) {
-                final boolean txBegun = graph.autoStartTransaction();
-                try {
-                    this.underlying.clear();
-                    this.underlying.lazySave();
-
-                    if (txBegun)
-                        graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                } catch (RuntimeException e) {
-                    if (txBegun)
-                        graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                    throw e;
-                } catch (Exception e) {
-                    if (txBegun)
-                        graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        } catch (Exception e) {
-            // FIXME: is there a reason this exception is gobbled? (dw 2010-Dec-6)
-            // throw new RuntimeException(e.getMessage(), e);
-        }
-    }*/
 
     protected void removeElement(final T vertex) {
         final ORecord<?> vertexDoc = vertex.getRawElement();
@@ -173,17 +151,17 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             className = indexClass.getName();
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
-        underlying.getConfiguration().field(CONFIG_CLASSNAME, className);
-        underlying.getConfiguration().field(CONFIG_TYPE, type.toString());
+        underlying.updateConfiguration().field(CONFIG_CLASSNAME, className);
+        underlying.updateConfiguration().field(CONFIG_TYPE, type.toString());
     }
 
     private void load(final ODocument indexCfg) {
         // LOAD TREEMAP
         final String indexClassName = indexCfg.field(CONFIG_CLASSNAME);
 
-        if ("Vertex".equals(indexClassName))
+        if (VERTEX.equals(indexClassName))
             this.indexClass = OrientVertex.class;
-        else if ("Edge".equals(indexClassName))
+        else if (EDGE.equals(indexClassName))
             this.indexClass = OrientEdge.class;
         else
             try {

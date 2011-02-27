@@ -1,13 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import com.orientechnologies.orient.core.db.record.ORecordTrackedList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.index.OIndex;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -53,7 +53,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     private void init() {
-        ORecordTrackedList field = underlying.getConfiguration().field(KEYS);
+        final Collection<Object> field = underlying.updateConfiguration().field(KEYS);
         if (null != field) {
             this.autoIndexKeys = new HashSet<String>();
             for (Object key : field) {
