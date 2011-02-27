@@ -1,76 +1,58 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
-import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.ORecord.STATUS;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientElement;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientVertex;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientElementSequence<T extends Element> implements Iterator<T>, Iterable<T> {
-	private final Iterator<?>	underlying;
-	private final OrientGraph	graph;
-	private ODocument					currentDocument;
-	private OrientElement			currentElement;
+    private final Iterator<?> underlying;
+    private final OrientGraph graph;
 
-	public OrientElementSequence(final OrientGraph graph, final Iterator<?> iUnderlying) {
-		this.graph = graph;
-		this.underlying = iUnderlying;
-	}
+    public OrientElementSequence(final OrientGraph graph, final Iterator<?> iUnderlying) {
+        this.graph = graph;
+        this.underlying = iUnderlying;
+    }
 
-	public boolean hasNext() {
-		return this.underlying.hasNext();
-	}
+    public boolean hasNext() {
+        return this.underlying.hasNext();
+    }
 
-	@SuppressWarnings("unchecked")
-	public T next() {
-		currentDocument = (ODocument) this.underlying.next();
-		if (null == currentDocument)
-			throw new NoSuchElementException();
+    @SuppressWarnings("unchecked")
+    public T next() {
+        OrientElement currentElement=null;
+        final Object current = this.underlying.next();
+        if( current instanceof ODocument ){
+	        final ODocument currentDocument = (ODocument) current;
+	        if (null == currentDocument)
+	            throw new NoSuchElementException();
+	
+	        if (currentDocument.getInternalStatus() == STATUS.NOT_LOADED)
+	            currentDocument.load();
+	
+	        if (currentDocument.getSchemaClass().isSubClassOf(graph.getRawGraph().getEdgeBaseClass()))
+	            currentElement = new OrientEdge(graph, currentDocument);
+	        else
+	            currentElement = new OrientVertex(graph, currentDocument);
+        }
+        
+        return (T) currentElement;
+    }
 
-		if (currentDocument.getInternalStatus() == STATUS.NOT_LOADED)
-			currentDocument.load();
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
 
-		currentElement = this.graph.getCache().get(currentDocument.getIdentity());
-		if (currentElement != null)
-			return (T) currentElement;
-
-		currentElement = graph.getCache().get(currentDocument.getIdentity());
-
-		if (currentElement == null) {
-			if (currentDocument.getSchemaClass().isSubClassOf(graph.getRawGraph().getEdgeBaseClass()))
-				currentElement = new OrientEdge(graph, currentDocument);
-			else
-				currentElement = new OrientVertex(graph, currentDocument);
-
-			this.graph.getCache().put((ORecordId) currentElement.getId(), currentElement);
-		}
-
-		return (T) currentElement;
-	}
-
-	public void remove() {
-		if (currentElement != null) {
-			if (currentElement instanceof Edge)
-				graph.removeEdge((Edge) currentElement);
-			else
-				graph.removeVertex((Vertex) currentElement);
-			currentElement = null;
-			currentDocument = null;
-		}
-	}
-
-	public Iterator<T> iterator() {
-		return this;
-	}
+    public Iterator<T> iterator() {
+        return this;
+    }
 }
