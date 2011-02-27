@@ -323,7 +323,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return this.mode;
     }
 
-    void saveIndexConfiguration() {
+    protected void saveIndexConfiguration() {
         rawGraph.getMetadata().getIndexManager().setDirty();
         rawGraph.getMetadata().getIndexManager().save();
     }

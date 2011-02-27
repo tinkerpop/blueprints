@@ -25,8 +25,8 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
         saveConfiguration();
     }
 
-    public OrientAutomaticIndex(OrientGraph graph, OIndex index) {
-        super(graph, index);
+    public OrientAutomaticIndex(OrientGraph graph, OIndex rawIndex) {
+        super(graph, rawIndex);
         init();
     }
 

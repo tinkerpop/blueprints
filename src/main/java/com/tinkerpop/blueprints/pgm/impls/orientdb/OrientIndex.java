@@ -33,16 +33,16 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected Class<? extends Element> indexClass;
 
-    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> iIndexClass, final com.tinkerpop.blueprints.pgm.Index.Type type) {
+    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
         this.graph = graph;
-        this.indexClass = iIndexClass;
-        create(indexName, indexClass, type);
+        this.indexClass = indexClass;
+        create(indexName, this.indexClass, indexType);
     }
 
-    public OrientIndex(OrientGraph orientGraph, OIndex iIndex) {
+    public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
         this.graph = orientGraph;
-        this.underlying = iIndex;
-        load(iIndex.updateConfiguration());
+        this.underlying = rawIndex;
+        load(rawIndex.updateConfiguration());
     }
 
     public OIndex getRawIndex() {
@@ -135,7 +135,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
-    private void create(final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type type) {
+    private void create(final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
         this.indexClass = indexClass;
 
         // CREATE THE MAP
@@ -152,12 +152,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
         underlying.updateConfiguration().field(CONFIG_CLASSNAME, className);
-        underlying.updateConfiguration().field(CONFIG_TYPE, type.toString());
+        underlying.updateConfiguration().field(CONFIG_TYPE, indexType.toString());
     }
 
-    private void load(final ODocument indexCfg) {
+    private void load(final ODocument indexConfiguration) {
         // LOAD TREEMAP
-        final String indexClassName = indexCfg.field(CONFIG_CLASSNAME);
+        final String indexClassName = indexConfiguration.field(CONFIG_CLASSNAME);
 
         if (VERTEX.equals(indexClassName))
             this.indexClass = OrientVertex.class;
@@ -171,7 +171,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             }
 
         // LOAD THE TREE-MAP
-        underlying = new OIndexNotUnique().loadFromConfiguration(indexCfg);
+        underlying = new OIndexNotUnique().loadFromConfiguration(indexConfiguration);
     }
 
 }
