@@ -1,5 +1,4 @@
-Blueprints: A Property Graph Model Interface
-"http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
+All releases can be accessed through the TinkerPop Maven2 repository identified below.
 
 ```xml
 <repository>
@@ -13,13 +12,13 @@ Blueprints: A Property Graph Model Interface
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-scooby.png!
 
-h3. Version 0.5 (Scooby -- March 2, 2011)
+h3. Version 0.5 (Scooby -- NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop</groupId>
   <artifactId>blueprints</artifactId>
-  <version>0.5</version>
+  <version>0.5-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -31,15 +30,12 @@ h3. Version 0.5 (Scooby -- March 2, 2011)
 ** Added support for bulk processing with @CommitManager@
 * Added UTF-8 writer to @GraphMLWriter@
 * Updates to @OrientGraph@ implementation
-* Fixed bug in @Neo4jGraph@ index loader
+* Fixed a bug in @Neo4jGraph@ index loader
 * Added @toString()@ method to indices
 * Added experimental Lucene query syntax support for @Neo4jGraph@
-* Bumped version support to Neo4j 1.3.M03
+* Bumped version support to Neo4j 1.3.M02
 * Added performance benchmark for Neo4j @GraphDatabaseService@ vs. Blueprints @Neo4jGraph@
-* Added performance benchmark for OrientDB @OGraphDatabase@ vs. Blueprints @OrientGraph@
 * Added @Vertex.getOutEdges(String label)@ and @Vertex.getInEdges(String label)@
-* Rewrote OrientDB implementation from scratch (significant reduction in code) (Luca)
-* Added @ReadOnlyGraph@ and @ReadOnlyIndexableGraph@ to prevent graph mutations
 
 ==<hr/>==
 
@@ -55,14 +51,15 @@ h3. Version 0.4 (Elmo -- January 22, 2011)
 </dependency>
 ```
 
-* Added support for Neo4j 1.2
+Blueprints 0.4 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.4/api/
+
+* Added Support for Neo4j 1.2
 * Added edge label indexing to @AutomaticIndex@
 * Added concept of "ouplementation"
 ** Repackaged JUNG ouplementation as @GraphJung@
 ** Added Sail ouplementation as @GraphSail@
 * Created @util@ utility package
 ** Repackaged GraphML library in @util.graphml@
-
 
 ==<hr/>==
 
@@ -77,6 +74,8 @@ h3. Version 0.3 (Smurf -- December 14, 2010)
   <version>0.3</version>
 </dependency>
 ```
+
+Blueprints 0.3 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.3/api/
 
 * Moved to @graphdb-deps-*@ database dependency management model
 ** Neo4j 1.2.M05
@@ -115,14 +114,16 @@ h3. Version 0.2 (Kermit -- September 22, 2010)
 </dependency>
 ```
 
+Blueprints 0.2 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.2/api/
+
 * Removed Blueprints Pipes BETA and put it into a separate project
 * @Neo4jGraph@ constructor can be passed in a Neo4j properties map
 * @Neo4jGraph@ constructor can be passed in a live @GraphDatabaseService@
 * Updated @GraphMLWriter@ to write all vertices and then all edges
 * Added RDF load functionality to @SailGraph@
-* Added SPARQL functionality to @SailGraph@
+* Added SPARQL functioanlity to @SailGraph@
 * Fixed sever @GraphMLReader@ bug
-* Added OrientDB (@OrientGraph@) as a property graph implementation
+* Added OrientDB (OrientGraph) as a property graph implementation
 * Added support for @Graph.getEdge(Object id)@
 * Added support for @kind@ in the Sail implementation of Blueprints
 * Made iterating edges in @SailGraph@ faster and more memory efficient
@@ -142,10 +143,12 @@ h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 </dependency>
 ```
 
+Blueprints 0.1.1 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1.1/api/
+
 * Added Blueprints Pipes BETA to the distribution
 * Changed all the OpenRDF Sesame dependencies to version 2.3.1
 * Added performance timing printouts to model test cases
-* Neo4j dependency was changed for 1.0-rc to 1.0
+* Neo4j depedency was changed for 1.0-rc to 1.0
 * Added object document interfaces
 * Added TinkerDoc implementation of the object document interfaces
 * Added MongoDB implementation of the object document interfaces
@@ -159,6 +162,8 @@ h3. Version 0.1 (Bob the Builder -- February 9, 2010)
   <version>0.1</version>
 </dependency>
 ```
+
+Blueprints 0.1 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1/api/
 
 * Initial release providing the property graph model
 * Code originally packaged with "Gremlin":http://gremlin.tinkerpop.com

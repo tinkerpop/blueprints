@@ -24,42 +24,6 @@ public class OrientBenchmarkTestSuite extends TestSuite {
         super(graphTest);
     }
 
-    public void testOrientGraph() throws Exception {
-        double totalTime = 0.0d;
-        Graph graph = graphTest.getGraphInstance();
-        GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
-        graph.shutdown();
-
-        for (int i = 0; i < TOTAL_RUNS; i++) {
-            graph = graphTest.getGraphInstance();
-            this.stopWatch();
-            int counter = 0;
-            for (final Vertex vertex : graph.getVertices()) {
-                counter++;
-                for (final Edge edge : vertex.getOutEdges()) {
-                    counter++;
-                    final Vertex vertex2 = edge.getInVertex();
-                    counter++;
-                    for (final Edge edge2 : vertex2.getOutEdges()) {
-                        counter++;
-                        final Vertex vertex3 = edge2.getInVertex();
-                        counter++;
-                        for (final Edge edge3 : vertex3.getOutEdges()) {
-                            counter++;
-                            edge3.getOutVertex();
-                            counter++;
-                        }
-                    }
-                }
-            }
-            double currentTime = this.stopWatch();
-            totalTime = totalTime + currentTime;
-            BaseTest.printPerformance(graph.toString(), counter, "OrientGraph elements touched", currentTime);
-            graph.shutdown();
-        }
-        BaseTest.printPerformance("OrientGraph", 1, "OrientGraph experiment average", totalTime / (double) TOTAL_RUNS);
-    }
-
     public void testOrientRaw() throws Exception {
         double totalTime = 0.0d;
         OrientGraph graph = (OrientGraph) graphTest.getGraphInstance();
@@ -95,6 +59,42 @@ public class OrientBenchmarkTestSuite extends TestSuite {
             graph.shutdown();
         }
         BaseTest.printPerformance("OrientRaw", 1, "OrientDB Raw experiment average", totalTime / (double) TOTAL_RUNS);
+    }
+
+    public void testOrientGraph() throws Exception {
+        double totalTime = 0.0d;
+        Graph graph = graphTest.getGraphInstance();
+        GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+        graph.shutdown();
+
+        for (int i = 0; i < TOTAL_RUNS; i++) {
+            graph = graphTest.getGraphInstance();
+            this.stopWatch();
+            int counter = 0;
+            for (final Vertex vertex : graph.getVertices()) {
+                counter++;
+                for (final Edge edge : vertex.getOutEdges()) {
+                    counter++;
+                    final Vertex vertex2 = edge.getInVertex();
+                    counter++;
+                    for (final Edge edge2 : vertex2.getOutEdges()) {
+                        counter++;
+                        final Vertex vertex3 = edge2.getInVertex();
+                        counter++;
+                        for (final Edge edge3 : vertex3.getOutEdges()) {
+                            counter++;
+                            edge3.getOutVertex();
+                            counter++;
+                        }
+                    }
+                }
+            }
+            double currentTime = this.stopWatch();
+            totalTime = totalTime + currentTime;
+            BaseTest.printPerformance(graph.toString(), counter, "OrientGraph elements touched", currentTime);
+            graph.shutdown();
+        }
+        BaseTest.printPerformance("OrientGraph", 1, "OrientGraph experiment average", totalTime / (double) TOTAL_RUNS);
     }
 
 
