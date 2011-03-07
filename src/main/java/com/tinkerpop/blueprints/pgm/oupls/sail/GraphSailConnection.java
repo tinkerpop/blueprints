@@ -20,6 +20,7 @@ import org.openrdf.sail.SailException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 
 /**
  * A stateful connection to a BlueprintsSail RDF store interface.
@@ -348,10 +349,47 @@ public class GraphSailConnection implements SailConnection {
             Resource context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
 
             return store.valueFactory.createStatement(subject, predicate, object, context);
+            //return new TempStatement(store.valueFactory.createStatement(subject, predicate, object, context));
         }
 
         public void remove() throws SailException {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    // This class is purely for demonstrative purposes.  Use it StableEdgeIteration, and it will have no
+    // effect unless you include the finalize() method.  With the finalize method, it dramatically
+    // increases query time, as it interferes with a JDK optimization which eliminates creation of
+    // very many short-lived Statement objects.
+    private class TempStatement implements Statement {
+        private final Statement wrapped;
+
+        public TempStatement(Statement wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        @Override
+        public Resource getSubject() {
+            return wrapped.getSubject();
+        }
+
+        @Override
+        public URI getPredicate() {
+            return wrapped.getPredicate();
+        }
+
+        @Override
+        public Value getObject() {
+            return wrapped.getObject();
+        }
+
+        @Override
+        public Resource getContext() {
+            return wrapped.getContext();
+        }
+
+        protected void finalize() throws Throwable {
+            super.finalize();
         }
     }
 
