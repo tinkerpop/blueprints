@@ -55,6 +55,13 @@
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
         </dependency>
+        <dependency>
+            <groupId>jredis</groupId>
+            <artifactId>org.jredis.ri</artifactId>
+            <version>a.0-SNAPSHOT-jar-with-dependencies</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/deps/JRedis.jar</systemPath>
+        </dependency>
         <!-- JUNG SUPPORT -->
         <dependency>
             <groupId>net.sf.jung</groupId>
