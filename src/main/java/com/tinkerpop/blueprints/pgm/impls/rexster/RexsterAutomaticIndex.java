@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import org.json.simple.JSONArray;
 
@@ -31,5 +32,9 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
             return null;
         else
             return keys;
+    }
+
+    public String toString() {
+        return StringFactory.indexString(this);
     }
 }

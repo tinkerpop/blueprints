@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>graphdb-deps-orientdb</artifactId>
-    <version>0.4</version>
+    <version>0.5</version>
     <packaging>pom</packaging>
     <name>GraphDB Dependencies-OrientDB</name>
     <url>http://orientechnologies.com/</url>
@@ -22,12 +22,12 @@
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-core</artifactId>
-            <version>0.9.25-SNAPSHOT</version>
+            <version>0.9.25</version>
         </dependency>
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orient-commons</artifactId>
-            <version>0.9.25-SNAPSHOT</version>
+            <version>0.9.25</version>
         </dependency>
     </dependencies>
     <repositories>

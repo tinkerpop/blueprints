@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -46,4 +47,59 @@ public class GraphHelperTest extends BaseTest {
             assertEquals(count(graph.getEdges()), 1);
         }
     }
+
+    public void testCopyGraph() {
+        Graph g = TinkerGraphFactory.createTinkerGraph();
+        Graph h = new TinkerGraph();
+
+        GraphHelper.copyGraph(g, h);
+        assertEquals(count(h.getVertices()), 6);
+        assertEquals(count(h.getEdges()), 6);
+        assertEquals(count(h.getVertex("1").getOutEdges()), 3);
+        assertEquals(count(h.getVertex("1").getInEdges()), 0);
+        Vertex marko = h.getVertex("1");
+        assertEquals(marko.getProperty("name"), "marko");
+        assertEquals(marko.getProperty("age"), 29);
+        int counter = 0;
+        for (Edge e : h.getVertex("1").getOutEdges()) {
+            if (e.getInVertex().getId().equals("2")) {
+                assertEquals(e.getProperty("weight"), 0.5f);
+                assertEquals(e.getLabel(), "knows");
+                assertEquals(e.getId(), "7");
+                counter++;
+            } else if (e.getInVertex().getId().equals("3")) {
+                assertEquals(Math.round((Float) e.getProperty("weight")), 0);
+                assertEquals(e.getLabel(), "created");
+                assertEquals(e.getId(), "9");
+                counter++;
+            } else if (e.getInVertex().getId().equals("4")) {
+                assertEquals(Math.round((Float) e.getProperty("weight")), 1);
+                assertEquals(e.getLabel(), "knows");
+                assertEquals(e.getId(), "8");
+                counter++;
+            }
+        }
+
+        assertEquals(count(h.getVertex("4").getOutEdges()), 2);
+        assertEquals(count(h.getVertex("4").getInEdges()), 1);
+        Vertex josh = h.getVertex("4");
+        assertEquals(josh.getProperty("name"), "josh");
+        assertEquals(josh.getProperty("age"), 32);
+        for (Edge e : h.getVertex("4").getOutEdges()) {
+            if (e.getInVertex().getId().equals("3")) {
+                assertEquals(Math.round((Float) e.getProperty("weight")), 0);
+                assertEquals(e.getLabel(), "created");
+                assertEquals(e.getId(), "11");
+                counter++;
+            } else if (e.getInVertex().getId().equals("5")) {
+                assertEquals(Math.round((Float) e.getProperty("weight")), 1);
+                assertEquals(e.getLabel(), "created");
+                assertEquals(e.getId(), "10");
+                counter++;
+            }
+        }
+
+        assertEquals(counter, 5);
+    }
+
 }

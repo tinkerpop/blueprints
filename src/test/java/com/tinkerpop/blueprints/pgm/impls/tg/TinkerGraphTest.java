@@ -23,6 +23,12 @@ public class TinkerGraphTest extends GraphTest {
         this.supportsEdgeIndex = true;
     }
 
+    /*public void testTinkerBenchmarkTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new TinkerBenchmarkTestSuite(this));
+        printTestPerformance("TinkerBenchmarkTestSuite", this.stopWatch());
+    }*/
+
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new VertexTestSuite(this));

@@ -47,8 +47,8 @@ public class SailVertex implements Vertex {
 
     private void updateLiteral(final Literal oldLiteral, final Literal newLiteral) {
         try {
-            Set<Statement> statements = new HashSet<Statement>();
-            CloseableIteration<? extends Statement, SailException> results = this.graph.getSailConnection().getStatements(null, null, oldLiteral, false);
+            final Set<Statement> statements = new HashSet<Statement>();
+            final CloseableIteration<? extends Statement, SailException> results = this.graph.getSailConnection().getStatements(null, null, oldLiteral, false);
             while (results.hasNext()) {
                 statements.add(results.next());
             }
@@ -70,7 +70,7 @@ public class SailVertex implements Vertex {
             throw new RuntimeException(URI_BLANK_NODE_PROPERTIES);
         } else {
             boolean update = false;
-            Literal oldLiteral = (Literal) this.rawVertex;
+            final Literal oldLiteral = (Literal) this.rawVertex;
             if (key.equals(SailTokens.DATATYPE)) {
                 this.rawVertex = new LiteralImpl(oldLiteral.getLabel(), new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.graph.getSailConnection())));
                 update = true;
@@ -88,7 +88,7 @@ public class SailVertex implements Vertex {
         if (this.rawVertex instanceof Resource) {
             throw new RuntimeException(URI_BLANK_NODE_PROPERTIES);
         } else {
-            Literal oldLiteral = (Literal) this.rawVertex;
+            final Literal oldLiteral = (Literal) this.rawVertex;
             if (key.equals(SailTokens.DATATYPE) || key.equals(SailTokens.LANGUAGE)) {
                 this.rawVertex = new LiteralImpl(oldLiteral.getLabel());
                 this.updateLiteral(oldLiteral, (Literal) this.rawVertex);
@@ -113,7 +113,7 @@ public class SailVertex implements Vertex {
         }
 
         if (this.rawVertex instanceof Literal) {
-            Literal literal = (Literal) rawVertex;
+            final Literal literal = (Literal) rawVertex;
             if (key.equals(SailTokens.DATATYPE)) {
                 if (null != literal.getDatatype())
                     return literal.getDatatype().stringValue();
@@ -129,7 +129,7 @@ public class SailVertex implements Vertex {
     }
 
     public Set<String> getPropertyKeys() {
-        Set<String> keys = new HashSet<String>();
+        final Set<String> keys = new HashSet<String>();
         if (this.rawVertex instanceof Literal) {
             if (null != this.getProperty(SailTokens.DATATYPE)) {
                 keys.add(SailTokens.DATATYPE);
@@ -154,11 +154,35 @@ public class SailVertex implements Vertex {
         }
     }
 
+    public Iterable<Edge> getOutEdges(final String label) {
+        if (this.rawVertex instanceof Resource) {
+            try {
+                return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.rawVertex, new URIImpl(SailGraph.prefixToNamespace(label, this.graph.getSailConnection())), null, false), this.graph);
+            } catch (SailException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        } else {
+            return new SailEdgeSequence();
+        }
+    }
+
     public Iterable<Edge> getInEdges() {
         try {
             return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, null, this.rawVertex, false), this.graph);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public Iterable<Edge> getInEdges(final String label) {
+        if (this.rawVertex instanceof Resource) {
+            try {
+                return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, new URIImpl(SailGraph.prefixToNamespace(label, this.graph.getSailConnection())), (Resource) this.rawVertex, false), this.graph);
+            } catch (SailException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        } else {
+            return new SailEdgeSequence();
         }
     }
 

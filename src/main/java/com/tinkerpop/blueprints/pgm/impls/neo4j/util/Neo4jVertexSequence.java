@@ -21,7 +21,7 @@ public class Neo4jVertexSequence<T extends Vertex> implements Iterator<Neo4jVert
         this.nodes = nodes.iterator();
     }
 
-    public void remove() throws UnsupportedOperationException {
+    public void remove() {
         throw new UnsupportedOperationException();
     }
 

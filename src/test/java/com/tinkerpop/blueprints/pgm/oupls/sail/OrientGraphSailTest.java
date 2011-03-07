@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
@@ -10,15 +11,26 @@ import junit.framework.TestCase;
  * Date: 1/18/11
  * Time: 10:54 AM
  */
-public class OrientGraphSailTest extends TestCase {
+public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
 
     public void testTrue() {
         assertTrue(true);
     }
 
     protected IndexableGraph createGraph() {
+        /*try {
+            synchronized (this) {
+                wait(2000);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }*/
 
         String directory = getWorkingDirectory();
+
+        new ODatabaseGraphTx("local:" + directory + "/graph").delete();
+
+
         OrientGraph g = new OrientGraph("local:" + directory + "/graph");
         g.setTransactionMode(TransactionalGraph.Mode.MANUAL);
         return g;

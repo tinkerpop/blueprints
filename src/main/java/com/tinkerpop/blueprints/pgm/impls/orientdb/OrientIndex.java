@@ -1,24 +1,28 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import com.orientechnologies.orient.core.db.graph.OGraphElement;
-import com.orientechnologies.orient.core.db.object.OLazyObjectList;
+import java.util.Collections;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexNotUnique;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 @SuppressWarnings("unchecked")
 public class OrientIndex<T extends OrientElement> implements Index<T> {
+    private static final String VERTEX = "Vertex";
+    private static final String EDGE = "Edge";
     protected static final String CONFIG_TYPE = "blueprintsIndexType";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
 
@@ -29,19 +33,19 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected Class<? extends Element> indexClass;
 
-    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> iIndexClass, final com.tinkerpop.blueprints.pgm.Index.Type type) {
+    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
         this.graph = graph;
-        this.indexClass = iIndexClass;
-        create(indexName, indexClass, type);
+        this.indexClass = indexClass;
+        create(indexName, this.indexClass, indexType);
     }
 
-    public OrientIndex(OrientGraph orientGraph, OIndex iIndex) {
+    public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
         this.graph = orientGraph;
-        this.underlying = iIndex;
-        load(iIndex.getConfiguration());
+        this.underlying = rawIndex;
+        load(rawIndex.updateConfiguration());
     }
 
-    protected OIndex getRawIndex() {
+    public OIndex getRawIndex() {
         return this.underlying;
     }
 
@@ -60,8 +64,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     public void put(final String key, final Object value, final T element) {
         final String keyTemp = key + SEPARATOR + value;
 
-        final ODocument doc = element.getRawElement().getDocument();
-        if (doc.getIdentity().isTemporary())
+        final ODocument doc = element.getRawElement();
+        if (!doc.getIdentity().isValid())
             doc.save();
 
         final boolean txBegun = graph.autoStartTransaction();
@@ -85,13 +89,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final List<ORecord<?>> recList = underlying.get(keyTemp);
+        final Set<ORecord<?>> records = underlying.get(keyTemp);
 
-        if (recList.isEmpty())
-            return new LinkedList<T>();
+        if (records.isEmpty())
+            return Collections.emptySet();
 
-        final OLazyObjectList<OGraphElement> list = new OLazyObjectList<OGraphElement>(graph.getRawGraph(), null, recList);
-        return new OrientElementSequence(graph, list.iterator());
+        return new OrientElementSequence(graph, records.iterator());
     }
 
     public void remove(final String key, final Object value, final T element) {
@@ -99,7 +102,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final boolean txBegun = graph.autoStartTransaction();
         try {
-            underlying.remove(keyTemp, element.getRawElement().getDocument());
+            underlying.remove(keyTemp, element.getRawElement());
 
             if (txBegun)
                 graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -119,52 +122,20 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         return underlying != null ? underlying.toString() : "?";
     }
 
-    protected void clear() {
-        try {
-            if (null != this.underlying) {
-                final boolean txBegun = graph.autoStartTransaction();
-                try {
-                    this.underlying.clear();
-                    this.underlying.lazySave();
-
-                    if (txBegun)
-                        graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                } catch (RuntimeException e) {
-                    if (txBegun)
-                        graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                    throw e;
-                } catch (Exception e) {
-                    if (txBegun)
-                        graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        } catch (Exception e) {
-            // FIXME: is there a reason this exception is gobbled? (dw 2010-Dec-6)
-            // throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     protected void removeElement(final T vertex) {
-        final ORecord<?> vertexDoc = (ORecord<?>) vertex.getRawElement().getDocument();
-        List<ORecord<?>> rids;
-        for (Entry<String, List<ORecord<?>>> entries : getRawIndex()) {
+        final ORecord<?> vertexDoc = vertex.getRawElement();
+
+        Set<ORecord<?>> rids;
+        for (Entry<Object, Set<ORecord<?>>> entries : getRawIndex()) {
             rids = entries.getValue();
-
             if (rids != null) {
-                ORecord<?> rec;
-                for (int i = 0; i < rids.size(); ++i) {
-                    rec = rids.get(i);
-
-                    if (rec.equals(vertexDoc)) {
-                        underlying.remove(entries.getKey(), vertexDoc);
-                    }
-                }
+                if (rids.contains(vertexDoc))
+                    underlying.remove(entries.getKey(), vertexDoc);
             }
         }
     }
 
-    private void create(final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type type) {
+    private void create(final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
         this.indexClass = indexClass;
 
         // CREATE THE MAP
@@ -173,24 +144,24 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))
-            className = OrientGraph.VERTEX;
+            className = VERTEX;
         else if (Edge.class.isAssignableFrom(indexClass))
-            className = OrientGraph.EDGE;
+            className = EDGE;
         else
             className = indexClass.getName();
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
-        underlying.getConfiguration().field(CONFIG_CLASSNAME, className);
-        underlying.getConfiguration().field(CONFIG_TYPE, type.toString());
+        underlying.updateConfiguration().field(CONFIG_CLASSNAME, className);
+        underlying.updateConfiguration().field(CONFIG_TYPE, indexType.toString());
     }
 
-    private void load(final ODocument indexCfg) {
+    private void load(final ODocument indexConfiguration) {
         // LOAD TREEMAP
-        final String indexClassName = indexCfg.field(CONFIG_CLASSNAME);
+        final String indexClassName = indexConfiguration.field(CONFIG_CLASSNAME);
 
-        if ("Vertex".equals(indexClassName))
+        if (VERTEX.equals(indexClassName))
             this.indexClass = OrientVertex.class;
-        else if ("Edge".equals(indexClassName))
+        else if (EDGE.equals(indexClassName))
             this.indexClass = OrientEdge.class;
         else
             try {
@@ -200,7 +171,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             }
 
         // LOAD THE TREE-MAP
-        underlying = new OIndexNotUnique().loadFromConfiguration(indexCfg);
+        underlying = new OIndexNotUnique().loadFromConfiguration(indexConfiguration);
     }
 
 }

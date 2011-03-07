@@ -4,13 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop</groupId>
     <artifactId>blueprints</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
-    <description>Blueprints is a property graph model interface. It also provides implementations, ouplementations, test
-        suites, and
-        supporting extensions.
+    <description>Blueprints is a property graph model interface. It provides implementations, ouplementations, test suites, and supporting utilities.
     </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,7 +46,7 @@
         <dependency>
             <groupId>com.tinkerpop</groupId>
             <artifactId>graphdb-deps-all</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.5</version>
             <type>pom</type>
             <scope>provided</scope>
         </dependency>

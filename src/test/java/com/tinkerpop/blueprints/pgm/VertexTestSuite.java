@@ -342,6 +342,8 @@ public class VertexTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    /*
+    TODO: Is this test appropriate for a graph database? Assumes strong sychronization between Blueprints and backend
     public void testVertexPropertyInconsistency() {
         Graph graph = graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {
@@ -365,6 +367,6 @@ public class VertexTestSuite extends TestSuite {
             assertNull(v1.getProperty("key1"));
         }
         graph.shutdown();
-    }
+    }*/
 
 }

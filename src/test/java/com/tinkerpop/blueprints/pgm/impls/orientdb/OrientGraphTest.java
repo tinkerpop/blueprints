@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphTest extends GraphTest {
+
     private OrientGraph currentGraph;
 
     public OrientGraphTest() {
@@ -28,6 +29,12 @@ public class OrientGraphTest extends GraphTest {
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = true;
     }
+
+    /*public void testOrientBenchmarkTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new OrientBenchmarkTestSuite(this));
+        printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
+    }*/
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();

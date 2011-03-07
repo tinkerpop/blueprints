@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import com.orientechnologies.orient.core.db.graph.OGraphElement;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 
@@ -14,9 +14,9 @@ public abstract class OrientElement implements Element {
 
     protected static final String LABEL = "label";
     protected final OrientGraph graph;
-    protected final OGraphElement rawElement;
+    protected final ODocument rawElement;
 
-    protected OrientElement(final OrientGraph graph, final OGraphElement rawElement) {
+    protected OrientElement(final OrientGraph graph, final ODocument rawElement) {
         this.graph = graph;
         this.rawElement = rawElement;
     }
@@ -30,8 +30,8 @@ public abstract class OrientElement implements Element {
                 autoIndex.autoUpdate(key, value, oldValue, this);
             }
 
-            this.rawElement.set(key, value);
-            this.save();
+            this.rawElement.field(key, value);
+            graph.getRawGraph().save(rawElement);
 
             graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
@@ -48,7 +48,7 @@ public abstract class OrientElement implements Element {
         graph.autoStartTransaction();
 
         try {
-            Object oldValue = this.rawElement.remove(key);
+            Object oldValue = this.rawElement.removeField(key);
             if (null != oldValue) {
                 for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
                     autoIndex.autoRemove(key, oldValue, this);
@@ -69,11 +69,11 @@ public abstract class OrientElement implements Element {
     }
 
     public Object getProperty(final String key) {
-        return this.rawElement.get(key);
+        return this.rawElement.field(key);
     }
 
     public Set<String> getPropertyKeys() {
-        final Set<String> set = this.rawElement.propertyNames();
+        final Set<String> set = this.rawElement.fieldNames();
         set.remove(LABEL);
         return set;
     }
@@ -82,32 +82,16 @@ public abstract class OrientElement implements Element {
      * Returns the Element Id assuring to save it if it's transient yet.
      */
     public Object getId() {
-        ORID rid = this.rawElement.getId();
+        ORID rid = this.rawElement.getIdentity();
         this.save();
         return rid;
-    }
-
-    protected void delete() {
-        final boolean txBegun = graph.autoStartTransaction();
-
-        try {
-            this.rawElement.delete();
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
-        } catch (Exception e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw new RuntimeException(e.getMessage(), e);
-        }
     }
 
     protected void save() {
         this.rawElement.save();
     }
 
-    public OGraphElement getRawElement() {
+    public ODocument getRawElement() {
         return rawElement;
     }
 

@@ -257,6 +257,51 @@ public class GraphTestSuite extends TestSuite {
 
     }
 
+    public void testVertexEdgeLabels() {
+        Graph graph = graphTest.getGraphInstance();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        Vertex c = graph.addVertex(null);
+        Edge aFriendB = graph.addEdge(null, a, b, convertId("friend"));
+        Edge aFriendC = graph.addEdge(null, a, c, convertId("friend"));
+        Edge aHateC = graph.addEdge(null, a, c, convertId("hate"));
+        Edge cHateA = graph.addEdge(null, c, a, convertId("hate"));
+        Edge cHateB = graph.addEdge(null, c, b, convertId("hate"));
+
+        List<Edge> results = asList(a.getOutEdges());
+        assertEquals(results.size(), 3);
+        assertTrue(results.contains(aFriendB));
+        assertTrue(results.contains(aFriendC));
+        assertTrue(results.contains(aHateC));
+
+        results = asList(a.getOutEdges(convertId("friend")));
+        assertEquals(results.size(), 2);
+        assertTrue(results.contains(aFriendB));
+        assertTrue(results.contains(aFriendC));
+
+        results = asList(a.getOutEdges(convertId("hate")));
+        assertEquals(results.size(), 1);
+        assertTrue(results.contains(aHateC));
+
+        results = asList(a.getInEdges(convertId("hate")));
+        assertEquals(results.size(), 1);
+        assertTrue(results.contains(cHateA));
+
+        results = asList(a.getInEdges(convertId("friend")));
+        assertEquals(results.size(), 0);
+
+        results = asList(b.getInEdges(convertId("hate")));
+        assertEquals(results.size(), 1);
+        assertTrue(results.contains(cHateB));
+
+        results = asList(b.getInEdges(convertId("friend")));
+        assertEquals(results.size(), 1);
+        assertTrue(results.contains(aFriendB));
+
+        graph.shutdown();
+
+    }
+
     public void testTreeConnectivity() {
         Graph graph = graphTest.getGraphInstance();
         this.stopWatch();

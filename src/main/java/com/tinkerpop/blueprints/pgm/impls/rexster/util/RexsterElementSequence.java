@@ -22,6 +22,7 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
     protected final RexsterGraph graph;
     protected final String uri;
 
+
     public RexsterElementSequence(final String uri, final RexsterGraph graph) {
         this.graph = graph;
         this.uri = uri;
@@ -38,23 +39,23 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
     }
 
     public T next() {
-        if (!queue.isEmpty())
+        if (!queue.isEmpty()) {
             return queue.remove();
-        else {
+        } else {
             fillBuffer();
-            if (!queue.isEmpty())
+            if (!queue.isEmpty()) {
                 return queue.remove();
-            else
+            } else
                 throw new NoSuchElementException();
         }
     }
 
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
-
     public Iterator<T> iterator() {
         return this;
+    }
+
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 
     protected abstract void fillBuffer();

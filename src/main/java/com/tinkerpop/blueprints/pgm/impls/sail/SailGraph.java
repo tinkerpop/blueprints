@@ -41,6 +41,8 @@ public class SailGraph implements TransactionalGraph {
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
     /**
+     * Construct a new SailGraph with an uninitialized Sail.
+     *
      * @param rawGraph a not-yet-initialized Sail instance
      */
     public SailGraph(final Sail rawGraph) {
@@ -151,11 +153,21 @@ public class SailGraph implements TransactionalGraph {
         this.autoStopTransaction(Conclusion.SUCCESS);
     }
 
+    /**
+     * Get the Sail connection currently being used by the graph.
+     *
+     * @return the Sail connection
+     */
     public SailConnection getSailConnection() {
         return this.sailConnection;
     }
 
-
+    /**
+     * Add a prefix-to-namespace mapping to the Sail connection of this graph.
+     *
+     * @param prefix    the prefix (e.g. tg)
+     * @param namespace the namespace (e.g. http://tinkerpop.com#)
+     */
     public void addNamespace(final String prefix, final String namespace) {
         try {
             this.sailConnection.setNamespace(prefix, namespace);
@@ -165,6 +177,11 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
+    /**
+     * Remove a prefix-to-namespace mapping from the Sail connection of this graph.
+     *
+     * @param prefix the prefix of the prefix-to-namespace mapping to remove
+     */
     public void removeNamespace(final String prefix) {
         try {
             this.sailConnection.removeNamespace(prefix);
@@ -174,6 +191,11 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
+    /**
+     * Get all the prefix-to-namespace mappings of the graph.
+     *
+     * @return a map of the prefix-to-namespace mappings
+     */
     public Map<String, String> getNamespaces() {
         Map<String, String> namespaces = new HashMap<String, String>();
         try {
@@ -189,14 +211,34 @@ public class SailGraph implements TransactionalGraph {
         return namespaces;
     }
 
+    /**
+     * Given a URI, expand it to its full URI.
+     *
+     * @param uri the compressed URI (e.g. tg:knows)
+     * @return the expanded URI (e.g. http://tinkerpop.com#knows)
+     */
     public String expandPrefix(final String uri) {
         return SailGraph.prefixToNamespace(uri, this.sailConnection);
     }
 
+    /**
+     * Given a URI, compress it to its prefixed URI.
+     *
+     * @param uri the expanded URI (e.g. http://tinkerpop.com#knows)
+     * @return the compressed URI (e.g. tg:knows)
+     */
     public String prefixNamespace(final String uri) {
         return SailGraph.namespaceToPrefix(uri, this.sailConnection);
     }
 
+    /**
+     * Load RDF data into the SailGraph. Supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig.
+     *
+     * @param input     the InputStream of RDF data
+     * @param baseURI   the baseURI for RDF data
+     * @param format    supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
+     * @param baseGraph the baseGraph to insert the data into
+     */
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
         Repository repository = new SailRepository(this.rawGraph);
         try {
@@ -217,7 +259,7 @@ public class SailGraph implements TransactionalGraph {
     public void clear() {
         try {
             this.sailConnection.clear();
-            this.sailConnection.commit();
+            this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -233,7 +275,7 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
-    public static String prefixToNamespace(String uri, final SailConnection sailConnection) {
+    protected static String prefixToNamespace(String uri, final SailConnection sailConnection) {
         try {
             if (uri.contains(SailTokens.NAMESPACE_SEPARATOR)) {
                 String namespace = sailConnection.getNamespace(uri.substring(0, uri.indexOf(SailTokens.NAMESPACE_SEPARATOR)));
@@ -246,8 +288,7 @@ public class SailGraph implements TransactionalGraph {
         return uri;
     }
 
-    public static String namespaceToPrefix(String uri, final SailConnection sailConnection) {
-
+    protected static String namespaceToPrefix(String uri, final SailConnection sailConnection) {
         try {
             CloseableIteration<? extends Namespace, SailException> namespaces = sailConnection.getNamespaces();
             while (namespaces.hasNext()) {
@@ -328,6 +369,13 @@ public class SailGraph implements TransactionalGraph {
         return prefixString;
     }
 
+    /**
+     * Evaluate a SPARQL query against the SailGraph (http://www.w3.org/TR/rdf-sparql-query/). The result is a mapping between the ?-bindings and the bound URI, blank node, or literal represented as a Vertex.
+     *
+     * @param sparqlQuery the SPARQL query to evaluate
+     * @return the mapping between a ?-binding and the URI, blank node, or literal as a Vertex
+     * @throws RuntimeException if an error occurs in the SPARQL query engine
+     */
     public List<Map<String, Vertex>> executeSparql(String sparqlQuery) throws RuntimeException {
         try {
             sparqlQuery = getPrefixes() + sparqlQuery;

@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -25,6 +26,12 @@ public class Neo4jGraphTest extends GraphTest {
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = true;
     }
+
+    /*public void testNeo4jBenchmarkTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new Neo4jBenchmarkTestSuite(this));
+        printTestPerformance("Neo4jBenchmarkTestSuite", this.stopWatch());
+    }*/
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -139,6 +146,44 @@ public class Neo4jGraphTest extends GraphTest {
         } catch (NumberFormatException e) {
             assertFalse(false);
         }
+    }
 
+    public void testQueryIndex() throws Exception {
+        String directory = System.getProperty("neo4jDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        IndexableGraph graph = new Neo4jGraph(directory);
+        Vertex a = graph.addVertex(null);
+        a.setProperty("name", "marko");
+        Iterator itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        int counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), a);
+        }
+        assertEquals(counter, 1);
+
+        Vertex b = graph.addVertex(null);
+        Edge edge = graph.addEdge(null, a, b, "knows");
+        edge.setProperty("weight", 0.75);
+        itty = graph.getIndex(Index.EDGES, Edge.class).get("label", Neo4jTokens.QUERY_HEADER + "k?ows").iterator();
+        counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), edge);
+        }
+        assertEquals(counter, 1);
+        itty = graph.getIndex(Index.EDGES, Edge.class).get("weight", Neo4jTokens.QUERY_HEADER + "[0.5 TO 1.0]").iterator();
+        counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), edge);
+        }
+        assertEquals(counter, 1);
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("weight", Neo4jTokens.QUERY_HEADER + "[0.1 TO 0.5]")), 0);
+
+
+        graph.shutdown();
+        deleteDirectory(new File(directory));
     }
 }

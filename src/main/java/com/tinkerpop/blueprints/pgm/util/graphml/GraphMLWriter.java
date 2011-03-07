@@ -58,7 +58,7 @@ public class GraphMLWriter {
      */
     public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream, final Map<String, String> vertexKeyTypes, final Map<String, String> edgeKeyTypes) throws XMLStreamException {
         XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
-        XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream);
+        XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream, "UTF8");
 
         writer.writeStartDocument();
         writer.writeStartElement(GraphMLTokens.GRAPHML);
@@ -92,7 +92,9 @@ public class GraphMLWriter {
             for (String key : vertex.getPropertyKeys()) {
                 writer.writeStartElement(GraphMLTokens.DATA);
                 writer.writeAttribute(GraphMLTokens.KEY, key);
-                writer.writeCharacters(vertex.getProperty(key).toString());
+                Object value = vertex.getProperty(key);
+                if (null != value)
+                    writer.writeCharacters(value.toString());
                 writer.writeEndElement();
             }
             writer.writeEndElement();
@@ -109,7 +111,9 @@ public class GraphMLWriter {
                 for (String key : edge.getPropertyKeys()) {
                     writer.writeStartElement(GraphMLTokens.DATA);
                     writer.writeAttribute(GraphMLTokens.KEY, key);
-                    writer.writeCharacters(edge.getProperty(key).toString());
+                    Object value = edge.getProperty(key);
+                    if (null != value)
+                        writer.writeCharacters(value.toString());
                     writer.writeEndElement();
                 }
                 writer.writeEndElement();

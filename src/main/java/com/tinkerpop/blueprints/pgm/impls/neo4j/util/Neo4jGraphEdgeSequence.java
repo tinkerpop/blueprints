@@ -43,7 +43,7 @@ public class Neo4jGraphEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
     private boolean goToNextEdge() {
         while (true) {
             if (this.currentRelationships == null || !this.currentRelationships.hasNext()) {
-                if (nodes.hasNext()) {
+                if (this.nodes.hasNext()) {
                     this.currentRelationships = nodes.next().getRelationships(Direction.OUTGOING).iterator();
                 } else {
                     return true;

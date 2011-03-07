@@ -64,7 +64,7 @@ public class SailHelper {
     }
 
     public static Literal makeLiteral(final String resource, SailConnection sailConnection) {
-        Matcher matcher = literalPattern.matcher(resource);
+        final Matcher matcher = literalPattern.matcher(resource);
         if (matcher.matches()) {
             if (null != matcher.group(4))
                 return new LiteralImpl(matcher.group(1), new URIImpl(SailGraph.prefixToNamespace(matcher.group(4), sailConnection)));

@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -26,6 +27,15 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
     public Iterable<Edge> getInEdges() {
         return new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.INCOMING), this.graph);
     }
+
+    public Iterable<Edge> getOutEdges(final String label) {
+        return new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(DynamicRelationshipType.withName(label), Direction.OUTGOING), this.graph);
+    }
+
+    public Iterable<Edge> getInEdges(final String label) {
+        return new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(DynamicRelationshipType.withName(label), Direction.INCOMING), this.graph);
+    }
+
 
     public boolean equals(final Object object) {
         return object instanceof Neo4jVertex && ((Neo4jVertex) object).getId().equals(this.getId());

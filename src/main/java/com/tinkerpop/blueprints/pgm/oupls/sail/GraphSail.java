@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -9,7 +13,11 @@ import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -79,6 +87,7 @@ public class GraphSail implements Sail, GraphSource {
     public GraphSail(final IndexableGraph graph, final String indexedPatterns) {
         //if (graph instanceof TransactionalGraph)
         //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        //printGraphInfo(graph);
 
         store.graph = graph;
 
@@ -87,10 +96,11 @@ public class GraphSail implements Sail, GraphSource {
         store.edges = graph.getIndex(Index.EDGES, Edge.class);
         store.vertices = graph.getIndex(Index.VERTICES, Vertex.class);
 
+        store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
+
         store.namespaces = store.getVertex(NAMESPACES_VERTEX_ID);
         if (null == store.namespaces) {
-            boolean trans = graph instanceof TransactionalGraph && ((TransactionalGraph) graph).getTransactionMode() == TransactionalGraph.Mode.MANUAL;
-            if (trans) {
+            if (store.manualTransactions) {
                 ((TransactionalGraph) graph).startTransaction();
             }
             try {
@@ -98,7 +108,7 @@ public class GraphSail implements Sail, GraphSource {
                 // should be given individual nodes, rather than being encapsulated in properties of the namespaces node.
                 store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
             } finally {
-                if (trans) {
+                if (store.manualTransactions) {
                     ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
                 }
             }
@@ -111,14 +121,27 @@ public class GraphSail implements Sail, GraphSource {
 
         //if (graph instanceof TransactionalGraph)
         //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
-        store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
 
         //for (int i = 0; i < 16; i++) {
         //    System.out.println("matcher " + i + ": " + indexes.matchers[i]);
         //}
     }
 
-    public Graph getGraph() {
+    /*
+    private void printGraphInfo(final IndexableGraph graph) {
+        boolean trans = graph instanceof TransactionalGraph;
+
+        StringBuilder sb = new StringBuilder("graph ").append(graph).append("\n");
+        sb.append("\ttransactional: ").append(trans).append("\n");
+        if (trans) {
+            sb.append("\tmode: ").append(((TransactionalGraph) graph).getTransactionMode()).append("\n");
+        }
+
+        System.out.println(sb.toString());
+    }
+    //*/
+
+    public IndexableGraph getGraph() {
         return this.store.getGraph();
     }
 
@@ -151,6 +174,20 @@ public class GraphSail implements Sail, GraphSource {
         return store.valueFactory;
     }
 
+    /**
+     * Enables or disables the use of efficient, short-lived statements in the iterators returned by
+     * <code>GraphSailConnection.getStatements()</code> and <code>GraphSailConnection.evaluate()</code>.
+     * This feature is disabled by default, and in typical usage scenarios, Java compiler optimization makes it superfluous.
+     * However, it potentially confers a performance advantage when a single thread consumes the iterator,
+     * inspecting and then immediately discarding each statement.
+     *
+     * @param flag whether to use volatile statements.
+     *             When this method is called, only subsequently created iterators are affected.
+     */
+    public void useVolatileStatements(final boolean flag) {
+        store.volatileStatements = flag;
+    }
+
     public String toString() {
         String type = store.graph.getClass().getSimpleName().toLowerCase();
         return "graphsail[" + type + "]";
@@ -161,7 +198,7 @@ public class GraphSail implements Sail, GraphSource {
     /**
      * A context object which is shared between the Blueprints Sail and its connections.
      */
-    public class DataStore {
+    class DataStore {
         public IndexableGraph graph;
 
         // We don't need a special ValueFactory implementation.
@@ -173,6 +210,7 @@ public class GraphSail implements Sail, GraphSource {
         public final Matcher[] matchers = new Matcher[16];
 
         public boolean manualTransactions;
+        public boolean volatileStatements = false;
 
         public Index<Vertex> vertices;
         public Index<Edge> edges;

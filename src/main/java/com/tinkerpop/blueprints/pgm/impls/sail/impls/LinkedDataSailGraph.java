@@ -11,7 +11,7 @@ import org.openrdf.sail.Sail;
  */
 public class LinkedDataSailGraph extends SailGraph {
 
-    public LinkedDataSailGraph(SailGraph storageGraph) {
+    public LinkedDataSailGraph(final SailGraph storageGraph) {
         try {
             Ripple.initialize();
             final Sail sail = new LinkedDataSail(storageGraph.getRawGraph(), new URIMap());

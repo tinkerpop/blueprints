@@ -1,6 +1,6 @@
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
 
-Blueprints is a "property graph model interface":http://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph. It also provides implementations, test suites, and supporting extensions. Graph databases and frameworks that implement the Blueprints interfaces automatically support Blueprints-enabled applications. Likewise, Blueprints-enabled applications can plug-and-play different Blueprints-enabled graph backends.
+Blueprints is a "property graph model interface":http://github.com/tinkerpop/gremlin/wiki/Defining-a-Property-Graph. It provides implementations, test suites, and supporting extensions. Graph databases and frameworks that implement the Blueprints interfaces automatically support Blueprints-enabled applications. Likewise, Blueprints-enabled applications can plug-and-play different Blueprints-enabled graph backends.
 
 * Implementations:
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
@@ -12,8 +12,10 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 * Ouplementations:
 ** "Java Universal/Graph":http://jung.sourceforge.net/ interface
 ** "Sesame 2.0":http://www.openrdf.org Sail interface
-* Supporting extensions:
+* Supporting utilities:
 ** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ library
+** Blueprints helper utilities
+** ReadOnlyGraph wrapper
 
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

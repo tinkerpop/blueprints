@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
-import com.orientechnologies.orient.core.db.graph.OGraphEdge;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -14,28 +14,24 @@ import java.util.Set;
  */
 public class OrientEdge extends OrientElement implements Edge {
 
-    public OrientEdge(final OrientGraph graph, final OGraphEdge rawEdge) {
+    public OrientEdge(final OrientGraph graph, final ODocument rawEdge) {
         super(graph, rawEdge);
     }
 
     public Vertex getOutVertex() {
-        return new OrientVertex(graph, getRawEdge().getOut());
+        return new OrientVertex(graph, graph.getRawGraph().getOutVertex(rawElement));
     }
 
     public Vertex getInVertex() {
-        return new OrientVertex(graph, getRawEdge().getIn());
-    }
-
-    public OGraphEdge getRawEdge() {
-        return (OGraphEdge) this.rawElement;
+        return new OrientVertex(graph, graph.getRawGraph().getInVertex(rawElement));
     }
 
     public String getLabel() {
-        return (String) this.rawElement.get(LABEL);
+        return (String) this.rawElement.field(LABEL);
     }
 
     protected void setLabel(final String label) {
-        this.rawElement.set(LABEL, label);
+        this.rawElement.field(LABEL, label);
         for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
             autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
         }

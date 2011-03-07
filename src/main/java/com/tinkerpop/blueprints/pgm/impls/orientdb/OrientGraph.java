@@ -1,14 +1,12 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
-import com.orientechnologies.orient.core.db.graph.OGraphEdge;
-import com.orientechnologies.orient.core.db.graph.OGraphVertex;
+import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndex;
-import com.orientechnologies.orient.core.iterator.OGraphEdgeIterator;
-import com.orientechnologies.orient.core.iterator.OGraphVertexIterator;
+import com.orientechnologies.orient.core.iterator.ORecordIteratorClass;
+import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
@@ -24,11 +22,9 @@ import java.util.*;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraph implements TransactionalGraph, IndexableGraph {
-    public static final String VERTEX = "Vertex";
-    public static final String EDGE = "Edge";
     private final static String ADMIN = "admin";
 
-    private ODatabaseGraphTx rawGraph;
+    private OGraphDatabase rawGraph;
 
     private final String url;
     private final String username;
@@ -110,8 +106,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void dropIndex(final String iIndexName) {
-        this.manualIndices.remove(iIndexName);
-        this.autoIndices.remove(iIndexName);
+        if (this.manualIndices.remove(iIndexName) == null)
+            this.autoIndices.remove(iIndexName);
 
         rawGraph.getMetadata().getIndexManager().deleteIndex(iIndexName);
         saveIndexConfiguration();
@@ -122,7 +118,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             autoStartTransaction();
             final OrientVertex vertex = new OrientVertex(this, this.rawGraph.createVertex(null));
             vertex.save();
+
             autoStopTransaction(Conclusion.SUCCESS);
+
             return vertex;
         } catch (RuntimeException e) {
             autoStopTransaction(Conclusion.FAILURE);
@@ -137,15 +135,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         try {
             autoStartTransaction();
 
-            final OrientEdge edge = new OrientEdge(this, ((OrientVertex) outVertex).getRawVertex().link(((OrientVertex) inVertex).getRawVertex()));
+            final ODocument edgeDoc = rawGraph.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement());
+            final OrientEdge edge = new OrientEdge(this, edgeDoc);
             edge.setLabel(label);
 
-            ((OrientVertex) outVertex).getRawVertex().getDocument().setDirty();
-            ((OrientVertex) inVertex).getRawVertex().getDocument().setDirty();
-
             // SAVE THE VERTICES TO ASSURE THEY ARE IN TX
-            ((OrientVertex) outVertex).save();
-            ((OrientVertex) inVertex).save();
+            rawGraph.save(((OrientVertex) outVertex).getRawElement());
+            rawGraph.save(((OrientVertex) inVertex).getRawElement());
             edge.save();
 
             autoStopTransaction(Conclusion.SUCCESS);
@@ -171,19 +167,20 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (!rid.isValid())
             return null;
 
-        final ODocument doc = this.rawGraph.getRecordById(rid);
-        if (doc != null)
-            return new OrientVertex(this, (OGraphVertex) this.rawGraph.getUserObjectByRecord(doc, null));
-        else {
-            OGraphVertex v = (OGraphVertex) this.rawGraph.load(rid);
-            if (v != null)
-                return new OrientVertex(this, (OGraphVertex) this.rawGraph.load(rid));
-            else
-                return null;
+
+        final ODocument doc = this.rawGraph.load(rid);
+        if (doc != null) {
+            return new OrientVertex(this, doc);
         }
+
+        return null;
     }
 
     public void removeVertex(final Vertex vertex) {
+        final OrientVertex oVertex = (OrientVertex) vertex;
+        if (oVertex == null || oVertex.getRawElement() == null)
+            return;
+
         try {
             AutomaticIndexHelper.removeElement(this, vertex);
 
@@ -192,11 +189,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             for (Index index : this.getManualIndices()) {
                 if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
                     OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;
-                    idx.removeElement((OrientVertex) vertex);
+                    idx.removeElement(oVertex);
                 }
             }
 
-            ((OrientVertex) vertex).delete();
+            rawGraph.removeVertex(oVertex.rawElement);
+
             autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             autoStopTransaction(Conclusion.FAILURE);
@@ -208,11 +206,19 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new OrientElementSequence<Vertex>(this, new OGraphVertexIterator(this.rawGraph, true));
+        return getVertices(true);
+    }
+
+    private Iterable<Vertex> getVertices(final boolean iPolymorphic) {
+        return new OrientElementSequence<Vertex>(this, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph, (ODatabaseRecordAbstract) rawGraph.getUnderlying(), OGraphDatabase.VERTEX_CLASS_NAME, iPolymorphic));
     }
 
     public Iterable<Edge> getEdges() {
-        return new OrientElementSequence<Edge>(this, new OGraphEdgeIterator(this.rawGraph, true));
+        return getEdges(true);
+    }
+
+    private Iterable<Edge> getEdges(final boolean iPolymorphic) {
+        return new OrientElementSequence<Edge>(this, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph, (ODatabaseRecordAbstract) rawGraph.getUnderlying(), OGraphDatabase.EDGE_CLASS_NAME, iPolymorphic));
     }
 
     public Edge getEdge(final Object id) {
@@ -222,19 +228,19 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         else
             rid = new ORecordId(id.toString());
 
-        final ODocument doc = this.rawGraph.getRecordById(rid);
-        if (doc != null)
-            return new OrientEdge(this, (OGraphEdge) this.rawGraph.getUserObjectByRecord(doc, null));
-        else {
-            OGraphEdge edge = (OGraphEdge) this.rawGraph.load(rid);
-            if (edge != null)
-                return new OrientEdge(this, edge);
-            else
-                return null;
+        final ODocument doc = this.rawGraph.load(rid);
+        if (doc != null) {
+            return new OrientEdge(this, doc);
         }
+
+        return null;
     }
 
     public void removeEdge(final Edge edge) {
+        final OrientEdge oEdge = (OrientEdge) edge;
+        if (oEdge == null || oEdge.getRawElement() == null)
+            return;
+
         try {
             AutomaticIndexHelper.removeElement(this, edge);
             autoStartTransaction();
@@ -242,11 +248,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             for (Index index : this.getManualIndices()) {
                 if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                     OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
-                    idx.removeElement((OrientEdge) edge);
+                    idx.removeElement(oEdge);
                 }
             }
 
-            ((OrientEdge) edge).delete();
+            rawGraph.removeEdge(oEdge.rawElement);
+
             autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             autoStopTransaction(Conclusion.FAILURE);
@@ -271,6 +278,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.rawGraph.close();
             this.rawGraph = null;
         }
+
         this.manualIndices.clear();
         this.autoIndices.clear();
     }
@@ -279,7 +287,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return "orientgraph[" + this.rawGraph.getURL() + "]";
     }
 
-    public ODatabaseGraphTx getRawGraph() {
+    public OGraphDatabase getRawGraph() {
         return this.rawGraph;
     }
 
@@ -300,11 +308,14 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.rawGraph.rollback();
             for (Index<?> index : this.manualIndices.values())
                 ((OrientIndex<?>) index).getRawIndex().unload();
+            for (Index<?> index : this.autoIndices.values())
+                ((OrientIndex<?>) index).getRawIndex().unload();
         } else
             this.rawGraph.commit();
     }
 
     public void setTransactionMode(final Mode mode) {
+    	  this.rawGraph.commit();
         this.mode = mode;
     }
 
@@ -312,7 +323,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return this.mode;
     }
 
-    void saveIndexConfiguration() {
+    protected void saveIndexConfiguration() {
         rawGraph.getMetadata().getIndexManager().setDirty();
         rawGraph.getMetadata().getIndexManager().save();
     }
@@ -341,17 +352,17 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private void openOrCreate(final boolean createDefaultIndices) {
-        this.rawGraph = new ODatabaseGraphTx(url);
+        this.rawGraph = new OGraphDatabase(url);
         if (this.rawGraph.exists()) {
             this.rawGraph.open(username, password);
 
             // LOAD THE INDEX CONFIGURATION FROM INTO THE DICTIONARY
-            final ODocument indexConfiguration = ((ODatabaseDocumentTx) rawGraph.getUnderlying()).getMetadata().getIndexManager().getDocument();
+            final ODocument indexConfiguration = rawGraph.getMetadata().getIndexManager().getDocument();
             if (indexConfiguration == null)
                 createIndexConfiguration(createDefaultIndices);
 
-            for (OIndex idx : ((ODatabaseDocumentTx) rawGraph.getUnderlying()).getMetadata().getIndexManager().getIndexes()) {
-                if (idx.getConfiguration().field(OrientIndex.CONFIG_TYPE) != null)
+            for (OIndex idx : rawGraph.getMetadata().getIndexManager().getIndexes()) {
+                if (idx.updateConfiguration().field(OrientIndex.CONFIG_TYPE) != null)
                     // LOAD THE INDEXES
                     loadIndex(idx);
             }
@@ -372,27 +383,27 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     @SuppressWarnings("rawtypes")
-    private OrientIndex<?> loadIndex(final OIndex iIndex) {
-        final String indexType = iIndex.getConfiguration().field(OrientIndex.CONFIG_TYPE);
-
+    private OrientIndex<?> loadIndex(final OIndex rawIndex) {
+        String indexType = rawIndex.updateConfiguration().field(OrientIndex.CONFIG_TYPE);
         final OrientIndex<?> index;
 
         switch (Index.Type.valueOf(indexType.toUpperCase())) {
             case MANUAL:
-                index = new OrientIndex(this, iIndex);
+                index = new OrientIndex(this, rawIndex);
+
+                // REGISTER THE INDEX
+                this.manualIndices.put(index.getIndexName(), index);
                 break;
+
             case AUTOMATIC:
-                // index = new OrientAutomaticIndex(indexName, null, this, indexCfg);
-                index = new OrientAutomaticIndex(this, iIndex);
+                index = new OrientAutomaticIndex(this, rawIndex);
+
                 // REGISTER THE INDEX INTO THE AUTOMATIC INDEXES
                 this.autoIndices.put(index.getIndexName(), (OrientAutomaticIndex<?>) index);
                 break;
             default:
                 throw new IllegalArgumentException("Index type '" + indexType + "' is not supported. Supported indicies: MANUAL, AUTOMATIC");
         }
-
-        // REGISTER THE INDEX
-        this.manualIndices.put(index.getIndexName(), index);
 
         return index;
     }

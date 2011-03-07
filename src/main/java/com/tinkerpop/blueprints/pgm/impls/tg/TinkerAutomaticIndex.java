@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,5 +43,9 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             this.remove(key, oldValue, element);
         }
+    }
+
+    public String toString() {
+        return StringFactory.indexString(this);
     }
 }

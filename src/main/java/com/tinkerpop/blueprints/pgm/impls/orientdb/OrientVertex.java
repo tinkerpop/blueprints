@@ -1,12 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
-import com.orientechnologies.orient.core.db.graph.OGraphVertex;
+import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -14,16 +15,30 @@ import java.util.Set;
  */
 public class OrientVertex extends OrientElement implements Vertex {
 
-    public OrientVertex(final OrientGraph iGraph, final OGraphVertex rawVertex) {
+    public OrientVertex(final OrientGraph iGraph, final ODocument rawVertex) {
         super(iGraph, rawVertex);
     }
 
     public Iterable<Edge> getOutEdges() {
-        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getOutEdges().iterator());
+        return getOutEdges(null);
     }
 
     public Iterable<Edge> getInEdges() {
-        return new OrientElementSequence<Edge>(graph, ((OGraphVertex) this.rawElement).getInEdges().iterator());
+        return getInEdges(null);
+    }
+
+    public Iterable<Edge> getOutEdges(final String label) {
+        if (this.rawElement == null)
+            return Collections.emptyList();
+
+        return new OrientElementSequence<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, label).iterator());
+    }
+
+    public Iterable<Edge> getInEdges(final String label) {
+        if (this.rawElement == null)
+            return Collections.emptyList();
+
+        return new OrientElementSequence<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, label).iterator());
     }
 
     public Set<String> getPropertyKeys() {
@@ -33,10 +48,6 @@ public class OrientVertex extends OrientElement implements Vertex {
             set.remove(OGraphDatabase.VERTEX_FIELD_OUT_EDGES);
         }
         return set;
-    }
-
-    public OGraphVertex getRawVertex() {
-        return (OGraphVertex) this.rawElement;
     }
 
     public String toString() {

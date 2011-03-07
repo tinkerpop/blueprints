@@ -14,7 +14,7 @@ public class MemoryStoreSailGraph extends SailGraph {
         super(new MemoryStore());
     }
 
-    public MemoryStoreSailGraph(String dataDirectory) {
+    public MemoryStoreSailGraph(final String dataDirectory) {
         super(new MemoryStore(new File(dataDirectory)));
     }
 }
