@@ -36,9 +36,9 @@ public class RedisElementType {
         } else {
             if(element instanceof Vertex){
                 if(type.equals(TYPE.REDIS_ELEMENT_EDGES_IN))
-                    return "vertex:".concat(element.getId().toString()).concat(":edges:in");
+                    return "vertex:" + element.getId().toString() + ":edges:in";
                 if(type.equals(TYPE.REDIS_ELEMENT_EDGES_OUT))
-                    return "vertex:".concat(element.getId().toString()).concat(":edges:out");
+                    return "vertex:" + element.getId().toString() + ":edges:out";
             }
             /*
             else {

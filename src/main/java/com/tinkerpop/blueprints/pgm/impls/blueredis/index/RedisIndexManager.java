@@ -46,35 +46,49 @@ public class RedisIndexManager {
     }
 
     public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass){
-        RedisIndex<T> idx = new RedisIndex<T>(this.graph, indexName, indexClass);
+        return this.createManualIndex(indexName, indexClass, new HashSet<String>());
+    }
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, Set<String> keys) {
+        String idxName = RedisIndex.normalizeName(indexName);
+        RedisIndex<T> idx = (RedisIndex<T>)this.manualIndices.get(idxName);
 
-        String idxName = idx.getIndexName();
+        if(null != idx){
+            throw new RuntimeException("Index already exists: " + indexName);
+        } else {
+            idx = new RedisIndex<T>(this.graph, idxName, indexClass, keys);
 
-        this.manualIndices.put(idxName, (Index<Element>)idx);
-
-        if(!this.restoreMode){
-            this.saveIndexMeta(RedisIndexKeys.MANUAL, indexName, indexClass.getCanonicalName(), null);
+            this.manualIndices.put(idxName, (RedisIndex<Element>)idx);
+            if(!this.restoreMode){
+                this.saveIndexMeta(RedisIndexKeys.MANUAL, idxName, indexClass.getCanonicalName(), keys);
+            }
         }
 
         return idx;
     }
 
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys){
-        RedisAutomaticIndex<T> idx = new RedisAutomaticIndex<T>(this.graph, indexName, indexClass, keys);
+        String idxName = RedisIndex.normalizeName(indexName);
+        RedisAutomaticIndex<T> idx = (RedisAutomaticIndex<T>)this.autoIndices.get(idxName);
 
-        String idxName = idx.getIndexName();
-        this.autoIndices.put(idxName, (AutomaticIndex<Element>)idx);
-        if(!this.restoreMode){
-            this.saveIndexMeta(RedisIndexKeys.AUTO, indexName, indexClass.getCanonicalName(), keys);
+        if(null != idx){
+            throw new RuntimeException("Index already exists: " + indexName);
+        } else {
+            idx = new RedisAutomaticIndex<T>(this.graph, idxName, indexClass, keys);
+
+            this.autoIndices.put(idxName, (AutomaticIndex<Element>)idx);
+            if(!this.restoreMode){
+                this.saveIndexMeta(RedisIndexKeys.AUTO, idxName, indexClass.getCanonicalName(), keys);
+            }
         }
 
         return idx;
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        Index index = this.manualIndices.get(indexName);
+        String idxName = RedisIndex.normalizeName(indexName);
+        Index index = this.manualIndices.get(idxName);
         if (null == index)
-            index = this.autoIndices.get(indexName);
+            index = this.autoIndices.get(idxName);
 
         if(null == index)
             throw new RuntimeException("No such index exists: " + indexName);
@@ -96,38 +110,39 @@ public class RedisIndexManager {
     }
 
     public void dropIndex(final String indexName) {
+        String idxName = RedisIndex.normalizeName(indexName);
         JRedis db = this.graph.getDatabase();
 
         try {
-            List<String> keyList = db.keys(RedisIndexKeys.AUTO + indexName + ":*");
+            List<String> keyList = db.keys(RedisIndexKeys.AUTO + idxName + ":*");
             for(String key : keyList){
                     db.del(key);
             }
 
-            keyList = db.keys(RedisIndexKeys.META_AUTO + indexName + ":*");
+            keyList = db.keys(RedisIndexKeys.META_AUTO + idxName + ":*");
             for(String key : keyList){
                     db.del(key);
             }
 
-            db.lrem(RedisIndexKeys.META_INDICES_AUTO, indexName, 0);
+            db.lrem(RedisIndexKeys.META_INDICES_AUTO, idxName, 0);
 
-            keyList = db.keys(RedisIndexKeys.MANUAL + indexName + ":*");
+            keyList = db.keys(RedisIndexKeys.MANUAL + idxName + ":*");
             for(String key : keyList){
                     db.del(key);
             }
 
-            keyList = db.keys(RedisIndexKeys.META_MANUAL + indexName + ":*");
+            keyList = db.keys(RedisIndexKeys.META_MANUAL + idxName + ":*");
             for(String key : keyList){
                     db.del(key);
             }
 
-            db.lrem(RedisIndexKeys.META_INDICES_MANUAL, indexName, 0);
+            db.lrem(RedisIndexKeys.META_INDICES_MANUAL, idxName, 0);
         } catch (RedisException e) {
             e.printStackTrace();
         }
 
-        this.manualIndices.remove(indexName);
-        this.autoIndices.remove(indexName);
+        this.manualIndices.remove(idxName);
+        this.autoIndices.remove(idxName);
 
     }
 
@@ -157,7 +172,7 @@ public class RedisIndexManager {
                 if(null != keys){
                     String key_list = RedisIndexKeys.META_AUTO + indexName + ":keys";
                     for(String key : keys){
-                        db.lpush(key_list, key);
+                        db.sadd(key_list, key);
                     }
                 }
             } else {
@@ -194,7 +209,7 @@ public class RedisIndexManager {
 
                 Class indexClass = Class.forName(className);
 
-                List<byte[]> keys = db.lrange(metaType + indexName + ":keys", 0, db.llen(metaType + indexName + ":keys"));
+                List<byte[]> keys = db.smembers(metaType + indexName + ":keys");
                 HashSet<String> indexKeys = new HashSet<String>();
 
                 if(null != keys){
@@ -206,7 +221,7 @@ public class RedisIndexManager {
                 if(type.equals(RedisIndexKeys.AUTO)){
                     this.createAutomaticIndex(indexName, indexClass, indexKeys.size() != 0 ? indexKeys : null);
                 } else {
-                    this.createManualIndex(indexName, indexClass);
+                    this.createManualIndex(indexName, indexClass, indexKeys.size() != 0 ? indexKeys : new HashSet<String>());
                 }
             }
         } catch (RedisException e) {
@@ -227,5 +242,10 @@ public class RedisIndexManager {
                 idx.removeElement(el);
             }
         }
+    }
+
+    public void clear(){
+        this.autoIndices.clear();
+        this.manualIndices.clear();
     }
 }

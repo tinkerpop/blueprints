@@ -37,6 +37,6 @@ public class RedisVertexIterable extends RedisElementIterable implements Iterabl
 
     @Override
     public Iterator iterator() {
-        return new RedisVertexIterator(type, graph, count, element);
+        return new RedisVertexIterator(type, this);
     }
 }

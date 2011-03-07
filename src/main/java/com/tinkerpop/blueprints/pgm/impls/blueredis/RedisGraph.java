@@ -40,8 +40,6 @@ public class RedisGraph implements IndexableGraph {
     protected Map<String, RedisIndex> indices = new HashMap<String, RedisIndex>();
     protected Map<String, RedisAutomaticIndex> autoIndices = new HashMap<String, RedisAutomaticIndex>();
 
-
-
     public RedisGraph() {
         database = new JRedisClient();
     }
@@ -70,10 +68,7 @@ public class RedisGraph implements IndexableGraph {
         do_index = b;
         if(b == true){
             this.indexManager = new RedisIndexManager();
-            this.indexManager.setGraph(this);
-            this.indexManager.restoreIndices();
-            this.createAutomaticIndex(Index.VERTICES, RedisVertex.class, null);
-            this.createAutomaticIndex(Index.EDGES, RedisEdge.class, null);
+            this.prepareIndexing();
         }
     }
 
@@ -81,10 +76,7 @@ public class RedisGraph implements IndexableGraph {
         do_index = b;
         this.indexManager = manager;
         if(b == true){
-            this.indexManager.setGraph(this);
-            this.indexManager.restoreIndices();
-            this.createAutomaticIndex(Index.VERTICES, RedisVertex.class, null);
-            this.createAutomaticIndex(Index.EDGES, RedisEdge.class, null);
+            this.prepareIndexing();
         }
     }
 
@@ -125,7 +117,7 @@ public class RedisGraph implements IndexableGraph {
         try{
             Long id = getLong(o);
 
-            Object v = database.get("vertex:".concat(String.valueOf(id)));
+            Object v = database.get("vertex:" + String.valueOf(id));
 
             if(v != null){
                 final Vertex vertex = new RedisVertex(id, this);
@@ -162,7 +154,7 @@ public class RedisGraph implements IndexableGraph {
         try{
             Long id = getLong(o);
 
-            Object e = database.get("edge:".concat(String.valueOf(id)));
+            Object e = database.get("edge:" + String.valueOf(id));
 
             if(e != null) {
                 final Edge edge = new RedisEdge(id, this);
@@ -191,6 +183,13 @@ public class RedisGraph implements IndexableGraph {
     public void clear() {
         try {
             database.flushdb();
+            if(this.doIndexing() && null != this.indexManager){
+                this.indexManager.clear();
+                // this is hackish in the following sense
+                // if we've dropped automatic indices, *do not* recreate them on next start
+                // we only automatically create indices for fresh databases
+                this.database.set("indexing_set", 1);
+            }
         } catch(RedisException e) {
             e.printStackTrace();
         }
@@ -202,8 +201,8 @@ public class RedisGraph implements IndexableGraph {
     }
 
     public static String getIdentifier(String prefix, Long id, String suffix) {
-        String identifier = prefix.concat(String.valueOf(id));
-        if(suffix != null) identifier.concat(":").concat(suffix);
+        String identifier = prefix + String.valueOf(id);
+        if(suffix != null) identifier += ":" + suffix;
 
         return identifier;
     }
@@ -269,6 +268,24 @@ public class RedisGraph implements IndexableGraph {
             return new ArrayList<RedisIndex>();
         }
         return  this.indexManager.getManualIndices();
+    }
+
+    private void prepareIndexing(){
+
+        this.indexManager.setGraph(this);
+        this.indexManager.restoreIndices();
+
+        try {
+            Object indexing_set = this.database.get("indexing_set");
+            if(null == indexing_set){
+                this.createAutomaticIndex(Index.VERTICES, RedisVertex.class, null);
+                this.createAutomaticIndex(Index.EDGES, RedisEdge.class, null);
+            }
+
+            this.database.set("indexing_set", 1);
+        } catch (RedisException e) {
+            e.printStackTrace();
+        }
     }
 
     // see http://stackoverflow.com/questions/1302605/how-do-i-convert-from-int-to-long-in-java/2904999#2904999

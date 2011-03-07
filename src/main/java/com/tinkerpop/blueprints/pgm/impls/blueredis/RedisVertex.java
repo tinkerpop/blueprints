@@ -46,8 +46,18 @@ public class RedisVertex extends RedisElement implements Vertex {
     }
 
     @Override
+    public Iterable<Edge> getOutEdges(final String label) {
+        return new RedisEdgeIterable(RedisElementType.TYPE.REDIS_ELEMENT_EDGES_OUT, graph, this, label);
+    }
+
+    @Override
     public Iterable<Edge> getInEdges() {
         return new RedisEdgeIterable(RedisElementType.TYPE.REDIS_ELEMENT_EDGES_IN, graph, this);
+    }
+
+    @Override
+    public Iterable<Edge> getInEdges(final String label) {
+        return new RedisEdgeIterable(RedisElementType.TYPE.REDIS_ELEMENT_EDGES_IN, graph, this, label);
     }
 
 }

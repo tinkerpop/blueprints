@@ -43,11 +43,9 @@ public class RedisAutomaticIndex<T extends Element> extends RedisIndex<T> implem
 
         // convert any index name to a form that can be sent to redis, i.e.
         // convert "Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ" to "this_is_a_funky_string"
-        this.indexName = Normalizer.normalize(indexName, Normalizer.Form.NFD)
-                                   .replaceAll("[^\\p{ASCII}]", "")
-                                   .replaceAll(" ", "_")
-                                   .toLowerCase();
+        this.indexName = RedisIndex.normalizeName(indexName);
         this.nodeName = RedisIndexKeys.AUTO +  this.indexName + ":";
+        this.indexType = Type.AUTOMATIC;
     }
 
     public RedisAutomaticIndex(RedisGraph graph, final String indexName, final Class<T> indexClass) {

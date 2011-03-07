@@ -178,8 +178,8 @@ public class RedisElement implements Element {
 
     protected String getIdentifier(String suffix) {
         String prefix = this instanceof RedisVertex ? "vertex:" : "edge:";
-        String identifier = prefix.concat(String.valueOf(id));
-        if(suffix != null) identifier = identifier.concat(":").concat(suffix);
+        String identifier = prefix + String.valueOf(id);
+        if(suffix != null) identifier = identifier + ":" + suffix;
 
         return identifier;
 

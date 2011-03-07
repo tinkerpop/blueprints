@@ -33,22 +33,22 @@ public class RedisElementIterator implements Iterator {
     private JRedis db;
     protected RedisElementType.TYPE type;
     protected RedisElement element;
-    protected long count = 0, current = 0;
+    protected long count = 0, elementCount = 0, current = 0, currentElementIndex = 0;
+    protected String label = null;
+    protected RedisElementIterable iterable = null;
 
     private String elementCollectionKey;
 
-    public RedisElementIterator(RedisElementType.TYPE type, RedisGraph graph, long count) {
-        this(type, graph, count, null);
-    }
-    public RedisElementIterator(RedisElementType.TYPE type, RedisGraph graph, long count, RedisElement element) {
+    public RedisElementIterator(RedisElementType.TYPE type, RedisElementIterable iterable) {
+        this.iterable = iterable;
+        this.graph = iterable.getGraph();
+        this.db = this.graph.getDatabase();
+        this.label = iterable.getLabel();
+        this.count = iterable.getCount();
+        this.elementCount = iterable.getElementCount();
+        this.elementCollectionKey = iterable.getElementCollectionKey();
+        this.element = iterable.getElement();
         this.type = type;
-        this.graph = graph;
-        this.db = graph.getDatabase();
-        this.count = count;
-        this.element = element;
-
-        elementCollectionKey = RedisElementType.key(type, element);
-
     }
 
     @Override
@@ -63,11 +63,27 @@ public class RedisElementIterator implements Iterator {
 
         try {
             db_vertices = db.zrange(elementCollectionKey, current, current);
-
             long id = Long.parseLong(new String(db_vertices.get(0)));
 
-            if(type.equals(RedisElementType.TYPE.REDIS_ELEMENT_VERTEX)) el = new RedisVertex(id, graph);
-            else el = new RedisEdge(id, graph);
+            if(type.equals(RedisElementType.TYPE.REDIS_ELEMENT_VERTEX)){
+                el = new RedisVertex(id, graph);
+            }
+            else{
+                el = new RedisEdge(id, graph);
+                if(null != this.label && !((RedisEdge)el).getLabel().equals(this.label)){
+                    el = null;
+                    while(true && this.currentElementIndex < this.elementCount){
+                        this.currentElementIndex++;
+                        db_vertices = db.zrange(elementCollectionKey, this.currentElementIndex, this.currentElementIndex);
+                        id = Long.parseLong(new String(db_vertices.get(0)));
+
+                        el = new RedisEdge(id, graph);
+                        if(((RedisEdge)el).getLabel().equals(this.label)){
+                            break;
+                        }
+                    }
+                }
+            }
         } catch(RedisException e) {
             e.printStackTrace();
         }
@@ -79,5 +95,6 @@ public class RedisElementIterator implements Iterator {
 
     @Override
     public void remove() {
+
     }
 }

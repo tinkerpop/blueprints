@@ -35,12 +35,12 @@ public class RedisEdge extends RedisElement implements Edge {
         this.label = label;
 
         try {
-            this.graph.getDatabase().set("edge:".concat(String.valueOf(id)).concat(":out"), String.valueOf(out.getId()));
-            this.graph.getDatabase().set("edge:".concat(String.valueOf(id)).concat(":in"), String.valueOf(in.getId()));
-            this.graph.getDatabase().set("edge:".concat(String.valueOf(id)).concat(":label"), label);
+            this.graph.getDatabase().set("edge:"+ String.valueOf(id) + ":out", String.valueOf(out.getId()));
+            this.graph.getDatabase().set("edge:"+ String.valueOf(id) + ":in", String.valueOf(in.getId()));
+            this.graph.getDatabase().set("edge:"+ String.valueOf(id) + ":label", label);
 
-            this.graph.getDatabase().zadd("vertex:".concat(String.valueOf(in.getId())).concat(":edges:in"), id, String.valueOf(id));
-            this.graph.getDatabase().zadd("vertex:".concat(String.valueOf(out.getId())).concat(":edges:out"), id, String.valueOf(id));
+            this.graph.getDatabase().zadd("vertex:" + String.valueOf(in.getId()) + ":edges:in", id, String.valueOf(id));
+            this.graph.getDatabase().zadd("vertex:" + String.valueOf(out.getId()) + ":edges:out", id, String.valueOf(id));
 
             this.graph.getDatabase().set("edge:" + String.valueOf(id), String.valueOf(id));
             this.graph.getDatabase().zadd("globals:edges", id, String.valueOf(id));

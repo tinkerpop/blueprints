@@ -54,6 +54,8 @@ public class RedisIndex<T extends Element> implements Index<T> {
 
     protected boolean indexAll = true;
 
+    protected Type indexType = Type.MANUAL;
+
     public RedisIndex(RedisGraph graph, final String indexName, final Class<T> indexClass) {
         this.graph = graph;
         this.database = graph.getDatabase();
@@ -61,14 +63,13 @@ public class RedisIndex<T extends Element> implements Index<T> {
 
         // convert any index name to a form that can be sent to redis, i.e.
         // convert "Tĥïŝ ĩš â fůňķŷ Šťŕĭńġ" to "this_is_a_funky_string"
-        this.indexName = Normalizer.normalize(indexName, Normalizer.Form.NFD)
-                                   .replaceAll("[^\\p{ASCII}]", "")
-                                   .replaceAll(" ", "_")
-                                   .toLowerCase();
+        this.indexName = RedisIndex.normalizeName(indexName);
         this.nodeName = RedisIndexKeys.MANUAL + this.indexName + ":";
+        this.metaphone.setMaxCodeLen(12);
     }
-
-    public RedisIndex() {
+    public RedisIndex(RedisGraph graph, final String indexName, final Class<T> indexClass, Set<String> indexKeys) {
+        this(graph, indexName, indexClass);
+        this.indexKeys = indexKeys;
     }
 
     @Override
@@ -83,7 +84,7 @@ public class RedisIndex<T extends Element> implements Index<T> {
 
     @Override
     public Type getIndexType() {
-        return Type.MANUAL;
+        return this.indexType;
     }
 
     @Override
@@ -99,7 +100,7 @@ public class RedisIndex<T extends Element> implements Index<T> {
         indexKeys.add(key);
 
         String val = getMetaphone(value);
-        String node_name = this.nodeName.concat(key).concat(":").concat(val);
+        String node_name = this.nodeName + key + ":" + val;
 
         try {
             database.sadd(node_name, element.getId().toString());
@@ -124,7 +125,7 @@ public class RedisIndex<T extends Element> implements Index<T> {
         List<byte[]> l;
 
         try {
-            node_name = this.nodeName.concat(key).concat(":").concat(val);
+            node_name = this.nodeName + key + ":" + val;
             l = database.smembers(node_name);
             if(l != null) {
                 for(byte[] o : l) {
@@ -152,7 +153,7 @@ public class RedisIndex<T extends Element> implements Index<T> {
         }
 
         String val = getMetaphone(value);
-        String node_name = this.nodeName.concat(key).concat(":").concat(val);
+        String node_name = this.nodeName + key + ":" + val;
 
         try {
             database.srem(node_name, element.getId().toString());
@@ -172,7 +173,7 @@ public class RedisIndex<T extends Element> implements Index<T> {
 
         for(final String key : this.indexKeys){
             try {
-                List<String> keys = database.keys(this.nodeName.concat("*"));
+                List<String> keys = database.keys(this.nodeName + "*");
 
                 for(final String val : keys){
                     try{
@@ -203,12 +204,11 @@ public class RedisIndex<T extends Element> implements Index<T> {
     }
 
     protected void updateIndexKey(String key){
-        String type = this.getIndexClass().toString().contains("auto") ? "auto" : "manual";
         try{
-            if(type.equals("auto")){
-                database.sadd(RedisIndexKeys.META_AUTO + "keys", key);
+            if(this.indexType.equals(Type.AUTOMATIC)){
+                database.sadd(RedisIndexKeys.META_AUTO + this.indexName + ":keys", key);
             } else {
-                database.sadd(RedisIndexKeys.META_MANUAL + "keys", key);
+                database.sadd(RedisIndexKeys.META_MANUAL + this.indexName + ":keys", key);
             }
         } catch (RedisException ignore) {
         }
@@ -227,4 +227,15 @@ public class RedisIndex<T extends Element> implements Index<T> {
         return val;
     }
 
+    public static String normalizeName(final String indexName){
+        return Normalizer.normalize(indexName, Normalizer.Form.NFD)
+                                   .replaceAll("[^\\p{ASCII}]", "")
+                                   .replaceAll(" ", "_")
+                                   .toLowerCase();
+    }
+
+    public void addKey(String key){
+        this.indexKeys.add(key);
+        this.updateIndexKey(key);
+    }
 }

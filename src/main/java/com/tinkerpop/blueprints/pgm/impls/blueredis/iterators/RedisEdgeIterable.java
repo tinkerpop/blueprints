@@ -23,6 +23,9 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import java.util.Iterator;
 
 public class RedisEdgeIterable extends RedisElementIterable implements Iterable<Edge>{
+
+    private String label = null;
+
     public RedisEdgeIterable(final RedisGraph graph) {
         this(RedisElementType.TYPE.REDIS_ELEMENT_EDGE, graph, null);
     }
@@ -35,8 +38,13 @@ public class RedisEdgeIterable extends RedisElementIterable implements Iterable<
         super(type, graph, element);
     }
 
+    public RedisEdgeIterable(final RedisElementType.TYPE type, final RedisGraph graph, final RedisElement element, String label) {
+        super(type, graph, element, label);
+        this.label = label;
+    }
+
     @Override
     public Iterator iterator() {
-        return new RedisEdgeIterator(type, graph, count, element);
+        return new RedisEdgeIterator(this);
     }
 }

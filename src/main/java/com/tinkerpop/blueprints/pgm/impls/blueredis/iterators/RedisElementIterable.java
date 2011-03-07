@@ -16,6 +16,8 @@
 
 package com.tinkerpop.blueprints.pgm.impls.blueredis.iterators;
 
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.impls.blueredis.RedisEdge;
 import com.tinkerpop.blueprints.pgm.impls.blueredis.RedisElement;
 import com.tinkerpop.blueprints.pgm.impls.blueredis.RedisGraph;
 import org.jredis.JRedis;
@@ -26,13 +28,11 @@ public class RedisElementIterable {
     protected RedisElementType.TYPE type;
     protected RedisGraph graph;
     private JRedis db;
-    protected long count = 0;
+    protected long count = 0, elementCount = 0;
     protected RedisElement element;
     protected String elementCollectionKey;
+    protected String label = null;
 
-    public RedisElementIterable(RedisElementType.TYPE type, RedisGraph graph) {
-        this(type, graph, null);
-    }
     public RedisElementIterable(RedisElementType.TYPE type, RedisGraph graph, RedisElement element) {
         this.type  = type;
         this.graph = graph;
@@ -42,13 +42,55 @@ public class RedisElementIterable {
         elementCollectionKey = RedisElementType.key(type, element);
 
         try {
-            count = db.zcard(elementCollectionKey);
+            this.count = this.elementCount = this.db.zcard(elementCollectionKey);
         } catch(RedisException e) {
             e.printStackTrace();
         }
     }
 
+    public RedisElementIterable(RedisElementType.TYPE type, RedisGraph graph, RedisElement element, final String label) {
+        this(type, graph, element);
+        this.label = label;
+
+        if(null != this.label){
+            RedisEdgeIterable itr = new RedisEdgeIterable(type, graph, element);
+
+            this.count = 0;
+            for(Edge e : itr){
+                if(e.getLabel().equals(this.label)){
+                    this.count++;
+                }
+            }
+        }
+    }
     public long count(){
         return count;
+    }
+
+
+    /* used in iterators */
+
+    public RedisGraph getGraph() {
+        return graph;
+    }
+
+    public long getCount() {
+        return count;
+    }
+
+    public long getElementCount() {
+        return elementCount;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public RedisElement getElement() {
+        return element;
+    }
+
+    public String getElementCollectionKey() {
+        return elementCollectionKey;
     }
 }
