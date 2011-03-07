@@ -18,11 +18,13 @@ public class BlueredisGraphTest extends GraphTest {
 
     public static void main(String[] args){
         try {
-            //new BlueredisGraphTest().testEdgeTestSuite();
-            //new BlueredisGraphTest().testVertexTestSuite();
-            //new BlueredisGraphTest().testGraphTestSuite();
-            //new BlueredisGraphTest().testIndexTestSuite();
+            new BlueredisGraphTest().testEdgeTestSuite();
+            new BlueredisGraphTest().testVertexTestSuite();
+            new BlueredisGraphTest().testGraphTestSuite();
+            new BlueredisGraphTest().testIndexTestSuite();
             new BlueredisGraphTest().testAutomaticIndexTestSuite();
+            new BlueredisGraphTest().testIndexableGraphTestSuite();
+            new BlueredisGraphTest().testGraphMLReaderTestSuite();
         } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
@@ -101,7 +103,7 @@ public class BlueredisGraphTest extends GraphTest {
         if (doTest == null || doTest.equals("true")) {
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
-                    new RedisGraph().clear();
+                    new RedisGraph().getDatabase().flushdb();
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(testSuite);
                 }
