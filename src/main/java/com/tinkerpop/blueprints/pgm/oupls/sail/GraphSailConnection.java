@@ -98,7 +98,7 @@ public class GraphSailConnection implements SailConnection {
         }
 
         if (0 == contexts.length) {
-            return new EdgeIteration(store.matchers[index].match(s, p, o, null));
+            return createIteration(store.matchers[index].match(s, p, o, null));
         } else {
             Collection<CloseableIteration<Statement, SailException>> iterations = new LinkedList<CloseableIteration<Statement, SailException>>();
 
@@ -108,7 +108,7 @@ public class GraphSailConnection implements SailConnection {
                 c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
                 Matcher m = store.matchers[index];
-                iterations.add(new EdgeIteration(m.match(s, p, o, c)));
+                iterations.add(createIteration(m.match(s, p, o, c)));
             }
 
             return new CompoundCloseableIteration<Statement, SailException>(iterations);
@@ -250,7 +250,9 @@ public class GraphSailConnection implements SailConnection {
     }
 
     private void deleteEdgesInIterator(final Iterator<Edge> i) {
+        //System.out.println(".............");
         while (i.hasNext()) {
+            //System.out.println("----------------");
             Edge e = i.next();
             try {
                 i.remove();
@@ -259,6 +261,7 @@ public class GraphSailConnection implements SailConnection {
                 // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
                 // delete an edge in an iterator currently being traversed.  So for now, just ignore the
                 // UnsupportedOperationException and proceed to delete the edge from the graph.
+                //System.out.println("###################################");
             }
             Vertex h = e.getInVertex();
             Vertex t = e.getOutVertex();
@@ -270,6 +273,7 @@ public class GraphSailConnection implements SailConnection {
                 store.graph.removeVertex(t);
             }
         }
+        //System.out.println("================");
     }
 
     public CloseableIteration<? extends Namespace, SailException> getNamespaces() throws SailException {
@@ -314,10 +318,16 @@ public class GraphSailConnection implements SailConnection {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private class EdgeIteration implements CloseableIteration<Statement, SailException> {
+    private CloseableIteration<Statement, SailException> createIteration(final Iterator<Edge> iterator) {
+        return store.volatileStatements
+                ? new VolatileEdgeIteration(iterator)
+                : new StableEdgeIteration(iterator);
+    }
+
+    private class StableEdgeIteration implements CloseableIteration<Statement, SailException> {
         private final Iterator<Edge> iterator;
 
-        public EdgeIteration(final Iterator<Edge> iterator) {
+        public StableEdgeIteration(final Iterator<Edge> iterator) {
             this.iterator = iterator;
         }
 
@@ -338,6 +348,64 @@ public class GraphSailConnection implements SailConnection {
             Resource context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
 
             return store.valueFactory.createStatement(subject, predicate, object, context);
+        }
+
+        public void remove() throws SailException {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private class VolatileEdgeIteration implements CloseableIteration<Statement, SailException> {
+        private Resource subject;
+        private URI predicate;
+        private Value object;
+        private Resource context;
+
+        private final Iterator<Edge> iterator;
+
+        private final Statement s = new Statement() {
+            @Override
+            public Resource getSubject() {
+                return subject;
+            }
+
+            @Override
+            public URI getPredicate() {
+                return predicate;
+            }
+
+            @Override
+            public Value getObject() {
+                return object;
+            }
+
+            @Override
+            public Resource getContext() {
+                return context;
+            }
+        };
+
+        public VolatileEdgeIteration(final Iterator<Edge> iterator) {
+            this.iterator = iterator;
+        }
+
+        public void close() throws SailException {
+            // Do nothing.
+        }
+
+        public boolean hasNext() throws SailException {
+            return iterator.hasNext();
+        }
+
+        public Statement next() throws SailException {
+            Edge e = iterator.next();
+
+            subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
+            predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
+            object = toSesame(store.getValueOf(e.getInVertex()));
+            context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
+
+            return s;
         }
 
         public void remove() throws SailException {

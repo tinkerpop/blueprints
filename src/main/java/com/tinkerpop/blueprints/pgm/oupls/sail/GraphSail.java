@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -9,7 +13,11 @@ import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -119,6 +127,7 @@ public class GraphSail implements Sail, GraphSource {
         //}
     }
 
+    /*
     private void printGraphInfo(final IndexableGraph graph) {
         boolean trans = graph instanceof TransactionalGraph;
 
@@ -130,8 +139,9 @@ public class GraphSail implements Sail, GraphSource {
 
         System.out.println(sb.toString());
     }
+    //*/
 
-    public Graph getGraph() {
+    public IndexableGraph getGraph() {
         return this.store.getGraph();
     }
 
@@ -164,6 +174,20 @@ public class GraphSail implements Sail, GraphSource {
         return store.valueFactory;
     }
 
+    /**
+     * Enables or disables the use of efficient, short-lived statements in the iterators returned by
+     * <code>GraphSailConnection.getStatements()</code> and <code>GraphSailConnection.evaluate()</code>.
+     * This feature is disabled by default, and in typical usage scenarios, Java compiler optimization makes it superfluous.
+     * However, it potentially confers a performance advantage when a single thread consumes the iterator,
+     * inspecting and then immediately discarding each statement.
+     *
+     * @param flag whether to use volatile statements.
+     *             When this method is called, only subsequently created iterators are affected.
+     */
+    public void useVolatileStatements(final boolean flag) {
+        store.volatileStatements = flag;
+    }
+
     public String toString() {
         String type = store.graph.getClass().getSimpleName().toLowerCase();
         return "graphsail[" + type + "]";
@@ -174,7 +198,7 @@ public class GraphSail implements Sail, GraphSource {
     /**
      * A context object which is shared between the Blueprints Sail and its connections.
      */
-    public class DataStore {
+    class DataStore {
         public IndexableGraph graph;
 
         // We don't need a special ValueFactory implementation.
@@ -186,6 +210,7 @@ public class GraphSail implements Sail, GraphSource {
         public final Matcher[] matchers = new Matcher[16];
 
         public boolean manualTransactions;
+        public boolean volatileStatements = false;
 
         public Index<Vertex> vertices;
         public Index<Edge> edges;
