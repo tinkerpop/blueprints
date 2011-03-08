@@ -1,20 +1,16 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import java.util.Collections;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexNotUnique;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
+
+import java.util.Collections;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
