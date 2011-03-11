@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.HashSet;
@@ -92,10 +91,5 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
             return false; // index did not exist
         }
     }
-
-    public String toString() {
-        return StringFactory.indexString(this);
-    }
-
 
 }

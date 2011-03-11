@@ -18,21 +18,10 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.sail.NotifyingSail;
-import org.openrdf.sail.NotifyingSailConnection;
-import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailChangedEvent;
-import org.openrdf.sail.SailChangedListener;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailConnectionListener;
-import org.openrdf.sail.SailException;
+import org.openrdf.sail.*;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)

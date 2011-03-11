@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -65,9 +64,5 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     private void saveConfiguration() {
         underlying.getConfiguration().field(KEYS, this.autoIndexKeys);
         graph.saveIndexConfiguration();
-    }
-
-    public String toString() {
-        return StringFactory.indexString(this);
     }
 }

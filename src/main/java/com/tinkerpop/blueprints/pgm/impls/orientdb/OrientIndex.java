@@ -6,6 +6,7 @@ import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.util.Collections;
@@ -113,9 +114,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
-    @Override
     public String toString() {
-        return underlying != null ? underlying.toString() : "?";
+        return StringFactory.indexString(this);
     }
 
     protected void removeElement(final T vertex) {

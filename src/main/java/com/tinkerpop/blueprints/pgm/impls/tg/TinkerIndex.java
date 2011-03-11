@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -83,5 +84,9 @@ public class TinkerIndex<T extends Element> implements Index<T> {
                 }
             }
         }
+    }
+
+    public String toString() {
+        return StringFactory.indexString(this);
     }
 }
