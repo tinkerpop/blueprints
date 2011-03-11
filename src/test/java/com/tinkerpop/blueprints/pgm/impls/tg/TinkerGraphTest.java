@@ -21,6 +21,7 @@ public class TinkerGraphTest extends GraphTest {
         this.supportsEdgeIteration = true;
         this.supportsVertexIndex = true;
         this.supportsEdgeIndex = true;
+        this.supportsTransactions = false;
     }
 
     /*public void testTinkerBenchmarkTestSuite() throws Exception {
