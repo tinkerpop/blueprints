@@ -97,12 +97,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public long count(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final ORecordLazyList docList = treeMap.get(keyTemp);
-        if (null == docList) {
-            return 0;
-        } else {
-            return docList.size();
-        }
+        final Set<ORecord<?>> records = underlying.get(keyTemp);
+        return records.size();
     }
 
     public void remove(final String key, final Object value, final T element) {

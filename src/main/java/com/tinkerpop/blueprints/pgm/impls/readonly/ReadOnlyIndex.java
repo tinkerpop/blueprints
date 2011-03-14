@@ -36,6 +36,10 @@ public class ReadOnlyIndex<T extends Element> implements Index<T> {
         }
     }
 
+    public long count(final String key, final Object value) {
+        return this.index.count(key, value);
+    }
+
     public Index.Type getIndexType() {
         return Index.Type.MANUAL;
     }

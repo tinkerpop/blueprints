@@ -62,7 +62,7 @@ public class IndexTestSuite extends TestSuite {
     public void testIndexCount() {
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
-            Index<Vertex> index = graph.createIndex("basic", Vertex.class, Index.Type.MANUAL);
+            Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
             for (int i = 0; i < 10; i++) {
                 Vertex v = graph.addVertex(null);
                 index.put("dog", "puppy", v);

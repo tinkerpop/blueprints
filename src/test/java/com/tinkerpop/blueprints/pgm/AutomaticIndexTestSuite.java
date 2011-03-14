@@ -406,8 +406,9 @@ public class AutomaticIndexTestSuite extends TestSuite {
     public void testIndexCount() {
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
-            AutomaticIndex<Vertex> index = (AutomaticIndex) graph.createIndex("anyname", Vertex.class, Index.Type.AUTOMATIC);
-            index.addAutoIndexKey("dog");
+            Set<String> keys = new HashSet<String>();
+            keys.add("dog");
+            AutomaticIndex<Vertex> index = (AutomaticIndex) graph.createAutomaticIndex("anyname", Vertex.class, keys);
             for (int i = 0; i < 10; i++) {
                 Vertex v = graph.addVertex(null);
                 v.setProperty("dog", "puppy");
