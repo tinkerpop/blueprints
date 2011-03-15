@@ -342,9 +342,23 @@ public class VertexTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /*
-    TODO: Is this test appropriate for a graph database? Assumes strong sychronization between Blueprints and backend
-    public void testVertexPropertyInconsistency() {
+    public void testAddingIdProperty() {
+        if (!graphTest.isRDFModel) {
+            Graph graph = graphTest.getGraphInstance();
+            Vertex vertex = graph.addVertex(null);
+            try {
+                vertex.setProperty("id", "123");
+                assertTrue(false);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
+            graph.shutdown();
+        }
+    }
+
+
+    //TODO: Is this test appropriate for a graph database? Assumes strong sychronization between Blueprints and backend
+    /*public void testVertexPropertyInconsistency() {
         Graph graph = graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {
             List<String> ids = generateIds(1);

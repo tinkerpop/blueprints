@@ -1,7 +1,9 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,8 @@ public abstract class TinkerElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
+        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
+            throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
         Object oldValue = this.properties.put(key, value);
         for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
@@ -38,7 +42,6 @@ public abstract class TinkerElement implements Element {
     }
 
     public Object removeProperty(final String key) {
-
         Object oldValue = this.properties.remove(key);
         for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
             index.autoRemove(key, oldValue, this);

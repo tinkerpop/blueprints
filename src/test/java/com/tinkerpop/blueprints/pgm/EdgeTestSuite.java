@@ -488,4 +488,24 @@ public class EdgeTestSuite extends TestSuite {
             graph.shutdown();
         }
     }
+
+    public void testAddingLabelAndIdProperty() {
+        if (!graphTest.isRDFModel) {
+            Graph graph = graphTest.getGraphInstance();
+            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            try {
+                edge.setProperty("id", "123");
+                assertTrue(false);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
+            try {
+                edge.setProperty("label", "hates");
+                assertTrue(false);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
+            graph.shutdown();
+        }
+    }
 }

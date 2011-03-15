@@ -29,7 +29,7 @@ public class TinkerGraph implements IndexableGraph {
     }
 
     protected Iterable<TinkerIndex> getManualIndices() {
-        HashSet<TinkerIndex> indices = new HashSet<TinkerIndex>(this.indices.values());
+        final HashSet<TinkerIndex> indices = new HashSet<TinkerIndex>(this.indices.values());
         indices.removeAll(this.autoIndices.values());
         return indices;
     }
@@ -38,7 +38,7 @@ public class TinkerGraph implements IndexableGraph {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
-        TinkerAutomaticIndex index = new TinkerAutomaticIndex(indexName, indexClass, keys);
+        final TinkerAutomaticIndex index = new TinkerAutomaticIndex(indexName, indexClass, keys);
         this.autoIndices.put(index.getIndexName(), index);
         this.indices.put(index.getIndexName(), index);
         return index;
@@ -48,7 +48,7 @@ public class TinkerGraph implements IndexableGraph {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
-        TinkerIndex index = new TinkerIndex(indexName, indexClass);
+        final TinkerIndex index = new TinkerIndex(indexName, indexClass);
         this.indices.put(index.getIndexName(), index);
         return index;
     }
@@ -64,7 +64,7 @@ public class TinkerGraph implements IndexableGraph {
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
+        final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
         for (Index index : indices.values()) {
             list.add(index);
         }
