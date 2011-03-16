@@ -33,6 +33,13 @@
             <version>0.6-SNAPSHOT</version>
             <type>pom</type>
         </dependency>
+        <!-- DEX SUPPORT -->
+        <dependency>
+            <groupId>com.tinkerpop</groupId>
+            <artifactId>graphdb-deps-dex</artifactId>
+            <version>0.6-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>
         <!-- SAIL SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>

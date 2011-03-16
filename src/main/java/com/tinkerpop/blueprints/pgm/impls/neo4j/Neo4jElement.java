@@ -33,7 +33,7 @@ public abstract class Neo4jElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        if(key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
+        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
         try {

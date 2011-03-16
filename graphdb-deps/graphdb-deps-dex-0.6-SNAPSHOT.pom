@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.tinkerpop</groupId>
+    <artifactId>graphdb-deps-dex</artifactId>
+    <version>0.6-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>GraphDB Dependencies-Dex</name>
+    <url>http://www.sparsity-technologies.com/dex.php</url>
+    <developers>
+        <developer>
+            <name>Marko A. Rodriguez</name>
+            <email>marko@markorodriguez.com</email>
+            <url>http://markorodriguez.com</url>
+        </developer>
+    </developers>
+    <inceptionYear>2010</inceptionYear>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>edu.upc.dama</groupId>
+            <artifactId>dex</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <repository>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>http://tinkerpop.com/maven2</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>

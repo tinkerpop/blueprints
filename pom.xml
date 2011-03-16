@@ -175,6 +175,15 @@
                             <name>orientGraphDirectory</name>
                             <value>/tmp/blueprints_test</value>
                         </property>
+                        <!-- DEXGRAPH TEST PROPERTIES -->
+                        <property>
+                            <name>testDexGraph</name>
+                            <value>true</value>
+                        </property>
+                        <property>
+                            <name>dexGraphFile</name>
+                            <value>/tmp/blueprints_test.dex</value>
+                        </property>
                         <!-- REXSTERGRAPH TEST PROPERTIES -->
                         <property>
                             <name>testRexsterGraph</name>
