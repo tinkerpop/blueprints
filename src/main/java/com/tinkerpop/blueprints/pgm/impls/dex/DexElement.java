@@ -6,6 +6,8 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
+import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 import edu.upc.dama.dex.core.Graph;
 import edu.upc.dama.dex.core.Graph.AttributeData;
 import edu.upc.dama.dex.core.Value;
@@ -124,7 +126,7 @@ public class DexElement implements Element {
                 result = v.getDouble();
                 break;
             default:
-                throw new UnsupportedOperationException("Only boolean, integer, string, and doubles are supported property value types");
+                throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
         }
         return result;
     }
@@ -153,6 +155,7 @@ public class DexElement implements Element {
       */
     @Override
     public void setProperty(String key, Object value) {
+        //System.out.println(this + "!!" + key + "!!" + value);
         if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
@@ -161,8 +164,7 @@ public class DexElement implements Element {
                     + " property cannot be set.");
         }
 
-        Long attr = DexAttributes.getAttributeId(graph.getRawGraph(),
-                getObjectType(), key);
+        Long attr = DexAttributes.getAttributeId(graph.getRawGraph(), getObjectType(), key);
         short datatype = Value.NULL;
         if (attr == Graph.INVALID_ATTRIBUTE) {
             //
@@ -179,15 +181,13 @@ public class DexElement implements Element {
             } else if (value instanceof Value) {
                 datatype = ((Value) value).getType();
             } else {
-                throw new UnsupportedOperationException("Only boolean, integer, string, and doubles are supported property value types");
+                throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
             }
             assert datatype != Value.NULL;
-            attr = graph.getRawGraph().newAttribute(type, key, datatype,
-                    Graph.ATTR_KIND_INDEXED);
+            attr = graph.getRawGraph().newAttribute(type, key, datatype, Graph.ATTR_KIND_INDEXED);
             assert attr != Graph.INVALID_ATTRIBUTE;
         } else {
-            datatype = DexAttributes
-                    .getAttributeData(graph.getRawGraph(), attr).getDatatype();
+            datatype = DexAttributes.getAttributeData(graph.getRawGraph(), attr).getDatatype();
         }
         //
         // Set the Value
@@ -212,14 +212,20 @@ public class DexElement implements Element {
                         v.setDouble((Double) value);
                     }
                     if (value instanceof Float) {
-                        v.setDouble(((Float) value).doubleValue());
+                        v.setDouble(((Float) value));
                     }
                     break;
                 default:
-                    throw new UnsupportedOperationException("Only boolean, integer, string, and doubles are supported property value types");
+                    throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
             }
         }
-        graph.getRawGraph().setAttribute(oid, attr, v);
+        //try {
+        this.graph.getRawGraph().setAttribute(oid, attr, v);
+        //} catch(RuntimeException e) {
+            //System.out.println("\t" + this + "!!" + attr + "!!" + v);
+        //    throw e;
+        //}
+
     }
 
     /*

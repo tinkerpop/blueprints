@@ -5,6 +5,8 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
+import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 import edu.upc.dama.dex.core.Graph;
 import edu.upc.dama.dex.core.Graph.AttributeData;
 import edu.upc.dama.dex.core.Objects;
@@ -68,8 +70,7 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
             throw new IllegalArgumentException(key + " is not a valid key");
         }
 
-        AttributeData adata = DexAttributes.getAttributeData(
-                graph.getRawGraph(), attr);
+        AttributeData adata = DexAttributes.getAttributeData(this.graph.getRawGraph(), attr);
         Value v = new Value();
         switch (adata.getDatatype()) {
             case Value.BOOL:
@@ -108,8 +109,7 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
     public Set<String> getAutoIndexKeys() {
         Set<String> ret = new HashSet<String>();
         for (Long attr : graph.getRawGraph().getAttributesFromType(type)) {
-            ret.add(DexAttributes.getAttributeData(graph.getRawGraph(), attr)
-                    .getName());
+            ret.add(DexAttributes.getAttributeData(graph.getRawGraph(), attr).getName());
         }
         return ret;
     }

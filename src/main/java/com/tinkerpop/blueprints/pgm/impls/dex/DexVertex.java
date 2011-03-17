@@ -5,6 +5,8 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 import edu.upc.dama.dex.core.Graph;
 import edu.upc.dama.dex.core.Objects;
 
@@ -70,7 +72,7 @@ public class DexVertex extends DexElement implements Vertex {
     public Iterable<Edge> getOutEdges(String label) {
         int type = DexTypes.getTypeId(graph.getRawGraph(), label);
         if (type == Graph.INVALID_TYPE) {
-            throw new IllegalArgumentException("Unexisting edge label" + label);
+            throw new IllegalArgumentException("Non-existent edge label" + label);
         }
 
         Objects objs = graph.getRawGraph().explode(oid, type, Graph.EDGES_OUT);
@@ -87,11 +89,15 @@ public class DexVertex extends DexElement implements Vertex {
     public Iterable<Edge> getInEdges(String label) {
         int type = DexTypes.getTypeId(graph.getRawGraph(), label);
         if (type == Graph.INVALID_TYPE) {
-            throw new IllegalArgumentException("Unexisting edge label" + label);
+            throw new IllegalArgumentException("Non-existent edge label" + label);
         }
 
         Objects objs = graph.getRawGraph().explode(oid, type, Graph.EDGES_IN);
         Iterable<Edge> ret = new DexIterable<Edge>(graph, objs, Edge.class);
         return ret;
+    }
+
+    public String toString() {
+        return StringFactory.vertexString(this);
     }
 }

@@ -87,7 +87,7 @@ public class DexGraphTest extends GraphTest {
 
         File fDB = new File(db);
         try {
-            return new DexIndexableGraph(fDB, !fDB.exists());
+            return new DexGraph(fDB, !fDB.exists());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;

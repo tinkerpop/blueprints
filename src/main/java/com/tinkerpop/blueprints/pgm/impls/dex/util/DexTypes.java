@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.impls.dex;
+package com.tinkerpop.blueprints.pgm.impls.dex.util;
 
 import edu.upc.dama.dex.core.Graph;
 import edu.upc.dama.dex.core.Graph.TypeData;
@@ -12,7 +12,7 @@ import java.util.Map;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-class DexTypes {
+public class DexTypes {
 
     /**
      * DEX type identifier --> {@link TypeData}

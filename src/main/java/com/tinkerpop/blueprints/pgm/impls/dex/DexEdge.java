@@ -5,6 +5,7 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import edu.upc.dama.dex.core.Graph;
 
 /**
@@ -88,5 +89,9 @@ public class DexEdge extends DexElement implements Edge {
     @Override
     public String getLabel() {
         return getTypeLabel();
+    }
+
+    public String toString() {
+        return StringFactory.edgeString(this);
     }
 }

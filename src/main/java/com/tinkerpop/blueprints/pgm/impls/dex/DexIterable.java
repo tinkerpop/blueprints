@@ -6,16 +6,20 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.dex.DexEdge;
+import com.tinkerpop.blueprints.pgm.impls.dex.DexElement;
+import com.tinkerpop.blueprints.pgm.impls.dex.DexGraph;
+import com.tinkerpop.blueprints.pgm.impls.dex.DexVertex;
 import edu.upc.dama.dex.core.Objects;
 
 import java.util.Iterator;
 
 /**
- * {@link Iterable} {@link DexElement} collection implementation for DEX.
+ * {@link Iterable} {@link com.tinkerpop.blueprints.pgm.impls.dex.DexElement} collection implementation for DEX.
  * <p/>
  * It is just a wrapper for DEX Objects class.
  * <p/>
- * This collections are registered into the {@link DexGraph} to be automatically
+ * This collections are registered into the {@link com.tinkerpop.blueprints.pgm.impls.dex.DexGraph} to be automatically
  * closed when the database is stopped.
  *
  * @param <T>
@@ -53,7 +57,7 @@ public class DexIterable<T extends Element> implements Iterable<T> {
     }
 
     /**
-     * {@link DexElement} {@link Iterator} implementation for DEX.
+     * {@link com.tinkerpop.blueprints.pgm.impls.dex.DexElement} {@link Iterator} implementation for DEX.
      *
      * @param <TT>
      * @author <a href="http://www.sparsity-technologies.com">Sparsity
