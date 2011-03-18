@@ -22,22 +22,7 @@ public class DexBenchmarkTestSuite extends TestSuite {
         super(graphTest);
     }
 
-    /*public void testPlay() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "created");
-        edge.setProperty("weight", 0.4);
-        edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
-        edge.setProperty("weight", 0.1);
-        edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
-        edge.setProperty("weight", 0.2);
-        edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
-        edge.setProperty("weight", 0.8);
-        edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
-        edge.setProperty("weight", 0.43245);
-        graph.shutdown();
-    }*/
-
-    /*public void testDexGraph() throws Exception {
+    public void testDexGraph() throws Exception {
         double totalTime = 0.0d;
         Graph graph = graphTest.getGraphInstance();
         GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
@@ -67,9 +52,9 @@ public class DexBenchmarkTestSuite extends TestSuite {
             }
             double currentTime = this.stopWatch();
             totalTime = totalTime + currentTime;
-            BaseTest.printPerformance(graph.toString(), counter, "Neo4jGraph elements touched", currentTime);
+            BaseTest.printPerformance(graph.toString(), counter, "DexGraph elements touched", currentTime);
             graph.shutdown();
         }
-        BaseTest.printPerformance("Neo4jGraph", 1, "Neo4jGraph experiment average", totalTime / (double) TOTAL_RUNS);
-    }*/
+        BaseTest.printPerformance("DexGraph", 1, "DexGraph experiment average", totalTime / (double) TOTAL_RUNS);
+    }
 }

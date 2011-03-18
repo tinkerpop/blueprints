@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,6 +51,12 @@ public class DexGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
+    public void testGraphMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphMLReaderTestSuite(this));
+        printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
+    }
+
     /*public void testIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexableGraphTestSuite(this));
@@ -72,12 +79,6 @@ public class DexGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
-    }*/
-
-    /*public void testGraphMLReaderTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new GraphMLReaderTestSuite(this));
-        printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }*/
 
     public Graph getGraphInstance() {

@@ -17,10 +17,6 @@ public class DexAttributes {
      * DEX attribute identifier --> {@link AttributeData}
      */
     private static Map<Long, AttributeData> attrs = new HashMap<Long, AttributeData>();
-    /**
-     * Attribute name --> DEX attribute identifier
-     */
-    private static Map<String, Long> names = new HashMap<String, Long>();
 
     /**
      * Gets corresponding {@link AttributeData} for the given attribute
@@ -38,7 +34,6 @@ public class DexAttributes {
             adata = g.getAttributeData(attr);
             if (adata != null) {
                 attrs.put(attr, adata);
-                names.put(adata.getName(), attr);
             }
         }
         return adata;
@@ -57,18 +52,11 @@ public class DexAttributes {
         assert name != null;
 
         AttributeData adata = null;
-        Long attr = names.get(name);
-        if (attr == null) {
-            attr = g.findAttribute(type, name);
-            if (attr != Graph.INVALID_ATTRIBUTE) {
-                adata = g.getAttributeData(attr);
-                assert adata != null;
-                attrs.put(attr, adata);
-                names.put(adata.getName(), attr);
-            }
-        } else {
-            adata = attrs.get(attr);
+        Long attr = g.findAttribute(type, name);
+        if (attr != Graph.INVALID_ATTRIBUTE) {
+            adata = g.getAttributeData(attr);
             assert adata != null;
+            attrs.put(attr, adata);
         }
         return adata;
     }
@@ -87,15 +75,11 @@ public class DexAttributes {
         assert name != null;
 
         AttributeData adata = null;
-        Long attr = names.get(name);
-        if (attr == null) {
-            attr = g.findAttribute(type, name);
-            if (attr != Graph.INVALID_ATTRIBUTE) {
-                adata = g.getAttributeData(attr);
-                assert adata != null;
-                attrs.put(attr, adata);
-                names.put(adata.getName(), attr);
-            }
+        Long attr = g.findAttribute(type, name);
+        if (attr != Graph.INVALID_ATTRIBUTE) {
+            adata = g.getAttributeData(attr);
+            assert adata != null;
+            attrs.put(attr, adata);
         }
         return attr;
     }
@@ -105,6 +89,5 @@ public class DexAttributes {
      */
     public static void clear() {
         attrs.clear();
-        names.clear();
     }
 }
