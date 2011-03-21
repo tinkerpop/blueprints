@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +13,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class TinkerElement implements Element {
+public abstract class TinkerElement implements Element, Serializable {
 
     protected Map<String, Object> properties = new HashMap<String, Object>();
     protected final String id;

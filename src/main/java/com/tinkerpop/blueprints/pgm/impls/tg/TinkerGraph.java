@@ -4,6 +4,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -11,7 +12,7 @@ import java.util.*;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerGraph implements IndexableGraph {
+public class TinkerGraph implements IndexableGraph, Serializable {
 
     private Long currentId = 0l;
     protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();

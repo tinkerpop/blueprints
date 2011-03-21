@@ -4,7 +4,10 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
+import java.io.*;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -86,5 +89,16 @@ public class TinkerGraphTest extends GraphTest {
                 }
             }
         }
+    }
+
+    public void testSerializability() {
+        Graph graph = TinkerGraphFactory.createTinkerGraph();
+        try {
+			ObjectOutputStream out = new ObjectOutputStream(new ByteArrayOutputStream());
+            out.writeObject(graph);
+            out.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
     }
 }

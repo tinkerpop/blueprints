@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerIndex<T extends Element> implements Index<T> {
+public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
     private Map<String, Map<Object, Set<T>>> index = new HashMap<String, Map<Object, Set<T>>>();
     private final String indexName;

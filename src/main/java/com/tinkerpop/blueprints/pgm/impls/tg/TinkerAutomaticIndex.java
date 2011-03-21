@@ -2,13 +2,14 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements AutomaticIndex<T> {
+public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements AutomaticIndex<T>, Serializable {
 
     Set<String> autoIndexKeys;
 
