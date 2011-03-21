@@ -82,16 +82,16 @@ public class Neo4jGraphTest extends GraphTest {
     }
 
     public Graph getGraphInstance() {
-        String directory = System.getProperty("neo4jDirectory");
+        String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
         return new Neo4jGraph(directory);
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String doTest = System.getProperty("testNeo4j");
+        String doTest = System.getProperty("testNeo4jGraph");
         if (doTest == null || doTest.equals("true")) {
-            String directory = System.getProperty("neo4jDirectory");
+            String directory = System.getProperty("neo4jGraphDirectory");
             if (directory == null)
                 directory = this.getWorkingDirectory();
             deleteDirectory(new File(directory));
@@ -106,7 +106,7 @@ public class Neo4jGraphTest extends GraphTest {
     }
 
     private String getWorkingDirectory() {
-        String directory = System.getProperty("neo4jDirectory");
+        String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null) {
             if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
                 directory = "C:/temp/blueprints_test";
@@ -149,7 +149,7 @@ public class Neo4jGraphTest extends GraphTest {
     }
 
     public void testQueryIndex() throws Exception {
-        String directory = System.getProperty("neo4jDirectory");
+        String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
         IndexableGraph graph = new Neo4jGraph(directory);

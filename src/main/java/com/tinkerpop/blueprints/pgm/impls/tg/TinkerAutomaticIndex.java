@@ -13,7 +13,7 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
 
     Set<String> autoIndexKeys;
 
-    public TinkerAutomaticIndex(String name, Class<T> indexClass, Set<String> keys) {
+    public TinkerAutomaticIndex(final String name, final Class<T> indexClass, final Set<String> keys) {
         super(name, indexClass);
         if (keys == null)
             this.autoIndexKeys = null;

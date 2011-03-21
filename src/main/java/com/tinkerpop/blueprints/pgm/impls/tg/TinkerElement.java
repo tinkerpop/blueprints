@@ -17,11 +17,13 @@ public abstract class TinkerElement implements Element, Serializable {
 
     protected Map<String, Object> properties = new HashMap<String, Object>();
     protected final String id;
+    private final int hashCode;
     protected final TinkerGraph graph;
 
     protected TinkerElement(final String id, final TinkerGraph graph) {
         this.graph = graph;
         this.id = id;
+        this.hashCode = id.hashCode();
     }
 
     public Set<String> getPropertyKeys() {
@@ -52,7 +54,7 @@ public abstract class TinkerElement implements Element, Serializable {
 
 
     public int hashCode() {
-        return this.getId().hashCode();
+        return this.hashCode;
     }
 
     public String getId() {

@@ -152,13 +152,17 @@
                             <name>testTinkerGraph</name>
                             <value>true</value>
                         </property>
+                        <property>
+                            <name>tinkerGraphDirectory</name>
+                            <value>/tmp/blueprints_test</value>
+                        </property>
                         <!-- NEO4J TEST PROPERTIES -->
                         <property>
-                            <name>testNeo4j</name>
+                            <name>testNeo4jGraph</name>
                             <value>true</value>
                         </property>
                         <property>
-                            <name>neo4jDirectory</name>
+                            <name>neo4jGraphDirectory</name>
                             <value>/tmp/blueprints_test</value>
                         </property>
                         <!-- SAIL TEST PROPERTIES -->

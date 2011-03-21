@@ -6,10 +6,6 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.dex.DexEdge;
-import com.tinkerpop.blueprints.pgm.impls.dex.DexElement;
-import com.tinkerpop.blueprints.pgm.impls.dex.DexGraph;
-import com.tinkerpop.blueprints.pgm.impls.dex.DexVertex;
 import edu.upc.dama.dex.core.Objects;
 
 import java.util.Iterator;

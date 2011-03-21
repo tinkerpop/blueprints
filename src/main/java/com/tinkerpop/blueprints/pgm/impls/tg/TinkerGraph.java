@@ -4,7 +4,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -19,8 +19,34 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
     protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
     protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
+    private final String directory;
+    private static final String GRAPH_FILE = "/tinkergraph.dat";
+
+    public TinkerGraph(final String directory) {
+        this.directory = directory;
+        try {
+            File file = new File(directory);
+            if (!file.exists()) {
+                file.mkdir();
+                this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
+                this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
+            } else {
+                ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
+                TinkerGraph temp = (TinkerGraph) input.readObject();
+                input.close();
+                this.currentId = temp.currentId;
+                this.vertices = temp.vertices;
+                this.edges = temp.edges;
+                this.indices = temp.indices;
+                this.autoIndices = temp.autoIndices;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
     public TinkerGraph() {
+        this.directory = null;
         this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
         this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
     }
@@ -215,7 +241,20 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public void shutdown() {
-
+        if (null != this.directory) {
+            try {
+                File file = new File(this.directory + GRAPH_FILE);
+                if (file.exists()) {
+                    file.delete();
+                } else {
+                }
+                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.directory + GRAPH_FILE));
+                out.writeObject(this);
+                out.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
     }
 
     private String getNextId() {

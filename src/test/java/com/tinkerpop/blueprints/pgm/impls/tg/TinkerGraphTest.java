@@ -4,10 +4,8 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
-import java.io.*;
+import java.io.File;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -18,7 +16,7 @@ public class TinkerGraphTest extends GraphTest {
         this.allowsDuplicateEdges = true;
         this.allowsSelfLoops = true;
         this.ignoresSuppliedIds = false;
-        this.isPersistent = false;
+        this.isPersistent = true;
         this.isRDFModel = false;
         this.supportsVertexIteration = true;
         this.supportsEdgeIteration = true;
@@ -76,29 +74,37 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     public Graph getGraphInstance() {
-        return new TinkerGraph();
+        String directory = System.getProperty("tinkerGraphDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        return new TinkerGraph(directory);
+    }
+
+    private String getWorkingDirectory() {
+        String directory = System.getProperty("tinkerGraphDirectory");
+        if (directory == null) {
+            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
+                directory = "C:/temp/blueprints_test";
+            else
+                directory = "/tmp/blueprints_test";
+        }
+        return directory;
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         String doTest = System.getProperty("testTinkerGraph");
         if (doTest == null || doTest.equals("true")) {
+            String directory = System.getProperty("tinkerGraphDirectory");
+            if (directory == null)
+                directory = this.getWorkingDirectory();
+            deleteDirectory(new File(directory));
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(testSuite);
+                    deleteDirectory(new File(directory));
                 }
             }
         }
-    }
-
-    public void testSerializability() {
-        Graph graph = TinkerGraphFactory.createTinkerGraph();
-        try {
-			ObjectOutputStream out = new ObjectOutputStream(new ByteArrayOutputStream());
-            out.writeObject(graph);
-            out.close();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
     }
 }
