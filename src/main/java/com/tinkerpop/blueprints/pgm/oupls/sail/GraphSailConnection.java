@@ -20,7 +20,6 @@ import org.openrdf.sail.SailException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Random;
 
 /**
  * A stateful connection to a BlueprintsSail RDF store interface.
@@ -317,18 +316,18 @@ public class GraphSailConnection implements SailConnection {
         throw new UnsupportedOperationException("The clearNamespaces operation is not yet supported");
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    // statement iteration /////////////////////////////////////////////////////
 
     private CloseableIteration<Statement, SailException> createIteration(final Iterator<Edge> iterator) {
         return store.volatileStatements
-                ? new VolatileEdgeIteration(iterator)
-                : new StableEdgeIteration(iterator);
+                ? new VolatileStatementIteration(iterator)
+                : new StableStatementIteration(iterator);
     }
 
-    private class StableEdgeIteration implements CloseableIteration<Statement, SailException> {
+    private class StableStatementIteration implements CloseableIteration<Statement, SailException> {
         private final Iterator<Edge> iterator;
 
-        public StableEdgeIteration(final Iterator<Edge> iterator) {
+        public StableStatementIteration(final Iterator<Edge> iterator) {
             this.iterator = iterator;
         }
 
@@ -343,105 +342,11 @@ public class GraphSailConnection implements SailConnection {
         public Statement next() throws SailException {
             Edge e = iterator.next();
 
-            Resource subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
-            URI predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-            Value object = toSesame(store.getValueOf(e.getInVertex()));
-            Resource context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
-
-            return store.valueFactory.createStatement(subject, predicate, object, context);
-            //return new TempStatement(store.valueFactory.createStatement(subject, predicate, object, context));
-        }
-
-        public void remove() throws SailException {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    // This class is purely for demonstrative purposes.  Use it StableEdgeIteration, and it will have no
-    // effect unless you include the finalize() method.  With the finalize method, it dramatically
-    // increases query time, as it interferes with a JDK optimization which eliminates creation of
-    // very many short-lived Statement objects.
-    private class TempStatement implements Statement {
-        private final Statement wrapped;
-
-        public TempStatement(Statement wrapped) {
-            this.wrapped = wrapped;
-        }
-
-        @Override
-        public Resource getSubject() {
-            return wrapped.getSubject();
-        }
-
-        @Override
-        public URI getPredicate() {
-            return wrapped.getPredicate();
-        }
-
-        @Override
-        public Value getObject() {
-            return wrapped.getObject();
-        }
-
-        @Override
-        public Resource getContext() {
-            return wrapped.getContext();
-        }
-
-        protected void finalize() throws Throwable {
-            super.finalize();
-        }
-    }
-
-    private class VolatileEdgeIteration implements CloseableIteration<Statement, SailException> {
-        private Resource subject;
-        private URI predicate;
-        private Value object;
-        private Resource context;
-
-        private final Iterator<Edge> iterator;
-
-        private final Statement s = new Statement() {
-            @Override
-            public Resource getSubject() {
-                return subject;
-            }
-
-            @Override
-            public URI getPredicate() {
-                return predicate;
-            }
-
-            @Override
-            public Value getObject() {
-                return object;
-            }
-
-            @Override
-            public Resource getContext() {
-                return context;
-            }
-        };
-
-        public VolatileEdgeIteration(final Iterator<Edge> iterator) {
-            this.iterator = iterator;
-        }
-
-        public void close() throws SailException {
-            // Do nothing.
-        }
-
-        public boolean hasNext() throws SailException {
-            return iterator.hasNext();
-        }
-
-        public Statement next() throws SailException {
-            Edge e = iterator.next();
-
-            subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
-            predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-            object = toSesame(store.getValueOf(e.getInVertex()));
-            context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
+            SimpleStatement s = new SimpleStatement();
+            s.subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
+            s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
+            s.object = toSesame(store.getValueOf(e.getInVertex()));
+            s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
 
             return s;
         }
@@ -449,6 +354,74 @@ public class GraphSailConnection implements SailConnection {
         public void remove() throws SailException {
             throw new UnsupportedOperationException();
         }
+    }
+
+    private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
+        private final SimpleStatement s = new SimpleStatement();
+        private final Iterator<Edge> iterator;
+
+        public VolatileStatementIteration(final Iterator<Edge> iterator) {
+            this.iterator = iterator;
+        }
+
+        public void close() throws SailException {
+            // Do nothing.
+        }
+
+        public boolean hasNext() throws SailException {
+            return iterator.hasNext();
+        }
+
+        public Statement next() throws SailException {
+            Edge e = iterator.next();
+
+            s.subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
+            s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
+            s.object = toSesame(store.getValueOf(e.getInVertex()));
+            s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
+
+            return s;
+        }
+
+        public void remove() throws SailException {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * A POJO statement containing a subject, predicate, object and context.
+     * The purpose of using a special Statement implementation (rather than using an existing ValueFactory) is to
+     * guarantee that it does not contain anything which would interfere
+     * with JDK optimization aimed at eliminating creation of short-lived (Statement) objects.
+     * You can observe the effect of such interference by un-commenting the <code>finalize()</code> method below.
+     */
+    private class SimpleStatement implements Statement {
+        private Resource subject;
+        private URI predicate;
+        private Value object;
+        private Resource context;
+
+        public Resource getSubject() {
+            return subject;
+        }
+
+        public URI getPredicate() {
+            return predicate;
+        }
+
+        public Value getObject() {
+            return object;
+        }
+
+        public Resource getContext() {
+            return context;
+        }
+
+        /*
+        protected void finalize() throws Throwable {
+            super.finalize();
+        }
+        //*/
     }
 
     // value conversion ////////////////////////////////////////////////////////

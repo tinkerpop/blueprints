@@ -29,22 +29,22 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
 
     @SuppressWarnings("unchecked")
     public T next() {
-        OrientElement currentElement=null;
+        OrientElement currentElement = null;
         final Object current = this.underlying.next();
-        if( current instanceof ODocument ){
-	        final ODocument currentDocument = (ODocument) current;
-	        if (null == currentDocument)
-	            throw new NoSuchElementException();
-	
-	        if (currentDocument.getInternalStatus() == STATUS.NOT_LOADED)
-	            currentDocument.load();
-	
-	        if (currentDocument.getSchemaClass().isSubClassOf(graph.getRawGraph().getEdgeBaseClass()))
-	            currentElement = new OrientEdge(graph, currentDocument);
-	        else
-	            currentElement = new OrientVertex(graph, currentDocument);
+        if (current instanceof ODocument) {
+            final ODocument currentDocument = (ODocument) current;
+            if (null == currentDocument)
+                throw new NoSuchElementException();
+
+            if (currentDocument.getInternalStatus() == STATUS.NOT_LOADED)
+                currentDocument.load();
+
+            if (currentDocument.getSchemaClass().isSubClassOf(graph.getRawGraph().getEdgeBaseClass()))
+                currentElement = new OrientEdge(graph, currentDocument);
+            else
+                currentElement = new OrientVertex(graph, currentDocument);
         }
-        
+
         return (T) currentElement;
     }
 

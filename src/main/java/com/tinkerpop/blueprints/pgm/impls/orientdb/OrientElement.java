@@ -2,8 +2,10 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.Set;
 
@@ -22,19 +24,20 @@ public abstract class OrientElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        graph.autoStartTransaction();
+        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
+            throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
+
+        this.graph.autoStartTransaction();
 
         try {
-            Object oldValue = this.getProperty(key);
-            for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+            final Object oldValue = this.getProperty(key);
+            for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
                 autoIndex.autoUpdate(key, value, oldValue, this);
             }
 
             this.rawElement.field(key, value);
-            graph.getRawGraph().save(rawElement);
-
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-
+            this.graph.getRawGraph().save(rawElement);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
@@ -45,25 +48,24 @@ public abstract class OrientElement implements Element {
     }
 
     public Object removeProperty(final String key) {
-        graph.autoStartTransaction();
+        this.graph.autoStartTransaction();
 
         try {
-            Object oldValue = this.rawElement.removeField(key);
+            final Object oldValue = this.rawElement.removeField(key);
             if (null != oldValue) {
-                for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
                     autoIndex.autoRemove(key, oldValue, this);
                 }
             }
             this.save();
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             return oldValue;
 
         } catch (RuntimeException e) {
-
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

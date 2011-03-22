@@ -1,34 +1,36 @@
-package com.tinkerpop.blueprints.pgm.impls.tg;
+package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 
 /**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author <a href="http://www.sparsity-technologies.com">Sparsity
+ *         Technologies</a>
  */
-public class TinkerGraphTest extends GraphTest {
+public class DexGraphTest extends GraphTest {
 
-    public TinkerGraphTest() {
+    public DexGraphTest() {
         this.allowsDuplicateEdges = true;
         this.allowsSelfLoops = true;
-        this.ignoresSuppliedIds = false;
         this.isPersistent = true;
         this.isRDFModel = false;
         this.supportsVertexIteration = true;
         this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = true;
-        this.supportsEdgeIndex = true;
+        this.supportsVertexIndex = false;
+        this.supportsEdgeIndex = false;
+        this.ignoresSuppliedIds = true;
         this.supportsTransactions = false;
     }
 
-    /*public void testTinkerBenchmarkTestSuite() throws Exception {
+    /*public void testDexBenchmarkTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new TinkerBenchmarkTestSuite(this));
-        printTestPerformance("TinkerBenchmarkTestSuite", this.stopWatch());
+        doTestSuite(new DexBenchmarkTestSuite(this));
+        printTestPerformance("DexBenchmarkTestSuite", this.stopWatch());
     }*/
 
     public void testVertexTestSuite() throws Exception {
@@ -49,7 +51,13 @@ public class TinkerGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
+    public void testGraphMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphMLReaderTestSuite(this));
+        printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
+    }
+
+    /*public void testIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexableGraphTestSuite(this));
         printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
@@ -67,42 +75,39 @@ public class TinkerGraphTest extends GraphTest {
         printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
-    public void testGraphMLReaderTestSuite() throws Exception {
+    public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new GraphMLReaderTestSuite(this));
-        printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
-    }
+        doTestSuite(new TransactionalGraphTestSuite(this));
+        printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
+    }*/
 
     public Graph getGraphInstance() {
-        String directory = System.getProperty("tinkerGraphDirectory");
-        if (directory == null)
-            directory = this.getWorkingDirectory();
-        return new TinkerGraph(directory);
-    }
+        String db = System.getProperty("dexGraphFile");
+        if (db == null)
+            db = "/tmp/blueprints_test.dex";
 
-    private String getWorkingDirectory() {
-        String directory = System.getProperty("tinkerGraphDirectory");
-        if (directory == null) {
-            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-                directory = "C:/temp/blueprints_test";
-            else
-                directory = "/tmp/blueprints_test";
+        File fDB = new File(db);
+        try {
+            return new DexGraph(fDB, !fDB.exists());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
         }
-        return directory;
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String doTest = System.getProperty("testTinkerGraph");
+        String doTest = System.getProperty("testDexGraph");
         if (doTest == null || doTest.equals("true")) {
-            String directory = System.getProperty("tinkerGraphDirectory");
-            if (directory == null)
-                directory = this.getWorkingDirectory();
-            deleteDirectory(new File(directory));
+            String db = System.getProperty("dexGraphFile");
+            if (db == null)
+                db = "/tmp/blueprints_test.dex";
+            File fDB = new File(db);
+            fDB.delete();
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
                     method.invoke(testSuite);
-                    deleteDirectory(new File(directory));
+                    fDB.delete();
                 }
             }
         }

@@ -1,8 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
@@ -31,6 +33,9 @@ public abstract class Neo4jElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
+        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
+            throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
+
         try {
             this.graph.autoStartTransaction();
             Object oldValue = this.getProperty(key);

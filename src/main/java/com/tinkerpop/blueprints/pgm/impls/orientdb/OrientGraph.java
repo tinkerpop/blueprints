@@ -315,7 +315,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void setTransactionMode(final Mode mode) {
-    	  this.rawGraph.commit();
+        this.rawGraph.commit();
         this.mode = mode;
     }
 

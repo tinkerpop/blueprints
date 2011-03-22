@@ -1,19 +1,19 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements AutomaticIndex<T> {
+public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements AutomaticIndex<T>, Serializable {
 
     Set<String> autoIndexKeys;
 
-    public TinkerAutomaticIndex(String name, Class<T> indexClass, Set<String> keys) {
+    public TinkerAutomaticIndex(final String name, final Class<T> indexClass, final Set<String> keys) {
         super(name, indexClass);
         if (keys == null)
             this.autoIndexKeys = null;
@@ -43,9 +43,5 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
             this.remove(key, oldValue, element);
         }
-    }
-
-    public String toString() {
-        return StringFactory.indexString(this);
     }
 }

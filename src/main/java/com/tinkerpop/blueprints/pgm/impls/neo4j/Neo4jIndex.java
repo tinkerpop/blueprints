@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import org.neo4j.graphdb.Node;
@@ -110,5 +111,9 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
 
     protected IndexManager getIndexManager() {
         return this.graph.getRawGraph().index();
+    }
+
+    public String toString() {
+        return StringFactory.indexString(this);
     }
 }
