@@ -74,6 +74,9 @@ public class RedisElement implements Element {
 
     @Override
     public void setProperty(String s, Object o) {
+        if(s.equals("id") || (this instanceof RedisEdge && s.equals("label"))){
+            throw new RuntimeException("Cannot assign property " + s);
+        }
         try {
             String val;
             if(graph.serializeProperties()){
