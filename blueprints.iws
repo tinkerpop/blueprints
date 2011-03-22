@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b23b56ae-b77d-4c28-97a5-ed7a250c302d" name="Default" comment="" />
+    <list default="true" id="b23b56ae-b77d-4c28-97a5-ed7a250c302d" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/blueprints.iws" afterPath="$PROJECT_DIR$/blueprints.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/com/tinkerpop/blueprints/pgm/impls/blueredis/BlueredisGraphTest.java" afterPath="$PROJECT_DIR$/src/test/java/com/tinkerpop/blueprints/pgm/impls/blueredis/BlueredisGraphTest.java" />
+    </list>
     <ignored path="blueprints.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -59,10 +64,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BlueredisGraphTest.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="BlueredisGraphTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/java/com/tinkerpop/blueprints/pgm/impls/blueredis/BlueredisGraphTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="22" column="61" selection-start="722" selection-end="722" vertical-scroll-proportion="0.0">
+            <state line="105" column="60" selection-start="3880" selection-end="3880" vertical-scroll-proportion="0.42540324">
               <folding />
             </state>
           </provider>
@@ -81,15 +86,6 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/index/RedisIndex.java">
           <provider selected="true" editor-type-id="text-editor">
             <state line="175" column="36" selection-start="5892" selection-end="5892" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RedisElementType.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/iterators/RedisElementType.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="0" selection-start="2198" selection-end="2198" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -122,10 +118,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RedisElementIterator.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RedisElementIterator.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/iterators/RedisElementIterator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="15" selection-start="1786" selection-end="1786" vertical-scroll-proportion="0.13788968">
+            <state line="32" column="15" selection-start="1786" selection-end="1786" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="13" selection-start="2256" selection-end="2256" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -164,7 +169,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../erlang/zotonic/priv/sites/blog_test/templates/base.tpl" />
         <option value="$PROJECT_DIR$/../../erlang/zotonic/priv/sites/blog_test/templates/home.tpl" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/iterators/RedisEdgeIterable.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/iterators/RedisVertexIterable.java" />
@@ -179,6 +183,7 @@
         <option value="$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/iterators/RedisElementType.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/RedisGraph.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/index/RedisIndexManager.java" />
+        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/test/java/com/tinkerpop/blueprints/pgm/impls/blueredis/BlueredisGraphTest.java" />
       </list>
     </option>
@@ -362,6 +367,78 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="pgm" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="blueprints" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="blueprints-dmitrii" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="blueprints" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pgm" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impls" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="blueprints" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="blueprints-dmitrii" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="blueprints" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pgm" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="impls" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="blueredis" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -830,7 +907,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="57" y="22" width="1623" height="1028" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -840,10 +917,10 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32929516" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25794154" sideWeight="0.40198237" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25794154" sideWeight="0.2400881" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.32973316" sideWeight="0.60022026" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25794154" sideWeight="0.58920705" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25794154" sideWeight="0.35132158" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32929516" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -889,13 +966,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/tg/TinkerGraph.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="77" selection-start="1499" selection-end="1558" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/index/package-info.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="3" column="92" selection-start="93" selection-end="169" vertical-scroll-proportion="0.0">
@@ -961,13 +1031,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/java/com/tinkerpop/blueprints/pgm/impls/blueredis/BlueredisGraphTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="61" selection-start="722" selection-end="722" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/RedisGraph.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="189" column="75" selection-start="6089" selection-end="6089" vertical-scroll-proportion="0.0">
@@ -998,7 +1061,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/tinkerpop/blueprints/pgm/impls/blueredis/iterators/RedisElementIterator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="15" selection-start="1786" selection-end="1786" vertical-scroll-proportion="0.13788968">
+        <state line="32" column="15" selection-start="1786" selection-end="1786" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="13" selection-start="2256" selection-end="2256" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/java/com/tinkerpop/blueprints/pgm/impls/blueredis/BlueredisGraphTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="105" column="60" selection-start="3880" selection-end="3880" vertical-scroll-proportion="0.42540324">
           <folding />
         </state>
       </provider>

@@ -2,3 +2,7 @@
 target/
 blueprints.iml
 .idea/
+*.iws
+*.DS_Store
+*.ipr
+
