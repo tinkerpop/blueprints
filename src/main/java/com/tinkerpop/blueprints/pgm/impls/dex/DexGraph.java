@@ -81,11 +81,11 @@ public class DexGraph implements IndexableGraph {
     /**
      * Creates a new instance.
      *
-     * @param db     Database persistent file.
-     * @param create Create iff <code>true</code>, open otherwise.
+     * @param db Database persistent file.
      * @throws FileNotFoundException Given file is not found.
      */
-    public DexGraph(File db, boolean create) throws FileNotFoundException {
+    public DexGraph(final File db) throws FileNotFoundException {
+        boolean create = !db.exists();
         this.db = db;
         DEX.Config cfg = new DEX.Config();
         cfg.setCacheMaxSize(0); // use as much memory as possible
