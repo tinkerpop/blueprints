@@ -81,18 +81,22 @@ public class DexGraph implements IndexableGraph {
     /**
      * Creates a new instance.
      *
-     * @param db Database persistent file.
-     * @throws FileNotFoundException Given file is not found.
+     * @param fileName Database persistent file.
      */
-    public DexGraph(final File db) throws FileNotFoundException {
-        boolean create = !db.exists();
-        this.db = db;
-        DEX.Config cfg = new DEX.Config();
-        cfg.setCacheMaxSize(0); // use as much memory as possible
-        dex = new DEX(cfg);
-        gpool = (create ? dex.create(db) : dex.open(db));
-        session = gpool.newSession();
-        graph = session.getDbGraph();
+    public DexGraph(final String fileName) {
+        try {
+            final File db = new File(fileName);
+            boolean create = !db.exists();
+            this.db = db;
+            DEX.Config cfg = new DEX.Config();
+            cfg.setCacheMaxSize(0); // use as much memory as possible
+            dex = new DEX(cfg);
+            gpool = (create ? dex.create(db) : dex.open(db));
+            session = gpool.newSession();
+            graph = session.getDbGraph();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     /**

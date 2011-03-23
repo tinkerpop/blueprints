@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Method;
 
 /**
@@ -85,14 +84,7 @@ public class DexGraphTest extends GraphTest {
         String db = System.getProperty("dexGraphFile");
         if (db == null)
             db = "/tmp/blueprints_test.dex";
-
-        File fDB = new File(db);
-        try {
-            return new DexGraph(fDB);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return new DexGraph(db);
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {

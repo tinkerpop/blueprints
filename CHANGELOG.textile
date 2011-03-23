@@ -11,6 +11,22 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
+
+h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>blueprints</artifactId>
+  <version>0.6-SNAPSHOT</version>
+</dependency>
+```
+
+* Added @DexGraph@ implementation (Sparsity Technologies)
+* Bumped to OrientDB 1.0rc1-SNAPSHOT
+
+==<hr/>==
+
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-scooby.png!
 
 h3. Version 0.5 (Scooby -- March 2, 2011)
