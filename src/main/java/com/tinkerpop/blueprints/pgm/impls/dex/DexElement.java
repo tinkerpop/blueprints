@@ -83,7 +83,7 @@ public class DexElement implements Element {
      * @param g   DexGraph.
      * @param oid DEX OID.
      */
-    DexElement(DexGraph g, long oid) {
+    protected DexElement(final DexGraph g, final long oid) {
         assert g != null;
         assert oid != Graph.INVALID_OID;
 
@@ -97,7 +97,7 @@ public class DexElement implements Element {
       * @see com.tinkerpop.blueprints.pgm.Element#getProperty(java.lang.String)
       */
     @Override
-    public Object getProperty(String key) {
+    public Object getProperty(final String key) {
         AttributeData adata = DexAttributes.getAttributeData(graph.getRawGraph(), getObjectType(), key);
         if (adata == null) {
             return null;
@@ -154,7 +154,7 @@ public class DexElement implements Element {
       * java.lang.Object)
       */
     @Override
-    public void setProperty(String key, Object value) {
+    public void setProperty(final String key, final Object value) {
         //System.out.println(this + "!!" + key + "!!" + value);
         if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
@@ -235,7 +235,7 @@ public class DexElement implements Element {
       * com.tinkerpop.blueprints.pgm.Element#removeProperty(java.lang.String)
       */
     @Override
-    public Object removeProperty(String key) {
+    public Object removeProperty(final String key) {
         Object ret = getProperty(key);
         Value v = new Value();
         v.setNull();
@@ -254,11 +254,8 @@ public class DexElement implements Element {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof DexElement) {
-            return getId().equals(((DexElement) obj).getId());
-        }
-        return false;
+    public boolean equals(final Object object) {
+        return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
     }
 
     @Override

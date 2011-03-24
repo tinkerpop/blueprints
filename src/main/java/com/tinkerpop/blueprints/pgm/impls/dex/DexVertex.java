@@ -23,7 +23,7 @@ public class DexVertex extends DexElement implements Vertex {
      * @param g   DexGraph.
      * @param oid DEX OID.
      */
-    DexVertex(DexGraph g, long oid) {
+    protected DexVertex(final DexGraph g, final long oid) {
         super(g, oid);
     }
 
@@ -69,7 +69,7 @@ public class DexVertex extends DexElement implements Vertex {
       * @see com.tinkerpop.blueprints.pgm.Vertex#getOutEdges(java.lang.String)
       */
     @Override
-    public Iterable<Edge> getOutEdges(String label) {
+    public Iterable<Edge> getOutEdges(final String label) {
         int type = DexTypes.getTypeId(graph.getRawGraph(), label);
         if (type == Graph.INVALID_TYPE) {
             throw new IllegalArgumentException("Non-existent edge label" + label);
@@ -86,7 +86,7 @@ public class DexVertex extends DexElement implements Vertex {
       * @see com.tinkerpop.blueprints.pgm.Vertex#getInEdges(java.lang.String)
       */
     @Override
-    public Iterable<Edge> getInEdges(String label) {
+    public Iterable<Edge> getInEdges(final String label) {
         int type = DexTypes.getTypeId(graph.getRawGraph(), label);
         if (type == Graph.INVALID_TYPE) {
             throw new IllegalArgumentException("Non-existent edge label" + label);

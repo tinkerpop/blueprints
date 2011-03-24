@@ -33,7 +33,7 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
     private int type = Graph.INVALID_TYPE;
     private String name = null;
 
-    public DexAutomaticIndex(DexGraph g, Class<T> clazz, int type) {
+    public DexAutomaticIndex(final DexGraph g, final Class<T> clazz, final int type) {
         assert type != Graph.INVALID_ATTRIBUTE;
 
         this.graph = g;
@@ -58,12 +58,12 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
     }
 
     @Override
-    public void put(String key, Object value, T element) {
+    public void put(final String key, final Object value, final T element) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Iterable<T> get(String key, Object value) {
+    public Iterable<T> get(final String key, final Object value) {
         long attr = DexAttributes
                 .getAttributeId(graph.getRawGraph(), type, key);
         if (attr == Graph.INVALID_ATTRIBUTE) {
@@ -101,7 +101,7 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
     }
 
     @Override
-    public void remove(String key, Object value, T element) {
+    public void remove(final String key, final Object value, final T element) {
         throw new UnsupportedOperationException();
     }
 

@@ -53,7 +53,7 @@ public class DexEdge extends DexElement implements Edge {
      * @param g   DexGraph.
      * @param oid DEX OID.
      */
-    DexEdge(DexGraph g, long oid) {
+    protected DexEdge(final DexGraph g, final long oid) {
         super(g, oid);
         this.in = Graph.INVALID_NODE;
         this.out = Graph.INVALID_NODE;

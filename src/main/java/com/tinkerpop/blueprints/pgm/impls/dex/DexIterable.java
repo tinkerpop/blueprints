@@ -28,7 +28,7 @@ public class DexIterable<T extends Element> implements Iterable<T> {
     private Objects objs = null;
     private Class<T> clazz = null;
 
-    public DexIterable(DexGraph g, Objects objs, Class<T> clazz) {
+    public DexIterable(final DexGraph g, final Objects objs, final Class<T> clazz) {
         this.graph = g;
         this.objs = objs;
         this.clazz = clazz;
@@ -63,7 +63,7 @@ public class DexIterable<T extends Element> implements Iterable<T> {
 
         private Objects.Iterator it = null;
 
-        DEXIterator(Objects.Iterator it) {
+        DEXIterator(final Objects.Iterator it) {
             this.it = it;
         }
 

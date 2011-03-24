@@ -65,7 +65,7 @@ public class DexGraph implements IndexableGraph {
      *
      * @param col Collection to be registered.
      */
-    void register(DexIterable<? extends Element> col) {
+    protected void register(final DexIterable<? extends Element> col) {
         collections.add(col);
     }
 
@@ -74,7 +74,7 @@ public class DexGraph implements IndexableGraph {
      *
      * @param col Collection to be unregistered
      */
-    void unregister(DexIterable<? extends Element> col) {
+    protected void unregister(final DexIterable<? extends Element> col) {
         collections.remove(col);
     }
 
@@ -113,26 +113,21 @@ public class DexGraph implements IndexableGraph {
      * @see com.tinkerpop.blueprints.pgm.Graph#addVertex(java.lang.Object)
      */
     @Override
-    public Vertex addVertex(Object id) {
+    public Vertex addVertex(final Object id) {
         String label = LABEL;
         if (label == null) {
             label = DEFAULT_DEX_VERTEX_LABEL;
         }
-        Vertex v = null;
-        if (id instanceof Long) {
-            v = getVertex(id);
-        } else {
-            int type = DexTypes.getTypeId(graph, label);
-            if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
-                // First instance of this type, let's create it
-                type = graph.newNodeType(label);
-            }
-            assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
-            // create object instance
-            long oid = graph.newNode(type);
-            v = new DexVertex(this, oid);
+
+        int type = DexTypes.getTypeId(graph, label);
+        if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
+            // First instance of this type, let's create it
+            type = graph.newNodeType(label);
         }
-        return v;
+        assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
+        // create object instance
+        long oid = graph.newNode(type);
+        return new DexVertex(this, oid);
     }
 
     /*
@@ -141,19 +136,19 @@ public class DexGraph implements IndexableGraph {
       * @see com.tinkerpop.blueprints.pgm.Graph#getVertex(java.lang.Object)
       */
     @Override
-    public Vertex getVertex(Object id) {
-        Vertex v = null;
-        if (id instanceof Long) {
-            Long oid = (Long) id;
-            int type = graph.getType(oid);
-            if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
-                // this is an existing oid
-                v = new DexVertex(this, oid);
-            }
-        } else {
-            throw new UnsupportedOperationException("Not implemented");
+    public Vertex getVertex(final Object id) {
+        if (null == id)
+            return null;
+        try {
+            Long longId = Double.valueOf(id.toString()).longValue();
+            int type = graph.getType(longId);
+            if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
+                return new DexVertex(this, longId);
+            else
+                return null;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
         }
-        return v;
     }
 
     /*
@@ -164,7 +159,7 @@ public class DexGraph implements IndexableGraph {
       * .pgm.Vertex)
       */
     @Override
-    public void removeVertex(Vertex vertex) {
+    public void removeVertex(final Vertex vertex) {
         assert vertex instanceof DexVertex;
         graph.drop((Long) vertex.getId());
     }
@@ -195,27 +190,17 @@ public class DexGraph implements IndexableGraph {
       * java.lang.String)
       */
     @Override
-    public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex,
-                        String label) {
-
-        Edge e = null;
-        if (id instanceof Long) {
-            e = getEdge(id);
-        } else {
-            int type = DexTypes.getTypeId(graph, label);
-            if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
-                // First instance of this type, let's create it
-                type = graph.newEdgeType(label, true, true);
-            }
-            assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
-            // create object instance
-            assert outVertex instanceof DexVertex
-                    && inVertex instanceof DexVertex;
-            long oid = graph.newEdge((Long) outVertex.getId(),
-                    (Long) inVertex.getId(), type);
-            e = new DexEdge(this, oid);
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        int type = DexTypes.getTypeId(graph, label);
+        if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
+            // First instance of this type, let's create it
+            type = graph.newEdgeType(label, true, true);
         }
-        return e;
+        assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
+        // create object instance
+        assert outVertex instanceof DexVertex && inVertex instanceof DexVertex;
+        long oid = graph.newEdge((Long) outVertex.getId(), (Long) inVertex.getId(), type);
+        return new DexEdge(this, oid);
     }
 
     /*
@@ -224,19 +209,20 @@ public class DexGraph implements IndexableGraph {
       * @see com.tinkerpop.blueprints.pgm.Graph#getEdge(java.lang.Object)
       */
     @Override
-    public Edge getEdge(Object id) {
-        Edge e = null;
-        if (id instanceof Long) {
-            Long oid = (Long) id;
-            int type = graph.getType(oid);
-            if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
-                // this is an existing oid
-                e = new DexEdge(this, oid);
-            }
-        } else {
-            throw new UnsupportedOperationException("Not implemented");
+    public Edge getEdge(final Object id) {
+        if (null == id)
+            return null;
+        try {
+            Long longId = Double.valueOf(id.toString()).longValue();
+            int type = graph.getType(longId);
+            if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
+                return new DexEdge(this, longId);
+            else
+                return null;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
         }
-        return e;
+
     }
 
     /*
@@ -247,7 +233,7 @@ public class DexGraph implements IndexableGraph {
       * .pgm.Edge)
       */
     @Override
-    public void removeEdge(Edge edge) {
+    public void removeEdge(final Edge edge) {
         assert edge instanceof DexEdge;
         graph.drop((Long) edge.getId());
     }
@@ -265,8 +251,7 @@ public class DexGraph implements IndexableGraph {
             result.union(objs);
             objs.close();
         }
-        Iterable<Edge> ret = new DexIterable<Edge>(this, result, Edge.class);
-        return ret;
+        return new DexIterable<Edge>(this, result, Edge.class);
     }
 
     /*
@@ -335,8 +320,7 @@ public class DexGraph implements IndexableGraph {
     * .String, java.lang.Class)
     */
     @Override
-    public <T extends Element> Index<T> createManualIndex(String indexName,
-                                                          Class<T> indexClass) {
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
         throw new UnsupportedOperationException();
     }
 
@@ -348,8 +332,7 @@ public class DexGraph implements IndexableGraph {
       * .lang.String, java.lang.Class, java.util.Set)
       */
     @Override
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(
-            String indexName, Class<T> indexClass, Set<String> indexKeys) {
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
         throw new UnsupportedOperationException();
     }
 
@@ -361,10 +344,8 @@ public class DexGraph implements IndexableGraph {
       * java.lang.Class)
       */
     @Override
-    public <T extends Element> Index<T> getIndex(String indexName,
-                                                 Class<T> indexClass) {
-        if (indexName.compareTo(Index.VERTICES) == 0
-                || indexName.compareTo(Index.EDGES) == 0)
+    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
+        if (indexName.compareTo(Index.VERTICES) == 0 || indexName.compareTo(Index.EDGES) == 0)
             return null;
 
         int type = DexTypes.getTypeId(getRawGraph(), indexName);
@@ -405,7 +386,7 @@ public class DexGraph implements IndexableGraph {
       * com.tinkerpop.blueprints.pgm.IndexableGraph#dropIndex(java.lang.String)
       */
     @Override
-    public void dropIndex(String indexName) {
+    public void dropIndex(final String indexName) {
         throw new UnsupportedOperationException();
     }
 }
