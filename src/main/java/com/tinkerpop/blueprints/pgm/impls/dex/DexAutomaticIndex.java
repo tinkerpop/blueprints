@@ -64,6 +64,29 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
 
     @Override
     public Iterable<T> get(final String key, final Object value) {
+        return new DexIterable<T>(graph, rawGet(key, value), clazz);
+    }
+
+    @Override
+    public long count(final String key, final Object value) {
+        return rawGet(key, value).size();
+    }
+
+    @Override
+    public void remove(final String key, final Object value, final T element) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<String> getAutoIndexKeys() {
+        Set<String> ret = new HashSet<String>();
+        for (Long attr : graph.getRawGraph().getAttributesFromType(type)) {
+            ret.add(DexAttributes.getAttributeData(graph.getRawGraph(), attr).getName());
+        }
+        return ret;
+    }
+
+    private Objects rawGet(final String key, final Object value) {
         long attr = DexAttributes
                 .getAttributeId(graph.getRawGraph(), type, key);
         if (attr == Graph.INVALID_ATTRIBUTE) {
@@ -95,23 +118,6 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
             default:
                 throw new UnsupportedOperationException();
         }
-        Objects objs = graph.getRawGraph().select(attr, Graph.OPERATION_EQ, v);
-        Iterable<T> ret = new DexIterable<T>(graph, objs, clazz);
-        return ret;
+        return graph.getRawGraph().select(attr, Graph.OPERATION_EQ, v);
     }
-
-    @Override
-    public void remove(final String key, final Object value, final T element) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Set<String> getAutoIndexKeys() {
-        Set<String> ret = new HashSet<String>();
-        for (Long attr : graph.getRawGraph().getAttributesFromType(type)) {
-            ret.add(DexAttributes.getAttributeData(graph.getRawGraph(), attr).getName());
-        }
-        return ret;
-    }
-
 }

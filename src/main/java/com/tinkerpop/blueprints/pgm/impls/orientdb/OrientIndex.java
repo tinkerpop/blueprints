@@ -97,7 +97,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public long count(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final Set<ORecord<?>> records = underlying.get(keyTemp);
+        final Set<OIdentifiable> records = underlying.get(keyTemp);
         return records.size();
     }
 
