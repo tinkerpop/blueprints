@@ -9,6 +9,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import edu.upc.dama.dex.core.Objects;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * {@link Iterable} {@link com.tinkerpop.blueprints.pgm.impls.dex.DexElement} collection implementation for DEX.
@@ -75,6 +76,8 @@ public class DexIterable<T extends Element> implements Iterable<T> {
         @Override
         public TT next() {
             long oid = it.next();
+            if (oid == -1)
+              throw new NoSuchElementException();
             TT ret = null;
             if (clazz == Vertex.class) {
                 ret = (TT) new DexVertex(graph, oid);
