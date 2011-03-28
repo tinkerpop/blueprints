@@ -139,22 +139,16 @@ public class DexGraph implements IndexableGraph {
     public Vertex getVertex(final Object id) {
         if (null == id)
             return null;
-        Long longId;
         try {
-            longId = Double.valueOf(id.toString()).longValue();
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
-        }
-        try {
+            Long longId = Double.valueOf(id.toString()).longValue();
             int type = graph.getType(longId);
             if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
                 return new DexVertex(this, longId);
             else
                 return null;
-        } catch (IllegalArgumentException e) {
-            return null;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
         }
-
     }
 
     /*
@@ -218,21 +212,15 @@ public class DexGraph implements IndexableGraph {
     public Edge getEdge(final Object id) {
         if (null == id)
             return null;
-
-        Long longId;
         try {
-            longId = Double.valueOf(id.toString()).longValue();
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
-        }
-        try {
+            Long longId = Double.valueOf(id.toString()).longValue();
             int type = graph.getType(longId);
             if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
                 return new DexEdge(this, longId);
             else
                 return null;
-        } catch (IllegalArgumentException e) {
-            return null;
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
         }
 
     }
