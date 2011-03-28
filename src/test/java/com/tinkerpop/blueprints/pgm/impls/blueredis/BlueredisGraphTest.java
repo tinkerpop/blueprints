@@ -79,11 +79,11 @@ public class BlueredisGraphTest extends GraphTest {
         printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
-    public void testTransactionalGraphTestSuite() throws Exception {
+    /*public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
-    }
+    }*/
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();

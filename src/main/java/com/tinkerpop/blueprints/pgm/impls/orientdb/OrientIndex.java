@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexNotUnique;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
@@ -86,7 +87,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final Set<ORecord<?>> records = underlying.get(keyTemp);
+        final Set<OIdentifiable> records = underlying.get(keyTemp);
 
         if (records.isEmpty())
             return Collections.emptySet();
@@ -121,8 +122,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected void removeElement(final T vertex) {
         final ORecord<?> vertexDoc = vertex.getRawElement();
 
-        Set<ORecord<?>> rids;
-        for (Entry<Object, Set<ORecord<?>>> entries : getRawIndex()) {
+        Set<OIdentifiable> rids;
+        for (Entry<Object, Set<OIdentifiable>> entries : getRawIndex()) {
             rids = entries.getValue();
             if (rids != null) {
                 if (rids.contains(vertexDoc))
