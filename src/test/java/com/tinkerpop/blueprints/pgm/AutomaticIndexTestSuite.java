@@ -402,4 +402,22 @@ public class AutomaticIndexTestSuite extends TestSuite {
 
         graph.shutdown();
     }
+
+    public void testIndexCount() {
+        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
+            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+            Set<String> keys = new HashSet<String>();
+            keys.add("dog");
+            AutomaticIndex<Vertex> index = (AutomaticIndex) graph.createAutomaticIndex("anyname", Vertex.class, keys);
+            for (int i = 0; i < 10; i++) {
+                Vertex v = graph.addVertex(null);
+                v.setProperty("dog", "puppy");
+            }
+            assertEquals(10, index.count("dog", "puppy"));
+            Vertex v = index.get("dog", "puppy").iterator().next();
+            graph.removeVertex(v);
+            assertEquals(9, index.count("dog", "puppy"));
+            graph.shutdown();
+        }
+    }
 }

@@ -32,6 +32,7 @@ public class IndexTestSuite extends TestSuite {
             BaseTest.printPerformance(graph.toString(), 2, "vertices manually index", this.stopWatch());
             assertEquals(v1, index.get("dog", "puppy").iterator().next());
             assertEquals(v2, index.get("dog", "mama").iterator().next());
+            assertEquals(1, index.count("dog", "puppy"));
 
             v1.removeProperty("dog");
             assertEquals(v1, index.get("dog", "puppy").iterator().next());
@@ -56,6 +57,23 @@ public class IndexTestSuite extends TestSuite {
                 assertEquals(count(graph.getVertices()), 0);
         }
         graph.shutdown();
+    }
+
+    public void testIndexCount() {
+        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
+            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+            Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
+            for (int i = 0; i < 10; i++) {
+                Vertex v = graph.addVertex(null);
+                index.put("dog", "puppy", v);
+            }
+            assertEquals(10, index.count("dog", "puppy"));
+            Vertex v = index.get("dog", "puppy").iterator().next();
+            graph.removeVertex(v);
+            index.remove("dog", "puppy", v);
+            assertEquals(9, index.count("dog", "puppy"));
+            graph.shutdown();
+        }
     }
 
     public void testPutGetRemoveEdge() {

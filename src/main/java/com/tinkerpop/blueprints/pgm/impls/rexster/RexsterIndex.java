@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterElementSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
 
@@ -79,4 +80,8 @@ public class RexsterIndex<T extends Element> implements Index<T> {
         return StringFactory.indexString(this);
     }
 
+    public long count(final String key, final Object value) {
+        RexsterElementSequence<T> sequence = (RexsterElementSequence<T>)get(key, value);
+        return sequence.size();
+    }
 }

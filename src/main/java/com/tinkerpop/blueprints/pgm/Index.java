@@ -65,6 +65,16 @@ public interface Index<T extends Element> {
     public Iterable<T> get(String key, Object value);
 
     /**
+     * Get a count of elements with a particular key/value pair.
+     * The semantics are the same as the get method.
+     *
+     * @param key   denoting the sub-index to search
+     * @param value the value to search for
+     * @return the collection of elements that meet that criteria
+     */
+    public long count(String key, Object value);
+
+    /**
      * Remove an element indexed by a particular key/value.
      *
      * @param key     the key of the indexed element

@@ -95,6 +95,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         return new OrientElementSequence(graph, records.iterator());
     }
 
+    public long count(final String key, final Object value) {
+        final String keyTemp = key + SEPARATOR + value;
+        final Set<OIdentifiable> records = underlying.get(keyTemp);
+        return records.size();
+    }
+
     public void remove(final String key, final Object value, final T element) {
         final String keyTemp = key + SEPARATOR + value;
 

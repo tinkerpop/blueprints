@@ -69,6 +69,11 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
             return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
     }
 
+    public long count(final String key, final Object value) {
+        IndexHits<S> itty = this.rawIndex.get(key, value);
+        return itty.size();
+    }
+
     public void remove(final String key, final Object value, final T element) {
         try {
             this.graph.autoStartTransaction();
