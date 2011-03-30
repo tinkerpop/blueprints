@@ -44,4 +44,12 @@ public class ReadOnlyElement implements Element {
     public String toString() {
         return this.element.toString();
     }
+
+    public int hashCode() {
+        return this.element.hashCode();
+    }
+
+    public boolean equals(Object object) {
+        return this.element.equals(object);
+    }
 }
