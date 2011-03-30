@@ -10,7 +10,7 @@
     <artifactId>blueprints-graph-jung</artifactId>
     <version>0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Blueprints-JUNG</name>
+    <name>Blueprints-GraphJung</name>
     <description>JUNG (Java Universal Network/Graph Framework) utility for Blueprints property graphs</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
