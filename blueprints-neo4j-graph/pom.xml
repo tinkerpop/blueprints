@@ -2,10 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.tinkerpop.blueprints</groupId>
+    <parent>
+        <groupId>com.tinkerpop.blueprints</groupId>
+        <artifactId>blueprints</artifactId>
+        <version>0.6-SNAPSHOT</version>
+    </parent>
     <artifactId>blueprints-neo4j-graph</artifactId>
     <version>0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
+    <name>Blueprints-Neo4jGraph</name>
+    <description>Blueprints property graph implementation for the Neo4j graph database</description>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -14,28 +24,10 @@
         </dependency>
         <!-- GRAPHDB SUPPORT -->
         <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>graphdb-deps-all</artifactId>
-            <version>0.6-SNAPSHOT</version>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>1.3.M04</version>
             <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <!-- JUNG SUPPORT -->
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-api</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <!-- SAIL SUPPORT -->
-        <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>common</artifactId>
-            <version>1.1</version>
         </dependency>
         <!-- TESTING -->
         <dependency>
@@ -45,11 +37,21 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <repositories>
         <repository>
             <id>tinkerpop-repository</id>
             <name>TinkerPop Maven2 Repository</name>
             <url>http://tinkerpop.com/maven2</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>neo4j-public-repository</id>
+            <name>Publicly available Maven 2 repository for Neo4j</name>
+            <url>http://m2.neo4j.org/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
@@ -96,15 +98,6 @@
                 <version>2.4.2</version>
                 <configuration>
                     <systemProperties>
-                        <!-- TINKERGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testTinkerGraph</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>tinkerGraphDirectory</name>
-                            <value>/tmp/blueprints_test</value>
-                        </property>
                         <!-- NEO4J TEST PROPERTIES -->
                         <property>
                             <name>testNeo4jGraph</name>
@@ -113,38 +106,6 @@
                         <property>
                             <name>neo4jGraphDirectory</name>
                             <value>/tmp/blueprints_test</value>
-                        </property>
-                        <!-- SAIL TEST PROPERTIES -->
-                        <property>
-                            <name>testSail</name>
-                            <value>true</value>
-                        </property>
-                        <!-- ORIENTGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testOrientGraph</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>orientGraphDirectory</name>
-                            <value>/tmp/blueprints_test</value>
-                        </property>
-                        <!-- DEXGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testDexGraph</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>dexGraphFile</name>
-                            <value>/tmp/blueprints_test.dex</value>
-                        </property>
-                        <!-- REXSTERGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testRexsterGraph</name>
-                            <value>false</value>
-                        </property>
-                        <property>
-                            <name>rexsterGraphURI</name>
-                            <value>http://localhost:8182/emptygraph</value>
                         </property>
                     </systemProperties>
                 </configuration>
@@ -158,11 +119,4 @@
             </extension>
         </extensions>
     </build>
-    <distributionManagement>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
-        </repository>
-    </distributionManagement>
 </project>

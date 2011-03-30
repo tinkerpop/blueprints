@@ -12,6 +12,29 @@
     <description>Blueprints is a property graph model interface. It provides implementations, ouplementations, test
         suites, and supporting utilities.
     </description>
+    <inceptionYear>2010</inceptionYear>
+    <contributors>
+        <contributor>
+            <name>Marko A. Rodriguez</name>
+            <email>marko@markorodriguez.com</email>
+            <url>http://markorodriguez.com</url>
+        </contributor>
+        <contributor>
+            <name>Joshua Shinavier</name>
+            <email>josh@fortytwo.net</email>
+            <url>http://fortytwo.net</url>
+        </contributor>
+        <contributor>
+            <name>Luca Garulli</name>
+            <email>l.garulli@orientechnologies.com</email>
+            <url>http://zion-city.blogspot.com</url>
+        </contributor>
+        <contributor>
+            <name>Darrick Wiebe</name>
+            <email>darrick@innatesoftware.com</email>
+            <url>http://github.com/pangloss</url>
+        </contributor>
+    </contributors>
 
     <modules>
         <module>blueprints-core</module>
@@ -28,5 +51,13 @@
     <build>
         <directory>${basedir}/target</directory>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>tinkerpop-repository</id>
+            <name>TinkerPop Maven2 Repository</name>
+            <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
