@@ -60,7 +60,7 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(0, count(v1.getInEdges()));
         assertEquals(1, count(v2.getInEdges()));
         assertEquals(2, count(v3.getInEdges()));
-        BaseTest.printPerformance(graph.toString(), 6, "elements added and checked", this.stopWatch());
+        printPerformance(graph.toString(), 6, "elements added and checked", this.stopWatch());
         graph.shutdown();
     }
 
@@ -75,16 +75,16 @@ public class EdgeTestSuite extends TestSuite {
             Vertex in = graph.addVertex(convertId("" + counter++));
             graph.addEdge(null, out, in, convertId(UUID.randomUUID().toString()));
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount + edgeCount, "elements added", this.stopWatch());
+        printPerformance(graph.toString(), vertexCount + edgeCount, "elements added", this.stopWatch());
         if (graphTest.supportsEdgeIteration) {
             this.stopWatch();
             assertEquals(edgeCount, count(graph.getEdges()));
-            BaseTest.printPerformance(graph.toString(), edgeCount, "edges counted", this.stopWatch());
+            printPerformance(graph.toString(), edgeCount, "edges counted", this.stopWatch());
         }
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             assertEquals(vertexCount, count(graph.getVertices()));
-            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
+            printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
             this.stopWatch();
             for (Vertex vertex : graph.getVertices()) {
                 if (count(vertex.getOutEdges()) > 0) {
@@ -96,7 +96,7 @@ public class EdgeTestSuite extends TestSuite {
                     assertFalse(count(vertex.getOutEdges()) > 0);
                 }
             }
-            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices checked", this.stopWatch());
+            printPerformance(graph.toString(), vertexCount, "vertices checked", this.stopWatch());
         }
         graph.shutdown();
     }
@@ -125,7 +125,7 @@ public class EdgeTestSuite extends TestSuite {
             assertEquals(graph.getEdge(e3.getId()).getInVertex(), v1);
             assertEquals(graph.getEdge(e3.getId()).getOutVertex(), v3);
 
-            BaseTest.printPerformance(graph.toString(), 3, "edges retrieved", this.stopWatch());
+            printPerformance(graph.toString(), 3, "edges retrieved", this.stopWatch());
         }
         graph.shutdown();
     }
@@ -145,13 +145,13 @@ public class EdgeTestSuite extends TestSuite {
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
             assertEquals(edgeCount * 2, count(graph.getVertices()));
-            BaseTest.printPerformance(graph.toString(), edgeCount * 2, "vertices counted", this.stopWatch());
+            printPerformance(graph.toString(), edgeCount * 2, "vertices counted", this.stopWatch());
         }
 
         if (graphTest.supportsEdgeIteration) {
             this.stopWatch();
             assertEquals(edgeCount, count(graph.getEdges()));
-            BaseTest.printPerformance(graph.toString(), edgeCount, "edges counted", this.stopWatch());
+            printPerformance(graph.toString(), edgeCount, "edges counted", this.stopWatch());
 
             int i = edgeCount;
             this.stopWatch();
@@ -175,7 +175,7 @@ public class EdgeTestSuite extends TestSuite {
                     assertEquals((edgeCount - i) * 2, x);
                 }
             }
-            BaseTest.printPerformance(graph.toString(), edgeCount, "edges removed and graph checked", this.stopWatch());
+            printPerformance(graph.toString(), edgeCount, "edges removed and graph checked", this.stopWatch());
         }
         graph.shutdown();
     }

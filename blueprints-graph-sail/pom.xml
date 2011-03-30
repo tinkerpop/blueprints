@@ -39,9 +39,9 @@
         </dependency>
         <!-- TESTING -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-test</artifactId>
+            <version>0.6-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

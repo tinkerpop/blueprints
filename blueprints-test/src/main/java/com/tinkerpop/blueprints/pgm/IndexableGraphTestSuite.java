@@ -26,7 +26,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             count++;
             assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
         }
-        BaseTest.printPerformance(graph.toString(), count, "indices iterated through", this.stopWatch());
+        printPerformance(graph.toString(), count, "indices iterated through", this.stopWatch());
         graph.shutdown();
     }
 
@@ -46,7 +46,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertNull(graph.getIndex(Index.EDGES, Edge.class));
         }
 
-        BaseTest.printPerformance(graph.toString(), 2, "automatic indices retrieved", this.stopWatch());
+        printPerformance(graph.toString(), 2, "automatic indices retrieved", this.stopWatch());
         graph.shutdown();
     }
 
@@ -58,14 +58,14 @@ public class IndexableGraphTestSuite extends TestSuite {
             count++;
             graph.dropIndex(index.getIndexName());
         }
-        BaseTest.printPerformance(graph.toString(), count, "indices dropped", this.stopWatch());
+        printPerformance(graph.toString(), count, "indices dropped", this.stopWatch());
         assertEquals(count(graph.getIndices()), 0);
 
         this.stopWatch();
         Index<Vertex> index1 = graph.createManualIndex("index1", Vertex.class);
         Index<Edge> index2 = graph.createManualIndex("index2", Edge.class);
         Index<Vertex> index3 = graph.createAutomaticIndex("index3", Vertex.class, null);
-        BaseTest.printPerformance(graph.toString(), 3, "indices created", this.stopWatch());
+        printPerformance(graph.toString(), 3, "indices created", this.stopWatch());
 
         assertEquals(count(graph.getIndices()), 3);
         assertEquals(graph.getIndex("index1", Vertex.class).getIndexName(), "index1");
@@ -94,7 +94,7 @@ public class IndexableGraphTestSuite extends TestSuite {
 
         graph.dropIndex(index3.getIndexName());
         assertEquals(count(graph.getIndices()), 0);
-        BaseTest.printPerformance(graph.toString(), 3, "indices dropped and index iterable checked for consistency", this.stopWatch());
+        printPerformance(graph.toString(), 3, "indices dropped and index iterable checked for consistency", this.stopWatch());
         graph.shutdown();
     }
 
@@ -105,7 +105,7 @@ public class IndexableGraphTestSuite extends TestSuite {
         this.stopWatch();
         graph.dropIndex(Index.VERTICES);
         graph.dropIndex(Index.EDGES);
-        BaseTest.printPerformance(graph.toString(), 2, "indices dropped", this.stopWatch());
+        printPerformance(graph.toString(), 2, "indices dropped", this.stopWatch());
 
         this.stopWatch();
         try {
@@ -128,7 +128,7 @@ public class IndexableGraphTestSuite extends TestSuite {
         } catch (RuntimeException e) {
             assertTrue(true);
         }
-        BaseTest.printPerformance(graph.toString(), 3, "non-existent indices retrieved with runtime exceptions", this.stopWatch());
+        printPerformance(graph.toString(), 3, "non-existent indices retrieved with runtime exceptions", this.stopWatch());
         graph.shutdown();
     }
 
@@ -153,7 +153,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(manualIndex.get("key", "value").iterator().next().getId(), id);
             assertEquals(count(autoIndex.get("name", "marko")), 1);
             assertEquals(autoIndex.get("name", "marko").iterator().next().getId(), id);
-            BaseTest.printPerformance(graph.toString(), 2, "indices created and 1 vertex added and checked", this.stopWatch());
+            printPerformance(graph.toString(), 2, "indices created and 1 vertex added and checked", this.stopWatch());
             graph.shutdown();
 
             graph = (IndexableGraph) this.graphTest.getGraphInstance();
@@ -166,7 +166,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(manualIndex.get("key", "value").iterator().next().getId(), id);
             assertEquals(count(autoIndex.get("name", "marko")), 1);
             assertEquals(autoIndex.get("name", "marko").iterator().next().getId(), id);
-            BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked", this.stopWatch());
+            printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked", this.stopWatch());
             graph.shutdown();
 
             graph = (IndexableGraph) this.graphTest.getGraphInstance();
@@ -180,7 +180,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             graph.removeVertex(vertex);
             assertEquals(0, count(manualIndex.get("key", "value")));
             assertEquals(0, count(autoIndex.get("key", "value")));
-            BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked and then removed", this.stopWatch());
+            printPerformance(graph.toString(), 2, "indices reloaded and 1 vertex checked and then removed", this.stopWatch());
             graph.shutdown();
 
             graph = (IndexableGraph) this.graphTest.getGraphInstance();
@@ -189,7 +189,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             autoIndex = graph.getIndex(Index.VERTICES, Vertex.class);
             assertEquals(count(manualIndex.get("key", "value")), 0);
             assertEquals(count(autoIndex.get("key", "value")), 0);
-            BaseTest.printPerformance(graph.toString(), 2, "indices reloaded and checked to ensure empty", this.stopWatch());
+            printPerformance(graph.toString(), 2, "indices reloaded and checked to ensure empty", this.stopWatch());
             graph.shutdown();
         }
     }
@@ -220,7 +220,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             for (String indexName : indexNames) {
                 graph.dropIndex(indexName);
             }
-            BaseTest.printPerformance(graph.toString(), indexNames.size(), "indices dropped", this.stopWatch());
+            printPerformance(graph.toString(), indexNames.size(), "indices dropped", this.stopWatch());
             assertEquals(count(graph.getIndices()), 0);
             graph.shutdown();
 
@@ -257,7 +257,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(counter, exceptionCounter);
             graph.shutdown();
         }
-        BaseTest.printPerformance(graphName, loop, "attempt(s) to overwrite existing indices", this.stopWatch());
+        printPerformance(graphName, loop, "attempt(s) to overwrite existing indices", this.stopWatch());
 
 
     }

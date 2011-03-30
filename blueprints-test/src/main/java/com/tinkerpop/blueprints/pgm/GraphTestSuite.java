@@ -32,7 +32,7 @@ public class GraphTestSuite extends TestSuite {
         try {
             this.stopWatch();
             assertNotNull(graph.toString());
-            BaseTest.printPerformance(graph.toString(), 1, "graph string representation generated", this.stopWatch());
+            printPerformance(graph.toString(), 1, "graph string representation generated", this.stopWatch());
         } catch (Exception e) {
             assertFalse(true);
         }
@@ -47,7 +47,7 @@ public class GraphTestSuite extends TestSuite {
             Vertex b = graph.addVertex(null);
             graph.addEdge(null, a, b, convertId("knows"));
         }
-        BaseTest.printPerformance(graph.toString(), 75, "elements added", this.stopWatch());
+        printPerformance(graph.toString(), 75, "elements added", this.stopWatch());
 
         if (graphTest.supportsVertexIteration)
             assertEquals(50, count(graph.getVertices()));
@@ -56,7 +56,7 @@ public class GraphTestSuite extends TestSuite {
 
         this.stopWatch();
         graph.clear();
-        BaseTest.printPerformance(graph.toString(), 75, "elements deleted", this.stopWatch());
+        printPerformance(graph.toString(), 75, "elements deleted", this.stopWatch());
 
         if (graphTest.supportsVertexIteration)
             assertEquals(0, count(graph.getVertices()));
@@ -108,7 +108,7 @@ public class GraphTestSuite extends TestSuite {
         for (int i = 0; i < vertexCount; i++) {
             vertices.add(graph.addVertex(null));
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
+        printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
         this.stopWatch();
         for (int i = 0; i < edgeCount; i++) {
             Vertex a = vertices.get(random.nextInt(vertices.size()));
@@ -117,7 +117,7 @@ public class GraphTestSuite extends TestSuite {
                 edges.add(graph.addEdge(null, a, b, convertId("a" + UUID.randomUUID())));
             }
         }
-        BaseTest.printPerformance(graph.toString(), edgeCount, "edges added", this.stopWatch());
+        printPerformance(graph.toString(), edgeCount, "edges added", this.stopWatch());
         this.stopWatch();
         int counter = 0;
         for (Edge e : edges) {
@@ -130,7 +130,7 @@ public class GraphTestSuite extends TestSuite {
                 assertEquals(vertices.size(), count(graph.getVertices()));
             }
         }
-        BaseTest.printPerformance(graph.toString(), edgeCount, "edges deleted (with size check on each delete)", this.stopWatch());
+        printPerformance(graph.toString(), edgeCount, "edges deleted (with size check on each delete)", this.stopWatch());
         graph.shutdown();
 
     }
@@ -145,7 +145,7 @@ public class GraphTestSuite extends TestSuite {
         for (int i = 0; i < vertexCount; i++) {
             vertices.add(graph.addVertex(null));
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
+        printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
 
         this.stopWatch();
         for (int i = 0; i < vertexCount; i = i + 2) {
@@ -154,7 +154,7 @@ public class GraphTestSuite extends TestSuite {
             edges.add(graph.addEdge(null, a, b, convertId("a" + UUID.randomUUID())));
 
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount / 2, "edges added", this.stopWatch());
+        printPerformance(graph.toString(), vertexCount / 2, "edges added", this.stopWatch());
 
         this.stopWatch();
         int counter = 0;
@@ -171,7 +171,7 @@ public class GraphTestSuite extends TestSuite {
                 assertEquals(vertices.size() - counter, count(graph.getVertices()));
             }
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices deleted (with size check on each delete)", this.stopWatch());
+        printPerformance(graph.toString(), vertexCount, "vertices deleted (with size check on each delete)", this.stopWatch());
         graph.shutdown();
     }
 
@@ -342,7 +342,7 @@ public class GraphTestSuite extends TestSuite {
         for (int i = 0; i < 4; i++) {
             totalVertices = totalVertices + (int) Math.pow(branchSize, i);
         }
-        BaseTest.printPerformance(graph.toString(), totalVertices, "vertices added in a tree structure", this.stopWatch());
+        printPerformance(graph.toString(), totalVertices, "vertices added in a tree structure", this.stopWatch());
 
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
@@ -351,7 +351,7 @@ public class GraphTestSuite extends TestSuite {
                 vertices.add(v);
             }
             assertEquals(totalVertices, vertices.size());
-            BaseTest.printPerformance(graph.toString(), totalVertices, "vertices iterated", this.stopWatch());
+            printPerformance(graph.toString(), totalVertices, "vertices iterated", this.stopWatch());
         }
 
         if (graphTest.supportsEdgeIteration) {
@@ -361,7 +361,7 @@ public class GraphTestSuite extends TestSuite {
                 edges.add(e);
             }
             assertEquals(totalVertices - 1, edges.size());
-            BaseTest.printPerformance(graph.toString(), totalVertices - 1, "edges iterated", this.stopWatch());
+            printPerformance(graph.toString(), totalVertices - 1, "edges iterated", this.stopWatch());
         }
         graph.shutdown();
 
@@ -391,7 +391,7 @@ public class GraphTestSuite extends TestSuite {
 
             this.stopWatch();
             graph = graphTest.getGraphInstance();
-            BaseTest.printPerformance(graph.toString(), 1, "graph loaded", this.stopWatch());
+            printPerformance(graph.toString(), 1, "graph loaded", this.stopWatch());
             if (graphTest.supportsVertexIteration) {
                 assertEquals(count(graph.getVertices()), 2);
                 if (!graphTest.isRDFModel) {

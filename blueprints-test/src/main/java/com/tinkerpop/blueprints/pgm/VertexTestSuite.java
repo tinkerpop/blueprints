@@ -35,7 +35,7 @@ public class VertexTestSuite extends TestSuite {
         this.stopWatch();
         Vertex v = graph.addVertex(null);
         Vertex u = graph.getVertex(v.getId());
-        BaseTest.printPerformance(graph.toString(), 1, "vertex added and retrieved", this.stopWatch());
+        printPerformance(graph.toString(), 1, "vertex added and retrieved", this.stopWatch());
 
         assertEquals(v, u);
         assertEquals(graph.getVertex(u.getId()), graph.getVertex(u.getId()));
@@ -164,7 +164,7 @@ public class VertexTestSuite extends TestSuite {
         for (int i = 0; i < vertexCount; i++) {
             vertices.add(graph.addVertex(null));
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
+        printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
         if (graphTest.supportsVertexIteration)
             assertEquals(vertexCount, count(graph.getVertices()));
 
@@ -172,7 +172,7 @@ public class VertexTestSuite extends TestSuite {
         for (Vertex v : vertices) {
             graph.removeVertex(v);
         }
-        BaseTest.printPerformance(graph.toString(), vertexCount, "vertices deleted", this.stopWatch());
+        printPerformance(graph.toString(), vertexCount, "vertices deleted", this.stopWatch());
         if (graphTest.supportsVertexIteration)
             assertEquals(0, count(graph.getVertices()));
         graph.shutdown();
@@ -187,10 +187,10 @@ public class VertexTestSuite extends TestSuite {
             for (int i = 0; i < vertexCount; i++) {
                 ids.add(graph.addVertex(null).getId());
             }
-            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
+            printPerformance(graph.toString(), vertexCount, "vertices added", this.stopWatch());
             this.stopWatch();
             assertEquals(vertexCount, count(graph.getVertices()));
-            BaseTest.printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
+            printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
             // must create unique ids
             assertEquals(vertexCount, ids.size());
         }
@@ -240,7 +240,7 @@ public class VertexTestSuite extends TestSuite {
                 }
                 vertices.add(vertex);
             }
-            BaseTest.printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
+            printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
 
             if (graphTest.supportsVertexIteration)
                 assertEquals(50, count(graph.getVertices()));
@@ -258,7 +258,7 @@ public class VertexTestSuite extends TestSuite {
                 }
                 vertices.add(vertex);
             }
-            BaseTest.printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
+            printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
             if (graphTest.supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 50);
             assertEquals(vertices.size(), 50);
