@@ -1,225 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.tinkerpop</groupId>
+    <groupId>com.tinkerpop.blueprints</groupId>
     <artifactId>blueprints</artifactId>
     <version>0.6-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
     <description>Blueprints is a property graph model interface. It provides implementations, ouplementations, test
         suites, and supporting utilities.
     </description>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <developers>
-        <developer>
-            <name>Marko A. Rodriguez</name>
-            <email>marko@markorodriguez.com</email>
-            <url>http://markorodriguez.com</url>
-        </developer>
-    </developers>
-    <contributors>
-        <contributor>
-            <!-- ORIENTDB GRAPH -->
-            <name>Luca Garulli</name>
-            <email>l.garulli@orientechnologies.com</email>
-            <url>http://zion-city.blogspot.com</url>
-        </contributor>
-        <contributor>
-            <!-- BLUEPRINTS SAIL -->
-            <name>Joshua Shinavier</name>
-            <email>josh@fortytwo.net</email>
-            <url>http://fortytwo.net</url>
-        </contributor>
-        <contributor>
-            <!-- SOME TRANSACTION WORK -->
-            <name>Darrick Wiebe</name>
-            <email>darrick@innatesoftware.com</email>
-            <url>http://github.com/pangloss</url>
-        </contributor>
-    </contributors>
-    <inceptionYear>2010</inceptionYear>
-    <dependencies>
-        <!-- GRAPHDB SUPPORT -->
-        <dependency>
-            <groupId>com.tinkerpop</groupId>
-            <artifactId>graphdb-deps-all</artifactId>
-            <version>0.6-SNAPSHOT</version>
-            <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <!-- JUNG SUPPORT -->
-        <dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung-api</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <!-- SAIL SUPPORT -->
-        <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>common</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <!-- TESTING -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <repositories>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>http://tinkerpop.com/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>fortytwo</id>
-            <name>fortytwo.net Maven repository</name>
-            <url>http://fortytwo.net/maven2</url>
-        </repository>
-    </repositories>
+
+    <modules>
+        <module>blueprints-core</module>
+        <module>blueprints-dex-graph</module>
+        <module>blueprints-graph-jung</module>
+        <module>blueprints-graph-sail</module>
+        <module>blueprints-neo4j-graph</module>
+        <module>blueprints-orient-graph</module>
+        <module>blueprints-rexster-graph</module>
+        <module>blueprints-sail-graph</module>
+        <module>blueprints-test</module>
+    </modules>
+
     <build>
         <directory>${basedir}/target</directory>
-        <finalName>${artifactId}-${version}</finalName>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/main/resources
-                </directory>
-            </resource>
-        </resources>
-        <testResources>
-            <testResource>
-                <directory>${basedir}/src/test/resources
-                </directory>
-            </testResource>
-        </testResources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/distribution.xml</descriptor>
-                    </descriptors>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
-                    <outputDirectory>target</outputDirectory>
-                    <workDirectory>target/assembly/work</workDirectory>
-                    <tarLongFileMode>warn</tarLongFileMode>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4.2</version>
-                <configuration>
-                    <systemProperties>
-                        <!-- TINKERGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testTinkerGraph</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>tinkerGraphDirectory</name>
-                            <value>/tmp/blueprints_test</value>
-                        </property>
-                        <!-- NEO4J TEST PROPERTIES -->
-                        <property>
-                            <name>testNeo4jGraph</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>neo4jGraphDirectory</name>
-                            <value>/tmp/blueprints_test</value>
-                        </property>
-                        <!-- SAIL TEST PROPERTIES -->
-                        <property>
-                            <name>testSail</name>
-                            <value>true</value>
-                        </property>
-                        <!-- ORIENTGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testOrientGraph</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>orientGraphDirectory</name>
-                            <value>/tmp/blueprints_test</value>
-                        </property>
-                        <!-- DEXGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testDexGraph</name>
-                            <value>true</value>
-                        </property>
-                        <property>
-                            <name>dexGraphFile</name>
-                            <value>/tmp/blueprints_test.dex</value>
-                        </property>
-                        <!-- REXSTERGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testRexsterGraph</name>
-                            <value>false</value>
-                        </property>
-                        <property>
-                            <name>rexsterGraphURI</name>
-                            <value>http://localhost:8182/emptygraph</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-        </plugins>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-                <version>1.0-alpha-6</version>
-            </extension>
-        </extensions>
     </build>
-    <distributionManagement>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
-        </repository>
-    </distributionManagement>
+
 </project>
