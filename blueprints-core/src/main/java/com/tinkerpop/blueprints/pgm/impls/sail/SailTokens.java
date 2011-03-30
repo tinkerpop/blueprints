@@ -1,10 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
-import org.openrdf.rio.RDFFormat;
-
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -38,25 +33,4 @@ public class SailTokens {
     public static final String PREFIX_SPACE = "PREFIX ";
     public static final String COLON_LESSTHAN = ": <";
     public static final String GREATERTHAN_NEWLINE = ">\n";
-
-    public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
-
-    static {
-        formats.put("rdf-xml", RDFFormat.RDFXML);
-        formats.put("n-triples", RDFFormat.NTRIPLES);
-        formats.put("turtle", RDFFormat.TURTLE);
-        formats.put("n3", RDFFormat.N3);
-        formats.put("trix", RDFFormat.TRIX);
-        formats.put("trig", RDFFormat.TRIG);
-
-    }
-
-    public static RDFFormat getFormat(final String format) {
-        RDFFormat ret = formats.get(format);
-        if (null == ret)
-            throw new RuntimeException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, turtle, n3, trix, or trig");
-        else
-            return ret;
-    }
-
 }
