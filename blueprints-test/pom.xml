@@ -7,6 +7,11 @@
     <version>0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
     <dependencies>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-core</artifactId>
+            <version>0.6-SNAPSHOT</version>
+        </dependency>
         <!-- GRAPHDB SUPPORT -->
         <dependency>
             <groupId>com.tinkerpop</groupId>
