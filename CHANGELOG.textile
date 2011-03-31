@@ -22,6 +22,7 @@ h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Refactored to create a Maven multiproject with one module per major Blueprints component
 * Added @DexGraph@ implementation (Sparsity Technologies)
 * Bumped to OrientDB 1.0rc1-SNAPSHOT
 

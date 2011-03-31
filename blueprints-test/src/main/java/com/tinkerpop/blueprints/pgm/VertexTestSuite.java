@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.sun.org.apache.xerces.internal.xni.grammars.XMLSchemaDescription;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailTokens;

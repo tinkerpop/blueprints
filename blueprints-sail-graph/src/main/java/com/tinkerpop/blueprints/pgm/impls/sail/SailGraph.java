@@ -7,7 +7,12 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
 import org.apache.log4j.PropertyConfigurator;
-import org.openrdf.model.*;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Namespace;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.BNodeImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
@@ -17,16 +22,21 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.impl.MapBindingSet;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A Blueprints implementation of the RDF-based Sail interfaces by Aduna (http://openrdf.org).
@@ -260,6 +270,23 @@ public class SailGraph implements TransactionalGraph {
      * @param baseGraph the baseGraph to insert the data into
      */
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
+        try {
+            final SailConnection c = this.rawGraph.getConnection();
+            try {
+                RDFParser p = Rio.createParser(getFormat(format));
+                RDFHandler h = null == baseGraph
+                        ? new SailAdder(c)
+                        : new SailAdder(c, new URIImpl(baseGraph));
+                p.setRDFHandler(h);
+                p.parse(input, baseURI);
+                c.commit();
+            } finally {
+                c.close();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        /*
         Repository repository = new SailRepository(this.rawGraph);
         try {
 
@@ -273,7 +300,7 @@ public class SailGraph implements TransactionalGraph {
             connection.close();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
-        }
+        }  */
     }
 
     public void clear() {
@@ -422,5 +449,46 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
+    private class SailAdder implements RDFHandler {
+        private final SailConnection c;
+        private final Resource[] contexts;
 
+        public SailAdder(final SailConnection c,
+                         final Resource... contexts) {
+            this.c = c;
+            this.contexts = contexts;
+        }
+
+        public void startRDF() throws RDFHandlerException {
+        }
+
+        public void endRDF() throws RDFHandlerException {
+        }
+
+        public void handleNamespace(final String prefix,
+                                    final String uri) throws RDFHandlerException {
+            try {
+                c.setNamespace(prefix, uri);
+            } catch (SailException e) {
+                throw new RDFHandlerException(e);
+            }
+        }
+
+        public void handleStatement(final Statement s) throws RDFHandlerException {
+            try {
+                if (1 <= contexts.length) {
+                    for (Resource x : contexts) {
+                        c.addStatement(s.getSubject(), s.getPredicate(), s.getObject(), x);
+                    }
+                } else {
+                    c.addStatement(s.getSubject(), s.getPredicate(), s.getObject(), s.getContext());
+                }
+            } catch (SailException e) {
+                throw new RDFHandlerException(e);
+            }
+        }
+
+        public void handleComment(String s) throws RDFHandlerException {
+        }
+    }
 }
