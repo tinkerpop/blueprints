@@ -41,7 +41,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>tinkerpop-repository</id>
@@ -62,7 +61,6 @@
             </snapshots>
         </repository>
     </repositories>
-
     <build>
         <directory>${basedir}/target</directory>
         <finalName>${artifactId}-${version}</finalName>

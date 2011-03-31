@@ -15,7 +15,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -29,7 +28,6 @@
             <version>4.5</version>
         </dependency>
     </dependencies>
-
     <repositories>
         <repository>
             <id>tinkerpop-repository</id>
@@ -41,7 +39,6 @@
             </snapshots>
         </repository>
     </repositories>
-
     <build>
         <directory>${basedir}/target</directory>
         <finalName>${artifactId}-${version}</finalName>
