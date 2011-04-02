@@ -64,7 +64,7 @@ public class AutomaticIndexHelperTest extends BaseTest {
         index = graph.createAutomaticIndex(Index.VERTICES, Vertex.class, indexKeys);
         assertEquals(count(index.get("name", "marko")), 0);
         assertEquals(count(index.get("age", 31)), 0);
-        AutomaticIndexHelper.reIndexElements(index, (Iterable) graph.getVertices());
+        index = AutomaticIndexHelper.reIndexElements(graph, index, (Iterable) graph.getVertices());
         assertEquals(count(index.get("name", "marko")), 1);
         assertEquals(index.get("name", "marko").iterator().next(), a);
         assertEquals(count(index.get("age", 31)), 0);

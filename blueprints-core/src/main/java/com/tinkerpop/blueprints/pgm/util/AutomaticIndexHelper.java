@@ -1,6 +1,11 @@
 package com.tinkerpop.blueprints.pgm.util;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 
 import java.util.Set;
 
@@ -102,14 +107,33 @@ public class AutomaticIndexHelper {
      * The elements are first removed from the index and then added to the index.
      * The properties indexed are determined by the automatic index keys of the index.
      *
+     * @param graph    the indexable graph to reindex
      * @param index    the automatic index to reindex
      * @param elements the elements to reindex
+     * @return a new version of the AutomaticIndex
      */
-    public static void reIndexElements(final AutomaticIndex index, final Iterable<Element> elements) {
-        for (final Element element : elements) {
-            AutomaticIndexHelper.removeElement(index, element);
-            AutomaticIndexHelper.addElement(index, element);
+    public static <T extends Element> AutomaticIndex<T> reIndexElements(final IndexableGraph graph, AutomaticIndex<T> index, final Iterable<Element> elements) {
+        final String indexName = index.getIndexName();
+        final Class<T> indexClass = index.getIndexClass();
+        final Set<String> indexKeys = index.getAutoIndexKeys();
+
+        graph.dropIndex(indexName);
+        index = graph.createAutomaticIndex(indexName, indexClass, indexKeys);
+
+        TransactionalGraphHelper.CommitManager manager = null;
+        if (graph instanceof TransactionalGraph) {
+            manager = TransactionalGraphHelper.createCommitManager((TransactionalGraph) graph, 1000);
         }
+
+        for (final Element element : elements) {
+            AutomaticIndexHelper.addElement(index, element);
+            if (null != manager)
+                manager.incrCounter();
+        }
+        if (null != manager)
+            manager.close();
+
+        return index;
     }
 
 }
