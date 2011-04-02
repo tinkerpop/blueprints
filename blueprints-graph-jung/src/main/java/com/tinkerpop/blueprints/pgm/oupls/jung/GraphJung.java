@@ -8,7 +8,12 @@ import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -347,5 +352,9 @@ public class GraphJung implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, Gr
                 return true;
         }
         return false;
+    }
+
+    public String toString() {
+        return "graphjung[" + this.graph.toString() + "]";
     }
 }

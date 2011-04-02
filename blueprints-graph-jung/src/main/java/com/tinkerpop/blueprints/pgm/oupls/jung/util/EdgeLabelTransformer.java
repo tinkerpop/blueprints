@@ -23,6 +23,10 @@ public class EdgeLabelTransformer implements Transformer<Edge, Number> {
         this.probability = probability;
     }
 
+    public EdgeLabelTransformer(final Set<String> labels, final Boolean filterLabels) {
+        this(labels, filterLabels, 0, false);
+    }
+
     public Number transform(final Edge edge) {
         if (labels.contains(edge.getLabel())) {
             if (filter) {
