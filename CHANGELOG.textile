@@ -11,20 +11,23 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-oscar.png!
 
-h3. Version 0.6 (NOT OFFICIALLY RELEASED YET)
+h3. Version 0.6 (Oscar -- April 4, 2011)
 
 ```xml
 <dependency>
-  <groupId>com.tinkerpop</groupId>
-  <artifactId>blueprints</artifactId>
-  <version>0.6-SNAPSHOT</version>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>0.6</version>
 </dependency>
 ```
 
 * Refactored to create a Maven multiproject with one module per major Blueprints component
 * Added @DexGraph@ implementation (Sparsity Technologies)
 * Bumped to OrientDB 1.0rc1-SNAPSHOT
+* Bumped to Neo4j 1.3M05
+* Fixed equals() and hashCode() bug in @ReadOnlyGraph@
 
 ==<hr/>==
 
