@@ -1,0 +1,8 @@
+This section provides a list of the people that have contributed in some way to the creation of Blueprints.
+
+# "Marko A. Rodriguez":http://markorodriguez.com -- designed, developed, tested, and documented Blueprints.
+# "Luca Garulli":http://orientechnologies.com -- developed the OrientDB implementation.
+# "Joshua Shinavier":http://fortytwo.net -- developed Blueprints Sail (@GraphSail@).
+# "Darrick Weibe":http://github.com/pangloss -- tests, bug fixes, and transaction work.
+
+Please review Blueprints' "pom.xml":http://github.com/tinkerpop/blueprints/blob/master/pom.xml. Blueprints would not be possible without the work done by others to create these useful packages.
