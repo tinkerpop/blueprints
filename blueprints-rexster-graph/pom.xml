@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.6</version>
+        <version>0.7-SNAPSHOT</version>
     </parent>
     <artifactId>blueprints-rexster-graph</artifactId>
-    <version>0.6</version>
+    <version>0.7-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Blueprints-RexsterGraph</name>
     <description>Blueprints property graph implementation for Rexster</description>
@@ -19,13 +19,13 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
         </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

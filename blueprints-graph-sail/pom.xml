@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.6</version>
+        <version>0.7-SNAPSHOT</version>
     </parent>
     <artifactId>blueprints-graph-sail</artifactId>
-    <version>0.6</version>
+    <version>0.7-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Blueprints-GraphSail</name>
     <description>Sesame Sail implementation for Blueprints property graphs</description>
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
         </dependency>
         <!-- SESAME SUPPORT -->
         <dependency>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -55,13 +55,13 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-orient-graph</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>
-            <version>0.6</version>
+            <version>0.7-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
