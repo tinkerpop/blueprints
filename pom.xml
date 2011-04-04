@@ -71,6 +71,7 @@
             <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
         </repository>
     </distributionManagement>
+
     <!-- Note: plugin versions are the most recent (in repo1.maven.org) as of 2011-04-05 -->
     <reporting>
         <plugins>
