@@ -8,12 +8,16 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -175,6 +179,40 @@ class GitGraphHelper {
         }
         if (null != propsOut) {
             propsOut.close();
+        }
+
+        // TODO: this is a hack
+        sortProperties(directory);
+    }
+
+    private void sortProperties(final File directory) throws IOException {
+        for (File f : directory.listFiles()) {
+            if (f.isDirectory()) {
+                sortProperties(f);
+            } else if (f.getName().equals(VERTEX_PROPERTIES)
+                    || f.getName().equals(EDGE_PROPERTIES)) {
+                List<String> rows = new LinkedList<String>();
+                BufferedReader reader = new BufferedReader(new FileReader(f));
+                try {
+                    String s;
+                    while ((s = reader.readLine()) != null) {
+                        rows.add(s);
+                    }
+                } finally {
+                    reader.close();
+                }
+
+                Collections.sort(rows);
+
+                FileWriter writer = new FileWriter(f);
+                try {
+                    for (String cur : rows) {
+                        writer.write(cur + "\n");
+                    }
+                } finally {
+                    writer.close();
+                }
+            }
         }
     }
 

@@ -25,7 +25,7 @@ import java.util.Set;
  * Another developer can then check out your work and either load the whole graph or, if he is only interested in
  * either cities or people, one of the subdirectories.  Even if he only loads the graph about cities, he can make
  * local changes to it and push them back to you without invalidating the top-level graph.
- *
+ * <p/>
  * User: josh
  * Date: 4/13/11
  * Time: 1:39 PM
@@ -160,17 +160,21 @@ public class GitGraph implements IndexableGraph {
     }
 
     private void validateElementId(final Object id) {
-        if (!(id instanceof String)) {
+        if (null != id && !(id instanceof String)) {
             throw new IllegalArgumentException("element id is not a String: " + id);
         }
     }
 
     private void validateEdgeVertexId(final String edgeId,
                                       final String vertexId) {
-        int i = edgeId.lastIndexOf("/");
-        if (i >= 0) {
-            if (!vertexId.startsWith(edgeId.substring(0, i + 1))) {
-                throw new IllegalArgumentException("edge '" + edgeId + "' cannot reference vertex '" + vertexId + "'");
+        if (null != edgeId) {
+            int i = edgeId.lastIndexOf("/");
+            if (i >= 1) {
+                if (null == vertexId || !vertexId.startsWith(edgeId.substring(0, i + 1))) {
+                    throw null == vertexId
+                    ? new IllegalArgumentException("edge '" + edgeId + "' cannot reference vertex with automatically generated id")
+                    : new IllegalArgumentException("edge '" + edgeId + "' cannot reference vertex '" + vertexId + "'");
+                }
             }
         }
     }
