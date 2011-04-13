@@ -13,6 +13,19 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
+ * A Blueprints Graph which stores its data in a hierarchy of plain text files which plays well with version control
+ * software such as Git.
+ * This allows multiple parties to edit a graph concurrently and later to merge their changes.
+ * GitGraph also enables partitioning of a graph into functional hierarchies, and to combine graphs in a tree-like
+ * fashion.
+ * For example, if you have a graph with information about cities, and another with information about people,
+ * you can place the two graph directories side by side in a parent directory and load this as a single graph.
+ * You can create new vertices and edges, at the parent level, which connect people and cities, and then you can save
+ * the whole thing and check it in to Git.
+ * Another developer can then check out your work and either load the whole graph or, if he is only interested in
+ * either cities or people, one of the subdirectories.  Even if he only loads the graph about cities, he can make
+ * local changes to it and push them back to you without invalidating the top-level graph.
+ *
  * User: josh
  * Date: 4/13/11
  * Time: 1:39 PM
@@ -22,6 +35,14 @@ public class GitGraph implements IndexableGraph {
     private final IndexableGraph base;
     private final GitGraphHelper helper;
 
+    /**
+     * Creates a new GitGraph in the specified directory.
+     *
+     * @param directory the directory to use for data storage.
+     *                  If this directory already exists, GitGraph will attempt to load previously saved data.
+     *                  Data will be saved to this directory (over-writing any previous contents) when this Graph is shutdown.
+     * @throws IOException if the graph cannot be loaded
+     */
     public GitGraph(final File directory) throws IOException {
         this(directory, new TinkerGraph());
     }
@@ -31,7 +52,7 @@ public class GitGraph implements IndexableGraph {
      *                  If this directory already exists, GitGraph will attempt to load previously saved data.
      *                  Data will be saved to this directory when this Graph is shutdown.
      * @param base      a graph for temporary storage.  Note: this graph will be cleared of any pre-existing data.
-     * @throws IOException
+     * @throws IOException if loading fails
      */
     private GitGraph(final File directory,
                      final IndexableGraph base) throws IOException {
@@ -154,9 +175,8 @@ public class GitGraph implements IndexableGraph {
         }
     }
 
+    /*
     public static void main(final String[] args) throws Exception {
-
-        /*
         ByteArrayOutputStream helper = new ByteArrayOutputStream();
         ObjectOutputStream out = new ObjectOutputStream(helper);
         out.writeObject(2);
@@ -167,6 +187,5 @@ public class GitGraph implements IndexableGraph {
             System.out.println("byte: " + b);
         }
         System.exit(0);
-        //*/
-    }
+    } */
 }

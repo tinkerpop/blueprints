@@ -114,11 +114,13 @@ public class GitGraphTest extends TestCase {
         g.shutdown();
 
         // Add a new edge into the grandchild from the level of its parent.
+        // Also add a property to a grandchild vertex from this level.
         g = new GitGraph(new File(baseDir, "test2"));
         v4 = g.getVertex("leon");
         assertEquals(0.5, v4.getProperty("age"));
         v1 = g.getVertex("test3/yellow");
         assertEquals("yellow", v1.getProperty("name"));
+        v1.setProperty("comment", "comes after orange");
         e1 = g.addEdge("E", v4, v1, "likes");
         assertEquals(1, count(v4.getOutEdges("likes")));
         e1.setProperty("comment", "just a hunch");
@@ -131,6 +133,7 @@ public class GitGraphTest extends TestCase {
         assertEquals(1, count(v1.getOutEdges("likes")));
         v2 = v1.getOutEdges("likes").iterator().next().getInVertex();
         assertEquals("test2/test3/yellow", v2.getId());
+        assertEquals("comes after orange", v2.getProperty("comment"));
         g.shutdown();
     }
 

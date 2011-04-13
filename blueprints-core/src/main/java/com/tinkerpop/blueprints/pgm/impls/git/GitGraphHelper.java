@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ...stores data in a hierarchical pattern so that one can load a single domain from disk without reading the rest of the graph
+ * An object to read and write <code>GitGraph</code>s from the file system.
  * <p/>
  * User: josh
  * Date: 4/13/11
  * Time: 2:00 PM
  */
-public class GitGraphHelper {
+class GitGraphHelper {
     private static final String
             VERTICES = "vertices",
             EDGES = "edges",
@@ -418,6 +418,7 @@ public class GitGraphHelper {
                 .replaceAll("\\\\", "\\");
     }
 
+    /*
     public static void main(final String[] args) throws Exception {
         show("weird\tlabel");
     }
@@ -425,6 +426,7 @@ public class GitGraphHelper {
     private static void show(String s) {
         System.out.println(s + " -- " + escape(s) + " -- " + unescape(escape(s)));
     }
+    */
 
     private class RelativeId {
         private final String path;
