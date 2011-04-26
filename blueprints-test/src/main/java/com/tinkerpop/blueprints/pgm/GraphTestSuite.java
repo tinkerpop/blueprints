@@ -103,15 +103,17 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testSettingProperties() {
-        Graph graph = graphTest.getGraphInstance();
-        Vertex a = graph.addVertex(null);
-        Vertex b = graph.addVertex(null);
-        graph.addEdge(null, a, b, "knows");
-        graph.addEdge(null, a, b, "knows");
-        for (Edge edge : b.getInEdges()) {
-            edge.setProperty("key", "value");
+        if (!graphTest.isRDFModel) {
+            Graph graph = graphTest.getGraphInstance();
+            Vertex a = graph.addVertex(null);
+            Vertex b = graph.addVertex(null);
+            graph.addEdge(null, a, b, convertId("knows"));
+            graph.addEdge(null, a, b, convertId("knows"));
+            for (Edge edge : b.getInEdges()) {
+                edge.setProperty("key", "value");
+            }
+            graph.shutdown();
         }
-        graph.shutdown();
     }
 
     public void testRemovingEdges() {
