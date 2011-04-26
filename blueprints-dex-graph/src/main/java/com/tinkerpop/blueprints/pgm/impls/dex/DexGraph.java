@@ -3,7 +3,13 @@
  */
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 import edu.upc.dama.dex.core.DEX;
@@ -88,9 +94,10 @@ public class DexGraph implements IndexableGraph {
             final File db = new File(fileName);
             boolean create = !db.exists();
             this.db = db;
-            DEX.Config cfg = new DEX.Config();
-            cfg.setCacheMaxSize(0); // use as much memory as possible
-            dex = new DEX(cfg);
+            //DEX.Config cfg = new DEX.Config();
+            //cfg.setCacheMaxSize(0); // use as much memory as possible
+            //dex = new DEX(cfg);
+            dex = new DEX();
             gpool = (create ? dex.create(db) : dex.open(db));
             session = gpool.newSession();
             graph = session.getDbGraph();
