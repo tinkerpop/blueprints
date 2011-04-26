@@ -1,9 +1,13 @@
 package com.tinkerpop.blueprints.pgm;
 
-import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
 
 /**
@@ -93,6 +97,19 @@ public class GraphTestSuite extends TestSuite {
             }
         } catch (Exception e) {
             assertTrue(true);
+        }
+
+        graph.shutdown();
+    }
+
+    public void testSettingProperties() {
+        Graph graph = graphTest.getGraphInstance();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        graph.addEdge(null, a, b, "knows");
+        graph.addEdge(null, a, b, "knows");
+        for (Edge edge : b.getInEdges()) {
+            edge.setProperty("key", "value");
         }
         graph.shutdown();
     }
