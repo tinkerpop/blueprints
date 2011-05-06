@@ -52,11 +52,9 @@ public class RexsterTokens {
     public static final String NAME = "name";
     public static final String _LABEL_EQUALS = "_label=";
 
-
-    public static final String TOTAL_SIZE = "total_size";
     public static final String REXSTER_OFFSET_END = "rexster.offset.end";
     public static final String REXSTER_OFFSET_START = "rexster.offset.start";
-    public static final String REXSTER_SHOW_TYPES_EQUALS_TRUE = "rexster.show_types=true";
+    public static final String REXSTER_SHOW_TYPES_EQUALS_TRUE = "rexster.showTypes=true";
 
     public static final String FLOAT = "float";
     public static final String INTEGER = "integer";
