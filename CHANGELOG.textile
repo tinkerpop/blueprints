@@ -21,6 +21,12 @@ h3. Version 0.7 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Updated @RexsterGraph@ to work with latest Rexster REST API changes
+* Bumped to Neo4j 1.4.M01
+* Bumped to OrientDB 1.0rc1
+* Bumped to Sail 2.3.3
+
+
 ==<hr/>==
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-oscar.png!
