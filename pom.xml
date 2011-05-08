@@ -62,6 +62,19 @@
 
     <build>
         <directory>${basedir}/target</directory>
+        <plugins>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.5</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.wagon</groupId>
+                        <artifactId>wagon-ftp</artifactId>
+                        <version>1.0-alpha-6</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
     </build>
 
     <distributionManagement>
