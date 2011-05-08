@@ -1,3 +1,5 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/indices-example.png!
+
 An @IndexableGraph@ is a @Graph@ that supports the indexing of its vertices and edges. An index is a data structure that allows for the fast retrieval of an element by a particular key/value pair. The @IndexableGraph@ interface has the following methods:
 
 ```java

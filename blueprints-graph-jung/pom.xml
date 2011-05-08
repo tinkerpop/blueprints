@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.7</version>
     </parent>
     <artifactId>blueprints-graph-jung</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
     <packaging>jar</packaging>
     <name>Blueprints-GraphJung</name>
     <description>JUNG (Java Universal Network/Graph Framework) utility for Blueprints property graphs</description>
@@ -20,9 +20,8 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
         </dependency>
-        <!-- JUNG SUPPORT -->
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-api</artifactId>
@@ -38,11 +37,10 @@
             <artifactId>jung-visualization</artifactId>
             <version>2.0.1</version>
         </dependency>
-        <!-- TESTING -->
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

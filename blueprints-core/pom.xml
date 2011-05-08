@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.7</version>
     </parent>
     <artifactId>blueprints-core</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
     <packaging>jar</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints-Core</name>
@@ -22,7 +22,6 @@
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
         </dependency>
-        <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

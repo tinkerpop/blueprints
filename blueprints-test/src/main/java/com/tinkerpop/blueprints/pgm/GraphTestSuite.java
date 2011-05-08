@@ -2,12 +2,7 @@ package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 
 /**

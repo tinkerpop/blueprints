@@ -7,6 +7,24 @@ All releases can be accessed through the TinkerPop Maven2 repository identified 
   <url>http://tinkerpop.com/maven2</url>
 </repository>
 ```
+==<hr/>==
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-patrick.png!
+
+h3. Version 0.7 (Patrick -- May 8, 2011)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>0.7</version>
+</dependency>
+```
+
+* Updated @RexsterGraph@ to work with latest Rexster REST API changes
+* Bumped to Neo4j 1.4.M01
+* Bumped to OrientDB 1.0rc1
+* Bumped to Sail 2.3.3
 
 ==<hr/>==
 
@@ -22,11 +40,15 @@ h3. Version 0.6 (Oscar -- April 4, 2011)
 </dependency>
 ```
 
+Blueprints 0.6 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.6/api
+
 * Refactored to create a Maven multiproject with one module per major Blueprints component
 * Added @DexGraph@ implementation ("Sparsity Technologies":http://www.sparsity-technologies.com/)
 * Bumped to OrientDB 1.0rc1-SNAPSHOT
 * Bumped to Neo4j 1.3M05
 * Fixed equals() and hashCode() bug in @ReadOnlyGraph@
+* Bumped to supporting JUNG 2.0.1
+* Added @Index.count()@ method to Blueprints core API.
 
 ==<hr/>==
 

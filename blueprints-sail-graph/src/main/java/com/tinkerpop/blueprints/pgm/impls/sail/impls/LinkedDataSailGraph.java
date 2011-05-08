@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.sail.impls;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import net.fortytwo.linkeddata.sail.LinkedDataSail;
 import net.fortytwo.ripple.Ripple;
-import net.fortytwo.ripple.URIMap;
 import org.openrdf.sail.Sail;
 
 /**

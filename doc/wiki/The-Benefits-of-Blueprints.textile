@@ -1,4 +1,6 @@
-Blueprints is a generic graph Java API that binds to various graph backeds (i.e. frameworks and "databases":http://en.wikipedia.org/wiki/Graph_database). Below is a list of reasons for using Blueprints.
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
+
+Blueprints is a generic graph Java API that binds to various graph backends (i.e. frameworks and "databases":http://en.wikipedia.org/wiki/Graph_database). Below is a list of reasons for using Blueprints.
 
 * Blueprints makes it relatively easy to swap in and out different graph backends. In this way, its possible to avoid "vendor lock-in":http://en.wikipedia.org/wiki/Vendor_lock-in.
 * Any software built for Blueprints will work with any Blueprints-enabled graph backend (e.g "Gremlin":http://gremlin.tinkerpop.com).

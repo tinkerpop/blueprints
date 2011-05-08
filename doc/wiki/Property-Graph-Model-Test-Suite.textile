@@ -2,7 +2,7 @@ Blueprints comes with a suite of test cases to ensure that any implementation of
 
 There currently exists the following test suites:
 
-# *AutomaticIndexTestSuite*: ensures that automatic indices are managed property.
+# *AutomaticIndexTestSuite*: ensures that automatic indices are managed properly.
 # *EdgeTestSuite*: ensure that edges and their properties are added and removed properly.
 # *GraphMLReaderTestSuite*: ensure that GraphML files are read properly from disk and represented properly.
 # *GraphTestSuite*: ensure that vertices and edges work together properly.

@@ -77,7 +77,7 @@ public class DexIterable<T extends Element> implements Iterable<T> {
         public TT next() {
             long oid = it.next();
             if (oid == -1)
-              throw new NoSuchElementException();
+                throw new NoSuchElementException();
             TT ret = null;
             if (clazz == Vertex.class) {
                 ret = (TT) new DexVertex(graph, oid);

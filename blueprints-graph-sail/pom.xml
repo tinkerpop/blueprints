@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.7</version>
     </parent>
     <artifactId>blueprints-graph-sail</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
     <packaging>jar</packaging>
     <name>Blueprints-GraphSail</name>
     <description>Sesame Sail implementation for Blueprints property graphs</description>
@@ -19,49 +19,47 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
         </dependency>
-        <!-- SESAME SUPPORT -->
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>
             <artifactId>common</artifactId>
             <version>1.1</version>
         </dependency>
-        <!-- TESTING -->
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-queryparser-sparql</artifactId>
-            <version>2.3.2</version>
+            <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-repository-sail</artifactId>
-            <version>2.3.2</version>
+            <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-rio-trig</artifactId>
-            <version>2.3.2</version>
+            <version>2.3.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-orient-graph</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -70,6 +68,15 @@
             <id>tinkerpop-repository</id>
             <name>TinkerPop Maven2 Repository</name>
             <url>http://tinkerpop.com/maven2</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>aduna-repo</id>
+            <name>Aduna repository</name>
+            <url>http://repo.aduna-software.org/maven2/releases</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>

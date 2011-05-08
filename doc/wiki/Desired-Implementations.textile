@@ -16,3 +16,4 @@ Below is a list of desired implementations. This list is not intended to be exha
 ** "AllegroGraph":http://www.franz.com/agraph/allegrograph/
 ** "OpenVirtuoso":http://virtuoso.openlinksw.com/
 ** "OWLim":http://www.ontotext.com/owlim/
+** "Stardog":http://www.stardog.com (currently in development)

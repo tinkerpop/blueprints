@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.7-SNAPSHOT</version>
+        <version>0.7</version>
     </parent>
     <artifactId>blueprints-sail-graph</artifactId>
-    <version>0.7-SNAPSHOT</version>
+    <version>0.7</version>
     <packaging>jar</packaging>
     <name>Blueprints-SailGraph</name>
     <description>Blueprints property graph implementation for Sesame Sail</description>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
         </dependency>
         <!-- SESAME SUPPORT -->
         <dependency>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>0.7-SNAPSHOT</version>
+            <version>0.7</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -75,11 +75,6 @@
             </snapshots>
         </repository>
         <repository>
-            <id>fortytwo</id>
-            <name>fortytwo.net Maven repository</name>
-            <url>http://fortytwo.net/maven2</url>
-        </repository>
-        <repository>
             <id>aduna-repo</id>
             <name>Aduna repository</name>
             <url>http://repo.aduna-software.org/maven2/releases</url>
@@ -89,13 +84,9 @@
             </snapshots>
         </repository>
         <repository>
-            <id>neo4j-public-repository</id>
-            <name>Publicly available Maven 2 repository for Neo4j</name>
-            <url>http://m2.neo4j.org/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
+            <id>fortytwo</id>
+            <name>fortytwo.net Maven repository</name>
+            <url>http://fortytwo.net/maven2</url>
         </repository>
     </repositories>
     <build>
