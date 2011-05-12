@@ -11,6 +11,18 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
+h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>0.8-SNAPSHOT</version>
+</dependency>
+```
+
+==<hr/>==
+
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-patrick.png!
 
 h3. Version 0.7 (Patrick -- May 8, 2011)
