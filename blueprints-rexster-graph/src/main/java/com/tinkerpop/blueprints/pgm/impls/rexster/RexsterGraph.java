@@ -4,12 +4,16 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterObjectSequence; //PDW
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.net.URL; //PDW
+import java.net.URLEncoder; //PDW
 
 /**
  * A Blueprints implementation of the RESTful API of Rexster (http://rexster.tinkerpop.com)
@@ -19,11 +23,12 @@ import java.util.Set;
 public class RexsterGraph implements IndexableGraph {
 
     private final String graphURI;
+    private JSONObject rawGraph; //PDW not final since update via getRawGraph()
 
     public RexsterGraph(final String graphURI) {
         this.graphURI = graphURI;
         // test to make sure its a valid, accessible url
-        RestHelper.get(graphURI);
+        this.rawGraph = this.getRawGraph(); //PDW
     }
 
     public String getGraphURI() {
@@ -166,12 +171,25 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public String toString() {
-        JSONObject object = RestHelper.get(graphURI);
-        String graphName = (String) object.get(RexsterTokens.GRAPH);
+        // JSONObject object = RestHelper.get(this.graphURI); //PDW this.graphURI instead of graphURI
+        // String graphName = (String) object.get(RexsterTokens.GRAPH);
+        String graphName = (String) this.rawGraph.get(RexsterTokens.GRAPH);
         return "rexstergraph[" + this.graphURI + "][" + graphName + "]";
     }
-
+	
     public JSONObject getRawGraph() {
-        return RestHelper.getResultObject(this.graphURI);
+        // return (JSONObject) RestHelper.getResultObject(this.graphURI);
+        this.rawGraph = (JSONObject) RestHelper.get(this.graphURI); //PDW use .get() since no 'results' key
+        return this.rawGraph;
     }
+
+    //PDW add g.runGremlin(script)
+	public Iterable<Object> runGremlin(final String script) {
+	    try {
+            return new RexsterObjectSequence(this.graphURI + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this);
+	    } catch (Exception e) {
+            throw new RuntimeException("Could not run Gremlin script: " + script);
+	    }
+	}
+	
 }

@@ -12,7 +12,8 @@ import java.util.Queue;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class RexsterElementSequence<T extends Element> implements Iterable<T>, Iterator<T> {
+ //PDW change <T extends Element> into <T extends Object> to support RexsterObjectSequence
+public abstract class RexsterElementSequence<T extends Object> implements Iterable<T>, Iterator<T> {
 
     protected final int bufferSize = 100;
     protected int start = 0;
@@ -33,7 +34,8 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
         if (!queue.isEmpty())
             return true;
         else {
-            fillBuffer();
+            if (this.end > this.start) //PDW
+                fillBuffer();
             return !queue.isEmpty();
         }
     }
@@ -42,7 +44,8 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
         if (!queue.isEmpty()) {
             return queue.remove();
         } else {
-            fillBuffer();
+            if (this.end > this.start) //PDW
+                fillBuffer();
             if (!queue.isEmpty()) {
                 return queue.remove();
             } else

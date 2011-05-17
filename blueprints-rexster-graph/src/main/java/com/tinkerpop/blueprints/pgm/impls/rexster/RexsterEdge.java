@@ -29,7 +29,6 @@ public class RexsterEdge extends RexsterElement implements Edge {
 
     public Vertex getInVertex() {
         return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.inVertex), this.graph);
-
     }
 
     public String getLabel() {
@@ -41,6 +40,8 @@ public class RexsterEdge extends RexsterElement implements Edge {
     }
 
     public JSONObject getRawEdge() {
-        return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
+        return this.rawElement; //PDW
+        // return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
     }
+    
 }

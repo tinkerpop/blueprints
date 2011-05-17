@@ -6,6 +6,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter; //PDW
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -43,27 +44,53 @@ public class RestHelper {
 
     public static JSONObject postResultObject(final String uri) {
         try {
-            final URL url = new URL(safeUri(uri));
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(POST);
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            final JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
-            reader.close();
-            return retObject;
+			//PDW: convert URL querystring into form POST request
+			// final URL url = new URL(safeUri(uri));
+			// final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			// connection.setRequestMethod(POST);
+			URL url = new URL(safeUri(uri));
+			String data = url.getQuery(); // extract URL querystring
+			if (data == null)
+				data = "";
+			if (data.length() > 0)
+				url = new URL(safeUri(uri).substring(0,safeUri(uri).indexOf("?"+data)));
+			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setDoOutput(true);
+			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+			writer.write(data);
+			writer.close();
+			// END
+			InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+			final JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
+			reader.close();
+			return retObject;
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+			throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public static void post(final String uri) {
         try {
-            final URL url = new URL(safeUri(uri));
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(POST);
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            reader.close();
+			//PDW: convert URL querystring into form POST request
+			// final URL url = new URL(safeUri(uri));
+			// final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			// connection.setRequestMethod(POST);
+			URL url = new URL(safeUri(uri));
+			String data = url.getQuery(); // extract URL querystring
+			if (data == null)
+			    data = "";
+			if (data.length() > 0)
+				url = new URL(safeUri(uri).substring(0,safeUri(uri).indexOf("?"+data)));
+			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setDoOutput(true);
+			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+			writer.write(data);
+			writer.close();
+			// END
+			InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+			reader.close();
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+			throw new RuntimeException(e.getMessage(), e);
         }
     }
 
