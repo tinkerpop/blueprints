@@ -63,8 +63,11 @@ public class RexsterTokens {
     public static final String LONG = "long";
 
 	//PDW
-	public static final String GREMLIN_EXTENSION = "/tp/gremlin";
+	public static final String EXTENSIONS = "extensions";
+	public static final String GREMLIN_EXTENSION = "tp/gremlin";
 	public static final String SCRIPT_EQUALS = "script=";
+	public static final String SLASH = "/";
+	public static final String HREF = "href";
     public static final String SUCCESS = "success";
     public static final String ERROR = "error";
 	

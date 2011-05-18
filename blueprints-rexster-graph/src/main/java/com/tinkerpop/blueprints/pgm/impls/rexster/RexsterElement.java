@@ -111,9 +111,9 @@ public abstract class RexsterElement implements Element {
 
         try {
     	    if (this instanceof Vertex)
-    	        results = new RexsterObjectSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this.graph);
+    	        results = new RexsterObjectSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this.graph);
     	    else
-    	        results = new RexsterObjectSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId() + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this.graph);
+    	        results = new RexsterObjectSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId() + RexsterTokens.SLASH + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this.graph);
         } catch (Exception e) {
             throw new RuntimeException("Could not run Gremlin script: " + script);
         }

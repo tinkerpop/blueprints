@@ -13,11 +13,11 @@ import java.util.Set;
  */
 public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> implements AutomaticIndex<T> {
 
-    private Set<String> indexKeys = null;
+    private Set<String> indexKeys;
     
     public RexsterAutomaticIndex(final RexsterGraph graph, final String name, final Class<T> indexClass) {
         super(graph, name, indexClass);
-        this.indexKeys = this.getAutoIndexKeys();
+        this.indexKeys = this.setAutoIndexKeys();
     }
 
     public Type getIndexType() {
@@ -25,18 +25,19 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
     }
 
     public Set<String> getAutoIndexKeys() {
-        if (null == this.indexKeys) //PDW cache IndexKeys
-            return this.indexKeys;
-        else {
-            Set<String> keys = new HashSet<String>();
-            JSONArray array = RestHelper.getResultArray(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS);
-            for (Object key : array) {
-                keys.add((String) key);
-            }
-            if (keys.size() == 1 && null == keys.iterator().next())
-                return null;
-            else
-                return keys;
-        }
+        return this.indexKeys; //PDW cached indexKeys
     }
+
+    private Set<String> setAutoIndexKeys() {
+        Set<String> keys = new HashSet<String>();
+        JSONArray array = RestHelper.getResultArray(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS);
+        for (Object key : array) {
+            keys.add((String) key);
+        }
+        if (keys.size() == 1 && null == keys.iterator().next())
+            return null;
+        else
+            return keys;
+    }
+
 }

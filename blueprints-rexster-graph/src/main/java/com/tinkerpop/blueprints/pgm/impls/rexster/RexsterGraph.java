@@ -23,12 +23,13 @@ import java.net.URLEncoder; //PDW
 public class RexsterGraph implements IndexableGraph {
 
     private final String graphURI;
-    private JSONObject rawGraph; //PDW not final since update via getRawGraph()
+    private JSONObject rawGraph; //PDW not final since updated via getRawGraph
+    private Boolean isGremlin; //PDW not final updated via getIsGremlin
 
     public RexsterGraph(final String graphURI) {
         this.graphURI = graphURI;
-        // test to make sure its a valid, accessible url
-        this.rawGraph = this.getRawGraph(); //PDW
+        this.rawGraph = this.setRawGraph(); //PDW
+        this.isGremlin = this.setIsGremlin(); //PDW
     }
 
     public String getGraphURI() {
@@ -108,30 +109,53 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
-        for (JSONObject index : (List<JSONObject>) json) {
-            if (index.get(RexsterTokens.NAME).equals(indexName)) {
-                Class c;
-                String clazz = (String) index.get(RexsterTokens.CLASS);
-                if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
-                    c = Vertex.class;
-                else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
-                    c = Edge.class;
-                else
-                    throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
+        JSONObject index = RestHelper.get(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName);
+        if (index.get(RexsterTokens.NAME).equals(indexName)) {
+            Class c;
+            String clazz = (String) index.get(RexsterTokens.CLASS);
+            if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
+                c = Vertex.class;
+            else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
+                c = Edge.class;
+            else
+                throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
 
+            if (!c.isAssignableFrom(indexClass))
+                throw new RuntimeException("Stored index is " + c + " and is being loaded as a " + indexClass + " index");
 
-                if (!c.isAssignableFrom(indexClass))
-                    throw new RuntimeException("Stored index is " + c + " and is being loaded as a " + indexClass + " index");
-
-                if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
-                    return new RexsterAutomaticIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
-                else
-                    return new RexsterIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
-            }
+            if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
+                return new RexsterAutomaticIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
+            else
+                return new RexsterIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
         }
         throw new RuntimeException("No index with name " + indexName + " exists");
     }
+
+    // public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
+    //     JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
+    //     for (JSONObject index : (List<JSONObject>) json) {
+    //         if (index.get(RexsterTokens.NAME).equals(indexName)) {
+    //             Class c;
+    //             String clazz = (String) index.get(RexsterTokens.CLASS);
+    //             if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
+    //                 c = Vertex.class;
+    //             else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
+    //                 c = Edge.class;
+    //             else
+    //                 throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
+    // 
+    // 
+    //             if (!c.isAssignableFrom(indexClass))
+    //                 throw new RuntimeException("Stored index is " + c + " and is being loaded as a " + indexClass + " index");
+    // 
+    //             if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
+    //                 return new RexsterAutomaticIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
+    //             else
+    //                 return new RexsterIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
+    //         }
+    //     }
+    //     throw new RuntimeException("No index with name " + indexName + " exists");
+    // }
 
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
         String c;
@@ -178,17 +202,43 @@ public class RexsterGraph implements IndexableGraph {
     }
 	
     public JSONObject getRawGraph() {
-        // return (JSONObject) RestHelper.getResultObject(this.graphURI);
-        this.rawGraph = (JSONObject) RestHelper.get(this.graphURI); //PDW use .get() since no 'results' key
+        // return (JSONObject) RestHelper.getResultObject(this.graphURI); //bug: use .get() since no 'results' key
+        // return this.rawGraph; // cached value
+        return this.setRawGraph(); // refreshed value
+    }
+
+    //PDW private g.setRawGraph()
+    private JSONObject setRawGraph() {
+        this.rawGraph = (JSONObject) RestHelper.get(this.graphURI);
         return this.rawGraph;
     }
 
-    //PDW add g.runGremlin(script)
+    //PDW private g.setIsGremlin()
+    private Boolean setIsGremlin() {
+        Boolean isGremlin = false;
+        for (Object result : (JSONArray) this.rawGraph.get(RexsterTokens.EXTENSIONS)) {
+            final JSONObject extension = (JSONObject) result;
+            if (extension.get(RexsterTokens.HREF).equals(RexsterTokens.GREMLIN_EXTENSION)) {
+                isGremlin = true;
+                break;
+            }
+        }
+        return isGremlin;
+    }
+    
+    //PDW public g.isGremlin()
+    public Boolean isGremlin() {
+        return this.isGremlin;
+    }
+    
+    //PDW public g.runGremlin(script)
 	public Iterable<Object> runGremlin(final String script) {
+	    if (!this.isGremlin())
+            throw new RuntimeException("Gremlin Extension is not available on this graph.");
 	    try {
-            return new RexsterObjectSequence(this.graphURI + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this);
+            return new RexsterObjectSequence(this.graphURI + RexsterTokens.SLASH + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this);
 	    } catch (Exception e) {
-            throw new RuntimeException("Could not run Gremlin script: " + script);
+            throw new RuntimeException("Could not run Gremlin script: " + script, e);
 	    }
 	}
 	
