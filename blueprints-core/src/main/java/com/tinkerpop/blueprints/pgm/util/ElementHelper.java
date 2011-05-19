@@ -126,4 +126,17 @@ public class ElementHelper {
         return properties;
     }
 
+    /**
+     * Set the properties of the provided element using the provided map.
+     *
+     * @param element    the element to set the properties of
+     * @param properties the properties to set as a Map
+     */
+    public static void setProperties(final Element element, final Map<String, Object> properties) {
+        for (Map.Entry<String, Object> property : properties.entrySet()) {
+            element.setProperty(property.getKey(), property.getValue());
+        }
+    }
+
+
 }
