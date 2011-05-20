@@ -17,11 +17,8 @@ public class RexsterObjectSequence extends RexsterElementSequence<Object> {
     }
 
     protected void fillBuffer() {
+        // warning: require Rexster 0.4+
         final JSONObject object = RestHelper.get(this.uri + this.createSeparator() + RexsterTokens.REXSTER_OFFSET_START + RexsterTokens.EQUALS + this.start + RexsterTokens.AND + RexsterTokens.REXSTER_OFFSET_END + RexsterTokens.EQUALS + this.end);
-        if (this.start != 0) {//PDW: remove when rexster.offset.* is implemented
-            this.start = this.end;
-            return;
-        }
         for (Object result : (JSONArray) object.get(RexsterTokens.RESULTS)) {
             if (result instanceof JSONObject) {
                 JSONObject json = (JSONObject) result;
