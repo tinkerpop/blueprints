@@ -21,7 +21,7 @@ public class RexsterVertexSequence extends RexsterElementSequence<Vertex> {
         for (final Object vertex : (JSONArray) object.get(RexsterTokens.RESULTS)) {
             this.queue.add(new RexsterVertex(RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + ((JSONObject) vertex).get(RexsterTokens._ID)), this.graph));
         }
-        this.start = this.start + this.bufferSize;
-        this.end = this.end + this.bufferSize;
+        this.start = this.start + this.graph.getBufferSize();
+        this.end = this.end + this.graph.getBufferSize();
     }
 }

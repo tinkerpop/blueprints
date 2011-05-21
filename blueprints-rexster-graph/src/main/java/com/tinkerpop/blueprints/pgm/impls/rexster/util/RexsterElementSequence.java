@@ -14,9 +14,8 @@ import java.util.Queue;
  */
 public abstract class RexsterElementSequence<T extends Element> implements Iterable<T>, Iterator<T> {
 
-    protected final int bufferSize = 100;
     protected int start = 0;
-    protected int end = bufferSize;
+    protected int end;
 
     protected final Queue<T> queue = new LinkedList<T>();
     protected final RexsterGraph graph;
@@ -26,6 +25,7 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
     public RexsterElementSequence(final String uri, final RexsterGraph graph) {
         this.graph = graph;
         this.uri = uri;
+        this.end = graph.getBufferSize();
         this.fillBuffer();
     }
 

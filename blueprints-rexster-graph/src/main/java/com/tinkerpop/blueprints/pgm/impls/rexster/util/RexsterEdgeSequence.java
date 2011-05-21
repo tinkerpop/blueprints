@@ -21,7 +21,7 @@ public class RexsterEdgeSequence extends RexsterElementSequence<Edge> {
         for (final Object edge : (JSONArray) object.get(RexsterTokens.RESULTS)) {
             this.queue.add(new RexsterEdge(RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + ((JSONObject) edge).get(RexsterTokens._ID)), this.graph));
         }
-        this.start = this.start + this.bufferSize;
-        this.end = this.end + this.bufferSize;
+        this.start = this.start + this.graph.getBufferSize();
+        this.end = this.end + this.graph.getBufferSize();
     }
 }

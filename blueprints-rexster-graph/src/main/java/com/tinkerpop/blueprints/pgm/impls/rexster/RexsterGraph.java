@@ -19,9 +19,15 @@ import java.util.Set;
 public class RexsterGraph implements IndexableGraph {
 
     private final String graphURI;
+    private int bufferSize;
 
     public RexsterGraph(final String graphURI) {
+        this(graphURI, 100);
+    }
+
+    public RexsterGraph(final String graphURI, final int bufferSize) {
         this.graphURI = graphURI;
+        this.bufferSize = bufferSize;
         // test to make sure its a valid, accessible url
         RestHelper.get(graphURI);
     }
@@ -32,6 +38,14 @@ public class RexsterGraph implements IndexableGraph {
 
     public void shutdown() {
 
+    }
+
+    public int getBufferSize() {
+        return this.bufferSize;
+    }
+
+    public void setBufferSize(final int bufferSize) {
+        this.bufferSize = bufferSize;
     }
 
     public void clear() {
