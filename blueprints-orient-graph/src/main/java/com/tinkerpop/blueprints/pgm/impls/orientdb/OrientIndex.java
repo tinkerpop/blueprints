@@ -10,9 +10,8 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -31,7 +30,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected Class<? extends Element> indexClass;
 
-    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
+    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass,
+                final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
         this.graph = graph;
         this.indexClass = indexClass;
         create(indexName, this.indexClass, indexType);
@@ -40,7 +40,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
         this.graph = orientGraph;
         this.underlying = rawIndex;
-        load(rawIndex.updateConfiguration());
+        load(rawIndex.getConfiguration());
     }
 
     public OIndex getRawIndex() {
@@ -87,7 +87,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public Iterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final Set<OIdentifiable> records = underlying.get(keyTemp);
+        final Collection<OIdentifiable> records = underlying.get(keyTemp);
 
         if (records.isEmpty())
             return Collections.emptySet();
@@ -97,7 +97,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public long count(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final Set<OIdentifiable> records = underlying.get(keyTemp);
+        final Collection<OIdentifiable> records = underlying.get(keyTemp);
         return records.size();
     }
 
@@ -128,22 +128,16 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected void removeElement(final T vertex) {
         final ORecord<?> vertexDoc = vertex.getRawElement();
 
-        Set<OIdentifiable> rids;
-        for (Entry<Object, Set<OIdentifiable>> entries : getRawIndex()) {
-            rids = entries.getValue();
-            if (rids != null) {
-                if (rids.contains(vertexDoc))
-                    underlying.remove(entries.getKey(), vertexDoc);
-            }
-        }
+        underlying.remove(vertexDoc);
     }
 
-    private void create(final String indexName, final Class<? extends Element> indexClass, final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
+    private void create(final String indexName, final Class<? extends Element> indexClass,
+                        final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
         this.indexClass = indexClass;
 
         // CREATE THE MAP
-        this.underlying = graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), null, null, null);
-        underlying.setName(indexName);
+        this.underlying = graph.getRawGraph().getMetadata().getIndexManager()
+                .createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), null, null, null, true);
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))
@@ -154,8 +148,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             className = indexClass.getName();
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
-        underlying.updateConfiguration().field(CONFIG_CLASSNAME, className);
-        underlying.updateConfiguration().field(CONFIG_TYPE, indexType.toString());
+        underlying.getConfiguration().field(CONFIG_CLASSNAME, className);
+        underlying.getConfiguration().field(CONFIG_TYPE, indexType.toString());
     }
 
     private void load(final ODocument indexConfiguration) {
@@ -170,7 +164,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             try {
                 this.indexClass = (Class<T>) Class.forName(indexClassName);
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException("Index class '" + indexClassName + "' is not registered. Supported ones: Vertex, Edge and custom class that extends them");
+                throw new IllegalArgumentException("Index class '" + indexClassName
+                        + "' is not registered. Supported ones: Vertex, Edge and custom class that extends them");
             }
 
         // LOAD THE TREE-MAP

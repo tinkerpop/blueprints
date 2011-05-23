@@ -120,13 +120,13 @@ public class ElementHelperTest extends BaseTest {
         Graph graph = new TinkerGraph();
         Vertex vertex = graph.addVertex(null);
         Map map = new HashMap();
-        map.put("name","pierre");
+        map.put("name", "pierre");
         ElementHelper.setProperties(vertex, map);
         assertEquals(vertex.getPropertyKeys().size(), 1);
         assertEquals(vertex.getProperty("name"), "pierre");
 
-        map.put("name","dewilde");
-        map.put("country","belgium");
+        map.put("name", "dewilde");
+        map.put("country", "belgium");
         ElementHelper.setProperties(vertex, map);
         assertEquals(vertex.getPropertyKeys().size(), 2);
         assertEquals(vertex.getProperty("name"), "dewilde");
