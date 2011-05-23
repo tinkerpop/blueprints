@@ -4,16 +4,12 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterObjectSequence; //PDW
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.net.URL; //PDW
-import java.net.URLEncoder; //PDW
 
 /**
  * A Blueprints implementation of the RESTful API of Rexster (http://rexster.tinkerpop.com)
@@ -23,13 +19,21 @@ import java.net.URLEncoder; //PDW
 public class RexsterGraph implements IndexableGraph {
 
     private final String graphURI;
-    private JSONObject rawGraph; //PDW not final since updated via getRawGraph
-    private Boolean isGremlin; //PDW not final updated via getIsGremlin
+    private int bufferSize;
+    private JSONObject rawGraph;
+    private Iterable<Index<? extends Element>> indices = null;
 
     public RexsterGraph(final String graphURI) {
+        this(graphURI, 100);
+    }
+
+    public RexsterGraph(final String graphURI, final int bufferSize) {
         this.graphURI = graphURI;
-        this.rawGraph = this.setRawGraph(); //PDW
-        this.isGremlin = this.setIsGremlin(); //PDW
+        this.bufferSize = bufferSize;
+        this.rawGraph = this.getRawGraph();
+        // this.indices = this.getIndices(); // pre-load indices
+        // test to make sure its a valid, accessible url
+        // RestHelper.get(graphURI);
     }
 
     public String getGraphURI() {
@@ -38,6 +42,14 @@ public class RexsterGraph implements IndexableGraph {
 
     public void shutdown() {
 
+    }
+
+    public int getBufferSize() {
+        return this.bufferSize;
+    }
+
+    public void setBufferSize(final int bufferSize) {
+        this.bufferSize = bufferSize;
     }
 
     public void clear() {
@@ -52,15 +64,25 @@ public class RexsterGraph implements IndexableGraph {
         if (null == id)
             return new RexsterVertex(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES), this);
         else
-            return new RexsterVertex(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + id), this);
+            return new RexsterVertex(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(id)), this);
     }
 
     public Vertex getVertex(final Object id) {
-        return new RexsterVertex(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + id), this);
+        try {
+            return new RexsterVertex(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(id)), this);
+        } catch (Exception e) {
+            return null;
+            // throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public Edge getEdge(final Object id) {
-        return new RexsterEdge(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + id), this);
+        try {
+            return new RexsterEdge(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id)), this);
+        } catch (Exception e) {
+            return null;
+            // throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public Iterable<Edge> getEdges() {
@@ -69,24 +91,27 @@ public class RexsterGraph implements IndexableGraph {
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         if (null == id)
-            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
+            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + RestHelper.encode(outVertex.getId()) + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + RestHelper.encode(inVertex.getId()) + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + RestHelper.encode(label)), this);
         else
-            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + id + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + outVertex.getId() + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + inVertex.getId() + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + label), this);
+            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id) + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + RestHelper.encode(outVertex.getId()) + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + RestHelper.encode(inVertex.getId()) + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + RestHelper.encode(label)), this);
     }
 
     public void removeEdge(final Edge edge) {
-        RestHelper.delete(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + edge.getId());
+        RestHelper.delete(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(edge.getId()));
     }
 
     public void removeVertex(final Vertex vertex) {
-        RestHelper.delete(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + vertex.getId());
+        RestHelper.delete(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(vertex.getId()));
     }
 
     public void dropIndex(final String indexName) {
         RestHelper.delete(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName);
+        this.indices = null; // force indices reload
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
+        if (null != this.indices)
+            return this.indices;
         List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
         JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
         for (JSONObject index : (List<JSONObject>) json) {
@@ -105,28 +130,17 @@ public class RexsterGraph implements IndexableGraph {
                 indices.add(new RexsterIndex(this, (String) index.get(RexsterTokens.NAME), c));
 
         }
+        this.indices = indices;
         return indices;
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        JSONObject index = RestHelper.get(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + indexName);
-        if (index.get(RexsterTokens.NAME).equals(indexName)) {
-            Class c;
-            String clazz = (String) index.get(RexsterTokens.CLASS);
-            if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
-                c = Vertex.class;
-            else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
-                c = Edge.class;
-            else
-                throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
-
-            if (!c.isAssignableFrom(indexClass))
-                throw new RuntimeException("Stored index is " + c + " and is being loaded as a " + indexClass + " index");
-
-            if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
-                return new RexsterAutomaticIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
-            else
-                return new RexsterIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
+        for (Index index : getIndices()) {
+            if (index.getIndexName().equals(indexName)) {
+                if (!index.getIndexClass().isAssignableFrom(indexClass))
+                    throw new RuntimeException("Stored index is " + index.getIndexClass() + " and is being loaded as a " + indexClass + " index");
+                return index;
+            }
         }
         throw new RuntimeException("No index with name " + indexName + " exists");
     }
@@ -175,7 +189,7 @@ public class RexsterGraph implements IndexableGraph {
         if (!index.get(RexsterTokens.NAME).equals(indexName))
             throw new RuntimeException("Could not create index: " + index.get(RexsterTokens.MESSAGE));
 
-
+        this.indices = null; // force indices reload
         return new RexsterAutomaticIndex<T>(this, indexName, indexClass);
 
     }
@@ -191,55 +205,24 @@ public class RexsterGraph implements IndexableGraph {
         if (!index.get(RexsterTokens.NAME).equals(indexName))
             throw new RuntimeException("Could not create index: " + index.get(RexsterTokens.MESSAGE));
 
+        this.indices = null; // force indices reload
         return new RexsterIndex<T>(this, indexName, indexClass);
     }
 
     public String toString() {
-        // JSONObject object = RestHelper.get(this.graphURI); //PDW this.graphURI instead of graphURI
+        // JSONObject object = RestHelper.get(graphURI);
         // String graphName = (String) object.get(RexsterTokens.GRAPH);
         String graphName = (String) this.rawGraph.get(RexsterTokens.GRAPH);
         return "rexstergraph[" + this.graphURI + "][" + graphName + "]";
     }
-	
-    public JSONObject getRawGraph() {
-        // return (JSONObject) RestHelper.getResultObject(this.graphURI); //bug: use .get() since no 'results' key
-        // return this.rawGraph; // cached value
-        return this.setRawGraph(); // refreshed value
-    }
 
-    //PDW private g.setRawGraph()
-    private JSONObject setRawGraph() {
-        this.rawGraph = (JSONObject) RestHelper.get(this.graphURI);
+    public JSONObject getRawGraph() {
+        try {
+            this.rawGraph = (JSONObject) RestHelper.get(this.graphURI);
+        } catch (Exception e) {
+            this.rawGraph = null;
+        }
         return this.rawGraph;
     }
 
-    //PDW private g.setIsGremlin()
-    private Boolean setIsGremlin() {
-        Boolean isGremlin = false;
-        for (Object result : (JSONArray) this.rawGraph.get(RexsterTokens.EXTENSIONS)) {
-            final JSONObject extension = (JSONObject) result;
-            if (extension.get(RexsterTokens.HREF).equals(RexsterTokens.GREMLIN_EXTENSION)) {
-                isGremlin = true;
-                break;
-            }
-        }
-        return isGremlin;
-    }
-    
-    //PDW public g.isGremlin()
-    public Boolean isGremlin() {
-        return this.isGremlin;
-    }
-    
-    //PDW public g.runGremlin(script)
-	public Iterable<Object> runGremlin(final String script) {
-	    if (!this.isGremlin())
-            throw new RuntimeException("Gremlin Extension is not available on this graph.");
-	    try {
-            return new RexsterObjectSequence(this.graphURI + RexsterTokens.SLASH + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this);
-	    } catch (Exception e) {
-            throw new RuntimeException("Could not run Gremlin script: " + script, e);
-	    }
-	}
-	
 }

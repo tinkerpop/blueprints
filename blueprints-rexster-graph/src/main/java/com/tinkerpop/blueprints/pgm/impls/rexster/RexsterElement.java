@@ -5,37 +5,38 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterObjectSequence; //PDW
 
 import org.json.simple.JSONObject;
-import org.json.simple.JSONArray; //PDW
 
 import java.util.HashSet;
 import java.util.Set;
-import java.net.URLEncoder; //PDW
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public abstract class RexsterElement implements Element {
 
-    // protected final Object id;
+    protected final Object id;
     protected final RexsterGraph graph;
-    protected JSONObject rawElement; //PDW
+    protected JSONObject rawElement;
+    private Boolean isTypedElement = false;
 
     public RexsterElement(final JSONObject rawElement, final RexsterGraph graph) {
-        // this.id = rawElement.get(RexsterTokens._ID);
+        this.id = rawElement.get(RexsterTokens._ID);
         this.graph = graph;
-        this.rawElement = rawElement; //PDW
+        this.rawElement = rawElement; // cache vertex/edge raw JSON
     }
 
     public Object getId() {
-        return rawElement.get(RexsterTokens._ID);
-        // return this.id;
+        return this.id;
+    }
+
+    protected JSONObject getRawElement() {
+        return this.rawElement;
     }
 
     public Set<String> getPropertyKeys() {
-        JSONObject rawElement = this.rawElement; //PDW
+        JSONObject rawElement = this.rawElement;
         // JSONObject rawElement;
         // 
         // if (this instanceof Vertex)
@@ -56,18 +57,28 @@ public abstract class RexsterElement implements Element {
     }
 
     public Object getProperty(final String key) {
+        Object value = this.rawElement.get(key);
+        if (value instanceof String || this.isTypedElement) // already typed
+            return value;
+        // code necessary to distinguish Integer-Long and Float-Double
+        JSONObject typedElement;
+        if (this instanceof Vertex)
+            typedElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RexsterTokens.REXSTER_SHOW_TYPES_EQUALS_TRUE);
+        else
+            typedElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RexsterTokens.REXSTER_SHOW_TYPES_EQUALS_TRUE);
+        Set<String> typedKeys = new HashSet<String>();
+        typedKeys.addAll(typedElement.keySet());
+        typedKeys.remove(RexsterTokens._TYPE); // _type and _label are never typed
+        typedKeys.remove(RexsterTokens._LABEL);
+        for (String typedKey : typedKeys) {
+            JSONObject typedProperty = (JSONObject) typedElement.get(typedKey);
+            if (null != typedProperty) {
+                Object typedValue = RestHelper.typeCast((String) typedProperty.get(RexsterTokens.TYPE), typedProperty.get(RexsterTokens.VALUE));
+                this.rawElement.put(typedKey, typedValue); // save typed value
+            }
+        }    
+        this.isTypedElement = true; // flag as typed
         return this.rawElement.get(key);
-        // JSONObject rawElement;
-        // if (this instanceof Vertex)
-        //     rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.QUESTION + RexsterTokens.REXSTER_SHOW_TYPES_EQUALS_TRUE);
-        // else
-        //     rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId() + RexsterTokens.QUESTION + RexsterTokens.REXSTER_SHOW_TYPES_EQUALS_TRUE);
-        // 
-        // JSONObject typedProperty = (JSONObject) rawElement.get(key);
-        // if (null != typedProperty)
-        //     return RestHelper.typeCast((String) typedProperty.get(RexsterTokens.TYPE), typedProperty.get(RexsterTokens.VALUE));
-        // else
-        //     return null;        
     }
 
     public void setProperty(final String key, final Object value) {
@@ -78,11 +89,11 @@ public abstract class RexsterElement implements Element {
             throw new RuntimeException("RexsterGraph does not support property keys that start with underscore");
 
         if (this instanceof Vertex) {
-            RestHelper.postResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.QUESTION + key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
+            RestHelper.postResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RestHelper.encode(key) + RexsterTokens.EQUALS + RestHelper.uriCast(value));
         } else {
-            RestHelper.postResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId() + RexsterTokens.QUESTION + key + RexsterTokens.EQUALS + RestHelper.uriCast(value));
+            RestHelper.postResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RestHelper.encode(key) + RexsterTokens.EQUALS + RestHelper.uriCast(value));
         }
-        this.rawElement.put(key, value); //PDW
+        this.rawElement.put(key, value);
     }
 
     public int hashCode() {
@@ -90,13 +101,13 @@ public abstract class RexsterElement implements Element {
     }
 
     public Object removeProperty(final String key) {
-        Object object = this.rawElement.remove(key); //PDW
+        Object object = this.rawElement.remove(key);
         // Object object = this.getProperty(key);
 
         if (this instanceof Vertex)
-            RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.QUESTION + key);
+            RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RestHelper.encode(key));
         else
-            RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId() + RexsterTokens.QUESTION + key);
+            RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RestHelper.encode(key));
 
         return object;
     }
@@ -105,20 +116,4 @@ public abstract class RexsterElement implements Element {
         return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
     }
     
-    //PDW v.runGremlin(script) and e.runGremlin(script)
-	public Iterable<Object> runGremlin(final String script) {
-		Iterable<Object> results = null;
-
-        try {
-    	    if (this instanceof Vertex)
-    	        results = new RexsterObjectSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this.graph);
-    	    else
-    	        results = new RexsterObjectSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId() + RexsterTokens.SLASH + RexsterTokens.GREMLIN_EXTENSION + RexsterTokens.QUESTION + RexsterTokens.SCRIPT_EQUALS + URLEncoder.encode(script), this.graph);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not run Gremlin script: " + script);
-        }
-
-		return results;
-	}
-	
 }

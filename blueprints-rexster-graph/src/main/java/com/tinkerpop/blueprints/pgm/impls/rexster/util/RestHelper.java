@@ -6,9 +6,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter; //PDW
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.URLConnection;
 
 /**
@@ -44,22 +45,17 @@ public class RestHelper {
 
     public static JSONObject postResultObject(final String uri) {
         try {
-			//PDW: convert URL querystring into form POST request
-			// final URL url = new URL(safeUri(uri));
-			// final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			// connection.setRequestMethod(POST);
-			URL url = new URL(safeUri(uri));
-			String data = url.getQuery(); // extract URL querystring
-			if (data == null)
-				data = "";
-			if (data.length() > 0)
-				url = new URL(safeUri(uri).substring(0,safeUri(uri).indexOf("?"+data)));
+			// convert querystring into POST data
+		    URL url = new URL(postUri(uri));
+		    String data = postData(uri);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setDoOutput(true);
 			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-			writer.write(data);
+			writer.write(data); // post data with Content-Length automatically set
 			writer.close();
-			// END
+			// final URL url = new URL(safeUri(uri));
+			// final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			// connection.setRequestMethod(POST);
 			InputStreamReader reader = new InputStreamReader(connection.getInputStream());
 			final JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
 			reader.close();
@@ -71,22 +67,17 @@ public class RestHelper {
 
     public static void post(final String uri) {
         try {
-			//PDW: convert URL querystring into form POST request
-			// final URL url = new URL(safeUri(uri));
-			// final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			// connection.setRequestMethod(POST);
-			URL url = new URL(safeUri(uri));
-			String data = url.getQuery(); // extract URL querystring
-			if (data == null)
-			    data = "";
-			if (data.length() > 0)
-				url = new URL(safeUri(uri).substring(0,safeUri(uri).indexOf("?"+data)));
+			// convert querystring into POST data
+		    URL url = new URL(postUri(uri));
+		    String data = postData(uri);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setDoOutput(true);
 			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-			writer.write(data);
+			writer.write(data); // post data with Content-Length automatically set
 			writer.close();
-			// END
+			// final URL url = new URL(safeUri(uri));
+			// final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			// connection.setRequestMethod(POST);
 			InputStreamReader reader = new InputStreamReader(connection.getInputStream());
 			reader.close();
         } catch (Exception e) {
@@ -94,6 +85,28 @@ public class RestHelper {
         }
     }
 
+    private static String postUri(final String uri) {
+        String url = "";
+        final String safeUri = safeUri(uri);
+		final int sep = safeUri.indexOf("?");
+		if (sep == -1)
+		    url = safeUri;
+		else
+		    url = safeUri.substring(0,sep);
+		return url;
+    }
+
+    private static String postData(final String uri) {
+        String data = null;
+        final String safeUri = safeUri(uri);
+		final int sep = safeUri.indexOf("?");
+		if (sep == -1)
+		    data = "";
+		else {
+		    data = safeUri.substring(sep+1);
+		}
+		return data;
+    }
 
     public static void delete(final String uri) {
         try {
@@ -141,5 +154,12 @@ public class RestHelper {
     private static String safeUri(String uri) {
         // todo: make this way more safe
         return uri.replace(" ", "%20");
+    }
+    
+    public static String encode(Object id) {
+        if (id instanceof String)
+            return URLEncoder.encode(id.toString());
+        else
+            return id.toString();
     }
 }

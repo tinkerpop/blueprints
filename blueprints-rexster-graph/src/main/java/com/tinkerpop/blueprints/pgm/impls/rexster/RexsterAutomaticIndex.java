@@ -17,7 +17,7 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
     
     public RexsterAutomaticIndex(final RexsterGraph graph, final String name, final Class<T> indexClass) {
         super(graph, name, indexClass);
-        this.indexKeys = this.setAutoIndexKeys();
+        this.indexKeys = this.setAutoIndexKeys(); // cache indexKeys
     }
 
     public Type getIndexType() {
@@ -25,7 +25,7 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
     }
 
     public Set<String> getAutoIndexKeys() {
-        return this.indexKeys; //PDW cached indexKeys
+        return this.indexKeys;
     }
 
     private Set<String> setAutoIndexKeys() {

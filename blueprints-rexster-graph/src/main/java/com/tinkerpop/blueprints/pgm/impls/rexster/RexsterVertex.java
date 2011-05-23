@@ -17,19 +17,19 @@ public class RexsterVertex extends RexsterElement implements Vertex {
     }
 
     public Iterable<Edge> getInEdges() {
-        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_INE, this.graph);
+        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.SLASH_INE, this.graph);
     }
 
     public Iterable<Edge> getOutEdges() {
-        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_OUTE, this.graph);
+        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.SLASH_OUTE, this.graph);
     }
 
     public Iterable<Edge> getInEdges(final String label) {
-        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_INE + RexsterTokens.QUESTION + RexsterTokens._LABEL_EQUALS + label, this.graph);
+        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.SLASH_INE + RexsterTokens.QUESTION + RexsterTokens._LABEL_EQUALS + RestHelper.encode(label), this.graph);
     }
 
     public Iterable<Edge> getOutEdges(final String label) {
-        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId() + RexsterTokens.SLASH_OUTE + RexsterTokens.QUESTION + RexsterTokens._LABEL_EQUALS + label, this.graph);
+        return new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.SLASH_OUTE + RexsterTokens.QUESTION + RexsterTokens._LABEL_EQUALS + RestHelper.encode(label), this.graph);
     }
 
     public String toString() {
@@ -37,7 +37,7 @@ public class RexsterVertex extends RexsterElement implements Vertex {
     }
 
     public JSONObject getRawVertex() {
-        return this.rawElement; //PDW
+        return this.getRawElement();
         // return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId());
     }
 
