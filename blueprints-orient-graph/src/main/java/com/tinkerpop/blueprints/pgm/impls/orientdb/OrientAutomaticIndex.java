@@ -52,7 +52,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     }
 
     private void init() {
-        final Collection<Object> field = underlying.getConfiguration().field(KEYS);
+        final Collection<Object> field = underlying.updateConfiguration().field(KEYS);
         if (null != field) {
             this.autoIndexKeys = new HashSet<String>();
             for (Object key : field) {
