@@ -29,6 +29,8 @@ import java.util.*;
 public abstract class SailTest extends TestCase {
     private Sail sail = null;
 
+    protected boolean uniqueStatements = false;
+
     @Before
     public final void setUp() throws Exception {
         before();
@@ -524,6 +526,30 @@ public abstract class SailTest extends TestCase {
             assertEquals(3L, sc.size(uriA, uriB));
         } finally {
             sc.close();
+        }
+    }
+
+    @Test
+    public void testDuplicateStatements() throws Exception {
+        if (uniqueStatements) {
+            URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
+            URI uriB = sail.getValueFactory().createURI("http://example.org/uriB");
+            URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
+            SailConnection sc = sail.getConnection();
+            try {
+                sc.clear();
+                assertEquals(0, countStatements(sc, uriA, uriB, uriC));
+                sc.addStatement(uriA, uriB, uriC);
+                assertEquals(1, countStatements(sc, uriA, uriB, uriC));
+                sc.addStatement(uriA, uriB, uriC);
+                assertEquals(1, countStatements(sc, uriA, uriB, uriC));
+
+                sc.addStatement(uriA, uriB, uriC, uriC);
+                assertEquals(2, countStatements(sc, uriA, uriB, uriC));
+                assertEquals(1, countStatements(sc, uriA, uriB, uriC, uriC));
+            } finally {
+                sc.close();
+            }
         }
     }
 
