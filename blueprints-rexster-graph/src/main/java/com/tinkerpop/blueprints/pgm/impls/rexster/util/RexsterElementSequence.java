@@ -33,7 +33,8 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
         if (!queue.isEmpty())
             return true;
         else {
-            fillBuffer();
+            if (this.end > this.start) // last buffer if start == end
+                fillBuffer();
             return !queue.isEmpty();
         }
     }
@@ -42,7 +43,8 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
         if (!queue.isEmpty()) {
             return queue.remove();
         } else {
-            fillBuffer();
+            if (this.end > this.start) // last buffer if start == end
+                fillBuffer();
             if (!queue.isEmpty()) {
                 return queue.remove();
             } else
