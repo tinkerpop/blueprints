@@ -180,6 +180,19 @@ public class GraphSail implements Sail, GraphSource {
         store.volatileStatements = flag;
     }
 
+    /**
+     * Enables or disables enforcement of a unique statements policy,
+     * which ensures that no new statement will be added which is identical
+     * (in all of its subject, predicate, object and context) to an existing statement.
+     * If enabled, this policy will first remove any existing statements identical to the to-be-added statement,
+     * before adding the latter statement.
+     *
+     * @param flag whether this policy should be enforced
+     */
+    public void enforceUniqueStatements(final boolean flag) {
+        store.uniqueStatements = flag;
+    }
+
     public String toString() {
         String type = store.graph.getClass().getSimpleName().toLowerCase();
         return "graphsail[" + type + "]";
@@ -203,6 +216,7 @@ public class GraphSail implements Sail, GraphSource {
 
         public boolean manualTransactions;
         public boolean volatileStatements = false;
+        public boolean uniqueStatements = false;
 
         public Index<Vertex> vertices;
         public Index<Edge> edges;

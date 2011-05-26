@@ -156,10 +156,23 @@ public class GraphSailConnection implements SailConnection {
     // TODO: avoid duplicate statements
 
     public void addStatement(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
+        if (null == subject || null == predicate || null == object) {
+            throw new IllegalArgumentException("null part-of-speech for to-be-added statement");
+        }
+
+        String s = resourceToNative(subject);
+        String p = uriToNative(predicate);
+        String o = valueToNative(object);
+
+        if (store.uniqueStatements) {
+            if (0 == contexts.length) {
+                removeStatements(subject, predicate, object, (Resource) null);
+            } else {
+                removeStatements(subject, predicate, object, contexts);
+            }
+        }
+
         for (Resource context : ((0 == contexts.length) ? NULL_CONTEXT_ARRAY : contexts)) {
-            String s = resourceToNative(subject);
-            String p = uriToNative(predicate);
-            String o = valueToNative(object);
             String c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
             Vertex out = getOrCreateVertex(s);

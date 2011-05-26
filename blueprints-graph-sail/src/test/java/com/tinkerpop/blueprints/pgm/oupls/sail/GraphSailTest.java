@@ -24,7 +24,15 @@ public abstract class GraphSailTest extends SailTest {
     protected abstract IndexableGraph createGraph();
 
     protected Sail createSail() throws Exception {
-        return new GraphSail(createGraph());
+        // Flip this flag in order to test "unique statements" behavior
+        uniqueStatements = false;
+
+        GraphSail g =  new GraphSail(createGraph());
+        if (uniqueStatements) {
+            g.enforceUniqueStatements(true);
+        }
+
+        return g;
     }
 
     public void testIndexPatterns() throws Exception {
