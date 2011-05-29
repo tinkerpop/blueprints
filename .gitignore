@@ -1,6 +1,6 @@
 *.log
 target/
-blueprints.iml
+*.iml
 .idea/
 *.iws
 *.DS_Store
