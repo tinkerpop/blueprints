@@ -12,9 +12,6 @@
             <directory>src</directory>
         </fileSet>
         <fileSet>
-            <directory>target/apidocs</directory>
-        </fileSet>
-        <fileSet>
             <directory>target/site</directory>
         </fileSet>
         <fileSet>

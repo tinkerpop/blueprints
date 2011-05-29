@@ -12,7 +12,7 @@ import java.util.Set;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> implements AutomaticIndex<T> {
-
+    
     public RexsterAutomaticIndex(final RexsterGraph graph, final String name, final Class<T> indexClass) {
         super(graph, name, indexClass);
     }
@@ -32,4 +32,5 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
         else
             return keys;
     }
+
 }

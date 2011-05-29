@@ -9,6 +9,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -113,5 +114,24 @@ public class ElementHelperTest extends BaseTest {
         assertEquals(map.get("name"), "pavel");
 
         assertEquals(vertex.getProperty("name"), "marko");
+    }
+
+    public void testSetProperties() {
+        Graph graph = new TinkerGraph();
+        Vertex vertex = graph.addVertex(null);
+        Map map = new HashMap();
+        map.put("name", "pierre");
+        ElementHelper.setProperties(vertex, map);
+        assertEquals(vertex.getPropertyKeys().size(), 1);
+        assertEquals(vertex.getProperty("name"), "pierre");
+
+        map.put("name", "dewilde");
+        map.put("country", "belgium");
+        ElementHelper.setProperties(vertex, map);
+        assertEquals(vertex.getPropertyKeys().size(), 2);
+        assertEquals(vertex.getProperty("name"), "dewilde");
+        assertEquals(vertex.getProperty("country"), "belgium");
+
+
     }
 }

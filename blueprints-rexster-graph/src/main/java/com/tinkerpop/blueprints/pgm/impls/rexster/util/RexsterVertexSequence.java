@@ -17,11 +17,17 @@ public class RexsterVertexSequence extends RexsterElementSequence<Vertex> {
     }
 
     protected void fillBuffer() {
+        final int bufferSize = this.graph.getBufferSize();
         final JSONObject object = RestHelper.get(this.uri + this.createSeparator() + RexsterTokens.REXSTER_OFFSET_START + RexsterTokens.EQUALS + this.start + RexsterTokens.AND + RexsterTokens.REXSTER_OFFSET_END + RexsterTokens.EQUALS + this.end);
-        for (final Object vertex : (JSONArray) object.get(RexsterTokens.RESULTS)) {
-            this.queue.add(new RexsterVertex(RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + ((JSONObject) vertex).get(RexsterTokens._ID)), this.graph));
+        for (Object vertex : (JSONArray) object.get(RexsterTokens.RESULTS)) {
+            this.queue.add(new RexsterVertex((JSONObject) vertex, this.graph));
         }
-        this.start = this.start + this.bufferSize;
-        this.end = this.end + this.bufferSize;
+
+        if (this.queue.size() == bufferSize) { // next buffer if full
+            this.start = this.start + bufferSize;
+            this.end = this.end + bufferSize;
+        } else { // last buffer
+            this.start = this.end;
+        }
     }
 }

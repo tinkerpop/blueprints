@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm;
 
-import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.*;
@@ -93,6 +92,21 @@ public class GraphTestSuite extends TestSuite {
             }
         } catch (Exception e) {
             assertTrue(true);
+        }
+
+        graph.shutdown();
+    }
+
+    public void testSettingProperties() {
+        Graph graph = graphTest.getGraphInstance();
+        if (!graphTest.isRDFModel) {
+            Vertex a = graph.addVertex(null);
+            Vertex b = graph.addVertex(null);
+            graph.addEdge(null, a, b, convertId("knows"));
+            graph.addEdge(null, a, b, convertId("knows"));
+            for (Edge edge : b.getInEdges()) {
+                edge.setProperty("key", "value");
+            }
         }
         graph.shutdown();
     }

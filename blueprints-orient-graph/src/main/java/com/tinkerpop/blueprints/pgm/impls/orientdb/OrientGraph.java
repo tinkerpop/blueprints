@@ -5,6 +5,7 @@ import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndex;
+import com.orientechnologies.orient.core.index.OIndexManagerImpl;
 import com.orientechnologies.orient.core.iterator.ORecordIteratorClass;
 import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -109,7 +110,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (this.manualIndices.remove(iIndexName) == null)
             this.autoIndices.remove(iIndexName);
 
-        rawGraph.getMetadata().getIndexManager().deleteIndex(iIndexName);
+        rawGraph.getMetadata().getIndexManager().dropIndex(iIndexName);
         saveIndexConfiguration();
     }
 
@@ -324,8 +325,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     protected void saveIndexConfiguration() {
-        rawGraph.getMetadata().getIndexManager().setDirty();
-        rawGraph.getMetadata().getIndexManager().save();
+        OIndexManagerImpl idxMgr = (OIndexManagerImpl) rawGraph.getMetadata().getIndexManager();
+        idxMgr.setDirty();
+        idxMgr.save();
     }
 
     protected boolean autoStartTransaction() {
@@ -353,16 +355,16 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     private void openOrCreate(final boolean createDefaultIndices) {
         this.rawGraph = new OGraphDatabase(url);
-        if (this.rawGraph.exists()) {
+        if (url.startsWith("remote:") || this.rawGraph.exists()) {
             this.rawGraph.open(username, password);
 
             // LOAD THE INDEX CONFIGURATION FROM INTO THE DICTIONARY
-            final ODocument indexConfiguration = rawGraph.getMetadata().getIndexManager().getDocument();
+            final ODocument indexConfiguration = ((OIndexManagerImpl) rawGraph.getMetadata().getIndexManager()).getDocument();
             if (indexConfiguration == null)
                 createIndexConfiguration(createDefaultIndices);
 
             for (OIndex idx : rawGraph.getMetadata().getIndexManager().getIndexes()) {
-                if (idx.updateConfiguration().field(OrientIndex.CONFIG_TYPE) != null)
+                if (idx.getConfiguration().field(OrientIndex.CONFIG_TYPE) != null)
                     // LOAD THE INDEXES
                     loadIndex(idx);
             }
@@ -384,7 +386,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     @SuppressWarnings("rawtypes")
     private OrientIndex<?> loadIndex(final OIndex rawIndex) {
-        String indexType = rawIndex.updateConfiguration().field(OrientIndex.CONFIG_TYPE);
+        String indexType = rawIndex.getConfiguration().field(OrientIndex.CONFIG_TYPE);
         final OrientIndex<?> index;
 
         switch (Index.Type.valueOf(indexType.toUpperCase())) {

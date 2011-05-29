@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm;
 
-import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
