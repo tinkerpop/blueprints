@@ -45,13 +45,7 @@ public class RestHelper {
 
     public static JSONObject postResultObject(final String uri) {
         try {
-            //*****************************
-            //* reverted this to how it worked prior to pierre's changes.  post of JSON arrays in the query
-            //* string (ie. keys for indexes) need to be converted to multivalue lists (that's how rexster)
-            //* handles arrays through post of form data
-            //*****************************
-            /*
-			// convert querystring into POST data
+			// convert querystring into POST form data
 		    URL url = new URL(postUri(uri));
 		    String data = postData(uri);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -66,16 +60,6 @@ public class RestHelper {
 			final JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
 			reader.close();
 			return retObject;
-            */
-
-            final URL url = new URL(safeUri(uri));
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(POST);
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            final JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
-            reader.close();
-            return retObject;
-
         } catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
         }
@@ -83,13 +67,7 @@ public class RestHelper {
 
     public static void post(final String uri) {
         try {
-            //*****************************
-            //* reverted this to how it worked prior to pierre's changes.  post of JSON arrays in the query
-            //* string (ie. keys for indexes) need to be converted to multivalue lists (that's how rexster)
-            //* handles arrays through post of form data
-            //*****************************
-            /*
-			// convert querystring into POST data
+			// convert querystring into POST form data
 		    URL url = new URL(postUri(uri));
 		    String data = postData(uri);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -102,14 +80,6 @@ public class RestHelper {
 			// connection.setRequestMethod(POST);
 			InputStreamReader reader = new InputStreamReader(connection.getInputStream());
 			reader.close();
-			*/
-
-            final URL url = new URL(safeUri(uri));
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(POST);
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            reader.close();
-
         } catch (Exception e) {
 			throw new RuntimeException(e.getMessage(), e);
         }
