@@ -21,8 +21,8 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Added EventGraph implementation
-* RexsterGraph improvements
+* Added @EventGraph@ implementation
+* @RexsterGraph@ improvements
 ** Use of POST for REST Service Requests
 ** Better implementation URL encoding
 
