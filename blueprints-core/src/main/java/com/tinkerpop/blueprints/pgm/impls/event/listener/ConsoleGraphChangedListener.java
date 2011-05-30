@@ -46,4 +46,8 @@ public class ConsoleGraphChangedListener implements GraphChangedListener {
     public void edgeRemoved(final Edge edge) {
         System.out.println("Edge [" + edge.toString() + "] removed from graph [" + graph.toString() + "]");
     }
+
+    public void graphCleared() {
+        System.out.println("Graph [" + graph.toString() + "] cleared.");
+    }
 }

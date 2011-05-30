@@ -68,6 +68,12 @@ public class EventGraph implements Graph {
         }
     }
 
+    protected void onGraphCleared() {
+        for (GraphChangedListener listener : this.graphChangedListeners) {
+            listener.graphCleared();
+        }
+    }
+
     /**
      * Raises a vertexAdded event.
      */
@@ -148,6 +154,7 @@ public class EventGraph implements Graph {
 
     public void clear() {
         this.graph.clear();
+        this.onGraphCleared();
     }
 
     public void shutdown() {
