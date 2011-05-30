@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndex;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Set;
  */
 public class EventAutomaticIndex<T extends Element> extends EventIndex<T> implements AutomaticIndex<T> {
 
-    public EventAutomaticIndex(final AutomaticIndex autoIndex, Iterator<GraphChangedListener> graphChangedListeners) {
+    public EventAutomaticIndex(final AutomaticIndex autoIndex, List<GraphChangedListener> graphChangedListeners) {
         super(autoIndex, graphChangedListeners);
     }
 

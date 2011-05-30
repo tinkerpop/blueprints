@@ -83,7 +83,7 @@ public class EventGraph implements Graph {
             return null;
         } else {
             this.onVertexAdded(vertex);
-            return new EventVertex(vertex, this.getListenerIterator());
+            return new EventVertex(vertex, this.graphChangedListeners);
         }
     }
 
@@ -92,7 +92,7 @@ public class EventGraph implements Graph {
         if (vertex == null) {
             return null;
         } else {
-            return new EventVertex(vertex, this.getListenerIterator());
+            return new EventVertex(vertex, this.graphChangedListeners);
         }
     }
 
@@ -110,7 +110,7 @@ public class EventGraph implements Graph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new EventVertexSequence(this.graph.getVertices().iterator(), this.getListenerIterator());
+        return new EventVertexSequence(this.graph.getVertices().iterator(), this.graphChangedListeners);
     }
 
     /**
@@ -121,7 +121,7 @@ public class EventGraph implements Graph {
         if (edge == null) {
             return null;
         } else {
-            return new EventEdge(edge, this.getListenerIterator());
+            return new EventEdge(edge, this.graphChangedListeners);
         }
     }
 
@@ -131,7 +131,7 @@ public class EventGraph implements Graph {
             return null;
         } else {
             this.onEdgeAdded(edge);
-            return new EventEdge(edge, this.getListenerIterator());
+            return new EventEdge(edge, this.graphChangedListeners);
         }
     }
 
@@ -149,7 +149,7 @@ public class EventGraph implements Graph {
     }
 
     public Iterable<Edge> getEdges() {
-        return new EventEdgeSequence(this.graph.getEdges().iterator(), this.getListenerIterator());
+        return new EventEdgeSequence(this.graph.getEdges().iterator(), this.graphChangedListeners);
     }
 
     public void clear() {

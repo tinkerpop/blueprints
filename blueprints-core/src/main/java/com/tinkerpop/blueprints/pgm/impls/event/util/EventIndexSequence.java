@@ -11,6 +11,7 @@ import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndex;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyTokens;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A sequence of indices that applies the list of listeners into each element.
@@ -18,9 +19,9 @@ import java.util.Iterator;
 public class EventIndexSequence<T extends Element> implements Iterator<Index<T>>, Iterable<Index<T>> {
 
     private final Iterator<Index<T>> itty;
-    private final Iterator<GraphChangedListener> graphChangedListeners;
+    private final List<GraphChangedListener> graphChangedListeners;
 
-    public EventIndexSequence(final Iterator<Index<T>> itty, Iterator<GraphChangedListener> graphChangedListeners) {
+    public EventIndexSequence(final Iterator<Index<T>> itty, List<GraphChangedListener> graphChangedListeners) {
         this.itty = itty;
         this.graphChangedListeners = graphChangedListeners;
     }
@@ -36,9 +37,9 @@ public class EventIndexSequence<T extends Element> implements Iterator<Index<T>>
     public Index<T> next() {
         final Index<T> index = this.itty.next();
         if (index.getIndexType().equals(Index.Type.MANUAL))
-            return new EventIndex<T>(index, graphChangedListeners);
+            return new EventIndex<T>(index, this.graphChangedListeners);
         else
-            return new EventAutomaticIndex<T>((AutomaticIndex<T>) index, graphChangedListeners);
+            return new EventAutomaticIndex<T>((AutomaticIndex<T>) index, this.graphChangedListeners);
     }
 
     public boolean hasNext() {

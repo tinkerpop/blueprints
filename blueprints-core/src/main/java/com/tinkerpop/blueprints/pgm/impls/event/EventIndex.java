@@ -9,15 +9,16 @@ import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventVertexSequence;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An index that wraps graph elements in the "evented" way.
  */
 public class EventIndex<T extends Element> implements Index<T> {
     protected final Index<T> index;
-    protected final Iterator<GraphChangedListener> graphChangedListeners;
+    protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventIndex(Index<T> index, Iterator<GraphChangedListener> graphChangedListeners) {
+    public EventIndex(Index<T> index, List<GraphChangedListener> graphChangedListeners) {
         this.index = index;
         this.graphChangedListeners = graphChangedListeners;
     }

@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An edge with a GraphChangedListener attached.  Those listeners are notified when changes occur to
@@ -12,7 +13,7 @@ import java.util.Iterator;
  */
 public class EventEdge extends EventElement implements Edge {
 
-    public EventEdge(final Edge edge, final Iterator<GraphChangedListener> graphChangedListeners) {
+    public EventEdge(final Edge edge, final List<GraphChangedListener> graphChangedListeners) {
         super(edge, graphChangedListeners);
     }
 

@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -14,37 +15,33 @@ import java.util.Set;
  */
 public class EventElement implements Element {
     protected final Element element;
-    protected final Iterator<GraphChangedListener> graphChangedListeners;
+    protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventElement(final Element element, final Iterator<GraphChangedListener> graphChangedListeners) {
+    public EventElement(final Element element, final List<GraphChangedListener> graphChangedListeners) {
         this.element = element;
         this.graphChangedListeners = graphChangedListeners;
     }
 
     protected void onVertexPropertyChanged(final Vertex vertex, final String key, final Object newValue) {
-        while (this.graphChangedListeners.hasNext()) {
-            GraphChangedListener listener = this.graphChangedListeners.next();
+        for (GraphChangedListener listener : this.graphChangedListeners) {
             listener.vertexPropertyChanged(vertex, key, newValue);
         }
     }
 
     protected void onEdgePropertyChanged(final Edge edge, final String key, final Object removedValue) {
-        while (this.graphChangedListeners.hasNext()) {
-            GraphChangedListener listener = this.graphChangedListeners.next();
+        for (GraphChangedListener listener : this.graphChangedListeners) {
             listener.edgePropertyChanged(edge, key, removedValue);
         }
     }
 
     protected void onVertexPropertyRemoved(final Vertex vertex, final String key, final Object newValue) {
-        while (this.graphChangedListeners.hasNext()) {
-            GraphChangedListener listener = this.graphChangedListeners.next();
+        for (GraphChangedListener listener : this.graphChangedListeners) {
             listener.vertexPropertyRemoved(vertex, key, newValue);
         }
     }
 
     protected void onEdgePropertyRemoved(final Edge edge, final String key, final Object removedValue) {
-        while (this.graphChangedListeners.hasNext()) {
-            GraphChangedListener listener = this.graphChangedListeners.next();
+        for (GraphChangedListener listener : this.graphChangedListeners) {
             listener.edgePropertyRemoved(edge, key, removedValue);
         }
     }

@@ -11,7 +11,6 @@ import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventIndexSequence;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventVertexSequence;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
-import sun.plugin2.ipc.Event;
 
 import java.util.HashSet;
 import java.util.Iterator;
