@@ -23,7 +23,7 @@ public class RexsterAutomaticIndex<T extends Element> extends RexsterIndex<T> im
 
     public Set<String> getAutoIndexKeys() {
         Set<String> keys = new HashSet<String>();
-        JSONArray array = RestHelper.getResultArray(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + this.indexName + RexsterTokens.SLASH_KEYS);
+        JSONArray array = RestHelper.getResultArray(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.SLASH_KEYS);
         for (Object key : array) {
             keys.add((String) key);
         }
