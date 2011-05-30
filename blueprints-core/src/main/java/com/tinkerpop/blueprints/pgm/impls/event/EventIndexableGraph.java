@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.impls.event.util.EventIndexSequence;
+import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyIndexSequence;
 
 import java.util.Set;
 
@@ -33,7 +35,7 @@ public class EventIndexableGraph extends EventGraph implements IndexableGraph {
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return this.getRawGraph().getIndices();
+        return new EventIndexSequence(((IndexableGraph) this.graph).getIndices().iterator(), this.graphChangedListeners.iterator());
     }
 
     public IndexableGraph getRawGraph() {
