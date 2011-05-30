@@ -31,7 +31,11 @@ public class EventIndexableGraph extends EventGraph implements IndexableGraph {
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        return this.getRawGraph().getIndex(indexName, indexClass);
+        final Index<T> index = ((IndexableGraph) this.graph).getIndex(indexName, indexClass);
+        if (index.getIndexType().equals(Index.Type.MANUAL))
+            return new EventIndex<T>(index, this.graphChangedListeners.iterator());
+        else
+            return new EventAutomaticIndex<T>((AutomaticIndex<T>) index, this.graphChangedListeners.iterator());
     }
 
     public Iterable<Index<? extends Element>> getIndices() {

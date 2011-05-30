@@ -2,12 +2,16 @@ package com.tinkerpop.blueprints.pgm.impls.event;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.ConsoleGraphChangedListener;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.event.util.EventIndexSequence;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventVertexSequence;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
+import sun.plugin2.ipc.Event;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -111,5 +115,18 @@ public class EventedGraphTest extends BaseTest {
         }
 
         assertEquals(0, counter);
+    }
+
+    public void testEventIndices() {
+        IndexableGraph graph = new EventIndexableGraph(TinkerGraphFactory.createTinkerGraph());
+        assertTrue(graph.getIndices() instanceof EventIndexSequence);
+        Index<Vertex> index = graph.getIndex(Index.VERTICES, Vertex.class);
+        assertTrue(index instanceof EventIndex);
+        assertTrue(index instanceof EventAutomaticIndex);
+        assertTrue(index.get("name", "marko") instanceof EventVertexSequence);
+
+        assertTrue(Vertex.class.isAssignableFrom(index.getIndexClass()));
+        assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
+        assertEquals(index.getIndexName(), Index.VERTICES);
     }
 }
