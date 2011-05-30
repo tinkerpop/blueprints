@@ -68,6 +68,9 @@ public class EventGraph implements Graph {
         }
     }
 
+    /**
+     * Raises a vertexAdded event.
+     */
     public Vertex addVertex(Object id) {
         final Vertex vertex = this.graph.addVertex(id);
         if (vertex == null) {
@@ -87,6 +90,9 @@ public class EventGraph implements Graph {
         }
     }
 
+    /**
+     * Raises a vertexRemoved event.
+     */
     public void removeVertex(Vertex vertex) {
         Vertex vertexToRemove = vertex;
         if (vertex instanceof EventVertex) {
@@ -101,6 +107,9 @@ public class EventGraph implements Graph {
         return new EventVertexSequence(this.graph.getVertices().iterator(), this.getListenerIterator());
     }
 
+    /**
+     * Raises an edgeAdded event.
+     */
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
         final Edge edge = this.graph.addEdge(id, outVertex, inVertex, label);
         if (edge == null) {
@@ -120,6 +129,9 @@ public class EventGraph implements Graph {
         }
     }
 
+    /**
+     * Raises an edgeRemoved event.
+     */
     public void removeEdge(Edge edge) {
         Edge edgeToRemove = edge;
         if (edge instanceof EventEdge) {

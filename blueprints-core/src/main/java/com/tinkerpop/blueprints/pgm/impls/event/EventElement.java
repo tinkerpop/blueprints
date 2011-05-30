@@ -8,6 +8,10 @@ import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * An element with a GraphChangedListener attached.  Those listeners are notified when changes occur to
+ * the properties of the element.
+ */
 public class EventElement implements Element {
     protected final Element element;
     protected final Iterator<GraphChangedListener> graphChangedListeners;
@@ -53,6 +57,9 @@ public class EventElement implements Element {
         return this.element.getId();
     }
 
+    /**
+     * Raises a vertexPropertyRemoved or edgePropertyRemoved event.
+     */
     public Object removeProperty(final String key)  {
         Object propertyRemoved = element.removeProperty(key);
 
@@ -69,6 +76,9 @@ public class EventElement implements Element {
         return this.element.getProperty(key);
     }
 
+    /**
+     * Raises a vertexPropertyRemoved or edgePropertyChanged event.
+     */
     public void setProperty(final String key, final Object value)  {
         this.element.setProperty(key, value);
 

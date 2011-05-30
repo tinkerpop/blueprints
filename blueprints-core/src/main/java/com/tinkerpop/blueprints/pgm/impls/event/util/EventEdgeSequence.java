@@ -6,6 +6,9 @@ import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
 
+/**
+ * A sequence of edges that applies the list of listeners into each edge.
+ */
 public class EventEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
 
     private final Iterator<Edge> itty;

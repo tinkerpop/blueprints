@@ -4,6 +4,9 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
+/**
+ * An example listener that writes a message to the console for each event that fires from the graph.
+ */
 public class ConsoleGraphChangedListener implements GraphChangedListener {
 
     private final Graph graph;

@@ -6,6 +6,9 @@ import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
 
+/**
+ * A sequence of vertices that applies the list of listeners into each vertex.
+ */
 public class EventVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
 
     private final Iterator<Vertex> itty;

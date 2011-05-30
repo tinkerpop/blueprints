@@ -6,6 +6,10 @@ import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
 
+/**
+ * An edge with a GraphChangedListener attached.  Those listeners are notified when changes occur to
+ * the properties of the edge.
+ */
 public class EventEdge extends EventElement implements Edge {
 
     public EventEdge(final Edge edge, final Iterator<GraphChangedListener> graphChangedListeners) {

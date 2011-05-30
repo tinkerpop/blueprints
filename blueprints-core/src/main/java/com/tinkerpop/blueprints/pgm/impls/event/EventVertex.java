@@ -7,6 +7,10 @@ import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
 
 import java.util.Iterator;
 
+/**
+ * An vertex with a GraphChangedListener attached.  Those listeners are notified when changes occur to
+ * the properties of the vertex.
+ */
 public class EventVertex extends EventElement implements Vertex {
     public EventVertex(final Vertex vertex, final Iterator<GraphChangedListener> graphChangedListeners) {
         super(vertex, graphChangedListeners);
