@@ -153,8 +153,6 @@ public class GraphSailConnection implements SailConnection {
         }
     }
 
-    // TODO: avoid duplicate statements
-
     public void addStatement(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
         if (null == subject || null == predicate || null == object) {
             throw new IllegalArgumentException("null part-of-speech for to-be-added statement");
