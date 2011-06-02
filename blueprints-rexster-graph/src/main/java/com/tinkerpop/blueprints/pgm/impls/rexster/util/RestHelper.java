@@ -8,8 +8,8 @@ import org.codehaus.jettison.json.JSONTokener;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -57,7 +57,7 @@ public class RestHelper {
 
             return retObject;
         } catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -75,31 +75,31 @@ public class RestHelper {
             InputStreamReader reader = new InputStreamReader(connection.getInputStream());
 			reader.close();
         } catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     private static String postUri(final String uri) {
         String url = "";
         final String safeUri = safeUri(uri);
-		final int sep = safeUri.indexOf("?");
-		if (sep == -1)
-		    url = safeUri;
-		else
-		    url = safeUri.substring(0,sep);
-		return url;
+        final int sep = safeUri.indexOf("?");
+        if (sep == -1)
+            url = safeUri;
+        else
+            url = safeUri.substring(0, sep);
+        return url;
     }
 
     private static String postData(final String uri) {
         String data = null;
         final String safeUri = safeUri(uri);
-		final int sep = safeUri.indexOf("?");
-		if (sep == -1)
-		    data = "";
-		else {
-		    data = safeUri.substring(sep+1);
-		}
-		return data;
+        final int sep = safeUri.indexOf("?");
+        if (sep == -1)
+            data = "";
+        else {
+            data = safeUri.substring(sep + 1);
+        }
+        return data;
     }
 
     public static void delete(final String uri) {

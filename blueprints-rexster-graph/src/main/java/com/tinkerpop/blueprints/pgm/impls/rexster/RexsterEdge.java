@@ -42,5 +42,5 @@ public class RexsterEdge extends RexsterElement implements Edge {
     public JSONObject getRawEdge() {
         return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
     }
-    
+
 }
