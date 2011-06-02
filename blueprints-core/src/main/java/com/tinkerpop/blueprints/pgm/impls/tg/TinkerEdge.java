@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.io.Serializable;
 
+import org.json.simple.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -41,6 +42,22 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
 
     public Vertex getInVertex() {
         return this.inVertex;
+    }
+    
+    public JSONObject toJSON() {
+    		JSONObject edge = new JSONObject();
+				
+    		edge.put("_id", this.getId());
+    		edge.put("_type", "edge");
+    		edge.put("label", this.getLabel());
+    		edge.put("out_v", this.outVertex.getId());
+    		edge.put("in_v", this.inVertex.getId());
+    		
+    		for(String key : this.getPropertyKeys()) {
+    				edge.put(key, this.getProperty(key));
+    		}
+    		
+    		return edge;
     }
 
     public String toString() {

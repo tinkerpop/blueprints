@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.json.simple.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -40,6 +41,19 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
 
     public Iterable<Edge> getInEdges(final String label) {
         return new TinkerEdgeSequence(this.inEdges.iterator(), label);
+    }
+    
+    public JSONObject toJSON() {
+    		JSONObject vertex = new JSONObject();
+				
+    		vertex.put("_id", this.getId());
+    		vertex.put("_type", "vertex");
+    		
+    		for(String key : this.getPropertyKeys()) {
+    				vertex.put(key, this.getProperty(key));
+    		}
+    		
+    		return vertex;
     }
 
     public String toString() {
