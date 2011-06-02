@@ -6,9 +6,10 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 
-import org.json.simple.JSONObject;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ public abstract class RexsterElement implements Element {
     protected final RexsterGraph graph;
 
     public RexsterElement(final JSONObject rawElement, final RexsterGraph graph) {
-        this.id = rawElement.get(RexsterTokens._ID);
+        this.id = rawElement.opt(RexsterTokens._ID);
         this.graph = graph;
     }
 
@@ -37,7 +38,11 @@ public abstract class RexsterElement implements Element {
              rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()));
 
         Set<String> keys = new HashSet<String>();
-        keys.addAll(rawElement.keySet());
+        Iterator keyIterator = rawElement.keys();
+        while (keyIterator.hasNext()) {
+            keys.add((String) keyIterator.next());
+        }
+
         keys.remove(RexsterTokens._TYPE);
         keys.remove(RexsterTokens._LABEL);
         keys.remove(RexsterTokens._ID);
@@ -55,9 +60,9 @@ public abstract class RexsterElement implements Element {
         else
             rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RexsterTokens.REXSTER_SHOW_TYPES_EQUALS_TRUE);
 
-        JSONObject typedProperty = (JSONObject) rawElement.get(key);
+        JSONObject typedProperty = rawElement.optJSONObject(key);
         if (null != typedProperty)
-            return RestHelper.typeCast((String) typedProperty.get(RexsterTokens.TYPE), typedProperty.get(RexsterTokens.VALUE));
+            return RestHelper.typeCast(typedProperty.optString(RexsterTokens.TYPE), typedProperty.opt(RexsterTokens.VALUE));
         else
             return null;
     }

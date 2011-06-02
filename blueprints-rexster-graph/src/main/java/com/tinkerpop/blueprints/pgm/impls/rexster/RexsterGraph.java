@@ -4,8 +4,8 @@ import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,9 +105,11 @@ public class RexsterGraph implements IndexableGraph {
     public Iterable<Index<? extends Element>> getIndices() {
         List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
         JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
-        for (JSONObject index : (List<JSONObject>) json) {
+
+        for (int ix = 0; ix < json.length(); ix++) {
+            JSONObject index = json.optJSONObject(ix);
             Class c;
-            String clazz = (String) index.get(RexsterTokens.CLASS);
+            String clazz = index.optString(RexsterTokens.CLASS);
             if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
                 c = Vertex.class;
             else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
@@ -115,10 +117,10 @@ public class RexsterGraph implements IndexableGraph {
             else
                 throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
 
-            if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
-                indices.add(new RexsterAutomaticIndex(this, (String) index.get(RexsterTokens.NAME), c));
+            if (index.opt(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
+                indices.add(new RexsterAutomaticIndex(this, index.optString(RexsterTokens.NAME), c));
             else
-                indices.add(new RexsterIndex(this, (String) index.get(RexsterTokens.NAME), c));
+                indices.add(new RexsterIndex(this, index.optString(RexsterTokens.NAME), c));
 
         }
 
@@ -177,8 +179,8 @@ public class RexsterGraph implements IndexableGraph {
         } else {
             index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.AUTOMATIC.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
         }
-        if (!index.get(RexsterTokens.NAME).equals(indexName))
-            throw new RuntimeException("Could not create index: " + index.get(RexsterTokens.MESSAGE));
+        if (!index.opt(RexsterTokens.NAME).equals(indexName))
+            throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
 
         return new RexsterAutomaticIndex<T>(this, indexName, indexClass);
 
@@ -192,15 +194,15 @@ public class RexsterGraph implements IndexableGraph {
             c = RexsterTokens.EDGE;
 
         JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.MANUAL.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
-        if (!index.get(RexsterTokens.NAME).equals(indexName))
-            throw new RuntimeException("Could not create index: " + index.get(RexsterTokens.MESSAGE));
+        if (!index.opt(RexsterTokens.NAME).equals(indexName))
+            throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
 
         return new RexsterIndex<T>(this, indexName, indexClass);
     }
 
     public String toString() {
         JSONObject object = RestHelper.get(graphURI);
-        String graphName = (String) object.get(RexsterTokens.GRAPH);
+        String graphName = object.optString(RexsterTokens.GRAPH);
 
         return "rexstergraph[" + this.graphURI + "][" + graphName + "]";
     }
