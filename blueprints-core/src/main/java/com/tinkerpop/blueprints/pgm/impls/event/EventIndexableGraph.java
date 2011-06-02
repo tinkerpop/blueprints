@@ -6,7 +6,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventIndexSequence;
-import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyIndexSequence;
 
 import java.util.Set;
 
@@ -18,11 +17,11 @@ public class EventIndexableGraph extends EventGraph implements IndexableGraph {
         super(graph);
     }
 
-    public void dropIndex(final String name)  {
+    public void dropIndex(final String name) {
         this.getRawGraph().dropIndex(name);
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass)  {
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
         return this.getRawGraph().createManualIndex(indexName, indexClass);
     }
 

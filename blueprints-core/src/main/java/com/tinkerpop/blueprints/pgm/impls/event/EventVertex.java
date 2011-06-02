@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**

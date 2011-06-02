@@ -27,7 +27,7 @@ public abstract class GraphSailTest extends SailTest {
         // Flip this flag in order to test "unique statements" behavior
         uniqueStatements = false;
 
-        GraphSail g =  new GraphSail(createGraph());
+        GraphSail g = new GraphSail(createGraph());
         if (uniqueStatements) {
             g.enforceUniqueStatements(true);
         }

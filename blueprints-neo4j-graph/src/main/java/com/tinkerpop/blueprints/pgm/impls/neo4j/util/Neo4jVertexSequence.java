@@ -1,17 +1,19 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j.util;
 
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jVertex;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.index.IndexHits;
 
 import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jVertexSequence<T extends Vertex> implements Iterator<Neo4jVertex>, Iterable<Neo4jVertex> {
+public class Neo4jVertexSequence<T extends Vertex> implements CloseableSequence<Neo4jVertex> {
 
     private final Iterator<Node> nodes;
     private final Neo4jGraph graph;
@@ -35,5 +37,11 @@ public class Neo4jVertexSequence<T extends Vertex> implements Iterator<Neo4jVert
 
     public Iterator<Neo4jVertex> iterator() {
         return this;
+    }
+
+    public void close() {
+        if (this.nodes instanceof IndexHits) {
+            ((IndexHits) this.nodes).close();
+        }
     }
 }

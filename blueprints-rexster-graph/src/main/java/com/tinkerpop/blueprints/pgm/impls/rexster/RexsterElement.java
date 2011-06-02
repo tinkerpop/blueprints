@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
-
 import org.json.simple.JSONObject;
 
 import java.util.HashSet;
@@ -32,9 +31,9 @@ public abstract class RexsterElement implements Element {
         JSONObject rawElement;
 
         if (this instanceof Vertex)
-             rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()));
+            rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()));
         else
-             rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()));
+            rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()));
 
         Set<String> keys = new HashSet<String>();
         keys.addAll(rawElement.keySet());
@@ -95,5 +94,5 @@ public abstract class RexsterElement implements Element {
     public boolean equals(final Object object) {
         return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
     }
-    
+
 }
