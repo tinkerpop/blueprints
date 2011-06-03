@@ -52,7 +52,7 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
     		edge.append("\"in_v\": " + this.getInVertex().getId() + ",");
     		
     		for(String key : this.getPropertyKeys()) {
-    				edge.append("\"" + key.toString() + "\": " + this.getProperty(key).toString() + "\",");
+    				edge.append("\"" + key.toString() + "\": \"" + this.getProperty(key).toString() + "\",");
     		}
     		
     		edge.deleteCharAt(edge.length() - 1);
