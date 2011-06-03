@@ -7,8 +7,6 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.io.Serializable;
 
-import org.json.simple.JSONObject;
-
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -44,20 +42,23 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
         return this.inVertex;
     }
     
-    public JSONObject toJSON() {
-    		JSONObject edge = new JSONObject();
-				
-    		edge.put("_id", this.getId());
-    		edge.put("_type", "edge");
-    		edge.put("label", this.getLabel());
-    		edge.put("out_v", this.outVertex.getId());
-    		edge.put("in_v", this.inVertex.getId());
+    public String toJSON() {
+    		StringBuilder edge = new StringBuilder("{");
+
+    		edge.append("\"_id\": " + this.getId().toString() + ",");
+    		edge.append("\"_type\": \"edge\",");
+    		edge.append("\"label\": \"" + this.getLabel() + "\",");
+    		edge.append("\"out_v\": " + this.getOutVertex().getId().toString() + ",");
+    		edge.append("\"in_v\": " + this.getInVertex().getId() + ",");
     		
     		for(String key : this.getPropertyKeys()) {
-    				edge.put(key, this.getProperty(key));
+    				edge.append("\"" + key.toString() + "\": " + this.getProperty(key).toString() + "\",");
     		}
     		
-    		return edge;
+    		edge.deleteCharAt(edge.length() - 1);
+    		edge.append("}");
+    		
+    		return edge.toString();
     }
 
     public String toString() {

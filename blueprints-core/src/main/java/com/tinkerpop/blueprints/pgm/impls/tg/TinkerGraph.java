@@ -7,8 +7,6 @@ import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 import java.io.*;
 import java.util.*;
 
-import org.json.simple.JSONObject;
-
 /**
  * A in-memory, reference implementation of the property graph interfaces provided by Blueprints.
  *
@@ -230,24 +228,27 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public String toJSON() {
-    		JSONObject graph = new JSONObject();
+    		StringBuilder graph = new StringBuilder("{\"vertices\": [");
     		
     		// Build the vertices
-    		JSONObject vertices = new JSONObject();
     		for(Vertex vertex : this.getVertices()) {
     				TinkerVertex tinkerVertex = (TinkerVertex)vertex;
-    				vertices.put(tinkerVertex.getId(), tinkerVertex.toJSON());
+    				graph.append(tinkerVertex.toJSON());
+    				graph.append(",");
     		}
+    		
+    		graph.deleteCharAt(graph.length() - 1);
+    		graph.append("],\"edges\": [");
     		
     		// Build the edges
-    		JSONObject edges = new JSONObject();
     		for(Edge edge : this.getEdges()) {
     				TinkerEdge tinkerEdge = (TinkerEdge)edge;
-    				edges.put(tinkerEdge.getId(), tinkerEdge.toJSON());
+    				graph.append(tinkerEdge.toJSON());
+    				graph.append(",");
     		}
     		
-    		graph.put("vertices", vertices);
-    		graph.put("edges", edges);
+    		graph.deleteCharAt(graph.length() - 1);
+    		graph.append("]}");
     		
     		return graph.toString();
     }
