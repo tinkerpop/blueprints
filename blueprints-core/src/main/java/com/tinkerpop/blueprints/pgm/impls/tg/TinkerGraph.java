@@ -228,7 +228,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public String toJSON() {
-    		StringBuilder graph = new StringBuilder("{\"vertices\": [");
+    		StringBuilder graph = new StringBuilder("{\"vertices\": {");
     		
     		// Build the vertices
     		for(Vertex vertex : this.getVertices()) {
@@ -238,7 +238,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     		}
     		
     		graph.deleteCharAt(graph.length() - 1);
-    		graph.append("],\"edges\": [");
+    		graph.append("},\"edges\": {");
     		
     		// Build the edges
     		for(Edge edge : this.getEdges()) {
@@ -248,7 +248,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     		}
     		
     		graph.deleteCharAt(graph.length() - 1);
-    		graph.append("]}");
+    		graph.append("}}");
     		
     		return graph.toString();
     }
