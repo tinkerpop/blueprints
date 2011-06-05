@@ -25,6 +25,7 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * @RexsterGraph@ improvements
 ** Use of POST for REST Service Requests
 ** Better implementation URL encoding
+* Change JSON library from json-simple to jettison to be more in line with the rest of the TinkerPop stack.
 
 ==<hr/>==
 
