@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -25,6 +26,10 @@ public abstract class BaseTest extends TestCase {
 
     public static int count(final Iterable iterable) {
         return count(iterable.iterator());
+    }
+
+    public static int count(final CloseableSequence sequence) {
+        return count(sequence.iterator());
     }
 
     public static <T> List<T> asList(Iterable<T> iterable) {

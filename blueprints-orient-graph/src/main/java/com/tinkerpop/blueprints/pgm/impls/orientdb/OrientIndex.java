@@ -8,6 +8,7 @@ import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
 import java.util.Collection;
@@ -84,13 +85,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    public Iterable<T> get(final String key, final Object value) {
+    public CloseableSequence<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
         final Collection<OIdentifiable> records = underlying.get(keyTemp);
 
         if (records.isEmpty())
-            return Collections.emptySet();
+            return new WrappingCloseableSequence(Collections.emptySet());
 
         return new OrientElementSequence(graph, records.iterator());
     }

@@ -1,8 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -51,16 +53,16 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
     }
 
-    public Iterable<T> get(final String key, final Object value) {
+    public CloseableSequence<T> get(final String key, final Object value) {
         Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null == keyMap) {
-            return new HashSet<T>();
+            return new WrappingCloseableSequence<T>(new HashSet<T>());
         } else {
             Set<T> set = keyMap.get(value);
             if (null == set)
-                return new HashSet<T>();
+                return new WrappingCloseableSequence<T>(new HashSet<T>());
             else
-                return set;
+                return new WrappingCloseableSequence<T>(set);
         }
     }
 

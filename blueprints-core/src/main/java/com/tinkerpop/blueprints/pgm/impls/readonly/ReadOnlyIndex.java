@@ -1,9 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.readonly;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyVertexSequence;
 
@@ -28,11 +25,11 @@ public class ReadOnlyIndex<T extends Element> implements Index<T> {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public Iterable<T> get(final String key, final Object value) {
+    public CloseableSequence<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (Iterable<T>) new ReadOnlyVertexSequence((Iterator<Vertex>) this.index.get(key, value).iterator());
+            return (CloseableSequence<T>) new ReadOnlyVertexSequence((Iterator<Vertex>) this.index.get(key, value).iterator());
         } else {
-            return (Iterable<T>) new ReadOnlyEdgeSequence((Iterator<Edge>) this.index.get(key, value).iterator());
+            return (CloseableSequence<T>) new ReadOnlyEdgeSequence((Iterator<Edge>) this.index.get(key, value).iterator());
         }
     }
 

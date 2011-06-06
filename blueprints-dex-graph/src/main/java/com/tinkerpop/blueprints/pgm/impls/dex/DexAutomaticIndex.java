@@ -4,6 +4,7 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -63,7 +64,7 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
     }
 
     @Override
-    public Iterable<T> get(final String key, final Object value) {
+    public CloseableSequence<T> get(final String key, final Object value) {
         return new DexIterable<T>(graph, rawGet(key, value), clazz);
     }
 

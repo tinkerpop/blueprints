@@ -1,9 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.event;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventVertexSequence;
@@ -31,11 +28,11 @@ public class EventIndex<T extends Element> implements Index<T> {
         this.index.put(key, value, element);
     }
 
-    public Iterable<T> get(final String key, final Object value) {
+    public CloseableSequence<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (Iterable<T>) new EventVertexSequence((Iterator<Vertex>) this.index.get(key, value).iterator(), this.graphChangedListeners);
+            return (CloseableSequence<T>) new EventVertexSequence((Iterator<Vertex>) this.index.get(key, value).iterator(), this.graphChangedListeners);
         } else {
-            return (Iterable<T>) new EventEdgeSequence((Iterator<Edge>) this.index.get(key, value).iterator(), this.graphChangedListeners);
+            return (CloseableSequence<T>) new EventEdgeSequence((Iterator<Edge>) this.index.get(key, value).iterator(), this.graphChangedListeners);
         }
     }
 

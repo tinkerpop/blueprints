@@ -59,8 +59,9 @@ public class IndexTestSuite extends TestSuite {
     }
 
     public void testIndexCount() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
-            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+
             Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
             for (int i = 0; i < 10; i++) {
                 Vertex v = graph.addVertex(null);
@@ -71,8 +72,9 @@ public class IndexTestSuite extends TestSuite {
             graph.removeVertex(v);
             index.remove("dog", "puppy", v);
             assertEquals(9, index.count("dog", "puppy"));
-            graph.shutdown();
+
         }
+        graph.shutdown();
     }
 
     public void testPutGetRemoveEdge() {
@@ -116,6 +118,28 @@ public class IndexTestSuite extends TestSuite {
             assertEquals(count(index.get("dog", "mama")), 0);
             if (graphTest.supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 0);
+        }
+        graph.shutdown();
+    }
+
+    public void testCloseableSequence() {
+        IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
+
+            Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
+            for (int i = 0; i < 10; i++) {
+                Vertex v = graph.addVertex(null);
+                index.put("dog", "puppy", v);
+            }
+            CloseableSequence<Vertex> hits = index.get("dog", "puppy");
+            int counter = 0;
+            for (Vertex v : hits) {
+                counter++;
+
+            }
+            assertEquals(counter, 10);
+            hits.close(); // no exception should be thrown
+
         }
         graph.shutdown();
     }

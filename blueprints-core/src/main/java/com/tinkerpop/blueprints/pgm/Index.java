@@ -62,7 +62,7 @@ public interface Index<T extends Element> {
      * @param value the value of the indexed elements
      * @return an iterable of elements that have a particular key/value in the index
      */
-    public Iterable<T> get(String key, Object value);
+    public CloseableSequence<T> get(String key, Object value);
 
     /**
      * Get a count of elements with a particular key/value pair.
