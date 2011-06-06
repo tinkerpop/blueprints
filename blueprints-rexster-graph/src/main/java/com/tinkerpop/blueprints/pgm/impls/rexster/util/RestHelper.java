@@ -1,21 +1,21 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster.util;
 
 import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterTokens;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RestHelper {
 
-    private static final JSONParser parser = new JSONParser();
     private static final String POST = "POST";
     private static final String DELETE = "DELETE";
 
@@ -24,9 +24,8 @@ public class RestHelper {
             final URL url = new URL(safeUri(uri));
             final URLConnection connection = url.openConnection();
             connection.connect();
-            final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            final JSONObject object = (JSONObject) parser.parse(reader);
-            reader.close();
+            final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
+            final JSONObject object = new JSONObject(tokener);
             return object;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -34,21 +33,28 @@ public class RestHelper {
     }
 
     public static JSONArray getResultArray(final String uri) {
-        return (JSONArray) RestHelper.get(safeUri(uri)).get(RexsterTokens.RESULTS);
+        return RestHelper.get(safeUri(uri)).optJSONArray(RexsterTokens.RESULTS);
     }
 
     public static JSONObject getResultObject(final String uri) {
-        return (JSONObject) RestHelper.get(safeUri(uri)).get(RexsterTokens.RESULTS);
+        return RestHelper.get(safeUri(uri)).optJSONObject(RexsterTokens.RESULTS);
     }
 
     public static JSONObject postResultObject(final String uri) {
         try {
-            final URL url = new URL(safeUri(uri));
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(POST);
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            final JSONObject retObject = (JSONObject) ((JSONObject) parser.parse(reader)).get(RexsterTokens.RESULTS);
-            reader.close();
+			// convert querystring into POST form data
+		    URL url = new URL(postUri(uri));
+		    String data = postData(uri);
+			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setDoOutput(true);
+			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+			writer.write(data); // post data with Content-Length automatically set
+			writer.close();
+
+            final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
+            final JSONObject resultObject = new JSONObject(tokener);
+			final JSONObject retObject = resultObject.optJSONObject(RexsterTokens.RESULTS);
+
             return retObject;
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -57,16 +63,44 @@ public class RestHelper {
 
     public static void post(final String uri) {
         try {
-            final URL url = new URL(safeUri(uri));
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod(POST);
+			// convert querystring into POST form data
+		    URL url = new URL(postUri(uri));
+		    String data = postData(uri);
+			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setDoOutput(true);
+			OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+			writer.write(data); // post data with Content-Length automatically set
+			writer.close();
+
             InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            reader.close();
+			reader.close();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    private static String postUri(final String uri) {
+        String url = "";
+        final String safeUri = safeUri(uri);
+        final int sep = safeUri.indexOf("?");
+        if (sep == -1)
+            url = safeUri;
+        else
+            url = safeUri.substring(0, sep);
+        return url;
+    }
+
+    private static String postData(final String uri) {
+        String data = null;
+        final String safeUri = safeUri(uri);
+        final int sep = safeUri.indexOf("?");
+        if (sep == -1)
+            data = "";
+        else {
+            data = safeUri.substring(sep + 1);
+        }
+        return data;
+    }
 
     public static void delete(final String uri) {
         try {
@@ -114,5 +148,23 @@ public class RestHelper {
     private static String safeUri(String uri) {
         // todo: make this way more safe
         return uri.replace(" ", "%20");
+    }
+
+    private static String convertStreamToString(InputStream is) throws Exception {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+          sb.append(line + "\n");
+        }
+        is.close();
+        return sb.toString();
+      }
+    
+    public static String encode(Object id) {
+        if (id instanceof String)
+            return URLEncoder.encode(id.toString());
+        else
+            return id.toString();
     }
 }

@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
@@ -56,7 +57,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         }
     }
 
-    public Iterable<T> get(final String key, final Object value) {
+    public CloseableSequence<T> get(final String key, final Object value) {
         final IndexHits<S> itty;
         if (value instanceof String && ((String) value).startsWith(Neo4jTokens.QUERY_HEADER)) {
             itty = this.rawIndex.query(key, ((String) value).substring(Neo4jTokens.QUERY_HEADER.length()));

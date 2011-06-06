@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster.util;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterGraph;
 import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterTokens;
@@ -12,7 +13,7 @@ import java.util.Queue;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class RexsterElementSequence<T extends Element> implements Iterable<T>, Iterator<T> {
+public abstract class RexsterElementSequence<T extends Element> implements CloseableSequence<T> {
 
     protected int start = 0;
     protected int end;
@@ -33,7 +34,8 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
         if (!queue.isEmpty())
             return true;
         else {
-            fillBuffer();
+            if (this.end > this.start) // last buffer if start == end
+                fillBuffer();
             return !queue.isEmpty();
         }
     }
@@ -42,7 +44,8 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
         if (!queue.isEmpty()) {
             return queue.remove();
         } else {
-            fillBuffer();
+            if (this.end > this.start) // last buffer if start == end
+                fillBuffer();
             if (!queue.isEmpty()) {
                 return queue.remove();
             } else
@@ -69,5 +72,8 @@ public abstract class RexsterElementSequence<T extends Element> implements Itera
             return RexsterTokens.AND;
         else
             return RexsterTokens.QUESTION;
+    }
+
+    public void close() {
     }
 }

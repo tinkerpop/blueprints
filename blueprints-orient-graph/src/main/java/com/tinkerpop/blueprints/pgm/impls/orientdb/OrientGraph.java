@@ -31,7 +31,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private final String username;
     private final String password;
 
-    private Mode mode = Mode.AUTOMATIC;
+    private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
+        protected Mode initialValue() {
+            return Mode.AUTOMATIC;
+        }
+    };
 
     protected Map<String, OrientIndex> manualIndices = new HashMap<String, OrientIndex>();
     protected Map<String, OrientAutomaticIndex> autoIndices = new HashMap<String, OrientAutomaticIndex>();
@@ -293,7 +297,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         if (rawGraph.getTransaction() instanceof OTransactionNoTx || rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             this.rawGraph.begin();
@@ -302,7 +306,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         if (conclusion == Conclusion.FAILURE) {
@@ -317,11 +321,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void setTransactionMode(final Mode mode) {
         this.rawGraph.commit();
-        this.mode = mode;
+        txMode.set(mode);
     }
 
     public Mode getTransactionMode() {
-        return this.mode;
+        return txMode.get();
     }
 
     protected void saveIndexConfiguration() {

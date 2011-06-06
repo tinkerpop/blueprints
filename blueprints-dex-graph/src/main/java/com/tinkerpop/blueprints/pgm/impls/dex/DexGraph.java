@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.*;
@@ -16,17 +13,22 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * {@link Graph} implementation for DEX.
+ * DEX is a graph database developed by Sparsity Technologies.
+ * DEX natively supports the property graph data model defined by Blueprints. However, there are a few peculiarities.
+ * No user defined element identifiers: DEX is the gatekeeper and creator of vertex and edge identifiers.
+ * Thus, when creating a new vertex or edge instance, the provided object identifier is ignored.
+ * Vertices are labeled too: When adding vertices, the user can set DEXGraph#LABEL to be used as the label of the vertex to be created.
+ * Also, the label of a vertex (or even an element) can be retrieved through the DEXElement#LABEL_PROPERTY property.
+ * DexGraph implements IndexableGraph. However, the use of indices is limited when working with DEX and is explained as follows:
+ * There is no support to create indices. By default, there is an AutomaticIndex for each existing label which corresponds to the name of the index.
+ * Also, each index contains a key for each existing property.
  *
- * @author <a href="http://www.sparsity-technologies.com">Sparsity
- *         Technologies</a>
+ * @author <a href="http://www.sparsity-technologies.com">Sparsity Technologies</a>
  */
 public class DexGraph implements IndexableGraph {
 
     /**
-     * Default Vertex label.
-     * <p/>
-     * Just used when invoked addVertex with a null parameter.
+     * Default Vertex label. Just used when invoked addVertex with a null parameter.
      */
     public static final String DEFAULT_DEX_VERTEX_LABEL = "?DEFAULT_DEX_VERTEX_LABEL?";
 

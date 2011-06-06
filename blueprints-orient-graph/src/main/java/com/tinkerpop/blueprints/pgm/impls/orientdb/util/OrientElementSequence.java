@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
 import com.orientechnologies.orient.core.record.ORecord.STATUS;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientElement;
@@ -14,7 +15,7 @@ import java.util.NoSuchElementException;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientElementSequence<T extends Element> implements Iterator<T>, Iterable<T> {
+public class OrientElementSequence<T extends Element> implements CloseableSequence<T> {
     private final Iterator<?> underlying;
     private final OrientGraph graph;
 
@@ -27,7 +28,6 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
         return this.underlying.hasNext();
     }
 
-    @SuppressWarnings("unchecked")
     public T next() {
         OrientElement currentElement = null;
         final Object current = this.underlying.next();
@@ -54,5 +54,9 @@ public class OrientElementSequence<T extends Element> implements Iterator<T>, It
 
     public Iterator<T> iterator() {
         return this;
+    }
+
+    public void close() {
+
     }
 }
