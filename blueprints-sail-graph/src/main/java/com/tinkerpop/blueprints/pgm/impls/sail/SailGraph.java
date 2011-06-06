@@ -54,7 +54,11 @@ public class SailGraph implements TransactionalGraph {
     protected Sail rawGraph;
     protected SailConnection sailConnection;
     protected boolean inTransaction;
-    private Mode mode = Mode.AUTOMATIC;
+    private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
+        protected Mode initialValue() {
+            return Mode.AUTOMATIC;
+        }
+    };
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
     /**
@@ -338,7 +342,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         if (this.inTransaction)
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
@@ -346,7 +350,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         try {
@@ -362,7 +366,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     protected void autoStopTransaction(Conclusion conclusion) {
-        if (this.mode == Mode.AUTOMATIC) {
+        if (txMode.get() == Mode.AUTOMATIC) {
             try {
                 this.inTransaction = false;
                 if (conclusion == Conclusion.SUCCESS)
@@ -381,11 +385,11 @@ public class SailGraph implements TransactionalGraph {
         } catch (SailException e) {
         }
         this.inTransaction = false;
-        this.mode = mode;
+        txMode.set(mode);
     }
 
     public Mode getTransactionMode() {
-        return this.mode;
+        return txMode.get();
     }
 
 

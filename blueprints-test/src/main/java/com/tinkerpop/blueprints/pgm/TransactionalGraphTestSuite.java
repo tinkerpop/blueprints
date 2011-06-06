@@ -419,4 +419,42 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph.shutdown();
         }
     }
+
+    /*public void testCompetingThreads() {
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        int totalThreads = 250;
+        final AtomicInteger integer = new AtomicInteger(0);
+        for (int i = 0; i < totalThreads; i++) {
+            new Thread() {
+                public void run() {
+                    try {
+                        Random random = new Random();
+                        if (random.nextBoolean()) {
+                            Vertex vertex = graph.addVertex(null);
+                            if (!graphTest.isRDFModel)
+                                vertex.setProperty("test", this.getId());
+                            integer.getAndAdd(1);
+                        } else {
+                            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+                            graph.startTransaction();
+                            Vertex vertex = graph.addVertex(null);
+                            if (!graphTest.isRDFModel)
+                                vertex.setProperty("test", this.getId());
+                            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                            integer.getAndAdd(1);
+                        }
+                    } catch (Throwable e) {
+                        integer.getAndAdd(1);
+                        System.out.println(e);
+                        assertTrue(false);
+
+                    }
+                }
+            }.start();
+        }
+
+        while (integer.get() < totalThreads) {
+        }
+        graph.shutdown();
+    }*/
 }

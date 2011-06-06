@@ -19,9 +19,16 @@ import java.util.*;
 public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     private GraphDatabaseService rawGraph;
-    private String directory;
-    private Transaction tx;
-    private Mode mode = Mode.AUTOMATIC;
+    private final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {
+        protected Transaction initialValue() {
+            return null;
+        }
+    };
+    private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
+        protected Mode initialValue() {
+            return Mode.AUTOMATIC;
+        }
+    };
     protected Map<String, Neo4jIndex> indices = new HashMap<String, Neo4jIndex>();
     protected Map<String, Neo4jAutomaticIndex> autoIndices = new HashMap<String, Neo4jAutomaticIndex>();
 
@@ -30,13 +37,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Neo4jGraph(final String directory, final Map<String, String> configuration) {
-        this.directory = directory;
-        boolean fresh = !new File(this.directory).exists();
+        boolean fresh = !new File(directory).exists();
         try {
             if (null != configuration)
-                this.rawGraph = new EmbeddedGraphDatabase(this.directory, configuration);
+                this.rawGraph = new EmbeddedGraphDatabase(directory, configuration);
             else
-                this.rawGraph = new EmbeddedGraphDatabase(this.directory);
+                this.rawGraph = new EmbeddedGraphDatabase(directory);
 
             if (fresh) {
                 // remove reference node
@@ -261,49 +267,52 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-        if (this.tx == null)
-            this.tx = this.rawGraph.beginTx();
-        else
+        if (tx.get() == null) {
+            tx.set(this.rawGraph.beginTx());
+        } else
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-
-        if (null == this.tx)
+        if (null == tx.get())
             throw new RuntimeException("There is no active transaction to stop");
 
+        Transaction t = tx.get();
         if (conclusion == Conclusion.SUCCESS) {
-            this.tx.success();
+            t.success();
+            t.finish();
         } else {
-            this.tx.failure();
+            t.failure();
+            t.finish();
         }
-        this.tx.finish();
-        this.tx = null;
+        tx.remove();
     }
 
     public void setTransactionMode(final Mode mode) {
-        if (null != this.tx) {
-            this.tx.success();
-            this.tx.finish();
-            this.tx = null;
+        Transaction t = tx.get();
+        if (null != t) {
+            t.success();
+            t.finish();
+            tx.remove();
         }
-        this.mode = mode;
+        txMode.set(mode);
     }
 
     public Mode getTransactionMode() {
-        return this.mode;
+        return txMode.get();
     }
 
     public void shutdown() {
-        if (null != this.tx) {
+        Transaction t = tx.get();
+        if (null != t) {
             try {
-                this.tx.failure();
-                this.tx.finish();
-                this.tx = null;
+                t.failure();
+                t.finish();
+                tx.remove();
             } catch (TransactionFailureException e) {
             }
         }
@@ -321,21 +330,23 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     protected void autoStartTransaction() {
         if (getTransactionMode() == Mode.AUTOMATIC) {
-            if (this.tx == null)
-                this.tx = this.rawGraph.beginTx();
-            else
+            if (tx.get() == null) {
+                tx.set(this.rawGraph.beginTx());
+            } else
                 throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
         }
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
         if (getTransactionMode() == Mode.AUTOMATIC) {
-            if (conclusion == Conclusion.SUCCESS)
-                this.tx.success();
-            else
-                this.tx.failure();
-            this.tx.finish();
-            this.tx = null;
+            Transaction t = tx.get();
+            if (conclusion == Conclusion.SUCCESS) {
+                t.success();
+            } else {
+                t.failure();
+            }
+            t.finish();
+            tx.remove();
         }
     }
 
