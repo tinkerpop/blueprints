@@ -281,22 +281,20 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         if (null == tx.get())
             throw new RuntimeException("There is no active transaction to stop");
 
-        Transaction t = tx.get();
         if (conclusion == Conclusion.SUCCESS) {
-            t.success();
-            t.finish();
+            tx.get().success();
+            tx.get().finish();
         } else {
-            t.failure();
-            t.finish();
+            tx.get().failure();
+            tx.get().finish();
         }
         tx.remove();
     }
 
     public void setTransactionMode(final Mode mode) {
-        Transaction t = tx.get();
-        if (null != t) {
-            t.success();
-            t.finish();
+        if (null != tx.get()) {
+            tx.get().success();
+            tx.get().finish();
             tx.remove();
         }
         txMode.set(mode);
@@ -307,11 +305,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void shutdown() {
-        Transaction t = tx.get();
-        if (null != t) {
+        if (null != tx.get()) {
             try {
-                t.failure();
-                t.finish();
+                tx.get().failure();
+                tx.get().finish();
                 tx.remove();
             } catch (TransactionFailureException e) {
             }
@@ -339,13 +336,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     protected void autoStopTransaction(final Conclusion conclusion) {
         if (getTransactionMode() == Mode.AUTOMATIC) {
-            Transaction t = tx.get();
             if (conclusion == Conclusion.SUCCESS) {
-                t.success();
+                tx.get().success();
             } else {
-                t.failure();
+                tx.get().failure();
             }
-            t.finish();
+            tx.get().finish();
             tx.remove();
         }
     }

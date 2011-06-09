@@ -53,7 +53,11 @@ public class SailGraph implements TransactionalGraph {
 
     protected Sail rawGraph;
     protected SailConnection sailConnection;
-    protected boolean inTransaction;
+    private final ThreadLocal<Boolean> inTransaction = new ThreadLocal<Boolean>() {
+        protected Boolean initialValue() {
+            return Boolean.FALSE;
+        }
+    };
     private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
         protected Mode initialValue() {
             return Mode.AUTOMATIC;
@@ -344,9 +348,9 @@ public class SailGraph implements TransactionalGraph {
     public void startTransaction() {
         if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-        if (this.inTransaction)
+        if (inTransaction.get())
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
-        this.inTransaction = true;
+        inTransaction.set(Boolean.TRUE);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
@@ -354,7 +358,7 @@ public class SailGraph implements TransactionalGraph {
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         try {
-            this.inTransaction = false;
+            inTransaction.set(Boolean.FALSE);
             if (Conclusion.SUCCESS == conclusion) {
                 this.sailConnection.commit();
             } else {
@@ -368,7 +372,7 @@ public class SailGraph implements TransactionalGraph {
     protected void autoStopTransaction(Conclusion conclusion) {
         if (txMode.get() == Mode.AUTOMATIC) {
             try {
-                this.inTransaction = false;
+                inTransaction.set(Boolean.FALSE);
                 if (conclusion == Conclusion.SUCCESS)
                     this.sailConnection.commit();
                 else
@@ -384,7 +388,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.commit();
         } catch (SailException e) {
         }
-        this.inTransaction = false;
+        inTransaction.set(Boolean.FALSE);
         txMode.set(mode);
     }
 
