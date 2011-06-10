@@ -26,29 +26,29 @@
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-sail-api</artifactId>
-            <version>2.3.3</version>
+            <version>2.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-queryparser-sparql</artifactId>
-            <version>2.3.3</version>
+            <version>2.4.0</version>
             <type>jar</type>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.5.6</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-sail-memory</artifactId>
-            <version>2.3.3</version>
+            <version>2.4.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-sail-nativerdf</artifactId>
-            <version>2.3.3</version>
+            <version>2.4.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
