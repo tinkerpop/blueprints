@@ -2,6 +2,9 @@ package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
