@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
-
 import org.codehaus.jettison.json.JSONObject;
 
 /**
