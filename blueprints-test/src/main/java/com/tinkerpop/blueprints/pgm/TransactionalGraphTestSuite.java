@@ -423,38 +423,61 @@ public class TransactionalGraphTestSuite extends TestSuite {
     /*public void testCompetingThreads() {
         final TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         int totalThreads = 250;
-        final AtomicInteger integer = new AtomicInteger(0);
+        final AtomicInteger vertices = new AtomicInteger(0);
+        final AtomicInteger edges = new AtomicInteger(0);
+        final AtomicInteger completedThreads = new AtomicInteger(0);
         for (int i = 0; i < totalThreads; i++) {
             new Thread() {
                 public void run() {
                     try {
                         Random random = new Random();
                         if (random.nextBoolean()) {
-                            Vertex vertex = graph.addVertex(null);
-                            if (!graphTest.isRDFModel)
-                                vertex.setProperty("test", this.getId());
-                            integer.getAndAdd(1);
+                            Vertex a = graph.addVertex(null);
+                            Vertex b = graph.addVertex(null);
+                            Edge e = graph.addEdge(null, a, b, convertId("friend"));
+                            if (!graphTest.isRDFModel) {
+                                a.setProperty("test", this.getId());
+                                b.setProperty("blah", random.nextFloat());
+                                e.setProperty("bloop", random.nextInt());
+                            }
+
+                            vertices.getAndAdd(2);
+                            edges.getAndAdd(1);
+
                         } else {
                             graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
                             graph.startTransaction();
-                            Vertex vertex = graph.addVertex(null);
-                            if (!graphTest.isRDFModel)
-                                vertex.setProperty("test", this.getId());
-                            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                            integer.getAndAdd(1);
+                            Vertex a = graph.addVertex(null);
+                            Vertex b = graph.addVertex(null);
+                            Edge e = graph.addEdge(null, a, b, convertId("friend"));
+                            if (!graphTest.isRDFModel) {
+                                a.setProperty("test", this.getId());
+                                b.setProperty("blah", random.nextFloat());
+                                e.setProperty("bloop", random.nextInt());
+                            }
+                            if (random.nextBoolean()) {
+                                graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                                vertices.getAndAdd(2);
+                                edges.getAndAdd(1);
+                            } else {
+                                graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                            }
                         }
                     } catch (Throwable e) {
-                        integer.getAndAdd(1);
                         System.out.println(e);
                         assertTrue(false);
-
                     }
+                    completedThreads.getAndAdd(1);
                 }
             }.start();
         }
 
-        while (integer.get() < totalThreads) {
+        while (completedThreads.get() < totalThreads) {
         }
+        if (!graphTest.isRDFModel)
+            assertEquals(count(graph.getVertices()), vertices.get());
+        assertEquals(count(graph.getEdges()), edges.get());
         graph.shutdown();
     }*/
+
 }

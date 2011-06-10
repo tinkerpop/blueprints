@@ -21,7 +21,7 @@ public class RexsterVertexSequence extends RexsterElementSequence<Vertex> {
         final JSONObject object = RestHelper.get(this.uri + this.createSeparator() + RexsterTokens.REXSTER_OFFSET_START + RexsterTokens.EQUALS + this.start + RexsterTokens.AND + RexsterTokens.REXSTER_OFFSET_END + RexsterTokens.EQUALS + this.end);
 
         JSONArray array = object.optJSONArray(RexsterTokens.RESULTS);
-        for (int ix = 0 ; ix < array.length(); ix++) {
+        for (int ix = 0; ix < array.length(); ix++) {
             this.queue.add(new RexsterVertex(array.optJSONObject(ix), this.graph));
         }
 

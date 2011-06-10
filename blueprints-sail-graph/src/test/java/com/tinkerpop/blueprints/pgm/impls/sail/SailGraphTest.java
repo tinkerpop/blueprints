@@ -48,10 +48,10 @@ public class SailGraphTest extends GraphTest {
         SailGraph graph = new MemoryStoreSailGraph();
         graph.addNamespace("tg", "http://tinkerpop.com#");
         graph.addNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-        assertEquals(SailGraph.prefixToNamespace("tg:name", graph.getSailConnection()), "http://tinkerpop.com#name");
-        assertEquals(SailGraph.prefixToNamespace("rdf:label", graph.getSailConnection()), "http://www.w3.org/1999/02/22-rdf-syntax-ns#label");
-        assertEquals(SailGraph.namespaceToPrefix("http://www.w3.org/1999/02/22-rdf-syntax-ns#label", graph.getSailConnection()), "rdf:label");
-        assertEquals(SailGraph.namespaceToPrefix("http://tinkerpop.com#name", graph.getSailConnection()), "tg:name");
+        assertEquals(graph.expandPrefix("tg:name"), "http://tinkerpop.com#name");
+        assertEquals(graph.expandPrefix("rdf:label"), "http://www.w3.org/1999/02/22-rdf-syntax-ns#label");
+        assertEquals(graph.prefixNamespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#label"), "rdf:label");
+        assertEquals(graph.prefixNamespace("http://tinkerpop.com#name"), "tg:name");
         graph.shutdown();
 
     }
