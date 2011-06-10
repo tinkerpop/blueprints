@@ -26,6 +26,8 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 ** Use of POST for REST Service Requests
 ** Better implementation URL encoding
 * Change JSON library from json-simple to jettison to be more in line with the rest of the TinkerPop stack.
+* A more robust implementation of the @TransactionalGraph@ implementation for @Neo4jGraph@, @OrientGraph@, and @SailGraph@.
+* Bumped to Neo4j 1.4.M03
 
 ==<hr/>==
 

@@ -48,14 +48,14 @@ public class SailVertex implements Vertex {
     private void updateLiteral(final Literal oldLiteral, final Literal newLiteral) {
         try {
             final Set<Statement> statements = new HashSet<Statement>();
-            final CloseableIteration<? extends Statement, SailException> results = this.graph.getSailConnection().getStatements(null, null, oldLiteral, false);
+            final CloseableIteration<? extends Statement, SailException> results = this.graph.getSailConnection().get().getStatements(null, null, oldLiteral, false);
             while (results.hasNext()) {
                 statements.add(results.next());
             }
             results.close();
-            this.graph.getSailConnection().removeStatements(null, null, oldLiteral);
+            this.graph.getSailConnection().get().removeStatements(null, null, oldLiteral);
             for (Statement statement : statements) {
-                SailHelper.addStatement(statement.getSubject(), statement.getPredicate(), newLiteral, statement.getContext(), this.graph.getSailConnection());
+                SailHelper.addStatement(statement.getSubject(), statement.getPredicate(), newLiteral, statement.getContext(), this.graph.getSailConnection().get());
             }
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
@@ -72,7 +72,7 @@ public class SailVertex implements Vertex {
             boolean update = false;
             final Literal oldLiteral = (Literal) this.rawVertex;
             if (key.equals(SailTokens.DATATYPE)) {
-                this.rawVertex = new LiteralImpl(oldLiteral.getLabel(), new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.graph.getSailConnection())));
+                this.rawVertex = new LiteralImpl(oldLiteral.getLabel(), new URIImpl(this.graph.expandPrefix(value.toString())));
                 update = true;
             } else if (key.equals(SailTokens.LANGUAGE)) {
                 this.rawVertex = new LiteralImpl(oldLiteral.getLabel(), value.toString());
@@ -145,7 +145,7 @@ public class SailVertex implements Vertex {
     public Iterable<Edge> getOutEdges() {
         if (this.rawVertex instanceof Resource) {
             try {
-                return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.rawVertex, null, null, false), this.graph);
+                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph);
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -157,7 +157,7 @@ public class SailVertex implements Vertex {
     public Iterable<Edge> getOutEdges(final String label) {
         if (this.rawVertex instanceof Resource) {
             try {
-                return new SailEdgeSequence(this.graph.getSailConnection().getStatements((Resource) this.rawVertex, new URIImpl(SailGraph.prefixToNamespace(label, this.graph.getSailConnection())), null, false), this.graph);
+                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix(label)), null, false), this.graph);
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -168,7 +168,7 @@ public class SailVertex implements Vertex {
 
     public Iterable<Edge> getInEdges() {
         try {
-            return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, null, this.rawVertex, false), this.graph);
+            return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -177,7 +177,7 @@ public class SailVertex implements Vertex {
     public Iterable<Edge> getInEdges(final String label) {
         if (this.rawVertex instanceof Resource) {
             try {
-                return new SailEdgeSequence(this.graph.getSailConnection().getStatements(null, new URIImpl(SailGraph.prefixToNamespace(label, this.graph.getSailConnection())), (Resource) this.rawVertex, false), this.graph);
+                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix(label)), (Resource) this.rawVertex, false), this.graph);
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
