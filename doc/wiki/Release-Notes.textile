@@ -1,5 +1,4 @@
-Blueprints: A Property Graph Model Interface
-"http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
+All releases can be accessed through the "TinkerPop":http://tinkerpop.com Maven2 repository identified below.
 
 ```xml
 <repository>
@@ -23,6 +22,8 @@ h3. Version 0.8 (Winnie -- June 15, 2011)
 </dependency>
 ```
 
+Blueprints 0.8 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.8/api
+
 * Added @EventGraph@ implementation
 * @RexsterGraph@ improvements
 ** Use of POST for REST Service Requests
@@ -30,10 +31,10 @@ h3. Version 0.8 (Winnie -- June 15, 2011)
 * Change JSON library from json-simple to jettison to be more in line with the rest of the TinkerPop stack.
 * A more robust implementation of the @TransactionalGraph@ implementation for @Neo4jGraph@, @OrientGraph@, and @SailGraph@.
 * Bumped to Neo4j 1.4.M04
-* Bumped to Orient 1.0rc2-SNAPSHOT
+* Bumped to Orient 1.0rc2
 * Bumped to Sail 2.4.0
 
- ==<hr/>==
+==<hr/>==
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-patrick.png!
 
@@ -47,11 +48,12 @@ h3. Version 0.7 (Patrick -- May 8, 2011)
 </dependency>
 ```
 
+Blueprints 0.7 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.7/api
+
 * Updated @RexsterGraph@ to work with latest Rexster REST API changes
 * Bumped to Neo4j 1.4.M01
 * Bumped to OrientDB 1.0rc1
 * Bumped to Sail 2.3.3
-
 
 ==<hr/>==
 
@@ -66,6 +68,8 @@ h3. Version 0.6 (Oscar -- April 4, 2011)
   <version>0.6</version>
 </dependency>
 ```
+
+Blueprints 0.6 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.6/api
 
 * Refactored to create a Maven multiproject with one module per major Blueprints component
 * Added @DexGraph@ implementation ("Sparsity Technologies":http://www.sparsity-technologies.com/)
@@ -88,6 +92,8 @@ h3. Version 0.5 (Scooby -- March 2, 2011)
   <version>0.5</version>
 </dependency>
 ```
+
+Blueprints 0.5 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.5/api
 
 * Updated index model
 ** Changed the API and semantics of @AutomaticIndex@
@@ -121,14 +127,15 @@ h3. Version 0.4 (Elmo -- January 22, 2011)
 </dependency>
 ```
 
-* Added support for Neo4j 1.2
+Blueprints 0.4 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.4/api/
+
+* Added Support for Neo4j 1.2
 * Added edge label indexing to @AutomaticIndex@
 * Added concept of "ouplementation"
 ** Repackaged JUNG ouplementation as @GraphJung@
 ** Added Sail ouplementation as @GraphSail@
 * Created @util@ utility package
 ** Repackaged GraphML library in @util.graphml@
-
 
 ==<hr/>==
 
@@ -143,6 +150,8 @@ h3. Version 0.3 (Smurf -- December 14, 2010)
   <version>0.3</version>
 </dependency>
 ```
+
+Blueprints 0.3 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.3/api/
 
 * Moved to @graphdb-deps-*@ database dependency management model
 ** Neo4j 1.2.M05
@@ -181,14 +190,16 @@ h3. Version 0.2 (Kermit -- September 22, 2010)
 </dependency>
 ```
 
+Blueprints 0.2 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.2/api/
+
 * Removed Blueprints Pipes BETA and put it into a separate project
 * @Neo4jGraph@ constructor can be passed in a Neo4j properties map
 * @Neo4jGraph@ constructor can be passed in a live @GraphDatabaseService@
 * Updated @GraphMLWriter@ to write all vertices and then all edges
 * Added RDF load functionality to @SailGraph@
-* Added SPARQL functionality to @SailGraph@
+* Added SPARQL functioanlity to @SailGraph@
 * Fixed sever @GraphMLReader@ bug
-* Added OrientDB (@OrientGraph@) as a property graph implementation
+* Added OrientDB (OrientGraph) as a property graph implementation
 * Added support for @Graph.getEdge(Object id)@
 * Added support for @kind@ in the Sail implementation of Blueprints
 * Made iterating edges in @SailGraph@ faster and more memory efficient
@@ -208,10 +219,12 @@ h3. Version 0.1.1 (Bob the Builder -- March 7, 2010)
 </dependency>
 ```
 
+Blueprints 0.1.1 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1.1/api/
+
 * Added Blueprints Pipes BETA to the distribution
 * Changed all the OpenRDF Sesame dependencies to version 2.3.1
 * Added performance timing printouts to model test cases
-* Neo4j dependency was changed for 1.0-rc to 1.0
+* Neo4j depedency was changed for 1.0-rc to 1.0
 * Added object document interfaces
 * Added TinkerDoc implementation of the object document interfaces
 * Added MongoDB implementation of the object document interfaces
@@ -225,6 +238,8 @@ h3. Version 0.1 (Bob the Builder -- February 9, 2010)
   <version>0.1</version>
 </dependency>
 ```
+
+Blueprints 0.1 "JavaDocs":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1/api/
 
 * Initial release providing the property graph model
 * Code originally packaged with "Gremlin":http://gremlin.tinkerpop.com

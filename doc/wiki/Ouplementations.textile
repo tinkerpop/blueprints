@@ -1,0 +1,7 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/oupls.png!
+
+Blueprints is a collection of interfaces. If these interfaces are implemented, then the underlying graph database is "Blueprints-enabled." In many situations, its desirable to not expose a Blueprints-enabled graph database, but instead, to expose an implementation of another set of interfaces. In the package @com.tinkerpop.blueprints.pgm.oupls@, there are "outplementations" for other popular interfaces. In this way, any Blueprints-enabled graph database can be framed within the context of that set of interfaces.
+
+The naming convention for @impls@ and @oupls@ is as such.
+  * @XXXGraph@: An implementation of the @Graph@ interface. @XXX@ is modeled as a @Graph@.
+  * @GraphXXX@: An ouplementation of the @Graph@ interface to @XXX@. @Graph@ is modeled as an @XXX@.

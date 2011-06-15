@@ -1,0 +1,73 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/indices-example.png!
+
+An @IndexableGraph@ is a @Graph@ that supports the indexing of its vertices and edges. An index is a data structure that allows for the fast retrieval of an element by a particular key/value pair. The @IndexableGraph@ interface has the following methods:
+
+```java
+public <T extends Element> Index<T> createAutomaticIndex(String indexName, Class<T> indexClass, Set<String> indexKeys);
+public <T extends Element> Index<T> createManualIndex(String indexName, Class<T> indexClass);
+public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass);
+public Iterable<Index<? extends Element>> getIndices();
+public void dropIndex(String indexName);
+```
+
+h2. Manual Indices
+
+There are two types of indices: @Type.AUTOMATIC@ and @Type.MANUAL@. A manual index requires the developer to manually put, get, and remove elements from the index. To create a manual index of vertices, do the following:
+
+```java
+Index<Vertex> index = graph.createManualIndex("test-idx", Vertex.class);
+```
+
+The @Index@ interface has the following methods:
+
+```java
+public long count(String key, Object value);
+public String getIndexName();
+public Class<T> getIndexClass();
+public Type getIndexType();
+public void put(String key, Object value, T element);
+public Iterable<T> get(String key, Object value);
+public void remove(String key, Object value, T element);
+```
+
+Given the @index@ object created previous, to add, query, and remove a vertex from this index, do the following:
+
+```java
+index.put("name","peter",vertex);
+Iterable<Vertex> results = index.get("name","peter");
+index.remove("name","peter",vertex);
+```
+
+With manual indices, the developer must be cognizant of maintaining the index with these methods.
+
+h2. Automatic Indices
+
+When the developer does not wish to maintain an index, the developer can rely on indices of @Type.AUTOMATIC@. An automatic index will automatically @put@ and @remove@ elements from an index as the element mutates. That is, an automatic index indexes the properties of an element where the property key is the key and the property value is the value. As these properties change, an automatic index automatically reflects these changes. To create an automatic index, do the following:
+
+```java
+Set<String> indexKeys = ...
+AutomaticIndex<Vertex> autoIndex = graph.createAutomaticIndex("test-aidx", Vertex.class, indexKeys);
+```
+
+The @AutomaticIndex@ interface extends @Index@ and provides, along with the @Index@ methods, the following method:
+
+```java
+public Set<String> getAutoIndexKeys();
+```
+
+An @AutomaticIndex@ will index all newly created elements by the provide set of auto index keys. If this set of auto index keys is @null@, then all keys will be indexed. Here is an example of all this together:
+
+```java
+Set<String> indexKeys = new HashSet<String>();
+indexKeys.add("name");
+AutomaticIndex<Vertex> autoIndex = graph.createAutomaticIndex("test-aidx", Vertex.class, indexKeys);
+Vertex a = graph.addVertex(null);
+a.setProperty("name","pavel");
+a.setProperty("country","belarus");
+Iterable<Vertex> results = autoIndex.get("name","pavel");
+// results contains vertex a
+results = autoIndex.get("country","belarus");
+// results does not contain vertex a
+```
+
+*Note*: When an @IndexableGraph@ is created a new (not constructed, but when there is no historic persistence), it comes with two automatic indices named @Index.VERTICES@ and @Index.EDGES@ that index all properties (constructed with @null@ indexKeys argument). These indices automatically index any created vertices and edges, respectively. If these indices are not desired, simply @graph.dropIndex(Index.VERTICES)@ and @graph.dropIndex(Index.EDGES)@ before adding elements.

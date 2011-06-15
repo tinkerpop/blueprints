@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.8-SNAPSHOT</version>
+        <version>0.8</version>
     </parent>
     <artifactId>blueprints-orient-graph</artifactId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.8</version>
     <packaging>jar</packaging>
     <name>Blueprints-OrientGraph</name>
     <description>Blueprints property graph implementation for the OrientDB graph database</description>
@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.8-SNAPSHOT</version>
+            <version>0.8</version>
         </dependency>
         <dependency>
             <groupId>com.orientechnologies</groupId>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>0.8-SNAPSHOT</version>
+            <version>0.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
