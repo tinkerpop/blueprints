@@ -1,5 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.id.ORID;
@@ -11,11 +17,15 @@ import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
-
-import java.util.*;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
@@ -116,28 +126,30 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public Vertex addVertex(final Object id) {
     	  final OGraphDatabase db = getRawGraph();
+    	  final boolean txBegun = autoStartTransaction();
         try {
-            autoStartTransaction();
             final OrientVertex vertex = new OrientVertex(this, db.createVertex(null));
             vertex.save();
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if( txBegun)
+            	autoStopTransaction(Conclusion.SUCCESS);
 
             return vertex;
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+        		if( txBegun)
+        			autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        		if( txBegun)
+        			autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
     	  final OGraphDatabase db = getRawGraph();
+    	  final boolean txBegun = autoStartTransaction();
         try {
-            autoStartTransaction();
-
             final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement());
             final OrientEdge edge = new OrientEdge(this, edgeDoc);
             edge.setLabel(label);
@@ -147,15 +159,18 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             db.save(((OrientVertex) inVertex).getRawElement());
             edge.save();
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if( txBegun )
+            	autoStopTransaction(Conclusion.SUCCESS);
 
             return edge;
 
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+          	if( txBegun )
+          		autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        		if( txBegun )
+        			autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -184,10 +199,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (oVertex == null || oVertex.getRawElement() == null)
             return;
 
+        final boolean txBegun = autoStartTransaction();
         try {
             AutomaticIndexHelper.removeElement(this, vertex);
-
-            autoStartTransaction();
 
             for (Index index : this.getManualIndices()) {
                 if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
@@ -196,14 +210,17 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
                 }
             }
 
-            getRawGraph().removeVertex(oVertex.rawElement);
+           	getRawGraph().removeVertex(oVertex.rawElement);
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if( txBegun )
+            	autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+        		if( txBegun )
+        			autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        		if( txBegun )
+        			autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -213,7 +230,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private Iterable<Vertex> getVertices(final boolean iPolymorphic) {
-        return new OrientElementSequence<Vertex>(this, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph.get(), (ODatabaseRecordAbstract) rawGraph.get().getUnderlying(), OGraphDatabase.VERTEX_CLASS_NAME, iPolymorphic));
+    	  final OGraphDatabase db = rawGraph.get();
+        return new OrientElementSequence<Vertex>(this, new ORecordIteratorClass<ORecordInternal<?>>(db, (ODatabaseRecordAbstract) db.getUnderlying(), OGraphDatabase.VERTEX_CLASS_NAME, iPolymorphic));
     }
 
     public Iterable<Edge> getEdges() {
@@ -221,7 +239,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private Iterable<Edge> getEdges(final boolean iPolymorphic) {
-        return new OrientElementSequence<Edge>(this, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph.get(), (ODatabaseRecordAbstract) rawGraph.get().getUnderlying(), OGraphDatabase.EDGE_CLASS_NAME, iPolymorphic));
+    		final OGraphDatabase db = rawGraph.get();
+        return new OrientElementSequence<Edge>(this, new ORecordIteratorClass<ORecordInternal<?>>(db, (ODatabaseRecordAbstract) db.getUnderlying(), OGraphDatabase.EDGE_CLASS_NAME, iPolymorphic));
     }
 
     public Edge getEdge(final Object id) {
@@ -244,9 +263,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (oEdge == null || oEdge.getRawElement() == null)
             return;
 
+        final boolean txBegun = autoStartTransaction();
         try {
             AutomaticIndexHelper.removeElement(this, edge);
-            autoStartTransaction();
 
             for (Index index : this.getManualIndices()) {
                 if (Edge.class.isAssignableFrom(index.getIndexClass())) {
@@ -257,12 +276,15 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
             getRawGraph().removeEdge(oEdge.rawElement);
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if( txBegun )
+              autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+        		if( txBegun)
+        			autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        		if( txBegun )
+        			autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
