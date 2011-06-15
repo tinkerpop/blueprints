@@ -11,7 +11,7 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
+h3. Version 0.8 (Winnie -- NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
@@ -28,8 +28,10 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * Change JSON library from json-simple to jettison to be more in line with the rest of the TinkerPop stack.
 * A more robust implementation of the @TransactionalGraph@ implementation for @Neo4jGraph@, @OrientGraph@, and @SailGraph@.
 * Bumped to Neo4j 1.4.M04
+* Bumped to Orient 1.0rc2
+* Bumped to Sail 2.4.0
 
-==<hr/>==
+ ==<hr/>==
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-patrick.png!
 
