@@ -27,7 +27,7 @@ public abstract class OrientElement implements Element {
         if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
-        this.graph.autoStartTransaction();
+        final boolean txBegun = this.graph.autoStartTransaction();
 
         try {
             final Object oldValue = this.getProperty(key);
@@ -37,18 +37,21 @@ public abstract class OrientElement implements Element {
 
             this.rawElement.field(key, value);
             this.graph.getRawGraph().save(rawElement);
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            if (txBegun)
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Object removeProperty(final String key) {
-        this.graph.autoStartTransaction();
+        final boolean txBegun = this.graph.autoStartTransaction();
 
         try {
             final Object oldValue = this.rawElement.removeField(key);
@@ -58,14 +61,17 @@ public abstract class OrientElement implements Element {
                 }
             }
             this.save();
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            if (txBegun)
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             return oldValue;
 
         } catch (RuntimeException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

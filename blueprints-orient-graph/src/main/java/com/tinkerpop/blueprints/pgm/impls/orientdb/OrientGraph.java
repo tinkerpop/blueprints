@@ -31,11 +31,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private final String username;
     private final String password;
 
-    private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
-        protected Mode initialValue() {
-            return Mode.AUTOMATIC;
-        }
-    };
+    private Mode txMode = Mode.AUTOMATIC;
 
     protected Map<String, OrientIndex> manualIndices = new HashMap<String, OrientIndex>();
     protected Map<String, OrientAutomaticIndex> autoIndices = new HashMap<String, OrientAutomaticIndex>();
@@ -120,28 +116,30 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public Vertex addVertex(final Object id) {
         final OGraphDatabase db = getRawGraph();
+        final boolean txBegun = autoStartTransaction();
         try {
-            autoStartTransaction();
             final OrientVertex vertex = new OrientVertex(this, db.createVertex(null));
             vertex.save();
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if (txBegun)
+                autoStopTransaction(Conclusion.SUCCESS);
 
             return vertex;
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         final OGraphDatabase db = getRawGraph();
+        final boolean txBegun = autoStartTransaction();
         try {
-            autoStartTransaction();
-
             final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement());
             final OrientEdge edge = new OrientEdge(this, edgeDoc);
             edge.setLabel(label);
@@ -151,15 +149,18 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             db.save(((OrientVertex) inVertex).getRawElement());
             edge.save();
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if (txBegun)
+                autoStopTransaction(Conclusion.SUCCESS);
 
             return edge;
 
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -188,10 +189,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (oVertex == null || oVertex.getRawElement() == null)
             return;
 
+        final boolean txBegun = autoStartTransaction();
         try {
             AutomaticIndexHelper.removeElement(this, vertex);
-
-            autoStartTransaction();
 
             for (Index index : this.getManualIndices()) {
                 if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
@@ -202,12 +202,15 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
             getRawGraph().removeVertex(oVertex.rawElement);
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if (txBegun)
+                autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -217,7 +220,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private Iterable<Vertex> getVertices(final boolean iPolymorphic) {
-        return new OrientElementSequence<Vertex>(this, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph.get(), (ODatabaseRecordAbstract) rawGraph.get().getUnderlying(), OGraphDatabase.VERTEX_CLASS_NAME, iPolymorphic));
+        final OGraphDatabase db = rawGraph.get();
+        return new OrientElementSequence<Vertex>(this, new ORecordIteratorClass<ORecordInternal<?>>(db, (ODatabaseRecordAbstract) db.getUnderlying(), OGraphDatabase.VERTEX_CLASS_NAME, iPolymorphic));
     }
 
     public Iterable<Edge> getEdges() {
@@ -225,7 +229,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private Iterable<Edge> getEdges(final boolean iPolymorphic) {
-        return new OrientElementSequence<Edge>(this, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph.get(), (ODatabaseRecordAbstract) rawGraph.get().getUnderlying(), OGraphDatabase.EDGE_CLASS_NAME, iPolymorphic));
+        final OGraphDatabase db = rawGraph.get();
+        return new OrientElementSequence<Edge>(this, new ORecordIteratorClass<ORecordInternal<?>>(db, (ODatabaseRecordAbstract) db.getUnderlying(), OGraphDatabase.EDGE_CLASS_NAME, iPolymorphic));
     }
 
     public Edge getEdge(final Object id) {
@@ -248,9 +253,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (oEdge == null || oEdge.getRawElement() == null)
             return;
 
+        final boolean txBegun = autoStartTransaction();
         try {
             AutomaticIndexHelper.removeElement(this, edge);
-            autoStartTransaction();
 
             for (Index index : this.getManualIndices()) {
                 if (Edge.class.isAssignableFrom(index.getIndexClass())) {
@@ -261,12 +266,15 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
             getRawGraph().removeEdge(oEdge.rawElement);
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            if (txBegun)
+                autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            if (txBegun)
+                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -308,7 +316,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     public void startTransaction() {
         final OGraphDatabase db = getRawGraph();
 
-        if (Mode.AUTOMATIC == txMode.get())
+        if (Mode.AUTOMATIC == txMode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         if (db.getTransaction() instanceof OTransactionNoTx || db.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             db.begin();
@@ -317,7 +325,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == txMode.get())
+        if (Mode.AUTOMATIC == txMode)
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         if (conclusion == Conclusion.FAILURE) {
@@ -332,11 +340,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void setTransactionMode(final Mode mode) {
         getRawGraph().commit();
-        txMode.set(mode);
+        txMode = mode;
     }
 
     public Mode getTransactionMode() {
-        return txMode.get();
+        return txMode;
     }
 
     protected void saveIndexConfiguration() {
