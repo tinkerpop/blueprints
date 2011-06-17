@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>0.8</version>
+        <version>0.9-SNAPSHOT</version>
     </parent>
     <artifactId>blueprints-sail-graph</artifactId>
-    <version>0.8</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Blueprints-SailGraph</name>
     <description>Blueprints property graph implementation for Sesame Sail</description>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>0.8</version>
+            <version>0.9-SNAPSHOT</version>
         </dependency>
         <!-- SESAME SUPPORT -->
         <dependency>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>0.8</version>
+            <version>0.9-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
