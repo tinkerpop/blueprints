@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
-import com.orientechnologies.orient.core.index.OIndexNotUnique;
+import com.orientechnologies.orient.core.index.OIndexUser;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -40,7 +40,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
         this.graph = orientGraph;
-        this.underlying = rawIndex;
+        this.underlying = new OIndexUser(orientGraph.getRawGraph(), rawIndex);
         load(rawIndex.getConfiguration());
     }
 
@@ -136,8 +136,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         this.indexClass = indexClass;
 
         // CREATE THE MAP
-        this.underlying = graph.getRawGraph().getMetadata().getIndexManager()
-                .createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), null, null, null, true);
+        this.underlying = new OIndexUser(graph.getRawGraph(), graph.getRawGraph().getMetadata().getIndexManager()
+                .createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), null, null, null, true));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))
@@ -169,7 +169,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             }
 
         // LOAD THE TREE-MAP
-        underlying = new OIndexNotUnique().loadFromConfiguration(indexConfiguration);
+        //underlying = new OIndexUser(graph.getRawGraph(), new OIndexNotUnique().loadFromConfiguration(indexConfiguration) );
+    }
+
+    public void close() {
+        underlying = null;
+        graph = null;
     }
 
 }

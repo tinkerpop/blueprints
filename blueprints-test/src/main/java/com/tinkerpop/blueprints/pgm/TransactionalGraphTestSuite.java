@@ -2,6 +2,9 @@ package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -420,7 +423,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         }
     }
 
-    /*public void testCompetingThreads() {
+    public void testCompetingThreads() {
         final TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         int totalThreads = 250;
         final AtomicInteger vertices = new AtomicInteger(0);
@@ -435,6 +438,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
                             Vertex a = graph.addVertex(null);
                             Vertex b = graph.addVertex(null);
                             Edge e = graph.addEdge(null, a, b, convertId("friend"));
+
                             if (!graphTest.isRDFModel) {
                                 a.setProperty("test", this.getId());
                                 b.setProperty("blah", random.nextFloat());
@@ -478,6 +482,6 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getVertices()), vertices.get());
         assertEquals(count(graph.getEdges()), edges.get());
         graph.shutdown();
-    }*/
+    }
 
 }
