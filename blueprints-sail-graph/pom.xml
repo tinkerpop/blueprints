@@ -56,6 +56,11 @@
             <artifactId>linked-data-sail</artifactId>
             <version>0.7-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>net.fortytwo.sesametools</groupId>
+            <artifactId>nquads</artifactId>
+            <version>1.2</version>
+        </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

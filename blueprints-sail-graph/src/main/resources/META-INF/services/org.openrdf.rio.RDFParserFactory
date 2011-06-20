@@ -4,3 +4,4 @@ org.openrdf.rio.rdfxml.RDFXMLParserFactory
 org.openrdf.rio.trig.TriGParserFactory
 org.openrdf.rio.trix.TriXParserFactory
 org.openrdf.rio.turtle.TurtleParserFactory
+net.fortytwo.sesametools.nquads.NQuadsParserFactory
