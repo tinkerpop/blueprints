@@ -140,7 +140,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public Iterable<Vertex> getVertices() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("RDF is an edge based graph model");
     }
 
     public Iterable<Edge> getEdges() {
