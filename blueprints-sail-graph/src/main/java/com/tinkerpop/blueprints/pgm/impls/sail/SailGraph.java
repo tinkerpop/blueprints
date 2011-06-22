@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
+import net.fortytwo.sesametools.nquads.NQuadsFormat;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.BNodeImpl;
@@ -41,12 +42,13 @@ public class SailGraph implements TransactionalGraph {
         formats.put("n3", RDFFormat.N3);
         formats.put("trix", RDFFormat.TRIX);
         formats.put("trig", RDFFormat.TRIG);
+        formats.put("n-quads", NQuadsFormat.NQUADS);
     }
 
     public static RDFFormat getFormat(final String format) {
         RDFFormat ret = formats.get(format);
         if (null == ret)
-            throw new RuntimeException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, turtle, n3, trix, or trig");
+            throw new RuntimeException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, n-quads, turtle, n3, trix, or trig");
         else
             return ret;
     }
@@ -138,7 +140,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public Iterable<Vertex> getVertices() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("RDF is an edge based graph model");
     }
 
     public Iterable<Edge> getEdges() {
