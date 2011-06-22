@@ -4,6 +4,7 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
@@ -12,10 +13,7 @@ import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.sail.SailException;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -142,48 +140,47 @@ public class SailVertex implements Vertex {
         return keys;
     }
 
-    public Iterable<Edge> getOutEdges() {
+    public Iterable<Edge> getOutEdges(final String... labels) {
         if (this.rawVertex instanceof Resource) {
             try {
-                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph);
+                if (labels.length == 0) {
+                    return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph);
+                } else if (labels.length == 1) {
+                    return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix(labels[0])), null, false), this.graph);
+                } else {
+                    final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
+                    for (final String label : labels) {
+                        edges.add(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix(label)), null, false), this.graph));
+                    }
+                    return new MultiIterable<Edge>(edges);
+                }
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         } else {
             return new SailEdgeSequence();
         }
+
     }
 
-    public Iterable<Edge> getOutEdges(final String label) {
-        if (this.rawVertex instanceof Resource) {
-            try {
-                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix(label)), null, false), this.graph);
-            } catch (SailException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        } else {
-            return new SailEdgeSequence();
-        }
-    }
 
-    public Iterable<Edge> getInEdges() {
+    public Iterable<Edge> getInEdges(final String... labels) {
         try {
-            return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph);
+            if (labels.length == 0) {
+                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph);
+            } else if (labels.length == 1) {
+                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix(labels[0])), (Resource) this.rawVertex, false), this.graph);
+            } else {
+                final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
+                for (final String label : labels) {
+                    edges.add(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix(label)), (Resource) this.rawVertex, false), this.graph));
+                }
+                return new MultiIterable<Edge>(edges);
+            }
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
 
-    public Iterable<Edge> getInEdges(final String label) {
-        if (this.rawVertex instanceof Resource) {
-            try {
-                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix(label)), (Resource) this.rawVertex, false), this.graph);
-            } catch (SailException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        } else {
-            return new SailEdgeSequence();
-        }
     }
 
     public String toString() {
