@@ -53,10 +53,10 @@ public class SailEdge implements Edge {
 
     public void setProperty(final String key, final Object value) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
-            URI namedGraph = new URIImpl(SailGraph.prefixToNamespace(value.toString(), this.graph.getSailConnection()));
-            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection());
+            URI namedGraph = new URIImpl(this.graph.expandPrefix(value.toString()));
+            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
             this.rawEdge = new ContextStatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject(), namedGraph);
-            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection());
+            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } else {
             throw new RuntimeException(NAMED_GRAPH_PROPERTY);
@@ -66,9 +66,9 @@ public class SailEdge implements Edge {
     public Object removeProperty(final String key) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
             Resource ng = this.rawEdge.getContext();
-            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection());
+            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
             this.rawEdge = new StatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject());
-            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection());
+            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             return ng;
         } else {
@@ -85,17 +85,17 @@ public class SailEdge implements Edge {
     }
 
     public String toString() {
-        final String outVertex = SailGraph.namespaceToPrefix(this.rawEdge.getSubject().stringValue(), this.graph.getSailConnection());
-        final String edgeLabel = SailGraph.namespaceToPrefix(this.rawEdge.getPredicate().stringValue(), this.graph.getSailConnection());
+        final String outVertex = this.graph.prefixNamespace(this.rawEdge.getSubject().stringValue());
+        final String edgeLabel = this.graph.prefixNamespace(this.rawEdge.getPredicate().stringValue());
         String inVertex;
         if (this.rawEdge.getObject() instanceof Resource)
-            inVertex = SailGraph.namespaceToPrefix(this.rawEdge.getObject().stringValue(), this.graph.getSailConnection());
+            inVertex = this.graph.prefixNamespace(this.rawEdge.getObject().stringValue());
         else
             inVertex = literalString((Literal) this.rawEdge.getObject());
 
         String namedGraph = null;
         if (null != this.rawEdge.getContext()) {
-            namedGraph = SailGraph.namespaceToPrefix(this.rawEdge.getContext().stringValue(), this.graph.getSailConnection());
+            namedGraph = this.graph.prefixNamespace(this.rawEdge.getContext().stringValue());
         }
 
         String edgeString = "e[" + outVertex + " - " + edgeLabel + " -> " + inVertex + "]";
@@ -110,7 +110,7 @@ public class SailEdge implements Edge {
         final String language = literal.getLanguage();
         final URI datatype = literal.getDatatype();
         if (null != datatype) {
-            return "\"" + literal.getLabel() + "\"^^<" + SailGraph.namespaceToPrefix(datatype.stringValue(), this.graph.getSailConnection()) + ">";
+            return "\"" + literal.getLabel() + "\"^^<" + this.graph.prefixNamespace(datatype.stringValue()) + ">";
         } else if (null != language) {
             return "\"" + literal.getLabel() + "\"@" + language;
         } else {

@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
+import net.fortytwo.sesametools.nquads.NQuadsFormat;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.BNodeImpl;
@@ -41,33 +42,49 @@ public class SailGraph implements TransactionalGraph {
         formats.put("n3", RDFFormat.N3);
         formats.put("trix", RDFFormat.TRIX);
         formats.put("trig", RDFFormat.TRIG);
+        formats.put("n-quads", NQuadsFormat.NQUADS);
     }
 
     public static RDFFormat getFormat(final String format) {
         RDFFormat ret = formats.get(format);
         if (null == ret)
-            throw new RuntimeException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, turtle, n3, trix, or trig");
+            throw new RuntimeException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, n-quads, turtle, n3, trix, or trig");
         else
             return ret;
     }
 
     protected Sail rawGraph;
-    protected SailConnection sailConnection;
-    protected boolean inTransaction;
-    private Mode mode = Mode.AUTOMATIC;
+    protected final ThreadLocal<SailConnection> sailConnection = new ThreadLocal<SailConnection>() {
+        protected SailConnection initialValue() {
+            try {
+                return rawGraph.getConnection();
+            } catch (SailException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+    };
+    private final ThreadLocal<Boolean> inTransaction = new ThreadLocal<Boolean>() {
+        protected Boolean initialValue() {
+            return Boolean.FALSE;
+        }
+    };
+    private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
+        protected Mode initialValue() {
+            return Mode.AUTOMATIC;
+        }
+    };
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
     /**
      * Construct a new SailGraph with an uninitialized Sail.
      *
-     * @param rawGraph a not-yet-initialized Sail instance
+     * @param sail a not-yet-initialized Sail instance
      */
-    public SailGraph(final Sail rawGraph) {
-        this.startSail(rawGraph);
+    public SailGraph(final Sail sail) {
+        this.startSail(sail);
     }
 
     public SailGraph() {
-
     }
 
     protected void startSail(final Sail sail) {
@@ -78,8 +95,6 @@ public class SailGraph implements TransactionalGraph {
         try {
             this.rawGraph = sail;
             sail.initialize();
-            this.sailConnection = sail.getConnection();
-
             this.addNamespace(SailTokens.RDF_PREFIX, SailTokens.RDF_NS);
             this.addNamespace(SailTokens.RDFS_PREFIX, SailTokens.RDFS_NS);
             this.addNamespace(SailTokens.OWL_PREFIX, SailTokens.OWL_NS);
@@ -98,10 +113,10 @@ public class SailGraph implements TransactionalGraph {
         Literal literal;
         if (SailHelper.isBNode(resource)) {
             return new SailVertex(new BNodeImpl(resource.substring(2)), this);
-        } else if ((literal = SailHelper.makeLiteral(resource, this.sailConnection)) != null) {
+        } else if ((literal = SailHelper.makeLiteral(resource, this)) != null) {
             return new SailVertex(literal, this);
         } else if (resource.contains(SailTokens.NAMESPACE_SEPARATOR) || resource.contains(SailTokens.FORWARD_SLASH) || resource.contains(SailTokens.POUND)) {
-            resource = prefixToNamespace(resource, this.sailConnection);
+            resource = this.expandPrefix(resource);
             return new SailVertex(new URIImpl(resource), this);
         } else {
             throw new RuntimeException(resource + " is not a valid URI, blank node, or literal value");
@@ -125,12 +140,12 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public Iterable<Vertex> getVertices() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("RDF is an edge based graph model");
     }
 
     public Iterable<Edge> getEdges() {
         try {
-            return new SailEdgeSequence(this.sailConnection.getStatements(null, null, null, false), this);
+            return new SailEdgeSequence(this.sailConnection.get().getStatements(null, null, null, false), this);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -140,9 +155,9 @@ public class SailGraph implements TransactionalGraph {
         Value vertexValue = ((SailVertex) vertex).getRawVertex();
         try {
             if (vertexValue instanceof Resource) {
-                this.sailConnection.removeStatements((Resource) vertexValue, null, null);
+                this.sailConnection.get().removeStatements((Resource) vertexValue, null, null);
             }
-            this.sailConnection.removeStatements(null, null, vertexValue);
+            this.sailConnection.get().removeStatements(null, null, vertexValue);
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -157,16 +172,16 @@ public class SailGraph implements TransactionalGraph {
             throw new RuntimeException(outVertex.toString() + " is not a legal URI or blank node");
         }
 
-        URI labelURI = new URIImpl(prefixToNamespace(label, this.sailConnection));
+        URI labelURI = new URIImpl(this.expandPrefix(label));
         Statement statement = new StatementImpl((Resource) outVertexValue, labelURI, inVertexValue);
-        SailHelper.addStatement(statement, this.sailConnection);
+        SailHelper.addStatement(statement, this.sailConnection.get());
         this.autoStopTransaction(Conclusion.SUCCESS);
         return new SailEdge(statement, this);
     }
 
     public void removeEdge(final Edge edge) {
         Statement statement = ((SailEdge) edge).getRawEdge();
-        SailHelper.removeStatement(statement, this.sailConnection);
+        SailHelper.removeStatement(statement, this.sailConnection.get());
         this.autoStopTransaction(Conclusion.SUCCESS);
     }
 
@@ -175,7 +190,7 @@ public class SailGraph implements TransactionalGraph {
      *
      * @return the Sail connection
      */
-    public SailConnection getSailConnection() {
+    public ThreadLocal<SailConnection> getSailConnection() {
         return this.sailConnection;
     }
 
@@ -187,7 +202,7 @@ public class SailGraph implements TransactionalGraph {
      */
     public void addNamespace(final String prefix, final String namespace) {
         try {
-            this.sailConnection.setNamespace(prefix, namespace);
+            this.sailConnection.get().setNamespace(prefix, namespace);
             this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -201,7 +216,7 @@ public class SailGraph implements TransactionalGraph {
      */
     public void removeNamespace(final String prefix) {
         try {
-            this.sailConnection.removeNamespace(prefix);
+            this.sailConnection.get().removeNamespace(prefix);
             this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -216,7 +231,7 @@ public class SailGraph implements TransactionalGraph {
     public Map<String, String> getNamespaces() {
         Map<String, String> namespaces = new HashMap<String, String>();
         try {
-            CloseableIteration<? extends Namespace, SailException> results = this.sailConnection.getNamespaces();
+            CloseableIteration<? extends Namespace, SailException> results = this.sailConnection.get().getNamespaces();
             while (results.hasNext()) {
                 Namespace namespace = results.next();
                 namespaces.put(namespace.getPrefix(), namespace.getName());
@@ -226,26 +241,6 @@ public class SailGraph implements TransactionalGraph {
             throw new RuntimeException(e.getMessage(), e);
         }
         return namespaces;
-    }
-
-    /**
-     * Given a URI, expand it to its full URI.
-     *
-     * @param uri the compressed URI (e.g. tg:knows)
-     * @return the expanded URI (e.g. http://tinkerpop.com#knows)
-     */
-    public String expandPrefix(final String uri) {
-        return SailGraph.prefixToNamespace(uri, this.sailConnection);
-    }
-
-    /**
-     * Given a URI, compress it to its prefixed URI.
-     *
-     * @param uri the expanded URI (e.g. http://tinkerpop.com#knows)
-     * @return the compressed URI (e.g. tg:knows)
-     */
-    public String prefixNamespace(final String uri) {
-        return SailGraph.namespaceToPrefix(uri, this.sailConnection);
     }
 
     /**
@@ -273,26 +268,11 @@ public class SailGraph implements TransactionalGraph {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        /*
-        Repository repository = new SailRepository(this.rawGraph);
-        try {
-
-            RepositoryConnection connection = repository.getConnection();
-            if (null != baseGraph)
-                connection.add(input, baseURI, getFormat(format), new URIImpl(baseGraph));
-            else
-                connection.add(input, baseURI, getFormat(format));
-
-            connection.commit();
-            connection.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }  */
     }
 
     public void clear() {
         try {
-            this.sailConnection.clear();
+            this.sailConnection.get().clear();
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -301,18 +281,25 @@ public class SailGraph implements TransactionalGraph {
 
     public void shutdown() {
         try {
-            this.sailConnection.commit();
-            this.sailConnection.close();
+            this.sailConnection.get().close();
+            this.sailConnection.remove();
             this.rawGraph.shutDown();
-        } catch (SailException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        } catch (Throwable e) {
+            // TODO: close all connections.
+            //throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    protected static String prefixToNamespace(String uri, final SailConnection sailConnection) {
+    /**
+     * Given a URI, expand it to its full URI.
+     *
+     * @param uri the compressed URI (e.g. tg:knows)
+     * @return the expanded URI (e.g. http://tinkerpop.com#knows)
+     */
+    public String expandPrefix(String uri) {
         try {
             if (uri.contains(SailTokens.NAMESPACE_SEPARATOR)) {
-                String namespace = sailConnection.getNamespace(uri.substring(0, uri.indexOf(SailTokens.NAMESPACE_SEPARATOR)));
+                String namespace = this.sailConnection.get().getNamespace(uri.substring(0, uri.indexOf(SailTokens.NAMESPACE_SEPARATOR)));
                 if (null != namespace)
                     uri = namespace + uri.substring(uri.indexOf(SailTokens.NAMESPACE_SEPARATOR) + 1);
             }
@@ -322,9 +309,15 @@ public class SailGraph implements TransactionalGraph {
         return uri;
     }
 
-    protected static String namespaceToPrefix(String uri, final SailConnection sailConnection) {
+    /**
+     * Given a URI, compress it to its prefixed URI.
+     *
+     * @param uri the expanded URI (e.g. http://tinkerpop.com#knows)
+     * @return the prefixed URI (e.g. tg:knows)
+     */
+    public String prefixNamespace(String uri) {
         try {
-            CloseableIteration<? extends Namespace, SailException> namespaces = sailConnection.getNamespaces();
+            CloseableIteration<? extends Namespace, SailException> namespaces = this.sailConnection.get().getNamespaces();
             while (namespaces.hasNext()) {
                 Namespace namespace = namespaces.next();
                 if (uri.contains(namespace.getName()))
@@ -338,54 +331,54 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-        if (this.inTransaction)
+        if (inTransaction.get())
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
-        this.inTransaction = true;
+        inTransaction.set(Boolean.TRUE);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == this.mode)
+        if (Mode.AUTOMATIC == txMode.get())
             throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
 
         try {
-            this.inTransaction = false;
+            inTransaction.set(Boolean.FALSE);
             if (Conclusion.SUCCESS == conclusion) {
-                this.sailConnection.commit();
+                this.sailConnection.get().commit();
             } else {
-                this.sailConnection.rollback();
+                this.sailConnection.get().rollback();
             }
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    protected void autoStopTransaction(Conclusion conclusion) {
-        if (this.mode == Mode.AUTOMATIC) {
+    protected void autoStopTransaction(final Conclusion conclusion) {
+        if (txMode.get() == Mode.AUTOMATIC) {
             try {
-                this.inTransaction = false;
+                inTransaction.set(Boolean.FALSE);
                 if (conclusion == Conclusion.SUCCESS)
-                    this.sailConnection.commit();
+                    this.sailConnection.get().commit();
                 else
-                    this.sailConnection.rollback();
+                    this.sailConnection.get().rollback();
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
     }
 
-    public void setTransactionMode(Mode mode) {
+    public void setTransactionMode(final Mode mode) {
         try {
-            this.sailConnection.commit();
+            this.sailConnection.get().commit();
         } catch (SailException e) {
         }
-        this.inTransaction = false;
-        this.mode = mode;
+        inTransaction.set(Boolean.FALSE);
+        txMode.set(mode);
     }
 
     public Mode getTransactionMode() {
-        return this.mode;
+        return txMode.get();
     }
 
 
@@ -396,7 +389,7 @@ public class SailGraph implements TransactionalGraph {
 
     private String getPrefixes() {
         String prefixString = "";
-        Map<String, String> namespaces = this.getNamespaces();
+        final Map<String, String> namespaces = this.getNamespaces();
         for (Map.Entry<String, String> entry : namespaces.entrySet()) {
             prefixString = prefixString + SailTokens.PREFIX_SPACE + entry.getKey() + SailTokens.COLON_LESSTHAN + entry.getValue() + SailTokens.GREATERTHAN_NEWLINE;
         }
@@ -416,7 +409,7 @@ public class SailGraph implements TransactionalGraph {
             final SPARQLParser parser = new SPARQLParser();
             final ParsedQuery query = parser.parseQuery(sparqlQuery, null);
             boolean includeInferred = false;
-            final CloseableIteration<? extends BindingSet, QueryEvaluationException> results = this.sailConnection.evaluate(query.getTupleExpr(), query.getDataset(), new MapBindingSet(), includeInferred);
+            final CloseableIteration<? extends BindingSet, QueryEvaluationException> results = this.sailConnection.get().evaluate(query.getTupleExpr(), query.getDataset(), new MapBindingSet(), includeInferred);
             final List<Map<String, Vertex>> returnList = new ArrayList<Map<String, Vertex>>();
             try {
                 while (results.hasNext()) {

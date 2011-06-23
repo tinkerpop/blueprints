@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -57,7 +56,7 @@ public class EventElement implements Element {
     /**
      * Raises a vertexPropertyRemoved or edgePropertyRemoved event.
      */
-    public Object removeProperty(final String key)  {
+    public Object removeProperty(final String key) {
         Object propertyRemoved = element.removeProperty(key);
 
         if (this instanceof Vertex) {
@@ -76,7 +75,7 @@ public class EventElement implements Element {
     /**
      * Raises a vertexPropertyRemoved or edgePropertyChanged event.
      */
-    public void setProperty(final String key, final Object value)  {
+    public void setProperty(final String key, final Object value) {
         this.element.setProperty(key, value);
 
         if (this instanceof Vertex) {

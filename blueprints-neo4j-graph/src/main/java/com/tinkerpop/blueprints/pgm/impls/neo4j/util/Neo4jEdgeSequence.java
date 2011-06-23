@@ -1,17 +1,19 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j.util;
 
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jEdge;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.index.IndexHits;
 
 import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jEdgeSequence<T extends Edge> implements Iterator<Neo4jEdge>, Iterable<Neo4jEdge> {
+public class Neo4jEdgeSequence<T extends Edge> implements CloseableSequence<Neo4jEdge> {
 
     private final Iterator<Relationship> relationships;
     private final Neo4jGraph graph;
@@ -35,5 +37,11 @@ public class Neo4jEdgeSequence<T extends Edge> implements Iterator<Neo4jEdge>, I
 
     public Iterator<Neo4jEdge> iterator() {
         return this;
+    }
+
+    public void close() {
+        if (this.relationships instanceof IndexHits) {
+            ((IndexHits) this.relationships).close();
+        }
     }
 }

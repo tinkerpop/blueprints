@@ -63,11 +63,11 @@ public class SailHelper {
         return !isBNode(resource) && !isLiteral(resource) && (resource.contains(":") || resource.contains("/") || resource.contains("#"));
     }
 
-    public static Literal makeLiteral(final String resource, SailConnection sailConnection) {
+    public static Literal makeLiteral(final String resource, SailGraph graph) {
         final Matcher matcher = literalPattern.matcher(resource);
         if (matcher.matches()) {
             if (null != matcher.group(4))
-                return new LiteralImpl(matcher.group(1), new URIImpl(SailGraph.prefixToNamespace(matcher.group(4), sailConnection)));
+                return new LiteralImpl(matcher.group(1), new URIImpl(graph.expandPrefix(matcher.group(4))));
             else
                 return new LiteralImpl(matcher.group(1), matcher.group(6));
         } else {

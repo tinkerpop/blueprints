@@ -2,11 +2,14 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.tg.util.TinkerEdgeSequence;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,20 +28,33 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         return this;
     }
 
-    public Iterable<Edge> getOutEdges() {
-        return this.outEdges;
+    public Iterable<Edge> getInEdges(final String... labels) {
+        if (labels.length == 0)
+            return this.inEdges;
+        else if (labels.length == 1) {
+            return new TinkerEdgeSequence(this.inEdges.iterator(), labels[0]);
+        } else {
+
+            final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
+            for (final String label : labels) {
+                edges.add(this.getInEdges(label));
+            }
+            return new MultiIterable<Edge>(edges);
+        }
     }
 
-    public Iterable<Edge> getInEdges() {
-        return this.inEdges;
-    }
-
-    public Iterable<Edge> getOutEdges(final String label) {
-        return new TinkerEdgeSequence(this.outEdges.iterator(), label);
-    }
-
-    public Iterable<Edge> getInEdges(final String label) {
-        return new TinkerEdgeSequence(this.inEdges.iterator(), label);
+    public Iterable<Edge> getOutEdges(final String... labels) {
+        if (labels.length == 0)
+            return this.outEdges;
+        else if (labels.length == 1) {
+            return new TinkerEdgeSequence(this.outEdges.iterator(), labels[0]);
+        } else {
+            final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
+            for (final String label : labels) {
+                edges.add(this.getOutEdges(label));
+            }
+            return new MultiIterable<Edge>(edges);
+        }
     }
     
 		public String toJSON() {

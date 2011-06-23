@@ -16,7 +16,7 @@ import java.util.List;
  * to one or more listeners on changes to the Graph.  Notifications to the listeners occur for the the
  * following events: new vertex/edge, vertex/edge property changed, vertex/edge property removed,
  * vertex/edge removed.
- *
+ * <p/>
  * The limiting factor to events being raised is related to out-of-process functions changing graph elements.
  */
 public class EventGraph implements Graph {

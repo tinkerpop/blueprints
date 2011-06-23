@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
-import org.json.simple.JSONObject;
+import org.codehaus.jettison.json.JSONObject;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -18,9 +18,9 @@ public class RexsterEdge extends RexsterElement implements Edge {
 
     public RexsterEdge(final JSONObject rawEdge, final RexsterGraph graph) {
         super(rawEdge, graph);
-        this.label = (String) rawEdge.get(RexsterTokens._LABEL);
-        this.outVertex = rawEdge.get(RexsterTokens._OUTV);
-        this.inVertex = rawEdge.get(RexsterTokens._INV);
+        this.label = rawEdge.optString(RexsterTokens._LABEL);
+        this.outVertex = rawEdge.opt(RexsterTokens._OUTV);
+        this.inVertex = rawEdge.opt(RexsterTokens._INV);
     }
 
     public Vertex getOutVertex() {
@@ -42,5 +42,5 @@ public class RexsterEdge extends RexsterElement implements Edge {
     public JSONObject getRawEdge() {
         return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
     }
-    
+
 }

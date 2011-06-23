@@ -1310,11 +1310,14 @@ public abstract class SailTest extends TestCase {
     }
 
     private Set<Statement> toSet(final CloseableIteration<? extends Statement, SailException> i) throws SailException {
-        Set<Statement> set = new HashSet<Statement>();
-        while (i.hasNext()) {
-            set.add(i.next());
+        try {
+            Set<Statement> set = new HashSet<Statement>();
+            while (i.hasNext()) {
+                set.add(i.next());
+            }
+            return set;
+        } finally {
+            i.close();
         }
-        i.close();
-        return set;
     }
 }

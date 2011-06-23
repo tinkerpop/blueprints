@@ -11,13 +11,29 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
+h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>0.8-SNAPSHOT</version>
+  <version>0.9-SNAPSHOT</version>
+</dependency>
+```
+
+* Updated Vertex API to have @getOutEdges(String...)@ and @getInEdges(String...)@
+
+==<hr/>==
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-winnie.png!
+
+h3. Version 0.8 (Winnie -- June 15, 2011)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>0.8</version>
 </dependency>
 ```
 
@@ -25,8 +41,13 @@ h3. Version 0.8 (NOT OFFICIALLY RELEASED YET)
 * @RexsterGraph@ improvements
 ** Use of POST for REST Service Requests
 ** Better implementation URL encoding
+* Change JSON library from json-simple to jettison to be more in line with the rest of the TinkerPop stack.
+* A more robust implementation of the @TransactionalGraph@ implementation for @Neo4jGraph@, @OrientGraph@, and @SailGraph@.
+* Bumped to Neo4j 1.4.M04
+* Bumped to Orient 1.0rc2-SNAPSHOT
+* Bumped to Sail 2.4.0
 
-==<hr/>==
+ ==<hr/>==
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-patrick.png!
 

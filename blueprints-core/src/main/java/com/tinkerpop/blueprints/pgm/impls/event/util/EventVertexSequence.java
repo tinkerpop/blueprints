@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.event.util;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.EventVertex;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * A sequence of vertices that applies the list of listeners into each vertex.
  */
-public class EventVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
+public class EventVertexSequence implements CloseableSequence<Vertex> {
 
     private final Iterator<Vertex> itty;
     private final List<GraphChangedListener> graphChangedListeners;
@@ -34,5 +35,11 @@ public class EventVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
 
     public boolean hasNext() {
         return itty.hasNext();
+    }
+
+    public void close() {
+        if (itty instanceof CloseableSequence) {
+            ((CloseableSequence) itty).close();
+        }
     }
 }

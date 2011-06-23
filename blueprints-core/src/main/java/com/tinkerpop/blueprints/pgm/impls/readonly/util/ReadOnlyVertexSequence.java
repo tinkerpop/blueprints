@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.readonly.util;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyTokens;
 import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyVertex;
@@ -9,7 +10,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyVertexSequence implements Iterator<Vertex>, Iterable<Vertex> {
+public class ReadOnlyVertexSequence implements CloseableSequence<Vertex> {
 
     private final Iterator<Vertex> itty;
 
@@ -31,5 +32,11 @@ public class ReadOnlyVertexSequence implements Iterator<Vertex>, Iterable<Vertex
 
     public boolean hasNext() {
         return itty.hasNext();
+    }
+
+    public void close() {
+        if (itty instanceof CloseableSequence) {
+            ((CloseableSequence) itty).close();
+        }
     }
 }

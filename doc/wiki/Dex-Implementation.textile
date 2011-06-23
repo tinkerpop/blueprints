@@ -1,0 +1,67 @@
+[[http://www.sparsity-technologies.com/images/sparsity_logo_web.png]]
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-dex-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new DexGraph("/tmp/graph.dex");
+```
+
+"DEX":http://www.sparsity-technologies.com/dex is a graph database developed by "Sparsity Technologies":http://www.sparsity-technologies.com/. For a fine summary of the DEX graph database, please review the following "presentations":http://www.sparsity-technologies.com/dex_tutorials. The software can be downloaded from "here":http://www.sparsity-technologies.com/dex_downloads and be used with the default evaluation license (which restricts the amount of information DEX can deal with).
+
+DEX natively supports the property graph data model defined by Blueprints. However, there are a few peculiarities. 
+
+# *No user defined element identifiers*: DEX is the gatekeeper and creator of vertex and edge identifiers. Thus, when creating a new vertex or edge instance, the provided object identifier is ignored.
+# *Vertices are labeled too*: When adding vertices, the user can set @DEXGraph#LABEL@ to be used as the label of the vertex to be created. Also, the label of a vertex (or even an element) can be retrieved through the @DEXElement#LABEL_PROPERTY@ property.
+
+@DexGraph@ implements @IndexableGraph@. However, the use of indices is limited when working with DEX and is explained as follows:
+
+# There is no support to create indices.
+# By default, there is an @AutomaticIndex@ for each existing label which corresponds to the name of the index. Also, each index contains a key for each existing property.
+
+*Memory configuration*
+
+DEX memory is not managed by the JVM heap, so an specific memory configuration must be set for DEX in order to set the maximum amount of memory to be used by a DEX application.
+
+Specifically, users should set @dex.io.cache.maxsize@ as is explained [[here|http://www.sparsity-technologies.com/downloads/javadoc/edu/upc/dama/dex/utils/DEXConfig.html]].
+
+*Managment of @Iterable@ collections*
+
+As before, since DEX resources are not managed by the JVM heap, DEX-based blueprints applications should take into account the management of @Iterable@ collections and explicitly close them in order to free native resources.
+
+For example, if we execute a long traversal like this:
+
+```java
+for (final Vertex vertex : graph.getVertices()) {
+    for (final Edge edge : vertex.getOutEdges()) {
+        final Vertex vertex2 = edge.getInVertex();
+        for (final Edge edge2 : vertex2.getOutEdges()) {
+            ...
+        }
+    }
+}
+```
+
+all retrieved collections won't be closed until the graph database is stopped. Of course, keep active this amount of resources will have a negative impact in the performance. To avoid this, we should implement something like this:
+
+```java
+DexIterable<Vertex> vv = (DexIterable<Vertex>)graph.getVertices();
+for (final Vertex vertex : vv) {
+    DexIterable<Edge> ee = (DexIterable<Edge>)vertex.getOutEdges();
+    for (final Edge edge : ee) {
+        final Vertex vertex2 = edge.getInVertex();
+        DexIterable<Edge> ee2 = (DexIterable<Edge>)vertex2.getOutEdges();
+        for (final Edge edge2 : ee2) {
+            ...
+        }
+        ee2.close();
+    }
+    ee.close();
+}
+vv.close();
+```

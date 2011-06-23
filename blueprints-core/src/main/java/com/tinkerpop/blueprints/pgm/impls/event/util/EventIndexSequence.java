@@ -6,9 +6,6 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.event.EventAutomaticIndex;
 import com.tinkerpop.blueprints.pgm.impls.event.EventIndex;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyAutomaticIndex;
-import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndex;
-import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyTokens;
 
 import java.util.Iterator;
 import java.util.List;

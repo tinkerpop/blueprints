@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.event.util;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.impls.event.EventEdge;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * A sequence of edges that applies the list of listeners into each edge.
  */
-public class EventEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
+public class EventEdgeSequence implements CloseableSequence<Edge> {
 
     private final Iterator<Edge> itty;
     private final List<GraphChangedListener> graphChangedListeners;
@@ -34,5 +35,11 @@ public class EventEdgeSequence implements Iterator<Edge>, Iterable<Edge> {
 
     public boolean hasNext() {
         return itty.hasNext();
+    }
+
+    public void close() {
+        if (itty instanceof CloseableSequence) {
+            ((CloseableSequence) itty).close();
+        }
     }
 }

@@ -3,9 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.event;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.impls.readonly.ReadOnlyIndex;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
