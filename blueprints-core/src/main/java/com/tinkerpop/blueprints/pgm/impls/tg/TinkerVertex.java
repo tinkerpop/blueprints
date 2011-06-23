@@ -42,7 +42,7 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
     }
     
 		public String toJSON() {
-    		StringBuilder vertex = new StringBuilder(this.getId().toString() + ": {");
+    		StringBuilder vertex = new StringBuilder("\"" + this.getId().toString() + "\": {");
 
     		vertex.append("\"_id\": " + this.getId().toString() + ",");
     		vertex.append("\"_type: \"vertex\",");

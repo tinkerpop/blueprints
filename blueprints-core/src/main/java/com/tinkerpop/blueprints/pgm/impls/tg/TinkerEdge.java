@@ -43,7 +43,7 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
     }
     
     public String toJSON() {
-    		StringBuilder edge = new StringBuilder(this.getId().toString() + ": {");
+    		StringBuilder edge = new StringBuilder("\"" + this.getId().toString() + "\": {");
 
     		edge.append("\"_id\": " + this.getId().toString() + ",");
     		edge.append("\"_type\": \"edge\",");
