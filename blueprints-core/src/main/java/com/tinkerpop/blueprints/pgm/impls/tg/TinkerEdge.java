@@ -56,6 +56,7 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
     		}
     		
     		edge.deleteCharAt(edge.length() - 1);
+            edge.deleteCharAt(edge.length() - 1);
     		edge.append("}");
     		
     		return edge.toString();
