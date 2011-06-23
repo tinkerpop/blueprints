@@ -11,6 +11,20 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
+h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>0.9-SNAPSHOT</version>
+</dependency>
+```
+
+* Updated Vertex API to have @getOutEdges(String...)@ and @getInEdges(String...)@
+
+==<hr/>==
+
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-winnie.png!
 
 h3. Version 0.8 (Winnie -- June 15, 2011)

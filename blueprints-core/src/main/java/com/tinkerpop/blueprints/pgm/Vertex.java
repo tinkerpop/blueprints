@@ -13,20 +13,18 @@ public interface Vertex extends Element {
     /**
      * The edges emanating from, or leaving, the vertex.
      *
+     * @param labels the labels of the edges to return
      * @return the edges for which the vertex is the tail
      */
-    public Iterable<Edge> getOutEdges();
+    public Iterable<Edge> getOutEdges(String... labels);
 
     /**
      * The edges incoming to, or arriving at, the vertex.
      *
+     * @param labels the labels of the edges to return
      * @return the edges for which the vertex is the head
      */
-    public Iterable<Edge> getInEdges();
-
-    public Iterable<Edge> getOutEdges(String label);
-
-    public Iterable<Edge> getInEdges(String label);
+    public Iterable<Edge> getInEdges(String... labels);
 
     //public T getRawVertex();
 }
