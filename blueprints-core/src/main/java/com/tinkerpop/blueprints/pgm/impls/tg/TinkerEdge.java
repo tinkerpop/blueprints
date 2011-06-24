@@ -45,18 +45,17 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
     public String toJSON() {
     		StringBuilder edge = new StringBuilder("\"" + this.getId().toString() + "\": {");
 
-    		edge.append("\"_id\": " + this.getId().toString() + ",");
+    		edge.append("\"_id\": \"" + this.getId().toString() + "\",");
     		edge.append("\"_type\": \"edge\",");
     		edge.append("\"label\": \"" + this.getLabel() + "\",");
-    		edge.append("\"out_v\": " + this.getOutVertex().getId().toString() + ",");
-    		edge.append("\"in_v\": " + this.getInVertex().getId() + ",");
+    		edge.append("\"out_v\": \"" + this.getOutVertex().getId().toString() + "\",");
+    		edge.append("\"in_v\": \"" + this.getInVertex().getId().toString() + "\",");
     		
     		for(String key : this.getPropertyKeys()) {
     				edge.append("\"" + key.toString() + "\": \"" + this.getProperty(key).toString() + "\",");
     		}
     		
     		edge.deleteCharAt(edge.length() - 1);
-            edge.deleteCharAt(edge.length() - 1);
     		edge.append("}");
     		
     		return edge.toString();
