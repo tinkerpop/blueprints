@@ -238,6 +238,8 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.indices.clear();
         this.autoIndices.clear();
         this.currentId = 0l;
+        this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
+        this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
     }
 
     public void shutdown() {

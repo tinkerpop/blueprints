@@ -193,7 +193,8 @@ public class IndexableGraphTestSuite extends TestSuite {
         }
     }
 
-    public void testIndicesDroppedOnClear() {
+    public void testIndicesDroppedAndRecreatedOnClear() {
+        this.stopWatch();
         IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
         int count = 0;
         if (graphTest.supportsVertexIndex)
@@ -203,7 +204,21 @@ public class IndexableGraphTestSuite extends TestSuite {
         assertEquals(count(graph.getIndices()), count);
 
         graph.clear();
-        assertEquals(count(graph.getIndices()), 0);
+        assertEquals(count(graph.getIndices()), 2);
+        if (graphTest.supportsVertexIndex) {
+            assertNotNull(graph.getIndex(Index.VERTICES, Vertex.class));
+            assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).getIndexType(), Index.Type.AUTOMATIC);
+        } else {
+            assertNull(graph.getIndex(Index.VERTICES, Vertex.class));
+        }
+        if (graphTest.supportsEdgeIndex) {
+            assertNotNull(graph.getIndex(Index.EDGES, Edge.class));
+            assertEquals(graph.getIndex(Index.EDGES, Edge.class).getIndexType(), Index.Type.AUTOMATIC);
+        } else {
+            assertNull(graph.getIndex(Index.EDGES, Edge.class));
+        }
+
+        printPerformance(graph.toString(), 2, "automatic indices retrieved after graph cleared", this.stopWatch());
         graph.shutdown();
     }
 

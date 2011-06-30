@@ -323,6 +323,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         for (Index index : this.getIndices()) {
             this.dropIndex(index.getIndexName());
         }
+        this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
+        this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
     }
 
     protected void autoStartTransaction() {
