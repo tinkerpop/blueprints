@@ -33,8 +33,6 @@ public class GraphBasedMatcher extends Matcher {
     }
 
     public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final String context) {
-        final String p1 = null == predicate ? null : GraphSailConnection.uriToNative(predicate);
-
         System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
         System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
 
@@ -50,7 +48,7 @@ public class GraphBasedMatcher extends Matcher {
                 return new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                     public boolean fulfilledBy(final Edge edge) {
                         return store.matches(edge.getInVertex(), object)
-                                && (!p || edge.getLabel().equals(p1))
+                                && (!p || edge.getLabel().equals(predicate.stringValue()))
                                 && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
                     }
                 });
@@ -59,7 +57,7 @@ public class GraphBasedMatcher extends Matcher {
             Vertex vs = store.findVertex(subject);
             return null == vs ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
-                    return (!p || edge.getLabel().equals(p1))
+                    return (!p || edge.getLabel().equals(predicate.stringValue()))
                             && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
                 }
             });
@@ -67,7 +65,7 @@ public class GraphBasedMatcher extends Matcher {
             Vertex vo = store.findVertex(object);
             return null == vo ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vo.getInEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
-                    return (!p || edge.getLabel().equals(p1))
+                    return (!p || edge.getLabel().equals(predicate.stringValue()))
                             && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
                 }
             });

@@ -157,20 +157,16 @@ public class GraphSailConnection implements SailConnection {
             }
         }
 
-        String s = resourceToNative(subject);
-        String p = uriToNative(predicate);
-        String o = valueToNative(object);
-
         for (Resource context : ((0 == contexts.length) ? NULL_CONTEXT_ARRAY : contexts)) {
             String c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
             Vertex out = getOrCreateVertex(subject);
             Vertex in = getOrCreateVertex(object);
-            Edge edge = store.graph.addEdge(null, out, in, p);
+            Edge edge = store.graph.addEdge(null, out, in, predicate.stringValue());
 
             for (IndexingMatcher m : store.indexers) {
                 //System.out.println("\t\tindexing with: " + m);
-                m.indexStatement(edge, s, p, o, c);
+                m.indexStatement(edge, subject, predicate, object, c);
             }
 
             //System.out.println("added (s: " + s + ", p: " + p + ", o: " + o + ", c: " + c + ")");
@@ -183,14 +179,6 @@ public class GraphSailConnection implements SailConnection {
         Vertex v = store.findVertex(value);
         if (null == v) {
             v = store.addVertex(value);
-        }
-        return v;
-    }
-
-    private Vertex getOrCreateVertex(final String id) {
-        Vertex v = store.getVertex(id);
-        if (null == v) {
-            v = store.addVertex(id);
         }
         return v;
     }

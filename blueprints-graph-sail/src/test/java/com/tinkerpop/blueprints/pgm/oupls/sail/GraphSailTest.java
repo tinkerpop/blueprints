@@ -72,7 +72,7 @@ public abstract class GraphSailTest extends SailTest {
         after = countStatements(sc, null, null, plainLitA);
         assertEquals(0, before);
         GraphMLWriter.outputGraph(graph, System.out);
-        assertEquals(1, after);
+        assertEquals(0, after);
     }
 
 

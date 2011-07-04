@@ -105,7 +105,7 @@ public class IndexingMatcher extends Matcher {
      * @param object    the object of the statement
      * @param context   the context of the statement
      */
-    public void indexStatement(final Edge statement, final String subject, final String predicate, final String object, final String context) {
+    public void indexStatement(final Edge statement, final Resource subject, final URI predicate, final Value object, final String context) {
         StringBuilder sb = new StringBuilder();
 
         if (c) {
@@ -113,15 +113,15 @@ public class IndexingMatcher extends Matcher {
         }
 
         if (s) {
-            sb.append(GraphSail.SEPARATOR).append(subject);
+            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.resourceToNative(subject));
         }
 
         if (p) {
-            sb.append(GraphSail.SEPARATOR).append(predicate);
+            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.uriToNative(predicate));
         }
 
         if (o) {
-            sb.append(GraphSail.SEPARATOR).append(object);
+            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.valueToNative(object));
         }
 
         //edges.put(propertyName, sb.toString(), edge);
