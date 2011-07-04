@@ -23,83 +23,77 @@ import java.util.Map;
  * GraphMLWriter writes a Graph to a GraphML OutputStream.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GraphMLWriter {
+    private Graph graph;
+    private boolean normalize = false;
+    private Map<String, String> vertexKeyTypes = null;
+    private Map<String, String> edgeKeyTypes = null;
+
+    public GraphMLWriter(final Graph graph) {
+        this.graph = graph;
+    }
+
+    /**
+     * @param normalize whether to normalize the output.
+     *                  Normalized output is deterministic with respect to the order of elements and properties in the resulting XML document,
+     *                  and is compatible with line diff-based tools such as Git.
+     *                  Note: normalized output is memory-intensive and is not appropriate for very large graphs.
+     */
+    public void setNormalize(final boolean normalize) {
+        this.normalize = normalize;
+    }
+
+    /**
+     * @param vertexKeyTypes a Map of the data types of the vertex keys
+     */
+    public void setVertexKeyTypes(final Map<String, String> vertexKeyTypes) {
+        this.vertexKeyTypes = vertexKeyTypes;
+    }
+
+    /**
+     * @param edgeKeyTypes a Map of the data types of the edge keys
+     */
+    public void setEdgeKeyTypes(final Map<String, String> edgeKeyTypes) {
+        this.edgeKeyTypes = edgeKeyTypes;
+    }
 
     /**
      * Write the data in a Graph to a GraphML OutputStream.
      *
-     * @param graph               the Graph to pull the data from
      * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
      * @throws XMLStreamException thrown if there is an error generating the GraphML data
      */
-    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream) throws XMLStreamException {
-        outputGraph(graph, graphMLOutputStream, false);
-    }
+    public void outputGraph(final OutputStream graphMLOutputStream) throws XMLStreamException {
+        if (null == this.vertexKeyTypes || null == this.edgeKeyTypes) {
+            Map<String, String> vertexKeyTypes = new HashMap<String, String>();
+            Map<String, String> edgeKeyTypes = new HashMap<String, String>();
 
-    /**
-     * Write the data in a Graph to a GraphML OutputStream, optionally normalizing the output.
-     *
-     * @param graph               the Graph to pull the data from
-     * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
-     * @param normalize           whether to normalize the output.
-     * Normalized output is deterministic with respect to the order of elements and properties in the resulting XML document,
-     * and is compatible with line diff-based tools such as Git.
-     * Note: normalized output is memory-intensive and is not appropriate for very large graphs.
-     * @throws XMLStreamException thrown if there is an error generating the GraphML data
-     */
-    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream, final boolean normalize) throws XMLStreamException {
-        Map<String, String> vertexKeyTypes = new HashMap<String, String>();
-        Map<String, String> edgeKeyTypes = new HashMap<String, String>();
-
-        for (Vertex vertex : graph.getVertices()) {
-            for (String key : vertex.getPropertyKeys()) {
-                if (!vertexKeyTypes.containsKey(key)) {
-                    vertexKeyTypes.put(key, GraphMLWriter.getStringType(vertex.getProperty(key)));
+            for (Vertex vertex : graph.getVertices()) {
+                for (String key : vertex.getPropertyKeys()) {
+                    if (!vertexKeyTypes.containsKey(key)) {
+                        vertexKeyTypes.put(key, GraphMLWriter.getStringType(vertex.getProperty(key)));
+                    }
                 }
-            }
-            for (Edge edge : vertex.getOutEdges()) {
-                for (String key : edge.getPropertyKeys()) {
-                    if (!edgeKeyTypes.containsKey(key)) {
-                        edgeKeyTypes.put(key, GraphMLWriter.getStringType(edge.getProperty(key)));
+                for (Edge edge : vertex.getOutEdges()) {
+                    for (String key : edge.getPropertyKeys()) {
+                        if (!edgeKeyTypes.containsKey(key)) {
+                            edgeKeyTypes.put(key, GraphMLWriter.getStringType(edge.getProperty(key)));
+                        }
                     }
                 }
             }
+
+            if (null == this.vertexKeyTypes) {
+                this.vertexKeyTypes = vertexKeyTypes;
+            }
+
+            if (null == this.edgeKeyTypes) {
+                this.edgeKeyTypes = edgeKeyTypes;
+            }
         }
-        GraphMLWriter.outputGraph(graph, graphMLOutputStream, vertexKeyTypes, edgeKeyTypes, normalize);
-    }
 
-    /**
-     * Write the data in a Graph to a GraphML OutputStream.
-     *
-     * @param graph               the Graph to pull the data from
-     * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
-     * @param vertexKeyTypes      a Map of the data types of the vertex keys
-     * @param edgeKeyTypes        a Map of the data types of the edge keys
-     * @throws XMLStreamException thrown if there is an error generating the GraphML data
-     */
-    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream, final Map<String, String> vertexKeyTypes, final Map<String, String> edgeKeyTypes) throws XMLStreamException {
-        outputGraph(graph, graphMLOutputStream, vertexKeyTypes, edgeKeyTypes, false);
-    }
-
-    /**
-     * Write the data in a Graph to a GraphML OutputStream, optionally normalizing the output.
-     *
-     * @param graph               the Graph to pull the data from
-     * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
-     * @param vertexKeyTypes      a Map of the data types of the vertex keys
-     * @param edgeKeyTypes        a Map of the data types of the edge keys
-     * @param normalize           whether to normalize the output.
-     * Normalized output is deterministic with respect to the order of elements and properties in the resulting XML document,
-     * and is compatible with line diff-based tools such as Git.
-     * Note: normalized output is memory-intensive and is not appropriate for very large graphs.
-     * @throws XMLStreamException thrown if there is an error generating the GraphML data
-     */
-    public static void outputGraph(final Graph graph,
-                                   final OutputStream graphMLOutputStream,
-                                   final Map<String, String> vertexKeyTypes,
-                                   final Map<String, String> edgeKeyTypes,
-                                   final boolean normalize) throws XMLStreamException {
         XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
         XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream, "UTF8");
         if (normalize) {
@@ -240,6 +234,34 @@ public class GraphMLWriter {
 
         writer.flush();
         writer.close();
+    }
+
+    /**
+     * Write the data in a Graph to a GraphML OutputStream.
+     *
+     * @param graph               the Graph to pull the data from
+     * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
+     * @throws XMLStreamException thrown if there is an error generating the GraphML data
+     */
+    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream) throws XMLStreamException {
+        GraphMLWriter writer = new GraphMLWriter(graph);
+        writer.outputGraph(graphMLOutputStream);
+    }
+
+    /**
+     * Write the data in a Graph to a GraphML OutputStream.
+     *
+     * @param graph               the Graph to pull the data from
+     * @param graphMLOutputStream the GraphML OutputStream to write the Graph data to
+     * @param vertexKeyTypes      a Map of the data types of the vertex keys
+     * @param edgeKeyTypes        a Map of the data types of the edge keys
+     * @throws XMLStreamException thrown if there is an error generating the GraphML data
+     */
+    public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream, final Map<String, String> vertexKeyTypes, final Map<String, String> edgeKeyTypes) throws XMLStreamException {
+        GraphMLWriter writer = new GraphMLWriter(graph);
+        writer.setVertexKeyTypes(vertexKeyTypes);
+        writer.setEdgeKeyTypes(edgeKeyTypes);
+        writer.outputGraph(graphMLOutputStream);
     }
 
     private static String getStringType(final Object object) {

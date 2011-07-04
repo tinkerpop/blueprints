@@ -23,7 +23,9 @@ public class GraphMLWriterTest extends TestCase {
         GraphMLReader.inputGraph(g, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        GraphMLWriter.outputGraph(g, bos, true);
+        GraphMLWriter w = new GraphMLWriter(g);
+        w.setNormalize(true);
+        w.outputGraph(bos);
 
         String expected = streamToString(GraphMLWriterTest.class.getResourceAsStream("graph-example-1-normalized.xml"));
         //System.out.println(expected);
