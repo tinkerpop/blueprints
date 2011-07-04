@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.graphml;
 
 
-import com.sun.xml.internal.txw2.output.IndentingXMLStreamWriter;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
@@ -100,8 +99,8 @@ public class GraphMLWriter {
         XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
         XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream, "UTF8");
         if (normalize) {
-            writer = new IndentingXMLStreamWriter(writer);
-            ((IndentingXMLStreamWriter) writer).setIndentStep("    ");
+            writer = new GraphMLWriterHelper.IndentingXMLStreamWriter(writer);
+            ((GraphMLWriterHelper.IndentingXMLStreamWriter) writer).setIndentStep("    ");
         }
 
         writer.writeStartDocument();
