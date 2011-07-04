@@ -13,9 +13,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 /**
- * User: josh
- * Date: 6/28/11
- * Time: 10:40 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GraphMLWriterTest extends TestCase {
     public void testNormal() throws Exception {

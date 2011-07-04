@@ -23,7 +23,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = graphTest.getGraphInstance();
         if (!graphTest.ignoresSuppliedIds) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
 
             assertEquals(count(graph.getVertex("1").getOutEdges()), 3);
@@ -79,7 +79,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIteration) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> edgeIds = new HashSet<String>();
             Set<String> edgeKeys = new HashSet<String>();
@@ -105,7 +105,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> vertexNames = new HashSet<String>();
             int count = 0;
@@ -130,7 +130,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<Vertex> softwareVertices = new HashSet<Vertex>();
             int count = 0;
@@ -154,7 +154,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsVertexIteration) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+            new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Vertex marko = null;
             Vertex peter = null;
@@ -289,7 +289,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
                 graph.clear();
                 ((IndexableGraph) graph).createAutomaticIndex(Index.VERTICES, Vertex.class, null);
                 this.stopWatch();
-                GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"), i, null, null, null);
+                new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-2.xml"), i);
                 if (graph instanceof TransactionalGraph)
                     printPerformance(graph.toString(), null, "graph-example-2 loaded with buffer size equal to " + i + " for transactional graphs", this.stopWatch());
                 else
@@ -332,7 +332,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
 
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, null, null, null);
+            new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000);
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             // Specific Graph Characteristics
@@ -478,7 +478,9 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, null, null, "_label");
+            GraphMLReader r = new GraphMLReader(graph);
+            r.setEdgeLabelKey("_label");
+            r.inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000);
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
@@ -537,7 +539,10 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, "_id", "_id", null);
+            GraphMLReader r = new GraphMLReader(graph);
+            r.setVertexIdKey("_id");
+            r.setEdgeIdKey("_id");
+            r.inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000);
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
@@ -596,7 +601,11 @@ public class GraphMLReaderTestSuite extends TestSuite {
         Graph graph = this.graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, "_id", "_id", "_label");
+            GraphMLReader r = new GraphMLReader(graph);
+            r.setVertexIdKey("_id");
+            r.setEdgeIdKey("_id");
+            r.setEdgeLabelKey("_label");
+            r.inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000);
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
@@ -656,7 +665,7 @@ public class GraphMLReaderTestSuite extends TestSuite {
         if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
 
             this.stopWatch();
-            GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000, null, null, null);
+            new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-3.xml"), 1000);
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             this.stopWatch();

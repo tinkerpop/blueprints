@@ -26,11 +26,14 @@ import java.util.Map;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GraphMLWriter {
-    private Graph graph;
+    private final Graph graph;
     private boolean normalize = false;
     private Map<String, String> vertexKeyTypes = null;
     private Map<String, String> edgeKeyTypes = null;
 
+    /**
+     * @param graph the Graph to pull the data from
+     */
     public GraphMLWriter(final Graph graph) {
         this.graph = graph;
     }

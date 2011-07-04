@@ -21,8 +21,65 @@ import java.util.Map.Entry;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Alex Averbuch (alex.averbuch@gmail.com)
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GraphMLReader {
+    private final Graph graph;
+
+    private String vertexIdKey = null;
+    private String edgeIdKey = null;
+    private String edgeLabelKey = null;
+
+    /**
+     * @param graph the graph to populate with the GraphML data
+     */
+    public GraphMLReader(Graph graph) {
+        this.graph = graph;
+    }
+
+    /**
+     * @param vertexIdKey if the id of a vertex is a &lt;data/&gt; property, fetch it from the data property.
+     */
+    public void setVertexIdKey(String vertexIdKey) {
+        this.vertexIdKey = vertexIdKey;
+    }
+
+    /**
+     * @param edgeIdKey if the id of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     */
+    public void setEdgeIdKey(String edgeIdKey) {
+        this.edgeIdKey = edgeIdKey;
+    }
+
+    /**
+     * @param edgeLabelKey if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     */
+    public void setEdgeLabelKey(String edgeLabelKey) {
+        this.edgeLabelKey = edgeLabelKey;
+    }
+
+    /**
+     * Input the GraphML stream data into the graph.
+     * In practice, usually the provided graph is empty.
+     *
+     * @param graphMLInputStream an InputStream of GraphML data
+     * @throws XMLStreamException thrown when the GraphML data is not correctly formatted
+     */
+    public void inputGraph(final InputStream graphMLInputStream) throws XMLStreamException {
+        GraphMLReader.inputGraph(this.graph, graphMLInputStream, 1000, this.vertexIdKey, this.edgeIdKey, this.edgeLabelKey);
+    }
+
+    /**
+     * Input the GraphML stream data into the graph.
+     * In practice, usually the provided graph is empty.
+     *
+     * @param graphMLInputStream an InputStream of GraphML data
+     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @throws XMLStreamException thrown when the GraphML data is not correctly formatted
+     */
+    public void inputGraph(final InputStream graphMLInputStream, int bufferSize) throws XMLStreamException {
+        GraphMLReader.inputGraph(this.graph, graphMLInputStream, bufferSize, this.vertexIdKey, this.edgeIdKey, this.edgeLabelKey);
+    }
 
     /**
      * Input the GraphML stream data into the graph.
