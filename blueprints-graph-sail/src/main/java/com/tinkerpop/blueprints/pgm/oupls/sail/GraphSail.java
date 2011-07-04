@@ -9,6 +9,7 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
+import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
@@ -78,6 +79,8 @@ public class GraphSail implements Sail, GraphSource {
             TYPE = "type",
             URI = "uri",
             VALUE = "value";
+
+    public static final String NULL_CONTEXT_NATIVE = "" + GraphSail.NULL_CONTEXT_PREFIX;
 
     private static final String[][] ALTERNATIVES = {{"s", ""}, {"p", ""}, {"o", ""}, {"c", ""}, {"sp", "s", "p"}, {"so", "s", "o"}, {"sc", "s", "c"}, {"po", "o", "p"}, {"pc", "p", "c"}, {"oc", "o", "c"}, {"spo", "so", "sp", "po"}, {"spc", "sc", "sp", "pc"}, {"soc", "so", "sc", "oc"}, {"poc", "po", "oc", "pc"}, {"spoc", "spo", "soc", "spc", "poc"},};
 
@@ -344,6 +347,51 @@ public class GraphSail implements Sail, GraphSource {
 
         public IndexableGraph getGraph() {
             return this.graph;
+        }
+
+        public String valueToNative(final Value value) {
+            if (value instanceof Resource) {
+                return resourceToNative((Resource) value);
+            } else if (value instanceof Literal) {
+                return literalToNative((Literal) value);
+            } else {
+                throw new IllegalStateException("Value has unfamiliar type: " + value);
+            }
+        }
+
+        public String resourceToNative(final Resource value) {
+            if (value instanceof URI) {
+                return uriToNative((URI) value);
+            } else if (value instanceof BNode) {
+                return bnodeToNative((BNode) value);
+            } else {
+                throw new IllegalStateException("Resource has unfamiliar type: " + value);
+            }
+        }
+
+        public String uriToNative(final URI value) {
+            return GraphSail.URI_PREFIX + GraphSail.SEPARATOR + value.toString();
+        }
+
+        public String bnodeToNative(final BNode value) {
+            return GraphSail.BLANK_NODE_PREFIX + GraphSail.SEPARATOR + value.getID();
+        }
+
+        public String literalToNative(final Literal literal) {
+            URI datatype = literal.getDatatype();
+
+            if (null == datatype) {
+                String language = literal.getLanguage();
+
+                if (null == language) {
+                    return GraphSail.PLAIN_LITERAL_PREFIX + GraphSail.SEPARATOR + literal.getLabel();
+                } else {
+                    return GraphSail.LANGUAGE_TAG_LITERAL_PREFIX + GraphSail.SEPARATOR + language + GraphSail.SEPARATOR + literal.getLabel();
+                }
+            } else {
+                // FIXME
+                return "" + GraphSail.TYPED_LITERAL_PREFIX + GraphSail.SEPARATOR + datatype + GraphSail.SEPARATOR + literal.getLabel();
+            }
         }
     }
 

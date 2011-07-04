@@ -60,26 +60,26 @@ public class IndexingMatcher extends Matcher {
         StringBuilder sb = new StringBuilder();
 
         if (c) {
-            sb.append(GraphSail.SEPARATOR).append(null == context ? GraphSailConnection.NULL_CONTEXT_NATIVE : GraphSailConnection.resourceToNative(context));
+            sb.append(GraphSail.SEPARATOR).append(null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context));
         } else if (null != context) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, GraphSailConnection.resourceToNative(context)));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, store.resourceToNative(context)));
         }
         if (s) {
-            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.resourceToNative(subject));
+            sb.append(GraphSail.SEPARATOR).append(store.resourceToNative(subject));
         } else if (null != subject) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.SUBJECT, GraphSailConnection.resourceToNative(subject)));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.SUBJECT, store.resourceToNative(subject)));
         }
 
         if (p) {
-            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.uriToNative(predicate));
+            sb.append(GraphSail.SEPARATOR).append(store.uriToNative(predicate));
         } else if (null != predicate) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.PREDICATE, GraphSailConnection.uriToNative(predicate)));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.PREDICATE, store.uriToNative(predicate)));
         }
 
         if (o) {
-            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.valueToNative(object));
+            sb.append(GraphSail.SEPARATOR).append(store.valueToNative(object));
         } else if (null != object) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.OBJECT, GraphSailConnection.valueToNative(object)));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.OBJECT, store.valueToNative(object)));
         }
 
         //System.out.println("spoc: " + s + " " + p + " " + o + " " + c);
@@ -113,15 +113,15 @@ public class IndexingMatcher extends Matcher {
         }
 
         if (s) {
-            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.resourceToNative(subject));
+            sb.append(GraphSail.SEPARATOR).append(store.resourceToNative(subject));
         }
 
         if (p) {
-            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.uriToNative(predicate));
+            sb.append(GraphSail.SEPARATOR).append(store.uriToNative(predicate));
         }
 
         if (o) {
-            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.valueToNative(object));
+            sb.append(GraphSail.SEPARATOR).append(store.valueToNative(object));
         }
 
         //edges.put(propertyName, sb.toString(), edge);

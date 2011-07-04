@@ -36,7 +36,7 @@ public class GraphBasedMatcher extends Matcher {
     public CloseableSequence<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         //System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
-        final String contextStr = null == context ? GraphSailConnection.NULL_CONTEXT_NATIVE : GraphSailConnection.resourceToNative(context);
+        final String contextStr = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
 
         if (s && o) {
             Vertex vs = store.findVertex(subject);

@@ -7,8 +7,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
 import net.fortytwo.sesametools.SailConnectionTripleSource;
-import org.openrdf.model.BNode;
-import org.openrdf.model.Literal;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -35,7 +33,6 @@ import java.util.LinkedList;
  */
 public class GraphSailConnection implements SailConnection {
     private static final Resource[] NULL_CONTEXT_ARRAY = {null};
-    public static final String NULL_CONTEXT_NATIVE = "" + GraphSail.NULL_CONTEXT_PREFIX;
 
     private final GraphSail.DataStore store;
 
@@ -167,7 +164,7 @@ public class GraphSailConnection implements SailConnection {
         }
 
         for (Resource context : ((0 == contexts.length) ? NULL_CONTEXT_ARRAY : contexts)) {
-            String c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
+            String c = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
 
             Vertex out = getOrCreateVertex(subject);
             Vertex in = getOrCreateVertex(object);
@@ -474,51 +471,6 @@ public class GraphSailConnection implements SailConnection {
                 return null;
             default:
                 throw new IllegalStateException();
-        }
-    }
-
-    public static String valueToNative(final Value value) {
-        if (value instanceof Resource) {
-            return resourceToNative((Resource) value);
-        } else if (value instanceof Literal) {
-            return literalToNative((Literal) value);
-        } else {
-            throw new IllegalStateException("Value has unfamiliar type: " + value);
-        }
-    }
-
-    public static String resourceToNative(final Resource value) {
-        if (value instanceof URI) {
-            return uriToNative((URI) value);
-        } else if (value instanceof BNode) {
-            return bnodeToNative((BNode) value);
-        } else {
-            throw new IllegalStateException("Resource has unfamiliar type: " + value);
-        }
-    }
-
-    public static String uriToNative(final URI value) {
-        return GraphSail.URI_PREFIX + GraphSail.SEPARATOR + value.toString();
-    }
-
-    public static String bnodeToNative(final BNode value) {
-        return GraphSail.BLANK_NODE_PREFIX + GraphSail.SEPARATOR + value.getID();
-    }
-
-    public static String literalToNative(final Literal literal) {
-        URI datatype = literal.getDatatype();
-
-        if (null == datatype) {
-            String language = literal.getLanguage();
-
-            if (null == language) {
-                return GraphSail.PLAIN_LITERAL_PREFIX + GraphSail.SEPARATOR + literal.getLabel();
-            } else {
-                return GraphSail.LANGUAGE_TAG_LITERAL_PREFIX + GraphSail.SEPARATOR + language + GraphSail.SEPARATOR + literal.getLabel();
-            }
-        } else {
-            // FIXME
-            return "" + GraphSail.TYPED_LITERAL_PREFIX + GraphSail.SEPARATOR + datatype + GraphSail.SEPARATOR + literal.getLabel();
         }
     }
 }
