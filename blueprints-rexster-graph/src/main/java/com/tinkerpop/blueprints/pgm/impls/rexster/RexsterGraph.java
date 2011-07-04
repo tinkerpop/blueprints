@@ -138,32 +138,6 @@ public class RexsterGraph implements IndexableGraph {
         throw new RuntimeException("No index with name " + indexName + " exists");
     }
 
-    // public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-    //     JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
-    //     for (JSONObject index : (List<JSONObject>) json) {
-    //         if (index.get(RexsterTokens.NAME).equals(indexName)) {
-    //             Class c;
-    //             String clazz = (String) index.get(RexsterTokens.CLASS);
-    //             if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
-    //                 c = Vertex.class;
-    //             else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
-    //                 c = Edge.class;
-    //             else
-    //                 throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
-    // 
-    // 
-    //             if (!c.isAssignableFrom(indexClass))
-    //                 throw new RuntimeException("Stored index is " + c + " and is being loaded as a " + indexClass + " index");
-    // 
-    //             if (index.get(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
-    //                 return new RexsterAutomaticIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
-    //             else
-    //                 return new RexsterIndex<T>(this, (String) index.get(RexsterTokens.NAME), c);
-    //         }
-    //     }
-    //     throw new RuntimeException("No index with name " + indexName + " exists");
-    // }
-
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
         String c;
         if (Vertex.class.isAssignableFrom(indexClass))

@@ -31,7 +31,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private final String password;
 
     private ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
-    ;
 
     public OrientGraph(final String url) {
         this(url, ADMIN, ADMIN);
@@ -293,6 +292,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         this.getRawGraph().delete();
         this.threadContext.set(null);
         openOrCreate(false);
+        this.createAutomaticIndex(Index.VERTICES, OrientVertex.class, null);
+        this.createAutomaticIndex(Index.EDGES, OrientEdge.class, null);
     }
 
     public void shutdown() {
