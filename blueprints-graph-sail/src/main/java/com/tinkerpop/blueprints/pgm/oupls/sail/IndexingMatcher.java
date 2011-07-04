@@ -53,16 +53,16 @@ public class IndexingMatcher extends Matcher {
         propertyName = sb.toString();
     }
 
-    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final String context) {
+    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         // FIXME: the temporary linked list is a little wasty
         List<PartOfSpeechCriterion> criteria = new LinkedList<PartOfSpeechCriterion>();
 
         StringBuilder sb = new StringBuilder();
 
         if (c) {
-            sb.append(GraphSail.SEPARATOR).append(context);
+            sb.append(GraphSail.SEPARATOR).append(null == context ? GraphSailConnection.NULL_CONTEXT_NATIVE : GraphSailConnection.resourceToNative(context));
         } else if (null != context) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, context));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, GraphSailConnection.resourceToNative(context)));
         }
         if (s) {
             sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.resourceToNative(subject));

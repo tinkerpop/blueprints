@@ -32,9 +32,10 @@ public class GraphBasedMatcher extends Matcher {
         this.store = store;
     }
 
-    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final String context) {
-        System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
-        System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
+    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
+        //System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
+        //System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
+        final String contextStr = null == context ? GraphSailConnection.NULL_CONTEXT_NATIVE : GraphSailConnection.resourceToNative(context);
 
         if (s && o) {
             Vertex vs = store.findVertex(subject);
@@ -49,7 +50,7 @@ public class GraphBasedMatcher extends Matcher {
                     public boolean fulfilledBy(final Edge edge) {
                         return store.matches(edge.getInVertex(), object)
                                 && (!p || edge.getLabel().equals(predicate.stringValue()))
-                                && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
+                                && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
                     }
                 });
             }
@@ -58,7 +59,7 @@ public class GraphBasedMatcher extends Matcher {
             return null == vs ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
-                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
+                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
                 }
             });
         } else {
@@ -66,7 +67,7 @@ public class GraphBasedMatcher extends Matcher {
             return null == vo ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vo.getInEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
-                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(context));
+                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
                 }
             });
         }

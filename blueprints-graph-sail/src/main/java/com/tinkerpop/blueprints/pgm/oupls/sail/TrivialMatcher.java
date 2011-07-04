@@ -23,7 +23,7 @@ public class TrivialMatcher extends Matcher {
     }
 
     @Override
-    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final String context) {
+    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         return graph.getEdges().iterator();
     }
 }

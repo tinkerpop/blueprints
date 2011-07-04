@@ -28,7 +28,7 @@ import java.util.LinkedList;
  */
 public class GraphSailConnection implements SailConnection {
     private static final Resource[] NULL_CONTEXT_ARRAY = {null};
-    private static final String NULL_CONTEXT_NATIVE = "" + GraphSail.NULL_CONTEXT_PREFIX;
+    public static final String NULL_CONTEXT_NATIVE = "" + GraphSail.NULL_CONTEXT_PREFIX;
 
     private final GraphSail.DataStore store;
 
@@ -96,10 +96,9 @@ public class GraphSailConnection implements SailConnection {
             // TODO: as an optimization, filter on multiple contexts simultaneously (when context is not used in the matcher), rather than trying each context consecutively.
             for (Resource context : contexts) {
                 index |= 0x8;
-                c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
                 Matcher m = store.matchers[index];
-                iterations.add(createIteration(m.match(subject, predicate, object, c)));
+                iterations.add(createIteration(m.match(subject, predicate, object, context)));
             }
 
             return new CompoundCloseableIteration<Statement, SailException>(iterations);
@@ -113,8 +112,7 @@ public class GraphSailConnection implements SailConnection {
             int count = 0;
 
             for (Resource context : contexts) {
-                String c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
-                count += countIterator(store.matchers[0x8].match(null, null, null, c));
+                count += countIterator(store.matchers[0x8].match(null, null, null, context));
             }
 
             return count;
@@ -211,10 +209,9 @@ public class GraphSailConnection implements SailConnection {
             // TODO: as an optimization, filter on multiple contexts simultaneously (when context is not used in the matcher), rather than trying each context consecutively.
             for (Resource context : contexts) {
                 index |= 0x8;
-                c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
                 //System.out.println("matcher: " + indexes.matchers[index]);
-                Iterator<Edge> i = store.matchers[index].match(subject, predicate, object, c);
+                Iterator<Edge> i = store.matchers[index].match(subject, predicate, object, context);
                 while (i.hasNext()) {
                     edgesToRemove.add(i.next());
                 }
@@ -232,8 +229,7 @@ public class GraphSailConnection implements SailConnection {
             deleteEdgesInIterator(store.matchers[0x0].match(null, null, null, null));
         } else {
             for (Resource context : contexts) {
-                String c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
-                deleteEdgesInIterator(store.matchers[0x8].match(null, null, null, c));
+                deleteEdgesInIterator(store.matchers[0x8].match(null, null, null, context));
             }
         }
     }

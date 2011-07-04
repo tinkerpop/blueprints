@@ -271,7 +271,6 @@ public class GraphSail implements Sail, GraphSource {
         }
 
         public Vertex findVertex(final Value value) {
-            System.out.println("seeking value: " + value);
             CloseableSequence<Vertex> i = vertices.get(VALUE, value.stringValue());
             try {
                 while (i.hasNext()) {
@@ -280,46 +279,8 @@ public class GraphSail implements Sail, GraphSource {
                     if (matches(v, value)) {
                         return v;
                     }
-                    /*
-
-                    System.out.println("\tcandidate vertex: " + v);
-                    String kind = (String) v.getProperty(KIND);
-                    if (value instanceof URI) {
-                        System.out.println("\turi");
-                        if (kind.equals(URI)) {
-                            System.out.println("\tfound.");
-                            return v;
-                        }
-                    } else if (value instanceof Literal) {
-                        System.out.println("\tliteral");
-                        if (kind.equals(LITERAL)) {
-                            System.out.println("\tcheck");
-                            Literal l = (Literal) value;
-                            if (null != l.getDatatype()) {
-                                String t = (String) v.getProperty(TYPE);
-                                if (null != t && t.equals(l.getDatatype().stringValue())) {
-                                    System.out.println("\tfound.");
-                                    return v;
-                                }
-                            } else if (null != l.getLanguage()) {
-                                String lang = (String) v.getProperty(LANGUAGE);
-                                if (null != lang && lang.equals(l.getLanguage())) {
-                                    System.out.println("\tfound.");
-                                    return v;
-                                }
-                            }
-                        }
-                    } else if (value instanceof BNode) {
-                        System.out.println("\tbnode");
-                        if (kind.equals(BNODE)) {
-                            System.out.println("\tfound.");
-                            return v;
-                        }
-                    } else {
-                        throw new IllegalStateException("value of unexpected type: " + value);
-                    }   */
                 }
-                System.out.println("\tnot found.");
+
                 return null;
             } finally {
                 i.close();

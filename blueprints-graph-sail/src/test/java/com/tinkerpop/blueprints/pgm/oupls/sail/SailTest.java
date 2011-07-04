@@ -72,15 +72,11 @@ public abstract class SailTest extends TestCase {
         int before, after;
 
         // default context, different S,P,O
-        System.out.println("########### a");
         sc.removeStatements(uriA, null, null);
-        System.out.println("########### s");
         sc.commit();
         before = countStatements(sc, uriA, null, null);
-        System.out.println("########### d");
         sc.addStatement(uriA, uriB, uriC);
         sc.commit();
-        System.out.println("########### f");
         after = countStatements(sc, uriA, null, null);
         assertEquals(0, before);
         System.out.flush();

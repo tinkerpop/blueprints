@@ -44,7 +44,7 @@ public abstract class Matcher {
      * @param context   the context of matching statements
      * @return an iterator over all matching statements
      */
-    public abstract Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final String context);
+    public abstract Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context);
 
     public String toString() {
         StringBuilder sb = new StringBuilder("matcher[");
