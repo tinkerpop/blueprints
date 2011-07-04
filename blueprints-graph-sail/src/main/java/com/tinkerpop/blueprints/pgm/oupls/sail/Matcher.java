@@ -1,11 +1,10 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
-
-import java.util.Iterator;
 
 /**
  * An object which retrieves statements from the triple store based on a given triple pattern.
@@ -44,7 +43,7 @@ public abstract class Matcher {
      * @param context   the context of matching statements
      * @return an iterator over all matching statements
      */
-    public abstract Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context);
+    public abstract CloseableSequence<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context);
 
     public String toString() {
         StringBuilder sb = new StringBuilder("matcher[");

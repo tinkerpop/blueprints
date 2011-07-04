@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
+
 import java.util.Iterator;
 
 /**
@@ -7,7 +9,7 @@ import java.util.Iterator;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-class FilteredIterator<T> implements Iterator<T> {
+class FilteredIterator<T> implements CloseableSequence<T> {
     private final Iterator<T> baseIterator;
     private final Criterion<T> criterion;
     private T cur;
@@ -47,6 +49,16 @@ class FilteredIterator<T> implements Iterator<T> {
         }
 
         cur = null;
+    }
+
+    @Override
+    public void close() {
+        // Do nothing.
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return this;
     }
 
     public interface Criterion<T> {

@@ -1,12 +1,19 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
 import net.fortytwo.sesametools.SailConnectionTripleSource;
-import org.openrdf.model.*;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Namespace;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
@@ -119,13 +126,17 @@ public class GraphSailConnection implements SailConnection {
         }
     }
 
-    private int countIterator(final Iterator i) {
-        int count = 0;
-        while (i.hasNext()) {
-            count++;
-            i.next();
+    private int countIterator(final CloseableSequence i) {
+        try {
+            int count = 0;
+            while (i.hasNext()) {
+                count++;
+                i.next();
+            }
+            return count;
+        } finally {
+            i.close();
         }
-        return count;
     }
 
     public void commit() throws SailException {
@@ -201,9 +212,13 @@ public class GraphSailConnection implements SailConnection {
         }
 
         if (0 == contexts.length) {
-            Iterator<Edge> i = store.matchers[index].match(subject, predicate, object, null);
-            while (i.hasNext()) {
-                edgesToRemove.add(i.next());
+            CloseableSequence<Edge> i = store.matchers[index].match(subject, predicate, object, null);
+            try {
+                while (i.hasNext()) {
+                    edgesToRemove.add(i.next());
+                }
+            } finally {
+                i.close();
             }
         } else {
             // TODO: as an optimization, filter on multiple contexts simultaneously (when context is not used in the matcher), rather than trying each context consecutively.
@@ -211,9 +226,13 @@ public class GraphSailConnection implements SailConnection {
                 index |= 0x8;
 
                 //System.out.println("matcher: " + indexes.matchers[index]);
-                Iterator<Edge> i = store.matchers[index].match(subject, predicate, object, context);
-                while (i.hasNext()) {
-                    edgesToRemove.add(i.next());
+                CloseableSequence<Edge> i = store.matchers[index].match(subject, predicate, object, context);
+                try {
+                    while (i.hasNext()) {
+                        edgesToRemove.add(i.next());
+                    }
+                } finally {
+                    i.close();
                 }
             }
         }
@@ -234,31 +253,35 @@ public class GraphSailConnection implements SailConnection {
         }
     }
 
-    private void deleteEdgesInIterator(final Iterator<Edge> i) {
-        //System.out.println(".............");
-        while (i.hasNext()) {
-            //System.out.println("----------------");
-            Edge e = i.next();
-            try {
-                i.remove();
-            } catch (UnsupportedOperationException x) {
-                // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
-                // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
-                // delete an edge in an iterator currently being traversed.  So for now, just ignore the
-                // UnsupportedOperationException and proceed to delete the edge from the graph.
-                //System.out.println("###################################");
+    private void deleteEdgesInIterator(final CloseableSequence<Edge> i) {
+        try {
+            //System.out.println(".............");
+            while (i.hasNext()) {
+                //System.out.println("----------------");
+                Edge e = i.next();
+                try {
+                    i.remove();
+                } catch (UnsupportedOperationException x) {
+                    // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
+                    // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
+                    // delete an edge in an iterator currently being traversed.  So for now, just ignore the
+                    // UnsupportedOperationException and proceed to delete the edge from the graph.
+                    //System.out.println("###################################");
+                }
+                Vertex h = e.getInVertex();
+                Vertex t = e.getOutVertex();
+                store.graph.removeEdge(e);
+                if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
+                    store.graph.removeVertex(h);
+                }
+                if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
+                    store.graph.removeVertex(t);
+                }
             }
-            Vertex h = e.getInVertex();
-            Vertex t = e.getOutVertex();
-            store.graph.removeEdge(e);
-            if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
-                store.graph.removeVertex(h);
-            }
-            if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
-                store.graph.removeVertex(t);
-            }
+            //System.out.println("================");
+        } finally {
+            i.close();
         }
-        //System.out.println("================");
     }
 
     public CloseableIteration<? extends Namespace, SailException> getNamespaces() throws SailException {
@@ -303,21 +326,21 @@ public class GraphSailConnection implements SailConnection {
 
     // statement iteration /////////////////////////////////////////////////////
 
-    private CloseableIteration<Statement, SailException> createIteration(final Iterator<Edge> iterator) {
+    private CloseableIteration<Statement, SailException> createIteration(final CloseableSequence<Edge> iterator) {
         return store.volatileStatements
                 ? new VolatileStatementIteration(iterator)
                 : new StableStatementIteration(iterator);
     }
 
     private class StableStatementIteration implements CloseableIteration<Statement, SailException> {
-        private final Iterator<Edge> iterator;
+        private final CloseableSequence<Edge> iterator;
 
-        public StableStatementIteration(final Iterator<Edge> iterator) {
+        public StableStatementIteration(final CloseableSequence<Edge> iterator) {
             this.iterator = iterator;
         }
 
         public void close() throws SailException {
-            // Do nothing.
+            iterator.close();
         }
 
         public boolean hasNext() throws SailException {
@@ -343,14 +366,14 @@ public class GraphSailConnection implements SailConnection {
 
     private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
         private final SimpleStatement s = new SimpleStatement();
-        private final Iterator<Edge> iterator;
+        private final CloseableSequence<Edge> iterator;
 
-        public VolatileStatementIteration(final Iterator<Edge> iterator) {
+        public VolatileStatementIteration(final CloseableSequence<Edge> iterator) {
             this.iterator = iterator;
         }
 
         public void close() throws SailException {
-            // Do nothing.
+            iterator.close();
         }
 
         public boolean hasNext() throws SailException {
@@ -427,7 +450,7 @@ public class GraphSailConnection implements SailConnection {
         } else if (kind.equals(GraphSail.BNODE)) {
             return store.valueFactory.createBNode(value);
         } else {
-            throw new IllegalStateException("unexpected resource kind: "+ kind);
+            throw new IllegalStateException("unexpected resource kind: " + kind);
         }
     }
 

@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class IndexingMatcher extends Matcher {
         propertyName = sb.toString();
     }
 
-    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
+    public CloseableSequence<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         // FIXME: the temporary linked list is a little wasty
         List<PartOfSpeechCriterion> criteria = new LinkedList<PartOfSpeechCriterion>();
 
@@ -85,7 +85,7 @@ public class IndexingMatcher extends Matcher {
         //System.out.println("spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("\ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
 
-        Iterator<Edge> results = store.edges.get(propertyName, sb.toString().substring(1)).iterator();
+        CloseableSequence<Edge> results = store.edges.get(propertyName, sb.toString().substring(1));
 
         for (PartOfSpeechCriterion m : criteria) {
             results = new FilteredIterator<Edge>(results, m);

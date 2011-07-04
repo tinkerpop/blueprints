@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.openrdf.model.Resource;
@@ -32,7 +33,7 @@ public class GraphBasedMatcher extends Matcher {
         this.store = store;
     }
 
-    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
+    public CloseableSequence<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         //System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
         final String contextStr = null == context ? GraphSailConnection.NULL_CONTEXT_NATIVE : GraphSailConnection.resourceToNative(context);
@@ -42,7 +43,7 @@ public class GraphBasedMatcher extends Matcher {
             Vertex vo = store.findVertex(object);
 
             if (null == vs || null == vo) {
-                return new EmptyIterator<Edge>();
+                return new IteratorCloseableSequence<Edge>(new EmptyIterator<Edge>());
             } else {
                 // TODO: use a simple heuristic (e.g. based on the value type of the vertices) to choose either subject or object.
                 // Right now, we arbitrarily choose the subject as the starting point.
@@ -56,7 +57,7 @@ public class GraphBasedMatcher extends Matcher {
             }
         } else if (s) {
             Vertex vs = store.findVertex(subject);
-            return null == vs ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
+            return null == vs ? new IteratorCloseableSequence<Edge>(new EmptyIterator<Edge>()) : new FilteredIterator<Edge>(vs.getOutEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
                             && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
@@ -64,7 +65,7 @@ public class GraphBasedMatcher extends Matcher {
             });
         } else {
             Vertex vo = store.findVertex(object);
-            return null == vo ? new EmptyIterator<Edge>() : new FilteredIterator<Edge>(vo.getInEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
+            return null == vo ? new IteratorCloseableSequence<Edge>(new EmptyIterator<Edge>()) : new FilteredIterator<Edge>(vo.getInEdges().iterator(), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
                             && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));

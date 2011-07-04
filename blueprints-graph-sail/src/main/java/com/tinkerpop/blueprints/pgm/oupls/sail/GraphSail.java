@@ -56,9 +56,17 @@ import java.util.regex.Pattern;
 public class GraphSail implements Sail, GraphSource {
     public static final String SEPARATOR = " ";
 
-    public static final String PREDICATE_PROP = "p", CONTEXT_PROP = "c";
+    public static final String
+            PREDICATE_PROP = "p",
+            CONTEXT_PROP = "c";
 
-    public static final char URI_PREFIX = 'U', BLANK_NODE_PREFIX = 'B', PLAIN_LITERAL_PREFIX = 'P', TYPED_LITERAL_PREFIX = 'T', LANGUAGE_TAG_LITERAL_PREFIX = 'L', NULL_CONTEXT_PREFIX = 'N';
+    public static final char
+            URI_PREFIX = 'U',
+            BLANK_NODE_PREFIX = 'B',
+            PLAIN_LITERAL_PREFIX = 'P',
+            TYPED_LITERAL_PREFIX = 'T',
+            LANGUAGE_TAG_LITERAL_PREFIX = 'L',
+            NULL_CONTEXT_PREFIX = 'N';
 
     public static final Pattern INDEX_PATTERN = Pattern.compile("s?p?o?c?");
 
@@ -111,7 +119,7 @@ public class GraphSail implements Sail, GraphSource {
 
         store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
 
-        store.namespaces = store.getVertex(NAMESPACES_VERTEX_ID);
+        store.namespaces = store.getReferenceVertex();
         if (null == store.namespaces) {
             if (store.manualTransactions) {
                 ((TransactionalGraph) graph).startTransaction();
@@ -237,10 +245,14 @@ public class GraphSail implements Sail, GraphSource {
 
         public Vertex namespaces;
 
-        public Vertex getVertex(final String value) {
+        public Vertex getReferenceVertex() {
             //System.out.println("value = " + value);
-            Iterator<Vertex> i = vertices.get(VALUE, value).iterator();
-            return i.hasNext() ? i.next() : null;
+            CloseableSequence<Vertex> i = vertices.get(VALUE, NAMESPACES_VERTEX_ID);
+            try {
+                return i.hasNext() ? i.next() : null;
+            } finally {
+                i.close();
+            }
         }
 
         public Vertex addVertex(final Value value) {
@@ -314,7 +326,7 @@ public class GraphSail implements Sail, GraphSource {
                 }
             } else if (value instanceof BNode) {
                 return kind.equals(BNODE) && ((BNode) value).getID().equals(val);
-            }  else {
+            } else {
                 throw new IllegalStateException("value of unexpected kind: " + value);
             }
         }
