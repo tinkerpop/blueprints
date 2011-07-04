@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
@@ -86,6 +87,9 @@ public class GraphSail implements Sail, GraphSource {
 
     private static final String NAMESPACES_VERTEX_ID = "urn:com.tinkerpop.blueprints.pgm.oupls.sail:namespaces";
 
+    // Index name
+    private static final String VALUES = "values";
+
     private final DataStore store = new DataStore();
 
     /**
@@ -118,7 +122,7 @@ public class GraphSail implements Sail, GraphSource {
         // For now, use the default EDGES and VERTICES indices, which *must exist* in Blueprints and are automatically indexed.
         // Think harder about collision issues (if someone hands a non-empty, non-Sail graph to this constructor) later on.
         store.edges = graph.getIndex(Index.EDGES, Edge.class);
-        store.vertices = graph.getIndex(Index.VERTICES, Vertex.class);
+        store.values = getOrCreateValuesIndex(graph);
 
         store.manualTransactions = store.graph instanceof TransactionalGraph && TransactionalGraph.Mode.MANUAL == ((TransactionalGraph) store.graph).getTransactionMode();
 
@@ -142,6 +146,18 @@ public class GraphSail implements Sail, GraphSource {
 
         parseTripleIndices(indexedPatterns);
         assignUnassignedTriplePatterns();
+    }
+
+    private Index<Vertex> getOrCreateValuesIndex(final IndexableGraph graph) {
+        for (Index<? extends Element> index : graph.getIndices()) {
+            if (index.getIndexName().equals(VALUES)) {
+                return (Index<Vertex>) index;
+            }
+        }
+
+        Set<String> keys = new HashSet<String>();
+        keys.add(VALUE);
+        return graph.createAutomaticIndex(VALUES, Vertex.class, keys);
     }
 
     /*
@@ -243,14 +259,14 @@ public class GraphSail implements Sail, GraphSource {
         public boolean volatileStatements = false;
         public boolean uniqueStatements = false;
 
-        public Index<Vertex> vertices;
+        public Index<Vertex> values;
         public Index<Edge> edges;
 
         public Vertex namespaces;
 
         public Vertex getReferenceVertex() {
             //System.out.println("value = " + value);
-            CloseableSequence<Vertex> i = vertices.get(VALUE, NAMESPACES_VERTEX_ID);
+            CloseableSequence<Vertex> i = values.get(VALUE, NAMESPACES_VERTEX_ID);
             try {
                 return i.hasNext() ? i.next() : null;
             } finally {
@@ -286,7 +302,7 @@ public class GraphSail implements Sail, GraphSource {
         }
 
         public Vertex findVertex(final Value value) {
-            CloseableSequence<Vertex> i = vertices.get(VALUE, value.stringValue());
+            CloseableSequence<Vertex> i = values.get(VALUE, value.stringValue());
             try {
                 while (i.hasNext()) {
                     Vertex v = i.next();
