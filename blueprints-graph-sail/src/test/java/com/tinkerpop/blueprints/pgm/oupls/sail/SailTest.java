@@ -27,7 +27,7 @@ import java.util.*;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class SailTest extends TestCase {
-    private Sail sail = null;
+    protected Sail sail = null;
 
     protected boolean uniqueStatements = false;
 
@@ -72,13 +72,18 @@ public abstract class SailTest extends TestCase {
         int before, after;
 
         // default context, different S,P,O
+        System.out.println("########### a");
         sc.removeStatements(uriA, null, null);
+        System.out.println("########### s");
         sc.commit();
         before = countStatements(sc, uriA, null, null);
+        System.out.println("########### d");
         sc.addStatement(uriA, uriB, uriC);
         sc.commit();
+        System.out.println("########### f");
         after = countStatements(sc, uriA, null, null);
         assertEquals(0, before);
+        System.out.flush();
         assertEquals(1, after);
 
         // one specific context, different S,P,O
@@ -1294,18 +1299,21 @@ public abstract class SailTest extends TestCase {
         }
     }
 
-    private int countStatements(final SailConnection sc,
+    protected int countStatements(final SailConnection sc,
                                 final Resource subject,
                                 final URI predicate,
                                 final Value object,
                                 final Resource... contexts) throws SailException {
         CloseableIteration<?, SailException> statements = sc.getStatements(subject, predicate, object, false, contexts);
         int count = 0;
-        while (statements.hasNext()) {
-            statements.next();
-            count++;
+        try {
+            while (statements.hasNext()) {
+                statements.next();
+                count++;
+            }
+        } finally {
+            statements.close();
         }
-        statements.close();
         return count;
     }
 

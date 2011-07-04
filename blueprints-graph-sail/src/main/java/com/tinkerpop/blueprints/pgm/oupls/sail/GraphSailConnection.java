@@ -72,33 +72,24 @@ public class GraphSailConnection implements SailConnection {
     }
 
     public CloseableIteration<? extends Statement, SailException> getStatements(final Resource subject, final URI predicate, final Value object, final boolean includeInferred, final Resource... contexts) throws SailException {
-        String s, p, o, c;
+        String c;
 
         int index = 0;
 
         if (null != subject) {
             index |= 0x1;
-            s = resourceToNative(subject);
-        } else {
-            s = null;
         }
 
         if (null != predicate) {
             index |= 0x2;
-            p = uriToNative(predicate);
-        } else {
-            p = null;
         }
 
         if (null != object) {
             index |= 0x4;
-            o = valueToNative(object);
-        } else {
-            o = null;
         }
 
         if (0 == contexts.length) {
-            return createIteration(store.matchers[index].match(s, p, o, null));
+            return createIteration(store.matchers[index].match(subject, predicate, object, null));
         } else {
             Collection<CloseableIteration<Statement, SailException>> iterations = new LinkedList<CloseableIteration<Statement, SailException>>();
 
@@ -108,7 +99,7 @@ public class GraphSailConnection implements SailConnection {
                 c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
                 Matcher m = store.matchers[index];
-                iterations.add(createIteration(m.match(s, p, o, c)));
+                iterations.add(createIteration(m.match(subject, predicate, object, c)));
             }
 
             return new CompoundCloseableIteration<Statement, SailException>(iterations);
@@ -158,10 +149,6 @@ public class GraphSailConnection implements SailConnection {
             throw new IllegalArgumentException("null part-of-speech for to-be-added statement");
         }
 
-        String s = resourceToNative(subject);
-        String p = uriToNative(predicate);
-        String o = valueToNative(object);
-
         if (store.uniqueStatements) {
             if (0 == contexts.length) {
                 removeStatements(subject, predicate, object, (Resource) null);
@@ -170,11 +157,15 @@ public class GraphSailConnection implements SailConnection {
             }
         }
 
+        String s = resourceToNative(subject);
+        String p = uriToNative(predicate);
+        String o = valueToNative(object);
+
         for (Resource context : ((0 == contexts.length) ? NULL_CONTEXT_ARRAY : contexts)) {
             String c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
-            Vertex out = getOrCreateVertex(s);
-            Vertex in = getOrCreateVertex(o);
+            Vertex out = getOrCreateVertex(subject);
+            Vertex in = getOrCreateVertex(object);
             Edge edge = store.graph.addEdge(null, out, in, p);
 
             for (IndexingMatcher m : store.indexers) {
@@ -188,6 +179,14 @@ public class GraphSailConnection implements SailConnection {
         }
     }
 
+    private Vertex getOrCreateVertex(final Value value) {
+        Vertex v = store.findVertex(value);
+        if (null == v) {
+            v = store.addVertex(value);
+        }
+        return v;
+    }
+
     private Vertex getOrCreateVertex(final String id) {
         Vertex v = store.getVertex(id);
         if (null == v) {
@@ -199,33 +198,24 @@ public class GraphSailConnection implements SailConnection {
     public void removeStatements(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
         Collection<Edge> edgesToRemove = new LinkedList<Edge>();
 
-        String s, p, o, c;
+        String c;
 
         int index = 0;
 
         if (null != subject) {
             index |= 0x1;
-            s = resourceToNative(subject);
-        } else {
-            s = null;
         }
 
         if (null != predicate) {
             index |= 0x2;
-            p = uriToNative(predicate);
-        } else {
-            p = null;
         }
 
         if (null != object) {
             index |= 0x4;
-            o = valueToNative(object);
-        } else {
-            o = null;
         }
 
         if (0 == contexts.length) {
-            Iterator<Edge> i = store.matchers[index].match(s, p, o, null);
+            Iterator<Edge> i = store.matchers[index].match(subject, predicate, object, null);
             while (i.hasNext()) {
                 edgesToRemove.add(i.next());
             }
@@ -236,7 +226,7 @@ public class GraphSailConnection implements SailConnection {
                 c = null == context ? NULL_CONTEXT_NATIVE : resourceToNative(context);
 
                 //System.out.println("matcher: " + indexes.matchers[index]);
-                Iterator<Edge> i = store.matchers[index].match(s, p, o, c);
+                Iterator<Edge> i = store.matchers[index].match(subject, predicate, object, c);
                 while (i.hasNext()) {
                     edgesToRemove.add(i.next());
                 }
@@ -354,9 +344,9 @@ public class GraphSailConnection implements SailConnection {
             Edge e = iterator.next();
 
             SimpleStatement s = new SimpleStatement();
-            s.subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
+            s.subject = (Resource) toSesame(e.getOutVertex());
             s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-            s.object = toSesame(store.getValueOf(e.getInVertex()));
+            s.object = toSesame(e.getInVertex());
             s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
 
             return s;
@@ -386,9 +376,9 @@ public class GraphSailConnection implements SailConnection {
         public Statement next() throws SailException {
             Edge e = iterator.next();
 
-            s.subject = (Resource) toSesame(store.getValueOf(e.getOutVertex()));
+            s.subject = (Resource) toSesame(e.getOutVertex());
             s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-            s.object = toSesame(store.getValueOf(e.getInVertex()));
+            s.object = toSesame(e.getInVertex());
             s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
 
             return s;
@@ -437,6 +427,26 @@ public class GraphSailConnection implements SailConnection {
 
     // value conversion ////////////////////////////////////////////////////////
 
+    private Value toSesame(final Vertex v) {
+        String value = (String) v.getProperty(GraphSail.VALUE);
+        String kind = (String) v.getProperty(GraphSail.KIND);
+        if (kind.equals(GraphSail.URI)) {
+            return store.valueFactory.createURI(value);
+        } else if (kind.equals(GraphSail.LITERAL)) {
+            String datatype = (String) v.getProperty(GraphSail.TYPE);
+            String lang = (String) v.getProperty(GraphSail.LANGUAGE);
+            return null != datatype
+                    ? store.valueFactory.createLiteral(value, store.valueFactory.createURI(datatype))
+                    : null != lang
+                    ? store.valueFactory.createLiteral(value, lang)
+                    : store.valueFactory.createLiteral(value);
+        } else if (kind.equals(GraphSail.BNODE)) {
+            return store.valueFactory.createBNode(value);
+        } else {
+            throw new IllegalStateException("unexpected resource kind: "+ kind);
+        }
+    }
+
     private Value toSesame(final String s) {
         int i;
 
@@ -460,7 +470,7 @@ public class GraphSailConnection implements SailConnection {
         }
     }
 
-    private String valueToNative(final Value value) {
+    public static String valueToNative(final Value value) {
         if (value instanceof Resource) {
             return resourceToNative((Resource) value);
         } else if (value instanceof Literal) {
@@ -470,7 +480,7 @@ public class GraphSailConnection implements SailConnection {
         }
     }
 
-    private String resourceToNative(final Resource value) {
+    public static String resourceToNative(final Resource value) {
         if (value instanceof URI) {
             return uriToNative((URI) value);
         } else if (value instanceof BNode) {
@@ -480,15 +490,15 @@ public class GraphSailConnection implements SailConnection {
         }
     }
 
-    private String uriToNative(final URI value) {
+    public static String uriToNative(final URI value) {
         return GraphSail.URI_PREFIX + GraphSail.SEPARATOR + value.toString();
     }
 
-    private String bnodeToNative(final BNode value) {
+    public static String bnodeToNative(final BNode value) {
         return GraphSail.BLANK_NODE_PREFIX + GraphSail.SEPARATOR + value.getID();
     }
 
-    private String literalToNative(final Literal literal) {
+    public static String literalToNative(final Literal literal) {
         URI datatype = literal.getDatatype();
 
         if (null == datatype) {

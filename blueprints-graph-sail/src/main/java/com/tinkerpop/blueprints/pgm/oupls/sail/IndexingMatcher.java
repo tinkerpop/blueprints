@@ -1,6 +1,9 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -50,7 +53,7 @@ public class IndexingMatcher extends Matcher {
         propertyName = sb.toString();
     }
 
-    public Iterator<Edge> match(final String subject, final String predicate, final String object, final String context) {
+    public Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final String context) {
         // FIXME: the temporary linked list is a little wasty
         List<PartOfSpeechCriterion> criteria = new LinkedList<PartOfSpeechCriterion>();
 
@@ -62,21 +65,21 @@ public class IndexingMatcher extends Matcher {
             criteria.add(new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, context));
         }
         if (s) {
-            sb.append(GraphSail.SEPARATOR).append(subject);
+            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.resourceToNative(subject));
         } else if (null != subject) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.SUBJECT, subject));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.SUBJECT, GraphSailConnection.resourceToNative(subject)));
         }
 
         if (p) {
-            sb.append(GraphSail.SEPARATOR).append(predicate);
+            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.uriToNative(predicate));
         } else if (null != predicate) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.PREDICATE, predicate));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.PREDICATE, GraphSailConnection.uriToNative(predicate)));
         }
 
         if (o) {
-            sb.append(GraphSail.SEPARATOR).append(object);
+            sb.append(GraphSail.SEPARATOR).append(GraphSailConnection.valueToNative(object));
         } else if (null != object) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.OBJECT, object));
+            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.OBJECT, GraphSailConnection.valueToNative(object)));
         }
 
         //System.out.println("spoc: " + s + " " + p + " " + o + " " + c);

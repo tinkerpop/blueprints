@@ -1,6 +1,9 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import org.openrdf.model.Resource;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 
 import java.util.Iterator;
 
@@ -41,7 +44,7 @@ public abstract class Matcher {
      * @param context   the context of matching statements
      * @return an iterator over all matching statements
      */
-    public abstract Iterator<Edge> match(final String subject, final String predicate, final String object, final String context);
+    public abstract Iterator<Edge> match(final Resource subject, final URI predicate, final Value object, final String context);
 
     public String toString() {
         StringBuilder sb = new StringBuilder("matcher[");

@@ -5,9 +5,14 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLWriter;
 import info.aduna.iteration.CloseableIteration;
+import org.junit.Test;
+import org.openrdf.model.Literal;
 import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.vocabulary.XMLSchema;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.impl.EmptyBindingSet;
@@ -23,17 +28,53 @@ import org.openrdf.sail.SailException;
 public abstract class GraphSailTest extends SailTest {
     protected abstract IndexableGraph createGraph();
 
+    protected IndexableGraph graph;
+
     protected Sail createSail() throws Exception {
         // Flip this flag in order to test "unique statements" behavior
         uniqueStatements = false;
 
-        GraphSail g = new GraphSail(createGraph());
+        graph = createGraph();
+        GraphSail g = new GraphSail(graph);
         if (uniqueStatements) {
             g.enforceUniqueStatements(true);
         }
 
         return g;
     }
+
+    @Test
+    public void testDebug() throws Exception {
+        SailConnection sc = sail.getConnection();
+        URI uriA = sail.getValueFactory().createURI("http://example.org/test/O_SPG#a");
+        URI uriB = sail.getValueFactory().createURI("http://example.org/test/O_SPG#b");
+        URI uriC = sail.getValueFactory().createURI("http://example.org/test/O_SPG#c");
+        Literal plainLitA = sail.getValueFactory().createLiteral("arbitrary plain literal 9548734867");
+        Literal stringLitA = sail.getValueFactory().createLiteral("arbitrary string literal 8765", XMLSchema.STRING);
+        int before, after;
+
+        // Add statement to a specific context.
+        sc.removeStatements(null, null, uriA, uriA);
+        sc.commit();
+        before = countStatements(sc, null, null, uriA);
+        sc.addStatement(uriB, uriC, uriA);
+        sc.commit();
+        after = countStatements(sc, null, null, uriA);
+        assertEquals(0, before);
+        assertEquals(1, after);
+
+        // Add plain literal statement to the default context.
+        sc.removeStatements(null, null, plainLitA);
+        sc.commit();
+        before = countStatements(sc, null, null, plainLitA);
+        sc.addStatement(uriA, uriA, plainLitA);
+        sc.commit();
+        after = countStatements(sc, null, null, plainLitA);
+        assertEquals(0, before);
+        GraphMLWriter.outputGraph(graph, System.out);
+        assertEquals(1, after);
+    }
+
 
     public void testIndexPatterns() throws Exception {
         assertTriplePattern("spoc", true);

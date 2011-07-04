@@ -1,7 +1,16 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.sail.Sail;
@@ -9,7 +18,11 @@ import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -34,6 +47,9 @@ import java.util.regex.Pattern;
  * either the john or jane vertex as a starting point and filters on adjacent edges.  Graph-based matches are used for
  * all of the triple patterns s,o,sp,so,sc,po,oc,spo,spc,soc,poc,spoc which have not been explicitly flagged for
  * index-based matching.
+ * <p/>
+ * Note: this implementation attaches no semantics to Vertex and Edge IDs, so as to be compatible with Graph
+ * implementations which do no not allow IDs to be chosen.
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -46,9 +62,14 @@ public class GraphSail implements Sail, GraphSource {
 
     public static final Pattern INDEX_PATTERN = Pattern.compile("s?p?o?c?");
 
-    // Allow for OrientDB, in which manual vertex IDs are not possible.
-    private static boolean FAKE_VERTEX_IDS = true;
-    private static final String VALUE = "value";
+    public static final String
+            BNODE = "bnode",
+            KIND = "kind",
+            LANGUAGE = "language",
+            LITERAL = "literal",
+            TYPE = "type",
+            URI = "uri",
+            VALUE = "value";
 
     private static final String[][] ALTERNATIVES = {{"s", ""}, {"p", ""}, {"o", ""}, {"c", ""}, {"sp", "s", "p"}, {"so", "s", "o"}, {"sc", "s", "c"}, {"po", "o", "p"}, {"pc", "p", "c"}, {"oc", "o", "c"}, {"spo", "so", "sp", "po"}, {"spc", "sc", "sp", "pc"}, {"soc", "so", "sc", "oc"}, {"poc", "po", "oc", "pc"}, {"spoc", "spo", "soc", "spc", "poc"},};
 
@@ -110,13 +131,6 @@ public class GraphSail implements Sail, GraphSource {
 
         parseTripleIndices(indexedPatterns);
         assignUnassignedTriplePatterns();
-
-        //if (graph instanceof TransactionalGraph)
-        //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
-
-        //for (int i = 0; i < 16; i++) {
-        //    System.out.println("matcher " + i + ": " + indexes.matchers[i]);
-        //}
     }
 
     /*
@@ -224,32 +238,135 @@ public class GraphSail implements Sail, GraphSource {
         public Vertex namespaces;
 
         public Vertex getVertex(final String value) {
-            if (FAKE_VERTEX_IDS) {
-                //System.out.println("value = " + value);
-                Iterator<Vertex> i = vertices.get(VALUE, value).iterator();
-                return i.hasNext() ? i.next() : null;
+            //System.out.println("value = " + value);
+            Iterator<Vertex> i = vertices.get(VALUE, value).iterator();
+            return i.hasNext() ? i.next() : null;
+        }
+
+        public Vertex addVertex(final Value value) {
+            Vertex v = graph.addVertex(null);
+
+            if (value instanceof URI) {
+                v.setProperty(KIND, URI);
+                v.setProperty(VALUE, value.stringValue());
+            } else if (value instanceof Literal) {
+                Literal l = (Literal) value;
+                v.setProperty(KIND, LITERAL);
+                v.setProperty(VALUE, l.getLabel());
+                if (null != l.getDatatype()) {
+                    v.setProperty(TYPE, l.getDatatype().stringValue());
+                }
+                if (null != l.getLanguage()) {
+                    v.setProperty(LANGUAGE, l.getLanguage());
+                }
+            } else if (value instanceof BNode) {
+                BNode b = (BNode) value;
+                v.setProperty(KIND, BNODE);
+                v.setProperty(VALUE, b.getID());
             } else {
-                return graph.getVertex(value);
+                throw new IllegalStateException("value of unexpected type: " + value);
+            }
+
+            return v;
+        }
+
+        public Vertex findVertex(final Value value) {
+            System.out.println("seeking value: " + value);
+            CloseableSequence<Vertex> i = vertices.get(VALUE, value.stringValue());
+            try {
+                while (i.hasNext()) {
+                    Vertex v = i.next();
+
+                    if (matches(v, value)) {
+                        return v;
+                    }
+                    /*
+
+                    System.out.println("\tcandidate vertex: " + v);
+                    String kind = (String) v.getProperty(KIND);
+                    if (value instanceof URI) {
+                        System.out.println("\turi");
+                        if (kind.equals(URI)) {
+                            System.out.println("\tfound.");
+                            return v;
+                        }
+                    } else if (value instanceof Literal) {
+                        System.out.println("\tliteral");
+                        if (kind.equals(LITERAL)) {
+                            System.out.println("\tcheck");
+                            Literal l = (Literal) value;
+                            if (null != l.getDatatype()) {
+                                String t = (String) v.getProperty(TYPE);
+                                if (null != t && t.equals(l.getDatatype().stringValue())) {
+                                    System.out.println("\tfound.");
+                                    return v;
+                                }
+                            } else if (null != l.getLanguage()) {
+                                String lang = (String) v.getProperty(LANGUAGE);
+                                if (null != lang && lang.equals(l.getLanguage())) {
+                                    System.out.println("\tfound.");
+                                    return v;
+                                }
+                            }
+                        }
+                    } else if (value instanceof BNode) {
+                        System.out.println("\tbnode");
+                        if (kind.equals(BNODE)) {
+                            System.out.println("\tfound.");
+                            return v;
+                        }
+                    } else {
+                        throw new IllegalStateException("value of unexpected type: " + value);
+                    }   */
+                }
+                System.out.println("\tnot found.");
+                return null;
+            } finally {
+                i.close();
+            }
+        }
+
+        public boolean matches(final Vertex vertex,
+                               final Value value) {
+            String kind = (String) vertex.getProperty(KIND);
+            String val = (String) vertex.getProperty(VALUE);
+            if (value instanceof URI) {
+                return kind.equals(URI) && val.equals(value.stringValue());
+            } else if (value instanceof Literal) {
+                if (kind.equals(LITERAL)) {
+                    if (!val.equals(((Literal) value).getLabel())) {
+                        return false;
+                    }
+
+                    String type = (String) vertex.getProperty(TYPE);
+                    String lang = (String) vertex.getProperty(LANGUAGE);
+
+                    URI vType = ((Literal) value).getDatatype();
+                    String vLang = ((Literal) value).getLanguage();
+
+                    return null == type && null == vType && null == lang && null == vLang
+                            || null != type && null != vType && type.equals(vType.stringValue())
+                            || null != lang && null != vLang && lang.equals(vLang);
+
+                } else {
+                    return false;
+                }
+            } else if (value instanceof BNode) {
+                return kind.equals(BNODE) && ((BNode) value).getID().equals(val);
+            }  else {
+                throw new IllegalStateException("value of unexpected kind: " + value);
             }
         }
 
         public Vertex addVertex(final String id) {
-            if (FAKE_VERTEX_IDS) {
-                Vertex v = graph.addVertex(null);
-                //vertices.put(VALUE, id, store.namespaces);
-                v.setProperty(VALUE, id);
-                return v;
-            } else {
-                return graph.addVertex(id);
-            }
+            Vertex v = graph.addVertex(null);
+            //vertices.put(VALUE, id, store.namespaces);
+            v.setProperty(VALUE, id);
+            return v;
         }
 
         public String getValueOf(final Vertex v) {
-            if (FAKE_VERTEX_IDS) {
-                return (String) v.getProperty(VALUE);
-            } else {
-                return (String) v.getId();
-            }
+            return (String) v.getProperty(VALUE);
         }
 
         public IndexableGraph getGraph() {
