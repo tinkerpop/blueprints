@@ -77,7 +77,7 @@ public class GraphMLReader {
         Mode transactionMode = null;
         boolean isTransactionalGraph = false;
         Integer transactionBufferSize = 0;
-        if (graph instanceof TransactionalGraph) {
+        if ( bufferSize > 0 && graph instanceof TransactionalGraph) {
             transactionMode = ((TransactionalGraph) graph).getTransactionMode();
             ((TransactionalGraph) graph).setTransactionMode(Mode.MANUAL);
             ((TransactionalGraph) graph).startTransaction();
