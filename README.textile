@@ -17,6 +17,6 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ library
 ** Blueprints helper utilities
 ** ReadOnlyGraph wrapper
-
+** EventGraph wrapper
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

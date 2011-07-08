@@ -35,7 +35,6 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         else if (labels.length == 1) {
             return new TinkerEdgeSequence(this.inEdges.iterator(), labels[0]);
         } else {
-
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
             for (final String label : labels) {
                 edges.add(this.getInEdges(label));
