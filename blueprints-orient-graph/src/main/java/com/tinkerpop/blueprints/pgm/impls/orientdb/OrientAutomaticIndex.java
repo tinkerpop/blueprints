@@ -17,7 +17,7 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
     private static final String KEYS = "keys";
 
     public OrientAutomaticIndex(final OrientGraph graph, final String indexName, final Class<T> indexClass, Set<String> indexKeys) {
-        super(graph, indexName, indexClass, Index.Type.AUTOMATIC);
+        super(graph, indexName, indexClass, Index.Type.AUTOMATIC, null);
         if (indexKeys != null)
             autoIndexKeys = new HashSet<String>(indexKeys);
         init();

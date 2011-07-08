@@ -68,7 +68,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (context.manualIndices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
-        final OrientIndex index = new OrientIndex(this, indexName, indexClass, Index.Type.MANUAL);
+        final OrientIndex index = new OrientIndex(this, indexName, indexClass, Index.Type.MANUAL, null);
         context.manualIndices.put(index.getIndexName(), index);
 
         // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
@@ -401,7 +401,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 	        	context.rawGraph.open(username, password);
 	
 	            // LOAD THE INDEX CONFIGURATION FROM INTO THE DICTIONARY
-	            final ODocument indexConfiguration = context.rawGraph.getMetadata().getIndexManager().getDocument();
+	            final ODocument indexConfiguration = context.rawGraph.getMetadata().getIndexManager().getConfiguration();
 	            if (indexConfiguration == null)
 	                createIndexConfiguration(context, createDefaultIndices);
 	

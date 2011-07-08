@@ -7,6 +7,7 @@ import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexUser;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
@@ -37,10 +38,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected Class<? extends Element> indexClass;
 
     OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass,
-                final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
+                final com.tinkerpop.blueprints.pgm.Index.Type indexType, final OType iType) {
         this.graph = graph;
         this.indexClass = indexClass;
-        create(indexName, this.indexClass, indexType);
+        create(indexName, this.indexClass, indexType, iType);
     }
 
     public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
@@ -137,12 +138,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     private void create(final String indexName, final Class<? extends Element> indexClass,
-                        final com.tinkerpop.blueprints.pgm.Index.Type indexType) {
+                        final com.tinkerpop.blueprints.pgm.Index.Type indexType, final OType iKeyType) {
         this.indexClass = indexClass;
 
         // CREATE THE MAP
         this.underlying = new OIndexUser(graph.getRawGraph(),  graph.getRawGraph().getMetadata().getIndexManager()
-                .createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), null, null, null, true));
+                .createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), iKeyType, null, null, null, true));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))
