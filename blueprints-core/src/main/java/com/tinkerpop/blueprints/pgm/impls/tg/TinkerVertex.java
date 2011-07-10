@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -27,6 +26,14 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
 
     public TinkerVertex getRawVertex() {
         return this;
+    }
+
+    public Iterable<Edge> getOutEdges() {
+        return this.outEdges;
+    }
+
+    public Iterable<Edge> getInEdges() {
+        return this.inEdges;
     }
 
     public Iterable<Edge> getInEdges(final String... labels) {
@@ -55,6 +62,22 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
             }
             return new MultiIterable<Edge>(edges);
         }
+    }
+
+		public String toJSON() {
+    		StringBuilder vertex = new StringBuilder("\"" + this.getId().toString() + "\": {");
+
+    		vertex.append("\"_id\": \"" + this.getId().toString() + "\",");
+    		vertex.append("\"_type\": \"vertex\",");
+    		
+    		for(String key : this.getPropertyKeys()) {
+    				vertex.append("\"" + key + "\": \"" + this.getProperty(key).toString() + "\",");
+    		}
+    		
+    		vertex.deleteCharAt(vertex.length() - 1);
+    		vertex.append("}");
+    		
+    		return vertex.toString();
     }
 
     public String toString() {

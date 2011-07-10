@@ -227,11 +227,36 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.edges.remove(edge.getId().toString());
     }
 
+    public String toJSON() {
+    		StringBuilder graph = new StringBuilder("{\"vertices\": {");
+    		
+    		// Build the vertices
+    		for(Vertex vertex : this.getVertices()) {
+    				TinkerVertex tinkerVertex = (TinkerVertex)vertex;
+    				graph.append(tinkerVertex.toJSON());
+    				graph.append(",");
+    		}
+    		
+    		graph.deleteCharAt(graph.length() - 1);
+    		graph.append("},\"edges\": {");
+    		
+    		// Build the edges
+    		for(Edge edge : this.getEdges()) {
+    				TinkerEdge tinkerEdge = (TinkerEdge)edge;
+    				graph.append(tinkerEdge.toJSON());
+    				graph.append(",");
+    		}
+    		
+    		graph.deleteCharAt(graph.length() - 1);
+    		graph.append("}}");
+    		
+    		return graph.toString();
+    }
 
     public String toString() {
         return "tinkergraph[vertices:" + this.vertices.size() + " edges:" + this.edges.size() + "]";
     }
-
+    
     public void clear() {
         this.vertices.clear();
         this.edges.clear();

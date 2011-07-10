@@ -81,6 +81,13 @@ public interface Graph {
      * @return an iterable reference to all edges in the graph
      */
     public Iterable<Edge> getEdges();
+    
+    /**
+     * Return a JSON string representation of the graph.
+     *
+     * @return a json string of all nodes and edges in thr graph
+     */
+    //public String toJSON();
 
     /**
      * Remove all the edges and vertices from the graph.

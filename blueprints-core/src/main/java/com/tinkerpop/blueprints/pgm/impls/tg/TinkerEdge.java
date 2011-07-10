@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.io.Serializable;
 
-
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -41,6 +40,25 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
 
     public Vertex getInVertex() {
         return this.inVertex;
+    }
+    
+    public String toJSON() {
+    		StringBuilder edge = new StringBuilder("\"" + this.getId().toString() + "\": {");
+
+    		edge.append("\"_id\": \"" + this.getId().toString() + "\",");
+    		edge.append("\"_type\": \"edge\",");
+    		edge.append("\"label\": \"" + this.getLabel() + "\",");
+    		edge.append("\"out_v\": \"" + this.getOutVertex().getId().toString() + "\",");
+    		edge.append("\"in_v\": \"" + this.getInVertex().getId().toString() + "\",");
+    		
+    		for(String key : this.getPropertyKeys()) {
+    				edge.append("\"" + key.toString() + "\": \"" + this.getProperty(key).toString() + "\",");
+    		}
+    		
+    		edge.deleteCharAt(edge.length() - 1);
+    		edge.append("}");
+    		
+    		return edge.toString();
     }
 
     public String toString() {
