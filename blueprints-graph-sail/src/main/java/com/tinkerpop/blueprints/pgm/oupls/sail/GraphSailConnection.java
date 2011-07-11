@@ -19,58 +19,71 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.TripleSource;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
-import org.openrdf.sail.SailChangedListener;
-import org.openrdf.sail.SailConnectionListener;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.DefaultSailChangedEvent;
+import org.openrdf.sail.helpers.NotifyingSailConnectionBase;
 import org.openrdf.sail.inferencer.InferencerConnection;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * A stateful connection to a BlueprintsSail RDF store interface.
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSailConnection implements InferencerConnection {
+public class GraphSailConnection extends NotifyingSailConnectionBase implements InferencerConnection {
     private static final Resource[] NULL_CONTEXT_ARRAY = {null};
 
     private final GraphSail.DataStore store;
-    private final Set<SailConnectionListener> listeners = new HashSet<SailConnectionListener>();
 
-    private boolean open;
-
-    private boolean statementsAdded = false;
-    private boolean statementsRemoved = false;
+    private boolean statementsAdded;
+    private boolean statementsRemoved;
 
     public GraphSailConnection(final GraphSail.DataStore store) {
+        super(store.sail);
         this.store = store;
 
         if (store.manualTransactions) {
             ((TransactionalGraph) store.graph).startTransaction();
         }
-
-        open = true;
     }
 
-    public boolean isOpen() throws SailException {
-        return open;
+    protected void startTransactionInternal() throws SailException {
+        statementsAdded = false;
+        statementsRemoved = false;
     }
 
-    public void close() throws SailException {
-        open = false;
+    public void commitInternal() throws SailException {
+        if (store.manualTransactions) {
+            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            ((TransactionalGraph) store.graph).startTransaction();
+        }
 
+        if (statementsAdded || statementsRemoved) {
+            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
+            e.setStatementsAdded(statementsAdded);
+            e.setStatementsRemoved(statementsRemoved);
+            store.sail.notifySailChanged(e);
+        }
+    }
+
+    public void rollbackInternal() throws SailException {
+        if (store.manualTransactions) {
+            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            ((TransactionalGraph) store.graph).startTransaction();
+        }
+    }
+
+    public void closeInternal() throws SailException {
         // Roll back any uncommitted operations.
         if (store.manualTransactions) {
             ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         }
     }
 
-    public CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluate(final TupleExpr query, final Dataset dataset, final BindingSet bindings, final boolean includeInferred) throws SailException {
+    public CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluateInternal(final TupleExpr query, final Dataset dataset, final BindingSet bindings, final boolean includeInferred) throws SailException {
         try {
             TripleSource tripleSource = new SailConnectionTripleSource(this, store.valueFactory, includeInferred);
             EvaluationStrategyImpl strategy = new EvaluationStrategyImpl(tripleSource, dataset);
@@ -80,13 +93,11 @@ public class GraphSailConnection implements InferencerConnection {
         }
     }
 
-    public CloseableIteration<? extends Resource, SailException> getContextIDs() throws SailException {
+    public CloseableIteration<? extends Resource, SailException> getContextIDsInternal() throws SailException {
         throw new UnsupportedOperationException("the getContextIDs operation is not yet supported");
     }
 
-    public CloseableIteration<? extends Statement, SailException> getStatements(final Resource subject, final URI predicate, final Value object, final boolean includeInferred, final Resource... contexts) throws SailException {
-        String c;
-
+    public CloseableIteration<? extends Statement, SailException> getStatementsInternal(final Resource subject, final URI predicate, final Value object, final boolean includeInferred, final Resource... contexts) throws SailException {
         int index = 0;
 
         if (null != subject) {
@@ -118,7 +129,7 @@ public class GraphSailConnection implements InferencerConnection {
         }
     }
 
-    public long size(final Resource... contexts) throws SailException {
+    public long sizeInternal(final Resource... contexts) throws SailException {
         if (0 == contexts.length) {
             return countIterator(store.matchers[0x0].match(null, null, null, null));
         } else {
@@ -145,40 +156,10 @@ public class GraphSailConnection implements InferencerConnection {
         }
     }
 
-    public void commit() throws SailException {
-        if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            ((TransactionalGraph) store.graph).startTransaction();
-        }
-
-        if ((statementsAdded || statementsRemoved) && (0 < store.listeners.size())) {
-            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
-            e.setStatementsAdded(statementsAdded);
-            e.setStatementsRemoved(statementsRemoved);
-
-            for (SailChangedListener l : store.listeners) {
-                l.sailChanged(e);
-            }
-        }
-
-        statementsAdded = false;
-        statementsRemoved = false;
-    }
-
-    public void rollback() throws SailException {
-        if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            ((TransactionalGraph) store.graph).startTransaction();
-        }
-
-        statementsAdded = false;
-        statementsRemoved = false;
-    }
-
-    public void addStatement(final Resource subject,
-                             final URI predicate,
-                             final Value object,
-                             final Resource... contexts) throws SailException {
+    public void addStatementInternal(final Resource subject,
+                                     final URI predicate,
+                                     final Value object,
+                                     final Resource... contexts) throws SailException {
         addStatementInternal(false, subject, predicate, object, contexts);
     }
 
@@ -214,11 +195,9 @@ public class GraphSailConnection implements InferencerConnection {
                 m.indexStatement(edge, subject, predicate, object, c);
             }
 
-            if (0 < listeners.size()) {
+            if (hasConnectionListeners()) {
                 Statement s = store.valueFactory.createStatement(subject, predicate, object, context);
-                for (SailConnectionListener l : listeners) {
-                    l.statementAdded(s);
-                }
+                notifyStatementAdded(s);
             }
 
             //System.out.println("added (s: " + s + ", p: " + p + ", o: " + o + ", c: " + c + ")");
@@ -237,7 +216,7 @@ public class GraphSailConnection implements InferencerConnection {
         return v;
     }
 
-    public void removeStatements(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
+    public void removeStatementsInternal(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
         removeStatementsInternal(false, subject, predicate, object, contexts);
     }
 
@@ -295,7 +274,7 @@ public class GraphSailConnection implements InferencerConnection {
 
         for (Edge e : edgesToRemove) {
             SimpleStatement s;
-            if (0 < listeners.size()) {
+            if (hasConnectionListeners()) {
                 s = new SimpleStatement();
                 fillStatement(s, e);
             } else {
@@ -306,9 +285,7 @@ public class GraphSailConnection implements InferencerConnection {
             store.graph.removeEdge(e);
 
             if (null != s) {
-                for (SailConnectionListener l : listeners) {
-                    l.statementRemoved(s);
-                }
+                notifyStatementRemoved(s);
             }
         }
 
@@ -317,42 +294,33 @@ public class GraphSailConnection implements InferencerConnection {
         }
     }
 
-    public void clear(final Resource... contexts) throws SailException {
+    public void clearInternal(final Resource... contexts) throws SailException {
         clearInternal(false, contexts);
     }
 
     private void clearInternal(final boolean inferred,
                                final Resource... contexts) throws SailException {
-        boolean removed = false;
-
         if (0 == contexts.length) {
-            removed = deleteEdgesInIterator(inferred, store.matchers[0x0].match(null, null, null, null));
+            deleteEdgesInIterator(inferred, store.matchers[0x0].match(null, null, null, null));
         } else {
             for (Resource context : contexts) {
                 // Note: order of operands to the "or" is important here
-                removed = deleteEdgesInIterator(inferred, store.matchers[0x8].match(null, null, null, context)) || removed;
+                deleteEdgesInIterator(inferred, store.matchers[0x8].match(null, null, null, context));
             }
-        }
-
-        if (removed) {
-            statementsRemoved = true;
         }
     }
 
-    private boolean deleteEdgesInIterator(final boolean inferred,
+    private void deleteEdgesInIterator(final boolean inferred,
                                           final CloseableSequence<Edge> i) {
-        boolean removed = false;
         try {
-            //System.out.println(".............");
             while (i.hasNext()) {
-                //System.out.println("----------------");
                 Edge e = i.next();
 
                 Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
                 if ((!inferred && null == b)
                         || (inferred && null != b && b)) {
                     SimpleStatement s;
-                    if (0 < listeners.size()) {
+                    if (hasConnectionListeners()) {
                         s = new SimpleStatement();
                         fillStatement(s, e);
                     } else {
@@ -378,24 +346,19 @@ public class GraphSailConnection implements InferencerConnection {
                         store.graph.removeVertex(t);
                     }
 
-                    removed = true;
-
                     if (null != s) {
-                        for (SailConnectionListener l : listeners) {
-                            l.statementRemoved(s);
-                        }
+                        notifyStatementRemoved(s);
                     }
+
+                    statementsRemoved = true;
                 }
             }
-            //System.out.println("================");
         } finally {
             i.close();
         }
-
-        return removed;
     }
 
-    public CloseableIteration<? extends Namespace, SailException> getNamespaces() throws SailException {
+    public CloseableIteration<? extends Namespace, SailException> getNamespacesInternal() throws SailException {
         final Iterator<String> prefixes = store.namespaces.getPropertyKeys().iterator();
 
         return new CloseableIteration<Namespace, SailException>() {
@@ -419,30 +382,20 @@ public class GraphSailConnection implements InferencerConnection {
         };
     }
 
-    public String getNamespace(final String prefix) throws SailException {
+    public String getNamespaceInternal(final String prefix) throws SailException {
         return (String) store.namespaces.getProperty(prefix);
     }
 
-    public void setNamespace(final String prefix, final String uri) throws SailException {
+    public void setNamespaceInternal(final String prefix, final String uri) throws SailException {
         store.namespaces.setProperty(prefix, uri);
     }
 
-    public void removeNamespace(final String prefix) throws SailException {
+    public void removeNamespaceInternal(final String prefix) throws SailException {
         store.namespaces.removeProperty(prefix);
     }
 
-    public void clearNamespaces() throws SailException {
+    public void clearNamespacesInternal() throws SailException {
         throw new UnsupportedOperationException("The clearNamespaces operation is not yet supported");
-    }
-
-    @Override
-    public void addConnectionListener(final SailConnectionListener listener) {
-        listeners.add(listener);
-    }
-
-    @Override
-    public void removeConnectionListener(final SailConnectionListener listener) {
-        listeners.remove(listener);
     }
 
     // inference ///////////////////////////////////////////////////////////////

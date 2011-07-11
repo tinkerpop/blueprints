@@ -15,11 +15,9 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.sail.NotifyingSail;
 import org.openrdf.sail.NotifyingSailConnection;
-import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailChangedListener;
 import org.openrdf.sail.SailException;
+import org.openrdf.sail.helpers.NotifyingSailBase;
 
 import java.io.File;
 import java.util.Collection;
@@ -57,7 +55,7 @@ import java.util.regex.Pattern;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSail implements NotifyingSail, GraphSource {
+public class GraphSail extends NotifyingSailBase implements GraphSource {
     public static final String SEPARATOR = " ";
 
     public static final String
@@ -190,11 +188,11 @@ public class GraphSail implements NotifyingSail, GraphSource {
         throw new UnsupportedOperationException();
     }
 
-    public void initialize() throws SailException {
+    public void initializeInternal() throws SailException {
         // Do nothing.
     }
 
-    public void shutDown() throws SailException {
+    public void shutDownInternal() throws SailException {
         store.graph.shutdown();
     }
 
@@ -203,18 +201,8 @@ public class GraphSail implements NotifyingSail, GraphSource {
         return true;
     }
 
-    public NotifyingSailConnection getConnection() throws SailException {
+    public NotifyingSailConnection getConnectionInternal() throws SailException {
         return new GraphSailConnection(store);
-    }
-
-    @Override
-    public void addSailChangedListener(final SailChangedListener listener) {
-        store.listeners.add(listener);
-    }
-
-    @Override
-    public void removeSailChangedListener(final SailChangedListener listener) {
-        store.listeners.remove(listener);
     }
 
     public ValueFactory getValueFactory() {
@@ -260,7 +248,7 @@ public class GraphSail implements NotifyingSail, GraphSource {
      */
     class DataStore {
         public IndexableGraph graph;
-        public Sail sail;
+        public NotifyingSailBase sail;
 
         // We don't need a special ValueFactory implementation.
         public final ValueFactory valueFactory = new ValueFactoryImpl();
@@ -269,8 +257,6 @@ public class GraphSail implements NotifyingSail, GraphSource {
 
         // A triple pattern matcher for each spoc combination
         public final Matcher[] matchers = new Matcher[16];
-
-        public final Set<SailChangedListener> listeners = new HashSet<SailChangedListener>();
 
         public boolean manualTransactions;
         public boolean volatileStatements = false;
