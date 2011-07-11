@@ -1418,7 +1418,7 @@ public abstract class SailTest extends TestCase {
                 sc.addStatement(uriB, RDF.TYPE, classY);
                 sc.commit();
 
-                showStatements(sc, uriA, RDF.TYPE, null);
+                //showStatements(sc, uriA, RDF.TYPE, null);
                 assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null));
                 assertEquals(2, countStatements(sc, uriB, RDF.TYPE, null));
 
@@ -1426,6 +1426,25 @@ public abstract class SailTest extends TestCase {
                 //assertEquals(1, countStatements(ic, uriA, RDF.TYPE, null));
                 //assertEquals(1, countStatements(ic, uriB, RDF.TYPE, null));
                 //ic.close();
+
+
+                if (uniqueStatements) {
+                    sc.addStatement(uriA, RDF.TYPE, classY);
+                    sc.commit();
+
+                    assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null));
+
+                    sc.removeStatements(uriA, RDF.TYPE, classY);
+                    sc.commit();
+
+                    assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null));
+
+                    sc.removeStatements(uriA, RDF.TYPE, classX);
+                    sc.commit();
+
+                    assertEquals(1, countStatements(sc, uriA, RDF.TYPE, null));
+                }
+
             } finally {
                 sc.close();
             }
