@@ -15,8 +15,10 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.sail.NotifyingSail;
+import org.openrdf.sail.NotifyingSailConnection;
 import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.SailChangedListener;
 import org.openrdf.sail.SailException;
 
 import java.io.File;
@@ -55,7 +57,7 @@ import java.util.regex.Pattern;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSail implements Sail, GraphSource {
+public class GraphSail implements NotifyingSail, GraphSource {
     public static final String SEPARATOR = " ";
 
     public static final String
@@ -117,6 +119,7 @@ public class GraphSail implements Sail, GraphSource {
         //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         //printGraphInfo(graph);
 
+        store.sail = this;
         store.graph = graph;
 
         // For now, use the default EDGES and VERTICES indices, which *must exist* in Blueprints and are automatically indexed.
@@ -199,8 +202,18 @@ public class GraphSail implements Sail, GraphSource {
         return true;
     }
 
-    public SailConnection getConnection() throws SailException {
+    public NotifyingSailConnection getConnection() throws SailException {
         return new GraphSailConnection(store);
+    }
+
+    @Override
+    public void addSailChangedListener(final SailChangedListener listener) {
+        store.listeners.add(listener);
+    }
+
+    @Override
+    public void removeSailChangedListener(final SailChangedListener listener) {
+        store.listeners.remove(listener);
     }
 
     public ValueFactory getValueFactory() {
@@ -246,6 +259,7 @@ public class GraphSail implements Sail, GraphSource {
      */
     class DataStore {
         public IndexableGraph graph;
+        public Sail sail;
 
         // We don't need a special ValueFactory implementation.
         public final ValueFactory valueFactory = new ValueFactoryImpl();
@@ -254,6 +268,8 @@ public class GraphSail implements Sail, GraphSource {
 
         // A triple pattern matcher for each spoc combination
         public final Matcher[] matchers = new Matcher[16];
+
+        public final Set<SailChangedListener> listeners = new HashSet<SailChangedListener>();
 
         public boolean manualTransactions;
         public boolean volatileStatements = false;

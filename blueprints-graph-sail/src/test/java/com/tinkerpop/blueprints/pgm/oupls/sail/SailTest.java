@@ -972,20 +972,39 @@ public abstract class SailTest extends TestCase {
     @Test
     public void testSailConnectionListeners() throws Exception {
         if (sail instanceof NotifyingSail) {
+            URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
+            URI uriB = sail.getValueFactory().createURI("http://example.org/uriB");
+            URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
+
             TestListener listener1 = new TestListener(), listener2 = new TestListener();
             NotifyingSailConnection sc = ((NotifyingSail) sail).getConnection();
+            sc.clear();
+            sc.commit();
+
+            // Add a listener and add statements
             sc.addConnectionListener(listener1);
-            URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
-            sc.removeStatements(null, null, null, uriA);
+            sc.addStatement(uriA, uriB, uriC, uriA);
+            sc.addStatement(uriB, uriC, uriA, uriA);
             sc.commit();
+
+            // Add another listener and remove a statement
             sc.addConnectionListener(listener2);
-            sc.addStatement(uriA, uriA, uriA, uriA);
+            sc.removeStatements(uriA, null, null);
             sc.commit();
-            // TODO: listening on removal is not yet supported
-            // assertEquals(1, listener1.getRemoved());
-            // assertEquals(0, listener2.getRemoved());
-            assertEquals(1, listener1.getAdded());
-            assertEquals(1, listener2.getAdded());
+
+            assertEquals(2, listener1.getAdded());
+            assertEquals(0, listener2.getAdded());
+            assertEquals(1, listener1.getRemoved());
+            assertEquals(1, listener2.getRemoved());
+
+            // Remove a listener and clear
+            sc.removeConnectionListener(listener1);
+            sc.clear();
+            sc.commit();
+
+            assertEquals(1, listener1.getRemoved());
+            assertEquals(2, listener2.getRemoved());
+
             sc.close();
         }
     }
@@ -1001,17 +1020,31 @@ public abstract class SailTest extends TestCase {
             };
             ((NotifyingSail) sail).addSailChangedListener(listener);
             URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
+            URI uriB = sail.getValueFactory().createURI("http://example.org/uriB");
+            URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
             SailConnection sc = sail.getConnection();
-            assertEquals(0, events.size());
-            sc.addStatement(uriA, uriA, uriA, uriA);
+            sc.clear();
             sc.commit();
-            assertEquals(1, events.size());
+            events.clear();
+            assertEquals(0, events.size());
+            sc.addStatement(uriA, uriB, uriC, uriA);
+            sc.addStatement(uriB, uriC, uriA, uriA);
+            sc.commit();
+            assertEquals(2, events.size());
             SailChangedEvent event = events.iterator().next();
             assertTrue(event.statementsAdded());
             assertFalse(event.statementsRemoved());
             events.clear();
             assertEquals(0, events.size());
-            sc.removeStatements(uriA, uriA, uriA, uriA);
+            sc.removeStatements(uriA, uriB, uriC, uriA);
+            sc.commit();
+            assertEquals(1, events.size());
+            event = events.iterator().next();
+            assertFalse(event.statementsAdded());
+            assertTrue(event.statementsRemoved());
+            events.clear();
+            assertEquals(0, events.size());
+            sc.clear();
             sc.commit();
             assertEquals(1, events.size());
             event = events.iterator().next();
@@ -1296,10 +1329,10 @@ public abstract class SailTest extends TestCase {
     }
 
     protected int countStatements(final SailConnection sc,
-                                final Resource subject,
-                                final URI predicate,
-                                final Value object,
-                                final Resource... contexts) throws SailException {
+                                  final Resource subject,
+                                  final URI predicate,
+                                  final Value object,
+                                  final Resource... contexts) throws SailException {
         CloseableIteration<?, SailException> statements = sc.getStatements(subject, predicate, object, false, contexts);
         int count = 0;
         try {

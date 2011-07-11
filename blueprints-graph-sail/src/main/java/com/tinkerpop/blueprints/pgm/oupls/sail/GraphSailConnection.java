@@ -19,22 +19,28 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.TripleSource;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
-import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.NotifyingSailConnection;
+import org.openrdf.sail.SailChangedListener;
+import org.openrdf.sail.SailConnectionListener;
 import org.openrdf.sail.SailException;
+import org.openrdf.sail.helpers.DefaultSailChangedEvent;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * A stateful connection to a BlueprintsSail RDF store interface.
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSailConnection implements SailConnection {
+public class GraphSailConnection implements NotifyingSailConnection {
     private static final Resource[] NULL_CONTEXT_ARRAY = {null};
 
     private final GraphSail.DataStore store;
+    private final Set<SailConnectionListener> listeners = new HashSet<SailConnectionListener>();
 
     private boolean open;
 
@@ -175,9 +181,25 @@ public class GraphSailConnection implements SailConnection {
                 m.indexStatement(edge, subject, predicate, object, c);
             }
 
+            if (0 < listeners.size()) {
+                Statement s = store.valueFactory.createStatement(subject, predicate, object, context);
+                for (SailConnectionListener l : listeners) {
+                    l.statementAdded(s);
+                }
+            }
+
             //System.out.println("added (s: " + s + ", p: " + p + ", o: " + o + ", c: " + c + ")");
             //System.out.print("\t--> ");
             //BlueprintsSail.debugEdge(edge);
+        }
+
+        if (0 < store.listeners.size()) {
+            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
+            e.setStatementsAdded(true);
+
+            for (SailChangedListener l : store.listeners) {
+                l.sailChanged(e);
+            }
         }
     }
 
@@ -191,8 +213,6 @@ public class GraphSailConnection implements SailConnection {
 
     public void removeStatements(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
         Collection<Edge> edgesToRemove = new LinkedList<Edge>();
-
-        String c;
 
         int index = 0;
 
@@ -235,27 +255,71 @@ public class GraphSailConnection implements SailConnection {
         }
 
         for (Edge e : edgesToRemove) {
+            SimpleStatement s;
+            if (0 < listeners.size()) {
+                s = new SimpleStatement();
+                fillStatement(s, e);
+            } else {
+                s = null;
+            }
+
             //System.out.println("removing this edge: " + e);
             store.graph.removeEdge(e);
-        }
-    }
 
-    public void clear(final Resource... contexts) throws SailException {
-        if (0 == contexts.length) {
-            deleteEdgesInIterator(store.matchers[0x0].match(null, null, null, null));
-        } else {
-            for (Resource context : contexts) {
-                deleteEdgesInIterator(store.matchers[0x8].match(null, null, null, context));
+            if (null != s) {
+                for (SailConnectionListener l : listeners) {
+                    l.statementRemoved(s);
+                }
+            }
+        }
+
+        if (0 < store.listeners.size() && 0 < edgesToRemove.size()) {
+            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
+            e.setStatementsRemoved(true);
+
+            for (SailChangedListener l : store.listeners) {
+                l.sailChanged(e);
             }
         }
     }
 
-    private void deleteEdgesInIterator(final CloseableSequence<Edge> i) {
+    public void clear(final Resource... contexts) throws SailException {
+        boolean removed = false;
+
+        if (0 == contexts.length) {
+            removed = deleteEdgesInIterator(store.matchers[0x0].match(null, null, null, null));
+        } else {
+            for (Resource context : contexts) {
+                // Note: order of operands to the "or" is important here
+                removed = deleteEdgesInIterator(store.matchers[0x8].match(null, null, null, context)) || removed;
+            }
+        }
+
+        if (removed && 0 < store.listeners.size()) {
+            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
+            e.setStatementsRemoved(true);
+            for (SailChangedListener l : store.listeners) {
+                l.sailChanged(e);
+            }
+        }
+    }
+
+    private boolean deleteEdgesInIterator(final CloseableSequence<Edge> i) {
+        boolean removed = false;
         try {
             //System.out.println(".............");
             while (i.hasNext()) {
                 //System.out.println("----------------");
                 Edge e = i.next();
+
+                SimpleStatement s;
+                if (0 < listeners.size()) {
+                    s = new SimpleStatement();
+                    fillStatement(s, e);
+                } else {
+                    s = null;
+                }
+
                 try {
                     i.remove();
                 } catch (UnsupportedOperationException x) {
@@ -274,11 +338,21 @@ public class GraphSailConnection implements SailConnection {
                 if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
                     store.graph.removeVertex(t);
                 }
+
+                removed = true;
+
+                if (null != s) {
+                    for (SailConnectionListener l : listeners) {
+                        l.statementRemoved(s);
+                    }
+                }
             }
             //System.out.println("================");
         } finally {
             i.close();
         }
+
+        return removed;
     }
 
     public CloseableIteration<? extends Namespace, SailException> getNamespaces() throws SailException {
@@ -321,6 +395,16 @@ public class GraphSailConnection implements SailConnection {
         throw new UnsupportedOperationException("The clearNamespaces operation is not yet supported");
     }
 
+    @Override
+    public void addConnectionListener(final SailConnectionListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeConnectionListener(final SailConnectionListener listener) {
+        listeners.remove(listener);
+    }
+
     // statement iteration /////////////////////////////////////////////////////
 
     private CloseableIteration<Statement, SailException> createIteration(final CloseableSequence<Edge> iterator) {
@@ -348,10 +432,7 @@ public class GraphSailConnection implements SailConnection {
             Edge e = iterator.next();
 
             SimpleStatement s = new SimpleStatement();
-            s.subject = (Resource) toSesame(e.getOutVertex());
-            s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-            s.object = toSesame(e.getInVertex());
-            s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
+            fillStatement(s, e);
 
             return s;
         }
@@ -359,6 +440,14 @@ public class GraphSailConnection implements SailConnection {
         public void remove() throws SailException {
             throw new UnsupportedOperationException();
         }
+    }
+
+    private void fillStatement(final SimpleStatement s,
+                               final Edge e) {
+        s.subject = (Resource) toSesame(e.getOutVertex());
+        s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
+        s.object = toSesame(e.getInVertex());
+        s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
     }
 
     private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
@@ -380,10 +469,7 @@ public class GraphSailConnection implements SailConnection {
         public Statement next() throws SailException {
             Edge e = iterator.next();
 
-            s.subject = (Resource) toSesame(e.getOutVertex());
-            s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-            s.object = toSesame(e.getInVertex());
-            s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
+            fillStatement(s, e);
 
             return s;
         }
