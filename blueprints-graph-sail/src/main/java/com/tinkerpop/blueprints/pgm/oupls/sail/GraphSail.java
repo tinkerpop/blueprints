@@ -76,7 +76,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
             BNODE = "bnode",
             INFERRED = "inferred",
             KIND = "kind",
-            LANGUAGE = "language",
+            LANG = "lang",
             LITERAL = "literal",
             TYPE = "type",
             URI = "uri",
@@ -291,7 +291,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
                     v.setProperty(TYPE, l.getDatatype().stringValue());
                 }
                 if (null != l.getLanguage()) {
-                    v.setProperty(LANGUAGE, l.getLanguage());
+                    v.setProperty(LANG, l.getLanguage());
                 }
             } else if (value instanceof BNode) {
                 BNode b = (BNode) value;
@@ -334,7 +334,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
                     }
 
                     String type = (String) vertex.getProperty(TYPE);
-                    String lang = (String) vertex.getProperty(LANGUAGE);
+                    String lang = (String) vertex.getProperty(LANG);
 
                     URI vType = ((Literal) value).getDatatype();
                     String vLang = ((Literal) value).getLanguage();

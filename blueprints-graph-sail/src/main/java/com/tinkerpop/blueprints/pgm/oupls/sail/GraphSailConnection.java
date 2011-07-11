@@ -551,7 +551,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             return store.valueFactory.createURI(value);
         } else if (kind.equals(GraphSail.LITERAL)) {
             String datatype = (String) v.getProperty(GraphSail.TYPE);
-            String lang = (String) v.getProperty(GraphSail.LANGUAGE);
+            String lang = (String) v.getProperty(GraphSail.LANG);
             return null != datatype
                     ? store.valueFactory.createLiteral(value, store.valueFactory.createURI(datatype))
                     : null != lang
