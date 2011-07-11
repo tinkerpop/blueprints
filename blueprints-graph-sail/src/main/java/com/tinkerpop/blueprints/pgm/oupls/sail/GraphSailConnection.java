@@ -19,11 +19,11 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.TripleSource;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
-import org.openrdf.sail.NotifyingSailConnection;
 import org.openrdf.sail.SailChangedListener;
 import org.openrdf.sail.SailConnectionListener;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.DefaultSailChangedEvent;
+import org.openrdf.sail.inferencer.InferencerConnection;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,13 +36,16 @@ import java.util.Set;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSailConnection implements NotifyingSailConnection {
+public class GraphSailConnection implements InferencerConnection {
     private static final Resource[] NULL_CONTEXT_ARRAY = {null};
 
     private final GraphSail.DataStore store;
     private final Set<SailConnectionListener> listeners = new HashSet<SailConnectionListener>();
 
     private boolean open;
+
+    private boolean statementsAdded = false;
+    private boolean statementsRemoved = false;
 
     public GraphSailConnection(final GraphSail.DataStore store) {
         this.store = store;
@@ -147,6 +150,19 @@ public class GraphSailConnection implements NotifyingSailConnection {
             ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             ((TransactionalGraph) store.graph).startTransaction();
         }
+
+        if ((statementsAdded || statementsRemoved) && (0 < store.listeners.size())) {
+            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
+            e.setStatementsAdded(statementsAdded);
+            e.setStatementsRemoved(statementsRemoved);
+
+            for (SailChangedListener l : store.listeners) {
+                l.sailChanged(e);
+            }
+        }
+
+        statementsAdded = false;
+        statementsRemoved = false;
     }
 
     public void rollback() throws SailException {
@@ -154,9 +170,23 @@ public class GraphSailConnection implements NotifyingSailConnection {
             ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
             ((TransactionalGraph) store.graph).startTransaction();
         }
+
+        statementsAdded = false;
+        statementsRemoved = false;
     }
 
-    public void addStatement(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
+    public void addStatement(final Resource subject,
+                             final URI predicate,
+                             final Value object,
+                             final Resource... contexts) throws SailException {
+        addStatementInternal(false, subject, predicate, object, contexts);
+    }
+
+    private void addStatementInternal(final boolean inferred,
+                                      final Resource subject,
+                                      final URI predicate,
+                                      final Value object,
+                                      final Resource... contexts) throws SailException {
         if (null == subject || null == predicate || null == object) {
             throw new IllegalArgumentException("null part-of-speech for to-be-added statement");
         }
@@ -175,6 +205,9 @@ public class GraphSailConnection implements NotifyingSailConnection {
             Vertex out = getOrCreateVertex(subject);
             Vertex in = getOrCreateVertex(object);
             Edge edge = store.graph.addEdge(null, out, in, predicate.stringValue());
+            if (inferred) {
+                edge.setProperty(GraphSail.INFERRED, inferred);
+            }
 
             for (IndexingMatcher m : store.indexers) {
                 //System.out.println("\t\tindexing with: " + m);
@@ -193,14 +226,7 @@ public class GraphSailConnection implements NotifyingSailConnection {
             //BlueprintsSail.debugEdge(edge);
         }
 
-        if (0 < store.listeners.size()) {
-            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
-            e.setStatementsAdded(true);
-
-            for (SailChangedListener l : store.listeners) {
-                l.sailChanged(e);
-            }
-        }
+        statementsAdded = true;
     }
 
     private Vertex getOrCreateVertex(final Value value) {
@@ -212,6 +238,14 @@ public class GraphSailConnection implements NotifyingSailConnection {
     }
 
     public void removeStatements(final Resource subject, final URI predicate, final Value object, final Resource... contexts) throws SailException {
+        removeStatementsInternal(false, subject, predicate, object, contexts);
+    }
+
+    private void removeStatementsInternal(final boolean inferred,
+                                          final Resource subject,
+                                          final URI predicate,
+                                          final Value object,
+                                          final Resource... contexts) throws SailException {
         Collection<Edge> edgesToRemove = new LinkedList<Edge>();
 
         int index = 0;
@@ -246,7 +280,12 @@ public class GraphSailConnection implements NotifyingSailConnection {
                 CloseableSequence<Edge> i = store.matchers[index].match(subject, predicate, object, context);
                 try {
                     while (i.hasNext()) {
-                        edgesToRemove.add(i.next());
+                        Edge e = i.next();
+                        Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
+                        if ((!inferred && null == b)
+                                || (inferred && null != b && b)) {
+                            edgesToRemove.add(e);
+                        }
                     }
                 } finally {
                     i.close();
@@ -273,38 +312,35 @@ public class GraphSailConnection implements NotifyingSailConnection {
             }
         }
 
-        if (0 < store.listeners.size() && 0 < edgesToRemove.size()) {
-            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
-            e.setStatementsRemoved(true);
-
-            for (SailChangedListener l : store.listeners) {
-                l.sailChanged(e);
-            }
+        if (0 < edgesToRemove.size()) {
+            statementsRemoved = true;
         }
     }
 
     public void clear(final Resource... contexts) throws SailException {
+        clearInternal(false, contexts);
+    }
+
+    private void clearInternal(final boolean inferred,
+                               final Resource... contexts) throws SailException {
         boolean removed = false;
 
         if (0 == contexts.length) {
-            removed = deleteEdgesInIterator(store.matchers[0x0].match(null, null, null, null));
+            removed = deleteEdgesInIterator(inferred, store.matchers[0x0].match(null, null, null, null));
         } else {
             for (Resource context : contexts) {
                 // Note: order of operands to the "or" is important here
-                removed = deleteEdgesInIterator(store.matchers[0x8].match(null, null, null, context)) || removed;
+                removed = deleteEdgesInIterator(inferred, store.matchers[0x8].match(null, null, null, context)) || removed;
             }
         }
 
-        if (removed && 0 < store.listeners.size()) {
-            DefaultSailChangedEvent e = new DefaultSailChangedEvent(store.sail);
-            e.setStatementsRemoved(true);
-            for (SailChangedListener l : store.listeners) {
-                l.sailChanged(e);
-            }
+        if (removed) {
+            statementsRemoved = true;
         }
     }
 
-    private boolean deleteEdgesInIterator(final CloseableSequence<Edge> i) {
+    private boolean deleteEdgesInIterator(final boolean inferred,
+                                          final CloseableSequence<Edge> i) {
         boolean removed = false;
         try {
             //System.out.println(".............");
@@ -312,38 +348,42 @@ public class GraphSailConnection implements NotifyingSailConnection {
                 //System.out.println("----------------");
                 Edge e = i.next();
 
-                SimpleStatement s;
-                if (0 < listeners.size()) {
-                    s = new SimpleStatement();
-                    fillStatement(s, e);
-                } else {
-                    s = null;
-                }
+                Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
+                if ((!inferred && null == b)
+                        || (inferred && null != b && b)) {
+                    SimpleStatement s;
+                    if (0 < listeners.size()) {
+                        s = new SimpleStatement();
+                        fillStatement(s, e);
+                    } else {
+                        s = null;
+                    }
 
-                try {
-                    i.remove();
-                } catch (UnsupportedOperationException x) {
-                    // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
-                    // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
-                    // delete an edge in an iterator currently being traversed.  So for now, just ignore the
-                    // UnsupportedOperationException and proceed to delete the edge from the graph.
-                    //System.out.println("###################################");
-                }
-                Vertex h = e.getInVertex();
-                Vertex t = e.getOutVertex();
-                store.graph.removeEdge(e);
-                if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
-                    store.graph.removeVertex(h);
-                }
-                if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
-                    store.graph.removeVertex(t);
-                }
+                    try {
+                        i.remove();
+                    } catch (UnsupportedOperationException x) {
+                        // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
+                        // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
+                        // delete an edge in an iterator currently being traversed.  So for now, just ignore the
+                        // UnsupportedOperationException and proceed to delete the edge from the graph.
+                        //System.out.println("###################################");
+                    }
+                    Vertex h = e.getInVertex();
+                    Vertex t = e.getOutVertex();
+                    store.graph.removeEdge(e);
+                    if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
+                        store.graph.removeVertex(h);
+                    }
+                    if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
+                        store.graph.removeVertex(t);
+                    }
 
-                removed = true;
+                    removed = true;
 
-                if (null != s) {
-                    for (SailConnectionListener l : listeners) {
-                        l.statementRemoved(s);
+                    if (null != s) {
+                        for (SailConnectionListener l : listeners) {
+                            l.statementRemoved(s);
+                        }
                     }
                 }
             }
@@ -403,6 +443,40 @@ public class GraphSailConnection implements NotifyingSailConnection {
     @Override
     public void removeConnectionListener(final SailConnectionListener listener) {
         listeners.remove(listener);
+    }
+
+    // inference ///////////////////////////////////////////////////////////////
+
+    @Override
+    public boolean addInferredStatement(final Resource subject,
+                                        final URI predicate,
+                                        final Value object,
+                                        final Resource... contexts) throws SailException {
+        addStatementInternal(true, subject, predicate, object, contexts);
+
+        // Note: the meaning of the return value is not documented (in the Sesame 2.3.2 JavaDocs)
+        return true;
+    }
+
+    @Override
+    public boolean removeInferredStatement(final Resource subject,
+                                           final URI predicate,
+                                           final Value object,
+                                           final Resource... contexts) throws SailException {
+        removeStatementsInternal(true, subject, predicate, object, contexts);
+
+        // Note: the meaning of the return value is not documented (in the Sesame 2.3.2 JavaDocs)
+        return true;
+    }
+
+    @Override
+    public void clearInferred(final Resource... contexts) throws SailException {
+        clearInternal(true, contexts);
+    }
+
+    @Override
+    public void flushUpdates() throws SailException {
+        // Do nothing.  All updates are pushed as soon as the event (statement addition or removal) occurs.
     }
 
     // statement iteration /////////////////////////////////////////////////////

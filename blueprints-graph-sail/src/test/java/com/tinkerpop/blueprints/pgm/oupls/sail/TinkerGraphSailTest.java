@@ -4,9 +4,7 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 
 /**
- * User: josh
- * Date: 1/18/11
- * Time: 10:54 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class TinkerGraphSailTest extends GraphSailTest {
     @Override

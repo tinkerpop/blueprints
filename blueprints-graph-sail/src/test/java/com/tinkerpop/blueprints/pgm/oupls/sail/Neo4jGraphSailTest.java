@@ -5,9 +5,7 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 
 /**
- * User: josh
- * Date: 1/18/11
- * Time: 10:54 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Neo4jGraphSailTest extends GraphSailTest {
     protected IndexableGraph createGraph() {

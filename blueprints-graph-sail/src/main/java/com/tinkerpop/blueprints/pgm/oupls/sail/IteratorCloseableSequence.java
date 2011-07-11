@@ -5,9 +5,9 @@ import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import java.util.Iterator;
 
 /**
- * User: josh
- * Date: 7/4/11
- * Time: 5:32 PM
+ * A CloseableSequence which wraps a simple iterator.
+ *
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class IteratorCloseableSequence<T> implements CloseableSequence<T> {
     private final Iterator<T> iterator;

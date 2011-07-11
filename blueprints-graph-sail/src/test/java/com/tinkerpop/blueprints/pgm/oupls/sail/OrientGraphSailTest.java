@@ -7,9 +7,7 @@ import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import junit.framework.TestCase;
 
 /**
- * User: josh
- * Date: 1/18/11
- * Time: 10:54 AM
+ * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
 

@@ -76,6 +76,7 @@ public class GraphSail implements NotifyingSail, GraphSource {
 
     public static final String
             BNODE = "bnode",
+            INFERRED = "inferred",
             KIND = "kind",
             LANGUAGE = "language",
             LITERAL = "literal",
