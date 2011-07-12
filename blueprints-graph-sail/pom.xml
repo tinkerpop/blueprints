@@ -44,12 +44,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>replay</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.openrdf.sesame</groupId>
             <artifactId>sesame-queryparser-sparql</artifactId>
             <version>2.4.0</version>

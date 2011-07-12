@@ -260,7 +260,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
 
         public boolean manualTransactions;
         public boolean volatileStatements = false;
-        public boolean uniqueStatements = false;
+        public boolean uniqueStatements = true;
 
         public Index<Vertex> values;
         public Index<Edge> edges;

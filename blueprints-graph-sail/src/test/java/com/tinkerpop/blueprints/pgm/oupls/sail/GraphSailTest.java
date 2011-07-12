@@ -26,7 +26,7 @@ public abstract class GraphSailTest extends SailTest {
     protected IndexableGraph graph;
 
     protected Sail createSail() throws Exception {
-        // Flip this flag in order to test "unique statements" behavior
+        // Flip this flag in order to disable "unique statements" behavior
         uniqueStatements = true;
 
         graph = createGraph();
