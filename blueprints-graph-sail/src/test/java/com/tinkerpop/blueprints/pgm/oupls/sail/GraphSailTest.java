@@ -27,7 +27,7 @@ public abstract class GraphSailTest extends SailTest {
 
     protected Sail createSail() throws Exception {
         // Flip this flag in order to test "unique statements" behavior
-        uniqueStatements = false;
+        uniqueStatements = true;
 
         graph = createGraph();
         GraphSail g = new GraphSail(graph);

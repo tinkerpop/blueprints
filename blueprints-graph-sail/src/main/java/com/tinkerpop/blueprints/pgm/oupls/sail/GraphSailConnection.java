@@ -38,6 +38,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private final GraphSail.DataStore store;
 
+    private final Collection<WriteAction> writeBuffer = new LinkedList<WriteAction>();
+
     private boolean statementsAdded;
     private boolean statementsRemoved;
 
@@ -83,7 +85,10 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
     }
 
-    public CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluateInternal(final TupleExpr query, final Dataset dataset, final BindingSet bindings, final boolean includeInferred) throws SailException {
+    public CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluateInternal(final TupleExpr query,
+                                                                                               final Dataset dataset,
+                                                                                               final BindingSet bindings,
+                                                                                               final boolean includeInferred) throws SailException {
         try {
             TripleSource tripleSource = new SailConnectionTripleSource(this, store.valueFactory, includeInferred);
             EvaluationStrategyImpl strategy = new EvaluationStrategyImpl(tripleSource, dataset);
@@ -97,7 +102,12 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         throw new UnsupportedOperationException("the getContextIDs operation is not yet supported");
     }
 
-    public CloseableIteration<? extends Statement, SailException> getStatementsInternal(final Resource subject, final URI predicate, final Value object, final boolean includeInferred, final Resource... contexts) throws SailException {
+    public CloseableIteration<? extends Statement, SailException> getStatementsInternal(final Resource subject,
+                                                                                        final URI predicate,
+                                                                                        final Value object,
+                                                                                        final boolean includeInferred,
+                                                                                        final Resource... contexts) throws SailException {
+        //System.out.println("getting: " + subject + ", " + predicate + ", " + object + ", " + includeInferred + ", " + contexts); System.out.flush();
         int index = 0;
 
         if (null != subject) {
@@ -168,15 +178,35 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                                       final URI predicate,
                                       final Value object,
                                       final Resource... contexts) throws SailException {
+        //System.out.println("adding (" + inferred + "): " + subject + ", " + predicate + ", " + object + ", " + contexts); System.out.flush();
+
+        if (!canWrite()) {
+            WriteAction a = new WriteAction(ActionType.ADD);
+            a.inferred = inferred;
+            a.subject = subject;
+            a.predicate = predicate;
+            a.object = object;
+            a.contexts = contexts;
+
+            queueUpdate(a);
+            return;
+        }
+
         if (null == subject || null == predicate || null == object) {
             throw new IllegalArgumentException("null part-of-speech for to-be-added statement");
         }
 
         if (store.uniqueStatements) {
             if (0 == contexts.length) {
-                removeStatements(subject, predicate, object, (Resource) null);
+                removeStatementsInternal(inferred, subject, predicate, object, (Resource) null);
+                if (!inferred) {
+                    removeStatementsInternal(true, subject, predicate, object, (Resource) null);
+                }
             } else {
-                removeStatements(subject, predicate, object, contexts);
+                removeStatementsInternal(inferred, subject, predicate, object, contexts);
+                if (!inferred) {
+                    removeStatementsInternal(true, subject, predicate, object, contexts);
+                }
             }
         }
 
@@ -206,6 +236,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
 
         statementsAdded = true;
+        //System.out.println("\tdone adding");
     }
 
     private Vertex getOrCreateVertex(final Value value) {
@@ -225,6 +256,20 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                                           final URI predicate,
                                           final Value object,
                                           final Resource... contexts) throws SailException {
+        //System.out.println("removing (" + inferred + "): " + subject + ", " + predicate + ", " + object + ", " + contexts); System.out.flush();
+
+        if (!canWrite()) {
+            WriteAction a = new WriteAction(ActionType.REMOVE);
+            a.inferred = inferred;
+            a.subject = subject;
+            a.predicate = predicate;
+            a.object = object;
+            a.contexts = contexts;
+
+            queueUpdate(a);
+            return;
+        }
+
         Collection<Edge> edgesToRemove = new LinkedList<Edge>();
 
         int index = 0;
@@ -292,6 +337,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         if (0 < edgesToRemove.size()) {
             statementsRemoved = true;
         }
+
+        //System.out.println("\tdone removing");
     }
 
     public void clearInternal(final Resource... contexts) throws SailException {
@@ -300,6 +347,17 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private void clearInternal(final boolean inferred,
                                final Resource... contexts) throws SailException {
+        //System.out.println("clearing (" + inferred + "): " + contexts); System.out.flush();
+
+        if (!canWrite()) {
+            WriteAction a = new WriteAction(ActionType.CLEAR);
+            a.inferred = inferred;
+            a.contexts = contexts;
+
+            queueUpdate(a);
+            return;
+        }
+
         if (0 == contexts.length) {
             deleteEdgesInIterator(inferred, store.matchers[0x0].match(null, null, null, null));
         } else {
@@ -311,7 +369,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     private void deleteEdgesInIterator(final boolean inferred,
-                                          final CloseableSequence<Edge> i) {
+                                       final CloseableSequence<Edge> i) {
         try {
             while (i.hasNext()) {
                 Edge e = i.next();
@@ -334,16 +392,25 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                         // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
                         // delete an edge in an iterator currently being traversed.  So for now, just ignore the
                         // UnsupportedOperationException and proceed to delete the edge from the graph.
-                        //System.out.println("###################################");
                     }
                     Vertex h = e.getInVertex();
                     Vertex t = e.getOutVertex();
                     store.graph.removeEdge(e);
                     if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
-                        store.graph.removeVertex(h);
+                        try {
+                            store.graph.removeVertex(h);
+                        } catch (IllegalStateException ex) {
+                            // Just keep going.  This is a hack for Neo4j vertices which appear in more than
+                            // one to-be-deleted edge.
+                        }
                     }
                     if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
-                        store.graph.removeVertex(t);
+                        try {
+                            store.graph.removeVertex(t);
+                        } catch (IllegalStateException ex) {
+                            // Just keep going.  This is a hack for Neo4j vertices which appear in more than
+                            // one to-be-deleted edge.
+                        }
                     }
 
                     if (null != s) {
@@ -398,17 +465,110 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         throw new UnsupportedOperationException("The clearNamespaces operation is not yet supported");
     }
 
+    // write lock //////////////////////////////////////////////////////////////
+
+    private int writeSemaphore = 0;
+
+    private boolean canWrite() {
+        return 0 == writeSemaphore;
+    }
+
+    private void writeSemaphoreUp() {
+        writeSemaphore++;
+    }
+
+    private void writeSemaphoreDown() throws SailException {
+        writeSemaphore--;
+
+        if (0 == writeSemaphore) {
+            flushWrites();
+        }
+    }
+
+    private void queueUpdate(final WriteAction a) throws SailException {
+        if (0 == writeSemaphore) {
+            a.execute();
+        } else {
+            writeBuffer.add(a);
+        }
+    }
+
+    private void flushWrites() throws SailException {
+        for (WriteAction a : writeBuffer) {
+            switch (a.type) {
+                case ADD:
+                    addStatementInternal(true, a.subject, a.predicate, a.object, a.contexts);
+                    break;
+                case REMOVE:
+                    removeStatementsInternal(true, a.subject, a.predicate, a.object, a.contexts);
+                    break;
+                case CLEAR:
+                    clearInternal(true, a.contexts);
+                    break;
+            }
+        }
+
+        writeBuffer.clear();
+    }
+
     // inference ///////////////////////////////////////////////////////////////
+
+    private enum ActionType {ADD, REMOVE, CLEAR}
+
+    private class WriteAction {
+        public final ActionType type;
+
+        public WriteAction(final ActionType type) {
+            this.type = type;
+        }
+
+        public Resource subject;
+        public URI predicate;
+        public Value object;
+        public Resource[] contexts;
+        public boolean inferred = true;
+
+        public void execute() throws SailException {
+            switch (type) {
+                case ADD:
+                    addStatementInternal(inferred, subject, predicate, object, contexts);
+                    break;
+                case REMOVE:
+                    removeStatementsInternal(inferred, subject, predicate, object, contexts);
+                    break;
+                case CLEAR:
+                    clearInternal(inferred, contexts);
+                    break;
+            }
+        }
+    }
 
     @Override
     public boolean addInferredStatement(final Resource subject,
                                         final URI predicate,
                                         final Value object,
                                         final Resource... contexts) throws SailException {
-        addStatementInternal(true, subject, predicate, object, contexts);
+        for (Resource context : (0 == contexts.length ? NULL_CONTEXT_ARRAY : contexts)) {
+            boolean doAdd = true;
+            if (store.uniqueStatements) {
+                CloseableIteration<?, SailException> i
+                        = getStatementsInternal(subject, predicate, object, true, context);
+                try {
+                    if (i.hasNext()) {
+                        doAdd = false;
+                    }
+                } finally {
+                    i.close();
+                }
+            }
+
+            if (doAdd) {
+                addStatementInternal(true, subject, predicate, object, context);
+            }
+        }
 
         // Note: the meaning of the return value is not documented (in the Sesame 2.3.2 JavaDocs)
-        return true;
+        return false;
     }
 
     @Override
@@ -419,7 +579,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         removeStatementsInternal(true, subject, predicate, object, contexts);
 
         // Note: the meaning of the return value is not documented (in the Sesame 2.3.2 JavaDocs)
-        return true;
+        return false;
     }
 
     @Override
@@ -429,7 +589,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     @Override
     public void flushUpdates() throws SailException {
-        // Do nothing.  All updates are pushed as soon as the event (statement addition or removal) occurs.
+        // No-op
     }
 
     // statement iteration /////////////////////////////////////////////////////
@@ -442,20 +602,32 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private class StableStatementIteration implements CloseableIteration<Statement, SailException> {
         private final CloseableSequence<Edge> iterator;
+        private boolean closed = false;
 
         public StableStatementIteration(final CloseableSequence<Edge> iterator) {
+            writeSemaphoreUp();
             this.iterator = iterator;
         }
 
         public void close() throws SailException {
+            closed = true;
             iterator.close();
+            writeSemaphoreDown();
         }
 
         public boolean hasNext() throws SailException {
+            if (closed) {
+                throw new IllegalStateException("already closed");
+            }
+
             return iterator.hasNext();
         }
 
         public Statement next() throws SailException {
+            if (closed) {
+                throw new IllegalStateException("already closed");
+            }
+
             Edge e = iterator.next();
 
             SimpleStatement s = new SimpleStatement();
@@ -540,6 +712,16 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             super.finalize();
         }
         //*/
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("(").append(subject).append(", ").append(predicate).append(", ").append(object);
+            if (null != context) {
+                sb.append(", ").append(context);
+            }
+            sb.append(")");
+            return sb.toString();
+        }
     }
 
     // value conversion ////////////////////////////////////////////////////////
