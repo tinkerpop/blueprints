@@ -9,10 +9,17 @@ public class JSONTokens {
     public static final String EDGE = "edge";
     public static final String _ID = "_id";
     public static final String _LABEL = "_label";
-    public static final String _PROPERTIES = "_properties";
     public static final String _TYPE = "_type";
-    public static final String OUT_E = "outE";
-    public static final String IN_E = "inE";
     public static final String OUT_V = "outV";
     public static final String IN_V = "inV";
+    public static final String VALUE = "value";
+    public static final String TYPE = "type";
+    public static final String TYPE_LIST = "list";
+    public static final String TYPE_STRING = "string";
+    public static final String TYPE_DOUBLE = "double";
+    public static final String TYPE_INTEGER = "integer";
+    public static final String TYPE_FLOAT = "float";
+    public static final String TYPE_MAP = "map";
+    public static final String TYPE_BOOLEAN = "boolean";
+    public static final String TYPE_LONG = "long";
 }
