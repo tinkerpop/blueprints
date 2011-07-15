@@ -135,7 +135,7 @@ public class RexsterGraph implements IndexableGraph {
                 return index;
             }
         }
-        throw new RuntimeException("No index with name " + indexName + " exists");
+        return null;
     }
 
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {

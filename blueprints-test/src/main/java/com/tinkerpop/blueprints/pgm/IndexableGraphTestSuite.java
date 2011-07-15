@@ -107,26 +107,11 @@ public class IndexableGraphTestSuite extends TestSuite {
         printPerformance(graph.toString(), 2, "indices dropped", this.stopWatch());
 
         this.stopWatch();
-        try {
-            graph.getIndex(Index.VERTICES, Vertex.class);
-            assertFalse(true);
-        } catch (RuntimeException e) {
-            assertTrue(true);
-        }
 
-        try {
-            graph.getIndex(Index.EDGES, Edge.class);
-            assertFalse(true);
-        } catch (RuntimeException e) {
-            assertTrue(true);
-        }
+        assertNull(graph.getIndex(Index.VERTICES, Vertex.class));
+        assertNull(graph.getIndex(Index.EDGES, Edge.class));
+        assertNull(graph.getIndex("blah blah", Edge.class));
 
-        try {
-            graph.getIndex("blah blah", Edge.class);
-            assertFalse(true);
-        } catch (RuntimeException e) {
-            assertTrue(true);
-        }
         printPerformance(graph.toString(), 3, "non-existent indices retrieved with runtime exceptions", this.stopWatch());
         graph.shutdown();
     }

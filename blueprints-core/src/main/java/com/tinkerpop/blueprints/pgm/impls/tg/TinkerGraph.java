@@ -83,7 +83,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
         Index index = this.indices.get(indexName);
         if (null == index)
-            throw new RuntimeException("No such index exists: " + indexName);
+            return null;
         if (!indexClass.isAssignableFrom(index.getIndexClass()))
             throw new RuntimeException(indexClass + " is not assignable from " + index.getIndexClass());
         else

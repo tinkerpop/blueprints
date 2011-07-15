@@ -116,7 +116,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         Index index = this.indices.get(indexName);
         // todo: be sure to do code for multiple connections interacting with graph
         if (null == index)
-            throw new RuntimeException("No such index exists: " + indexName);
+            return null;
         else if (indexClass.isAssignableFrom(index.getIndexClass()))
             return (Index<T>) index;
         else

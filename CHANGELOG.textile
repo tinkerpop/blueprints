@@ -25,6 +25,7 @@ h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 * Updated @TinkerGraph@ to be @ConcurrentModificationException@ safe
 * Bumped to support Neo4j 1.4
 * Bumped to support OrientDB 1.0rc3
+* @IndexableGraph.getIndex()@ new return @null@ for non-existent indices instead of @RuntimeException@
 
 ==<hr/>==
 
