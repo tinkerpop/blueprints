@@ -22,6 +22,7 @@ h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Updated Vertex API to have @getOutEdges(String...)@ and @getInEdges(String...)@
+* Updated @TinkerGraph@ to be @ConcurrentModificationException@ safe
 
 ==<hr/>==
 
