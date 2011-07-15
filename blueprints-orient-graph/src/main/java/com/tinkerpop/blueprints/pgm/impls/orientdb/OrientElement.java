@@ -1,13 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.Set;
+
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-
-import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -77,6 +77,16 @@ public abstract class OrientElement implements Element {
     }
 
     public Object getProperty(final String key) {
+    		if( key == null )
+    			return null;
+    		
+    		if( key.equals("_class"))
+    			return rawElement.getSchemaClass().getName();
+    		else if( key.equals("_version"))
+    			return rawElement.getVersion();
+    		else if( key.equals("_rid"))
+    			return rawElement.getIdentity().toString();
+    	
         return this.rawElement.field(key);
     }
 
