@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg.util;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 /**
@@ -9,12 +10,12 @@ import java.util.Iterator;
  */
 public class TinkerEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
 
-    private final Iterator<Edge> edges;
+    private final Iterator<Edge> itty;
     private final String label;
     private Edge currentEdge;
 
-    public TinkerEdgeSequence(final Iterator<Edge> edges, final String label) {
-        this.edges = edges;
+    public TinkerEdgeSequence(final Collection<Edge> edges, final String label) {
+        this.itty = edges.iterator();
         this.label = label;
     }
 
@@ -30,7 +31,7 @@ public class TinkerEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
             return temp;
         } else {
             while (true) {
-                final Edge edge = this.edges.next();
+                final Edge edge = this.itty.next();
                 if (edge.getLabel().equals(this.label)) {
                     return edge;
                 }
@@ -43,8 +44,8 @@ public class TinkerEdgeSequence implements Iterable<Edge>, Iterator<Edge> {
         if (null != this.currentEdge) {
             return true;
         } else {
-            while (this.edges.hasNext()) {
-                final Edge edge = edges.next();
+            while (this.itty.hasNext()) {
+                final Edge edge = itty.next();
                 if (edge.getLabel().equals(this.label)) {
                     this.currentEdge = edge;
                     return true;

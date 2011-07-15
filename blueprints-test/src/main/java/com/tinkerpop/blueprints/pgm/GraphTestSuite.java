@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.*;
@@ -410,6 +411,37 @@ public class GraphTestSuite extends TestSuite {
             }
             assertEquals(totalVertices - 1, edges.size());
             printPerformance(graph.toString(), totalVertices - 1, "edges iterated", this.stopWatch());
+        }
+        graph.shutdown();
+
+    }
+
+    public void testConcurrentModification() {
+        Graph graph = graphTest.getGraphInstance();
+        Vertex a = graph.addVertex(null);
+        graph.addVertex(null);
+        graph.addVertex(null);
+        if (!graphTest.isRDFModel) {
+            for (Vertex vertex : graph.getVertices()) {
+                graph.addEdge(null, vertex, a, convertId("x"));
+                graph.addEdge(null, vertex, a, convertId("y"));
+            }
+            for (Vertex vertex : graph.getVertices()) {
+                assertEquals(BaseTest.count(vertex.getOutEdges()), 2);
+                for (Edge edge : vertex.getOutEdges()) {
+                    graph.removeEdge(edge);
+                }
+            }
+            for (Vertex vertex : graph.getVertices()) {
+                graph.removeVertex(vertex);
+            }
+        } else {
+            for (int i = 0; i < 10; i++) {
+                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+            }
+            for (Edge edge : graph.getEdges()) {
+                graph.removeEdge(edge);
+            }
         }
         graph.shutdown();
 

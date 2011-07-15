@@ -149,11 +149,11 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
 
     public Iterable<Vertex> getVertices() {
-        return vertices.values();
+        return new LinkedList<Vertex>(vertices.values());
     }
 
     public Iterable<Edge> getEdges() {
-        return edges.values();
+        return new LinkedList<Edge>(edges.values());
     }
 
     public void removeVertex(final Vertex vertex) {
