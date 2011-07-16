@@ -26,6 +26,10 @@ h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 * Bumped to support Neo4j 1.4
 * Bumped to support OrientDB 1.0rc3
 * @IndexableGraph.getIndex()@ new return @null@ for non-existent indices instead of @RuntimeException@
+* Added support for statement deduplication (now the default) in GraphSail
+* Refactored GraphMLReader and GraphMLWriter to use a more typical pattern for readers and writers (rather than continuing to overload inputGraph and outputGraph).  Added normalizing functionality to GraphMLWriter, enabling graph versioning
+* Changed the property graph schema of GraphSail to more closely resemble SailGraph's
+* Extended GraphSail to support Sesame-style inferencing
 
 ==<hr/>==
 
