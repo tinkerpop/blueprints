@@ -10,8 +10,8 @@ public class JSONTokens {
     public static final String _ID = "_id";
     public static final String _LABEL = "_label";
     public static final String _TYPE = "_type";
-    public static final String OUT_V = "outV";
-    public static final String IN_V = "inV";
+    public static final String _OUT_V = "_outV";
+    public static final String _IN_V = "_inV";
     public static final String VALUE = "value";
     public static final String TYPE = "type";
     public static final String TYPE_LIST = "list";

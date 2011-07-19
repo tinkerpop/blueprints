@@ -70,8 +70,8 @@ public class JSONWriter {
             } else if (element instanceof Edge) {
                 final Edge edge = (Edge) element;
                 jsonElement.put(JSONTokens._TYPE, JSONTokens.EDGE);
-                jsonElement.put(JSONTokens.OUT_V, edge.getOutVertex().getId());
-                jsonElement.put(JSONTokens.IN_V, edge.getInVertex().getId());
+                jsonElement.put(JSONTokens._OUT_V, edge.getOutVertex().getId());
+                jsonElement.put(JSONTokens._IN_V, edge.getInVertex().getId());
                 jsonElement.put(JSONTokens._LABEL, edge.getLabel());
 
             }

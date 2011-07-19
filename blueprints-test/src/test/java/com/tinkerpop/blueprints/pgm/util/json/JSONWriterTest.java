@@ -39,10 +39,10 @@ public class JSONWriterTest {
         Assert.assertEquals("test", json.optString(JSONTokens._LABEL));
         Assert.assertTrue(json.has(JSONTokens._TYPE));
         Assert.assertEquals("edge", json.optString(JSONTokens._TYPE));
-        Assert.assertTrue(json.has(JSONTokens.IN_V));
-        Assert.assertEquals(2, json.optInt(JSONTokens.IN_V));
-        Assert.assertTrue(json.has(JSONTokens.OUT_V));
-        Assert.assertEquals(1, json.optInt(JSONTokens.OUT_V));
+        Assert.assertTrue(json.has(JSONTokens._IN_V));
+        Assert.assertEquals(2, json.optInt(JSONTokens._IN_V));
+        Assert.assertTrue(json.has(JSONTokens._OUT_V));
+        Assert.assertEquals(1, json.optInt(JSONTokens._OUT_V));
     }
 
     @Test
