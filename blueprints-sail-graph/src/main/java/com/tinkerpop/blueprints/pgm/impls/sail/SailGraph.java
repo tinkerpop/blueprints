@@ -53,16 +53,11 @@ public class SailGraph implements TransactionalGraph {
             return ret;
     }
 
+    protected final List<ThreadLocal<SailConnection>> connections = new LinkedList<ThreadLocal<SailConnection>>();
+
     protected Sail rawGraph;
-    protected final ThreadLocal<SailConnection> sailConnection = new ThreadLocal<SailConnection>() {
-        protected SailConnection initialValue() {
-            try {
-                return rawGraph.getConnection();
-            } catch (SailException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        }
-    };
+    protected final ThreadLocal<SailConnection> sailConnection = createConnection();
+
     private final ThreadLocal<Boolean> inTransaction = new ThreadLocal<Boolean>() {
         protected Boolean initialValue() {
             return Boolean.FALSE;
@@ -279,14 +274,66 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
-    public void shutdown() {
+    private synchronized ThreadLocal<SailConnection> createConnection() {
         try {
-            this.sailConnection.get().close();
-            this.sailConnection.remove();
+            cleanupConnections();
+
+            ThreadLocal<SailConnection> tl = new ThreadLocal<SailConnection>() {
+                protected SailConnection initialValue() {
+                    try {
+                        return rawGraph.getConnection();
+                    } catch (SailException e) {
+                        throw new RuntimeException(e.getMessage(), e);
+                    }
+                }
+            };
+
+            connections.add(tl);
+
+            return tl;
+        } catch (SailException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private void cleanupConnections() throws SailException {
+        Collection<ThreadLocal<SailConnection>> toRemove = new LinkedList<ThreadLocal<SailConnection>>();
+
+        for (ThreadLocal<SailConnection> tl : connections) {
+            SailConnection sc = tl.get();
+            if (null == sc || !sc.isOpen()) {
+                toRemove.add(tl);
+            }
+        }
+
+        for (ThreadLocal<SailConnection> tl : toRemove) {
+            connections.remove(tl);
+        }
+    }
+
+    private void closeAllConnections() throws SailException {
+        for (ThreadLocal<SailConnection> tl : connections) {
+            SailConnection sc = tl.get();
+            if (null != sc) {
+                if (sc.isOpen()) {
+                    sc.rollback();
+                    sc.close();
+                }
+
+                tl.remove();
+            }
+        }
+    }
+
+    public synchronized void shutdown() {
+        try {
+            closeAllConnections();
+
+            //this.sailConnection.get().close();
+            //this.sailConnection.remove();
             this.rawGraph.shutDown();
         } catch (Throwable e) {
-            // TODO: close all connections.
-            //throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
