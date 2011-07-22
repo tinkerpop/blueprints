@@ -76,5 +76,14 @@ public class TransactionalGraphHelper {
             this.graph.setTransactionMode(this.startMode);
         }
 
+        /**
+         * Returns the number of commits that have occurred thus far.
+         *
+         * @return the number of commits thus far
+         */
+        public long getCommitCount() {
+            return this.counter / this.bufferSize;
+        }
+
     }
 }
