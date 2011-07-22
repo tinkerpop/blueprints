@@ -30,6 +30,7 @@ h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
 * Refactored @GraphMLReader@ and @GraphMLWriter@ to use a more typical pattern for readers and writers (rather than continuing to overload @inputGraph()@ and @outputGraph()@).  Added normalizing functionality to @GraphMLWriter@, enabling graph versioning
 * Changed the property graph schema of @GraphSail@ to more closely resemble the @SailGraph@ schema
 * Extended @GraphSail@ to support Sesame-style inferencing
+* @SailGraph@ dangling connection issue fixed
 
 ==<hr/>==
 
