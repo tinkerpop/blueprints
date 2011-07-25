@@ -290,7 +290,7 @@ public class SailGraph implements TransactionalGraph {
 
             connections.add(tl);
 
-            // Force creation of the connection (otherwise, it will be created at shutdown time, leading to weird behavior).
+            // Force creation of the connection (otherwise, it may be created at shutdown time, leading to weird behavior).
             tl.get();
 
             return tl;
