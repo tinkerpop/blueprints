@@ -170,7 +170,7 @@ class GraphMLWriterHelper {
 
         /**
          * Return the current indent step.
-         *
+         * <p/>
          * <p>Return the current indent step: each start tag will be
          * indented by this number of spaces times the number of
          * ancestors that the element has.</p>
@@ -178,9 +178,7 @@ class GraphMLWriterHelper {
          * @return The number of spaces in each indentation step,
          *         or 0 or less for no indentation.
          * @see #setIndentStep(int)
-         *
-         * @deprecated
-         *      Only return the length of the indent string.
+         * @deprecated Only return the length of the indent string.
          */
         public int getIndentStep() {
             return indentStep.length();
@@ -191,11 +189,9 @@ class GraphMLWriterHelper {
          * Set the current indent step.
          *
          * @param indentStep The new indent step (0 or less for no
-         *        indentation).
+         *                   indentation).
          * @see #getIndentStep()
-         *
-         * @deprecated
-         *      Should use the version that takes string.
+         * @deprecated Should use the version that takes string.
          */
         public void setIndentStep(int indentStep) {
             StringBuilder s = new StringBuilder();
@@ -237,9 +233,9 @@ class GraphMLWriterHelper {
         /**
          * Print indentation for the current level.
          *
-         * @exception org.xml.sax.SAXException If there is an error
-         *            writing the indentation characters, or if a filter
-         *            further down the chain raises an exception.
+         * @throws org.xml.sax.SAXException If there is an error
+         *                                  writing the indentation characters, or if a filter
+         *                                  further down the chain raises an exception.
          */
         private void doIndent() throws XMLStreamException {
             if (depth > 0) {

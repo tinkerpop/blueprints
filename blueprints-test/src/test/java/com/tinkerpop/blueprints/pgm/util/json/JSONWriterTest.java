@@ -136,7 +136,7 @@ public class JSONWriterTest {
     @Test
     public void createJSONObjectVertexStringArrayPropertyNoKeysNoTypes() {
         Vertex v = this.graph.addVertex(1);
-        String[] stringArray = new String[] { "this", "that", "other" };
+        String[] stringArray = new String[]{"this", "that", "other"};
 
         v.setProperty("keyStringArray", stringArray);
 
@@ -155,7 +155,7 @@ public class JSONWriterTest {
     @Test
     public void createJSONObjectVertexDoubleArrayPropertyNoKeysNoTypes() {
         Vertex v = this.graph.addVertex(1);
-        double[] doubleArray = new double[] { 1.0, 2.0, 3.0 };
+        double[] doubleArray = new double[]{1.0, 2.0, 3.0};
 
         v.setProperty("keyDoubleArray", doubleArray);
 
@@ -174,7 +174,7 @@ public class JSONWriterTest {
     @Test
     public void createJSONObjectVertexIntArrayPropertyNoKeysNoTypes() {
         Vertex v = this.graph.addVertex(1);
-        int[] intArray = new int[] { 1, 2, 3 };
+        int[] intArray = new int[]{1, 2, 3};
 
         v.setProperty("keyIntArray", intArray);
 
@@ -193,7 +193,7 @@ public class JSONWriterTest {
     @Test
     public void createJSONObjectVertexLongArrayPropertyNoKeysNoTypes() {
         Vertex v = this.graph.addVertex(1);
-        long[] longArray = new long[] { 1l, 2l, 3l };
+        long[] longArray = new long[]{1l, 2l, 3l};
 
         v.setProperty("keyLongArray", longArray);
 
@@ -212,7 +212,7 @@ public class JSONWriterTest {
     @Test
     public void createJSONObjectFloatArrayPropertyNoKeysNoTypes() {
         Vertex v = this.graph.addVertex(1);
-        float[] floatArray = new float[] { 1.0f, 2.0f, 3.0f };
+        float[] floatArray = new float[]{1.0f, 2.0f, 3.0f};
 
         v.setProperty("keyFloatArray", floatArray);
 
@@ -231,7 +231,7 @@ public class JSONWriterTest {
     @Test
     public void createJSONObjectBooleanArrayPropertyNoKeysNoTypes() {
         Vertex v = this.graph.addVertex(1);
-        boolean[] booleanArray = new boolean[] { true, false, true };
+        boolean[] booleanArray = new boolean[]{true, false, true};
 
         v.setProperty("keyBooleanArray", booleanArray);
 
@@ -296,7 +296,7 @@ public class JSONWriterTest {
         Map map = new HashMap();
         map.put("crazy", mix);
 
-        int[] someInts = new int[] { 1, 2, 3 };
+        int[] someInts = new int[]{1, 2, 3};
         map.put("ints", someInts);
 
         map.put("regular", "stuff");

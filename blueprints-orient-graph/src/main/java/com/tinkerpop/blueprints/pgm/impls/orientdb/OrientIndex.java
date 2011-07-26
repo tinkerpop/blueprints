@@ -1,8 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexUser;
@@ -10,15 +7,13 @@ import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -46,7 +41,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
         this.graph = orientGraph;
-        this.underlying = new OIndexUser( orientGraph.getRawGraph(), rawIndex );
+        this.underlying = new OIndexUser(orientGraph.getRawGraph(), rawIndex);
         load(rawIndex.getConfiguration());
     }
 
@@ -142,7 +137,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         this.indexClass = indexClass;
 
         // CREATE THE MAP
-        this.underlying = new OIndexUser(graph.getRawGraph(),  graph.getRawGraph().getMetadata().getIndexManager()
+        this.underlying = new OIndexUser(graph.getRawGraph(), graph.getRawGraph().getMetadata().getIndexManager()
                 .createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), iKeyType, null, null, null, true));
 
         final String className;
@@ -178,9 +173,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         //underlying = new OIndexUser(graph.getRawGraph(), new OIndexNotUnique().loadFromConfiguration(indexConfiguration) );
     }
 
-		public void close() {
-			underlying = null;
-			graph = null;
-		}
+    public void close() {
+        underlying = null;
+        graph = null;
+    }
 
 }

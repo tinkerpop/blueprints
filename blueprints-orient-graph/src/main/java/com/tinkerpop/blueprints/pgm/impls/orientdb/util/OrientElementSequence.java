@@ -1,8 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
@@ -11,6 +8,9 @@ import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientEdge;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientElement;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientVertex;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -31,10 +31,10 @@ public class OrientElementSequence<T extends Element> implements CloseableSequen
     public T next() {
         OrientElement currentElement = null;
         Object current = this.underlying.next();
-        
-        if( current instanceof ORID)
-        	current = graph.getRawGraph().load( (ORID) current );
-        
+
+        if (current instanceof ORID)
+            current = graph.getRawGraph().load((ORID) current);
+
         if (current instanceof ODocument) {
             final ODocument currentDocument = (ODocument) current;
             if (null == currentDocument)

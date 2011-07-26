@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class JSONWriter {
 
-    private static JSONArray createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes) throws JSONException{
+    private static JSONArray createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
         final JSONArray jsonList = new JSONArray();
         for (Object item : list) {
             if (item instanceof Element) {
@@ -32,7 +32,7 @@ public class JSONWriter {
         return jsonList;
     }
 
-    private static JSONObject createJSONMap(final Map map, final List<String> propertyKeys, final boolean showTypes)  throws JSONException {
+    private static JSONObject createJSONMap(final Map map, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
         final JSONObject jsonMap = new JSONObject();
         for (Object key : map.keySet()) {
             Object value = map.get(key);
