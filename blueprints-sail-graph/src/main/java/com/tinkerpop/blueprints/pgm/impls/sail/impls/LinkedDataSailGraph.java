@@ -11,11 +11,13 @@ import org.openrdf.sail.Sail;
 public class LinkedDataSailGraph extends SailGraph {
 
     public LinkedDataSailGraph(final SailGraph storageGraph) {
-        try {
+        super(createSail(storageGraph));
+    }
+
+    private static Sail createSail(final SailGraph storageGraph) {
+         try {
             Ripple.initialize();
-            final Sail sail = new LinkedDataSail(storageGraph.getRawGraph());
-            sail.initialize();
-            this.startSail(sail);
+            return new LinkedDataSail(storageGraph.getRawGraph());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
