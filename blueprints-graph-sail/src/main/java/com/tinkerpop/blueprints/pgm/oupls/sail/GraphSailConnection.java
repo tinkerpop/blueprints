@@ -7,7 +7,11 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
 import net.fortytwo.sesametools.SailConnectionTripleSource;
-import org.openrdf.model.*;
+import org.openrdf.model.Namespace;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
@@ -323,7 +327,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             }
 
             //System.out.println("removing this edge: " + e);
-            store.graph.removeEdge(e);
+            removeEdge(e);
 
             if (null != s) {
                 notifyStatementRemoved(s);
@@ -389,25 +393,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                         // delete an edge in an iterator currently being traversed.  So for now, just ignore the
                         // UnsupportedOperationException and proceed to delete the edge from the graph.
                     }
-                    Vertex h = e.getInVertex();
-                    Vertex t = e.getOutVertex();
-                    store.graph.removeEdge(e);
-                    if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
-                        try {
-                            store.graph.removeVertex(h);
-                        } catch (IllegalStateException ex) {
-                            // Just keep going.  This is a hack for Neo4j vertices which appear in more than
-                            // one to-be-deleted edge.
-                        }
-                    }
-                    if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
-                        try {
-                            store.graph.removeVertex(t);
-                        } catch (IllegalStateException ex) {
-                            // Just keep going.  This is a hack for Neo4j vertices which appear in more than
-                            // one to-be-deleted edge.
-                        }
-                    }
+
+                    removeEdge(e);
 
                     if (null != s) {
                         notifyStatementRemoved(s);
@@ -418,6 +405,28 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             }
         } finally {
             i.close();
+        }
+    }
+
+    private void removeEdge(final Edge edge) {
+        Vertex h = edge.getInVertex();
+        Vertex t = edge.getOutVertex();
+        store.graph.removeEdge(edge);
+        if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
+            try {
+                store.graph.removeVertex(h);
+            } catch (IllegalStateException ex) {
+                // Just keep going.  This is a hack for Neo4j vertices which appear in more than
+                // one to-be-deleted edge.
+            }
+        }
+        if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
+            try {
+                store.graph.removeVertex(t);
+            } catch (IllegalStateException ex) {
+                // Just keep going.  This is a hack for Neo4j vertices which appear in more than
+                // one to-be-deleted edge.
+            }
         }
     }
 

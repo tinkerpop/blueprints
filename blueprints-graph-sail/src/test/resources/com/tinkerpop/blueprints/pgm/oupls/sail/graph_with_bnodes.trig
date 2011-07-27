@@ -1,0 +1,29 @@
+@prefix ex: <http://example.org/ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+{
+    ex:Class1
+        a owl:Class ;
+        rdfs:subClassOf ex:Class2, [
+            a owl:Restriction ;
+            owl:onProperty ex:Ref ;
+            owl:someValuesFrom ex:Class3
+        ], [
+            a owl:Restriction ;
+            owl:onClass ex:Class3 ;
+            owl:onProperty ex:Ref ;
+            owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
+        ] .
+
+    ex:Class2
+        a owl:Class .
+
+    ex:Class3
+        a owl:Class .
+
+    ex:Ref
+        a owl:ObjectProperty .
+}

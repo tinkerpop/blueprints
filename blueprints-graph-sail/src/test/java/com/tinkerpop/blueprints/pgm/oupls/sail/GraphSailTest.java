@@ -7,12 +7,16 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.sparql.SPARQLParser;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
@@ -44,6 +48,92 @@ public abstract class GraphSailTest extends SailTest {
 
     protected void after() throws Exception {
         // Nothing to do.
+    }
+
+    public void testOrphanVerticesAutomaticallyDeleted() throws Exception {
+        String ex = "http://example.org/ns#";
+        URI ref = new URIImpl(ex + "Ref");
+
+        clear();
+        int edgesBefore, verticesBefore;
+
+        SailConnection sc = sail.getConnection();
+        try {
+            edgesBefore = countEdges();
+            verticesBefore = countVertices();
+        } finally {
+            sc.commit();
+            sc.close();
+        }
+
+        addFile(SailTest.class.getResourceAsStream("graph_with_bnodes.trig"), RDFFormat.TRIG);
+
+        sc = sail.getConnection();
+        //showStatements(sc, null, null, null);
+        try {
+            assertEquals(14, countStatements(sc, null, null, null));
+            assertEquals(edgesBefore + 14, countEdges());
+            assertEquals(verticesBefore + 10, countVertices());
+
+            sc.removeStatements(ref, null, null);
+            sc.commit();
+
+            assertEquals(13, countStatements(sc, null, null, null));
+            assertEquals(edgesBefore + 13, countEdges());
+            assertEquals(verticesBefore + 9, countVertices());
+
+            sc.clear();
+            sc.commit();
+
+            assertEquals(0, countStatements(sc, null, null, null));
+            assertEquals(0, countEdges());
+            // Namespaces vertex is still present.
+            assertEquals(verticesBefore, countVertices());
+        } finally {
+            sc.close();
+        }
+    }
+
+    public void testBlankNodesUnique() throws Exception {
+        String ex = "http://example.org/ns#";
+        URI class1 = new URIImpl(ex + "Class1");
+
+        clear();
+        int edgesBefore, verticesBefore;
+
+        SailConnection sc = sail.getConnection();
+        try {
+            edgesBefore = countEdges();
+            verticesBefore = countVertices();
+        } finally {
+            sc.close();
+        }
+
+        // Load a file once.
+        addFile(SailTest.class.getResourceAsStream("graph_with_bnodes.trig"), RDFFormat.TRIG);
+
+        sc = sail.getConnection();
+        try {
+            assertEquals(3, countStatements(sc, class1, RDFS.SUBCLASSOF, null));
+            assertEquals(edgesBefore + 14, countEdges());
+            assertEquals(verticesBefore + 10, countVertices());
+        } finally {
+            sc.close();
+        }
+
+        // Load the file again.
+        // Loading the same file twice results in extra vertices and edges,
+        // since blank nodes assume different identities on each load.
+        addFile(SailTest.class.getResourceAsStream("graph_with_bnodes.trig"), RDFFormat.TRIG);
+
+        sc = sail.getConnection();
+        try {
+            assertEquals(5, countStatements(sc, class1, RDFS.SUBCLASSOF, null));
+            assertEquals(edgesBefore + 23, countEdges());
+            assertEquals(verticesBefore + 12, countVertices());
+        } finally {
+            sc.close();
+        }
     }
 
     public void testIndexPatterns() throws Exception {
@@ -131,5 +221,25 @@ public abstract class GraphSailTest extends SailTest {
     private void assertTriplePattern(final String pattern, final boolean isValid) {
         boolean m = GraphSail.INDEX_PATTERN.matcher(pattern).matches();
         assertTrue(isValid ? m : !m);
+    }
+
+    private int countVertices() {
+        int count = 0;
+
+        for (Vertex v : graph.getVertices()) {
+            count++;
+        }
+
+        return count;
+    }
+
+    private int countEdges() {
+        int count = 0;
+
+        for (Edge e : graph.getEdges()) {
+            count++;
+        }
+
+        return count;
     }
 }

@@ -9,11 +9,10 @@ import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
  */
 public class Neo4jGraphSailTest extends GraphSailTest {
     protected IndexableGraph createGraph() {
-        //String directory = System.getProperty("neo4jDirectory");
-        //if (directory == null) {
         String directory = this.getWorkingDirectory();
-        //}
+
         Neo4jGraph g = new Neo4jGraph(directory);
+        g.clear();
         g.setTransactionMode(TransactionalGraph.Mode.MANUAL);
         return g;
     }

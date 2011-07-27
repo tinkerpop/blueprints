@@ -5,7 +5,14 @@ import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.*;
+import org.openrdf.model.BNode;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Namespace;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.datatypes.XMLDatatypeUtil;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -15,16 +22,29 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
-import org.openrdf.sail.*;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
+import org.openrdf.sail.NotifyingSail;
+import org.openrdf.sail.NotifyingSailConnection;
+import org.openrdf.sail.Sail;
+import org.openrdf.sail.SailChangedEvent;
+import org.openrdf.sail.SailChangedListener;
+import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.SailConnectionListener;
+import org.openrdf.sail.SailException;
 import org.openrdf.sail.inferencer.InferencerConnection;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.*;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -53,17 +73,7 @@ public abstract class SailTest extends TestCase {
             }
         }
 
-        Repository repo = new SailRepository(sail);
-        RepositoryConnection rc = repo.getConnection();
-        try {
-            // TODO: this keeps OrientDB from throwing transaction errors, but... why?
-            rc.setAutoCommit(false);
-
-            rc.add(SailTest.class.getResource("sailTest.trig"), "", RDFFormat.TRIG);
-            rc.commit();
-        } finally {
-            rc.close();
-        }
+        addFile(SailTest.class.getResourceAsStream("sailTest.trig"), RDFFormat.TRIG);
     }
 
     @After
@@ -1491,6 +1501,78 @@ public abstract class SailTest extends TestCase {
             return set;
         } finally {
             i.close();
+        }
+    }
+
+    protected void clear() throws Exception {
+        SailConnection sc = sail.getConnection();
+        try {
+            sc.clear();
+            sc.commit();
+        } finally {
+            sc.close();
+        }
+    }
+
+    protected void addFile(final InputStream in,
+                           final RDFFormat format) throws Exception {
+        try {
+            SailConnection sc = sail.getConnection();
+            try {
+                RDFHandler h = new SailAdder(sc);
+                RDFParser p = Rio.createParser(format);
+                p.setRDFHandler(h);
+                p.parse(in, "");
+                sc.commit();
+            } finally {
+                sc.close();
+            }
+        } finally {
+            in.close();
+        }
+    }
+
+    protected class SailAdder implements RDFHandler {
+        private final SailConnection c;
+        private final Resource[] contexts;
+
+        public SailAdder(final SailConnection c,
+                         final Resource... contexts) {
+            this.c = c;
+            this.contexts = contexts;
+        }
+
+        public void startRDF() throws RDFHandlerException {
+        }
+
+        public void endRDF() throws RDFHandlerException {
+        }
+
+        public void handleNamespace(final String prefix,
+                                    final String uri) throws RDFHandlerException {
+            try {
+                c.setNamespace(prefix, uri);
+            } catch (SailException e) {
+                throw new RDFHandlerException(e);
+            }
+        }
+
+        public void handleStatement(final Statement s) throws RDFHandlerException {
+            //System.out.println("adding statement: " + s);
+            try {
+                if (1 <= contexts.length) {
+                    for (Resource x : contexts) {
+                        c.addStatement(s.getSubject(), s.getPredicate(), s.getObject(), x);
+                    }
+                } else {
+                    c.addStatement(s.getSubject(), s.getPredicate(), s.getObject(), s.getContext());
+                }
+            } catch (SailException e) {
+                throw new RDFHandlerException(e);
+            }
+        }
+
+        public void handleComment(String s) throws RDFHandlerException {
         }
     }
 }

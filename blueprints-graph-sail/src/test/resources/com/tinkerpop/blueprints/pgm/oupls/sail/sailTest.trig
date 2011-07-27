@@ -8,8 +8,7 @@
 #    	rdfs:comment "he's a jerk".
 }
 
-:ctx1
-{
+:ctx1 {
 	:ford a foaf:Person;
 		foaf:knows :arthur, :zaphod;
 		rdfs:comment "he really knows where his towel is".
@@ -41,3 +40,4 @@
 
     :instance1 a :classB.
 }
+
