@@ -11,7 +11,9 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-h3. Version 0.9 (NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-marvin.png!
+
+h3. Version 0.9 (Marvin -- NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
