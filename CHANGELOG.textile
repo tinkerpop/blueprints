@@ -33,6 +33,7 @@ h3. Version 0.9 (Marvin -- NOT OFFICIALLY RELEASED YET)
 * Changed the property graph schema of @GraphSail@ to more closely resemble the @SailGraph@ schema
 * Extended @GraphSail@ to support Sesame-style inferencing
 * @SailGraph@ dangling connection issue fixed
+* Updated @Index.toString()@ to make it more readable and compact
 
 ==<hr/>==
 

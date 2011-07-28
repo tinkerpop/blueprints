@@ -34,7 +34,7 @@ public class StringFactory {
     }
 
     public static String indexString(final Index index) {
-        String returnString = index.getIndexType() + "[" + index.getIndexName() + ":" + index.getIndexClass() + "]";
+        String returnString = index.getIndexType() + "[" + index.getIndexName() + ":" + index.getIndexClass().getSimpleName() + "]";
         if (index instanceof AutomaticIndex) {
             returnString = returnString + "[autoIndexKeys:" + ((AutomaticIndex) index).getAutoIndexKeys() + "]";
         }
