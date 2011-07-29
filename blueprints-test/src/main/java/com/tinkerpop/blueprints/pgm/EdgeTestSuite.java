@@ -129,6 +129,18 @@ public class EdgeTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testGetNonExistantEdges() {
+        Graph graph = graphTest.getGraphInstance();
+        try {
+            assertNull(graph.getEdge(null));
+            assertNull(graph.getEdge("asbv"));
+            assertNull(graph.getEdge(12.0d));
+        } catch (Exception e) {
+            assertTrue(true);
+        }
+        graph.shutdown();
+    }
+
     public void testRemoveManyEdges() {
         Graph graph = graphTest.getGraphInstance();
         long counter = 200000l;

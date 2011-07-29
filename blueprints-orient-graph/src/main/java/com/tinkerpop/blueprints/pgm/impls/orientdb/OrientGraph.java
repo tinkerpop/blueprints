@@ -10,7 +10,13 @@ import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
@@ -167,6 +173,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Vertex getVertex(final Object id) {
+        if (null == id)
+            return null;
+
         ORID rid;
         if (id instanceof ORID)
             rid = (ORID) id;
@@ -235,6 +244,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Edge getEdge(final Object id) {
+        if (null == id)
+            return null;
+
         final ORID rid;
         if (id instanceof ORID)
             rid = (ORID) id;

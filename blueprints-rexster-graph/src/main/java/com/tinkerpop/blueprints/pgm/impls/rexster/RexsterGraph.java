@@ -1,6 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
@@ -62,6 +67,9 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public Vertex getVertex(final Object id) {
+        if (null == id)
+            return null;
+
         try {
             return new RexsterVertex(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(id)), this);
         } catch (Exception e) {
@@ -71,6 +79,9 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public Edge getEdge(final Object id) {
+        if (null == id)
+            return null;
+
         try {
             return new RexsterEdge(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id)), this);
         } catch (Exception e) {

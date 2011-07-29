@@ -137,11 +137,11 @@ public class VertexTestSuite extends TestSuite {
 
     public void testGetNonExistantVertices() {
         Graph graph = graphTest.getGraphInstance();
+        assertNull(graph.getVertex(null));
         try {
             assertNull(graph.getVertex("asbv"));
             assertNull(graph.getVertex(12.0d));
-            assertNull(graph.getVertex(null));
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             assertTrue(true);
         }
         graph.shutdown();
