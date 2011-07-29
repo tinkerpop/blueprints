@@ -66,7 +66,7 @@ public abstract class GraphSailTest extends SailTest {
             sc.close();
         }
 
-        addFile(SailTest.class.getResourceAsStream("graph_with_bnodes.trig"), RDFFormat.TRIG);
+        addFile(SailTest.class.getResourceAsStream("graph-example-bnodes.trig"), RDFFormat.TRIG);
 
         sc = sail.getConnection();
         //showStatements(sc, null, null, null);
@@ -110,7 +110,7 @@ public abstract class GraphSailTest extends SailTest {
         }
 
         // Load a file once.
-        addFile(SailTest.class.getResourceAsStream("graph_with_bnodes.trig"), RDFFormat.TRIG);
+        addFile(SailTest.class.getResourceAsStream("graph-example-bnodes.trig"), RDFFormat.TRIG);
 
         sc = sail.getConnection();
         try {
@@ -124,7 +124,7 @@ public abstract class GraphSailTest extends SailTest {
         // Load the file again.
         // Loading the same file twice results in extra vertices and edges,
         // since blank nodes assume different identities on each load.
-        addFile(SailTest.class.getResourceAsStream("graph_with_bnodes.trig"), RDFFormat.TRIG);
+        addFile(SailTest.class.getResourceAsStream("graph-example-bnodes.trig"), RDFFormat.TRIG);
 
         sc = sail.getConnection();
         try {

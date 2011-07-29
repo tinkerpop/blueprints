@@ -63,7 +63,7 @@ public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
             RepositoryConnection rc = repo.getConnection();
             rc.setAutoCommit(false);
             try {
-                rc.add(SailTest.class.getResource("sailTest.trig"), "", RDFFormat.TRIG);
+                rc.add(SailTest.class.getResource("graph-example-sail-test.trig"), "", RDFFormat.TRIG);
             } finally {
                 rc.close();
             }

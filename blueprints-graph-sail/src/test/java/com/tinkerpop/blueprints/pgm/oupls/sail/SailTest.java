@@ -73,7 +73,7 @@ public abstract class SailTest extends TestCase {
             }
         }
 
-        addFile(SailTest.class.getResourceAsStream("sailTest.trig"), RDFFormat.TRIG);
+        addFile(SailTest.class.getResourceAsStream("graph-example-sail-test.trig"), RDFFormat.TRIG);
     }
 
     @After
