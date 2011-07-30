@@ -34,6 +34,7 @@ h3. Version 0.9 (Marvin -- NOT OFFICIALLY RELEASED YET)
 * Extended @GraphSail@ to support Sesame-style inferencing
 * @SailGraph@ dangling connection issue fixed
 * Updated @Index.toString()@ to make it more readable and compact
+* Updated @graph.getVertex/Edge(null)@ to ensure that @null@ is returned
 
 ==<hr/>==
 
