@@ -32,11 +32,11 @@ import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private final static String ADMIN = "admin";
 
-    private final String url;
-    private final String username;
-    private final String password;
+    private String url;
+    private String username;
+    private String password;
 
-    private ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
+    private final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
     
     static{
       //OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(false);
@@ -332,6 +332,10 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
             this.threadContext.set(null);
         }
+        
+        url=null;
+        username=null;
+        password=null;
     }
 
     public String toString() {
@@ -405,6 +409,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private OrientGraphContext openOrCreate(final boolean createDefaultIndices) {
+    	  if( url == null )
+    	  	throw new IllegalStateException("Database is closed");
+    	  
         synchronized (this) {
             OrientGraphContext context = threadContext.get();
             if (context != null)
