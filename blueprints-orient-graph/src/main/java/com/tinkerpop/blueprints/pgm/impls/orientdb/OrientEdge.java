@@ -30,7 +30,8 @@ public class OrientEdge extends OrientElement implements Edge {
         return (String) this.rawElement.field(LABEL);
     }
 
-    protected void setLabel(final String label) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+		protected void setLabel(final String label) {
         this.rawElement.field(LABEL, label);
         for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
             autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
