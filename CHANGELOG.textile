@@ -13,20 +13,20 @@ Blueprints: A Property Graph Model Interface
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-marvin.png!
 
-h3. Version 0.9 (Marvin -- NOT OFFICIALLY RELEASED YET)
+h3. Version 0.9 (Marvin -- August 1, 2011)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>0.9-SNAPSHOT</version>
+  <version>0.9</version>
 </dependency>
 ```
 
 * Updated Vertex API to have @getOutEdges(String...)@ and @getInEdges(String...)@
 * Updated @TinkerGraph@ to be @ConcurrentModificationException@ safe
 * Bumped to support Neo4j 1.4
-* Bumped to support OrientDB 1.0rc3
+* Bumped to support OrientDB 1.0rc4
 * @IndexableGraph.getIndex()@ now return @null@ for non-existent indices instead of @RuntimeException@
 * Added support for statement deduplication (now the default) in @GraphSail@
 * Refactored @GraphMLReader@ and @GraphMLWriter@ to use a more typical pattern for readers and writers (rather than continuing to overload @inputGraph()@ and @outputGraph()@).  Added normalizing functionality to @GraphMLWriter@, enabling graph versioning
