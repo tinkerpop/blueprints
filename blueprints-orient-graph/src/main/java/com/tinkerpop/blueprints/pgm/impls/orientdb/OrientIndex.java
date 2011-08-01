@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexUser;
@@ -16,9 +19,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -91,14 +91,15 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
+    @SuppressWarnings("rawtypes")
+		public CloseableSequence<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
         final Collection<OIdentifiable> records = underlying.get(keyTemp);
 
         if (records.isEmpty())
             return new WrappingCloseableSequence(Collections.emptySet());
 
-        return new OrientElementSequence(graph, records.iterator());
+        return new OrientElementSequence<T>(graph, records.iterator());
     }
 
     public long count(final String key, final Object value) {
@@ -173,9 +174,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
                 throw new IllegalArgumentException("Index class '" + indexClassName
                         + "' is not registered. Supported ones: Vertex, Edge and custom class that extends them");
             }
-
-        // LOAD THE TREE-MAP
-        //underlying = new OIndexUser(graph.getRawGraph(), new OIndexNotUnique().loadFromConfiguration(indexConfiguration) );
     }
 
     public void close() {
