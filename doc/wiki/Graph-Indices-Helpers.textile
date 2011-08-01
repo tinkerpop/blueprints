@@ -1,0 +1,15 @@
+A "helper class" in Blueprints is provided in the @com.tinkerpop.blueprints.pgm.util@ package. Helper classes provide (usually) static methods that yield high-level support for manipulating various Blueprints objects. Of particular interest to this page of documentation, there are a collection of helper classes for handling indices.
+
+h2. AutomaticIndexHelper
+
+@AutomaticIndexHelper@ provides high-level methods for adding, removing, and reindexing elements in an @AutomaticIndex@. Here is an example.
+
+```java
+graph = TinkerGraphFactory.createTinkerGraph();
+indexKeys = new HashSet<String>();
+indexKeys.add("name");
+index = graph.createAutomaticIndex("test-idx", Vertex.class, indexKeys);
+index.get("name","marko"); // returns an empty iterator
+index = AutomaticIndexHelper.reIndexElements(graph, index, graph.getVertices()); // reindex all the vertices in the graph
+index.get("name","marko"); // returns an iterator with v[1] in it
+```

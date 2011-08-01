@@ -1,0 +1,16 @@
+!http://icons.iconarchive.com/icons/dryicons/aesthetica-2/128/lock-icon.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+@ReadOnlyGraph@ and @ReadOnlyIndexableGraph@ wrap any @Graph@ or @IndexableGraph@, respectively. The purpose of a @ReadOnlyGraph@ is to ensure that the graph is not mutated by a mutating method invocation. The following methods throw an @UnsupportedOperationException@:
+
+* @Graph@: @addVertex()@, @removeVertex()@, @addEdge()@, @removeEdge()@, @clear()@, @shutdown()@
+* @IndexableGraph@: @dropIndex()@, @createManualIndex()@, @createAutomaticIndex()@
+* @Element@: @setProperty()@, @removeProperty()@
+* @Index@: @put()@, @remove()@

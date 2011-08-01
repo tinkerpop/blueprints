@@ -1,0 +1,63 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/jung-visualization.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-graph-jung</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+Blueprints provides an implementation of the "JUNG":http://jung.sourceforge.net/ @edu.uci.ics.jung.graph.Graph<Vertex, Edge>@ interface called @com.tinkerpop.blueprints.pgm.oupl.jung.GraphJung@.
+
+bq. The Java Universal Network/Graph Framework is a software library that provides a common and extensible language for the modeling, analysis, and visualization of data that can be represented as a graph or network. It is written in Java, which allows JUNG-based applications to make use of the extensive built-in capabilities of the Java API, as well as those of other existing third-party Java libraries. -- "JUNG Development Team":http://jung.sourceforge.net/team.html
+
+The benefits of @GraphJung@ is that any application that is written to talk to a JUNG @edu.uci.ics.jung.graph.Graph<Vertex, Edge>@ can now, indirectly, talk to a Blueprints @com.tinkerpop.blueprints.pgm.Graph@. Exciting applications include the use of the JUNG visualization and algorithms packages (see "JUNG JavaDoc":http://jung.sourceforge.net/doc/api/index.html) over any Blueprints-enabled graph database/framework. An example  use case involving the JUNG algorithms package is provided below.
+
+```java
+Graph graph = ... // construct a particular Blueprints graph implementation
+PageRank<Vertex,Edge> pageRank = new PageRank<Vertex, Edge>(new GraphJung(graph), 0.15d);
+pageRank.evaluate();
+for (Vertex vertex : graph.getVertices()) {
+  System.out.println("The PageRank score of " + vertex + " is: " + pageRank.getVertexScore(vertex));
+}
+```
+
+For those interested in visualization, the visualization provided at the beginning of this page is done with the following.
+
+```java
+public static void main(String[] args) {
+  GraphJung graph = new GraphJung(TinkerGraphFactory.createTinkerGraph());
+  Layout<Vertex, Edge> layout = new CircleLayout<Vertex, Edge>(graph);
+  layout.setSize(new Dimension(300, 300));
+  BasicVisualizationServer<Vertex, Edge> viz = new BasicVisualizationServer<Vertex, Edge>(layout);
+  viz.setPreferredSize(new Dimension(350, 350));
+
+  Transformer<Vertex, String> vertexLabelTransformer = new Transformer<Vertex, String>() {
+    public String transform(Vertex vertex) {
+      return (String) vertex.getProperty("name");
+    }
+  };
+
+  Transformer<Edge, String> edgeLabelTransformer = new Transformer<Edge, String>() {
+    public String transform(Edge edge) {
+      return edge.getLabel();
+    }
+  };
+
+  viz.getRenderContext().setEdgeLabelTransformer(edgeLabelTransformer);
+  viz.getRenderContext().setVertexLabelTransformer(vertexLabelTransformer);
+
+  JFrame frame = new JFrame("TinkerPop");
+  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  frame.getContentPane().add(viz);
+  frame.pack();
+  frame.setVisible(true);
+}
+```
+
+<br/>
+<hr/>
+<br/>
+
+*NOTE*: JUNG is a library that was developed for in-memory graph structures. As such, many of the aspects of its various classes are memory based. For instance, given the above @PageRank@ example, the method @pageRank.getVertexScore()@ is pulling from an in-memory @Map<Vertex,Double>@ that contains the score for each vertex. If the number of vertices in the graph is large, then such in-memory structures will ultimately throw an @OutOfMemoryError@. As such, be wary of such situations when using @GraphJung@. 

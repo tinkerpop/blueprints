@@ -1,0 +1,93 @@
+This section will provide a collection of code examples that work with the Blueprints graph API. The in-memory [[TinkerGraph]] database will be used throughout the examples. Please feel free to alter the graph constructor to work with different graph databases. These code examples can be found in the main Blueprints distribution "at this location":https://github.com/tinkerpop/blueprints/blob/master/blueprints-test/src/test/java/com/tinkerpop/blueprints/pgm/impls/tg/CodeExamples.java.
+
+# "Create a Simple Graph":#create
+# "Iterate through the Elements of a Graph":#elements
+# "Iterate through the Edges of a Vertex":#edge
+# "Use Indices to Get a Vertex by its Property":#index
+
+h2(#create). Create a Simple Graph
+
+Create a graph. Add two vertices. Set the @name@ property of each vertex. Create an @knows@ edge between the two vertices. Print the components of the graph.
+
+```java
+Graph graph = new TinkerGraph();
+Vertex a = graph.addVertex(null);
+Vertex b = graph.addVertex(null);
+a.setProperty("name", "marko");
+b.setProperty("name", "peter");
+Edge e = graph.addEdge(null, a, b, "knows");
+System.out.println(e.getOutVertex().getProperty("name") + "--" + e.getLabel() + "-->" + e.getInVertex().getProperty("name"));
+```
+
+The @System.out@ after the code executes is:
+
+bc. marko--knows-->peter
+
+h2(#elements). Iterate through the Elements of a Graph
+
+Load the TinkerPop play graph diagrammed in [[Property Graph Model]]. Iterate through all the vertices and print them to @System.out@. Iterate through all the edges and print them to @System.out@.
+
+```java
+public void testIteratingGraph() {
+  Graph graph = TinkerGraphFactory.createTinkerGraph();
+  System.out.println("Vertices of " + graph);
+  for (Vertex vertex : graph.getVertices()) {
+    System.out.println(vertex);
+  }
+  System.out.println("Edges of " + graph);
+  for (Edge edge : graph.getEdges()) {
+    System.out.println(edge);
+   }
+}
+```
+
+The @System.out@ after the code executes is:
+
+bc. Vertices of tinkergraph[vertices:6 edges:6]
+v[3]
+v[2]
+v[1]
+v[6]
+v[5]
+v[4]
+Edges of tinkergraph[vertices:6 edges:6]
+e[10][4-created->5]
+e[7][1-knows->2]
+e[9][1-created->3]
+e[8][1-knows->4]
+e[11][4-created->3]
+e[12][6-created->3]
+
+h2(#edge). Iterate through the Edges of a Vertex
+
+Load the TinkerPop play graph diagrammed in [[Property Graph Model]]. Get vertex @1@ from the graph by its @id@. Print some information about the vertex. Iterate through the outgoing edges of the vertex and print the edges.
+
+```java
+Graph graph = TinkerGraphFactory.createTinkerGraph();
+Vertex a = graph.getVertex("1");
+System.out.println("vertex " + a.getId() + " has name " + a.getProperty("name"));
+for(Edge e : a.getOutEdges()) {
+  System.out.println(e);
+}
+```
+
+The @System.out@ after the code executes is:
+
+bc. vertex 1 has name marko
+e[7][1-knows->2]
+e[9][1-created->3]
+e[8][1-knows->4]
+
+h2(#index). Use Indices to Get a Vertex by its Property
+
+Load the TinkerPop play graph diagrammed in [[Property Graph Model]]. [[TinkerGraph]] implements the @IndexableGraph@ interface. Get the standard vertex index and then get all vertices named @marko@. Given that there is only one, we can simple next the first vertex out of the returned iterable. Print some information about the vertex.
+
+```java
+Graph graph = TinkerGraphFactory.createTinkerGraph();
+Vertex a = ((IndexableGraph)graph).getIndex(Index.VERTICES, Vertex.class).get("name", "marko").iterator().next();
+System.out.println("vertex " + a.getId() + " has age " + a.getProperty("age"));
+```
+
+The @System.out@ after the code executes is:
+
+bc. vertex 1 has age 29
