@@ -18,8 +18,8 @@ import java.util.Set;
  */
 public class OrientVertex extends OrientElement implements Vertex {
 
-    public OrientVertex(final OrientGraph iGraph, final ODocument rawVertex) {
-        super(iGraph, rawVertex);
+    public OrientVertex(final OrientGraph rawGraph, final ODocument rawVertex) {
+        super(rawGraph, rawVertex);
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
@@ -59,8 +59,8 @@ public class OrientVertex extends OrientElement implements Vertex {
     public Set<String> getPropertyKeys() {
         final Set<String> set = super.getPropertyKeys();
         if (set.size() > 0) {
-            set.remove(OGraphDatabase.VERTEX_FIELD_IN_EDGES);
-            set.remove(OGraphDatabase.VERTEX_FIELD_OUT_EDGES);
+            set.remove(OGraphDatabase.VERTEX_FIELD_IN);
+            set.remove(OGraphDatabase.VERTEX_FIELD_OUT);
         }
         return set;
     }

@@ -18,8 +18,8 @@ public abstract class OrientElement implements Element {
     protected final OrientGraph graph;
     protected final ODocument rawElement;
 
-    protected OrientElement(final OrientGraph graph, final ODocument rawElement) {
-        this.graph = graph;
+    protected OrientElement(final OrientGraph rawGraph, final ODocument rawElement) {
+        this.graph = rawGraph;
         this.rawElement = rawElement;
     }
 
