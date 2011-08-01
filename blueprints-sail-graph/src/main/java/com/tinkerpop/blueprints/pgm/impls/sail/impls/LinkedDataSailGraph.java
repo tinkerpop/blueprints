@@ -15,7 +15,7 @@ public class LinkedDataSailGraph extends SailGraph {
     }
 
     private static Sail createSail(final SailGraph storageGraph) {
-         try {
+        try {
             Ripple.initialize();
             return new LinkedDataSail(storageGraph.getRawGraph());
         } catch (Exception e) {

@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.GraphTestSuite;
+import com.tinkerpop.blueprints.pgm.TestSuite;
+import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 

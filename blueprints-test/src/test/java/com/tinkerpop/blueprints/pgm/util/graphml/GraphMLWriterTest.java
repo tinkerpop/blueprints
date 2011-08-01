@@ -3,7 +3,14 @@ package com.tinkerpop.blueprints.pgm.util.graphml;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import junit.framework.TestCase;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)

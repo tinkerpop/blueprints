@@ -2,7 +2,11 @@ package com.tinkerpop.blueprints.pgm.util;
 
 import com.tinkerpop.blueprints.pgm.Element;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
