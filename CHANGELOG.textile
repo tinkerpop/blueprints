@@ -13,6 +13,22 @@ Blueprints: A Property Graph Model Interface
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-marvin.png!
 
+h3. Version 1.0 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+* Bumped to support Neo4j 1.4.1
+
+==<hr/>==
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-marvin.png!
+
 h3. Version 0.9 (Marvin -- August 1, 2011)
 
 ```xml
