@@ -29,6 +29,7 @@ public class RexsterTokens {
     public static final String SLASH_EDGES_SLASH = "/edges/";
     public static final String SLASH_INDICES = "/indices";
     public static final String SLASH_INDICES_SLASH = "/indices/";
+    public static final String SLASH_COUNT = "/count";
     public static final String SLASH_KEYS = "/keys";
     public static final String SLASH_KEYS_SLASH = "/keys/";
 

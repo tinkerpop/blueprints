@@ -102,7 +102,7 @@ public class RexsterGraphTest extends GraphTest {
     private String getWorkingUri() {
         String uri = System.getProperty("rexsterGraphURI");
         if (uri == null) {
-            uri = "http://localhost:8182/emptygraph";
+            uri = "http://127.0.0.1:8182/emptygraph";
         }
         return uri;
     }
