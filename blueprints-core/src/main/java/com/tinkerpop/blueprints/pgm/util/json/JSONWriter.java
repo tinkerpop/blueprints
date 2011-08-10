@@ -3,10 +3,25 @@ package com.tinkerpop.blueprints.pgm.util.json;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import org.codehaus.jackson.*;
+import org.codehaus.jackson.impl.WriterBasedGenerator;
+import org.codehaus.jackson.io.IOContext;
+import org.codehaus.jackson.map.*;
+import org.codehaus.jackson.map.module.SimpleModule;
+import org.codehaus.jackson.map.ser.ScalarSerializerBase;
+import org.codehaus.jackson.map.ser.StdSerializerProvider;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jackson.node.JsonNodeFactory;
+import org.codehaus.jettison.json.JSONTokener;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,26 +34,28 @@ import java.util.Map;
  */
 public class JSONWriter {
 
-    private static JSONArray createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
-        final JSONArray jsonList = new JSONArray();
+    private static JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+
+    private static ArrayNode createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes)  {
+        final ArrayNode jsonList = jsonNodeFactory.arrayNode();
         for (Object item : list) {
             if (item instanceof Element) {
-                jsonList.put(createJSONElement((Element) item, propertyKeys, showTypes));
+                jsonList.add(createJSONElementJackson((Element) item, propertyKeys, showTypes));
             } else if (item instanceof List) {
-                jsonList.put(createJSONList((List) item, propertyKeys, showTypes));
+                jsonList.add(createJSONList((List) item, propertyKeys, showTypes));
             } else if (item instanceof Map) {
-                jsonList.put(createJSONMap((Map) item, propertyKeys, showTypes));
+                jsonList.add(createJSONMap((Map) item, propertyKeys, showTypes));
             } else if (item.getClass().isArray()) {
-                jsonList.put(createJSONList(convertArrayToList(item), propertyKeys, showTypes));
+                jsonList.add(createJSONList(convertArrayToList(item), propertyKeys, showTypes));
             } else {
-                jsonList.put(item);
+                addObject(jsonList, item);
             }
         }
         return jsonList;
     }
 
-    private static JSONObject createJSONMap(final Map map, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
-        final JSONObject jsonMap = new JSONObject();
+    private static ObjectNode createJSONMap(final Map map, final List<String> propertyKeys, final boolean showTypes) {
+        final ObjectNode jsonMap = jsonNodeFactory.objectNode();
         for (Object key : map.keySet()) {
             Object value = map.get(key);
             if (value instanceof List) {
@@ -46,42 +63,103 @@ public class JSONWriter {
             } else if (value instanceof Map) {
                 value = createJSONMap((Map) value, propertyKeys, showTypes);
             } else if (value instanceof Element) {
-                value = createJSONElement((Element) value, propertyKeys, showTypes);
+                value = createJSONElementJackson((Element) value, propertyKeys, showTypes);
             } else if (value.getClass().isArray()) {
                 value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
             }
 
-            jsonMap.put(key.toString(), getValue(value, showTypes));
+            putObject(jsonMap, key.toString(), getValue(value, showTypes));
         }
         return jsonMap;
 
     }
 
+    private static void addObject(final ArrayNode jsonList, final Object value) {
+        if (value instanceof Boolean) {
+            jsonList.add((Boolean) value);
+        } else if (value instanceof Long) {
+            jsonList.add((Long) value);
+        } else if (value instanceof Integer) {
+            jsonList.add((Integer) value);
+        } else if (value instanceof Float) {
+            jsonList.add((Float) value);
+        } else if (value instanceof Double) {
+            jsonList.add((Double) value);
+        } else if (value instanceof String) {
+            jsonList.add((String) value);
+        } else {
+            jsonList.addPOJO(value);
+        }
+    }
+
+    private static void putObject(final ObjectNode jsonMap, final String key, final Object value) {
+        if (value instanceof Boolean) {
+            jsonMap.put(key, (Boolean) value);
+        } else if (value instanceof Long) {
+            jsonMap.put(key, (Long) value);
+        } else if (value instanceof Integer) {
+            jsonMap.put(key, (Integer) value);
+        } else if (value instanceof Float) {
+            jsonMap.put(key, (Float) value);
+        } else if (value instanceof Double) {
+            jsonMap.put(key, (Double) value);
+        } else if (value instanceof String) {
+            jsonMap.put(key, (String) value);
+        } else {
+            jsonMap.putPOJO(key, value);
+        }
+    }
 
     public static JSONObject createJSONElement(final Element element) {
         return createJSONElement(element, null, false);
     }
 
     public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) {
+        ObjectNode objectNode = createJSONElementJackson(element, propertyKeys, showTypes);
 
-        JSONObject jsonElement = new JSONObject();
+        JsonFactory jsonFactory = new MappingJsonFactory();
+        StringWriter writer = new StringWriter();
+
+        JSONObject jsonObject = null;
 
         try {
-            jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
-            jsonElement.put(JSONTokens._ID, element.getId());
+            JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(writer);
+            jsonGenerator.writeTree(objectNode);
+            jsonGenerator.flush();
+            jsonGenerator.close();
 
-            if (element instanceof Vertex) {
-                jsonElement.put(JSONTokens._TYPE, JSONTokens.VERTEX);
-            } else if (element instanceof Edge) {
-                final Edge edge = (Edge) element;
-                jsonElement.put(JSONTokens._TYPE, JSONTokens.EDGE);
-                jsonElement.put(JSONTokens._OUT_V, edge.getOutVertex().getId());
-                jsonElement.put(JSONTokens._IN_V, edge.getInVertex().getId());
-                jsonElement.put(JSONTokens._LABEL, edge.getLabel());
+            writer.flush();
+            writer.toString();
 
-            }
-        } catch (JSONException jsone) {
-            // the keys are all constants...this really can't happen
+            JSONTokener tokener = new JSONTokener(writer.toString());
+            jsonObject = new JSONObject(tokener);
+        } catch (IOException ioe) {
+            // this try-catch is temporary until jettison is dumped completely.  this is just a
+            // refactor checkpoint to not bring down rexster when the snapshot is deployed
+        } catch (JSONException jse) {
+
+        }
+
+        return jsonObject;
+    }
+
+    public static ObjectNode createJSONElementJackson(final Element element) {
+        return createJSONElementJackson(element, null, false);
+    }
+
+    public static ObjectNode createJSONElementJackson(final Element element, final List<String> propertyKeys, final boolean showTypes) {
+
+        ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
+        putObject(jsonElement, JSONTokens._ID, element.getId());
+
+        if (element instanceof Vertex) {
+            jsonElement.put(JSONTokens._TYPE, JSONTokens.VERTEX);
+        } else if (element instanceof Edge) {
+            final Edge edge = (Edge) element;
+            jsonElement.put(JSONTokens._TYPE, JSONTokens.EDGE);
+            putObject(jsonElement, JSONTokens._OUT_V, edge.getOutVertex().getId());
+            putObject(jsonElement, JSONTokens._IN_V, edge.getInVertex().getId());
+            jsonElement.put(JSONTokens._LABEL, edge.getLabel());
         }
 
         return jsonElement;
@@ -106,7 +184,7 @@ public class JSONWriter {
         return map;
     }
 
-    private static Object getValue(Object value, final boolean includeType) throws JSONException {
+    private static Object getValue(Object value, final boolean includeType) {
 
         Object returnValue = value;
 
@@ -117,29 +195,37 @@ public class JSONWriter {
 
         // if the includeType is set to true then show the data types of the properties
         if (includeType) {
-            JSONObject valueAndType = new JSONObject();
+            ObjectNode valueAndType = jsonNodeFactory.objectNode();
             valueAndType.put(JSONTokens.TYPE, type);
 
             if (type.equals(JSONTokens.TYPE_LIST)) {
 
-                // values of lists must be accumulated as JSONObjects under the value key.
-                // will return as a JSONArray. called recursively to traverse the entire
+                // values of lists must be accumulated as ObjectNode objects under the value key.
+                // will return as a ArrayNode. called recursively to traverse the entire
                 // object graph of each item in the array.
-                JSONArray list = (JSONArray) value;
-                for (int ix = 0; ix < list.length(); ix++) {
-                    valueAndType.accumulate(JSONTokens.VALUE, getValue(list.get(ix), includeType));
+                ArrayNode list = (ArrayNode) value;
+                if (list.size() == 1) {
+                    // since this is a size 1 then we don't want an array for the value
+                    valueAndType.putPOJO(JSONTokens.VALUE, getValue(list.get(0), includeType));
+                } else if (list.size() > 1) {
+                    // there is a set of values that must be accumulated as an array under a key
+                    ArrayNode valueArray = valueAndType.putArray(JSONTokens.VALUE);
+                    for (int ix = 0; ix < list.size(); ix++) {
+                        addObject(valueArray, getValue(list.get(ix), includeType));
+                    }
                 }
+
             } else if (type.equals(JSONTokens.TYPE_MAP)) {
 
-                // maps are converted to a JSONObject.  called recursively to traverse
+                // maps are converted to a ObjectNode.  called recursively to traverse
                 // the entire object graph within the map.
-                JSONObject convertedMap = new JSONObject();
-                JSONObject jsonObject = (JSONObject) value;
-                Iterator keyIterator = jsonObject.keys();
+                ObjectNode convertedMap = jsonNodeFactory.objectNode();
+                ObjectNode jsonObject = (ObjectNode) value;
+                Iterator keyIterator = jsonObject.getFieldNames();
                 while (keyIterator.hasNext()) {
                     Object key = keyIterator.next();
 
-                    // no need to getValue() here as this is already a JSONObject and should have type info
+                    // no need to getValue() here as this is already a ObjectNode and should have type info
                     convertedMap.put(key.toString(), jsonObject.get(key.toString()));
                 }
 
@@ -149,7 +235,7 @@ public class JSONWriter {
                 // this must be a primitive value or a complex object.  if a complex
                 // object it will be handled by a call to toString and stored as a
                 // string value
-                valueAndType.put(JSONTokens.VALUE, value);
+                putObject(valueAndType, JSONTokens.VALUE, value);
             }
 
             // this goes back as a JSONObject with data type and value
@@ -207,9 +293,9 @@ public class JSONWriter {
             type = JSONTokens.TYPE_LONG;
         } else if (value instanceof Boolean) {
             type = JSONTokens.TYPE_BOOLEAN;
-        } else if (value instanceof JSONArray) {
+        } else if (value instanceof ArrayNode) {
             type = JSONTokens.TYPE_LIST;
-        } else if (value instanceof JSONObject) {
+        } else if (value instanceof ObjectNode) {
             type = JSONTokens.TYPE_MAP;
         }
 

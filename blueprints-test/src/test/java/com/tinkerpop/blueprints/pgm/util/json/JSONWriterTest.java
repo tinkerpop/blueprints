@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +66,7 @@ public class JSONWriterTest {
         v.setProperty("keyLong", 1L);
         v.setProperty("keyInt", 2);
         v.setProperty("keyFloat", 3.3f);
+        v.setProperty("keyExponentialDouble", 1312928167.626012);
         v.setProperty("keyDouble", 4.4);
         v.setProperty("keyBoolean", true);
 
@@ -81,6 +83,8 @@ public class JSONWriterTest {
         Assert.assertEquals(2, json.optInt("keyInt"));
         Assert.assertTrue(json.has("keyFloat"));
         Assert.assertEquals(3.3f, (float) json.optDouble("keyFloat"), 0);
+        Assert.assertTrue(json.has("keyExponentialDouble"));
+        Assert.assertEquals(1312928167.626012, json.optDouble("keyExponentialDouble"), 0);
         Assert.assertTrue(json.has("keyDouble"));
         Assert.assertEquals(4.4, json.optDouble("keyDouble"), 0);
         Assert.assertTrue(json.has("keyBoolean"));
@@ -258,7 +262,8 @@ public class JSONWriterTest {
         Assert.assertTrue(json.has(JSONTokens._ID));
         Assert.assertEquals(1, json.optInt(JSONTokens._ID));
         Assert.assertTrue(json.has("mycat"));
-        Assert.assertEquals("smithers", json.optString("mycat"));
+        JSONObject jsonObjectCat = json.optJSONObject("mycat");
+        Assert.assertEquals("smithers", jsonObjectCat.optString("name"));
     }
 
     @Test
