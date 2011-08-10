@@ -137,7 +137,8 @@ public class JSONWriter {
             // this try-catch is temporary until jettison is dumped completely.  this is just a
             // refactor checkpoint to not bring down rexster when the snapshot is deployed
         } catch (JSONException jse) {
-
+            // this try-catch is temporary until jettison is dumped completely.  this is just a
+            // refactor checkpoint to not bring down rexster when the snapshot is deployed
         }
 
         return jsonObject;
