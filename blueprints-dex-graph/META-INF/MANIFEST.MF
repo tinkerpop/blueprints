@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: TinkerPop
+Bundle-Name: Blueprints-DexGraph
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: .
+Bundle-SymbolicName: com.tinkerpop.blueprints.dex
+Import-Package: com.tinkerpop.blueprints.pgm,
+ com.tinkerpop.blueprints.pgm.impls,
+ com.tinkerpop.blueprints.pgm.util.graphml,
+ edu.upc.dama.dex.core
+Export-Package: com.tinkerpop.blueprints.pgm.impls.dex,
+ com.tinkerpop.blueprints.pgm.impls.dex.util

@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Blueprints-GraphJung
+Bundle-Vendor: TinkerPop
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: com.tinkerpop.blueprints.jung
+Bundle-ClassPath: .
+Import-Package: com.tinkerpop.blueprints.pgm,
+ com.tinkerpop.blueprints.pgm.impls.tg,
+ com.tinkerpop.blueprints.pgm.oupls,
+ edu.uci.ics.jung.graph.util,
+ org.apache.commons.collections15
+Export-Package: com.tinkerpop.blueprints.pgm.oupls.jung,
+ com.tinkerpop.blueprints.pgm.oupls.jung.util

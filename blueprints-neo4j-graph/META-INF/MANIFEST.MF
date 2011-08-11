@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Blueprints-Neo4jGraph
+Bundle-Vendor: TinkerPop
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: com.tinkerpop.blueprints.neo4j
+Export-Package: com.tinkerpop.blueprints.pgm.impls.neo4j,
+ com.tinkerpop.blueprints.pgm.impls.neo4j.util
+Bundle-ClassPath: .
+Import-Package: com.tinkerpop.blueprints.pgm,
+ com.tinkerpop.blueprints.pgm.impls,
+ com.tinkerpop.blueprints.pgm.util,
+ com.tinkerpop.blueprints.pgm.util.graphml,
+ org.neo4j.kernel,
+ org.neo4j.graphdb,
+ org.neo4j.graphdb.index

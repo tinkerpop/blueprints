@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Blueprints-RexsterGraph
+Bundle-Vendor: TinkerPop
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: com.tinkerpop.blueprints.rexster
+Export-Package: com.tinkerpop.blueprints.pgm.impls.rexster,
+ com.tinkerpop.blueprints.pgm.impls.rexster.util
+Bundle-ClassPath: .
+Import-Package: com.tinkerpop.blueprints.pgm,
+ com.tinkerpop.blueprints.pgm.impls,
+ org.codehaus.jettison.json
