@@ -5,4 +5,4 @@ target/
 *.iws
 *.DS_Store
 *.ipr
-
+*.settings/
