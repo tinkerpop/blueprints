@@ -6,3 +6,6 @@ target/
 *.DS_Store
 *.ipr
 *.settings/
+*.project
+*/*.properties
+*/.classpath
