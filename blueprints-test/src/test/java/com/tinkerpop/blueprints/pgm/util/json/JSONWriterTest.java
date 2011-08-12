@@ -262,8 +262,23 @@ public class JSONWriterTest {
         Assert.assertTrue(json.has(JSONTokens._ID));
         Assert.assertEquals(1, json.optInt(JSONTokens._ID));
         Assert.assertTrue(json.has("mycat"));
+        Assert.assertEquals("smithers", json.optString("mycat"));
+    }
+
+    @Test
+    public void createJSONObjectVertexCatPropertyNoKeysWithTypes() {
+        Vertex v = this.graph.addVertex(1);
+        v.setProperty("mycat", new Cat("smithers"));
+
+        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(JSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has("mycat"));
         JSONObject jsonObjectCat = json.optJSONObject("mycat");
-        Assert.assertEquals("smithers", jsonObjectCat.optString("name"));
+        Assert.assertTrue(jsonObjectCat.has("value"));
+        Assert.assertEquals("smithers", jsonObjectCat.optString("value"));
     }
 
     @Test

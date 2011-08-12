@@ -87,8 +87,12 @@ public class JSONWriter {
             jsonList.add((Double) value);
         } else if (value instanceof String) {
             jsonList.add((String) value);
+        } else if (value instanceof ObjectNode) {
+            jsonList.add((ObjectNode) value);
+        } else if (value instanceof ArrayNode) {
+            jsonList.add((ArrayNode) value);
         } else {
-            jsonList.addPOJO(value);
+            jsonList.add(value.toString());
         }
     }
 
@@ -105,8 +109,12 @@ public class JSONWriter {
             jsonMap.put(key, (Double) value);
         } else if (value instanceof String) {
             jsonMap.put(key, (String) value);
+        } else if (value instanceof ObjectNode) {
+            jsonMap.put(key, (ObjectNode) value);
+        } else if (value instanceof ArrayNode) {
+            jsonMap.put(key, (ArrayNode) value);
         } else {
-            jsonMap.putPOJO(key, value);
+            jsonMap.put(key, value.toString());
         }
     }
 
@@ -207,12 +215,14 @@ public class JSONWriter {
                 ArrayNode list = (ArrayNode) value;
                 if (list.size() == 1) {
                     // since this is a size 1 then we don't want an array for the value
-                    valueAndType.putPOJO(JSONTokens.VALUE, getValue(list.get(0), includeType));
+                    putObject(valueAndType, JSONTokens.VALUE, getValue(list.get(0), includeType));
                 } else if (list.size() > 1) {
                     // there is a set of values that must be accumulated as an array under a key
                     ArrayNode valueArray = valueAndType.putArray(JSONTokens.VALUE);
                     for (int ix = 0; ix < list.size(); ix++) {
-                        addObject(valueArray, getValue(list.get(ix), includeType));
+                        // the value of each item in the array is a node object from an ArrayNode...must
+                        // get the text value of it.
+                        addObject(valueArray, getValue(list.get(ix).getTextValue(), includeType));
                     }
                 }
 
