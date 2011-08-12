@@ -22,4 +22,8 @@ public class JSONTokens {
     public static final String TYPE_MAP = "map";
     public static final String TYPE_BOOLEAN = "boolean";
     public static final String TYPE_LONG = "long";
+
+    public static final String VERTICES = "vertices";
+    public static final String EDGES = "edges";
+    public static final String GRAPH = "graph";
 }

@@ -3,16 +3,11 @@ package com.tinkerpop.blueprints.pgm.util.json;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import org.codehaus.jackson.*;
-import org.codehaus.jackson.impl.WriterBasedGenerator;
-import org.codehaus.jackson.io.IOContext;
-import org.codehaus.jackson.map.*;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.codehaus.jackson.map.ser.ScalarSerializerBase;
-import org.codehaus.jackson.map.ser.StdSerializerProvider;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.map.MappingJsonFactory;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jackson.node.JsonNodeFactory;
@@ -20,8 +15,6 @@ import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,15 +25,67 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class JSONWriter {
+public final class JSONWriter {
 
     private static JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+
+    public static JSONObject createJSONElement(final Element element) throws JSONException {
+        return createJSONElement(element, null, false);
+    }
+
+    public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
+        ObjectNode objectNode = createJSONElementAsObjectNode(element, propertyKeys, showTypes);
+
+        JsonFactory jsonFactory = new MappingJsonFactory();
+        StringWriter writer = new StringWriter();
+
+        JSONObject jsonObject = null;
+
+        try {
+            JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(writer);
+            jsonGenerator.writeTree(objectNode);
+            jsonGenerator.flush();
+            jsonGenerator.close();
+
+            writer.flush();
+
+            jsonObject = new JSONObject(new JSONTokener(writer.toString()));
+        } catch (IOException ioe) {
+            // repackage this as a JSONException...seems sensible as the caller will only know about
+            // the jettison object not being created
+            throw new JSONException(ioe);
+        }
+
+        return jsonObject;
+    }
+
+    public static ObjectNode createJSONElementAsObjectNode(final Element element) {
+        return createJSONElementAsObjectNode(element, null, false);
+    }
+
+    public static ObjectNode createJSONElementAsObjectNode(final Element element, final List<String> propertyKeys, final boolean showTypes) {
+
+        ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
+        putObject(jsonElement, JSONTokens._ID, element.getId());
+
+        if (element instanceof Vertex) {
+            jsonElement.put(JSONTokens._TYPE, JSONTokens.VERTEX);
+        } else if (element instanceof Edge) {
+            final Edge edge = (Edge) element;
+            jsonElement.put(JSONTokens._TYPE, JSONTokens.EDGE);
+            putObject(jsonElement, JSONTokens._OUT_V, edge.getOutVertex().getId());
+            putObject(jsonElement, JSONTokens._IN_V, edge.getInVertex().getId());
+            jsonElement.put(JSONTokens._LABEL, edge.getLabel());
+        }
+
+        return jsonElement;
+    }
 
     private static ArrayNode createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes)  {
         final ArrayNode jsonList = jsonNodeFactory.arrayNode();
         for (Object item : list) {
             if (item instanceof Element) {
-                jsonList.add(createJSONElementJackson((Element) item, propertyKeys, showTypes));
+                jsonList.add(createJSONElementAsObjectNode((Element) item, propertyKeys, showTypes));
             } else if (item instanceof List) {
                 jsonList.add(createJSONList((List) item, propertyKeys, showTypes));
             } else if (item instanceof Map) {
@@ -63,7 +108,7 @@ public class JSONWriter {
             } else if (value instanceof Map) {
                 value = createJSONMap((Map) value, propertyKeys, showTypes);
             } else if (value instanceof Element) {
-                value = createJSONElementJackson((Element) value, propertyKeys, showTypes);
+                value = createJSONElementAsObjectNode((Element) value, propertyKeys, showTypes);
             } else if (value.getClass().isArray()) {
                 value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
             }
@@ -116,62 +161,6 @@ public class JSONWriter {
         } else {
             jsonMap.put(key, value.toString());
         }
-    }
-
-    public static JSONObject createJSONElement(final Element element) {
-        return createJSONElement(element, null, false);
-    }
-
-    public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) {
-        ObjectNode objectNode = createJSONElementJackson(element, propertyKeys, showTypes);
-
-        JsonFactory jsonFactory = new MappingJsonFactory();
-        StringWriter writer = new StringWriter();
-
-        JSONObject jsonObject = null;
-
-        try {
-            JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(writer);
-            jsonGenerator.writeTree(objectNode);
-            jsonGenerator.flush();
-            jsonGenerator.close();
-
-            writer.flush();
-            writer.toString();
-
-            JSONTokener tokener = new JSONTokener(writer.toString());
-            jsonObject = new JSONObject(tokener);
-        } catch (IOException ioe) {
-            // this try-catch is temporary until jettison is dumped completely.  this is just a
-            // refactor checkpoint to not bring down rexster when the snapshot is deployed
-        } catch (JSONException jse) {
-            // this try-catch is temporary until jettison is dumped completely.  this is just a
-            // refactor checkpoint to not bring down rexster when the snapshot is deployed
-        }
-
-        return jsonObject;
-    }
-
-    public static ObjectNode createJSONElementJackson(final Element element) {
-        return createJSONElementJackson(element, null, false);
-    }
-
-    public static ObjectNode createJSONElementJackson(final Element element, final List<String> propertyKeys, final boolean showTypes) {
-
-        ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
-        putObject(jsonElement, JSONTokens._ID, element.getId());
-
-        if (element instanceof Vertex) {
-            jsonElement.put(JSONTokens._TYPE, JSONTokens.VERTEX);
-        } else if (element instanceof Edge) {
-            final Edge edge = (Edge) element;
-            jsonElement.put(JSONTokens._TYPE, JSONTokens.EDGE);
-            putObject(jsonElement, JSONTokens._OUT_V, edge.getOutVertex().getId());
-            putObject(jsonElement, JSONTokens._IN_V, edge.getInVertex().getId());
-            jsonElement.put(JSONTokens._LABEL, edge.getLabel());
-        }
-
-        return jsonElement;
     }
 
     private static Map createPropertyMap(final Element element, final List<String> propertyKeys) {
