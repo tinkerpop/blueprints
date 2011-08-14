@@ -6,26 +6,24 @@
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-test</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Blueprints-Test</name>
     <description>Reusable test suites for Blueprints</description>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${blueprints.version}</version>
         </dependency>
         <!-- TESTING -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.5</version>
+            <version>${junit.version}</version>
         </dependency>
     </dependencies>
     <repositories>
