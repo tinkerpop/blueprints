@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+/**
+ * GraphJSONReader reads the data from a TinkerPop JSON stream to a graph.
+ */
 public class GraphJSONReader {
     private final Graph graph;
 
