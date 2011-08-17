@@ -56,7 +56,7 @@ public class GraphJSONReader {
         GraphJSONReader.inputGraph(graph, jsonInputStream, 1000);
     }
 
-/**
+    /**
      * Input the JSON stream data into the graph.
      * More control over how data is streamed is provided by this method.
      *
