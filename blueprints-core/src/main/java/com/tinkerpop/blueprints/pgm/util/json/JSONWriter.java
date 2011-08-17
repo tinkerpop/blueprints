@@ -23,16 +23,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * Helps write graph elements to TinkerPop JSON format.
+ *
+ * Contains methods to support both Jackson and Jettison for JSON processing.
  */
 public final class JSONWriter {
 
     private static JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
 
+    /**
+     * Creates a Jettison JSONObject from a graph element. All property keys are serialized and types are not shown.
+     * @param element The graph element to convert to JSON.
+     */
     public static JSONObject createJSONElement(final Element element) throws JSONException {
         return createJSONElement(element, null, false);
     }
 
+    /**
+     * Creates a Jettison JSONObject from a graph element.
+     * @param element the graph element to convert to JSON.
+     * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
+     * @param showTypes Data types are written to the JSON explicitly if true.
+     */
     public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
         ObjectNode objectNode = createJSONElementAsObjectNode(element, propertyKeys, showTypes);
 
@@ -59,10 +71,20 @@ public final class JSONWriter {
         return jsonObject;
     }
 
+    /**
+     * Creates a Jackson ObjectNode from a graph element. All property keys are serialized and types are not shown.
+     * @param element The graph element to convert to JSON.
+     */
     public static ObjectNode createJSONElementAsObjectNode(final Element element) {
         return createJSONElementAsObjectNode(element, null, false);
     }
 
+    /**
+     * Creates a Jackson ObjectNode from a graph element.
+     * @param element the graph element to convert to JSON.
+     * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
+     * @param showTypes Data types are written to the JSON explicitly if true.
+     */
     public static ObjectNode createJSONElementAsObjectNode(final Element element, final List<String> propertyKeys, final boolean showTypes) {
 
         ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);

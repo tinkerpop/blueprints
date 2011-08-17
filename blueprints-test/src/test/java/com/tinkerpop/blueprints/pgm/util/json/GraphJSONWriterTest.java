@@ -25,7 +25,7 @@ public class GraphJSONWriterTest {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         GraphJSONWriter writer = new GraphJSONWriter(g);
-        writer.outputGraph(stream, null, null, true);
+        writer.outputGraph(stream, null, null);
 
         stream.flush();
         stream.close();
