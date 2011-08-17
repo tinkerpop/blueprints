@@ -4,12 +4,19 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import org.codehaus.jackson.*;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.map.MappingJsonFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * GraphJSONReader reads the data from a TinkerPop JSON stream to a graph.
@@ -29,7 +36,7 @@ public class GraphJSONReader {
      * In practice, usually the provided graph is empty.
      *
      * @param jsonInputStream an InputStream of JSON data
-     * @throws JsonParseException thrown when the JSON data is not correctly formatted
+     * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public void inputGraph(final InputStream jsonInputStream) throws IOException {
         GraphJSONReader.inputGraph(this.graph, jsonInputStream, 1000);
@@ -41,7 +48,7 @@ public class GraphJSONReader {
      *
      * @param jsonInputStream an InputStream of JSON data
      * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
-     * @throws JsonParseException thrown when the JSON data is not correctly formatted
+     * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public void inputGraph(final InputStream jsonInputStream, int bufferSize) throws IOException {
         GraphJSONReader.inputGraph(this.graph, jsonInputStream, bufferSize);
@@ -53,7 +60,7 @@ public class GraphJSONReader {
      *
      * @param graph              the graph to populate with the JSON data
      * @param jsonInputStream an InputStream of JSON data
-     * @throws JsonParseException thrown when the JSON data is not correctly formatted
+     * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph graph, final InputStream jsonInputStream) throws IOException {
         GraphJSONReader.inputGraph(graph, jsonInputStream, 1000);
@@ -66,7 +73,7 @@ public class GraphJSONReader {
      * @param graph              the graph to populate with the JSON data
      * @param jsonInputStream an InputStream of JSON data
      * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
-     * @throws JsonParseException thrown when the JSON data is not correctly formatted
+     * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph graph, final InputStream jsonInputStream, int bufferSize) throws IOException {
         JsonFactory jsonFactory = new MappingJsonFactory();
