@@ -24,7 +24,7 @@ public class GraphJSONReaderTest {
     public void inputGraphValid() throws IOException, JsonParseException {
         TinkerGraph graph = new TinkerGraph();
 
-        String json = "{ \"vertices\": [ {\"_id\":1, \"test\":\"please work\", \"testlist\":[1, 2, 3], \"testmap\":{\"big\":10000000000, \"small\":0.4954959595959}}, {\"_id\":2, \"testagain\":\"please work again\"}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\":\"please worke\"}]}";
+        String json = "{ \"vertices\": [ {\"_id\":1, \"test\": { \"type\":\"string\", \"value\":\"please work\"}, \"testlist\":{\"type\":\"list\", \"value\":[1, 2, 3]}, \"testmap\":{\"type\":\"map\", \"value\":{\"big\":{\"type\":\"long\", \"value\":10000000000}, \"small\":{\"type\":\"double\", \"value\":0.4954959595959}}}}, {\"_id\":2, \"testagain\":{\"type\":\"string\", \"value\":\"please work again\"}}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": {\"type\":\"string\", \"value\":\"please worke\"}}]}";
 
         byte[] bytes = json.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
@@ -96,6 +96,10 @@ public class GraphJSONReaderTest {
             Edge found = emptyGraph.getEdge(e.getId());
 
             Assert.assertNotNull(e);
+
+            for (String key : found.getPropertyKeys()) {
+                Assert.assertEquals(e.getProperty(key), found.getProperty(key));
+            }
         }
 
     }

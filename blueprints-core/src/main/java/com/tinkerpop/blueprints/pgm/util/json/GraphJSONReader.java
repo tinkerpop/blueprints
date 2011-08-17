@@ -164,20 +164,22 @@ public class GraphJSONReader {
     private static Object readProperty(JsonNode node) {
         Object propertyValue = null;
 
-        if (node.isBoolean()) {
-            propertyValue = node.getBooleanValue();
-        } else if (node.isDouble()) {
-            propertyValue = node.getDoubleValue();
-        } else if (node.isInt()) {
-            propertyValue = node.getIntValue();
-        } else if (node.isLong()) {
-            propertyValue = node.getLongValue();
-        } else if (node.isTextual()) {
-            propertyValue = node.getTextValue();
-        } else if (node.isArray()) {
-            propertyValue = readProperties(node.getElements());
-        } else if (node.isObject()) {
-            propertyValue = readProperties(node, false);
+        if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_BOOLEAN)) {
+            propertyValue = node.get(JSONTokens.VALUE).getBooleanValue();
+        } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_FLOAT)) {
+            propertyValue = Float.parseFloat(node.get(JSONTokens.VALUE).getValueAsText());
+        } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_DOUBLE)) {
+            propertyValue = node.get(JSONTokens.VALUE).getDoubleValue();
+        } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_INTEGER)) {
+            propertyValue = node.get(JSONTokens.VALUE).getIntValue();
+        } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_LONG)) {
+            propertyValue = node.get(JSONTokens.VALUE).getLongValue();
+        } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_STRING)) {
+            propertyValue = node.get(JSONTokens.VALUE).getTextValue();
+        } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_LIST)) {
+            propertyValue = readProperties(node.get(JSONTokens.VALUE).getElements());
+        } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_MAP)) {
+            propertyValue = readProperties(node.get(JSONTokens.VALUE), false);
         } else {
             propertyValue = node.getValueAsText();
         }

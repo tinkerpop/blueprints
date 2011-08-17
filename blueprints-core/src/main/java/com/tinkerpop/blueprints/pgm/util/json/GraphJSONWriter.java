@@ -41,14 +41,14 @@ public class GraphJSONWriter {
 
             jg.writeArrayFieldStart(JSONTokens.VERTICES);
             for (Vertex v : this.graph.getVertices()) {
-                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(v, vertexPropertyKeys, false));
+                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(v, vertexPropertyKeys, true));
             }
 
             jg.writeEndArray();
 
             jg.writeArrayFieldStart(JSONTokens.EDGES);
             for (Edge e : this.graph.getEdges()) {
-                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(e, edgePropertyKeys, false));
+                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(e, edgePropertyKeys, true));
             }
             jg.writeEndArray();
 
