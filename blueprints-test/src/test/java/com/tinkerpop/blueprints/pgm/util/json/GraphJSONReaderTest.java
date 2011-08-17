@@ -60,7 +60,7 @@ public class GraphJSONReaderTest {
     }
 
     @Test
-    public void inputGraphFullCycle() throws IOException, JsonParseException, JSONException {
+    public void inputGraphFullCycle() throws IOException, JSONException{
         TinkerGraph graph = TinkerGraphFactory.createTinkerGraph();
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

@@ -28,7 +28,7 @@ public class GraphJSONReader {
      * @param jsonInputStream an InputStream of JSON data
      * @throws JsonParseException thrown when the JSON data is not correctly formatted
      */
-    public void inputGraph(final InputStream jsonInputStream) throws JsonParseException, IOException {
+    public void inputGraph(final InputStream jsonInputStream) throws IOException {
         GraphJSONReader.inputGraph(this.graph, jsonInputStream, 1000);
     }
 
@@ -40,7 +40,7 @@ public class GraphJSONReader {
      * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws JsonParseException thrown when the JSON data is not correctly formatted
      */
-    public void inputGraph(final InputStream jsonInputStream, int bufferSize) throws JsonParseException, IOException {
+    public void inputGraph(final InputStream jsonInputStream, int bufferSize) throws IOException {
         GraphJSONReader.inputGraph(this.graph, jsonInputStream, bufferSize);
     }
 
@@ -52,7 +52,7 @@ public class GraphJSONReader {
      * @param jsonInputStream an InputStream of JSON data
      * @throws JsonParseException thrown when the JSON data is not correctly formatted
      */
-    public static void inputGraph(final Graph graph, final InputStream jsonInputStream) throws JsonParseException, IOException {
+    public static void inputGraph(final Graph graph, final InputStream jsonInputStream) throws IOException {
         GraphJSONReader.inputGraph(graph, jsonInputStream, 1000);
     }
 
@@ -65,7 +65,7 @@ public class GraphJSONReader {
      * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws JsonParseException thrown when the JSON data is not correctly formatted
      */
-    public static void inputGraph(final Graph graph, final InputStream jsonInputStream, int bufferSize) throws JsonParseException, IOException {
+    public static void inputGraph(final Graph graph, final InputStream jsonInputStream, int bufferSize) throws IOException {
         JsonFactory jsonFactory = new MappingJsonFactory();
         JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
