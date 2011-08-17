@@ -29,10 +29,9 @@ public class GraphJSONWriter {
      * @param jsonOutputStream the JSON OutputStream to write the Graph data to
      * @param edgePropertyKeys the keys of the edge elements to write to JSON
      * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
-     * @param showTypes determines if the types should be written into the JSON
      * @throws org.codehaus.jettison.json.JSONException thrown if there is an error generating the JSON data
      */
-    public void outputGraph(final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys, final boolean showTypes) throws JSONException {
+    public void outputGraph(final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys) throws JSONException {
 
         try {
             JsonFactory jsonFactory = new MappingJsonFactory();
@@ -42,14 +41,14 @@ public class GraphJSONWriter {
 
             jg.writeArrayFieldStart(JSONTokens.VERTICES);
             for (Vertex v : this.graph.getVertices()) {
-                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(v, vertexPropertyKeys, showTypes));
+                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(v, vertexPropertyKeys, false));
             }
 
             jg.writeEndArray();
 
             jg.writeArrayFieldStart(JSONTokens.EDGES);
             for (Edge e : this.graph.getEdges()) {
-                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(e, edgePropertyKeys, showTypes));
+                jg.writeTree(JSONWriter.createJSONElementAsObjectNode(e, edgePropertyKeys, false));
             }
             jg.writeEndArray();
 
@@ -65,7 +64,7 @@ public class GraphJSONWriter {
     }
 
     /**
-     * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON with types not shown.
+     * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
      *
      * @param graph the graph to serialize to JSON
      * @param jsonOutputStream the JSON OutputStream to write the Graph data to
@@ -73,20 +72,7 @@ public class GraphJSONWriter {
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream) throws JSONException {
         GraphJSONWriter writer = new GraphJSONWriter(graph);
-        writer.outputGraph(jsonOutputStream, null, null, false);
-    }
-
-    /**
-     * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
-     *
-     * @param graph the graph to serialize to JSON
-     * @param jsonOutputStream the JSON OutputStream to write the Graph data to
-     * @param showTypes determines if the types should be written into the JSON
-     * @throws org.codehaus.jettison.json.JSONException thrown if there is an error generating the JSON data
-     */
-    public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final boolean showTypes) throws JSONException {
-        GraphJSONWriter writer = new GraphJSONWriter(graph);
-        writer.outputGraph(jsonOutputStream, null, null, showTypes);
+        writer.outputGraph(jsonOutputStream, null, null);
     }
 
     /**
@@ -96,12 +82,11 @@ public class GraphJSONWriter {
      * @param jsonOutputStream the JSON OutputStream to write the Graph data to
      * @param edgePropertyKeys the keys of the edge elements to write to JSON
      * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
-     * @param showTypes determines if the types should be written into the JSON
      * @throws org.codehaus.jettison.json.JSONException thrown if there is an error generating the JSON data
      */
-    public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys, final boolean showTypes) throws JSONException {
+    public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys) throws JSONException {
         GraphJSONWriter writer = new GraphJSONWriter(graph);
-        writer.outputGraph(jsonOutputStream, edgePropertyKeys, vertexPropertyKeys, showTypes);
+        writer.outputGraph(jsonOutputStream, edgePropertyKeys, vertexPropertyKeys);
     }
 
 }
