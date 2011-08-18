@@ -19,13 +19,13 @@ import java.io.IOException;
 public class GraphJSONWriterTest {
 
     @Test
-    public void outputGraphValid() throws JSONException, IOException {
+    public void outputGraphNoEmbeddedTypes() throws JSONException, IOException {
         Graph g = TinkerGraphFactory.createTinkerGraph();
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         GraphJSONWriter writer = new GraphJSONWriter(g);
-        writer.outputGraph(stream, null, null);
+        writer.outputGraph(stream, null, null, false);
 
         stream.flush();
         stream.close();
@@ -38,6 +38,40 @@ public class GraphJSONWriterTest {
         // ensure that the JSON conforms to basic structure and that the right
         // number of graph elements are present.  other tests already cover element formatting
         Assert.assertNotNull(rootNode);
+        Assert.assertTrue(rootNode.has(JSONTokens.VERTICES));
+
+        ArrayNode vertices = (ArrayNode) rootNode.get(JSONTokens.VERTICES);
+        Assert.assertEquals(6, vertices.size());
+
+        Assert.assertTrue(rootNode.has(JSONTokens.EDGES));
+
+        ArrayNode edges = (ArrayNode) rootNode.get(JSONTokens.EDGES);
+        Assert.assertEquals(6, edges.size());
+    }
+
+    @Test
+    public void outputGraphWithEmbeddedTypes() throws JSONException, IOException {
+        Graph g = TinkerGraphFactory.createTinkerGraph();
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        GraphJSONWriter writer = new GraphJSONWriter(g);
+        writer.outputGraph(stream, null, null, true);
+
+        stream.flush();
+        stream.close();
+
+        String jsonString = new String(stream.toByteArray());
+
+        ObjectMapper m = new ObjectMapper();
+        JsonNode rootNode = m.readValue(jsonString, JsonNode.class);
+
+        // ensure that the JSON conforms to basic structure and that the right
+        // number of graph elements are present.  other tests already cover element formatting
+        Assert.assertNotNull(rootNode);
+        Assert.assertTrue(rootNode.has(JSONTokens.EMBEDDED_TYPES));
+        Assert.assertTrue(rootNode.get(JSONTokens.EMBEDDED_TYPES).getBooleanValue());
+
         Assert.assertTrue(rootNode.has(JSONTokens.VERTICES));
 
         ArrayNode vertices = (ArrayNode) rootNode.get(JSONTokens.VERTICES);
