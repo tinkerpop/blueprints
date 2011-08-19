@@ -4,8 +4,9 @@
 @prefix : <urn:com.tinkerpop.blueprints.pgm.oupls.sail.test/>.
 
 {
-#    :arthur a foaf:Person;
-#    	rdfs:comment "he's a jerk".
+    :arthur a foaf:Person;
+        foaf:knows :ford, :zaphod, :thor ;
+    	rdfs:comment "he's a jerk" .
 }
 
 :ctx1 {

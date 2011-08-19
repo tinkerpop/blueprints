@@ -1024,6 +1024,38 @@ public abstract class SailTest extends TestCase {
         }
     }
 
+    @Test
+    public void testJoins() throws Exception {
+        SPARQLParser parser = new SPARQLParser();
+        BindingSet bindings = new EmptyBindingSet();
+        String baseURI = "http://example.org/bogus/";
+
+        SailConnection sc = sail.getConnection();
+        try {
+            CloseableIteration<? extends BindingSet, QueryEvaluationException> results;
+            int count;
+            String queryStr = "PREFIX : <urn:com.tinkerpop.blueprints.pgm.oupls.sail.test/>\n" +
+                    "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
+                    "SELECT ?foaf WHERE {\n" +
+                    "    :ford foaf:knows ?friend .\n" +
+                    "    ?friend foaf:knows ?foaf .\n" +
+                    "}";
+            ParsedQuery query = parser.parseQuery(queryStr, baseURI);
+            results = sc.evaluate(query.getTupleExpr(), query.getDataset(), bindings, false);
+            count = 0;
+            while (results.hasNext()) {
+                count++;
+                BindingSet set = results.next();
+                URI foaf = (URI) set.getValue("foaf");
+                assertTrue(foaf.stringValue().startsWith("urn:com.tinkerpop.blueprints.pgm.oupls.sail.test/"));
+            }
+            results.close();
+            assertEquals(4, count);
+        } finally {
+            sc.close();
+        }
+    }
+
     // listeners ///////////////////////////////////////////////////////////////
     // (disabled for Sails which do not implement NotifyingSail)
 
@@ -1522,7 +1554,7 @@ public abstract class SailTest extends TestCase {
                 RDFHandler h = new SailAdder(sc);
                 RDFParser p = Rio.createParser(format);
                 p.setRDFHandler(h);
-                p.parse(in, "");
+                p.parse(in, "http://example.org/bogusBaseURI/");
                 sc.commit();
             } finally {
                 sc.close();

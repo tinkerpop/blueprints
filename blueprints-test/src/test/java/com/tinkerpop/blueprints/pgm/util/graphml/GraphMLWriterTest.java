@@ -61,7 +61,7 @@ public class GraphMLWriterTest extends TestCase {
 
         Graph g = new TinkerGraph();
         Vertex v = g.addVertex(1);
-        v.setProperty("text", "ˆ");
+        v.setProperty("text", "\u00E9");
 
         GraphMLWriter w = new GraphMLWriter(g);
 
@@ -78,6 +78,6 @@ public class GraphMLWriterTest extends TestCase {
         in.close();
 
         Vertex v2 = g2.getVertex(1);
-        assertEquals("ˆ", v2.getProperty("text"));
+        assertEquals("\u00E9", v2.getProperty("text"));
     }
 }

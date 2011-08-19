@@ -615,17 +615,20 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
 
         public void close() throws SailException {
-            closed = true;
-            iterator.close();
-            writeSemaphoreDown();
+            if (!closed) {
+                closed = true;
+                iterator.close();
+                writeSemaphoreDown();
+            }
         }
 
         public boolean hasNext() throws SailException {
-            if (closed) {
-                throw new IllegalStateException("already closed");
-            }
-
-            return iterator.hasNext();
+            // Note: this used to throw an IllegalStateException if the iteration had already been closed,
+            // but such is not the behavior of Aduna's LookAheadIteration, which simply does not provide any more
+            // elements if the iteration has already been closed.
+            // The CloseableIteration API says nothing about what to expect from a closed iteration,
+            // so the behavior of LookAheadIteration will be taken as normative.
+            return !closed && iterator.hasNext();
         }
 
         public Statement next() throws SailException {
