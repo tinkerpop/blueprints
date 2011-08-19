@@ -25,6 +25,7 @@ h3. Version 1.0 (NOT OFFICIALLY RELEASED YET)
 
 * Bumped to support Neo4j 1.4.1
 * RexsterGraph uses the actual count REST API instead of pulling back all results first and checking size.
+* GraphJSONReader and GraphJSONWriter utility classes.
 
 ==<hr/>==
 
