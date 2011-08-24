@@ -67,7 +67,7 @@
 
     <properties>
         <blueprints.version>1.0-SNAPSHOT</blueprints.version>
-        <sesame.version>2.4.2</sesame.version>
+        <sesame.version>2.5.0</sesame.version>
         <junit.version>4.5</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
