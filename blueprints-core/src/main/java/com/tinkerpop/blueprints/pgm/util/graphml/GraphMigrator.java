@@ -48,8 +48,6 @@ public class GraphMigrator {
                     GraphMLWriter.outputGraph(fromGraph, outPipe);
                     outPipe.flush();
                     outPipe.close();
-                } catch (XMLStreamException e) {
-                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
