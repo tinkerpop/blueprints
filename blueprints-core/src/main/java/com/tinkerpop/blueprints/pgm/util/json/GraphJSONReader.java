@@ -184,7 +184,9 @@ public class GraphJSONReader {
         Object propertyValue;
 
         if (hasEmbeddedTypes) {
-            if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_BOOLEAN)) {
+            if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_UNKNOWN)) {
+                propertyValue = null;
+            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_BOOLEAN)) {
                 propertyValue = node.get(JSONTokens.VALUE).getBooleanValue();
             } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_FLOAT)) {
                 propertyValue = Float.parseFloat(node.get(JSONTokens.VALUE).getValueAsText());
@@ -204,7 +206,9 @@ public class GraphJSONReader {
                 propertyValue = node.getValueAsText();
             }
         } else {
-            if (node.isBoolean()) {
+            if (node.isNull()) {
+                propertyValue = null;
+            } else if (node.isBoolean()) {
                 propertyValue = node.getBooleanValue();
             } else if (node.isDouble()) {
                 propertyValue = node.getDoubleValue();

@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.MappingJsonFactory;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -112,7 +113,7 @@ public final class JSONWriter {
                 jsonList.add(createJSONList((List) item, propertyKeys, showTypes));
             } else if (item instanceof Map) {
                 jsonList.add(createJSONMap((Map) item, propertyKeys, showTypes));
-            } else if (item.getClass().isArray()) {
+            } else if (item != null && item.getClass().isArray()) {
                 jsonList.add(createJSONList(convertArrayToList(item), propertyKeys, showTypes));
             } else {
                 addObject(jsonList, item);
@@ -125,14 +126,16 @@ public final class JSONWriter {
         final ObjectNode jsonMap = jsonNodeFactory.objectNode();
         for (Object key : map.keySet()) {
             Object value = map.get(key);
-            if (value instanceof List) {
-                value = createJSONList((List) value, propertyKeys, showTypes);
-            } else if (value instanceof Map) {
-                value = createJSONMap((Map) value, propertyKeys, showTypes);
-            } else if (value instanceof Element) {
-                value = createJSONElementAsObjectNode((Element) value, propertyKeys, showTypes);
-            } else if (value.getClass().isArray()) {
-                value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
+            if (value != null) {
+                if (value instanceof List) {
+                    value = createJSONList((List) value, propertyKeys, showTypes);
+                } else if (value instanceof Map) {
+                    value = createJSONMap((Map) value, propertyKeys, showTypes);
+                } else if (value instanceof Element) {
+                    value = createJSONElementAsObjectNode((Element) value, propertyKeys, showTypes);
+                } else if (value.getClass().isArray()) {
+                    value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
+                }
             }
 
             putObject(jsonMap, key.toString(), getValue(value, showTypes));
@@ -142,7 +145,9 @@ public final class JSONWriter {
     }
 
     private static void addObject(final ArrayNode jsonList, final Object value) {
-        if (value instanceof Boolean) {
+        if (value == null) {
+            jsonList.add((JsonNode) null);
+        } else if (value instanceof Boolean) {
             jsonList.add((Boolean) value);
         } else if (value instanceof Long) {
             jsonList.add((Long) value);
@@ -164,7 +169,9 @@ public final class JSONWriter {
     }
 
     private static void putObject(final ObjectNode jsonMap, final String key, final Object value) {
-        if (value instanceof Boolean) {
+        if (value == null) {
+            jsonMap.put(key, (JsonNode) null);
+        } else if (value instanceof Boolean) {
             jsonMap.put(key, (Boolean) value);
         } else if (value instanceof Long) {
             jsonMap.put(key, (Long) value);
@@ -305,7 +312,9 @@ public final class JSONWriter {
 
     private static String determineType(final Object value) {
         String type = JSONTokens.TYPE_STRING;
-        if (value instanceof Double) {
+        if (value == null) {
+            type = "unknown";
+        } else if (value instanceof Double) {
             type = JSONTokens.TYPE_DOUBLE;
         } else if (value instanceof Float) {
             type = JSONTokens.TYPE_FLOAT;

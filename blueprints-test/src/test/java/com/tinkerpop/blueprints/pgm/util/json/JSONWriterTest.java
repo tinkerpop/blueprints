@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.util.json;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import org.codehaus.jettison.json.JSONArray;
@@ -552,6 +553,94 @@ public class JSONWriterTest {
         Assert.assertEquals(1, thatAsJson.optInt(JSONTokens.VALUE));
 
 
+    }
+
+    @Test
+    public void createJSONObjectNullsNoKeysNoTypes() throws JSONException {
+        Graph g = new TinkerGraph();
+        Vertex v = g.addVertex(1);
+        v.setProperty("key", null);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("innerkey", null);
+
+        List<String> innerList = new ArrayList<String>();
+        innerList.add(null);
+        innerList.add("innerstring");
+        map.put("list", innerList);
+
+        v.setProperty("keyMap", map);
+
+        List<String> list = new ArrayList<String>();
+        list.add(null);
+        list.add("string");
+        v.setProperty("keyList", list);
+
+        JSONObject json = JSONWriter.createJSONElement(v, null, false);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.isNull("key"));
+
+        JSONObject jsonMap = json.optJSONObject("keyMap");
+        Assert.assertNotNull(jsonMap);
+        Assert.assertTrue(jsonMap.isNull("innerkey"));
+
+        JSONArray jsonInnerArray = jsonMap.getJSONArray("list");
+        Assert.assertNotNull(jsonInnerArray);
+        Assert.assertTrue(jsonInnerArray.isNull(0));
+        Assert.assertEquals("innerstring", jsonInnerArray.get(1));
+
+        JSONArray jsonArray = json.getJSONArray("keyList");
+        Assert.assertNotNull(jsonArray);
+        Assert.assertTrue(jsonArray.isNull(0));
+        Assert.assertEquals("string", jsonArray.get(1));
+    }
+
+    @Test
+    public void createJSONObjectNullsNoKeysWithTypes() throws JSONException {
+        Graph g = new TinkerGraph();
+        Vertex v = g.addVertex(1);
+        v.setProperty("key", null);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("innerkey", null);
+
+        List<String> innerList = new ArrayList<String>();
+        innerList.add(null);
+        innerList.add("innerstring");
+        map.put("list", innerList);
+
+        v.setProperty("keyMap", map);
+
+        List<String> list = new ArrayList<String>();
+        list.add(null);
+        list.add("string");
+        v.setProperty("keyList", list);
+
+        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+
+        Assert.assertNotNull(json);
+        JSONObject jsonObjectKey = json.optJSONObject("key");
+        Assert.assertTrue(jsonObjectKey.isNull(JSONTokens.VALUE));
+        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectKey.optString(JSONTokens.TYPE));
+
+        JSONObject jsonMap = json.optJSONObject("keyMap").optJSONObject(JSONTokens.VALUE);
+        Assert.assertNotNull(jsonMap);
+        JSONObject jsonObjectMap = jsonMap.optJSONObject("innerkey");
+        Assert.assertTrue(jsonObjectMap.isNull(JSONTokens.VALUE));
+        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectMap.optString(JSONTokens.TYPE));
+
+        JSONArray jsonInnerArray = jsonMap.getJSONObject("list").getJSONArray(JSONTokens.VALUE);
+        Assert.assertNotNull(jsonInnerArray);
+        JSONObject jsonObjectInnerListFirst = jsonInnerArray.getJSONObject(0);
+        Assert.assertTrue(jsonObjectInnerListFirst.isNull(JSONTokens.VALUE));
+        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectInnerListFirst.optString(JSONTokens.TYPE));
+
+        JSONArray jsonArray = json.getJSONObject("keyList").getJSONArray(JSONTokens.VALUE);
+        Assert.assertNotNull(jsonArray);
+        JSONObject jsonObjectListFirst = jsonArray.getJSONObject(0);
+        Assert.assertTrue(jsonObjectListFirst.isNull(JSONTokens.VALUE));
+        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectListFirst.optString(JSONTokens.TYPE));
     }
 
     private class Cat {
