@@ -234,7 +234,7 @@ public class GraphJSONReader {
         List array = new ArrayList();
 
         while (listOfNodes.hasNext()) {
-            array.add(readProperties(listOfNodes.next(), false, hasEmbeddedTypes));
+            array.add(readProperty(listOfNodes.next(), hasEmbeddedTypes));
         }
 
         return array;

@@ -24,7 +24,7 @@ public class GraphJSONReaderTest {
     public void inputGraphWithTypes() throws IOException {
         TinkerGraph graph = new TinkerGraph();
 
-        String json = "{ \"embeddedTypes\":true, \"vertices\": [ {\"_id\":1, \"test\": { \"type\":\"string\", \"value\":\"please work\"}, \"testlist\":{\"type\":\"list\", \"value\":[1, 2, 3]}, \"testmap\":{\"type\":\"map\", \"value\":{\"big\":{\"type\":\"long\", \"value\":10000000000}, \"small\":{\"type\":\"double\", \"value\":0.4954959595959}}}}, {\"_id\":2, \"testagain\":{\"type\":\"string\", \"value\":\"please work again\"}}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": {\"type\":\"string\", \"value\":\"please worke\"}}]}";
+        String json = "{ \"embeddedTypes\":true, \"vertices\": [ {\"_id\":1, \"test\": { \"type\":\"string\", \"value\":\"please work\"}, \"testlist\":{\"type\":\"list\", \"value\":[{\"type\":\"int\", \"value\":1}, {\"type\":\"int\",\"value\":2}, {\"type\":\"int\",\"value\":3}, {\"type\":\"unknown\",\"value\":null}]}, \"testmap\":{\"type\":\"map\", \"value\":{\"big\":{\"type\":\"long\", \"value\":10000000000}, \"small\":{\"type\":\"double\", \"value\":0.4954959595959}, \"nullKey\":{\"type\":\"unknown\", \"value\":null}}}}, {\"_id\":2, \"testagain\":{\"type\":\"string\", \"value\":\"please work again\"}}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": {\"type\":\"string\", \"value\":\"please worke\"}, \"keyNull\":{\"type\":\"unknown\", \"value\":null}}]}";
 
         byte[] bytes = json.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
@@ -42,9 +42,20 @@ public class GraphJSONReaderTest {
         Assert.assertNotNull(map);
         Assert.assertEquals(10000000000l, Long.parseLong(map.get("big").toString()));
         Assert.assertEquals(0.4954959595959, Double.parseDouble(map.get("small").toString()), 0);
+        Assert.assertNull(map.get("nullKey"));
 
         List list = (List) v1.getProperty("testlist");
-        Assert.assertEquals(3, list.size());
+        Assert.assertEquals(4, list.size());
+
+        boolean foundNull = false;
+        for (int ix = 0; ix < list.size(); ix++) {
+            if (list.get(ix) == null) {
+                foundNull = true;
+                break;
+            }
+        }
+
+        Assert.assertTrue(foundNull);
 
         Vertex v2 = graph.getVertex(2);
         Assert.assertNotNull(v2);
@@ -56,6 +67,7 @@ public class GraphJSONReaderTest {
         Assert.assertEquals(v1, e.getOutVertex());
         Assert.assertEquals(v2, e.getInVertex());
         Assert.assertEquals("please worke", e.getProperty("teste"));
+        Assert.assertNull(e.getProperty("keyNull"));
 
     }
 
@@ -63,7 +75,7 @@ public class GraphJSONReaderTest {
     public void inputGraphNoTypes() throws IOException {
         TinkerGraph graph = new TinkerGraph();
 
-        String json = "{ \"vertices\": [ {\"_id\":1, \"test\": \"please work\", \"testlist\":[1, 2, 3], \"testmap\":{\"big\":10000000000, \"small\":0.4954959595959}}, {\"_id\":2, \"testagain\":\"please work again\"}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": \"please worke\"}]}";
+        String json = "{ \"vertices\": [ {\"_id\":1, \"test\": \"please work\", \"testlist\":[1, 2, 3, null], \"testmap\":{\"big\":10000000000, \"small\":0.4954959595959, \"nullKey\":null}}, {\"_id\":2, \"testagain\":\"please work again\"}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": \"please worke\", \"keyNull\":null}]}";
 
         byte[] bytes = json.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
@@ -81,9 +93,20 @@ public class GraphJSONReaderTest {
         Assert.assertNotNull(map);
         Assert.assertEquals(10000000000l, Long.parseLong(map.get("big").toString()));
         Assert.assertEquals(0.4954959595959, Double.parseDouble(map.get("small").toString()), 0);
+        Assert.assertNull(map.get("nullKey"));
 
         List list = (List) v1.getProperty("testlist");
-        Assert.assertEquals(3, list.size());
+        Assert.assertEquals(4, list.size());
+
+        boolean foundNull = false;
+        for (int ix = 0; ix < list.size(); ix++) {
+            if (list.get(ix) == null) {
+                foundNull = true;
+                break;
+            }
+        }
+
+        Assert.assertTrue(foundNull);
 
         Vertex v2 = graph.getVertex(2);
         Assert.assertNotNull(v2);
@@ -95,6 +118,7 @@ public class GraphJSONReaderTest {
         Assert.assertEquals(v1, e.getOutVertex());
         Assert.assertEquals(v2, e.getInVertex());
         Assert.assertEquals("please worke", e.getProperty("teste"));
+        Assert.assertNull(e.getProperty("keyNull"));
 
     }
 
