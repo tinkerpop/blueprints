@@ -120,10 +120,11 @@ public class JSONWriterTest {
     @Test
     public void createJSONObjectVertexListPropertyNoKeysNoTypes() throws JSONException{
         Vertex v = this.graph.addVertex(1);
-        List<String> list = new ArrayList<String>();
+        List<Object> list = new ArrayList<Object>();
         list.add("this");
         list.add("that");
         list.add("other");
+        list.add(true);
 
         v.setProperty("keyList", list);
 
@@ -136,7 +137,7 @@ public class JSONWriterTest {
 
         JSONArray listAsJSON = json.optJSONArray("keyList");
         Assert.assertNotNull(listAsJSON);
-        Assert.assertEquals(3, listAsJSON.length());
+        Assert.assertEquals(4, listAsJSON.length());
     }
 
     @Test
@@ -512,6 +513,154 @@ public class JSONWriterTest {
             Assert.assertEquals("this", valueAsJson.optString(JSONTokens.VALUE));
         }
     }
+
+    @Test
+    public void createJSONObjectVertexBooleanListPropertiesNoKeysWithTypes()throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+        List<Boolean> list = new ArrayList<Boolean>();
+        list.add(true);
+        list.add(true);
+        list.add(true);
+
+        v.setProperty("keyList", list);
+
+        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(JSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has("keyList"));
+
+        JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
+        Assert.assertNotNull(listWithTypeAsJson);
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
+        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE);
+        Assert.assertNotNull(listAsJSON);
+        Assert.assertEquals(3, listAsJSON.length());
+
+        for (int ix = 0; ix < listAsJSON.length(); ix++) {
+            JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
+            Assert.assertNotNull(valueAsJson);
+            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
+            Assert.assertEquals(JSONTokens.TYPE_BOOLEAN, valueAsJson.optString(JSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
+            Assert.assertEquals(true, valueAsJson.optBoolean(JSONTokens.VALUE));
+        }
+    }
+
+    @Test
+    public void createJSONObjectVertexLongListPropertiesNoKeysWithTypes()throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+        List<Long> list = new ArrayList<Long>();
+        list.add(1000L);
+        list.add(1000L);
+        list.add(1000L);
+
+        v.setProperty("keyList", list);
+
+        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(JSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has("keyList"));
+
+        JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
+        Assert.assertNotNull(listWithTypeAsJson);
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
+        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE);
+        Assert.assertNotNull(listAsJSON);
+        Assert.assertEquals(3, listAsJSON.length());
+
+        for (int ix = 0; ix < listAsJSON.length(); ix++) {
+            JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
+            Assert.assertNotNull(valueAsJson);
+            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
+            Assert.assertEquals(JSONTokens.TYPE_LONG, valueAsJson.optString(JSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
+            Assert.assertEquals(1000L, valueAsJson.optLong(JSONTokens.VALUE));
+        }
+    }
+
+    @Test
+    public void createJSONObjectVertexIntListPropertiesNoKeysWithTypes()throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+        List<Integer> list = new ArrayList<Integer>();
+        list.add(1);
+        list.add(1);
+        list.add(1);
+
+        v.setProperty("keyList", list);
+
+        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(JSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has("keyList"));
+
+        JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
+        Assert.assertNotNull(listWithTypeAsJson);
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
+        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE);
+        Assert.assertNotNull(listAsJSON);
+        Assert.assertEquals(3, listAsJSON.length());
+
+        for (int ix = 0; ix < listAsJSON.length(); ix++) {
+            JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
+            Assert.assertNotNull(valueAsJson);
+            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
+            Assert.assertEquals(JSONTokens.TYPE_INTEGER, valueAsJson.optString(JSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
+            Assert.assertEquals(1, valueAsJson.optInt(JSONTokens.VALUE));
+        }
+    }
+
+    @Test
+    public void createJSONObjectVertexListOfListPropertiesNoKeysWithTypes()throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+        List<Integer> list = new ArrayList<Integer>();
+        list.add(1);
+        list.add(1);
+        list.add(1);
+
+        List<List<Integer>> listList = new ArrayList<List<Integer>>();
+        listList.add(list);
+
+        v.setProperty("keyList", listList);
+
+        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(JSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has("keyList"));
+
+        JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
+        Assert.assertNotNull(listWithTypeAsJson);
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
+        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE).optJSONObject(0).getJSONArray(JSONTokens.VALUE);
+        Assert.assertNotNull(listAsJSON);
+        Assert.assertEquals(3, listAsJSON.length());
+
+        for (int ix = 0; ix < listAsJSON.length(); ix++) {
+            JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
+            Assert.assertNotNull(valueAsJson);
+            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
+            Assert.assertEquals(JSONTokens.TYPE_INTEGER, valueAsJson.optString(JSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
+            Assert.assertEquals(1, valueAsJson.optInt(JSONTokens.VALUE));
+        }
+    }
+
 
     @Test
     public void createJSONObjectVertexMapPropertiesNoKeysWithTypes() throws JSONException{

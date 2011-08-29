@@ -231,17 +231,13 @@ public final class JSONWriter {
                 // will return as a ArrayNode. called recursively to traverse the entire
                 // object graph of each item in the array.
                 ArrayNode list = (ArrayNode) value;
-                if (list.size() == 1) {
-                    // since this is a size 1 then we don't want an array for the value
-                    putObject(valueAndType, JSONTokens.VALUE, getValue(list.get(0), includeType));
-                } else if (list.size() > 1) {
-                    // there is a set of values that must be accumulated as an array under a key
-                    ArrayNode valueArray = valueAndType.putArray(JSONTokens.VALUE);
-                    for (int ix = 0; ix < list.size(); ix++) {
-                        // the value of each item in the array is a node object from an ArrayNode...must
-                        // get the text value of it.
-                        addObject(valueArray, getValue(list.get(ix).getTextValue(), includeType));
-                    }
+
+                // there is a set of values that must be accumulated as an array under a key
+                ArrayNode valueArray = valueAndType.putArray(JSONTokens.VALUE);
+                for (int ix = 0; ix < list.size(); ix++) {
+                    // the value of each item in the array is a node object from an ArrayNode...must
+                    // get the value of it.
+                    addObject(valueArray, getValue(getTypedValueFromJsonNode(list.get(ix)), includeType));
                 }
 
             } else if (type.equals(JSONTokens.TYPE_MAP)) {
@@ -272,6 +268,32 @@ public final class JSONWriter {
         }
 
         return returnValue;
+    }
+
+    private static Object getTypedValueFromJsonNode(JsonNode node) {
+        Object theValue = null;
+
+        if (node != null && !node.isNull()) {
+            if (node.isBoolean()) {
+                theValue = node.getBooleanValue();
+            } else if (node.isDouble()) {
+                theValue = node.getDoubleValue();
+            } else if (node.isInt()) {
+                theValue = node.getIntValue();
+            } else if (node.isLong())  {
+                theValue = node.getLongValue();
+            } else if (node.isTextual()) {
+                theValue = node.getTextValue();
+            } else if (node.isArray()) {
+                // this is an array so just send it back so that it can be
+                // reprocessed to its primitive components
+                theValue = node;
+            } else {
+                theValue = node.getValueAsText();
+            }
+        }
+
+        return theValue;
     }
 
     private static List convertArrayToList(final Object value) {
