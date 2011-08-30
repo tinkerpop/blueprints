@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
-import com.orientechnologies.orient.core.index.OIndexUser;
+import com.orientechnologies.orient.core.index.OIndexTxAwareMultiValue;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
@@ -46,7 +46,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
         this.graph = orientGraph;
-        this.underlying = new OIndexUser(orientGraph.getRawGraph(), rawIndex);
+        this.underlying = new OIndexTxAwareMultiValue(orientGraph.getRawGraph(), rawIndex);
         load(rawIndex.getConfiguration());
     }
 
@@ -94,7 +94,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     @SuppressWarnings("rawtypes")
     public CloseableSequence<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final Collection<OIdentifiable> records = underlying.get(keyTemp);
+        final Collection<OIdentifiable> records = (Collection<OIdentifiable>) underlying.get(keyTemp);
 
         if (records.isEmpty())
             return new WrappingCloseableSequence(Collections.emptySet());
@@ -104,7 +104,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public long count(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
-        final Collection<OIdentifiable> records = underlying.get(keyTemp);
+        final Collection<OIdentifiable> records = (Collection<OIdentifiable>) underlying.get(keyTemp);
         return records.size();
     }
 
@@ -143,8 +143,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         this.indexClass = indexClass;
 
         // CREATE THE MAP
-        this.underlying = new OIndexUser(graph.getRawGraph(), graph.getRawGraph().getMetadata().getIndexManager()
-                .createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), iKeyType, null, null, null, true));
+        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), iKeyType, null, null, null, true));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))

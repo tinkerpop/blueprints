@@ -11,8 +11,6 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-marvin.png!
-
 h3. Version 1.0 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
@@ -24,7 +22,9 @@ h3. Version 1.0 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Bumped to support Neo4j 1.4.1
-* RexsterGraph uses the actual count REST API instead of pulling back all results first and checking size.
+* Bumped to support OrientDB 1.0rc5
+* RexsterGraph uses the actual count REST API instead of pulling back all results first and checking size
+* GraphJSONReader and GraphJSONWriter utility classes
 
 ==<hr/>==
 

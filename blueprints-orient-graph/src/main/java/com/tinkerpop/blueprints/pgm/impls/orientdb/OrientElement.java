@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -93,9 +94,14 @@ public abstract class OrientElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        final Set<String> set = this.rawElement.fieldNames();
-        set.remove(LABEL);
-        return set;
+        Set<String> result = new HashSet<String>();
+
+        final String[] fields = this.rawElement.fieldNames();
+        for (String field : fields)
+            if (!field.equals(LABEL))
+                result.add(field);
+
+        return result;
     }
 
     /**
