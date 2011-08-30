@@ -7,5 +7,6 @@ target/
 *.ipr
 *.settings/
 *.project
-*/*.properties
-*/.classpath
+.classpath
+build.properties
+.gitignore
