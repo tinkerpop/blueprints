@@ -26,7 +26,8 @@ h3. Version 1.0 (NOT OFFICIALLY RELEASED YET)
 * RexsterGraph uses the actual count REST API instead of pulling back all results first and checking size
 * GraphJSONReader and GraphJSONWriter utility classes
 * Updated @TransactionalGraph@ API to support transaction buffers
-** Removed @TransactionalGraphHelper.CommitManager@ as it is no longer need with API change
+** Removed @TransactionalGraphHelper.CommitManager@ as it is no longer relevant
+* Fixed a @ConcurrentModificationException@ in TinkerGraph and added respective test cases for all graphs
 
 ==<hr/>==
 

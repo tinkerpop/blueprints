@@ -8,10 +8,10 @@ import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.MappingJsonFactory;
 import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * Helps write graph elements to TinkerPop JSON format.
- *
+ * <p/>
  * Contains methods to support both Jackson and Jettison for JSON processing.
  */
 public final class JSONWriter {
@@ -34,6 +34,7 @@ public final class JSONWriter {
 
     /**
      * Creates a Jettison JSONObject from a graph element. All property keys are serialized and types are not shown.
+     *
      * @param element The graph element to convert to JSON.
      */
     public static JSONObject createJSONElement(final Element element) throws JSONException {
@@ -42,9 +43,10 @@ public final class JSONWriter {
 
     /**
      * Creates a Jettison JSONObject from a graph element.
-     * @param element the graph element to convert to JSON.
+     *
+     * @param element      the graph element to convert to JSON.
      * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
-     * @param showTypes Data types are written to the JSON explicitly if true.
+     * @param showTypes    Data types are written to the JSON explicitly if true.
      */
     public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
         ObjectNode objectNode = createJSONElementAsObjectNode(element, propertyKeys, showTypes);
@@ -74,6 +76,7 @@ public final class JSONWriter {
 
     /**
      * Creates a Jackson ObjectNode from a graph element. All property keys are serialized and types are not shown.
+     *
      * @param element The graph element to convert to JSON.
      */
     public static ObjectNode createJSONElementAsObjectNode(final Element element) {
@@ -82,9 +85,10 @@ public final class JSONWriter {
 
     /**
      * Creates a Jackson ObjectNode from a graph element.
-     * @param element the graph element to convert to JSON.
+     *
+     * @param element      the graph element to convert to JSON.
      * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
-     * @param showTypes Data types are written to the JSON explicitly if true.
+     * @param showTypes    Data types are written to the JSON explicitly if true.
      */
     public static ObjectNode createJSONElementAsObjectNode(final Element element, final List<String> propertyKeys, final boolean showTypes) {
 
@@ -104,7 +108,7 @@ public final class JSONWriter {
         return jsonElement;
     }
 
-    private static ArrayNode createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes)  {
+    private static ArrayNode createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes) {
         final ArrayNode jsonList = jsonNodeFactory.arrayNode();
         for (Object item : list) {
             if (item instanceof Element) {
@@ -280,7 +284,7 @@ public final class JSONWriter {
                 theValue = node.getDoubleValue();
             } else if (node.isInt()) {
                 theValue = node.getIntValue();
-            } else if (node.isLong())  {
+            } else if (node.isLong()) {
                 theValue = node.getLongValue();
             } else if (node.isTextual()) {
                 theValue = node.getTextValue();

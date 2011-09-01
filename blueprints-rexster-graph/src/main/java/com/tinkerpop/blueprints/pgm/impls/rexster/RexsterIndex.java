@@ -8,7 +8,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterElementSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
 import org.codehaus.jettison.json.JSONObject;
 

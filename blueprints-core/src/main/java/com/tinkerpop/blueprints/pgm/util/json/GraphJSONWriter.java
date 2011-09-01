@@ -28,10 +28,10 @@ public class GraphJSONWriter {
     /**
      * Write the data in a Graph to a JSON OutputStream.
      *
-     * @param jsonOutputStream the JSON OutputStream to write the Graph data to
-     * @param edgePropertyKeys the keys of the edge elements to write to JSON
+     * @param jsonOutputStream   the JSON OutputStream to write the Graph data to
+     * @param edgePropertyKeys   the keys of the edge elements to write to JSON
      * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
-     * @param showTypes determines if types are written explicitly to the JSON
+     * @param showTypes          determines if types are written explicitly to the JSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public void outputGraph(final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys, final boolean showTypes) throws IOException {
@@ -67,7 +67,7 @@ public class GraphJSONWriter {
     /**
      * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
      *
-     * @param graph the graph to serialize to JSON
+     * @param graph            the graph to serialize to JSON
      * @param jsonOutputStream the JSON OutputStream to write the Graph data to
      * @throws IOException thrown if there is an error generating the JSON data
      */
@@ -79,9 +79,9 @@ public class GraphJSONWriter {
     /**
      * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
      *
-     * @param graph the graph to serialize to JSON
+     * @param graph            the graph to serialize to JSON
      * @param jsonOutputStream the JSON OutputStream to write the Graph data to
-     * @param showTypes determines if types are explicitly defined in the JSON
+     * @param showTypes        determines if types are explicitly defined in the JSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final boolean showTypes) throws IOException {
@@ -92,11 +92,11 @@ public class GraphJSONWriter {
     /**
      * Write the data in a Graph to a JSON OutputStream.
      *
-     * @param graph the graph to serialize to JSON
-     * @param jsonOutputStream the JSON OutputStream to write the Graph data to
-     * @param edgePropertyKeys the keys of the edge elements to write to JSON
+     * @param graph              the graph to serialize to JSON
+     * @param jsonOutputStream   the JSON OutputStream to write the Graph data to
+     * @param edgePropertyKeys   the keys of the edge elements to write to JSON
      * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
-     * @param showTypes determines if types are explicitly defined in the JSON
+     * @param showTypes          determines if types are explicitly defined in the JSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys, final boolean showTypes) throws IOException {

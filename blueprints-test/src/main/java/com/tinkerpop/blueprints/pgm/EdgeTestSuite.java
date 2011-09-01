@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
@@ -518,5 +519,22 @@ public class EdgeTestSuite extends TestSuite {
             }
             graph.shutdown();
         }
+    }
+
+    public void testNoConcurrentModificationException() {
+        Graph graph = graphTest.getGraphInstance();
+        for (int i = 0; i < 25; i++) {
+            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+        }
+        if (!graphTest.isRDFModel)
+            assertEquals(BaseTest.count(graph.getVertices()), 50);
+        assertEquals(BaseTest.count(graph.getEdges()), 25);
+        for (final Edge edge : graph.getEdges()) {
+            graph.removeEdge(edge);
+        }
+        if (!graphTest.isRDFModel)
+            assertEquals(BaseTest.count(graph.getVertices()), 50);
+        assertEquals(BaseTest.count(graph.getEdges()), 0);
+        graph.shutdown();
     }
 }
