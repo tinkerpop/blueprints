@@ -24,30 +24,38 @@ public interface TransactionalGraph extends Graph {
     }
 
     /**
-     * Transactions in a transactional graph can either be handled automatically when provided a bufferSize > 0.
-     * If the graph is automatically handling transactions, then every X mutations to the graph will committed, where X is the bufferSize.
-     * A mutation is atomic up to the write methods of graph/element/index.
+     * Transactions in a transactional graph can be handled automatically when then transaction buffer size is greater than 0.
+     * If the graph is automatically handling transactions, then every X mutations to the graph, the mutations will be committed, where X is the provided bufferSize.
      * If the graph has a bufferSize of 0, then the user is responsible for starting and stopping transactions.
      *
-     * @param bufferSize 0 for manual transactions and > 0 for automatic transaction handling
+     * @param bufferSize 0 for manual transaction handling and > 0 for automatic transaction handling
      */
-    public void setTransactionBuffer(int bufferSize);
+    public void setMaxBufferSize(int bufferSize);
 
     /**
-     * Returns the size of the transaction buffer.
+     * Returns the maximum size of the transaction buffer.
      *
-     * @return the transaction buffer size
+     * @return the maximum transaction buffer size
      */
-    public int getTransactionBuffer();
+    public int getMaxBufferSize();
+
+    /**
+     * Returns the current size of the transaction buffer.
+     *
+     * @return the current size of the transaction buffer
+     */
+    public int getCurrentBufferSize();
 
     /**
      * Start a transaction in order to manipulate the graph.
      * This is required for graph manipulations in manual transaction mode.
+     *
+     * @throws RuntimeException If a transaction is already in progress, then a RuntimeException of "nested transaction" is thrown.
      */
     public void startTransaction();
 
     /**
-     * Stop the current transaction. This is possible only in manual transaction mode.
+     * Stop the current transaction. If the current buffer still has active mutations, then they are committed.
      * Specify whether the transaction was successful or not.
      * A failing transaction will rollback all updates to before the transaction was started.
      *

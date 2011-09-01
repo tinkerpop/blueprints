@@ -310,11 +310,15 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         txCounter.set(0);
     }
 
-    public int getTransactionBuffer() {
+    public int getMaxBufferSize() {
         return txBuffer.get();
     }
 
-    public void setTransactionBuffer(final int size) {
+    public int getCurrentBufferSize() {
+        return txCounter.get();
+    }
+
+    public void setMaxBufferSize(final int size) {
         if (null != tx.get()) {
             tx.get().success();
             tx.get().finish();
@@ -357,6 +361,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     protected void autoStopTransaction(final Conclusion conclusion) {
         if (this.txBuffer.get() > 0) {
+            txCounter.set(txCounter.get() + 1);
             if (conclusion == Conclusion.FAILURE) {
                 tx.get().failure();
                 tx.get().finish();
@@ -367,8 +372,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 tx.get().finish();
                 tx.remove();
                 txCounter.set(0);
-            } else {
-                txCounter.set(txCounter.get() + 1);
             }
         }
     }

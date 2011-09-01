@@ -349,13 +349,17 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.getRawGraph().commit();
     }
 
-    public void setTransactionBuffer(final int bufferSize) {
+    public void setMaxBufferSize(final int bufferSize) {
         getRawGraph().commit();
         getContext(true).txBuffer = bufferSize;
     }
 
-    public int getTransactionBuffer() {
+    public int getMaxBufferSize() {
         return getContext(true).txBuffer;
+    }
+
+    public int getCurrentBufferSize() {
+        return getContext(true).txCounter;
     }
 
     protected void saveIndexConfiguration() {
@@ -375,14 +379,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     protected void autoStopTransaction(final Conclusion conclusion) {
         if (getContext(true).txBuffer > 0) {
+            getContext(true).txCounter = getContext(true).txCounter + 1;
             final OGraphDatabase db = getRawGraph();
             if (getContext(true).txBuffer == 0 || (getContext(true).txCounter % getContext(true).txBuffer == 0)) {
                 if (conclusion == Conclusion.SUCCESS)
                     db.commit();
                 else
                     db.rollback();
-            } else {
-                getContext(true).txCounter = getContext(true).txCounter + 1;
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 /**
@@ -142,6 +143,23 @@ public class IndexTestSuite extends TestSuite {
 
         }
         graph.shutdown();
+    }
+
+    public void testNoConcurrentModificationException() {
+        if (graphTest.supportsEdgeIndex) {
+            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+            for (int i = 0; i < 25; i++) {
+                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test");
+            }
+            assertEquals(BaseTest.count(graph.getVertices()), 50);
+            assertEquals(BaseTest.count(graph.getEdges()), 25);
+            for (final Edge edge : graph.getIndex(Index.EDGES, Edge.class).get("label", "test")) {
+                graph.removeEdge(edge);
+            }
+            assertEquals(BaseTest.count(graph.getVertices()), 50);
+            assertEquals(BaseTest.count(graph.getEdges()), 0);
+            graph.shutdown();
+        }
     }
 
 }

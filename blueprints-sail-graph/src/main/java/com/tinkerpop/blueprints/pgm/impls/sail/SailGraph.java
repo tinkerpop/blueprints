@@ -392,6 +392,7 @@ public class SailGraph implements TransactionalGraph {
         if (inTransaction.get())
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
         inTransaction.set(Boolean.TRUE);
+        this.txCounter.set(0);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
@@ -402,6 +403,7 @@ public class SailGraph implements TransactionalGraph {
             } else {
                 this.sailConnection.get().rollback();
             }
+            this.txCounter.set(0);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -410,6 +412,7 @@ public class SailGraph implements TransactionalGraph {
     protected void autoStopTransaction(final Conclusion conclusion) {
         if (txBuffer.get() > 0) {
             try {
+                txCounter.set(txCounter.get() + 1);
                 if (conclusion == Conclusion.FAILURE) {
                     this.sailConnection.get().commit();
                     txCounter.set(0);
@@ -418,8 +421,6 @@ public class SailGraph implements TransactionalGraph {
                     this.sailConnection.get().commit();
                     txCounter.set(0);
                     inTransaction.set(Boolean.FALSE);
-                } else {
-                    txCounter.set(txCounter.get() + 1);
                 }
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
@@ -427,7 +428,7 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
-    public void setTransactionBuffer(final int bufferSize) {
+    public void setMaxBufferSize(final int bufferSize) {
         try {
             this.sailConnection.get().commit();
         } catch (SailException e) {
@@ -436,8 +437,12 @@ public class SailGraph implements TransactionalGraph {
         this.txBuffer.set(bufferSize);
     }
 
-    public int getTransactionBuffer() {
+    public int getMaxBufferSize() {
         return this.txBuffer.get();
+    }
+
+    public int getCurrentBufferSize() {
+        return this.txCounter.get();
     }
 
 

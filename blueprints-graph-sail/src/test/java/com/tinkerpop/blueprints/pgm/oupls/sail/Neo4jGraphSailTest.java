@@ -12,7 +12,7 @@ public class Neo4jGraphSailTest extends GraphSailTest {
 
         Neo4jGraph g = new Neo4jGraph(directory);
         g.clear();
-        g.setTransactionBuffer(0);
+        g.setMaxBufferSize(0);
         return g;
     }
 

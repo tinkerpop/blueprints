@@ -29,7 +29,7 @@ public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
 
 
         OrientGraph g = new OrientGraph("local:" + directory + "/graph");
-        g.setTransactionBuffer(0);
+        g.setMaxBufferSize(0);
         return g;
     }
 
