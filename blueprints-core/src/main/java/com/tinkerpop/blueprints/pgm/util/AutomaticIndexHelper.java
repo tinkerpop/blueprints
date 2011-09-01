@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 
 import java.util.Set;
 
@@ -120,19 +119,10 @@ public class AutomaticIndexHelper {
         graph.dropIndex(indexName);
         index = graph.createAutomaticIndex(indexName, indexClass, indexKeys);
 
-        TransactionalGraphHelper.CommitManager manager = null;
-        if (graph instanceof TransactionalGraph) {
-            manager = TransactionalGraphHelper.createCommitManager((TransactionalGraph) graph, 1000);
-        }
-
         for (final Element element : elements) {
             AutomaticIndexHelper.addElement(index, element);
-            if (null != manager)
-                manager.incrCounter();
-        }
-        if (null != manager)
-            manager.close();
 
+        }
         return index;
     }
 

@@ -4,17 +4,13 @@ package com.tinkerpop.blueprints.pgm;
  * A transactional graph supports the notion of transactions.
  * Once a transaction is started, all write operations can either be committed or rolled back.
  * Read operations are not required to be in a transaction.
- * A transactional graph can be in two modes: automatic or manual.
- * All constructed transactional graphs begin in automatic transaction mode.
+ * A transactional graph supports automatic transaction handling with user-defined transaction buffer size.
+ * All constructed transactional graphs begin in with a transaction buffer size of 1 (thus, every mutation is a commit).
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface TransactionalGraph extends Graph {
 
-    /**
-     * Error message to use when code is trying to stop/stop a transaction in automatic transaction mode.
-     */
-    public static final String TURN_OFF_MESSAGE = "Turn off automatic transactions to use manual transaction handling";
     /**
      * Error message to use when code is trying to start another transaction before stopping the previous.
      */
@@ -28,14 +24,21 @@ public interface TransactionalGraph extends Graph {
     }
 
     /**
-     * Transactions in a transactional graph can either be handled automatically or manually.
-     * If the graph is in automatic mode, then every mutation to the graph will committed at the time of mutation.
+     * Transactions in a transactional graph can either be handled automatically when provided a bufferSize > 0.
+     * If the graph is automatically handling transactions, then every X mutations to the graph will committed, where X is the bufferSize.
      * A mutation is atomic up to the write methods of graph/element/index.
-     * If the graph is in manual model, then the user is responsible for starting and stopping transactions.
+     * If the graph has a bufferSize of 0, then the user is responsible for starting and stopping transactions.
+     *
+     * @param bufferSize 0 for manual transactions and > 0 for automatic transaction handling
      */
-    public enum Mode {
-        AUTOMATIC, MANUAL
-    }
+    public void setTransactionBuffer(int bufferSize);
+
+    /**
+     * Returns the size of the transaction buffer.
+     *
+     * @return the transaction buffer size
+     */
+    public int getTransactionBuffer();
 
     /**
      * Start a transaction in order to manipulate the graph.
@@ -51,21 +54,4 @@ public interface TransactionalGraph extends Graph {
      * @param conclusion whether or not the current transaction was successful or not
      */
     public void stopTransaction(Conclusion conclusion);
-
-    /**
-     * There are two transaction modes: automatic and manual.
-     * Automatic transactions commit successfully on every operation.
-     * The benefit of auto transactions is that it requires less code.
-     * The drawback of auto transactions is that it is much slower than manually controlled transactions as every write/delete operation is committed when complete.
-     *
-     * @param mode the transaction mode to use
-     */
-    public void setTransactionMode(Mode mode);
-
-    /**
-     * Returns the transaction mode the graph is currently in.
-     *
-     * @return returns the graph's transaction mode
-     */
-    public Mode getTransactionMode();
 }
