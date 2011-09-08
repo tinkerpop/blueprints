@@ -10,7 +10,7 @@
     </parent>
     <artifactId>blueprints-sail-graph</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Blueprints-SailGraph</name>
     <description>Blueprints property graph implementation for Sesame Sail</description>
 
@@ -140,4 +140,10 @@
             </plugin>
         </plugins>
     </build>
+    
+    <properties>
+        <import.package>*</import.package>
+        <export.package>com.tinkerpop.blueprints.pgm.impls.sail, com.tinkerpop.blueprints.pgm.impls.sail.impls, com.tinkerpop.blueprints.pgm.impls.sail.util</export.package>
+    </properties>
+    
 </project>

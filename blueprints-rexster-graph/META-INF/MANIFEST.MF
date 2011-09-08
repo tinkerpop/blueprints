@@ -1,12 +1,22 @@
 Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
+Export-Package: com.tinkerpop.blueprints.pgm.impls.rexster;uses:="com.
+ tinkerpop.blueprints.pgm.impls.rexster.util,com.tinkerpop.blueprints.
+ pgm,org.codehaus.jettison.json,com.tinkerpop.blueprints.pgm.impls",co
+ m.tinkerpop.blueprints.pgm.impls.rexster.util;uses:="org.codehaus.jet
+ tison.json,com.tinkerpop.blueprints.pgm.impls.rexster,com.tinkerpop.b
+ lueprints.pgm"
+Built-By: guillaume
+Tool: Bnd-1.15.0
 Bundle-Name: Blueprints-RexsterGraph
-Bundle-Vendor: TinkerPop
-Bundle-Version: 1.0.0.qualifier
-Bundle-SymbolicName: com.tinkerpop.blueprints.rexster
-Export-Package: com.tinkerpop.blueprints.pgm.impls.rexster,
- com.tinkerpop.blueprints.pgm.impls.rexster.util
-Bundle-ClassPath: .
-Import-Package: com.tinkerpop.blueprints.pgm,
- com.tinkerpop.blueprints.pgm.impls,
- org.codehaus.jettison.json
+Created-By: Apache Maven Bundle Plugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Version: 1.0.0.SNAPSHOT
+Build-Jdk: 1.6.0_26
+Bnd-LastModified: 1315480277498
+Bundle-ManifestVersion: 2
+Bundle-Description: Blueprints property graph implementation for Rexst
+ er
+Import-Package: com.tinkerpop.blueprints.pgm,com.tinkerpop.blueprints.
+ pgm.impls,org.codehaus.jettison.json;version="[1.3,2)"
+Bundle-SymbolicName: com.tinkerpop.blueprints.rexster-graph
+

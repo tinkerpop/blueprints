@@ -1,13 +1,20 @@
 Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Vendor: TinkerPop
+Export-Package: com.tinkerpop.blueprints.pgm.impls.dex;uses:="com.tink
+ erpop.blueprints.pgm.impls.dex.util,com.tinkerpop.blueprints.pgm,edu.
+ upc.dama.dex.core,com.tinkerpop.blueprints.pgm.impls",com.tinkerpop.b
+ lueprints.pgm.impls.dex.util;uses:="edu.upc.dama.dex.core"
+Built-By: guillaume
+Tool: Bnd-1.15.0
 Bundle-Name: Blueprints-DexGraph
-Bundle-Version: 1.0.0.qualifier
-Bundle-ClassPath: .
-Bundle-SymbolicName: com.tinkerpop.blueprints.dex
-Import-Package: com.tinkerpop.blueprints.pgm,
- com.tinkerpop.blueprints.pgm.impls,
- com.tinkerpop.blueprints.pgm.util.graphml,
- edu.upc.dama.dex.core
-Export-Package: com.tinkerpop.blueprints.pgm.impls.dex,
- com.tinkerpop.blueprints.pgm.impls.dex.util
+Created-By: Apache Maven Bundle Plugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Version: 1.0.0.SNAPSHOT
+Build-Jdk: 1.6.0_26
+Bnd-LastModified: 1315480124574
+Bundle-ManifestVersion: 2
+Bundle-Description: Blueprints property graph implementation for the D
+ EX graph database
+Import-Package: com.tinkerpop.blueprints.pgm,com.tinkerpop.blueprints.
+ pgm.impls,edu.upc.dama.dex.core
+Bundle-SymbolicName: com.tinkerpop.blueprints.dex-graph
+

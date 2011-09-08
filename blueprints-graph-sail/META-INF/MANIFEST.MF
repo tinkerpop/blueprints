@@ -1,21 +1,26 @@
 Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
+Export-Package: com.tinkerpop.blueprints.pgm.oupls.sail;uses:="com.tin
+ kerpop.blueprints.pgm,org.openrdf.model,org.openrdf.model.impl,org.op
+ enrdf.sail.helpers,com.tinkerpop.blueprints.pgm.oupls,org.openrdf.sai
+ l,info.aduna.iteration,org.openrdf.query.algebra.evaluation,org.openr
+ df.query.algebra,org.openrdf.query.algebra.evaluation.impl,org.openrd
+ f.query,org.openrdf.sail.inferencer,net.fortytwo.sesametools"
+Built-By: guillaume
+Tool: Bnd-1.15.0
 Bundle-Name: Blueprints-GraphSail
-Bundle-Vendor: TinkerPop
-Bundle-Version: 1.0.0.qualifier
-Bundle-SymbolicName: com.tinkerpop.blueprints.graph.sail
-Export-Package: com.tinkerpop.blueprints.pgm.oupls.sail
-Bundle-ClassPath: .
-Import-Package: com.tinkerpop.blueprints.pgm,
- com.tinkerpop.blueprints.pgm.impls.tg,
- com.tinkerpop.blueprints.pgm.oupls,
- org.openrdf.model,
- org.openrdf.model.impl,
- org.openrdf.sail,
- info.aduna.iteration,
- net.fortytwo.sesametools,
- org.openrdf.query.algebra,
- org.openrdf.query.algebra.evaluation,
- org.openrdf.query.algebra.evaluation.impl,
- org.openrdf.sail.inferencer,
- org.openrdf.sail.helpers
+Created-By: Apache Maven Bundle Plugin
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Build-Jdk: 1.6.0_26
+Bundle-Version: 1.0.0.SNAPSHOT
+Bnd-LastModified: 1315480276644
+Bundle-ManifestVersion: 2
+Bundle-Description: Sesame Sail implementation for Blueprints property
+  graphs
+Import-Package: com.tinkerpop.blueprints.pgm,com.tinkerpop.blueprints.
+ pgm.oupls,info.aduna.iteration;version="[2.10,3)",net.fortytwo.sesame
+ tools,org.openrdf.model,org.openrdf.model.impl,org.openrdf.query,org.
+ openrdf.query.algebra,org.openrdf.query.algebra.evaluation,org.openrd
+ f.query.algebra.evaluation.impl,org.openrdf.sail,org.openrdf.sail.hel
+ pers,org.openrdf.sail.inferencer
+Bundle-SymbolicName: com.tinkerpop.blueprints.graph-sail
+

@@ -1,113 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.tinkerpop.blueprints</groupId>
-    <artifactId>blueprints</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <url>http://blueprints.tinkerpop.com</url>
-    <name>Blueprints: A Property Graph Model Interface</name>
-    <description>Blueprints is a property graph model interface. It provides implementations, ouplementations, test
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.tinkerpop.blueprints</groupId>
+	<artifactId>blueprints</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<url>http://blueprints.tinkerpop.com</url>
+	<name>Blueprints: A Property Graph Model Interface</name>
+	<description>Blueprints is a property graph model interface. It provides implementations, ouplementations, test
         suites, and supporting utilities.
     </description>
-    <inceptionYear>2010</inceptionYear>
-    <contributors>
-        <contributor>
-            <name>Marko A. Rodriguez</name>
-            <email>marko@markorodriguez.com</email>
-            <url>http://markorodriguez.com</url>
-        </contributor>
-        <contributor>
-            <name>Stephen Mallette</name>
-            <email>spmva@genoprime.com</email>
-            <url>http://stephen.genoprime.com</url>
-        </contributor>
-        <contributor>
-            <name>Joshua Shinavier</name>
-            <email>josh@fortytwo.net</email>
-            <url>http://fortytwo.net</url>
-        </contributor>
-        <contributor>
-            <name>Luca Garulli</name>
-            <email>l.garulli@orientechnologies.com</email>
-            <url>http://zion-city.blogspot.com</url>
-        </contributor>
-        <contributor>
-            <name>Darrick Wiebe</name>
-            <email>darrick@innatesoftware.com</email>
-            <url>http://github.com/pangloss</url>
-        </contributor>
-    </contributors>
+	<inceptionYear>2010</inceptionYear>
+	<contributors>
+		<contributor>
+			<name>Marko A. Rodriguez</name>
+			<email>marko@markorodriguez.com</email>
+			<url>http://markorodriguez.com</url>
+		</contributor>
+		<contributor>
+			<name>Stephen Mallette</name>
+			<email>spmva@genoprime.com</email>
+			<url>http://stephen.genoprime.com</url>
+		</contributor>
+		<contributor>
+			<name>Joshua Shinavier</name>
+			<email>josh@fortytwo.net</email>
+			<url>http://fortytwo.net</url>
+		</contributor>
+		<contributor>
+			<name>Luca Garulli</name>
+			<email>l.garulli@orientechnologies.com</email>
+			<url>http://zion-city.blogspot.com</url>
+		</contributor>
+		<contributor>
+			<name>Darrick Wiebe</name>
+			<email>darrick@innatesoftware.com</email>
+			<url>http://github.com/pangloss</url>
+		</contributor>
+	</contributors>
 
-    <modules>
-        <module>blueprints-core</module>
-        <module>blueprints-dex-graph</module>
-        <module>blueprints-graph-jung</module>
-        <module>blueprints-graph-sail</module>
-        <module>blueprints-neo4j-graph</module>
-        <module>blueprints-orient-graph</module>
-        <module>blueprints-rexster-graph</module>
-        <module>blueprints-sail-graph</module>
-        <module>blueprints-test</module>
-    </modules>
+	<modules>
+		<module>blueprints-core</module>
+		<module>blueprints-dex-graph</module>
+		<module>blueprints-graph-jung</module>
+		<module>blueprints-graph-sail</module>
+		<module>blueprints-neo4j-graph</module>
+		<module>blueprints-orient-graph</module>
+		<module>blueprints-rexster-graph</module>
+		<module>blueprints-sail-graph</module>
+		<module>blueprints-test</module>
+	</modules>
 
-    <repositories>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>http://tinkerpop.com/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>tinkerpop-repository</id>
+			<name>TinkerPop Maven2 Repository</name>
+			<url>http://tinkerpop.com/maven2</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
 
-    <properties>
-        <blueprints.version>1.0-SNAPSHOT</blueprints.version>
-        <sesame.version>2.5.0</sesame.version>
-        <junit.version>4.5</junit.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
+	<properties>
+		<blueprints.version>1.0-SNAPSHOT</blueprints.version>
+		<sesame.version>2.5.0</sesame.version>
+		<junit.version>4.5</junit.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
 
-    <build>
-        <directory>${basedir}/target</directory>
-        <plugins>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.5</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.wagon</groupId>
-                        <artifactId>wagon-ftp</artifactId>
-                        <version>1.0-alpha-6</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<directory>${basedir}/target</directory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.5</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.wagon</groupId>
+						<artifactId>wagon-ftp</artifactId>
+						<version>1.0-alpha-6</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.4</version>
+				<extensions>true</extensions>
+				<configuration>
+					<manifestLocation>META-INF</manifestLocation>
+					<instructions>
+						<Bundle-ClassPath>${bundle.classpath}</Bundle-ClassPath>
+						<Export-Package>${export.package}</Export-Package>
+						<Private-Package>${private.package}</Private-Package>
+						<Import-Package>${import.package}</Import-Package>
+						<Bundle-RequiredExecutionEnvironment>J2SE-1.5</Bundle-RequiredExecutionEnvironment>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-    <distributionManagement>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
-        </repository>
-    </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>tinkerpop-repository</id>
+			<name>TinkerPop Maven2 Repository</name>
+			<url>ftp://ftp.tinkerpop.com:21/public/maven2/</url>
+		</repository>
+	</distributionManagement>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
