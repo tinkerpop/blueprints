@@ -117,7 +117,17 @@ public class EventGraph implements Graph {
      * Raises an edgeAdded event.
      */
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
-        final Edge edge = this.graph.addEdge(id, outVertex, inVertex, label);
+        Vertex outVertexToSet = outVertex;
+        if(outVertex instanceof EventVertex) {
+            outVertexToSet = ((EventVertex) outVertex).getRawVertex();
+        }
+        
+        Vertex inVertexToSet = inVertex;
+        if(inVertex instanceof EventVertex) {
+            inVertexToSet = ((EventVertex) inVertex).getRawVertex();
+        }
+        
+        final Edge edge = this.graph.addEdge(id, outVertexToSet, inVertexToSet, label);
         if (edge == null) {
             return null;
         } else {
