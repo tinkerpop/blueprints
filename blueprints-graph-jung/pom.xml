@@ -12,8 +12,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Blueprints-GraphJung</name>
-    <description>JUNG (Java Universal Network/Graph Framework) utility for Blueprints property graphs</description>
-
+    <description>Blueprints property graphs outplementation for the JUNG (Java Universal Network/Graph Framework)</description>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

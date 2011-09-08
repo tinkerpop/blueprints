@@ -84,12 +84,15 @@ public class IndexableGraphTestSuite extends TestSuite {
         this.stopWatch();
         graph.dropIndex(index1.getIndexName());
         assertEquals(count(graph.getIndices()), 2);
-        assertTrue(asList(graph.getIndices()).contains(index2));
-        assertTrue(asList(graph.getIndices()).contains(index3));
+        for (Index index : graph.getIndices()) {
+            assertTrue(index.getIndexName().equals(index2.getIndexName()) || index.getIndexName().equals(index3.getIndexName()));
+        }
 
         graph.dropIndex(index2.getIndexName());
         assertEquals(count(graph.getIndices()), 1);
-        assertTrue(asList(graph.getIndices()).contains(index3));
+        for (Index index : graph.getIndices()) {
+            assertTrue(index.getIndexName().equals(index3.getIndexName()));
+        }
 
         graph.dropIndex(index3.getIndexName());
         assertEquals(count(graph.getIndices()), 0);

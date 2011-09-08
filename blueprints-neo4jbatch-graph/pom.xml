@@ -8,54 +8,23 @@
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <artifactId>blueprints-sail-graph</artifactId>
+    <artifactId>blueprints-neo4jbatch-graph</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Blueprints-SailGraph</name>
-    <description>Blueprints property graph implementation for Sesame RDF Sail</description>
+    <name>Blueprints-Neo4jBatchGraph</name>
+    <description>Blueprints property graph implementation for the Neo4j batch inserter</description>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
             <version>${blueprints.version}</version>
         </dependency>
-        <!-- SESAME SUPPORT -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.6</version>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>1.5.M01</version>
+            <type>pom</type>
         </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-sail-api</artifactId>
-            <version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-queryparser-sparql</artifactId>
-            <version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-sail-memory</artifactId>
-            <version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-sail-nativerdf</artifactId>
-            <version>${sesame.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.fortytwo</groupId>
-            <artifactId>linked-data-sail</artifactId>
-            <version>0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>nquads</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <!-- TESTING -->
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
@@ -74,18 +43,13 @@
             </snapshots>
         </repository>
         <repository>
-            <id>aduna-repo</id>
-            <name>Aduna repository</name>
-            <url>http://repo.aduna-software.org/maven2/releases</url>
+            <id>neo4j-public-repository</id>
+            <name>Publicly available Maven 2 repository for Neo4j</name>
+            <url>http://m2.neo4j.org/</url>
             <snapshots>
                 <enabled>true</enabled>
                 <updatePolicy>always</updatePolicy>
             </snapshots>
-        </repository>
-        <repository>
-            <id>fortytwo</id>
-            <name>fortytwo.net Maven repository</name>
-            <url>http://fortytwo.net/maven2</url>
         </repository>
     </repositories>
     <build>
@@ -118,10 +82,14 @@
                 <version>2.4.2</version>
                 <configuration>
                     <systemProperties>
-                        <!-- SAIL TEST PROPERTIES -->
+                        <!-- NEO4J TEST PROPERTIES -->
                         <property>
-                            <name>testSail</name>
+                            <name>testNeo4jBatchGraph</name>
                             <value>true</value>
+                        </property>
+                        <property>
+                            <name>neo4jGraphDirectory</name>
+                            <value>/tmp/blueprints_test</value>
                         </property>
                     </systemProperties>
                 </configuration>

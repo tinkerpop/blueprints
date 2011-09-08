@@ -2,8 +2,10 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -31,12 +33,22 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         this.generateIndex();
     }
 
+    public Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph, final org.neo4j.graphdb.index.Index<S> rawIndex) {
+        this.indexClass = indexClass;
+        this.indexName = indexName;
+        this.graph = graph;
+        this.rawIndex = rawIndex;
+    }
+
     public Type getIndexType() {
         return Type.MANUAL;
     }
 
     public Class<T> getIndexClass() {
-        return indexClass;
+        if (Vertex.class.isAssignableFrom(indexClass))
+            return (Class) Vertex.class;
+        else
+            return (Class) Edge.class;
     }
 
     public String getIndexName() {
