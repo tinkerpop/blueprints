@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.Random;
@@ -17,46 +18,20 @@ public class TransactionalGraphTestSuite extends TestSuite {
         super(graphTest);
     }
 
-    public void testConstructionAutomatic() {
+    public void testConstructionBufferSizeOne() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         this.stopWatch();
-        assertEquals(graph.getTransactionMode(), TransactionalGraph.Mode.AUTOMATIC);
+        assertEquals(graph.getMaxBufferSize(), 1);
         printPerformance(graph.toString(), 1, "transaction mode retrieved", this.stopWatch());
         graph.shutdown();
     }
 
-    public void testModeErrors() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
-        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
-        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
-        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
-        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
-        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
-
-        try {
-            graph.startTransaction();
-            assertFalse(true);
-        } catch (RuntimeException e) {
-            assertTrue(true);
-        }
-
-        try {
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            assertFalse(true);
-        } catch (RuntimeException e) {
-            assertTrue(true);
-        }
-        graph.shutdown();
-    }
-
-
     public void testTransactionsForVertices() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIteration) {
-            graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+            graph.setMaxBufferSize(1);
             graph.addVertex(null);
-            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+            graph.setMaxBufferSize(0);
 
             this.stopWatch();
             graph.startTransaction();
@@ -64,6 +39,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
                 graph.addVertex(null);
                 assertTrue(true);
             } catch (Exception e) {
+                System.out.println(e);
                 assertTrue(false);
             }
             assertEquals(count(graph.getVertices()), 2);
@@ -91,7 +67,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void testBruteVertexTransactions() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIteration) {
-            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+            graph.setMaxBufferSize(0);
 
             this.stopWatch();
             for (int i = 0; i < 100; i++) {
@@ -141,11 +117,11 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
     public void testTransactionsForEdges() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-        graph.setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
+        graph.setMaxBufferSize(1);
         Vertex v = graph.addVertex(null);
         Vertex u = graph.addVertex(null);
-        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
-        assertEquals(graph.getTransactionMode(), TransactionalGraph.Mode.MANUAL);
+        graph.setMaxBufferSize(0);
+        assertEquals(graph.getMaxBufferSize(), 0);
 
         this.stopWatch();
         graph.startTransaction();
@@ -191,7 +167,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
     public void testBruteEdgeTransactions() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        graph.setMaxBufferSize(0);
         this.stopWatch();
         for (int i = 0; i < 100; i++) {
             graph.startTransaction();
@@ -262,7 +238,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void testPropertyTransactions() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {
-            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+            graph.setMaxBufferSize(0);
 
             this.stopWatch();
             graph.startTransaction();
@@ -322,7 +298,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void testIndexTransactions() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex) {
-            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+            graph.setMaxBufferSize(0);
 
             this.stopWatch();
             graph.startTransaction();
@@ -395,7 +371,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
     public void testNestedManualTransactions() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-        graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        graph.setMaxBufferSize(0);
         graph.startTransaction();
         RuntimeException ex = null;
         try {
@@ -412,7 +388,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         if (graphTest.isPersistent) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
             Object v1id = graph.addVertex(null).getId();
-            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+            graph.setMaxBufferSize(0);
             graph.startTransaction();
             Object v2id = graph.addVertex(null).getId();
             graph.shutdown();
@@ -421,6 +397,19 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertNull("Vertex 2 should not be persisted", graph.getVertex(v2id));
             graph.shutdown();
         }
+    }
+
+    public void testBulkTransactions() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        graph.setMaxBufferSize(15);
+        for (int i = 0; i < 3; i++) {
+            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+        }
+        assertEquals(BaseTest.count(graph.getEdges()), 3);
+        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        assertEquals(BaseTest.count(graph.getEdges()), 0);
+
+        graph.shutdown();
     }
 
     public void testCompetingThreads() {
@@ -449,7 +438,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
                             edges.getAndAdd(1);
 
                         } else {
-                            graph.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+                            graph.setMaxBufferSize(0);
                             graph.startTransaction();
                             Vertex a = graph.addVertex(null);
                             Vertex b = graph.addVertex(null);

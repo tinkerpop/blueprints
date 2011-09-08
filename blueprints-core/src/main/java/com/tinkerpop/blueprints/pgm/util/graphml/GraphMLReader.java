@@ -2,9 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.graphml;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph.Conclusion;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph.Mode;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
 import javax.xml.stream.XMLInputFactory;
@@ -134,16 +131,6 @@ public class GraphMLReader {
             Map<String, Object> edgeProps = null;
             boolean inEdge = false;
 
-            Mode transactionMode = null;
-            boolean isTransactionalGraph = false;
-            Integer transactionBufferSize = 0;
-            if (bufferSize > 0 && graph instanceof TransactionalGraph) {
-                transactionMode = ((TransactionalGraph) graph).getTransactionMode();
-                ((TransactionalGraph) graph).setTransactionMode(Mode.MANUAL);
-                ((TransactionalGraph) graph).startTransaction();
-                isTransactionalGraph = true;
-            }
-
             while (reader.hasNext()) {
 
                 Integer eventType = reader.next();
@@ -191,7 +178,6 @@ public class GraphMLReader {
 
                         if (null == edgeOutVertex) {
                             edgeOutVertex = graph.addVertex(outVertexId);
-                            transactionBufferSize++;
                             vertexIdMap.put(outVertexId, edgeOutVertex.getId());
                             if (vertexIdKey != null)
                                 // Default to standard ID system (in case no mapped
@@ -200,7 +186,6 @@ public class GraphMLReader {
                         }
                         if (null == edgeInVertex) {
                             edgeInVertex = graph.addVertex(inVertexId);
-                            transactionBufferSize++;
                             vertexIdMap.put(inVertexId, edgeInVertex.getId());
                             if (vertexIdKey != null)
                                 // Default to standard ID system (in case no mapped
@@ -249,13 +234,11 @@ public class GraphMLReader {
                             currentVertex = graph.getVertex(vertexObjectId);
                         else {
                             currentVertex = graph.addVertex(vertexId);
-                            transactionBufferSize++;
                             vertexIdMap.put(vertexId, currentVertex.getId());
                         }
 
                         for (Entry<String, Object> prop : vertexProps.entrySet()) {
                             currentVertex.setProperty(prop.getKey(), prop.getValue());
-                            transactionBufferSize++;
                         }
 
                         vertexId = null;
@@ -264,11 +247,8 @@ public class GraphMLReader {
                     } else if (elementName.equals(GraphMLTokens.EDGE)) {
                         Edge currentEdge = graph.addEdge(edgeId, edgeOutVertex, edgeInVertex, edgeLabel);
 
-                        transactionBufferSize++;
-
                         for (Entry<String, Object> prop : edgeProps.entrySet()) {
                             currentEdge.setProperty(prop.getKey(), prop.getValue());
-                            transactionBufferSize++;
                         }
 
                         edgeId = null;
@@ -280,21 +260,9 @@ public class GraphMLReader {
                     }
 
                 }
-
-                if (isTransactionalGraph && (transactionBufferSize > bufferSize)) {
-                    ((TransactionalGraph) graph).stopTransaction(Conclusion.SUCCESS);
-                    ((TransactionalGraph) graph).startTransaction();
-                    transactionBufferSize = 0;
-                }
-
             }
 
             reader.close();
-
-            if (isTransactionalGraph) {
-                ((TransactionalGraph) graph).stopTransaction(Conclusion.SUCCESS);
-                ((TransactionalGraph) graph).setTransactionMode(transactionMode);
-            }
         } catch (XMLStreamException xse) {
             throw new IOException(xse);
         }

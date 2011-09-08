@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 
 /**
@@ -13,7 +12,7 @@ public class Neo4jGraphSailTest extends GraphSailTest {
 
         Neo4jGraph g = new Neo4jGraph(directory);
         g.clear();
-        g.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        g.setMaxBufferSize(0);
         return g;
     }
 

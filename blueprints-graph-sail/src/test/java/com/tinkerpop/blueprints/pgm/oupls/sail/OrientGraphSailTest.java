@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import junit.framework.TestCase;
 
@@ -30,7 +29,7 @@ public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
 
 
         OrientGraph g = new OrientGraph("local:" + directory + "/graph");
-        g.setTransactionMode(TransactionalGraph.Mode.MANUAL);
+        g.setMaxBufferSize(0);
         return g;
     }
 

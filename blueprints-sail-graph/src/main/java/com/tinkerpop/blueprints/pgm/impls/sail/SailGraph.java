@@ -90,11 +90,17 @@ public class SailGraph implements TransactionalGraph {
             return Boolean.FALSE;
         }
     };
-    private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
-        protected Mode initialValue() {
-            return Mode.AUTOMATIC;
+    private final ThreadLocal<Integer> txBuffer = new ThreadLocal<Integer>() {
+        protected Integer initialValue() {
+            return 1;
         }
     };
+    private final ThreadLocal<Integer> txCounter = new ThreadLocal<Integer>() {
+        protected Integer initialValue() {
+            return 0;
+        }
+    };
+
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
     /**
@@ -383,17 +389,13 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == txMode.get())
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         if (inTransaction.get())
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
         inTransaction.set(Boolean.TRUE);
+        this.txCounter.set(0);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == txMode.get())
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-
         try {
             inTransaction.set(Boolean.FALSE);
             if (Conclusion.SUCCESS == conclusion) {
@@ -401,36 +403,46 @@ public class SailGraph implements TransactionalGraph {
             } else {
                 this.sailConnection.get().rollback();
             }
+            this.txCounter.set(0);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
-        if (txMode.get() == Mode.AUTOMATIC) {
+        if (txBuffer.get() > 0) {
             try {
-                inTransaction.set(Boolean.FALSE);
-                if (conclusion == Conclusion.SUCCESS)
+                txCounter.set(txCounter.get() + 1);
+                if (conclusion == Conclusion.FAILURE) {
                     this.sailConnection.get().commit();
-                else
-                    this.sailConnection.get().rollback();
+                    txCounter.set(0);
+                    inTransaction.set(Boolean.FALSE);
+                } else if (this.txBuffer.get() == 0 || (this.txCounter.get() % this.txBuffer.get() == 0)) {
+                    this.sailConnection.get().commit();
+                    txCounter.set(0);
+                    inTransaction.set(Boolean.FALSE);
+                }
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
     }
 
-    public void setTransactionMode(final Mode mode) {
+    public void setMaxBufferSize(final int bufferSize) {
         try {
             this.sailConnection.get().commit();
         } catch (SailException e) {
         }
         inTransaction.set(Boolean.FALSE);
-        txMode.set(mode);
+        this.txBuffer.set(bufferSize);
     }
 
-    public Mode getTransactionMode() {
-        return txMode.get();
+    public int getMaxBufferSize() {
+        return this.txBuffer.get();
+    }
+
+    public int getCurrentBufferSize() {
+        return this.txCounter.get();
     }
 
 

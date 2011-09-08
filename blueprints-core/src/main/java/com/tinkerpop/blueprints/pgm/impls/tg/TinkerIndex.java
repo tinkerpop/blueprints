@@ -9,6 +9,7 @@ import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,7 +63,7 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
             if (null == set)
                 return new WrappingCloseableSequence<T>(new HashSet<T>());
             else
-                return new WrappingCloseableSequence<T>(set);
+                return new WrappingCloseableSequence<T>(new LinkedList<T>(set));
         }
     }
 

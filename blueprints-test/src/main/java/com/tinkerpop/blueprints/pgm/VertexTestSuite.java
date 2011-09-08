@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.sail.SailTokens;
 
@@ -356,30 +357,18 @@ public class VertexTestSuite extends TestSuite {
     }
 
 
-    //TODO: Is this test appropriate for a graph database? Assumes strong sychronization between Blueprints and backend
-    /*public void testVertexPropertyInconsistency() {
-        Graph graph = graphTest.getGraphInstance();
+    public void testNoConcurrentModificationException() {
         if (!graphTest.isRDFModel) {
-            List<String> ids = generateIds(1);
-            Vertex v1 = graph.addVertex(convertId(ids.get(0)));
-            v1.setProperty("key1", "value1");
-            if (graphTest.supportsVertexIteration) {
-                assertEquals(count(graph.getVertices()), 1);
+            Graph graph = graphTest.getGraphInstance();
+            for (int i = 0; i < 25; i++) {
+                graph.addVertex(null);
             }
-            assertEquals("value1", v1.getProperty("key1"));
-
-            Vertex v2 = graph.getVertex(v1.getId());
-            assertEquals("value1", v2.getProperty("key1"));
-
-            v1.setProperty("key1", "value111");
-            assertEquals("value111", v1.getProperty("key1"));
-            assertEquals("value111", v2.getProperty("key1"));
-
-            assertEquals("value111", v2.removeProperty("key1"));
-            assertNull(v2.getProperty("key1"));
-            assertNull(v1.getProperty("key1"));
+            assertEquals(BaseTest.count(graph.getVertices()), 25);
+            for (final Vertex vertex : graph.getVertices()) {
+                graph.removeVertex(vertex);
+            }
+            assertEquals(BaseTest.count(graph.getVertices()), 0);
+            graph.shutdown();
         }
-        graph.shutdown();
-    }*/
-
+    }
 }

@@ -40,11 +40,17 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             return null;
         }
     };
-    private final ThreadLocal<Mode> txMode = new ThreadLocal<Mode>() {
-        protected Mode initialValue() {
-            return Mode.AUTOMATIC;
+    private final ThreadLocal<Integer> txBuffer = new ThreadLocal<Integer>() {
+        protected Integer initialValue() {
+            return 1;
         }
     };
+    private final ThreadLocal<Integer> txCounter = new ThreadLocal<Integer>() {
+        protected Integer initialValue() {
+            return 0;
+        }
+    };
+
     protected Map<String, Neo4jIndex> indices = new HashMap<String, Neo4jIndex>();
     protected Map<String, Neo4jAutomaticIndex> autoIndices = new HashMap<String, Neo4jAutomaticIndex>();
 
@@ -283,41 +289,43 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void startTransaction() {
-        if (Mode.AUTOMATIC == txMode.get())
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         if (tx.get() == null) {
+            txCounter.set(0);
             tx.set(this.rawGraph.beginTx());
         } else
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == txMode.get())
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         if (null == tx.get())
             throw new RuntimeException("There is no active transaction to stop");
 
-        if (conclusion == Conclusion.SUCCESS) {
+        if (conclusion == Conclusion.SUCCESS)
             tx.get().success();
-            tx.get().finish();
-        } else {
+        else
             tx.get().failure();
-            tx.get().finish();
-        }
+
+        tx.get().finish();
         tx.remove();
+        txCounter.set(0);
     }
 
-    public void setTransactionMode(final Mode mode) {
+    public int getMaxBufferSize() {
+        return txBuffer.get();
+    }
+
+    public int getCurrentBufferSize() {
+        return txCounter.get();
+    }
+
+    public void setMaxBufferSize(final int size) {
         if (null != tx.get()) {
             tx.get().success();
             tx.get().finish();
             tx.remove();
         }
-        txMode.set(mode);
-    }
-
-    public Mode getTransactionMode() {
-        return txMode.get();
+        this.txBuffer.set(size);
+        this.txCounter.set(0);
     }
 
     public void shutdown() {
@@ -344,23 +352,27 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     protected void autoStartTransaction() {
-        if (getTransactionMode() == Mode.AUTOMATIC) {
+        if (this.txBuffer.get() > 0) {
             if (tx.get() == null) {
                 tx.set(this.rawGraph.beginTx());
-            } else
-                throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
+            }
         }
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
-        if (getTransactionMode() == Mode.AUTOMATIC) {
-            if (conclusion == Conclusion.SUCCESS) {
-                tx.get().success();
-            } else {
+        if (this.txBuffer.get() > 0) {
+            txCounter.set(txCounter.get() + 1);
+            if (conclusion == Conclusion.FAILURE) {
                 tx.get().failure();
+                tx.get().finish();
+                tx.remove();
+                txCounter.set(0);
+            } else if (this.txBuffer.get() == 0 || (this.txCounter.get() % this.txBuffer.get() == 0)) {
+                tx.get().success();
+                tx.get().finish();
+                tx.remove();
+                txCounter.set(0);
             }
-            tx.get().finish();
-            tx.remove();
         }
     }
 

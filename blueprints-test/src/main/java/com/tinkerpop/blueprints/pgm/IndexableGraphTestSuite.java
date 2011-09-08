@@ -257,8 +257,5 @@ public class IndexableGraphTestSuite extends TestSuite {
             graph.shutdown();
         }
         printPerformance(graphName, loop, "attempt(s) to overwrite existing indices", this.stopWatch());
-
-
     }
-
 }

@@ -11,7 +11,9 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-h3. Version 1.0 (NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-blueprints.png!
+
+h3. Version 1.0 (Blueprints -- NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
@@ -21,10 +23,13 @@ h3. Version 1.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Bumped to support Neo4j 1.4.1
+* Bumped to support Neo4j 1.5.M01
 * Bumped to support OrientDB 1.0rc5
-* RexsterGraph uses the actual count REST API instead of pulling back all results first and checking size
-* GraphJSONReader and GraphJSONWriter utility classes
+* @RexsterGraph@ uses the actual count REST API instead of pulling back all results first and checking size
+* @GraphJSONReader@ and @GraphJSONWriter@ utility classes
+* Updated @TransactionalGraph@ API to support transaction buffers
+** Removed @TransactionalGraphHelper.CommitManager@ as it is no longer relevant
+* Fixed a @ConcurrentModificationException@ in @TinkerGraph@ and added respective test cases for all graphs
 
 ==<hr/>==
 

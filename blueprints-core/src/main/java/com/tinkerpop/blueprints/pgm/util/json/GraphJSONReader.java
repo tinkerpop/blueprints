@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.json;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
@@ -31,7 +30,7 @@ public class GraphJSONReader {
         this.graph = graph;
     }
 
-     /**
+    /**
      * Input the JSON stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
@@ -47,7 +46,7 @@ public class GraphJSONReader {
      * In practice, usually the provided graph is empty.
      *
      * @param jsonInputStream an InputStream of JSON data
-     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param bufferSize      the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public void inputGraph(final InputStream jsonInputStream, int bufferSize) throws IOException {
@@ -58,7 +57,7 @@ public class GraphJSONReader {
      * Input the JSON stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
-     * @param graph              the graph to populate with the JSON data
+     * @param graph           the graph to populate with the JSON data
      * @param jsonInputStream an InputStream of JSON data
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
@@ -70,9 +69,9 @@ public class GraphJSONReader {
      * Input the JSON stream data into the graph.
      * More control over how data is streamed is provided by this method.
      *
-     * @param graph              the graph to populate with the JSON data
+     * @param graph           the graph to populate with the JSON data
      * @param jsonInputStream an InputStream of JSON data
-     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param bufferSize      the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph graph, final InputStream jsonInputStream, int bufferSize) throws IOException {
@@ -81,16 +80,6 @@ public class GraphJSONReader {
         JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
         Map<String, Object> vertexIdMap = new HashMap<String, Object>();
-
-        TransactionalGraph.Mode transactionMode = null;
-        boolean isTransactionalGraph = false;
-        Integer transactionBufferSize = 0;
-        if (bufferSize > 0 && graph instanceof TransactionalGraph) {
-            transactionMode = ((TransactionalGraph) graph).getTransactionMode();
-            ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.MANUAL);
-            ((TransactionalGraph) graph).startTransaction();
-            isTransactionalGraph = true;
-        }
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
             String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();
@@ -107,17 +96,8 @@ public class GraphJSONReader {
                     Vertex v = graph.addVertex(vertexId);
                     vertexIdMap.put(vertexId, v.getId());
 
-                    transactionBufferSize++;
-
                     for (Map.Entry<String, Object> entry : props.entrySet()) {
                         v.setProperty(entry.getKey(), entry.getValue());
-                        transactionBufferSize++;
-                    }
-
-                    if (isTransactionalGraph && (transactionBufferSize > bufferSize)) {
-                        ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                        ((TransactionalGraph) graph).startTransaction();
-                        transactionBufferSize = 0;
                     }
                 }
             } else if (fieldname.equals(JSONTokens.EDGES)) {
@@ -136,28 +116,14 @@ public class GraphJSONReader {
 
                     Edge e = graph.addEdge(edgeId, outV, inV, label);
 
-                    transactionBufferSize++;
-
                     for (Map.Entry<String, Object> entry : props.entrySet()) {
                         e.setProperty(entry.getKey(), entry.getValue());
-                        transactionBufferSize++;
-                    }
-
-                    if (isTransactionalGraph && (transactionBufferSize > bufferSize)) {
-                        ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                        ((TransactionalGraph) graph).startTransaction();
-                        transactionBufferSize = 0;
                     }
                 }
             }
         }
 
         jp.close();
-
-        if (isTransactionalGraph) {
-            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            ((TransactionalGraph) graph).setTransactionMode(transactionMode);
-        }
     }
 
     private static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {

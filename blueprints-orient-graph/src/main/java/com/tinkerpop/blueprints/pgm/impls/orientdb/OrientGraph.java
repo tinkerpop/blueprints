@@ -336,8 +336,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     public void startTransaction() {
         final OrientGraphContext context = getContext(true);
 
-        if (Mode.AUTOMATIC == context.txMode)
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
         if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             context.rawGraph.begin();
         } else
@@ -345,22 +343,23 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (Mode.AUTOMATIC == getContext(true).txMode)
-            throw new RuntimeException(TransactionalGraph.TURN_OFF_MESSAGE);
-
         if (conclusion == Conclusion.FAILURE) {
             this.getRawGraph().rollback();
         } else
             this.getRawGraph().commit();
     }
 
-    public void setTransactionMode(final Mode mode) {
+    public void setMaxBufferSize(final int bufferSize) {
         getRawGraph().commit();
-        getContext(true).txMode = mode;
+        getContext(true).txBuffer = bufferSize;
     }
 
-    public Mode getTransactionMode() {
-        return getContext(true).txMode;
+    public int getMaxBufferSize() {
+        return getContext(true).txBuffer;
+    }
+
+    public int getCurrentBufferSize() {
+        return getContext(true).txCounter;
     }
 
     protected void saveIndexConfiguration() {
@@ -368,28 +367,33 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     protected boolean autoStartTransaction() {
-        final OGraphDatabase db = getRawGraph();
-        if (getTransactionMode() == Mode.AUTOMATIC && (db.getTransaction() instanceof OTransactionNoTx || db.getTransaction().getStatus() != TXSTATUS.BEGUN)) {
-            db.begin();
-            return true;
-        }
-        return false;
+        if (getContext(true).txBuffer > 0) {
+            final OGraphDatabase db = getRawGraph();
+            if (db.getTransaction() instanceof OTransactionNoTx || db.getTransaction().getStatus() != TXSTATUS.BEGUN) {
+                db.begin();
+                return true;
+            }
+            return false;
+        } else return false;
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
-        final OGraphDatabase db = getRawGraph();
-        if (getTransactionMode() == Mode.AUTOMATIC) {
-            if (conclusion == Conclusion.SUCCESS)
-                db.commit();
-            else
-                db.rollback();
+        if (getContext(true).txBuffer > 0) {
+            getContext(true).txCounter = getContext(true).txCounter + 1;
+            final OGraphDatabase db = getRawGraph();
+            if (getContext(true).txBuffer == 0 || (getContext(true).txCounter % getContext(true).txBuffer == 0)) {
+                if (conclusion == Conclusion.SUCCESS)
+                    db.commit();
+                else
+                    db.rollback();
+            }
         }
     }
 
-    protected OrientGraphContext getContext(final boolean iCreate) {
+    protected OrientGraphContext getContext(final boolean create) {
         OrientGraphContext context = threadContext.get();
 
-        if (context == null && iCreate)
+        if (context == null && create)
             context = openOrCreate(false);
 
         return context;
