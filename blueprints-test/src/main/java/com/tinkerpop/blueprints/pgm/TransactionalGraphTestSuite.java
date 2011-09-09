@@ -409,6 +409,13 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         assertEquals(BaseTest.count(graph.getEdges()), 0);
 
+        for (int i = 0; i < 3; i++) {
+            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+        }
+        assertEquals(BaseTest.count(graph.getEdges()), 3);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        assertEquals(BaseTest.count(graph.getEdges()), 3);
+
         graph.shutdown();
     }
 
