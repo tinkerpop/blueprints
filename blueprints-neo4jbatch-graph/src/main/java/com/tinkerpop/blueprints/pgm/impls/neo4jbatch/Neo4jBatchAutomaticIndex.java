@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchAutomaticIndex<T extends Element> extends Neo4jBatchIndex implements AutomaticIndex<T> {
+public class Neo4jBatchAutomaticIndex<T extends Element> extends Neo4jBatchIndex<T> implements AutomaticIndex<T> {
 
     final Set<String> autoIndexKeys;
 

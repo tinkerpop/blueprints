@@ -25,7 +25,7 @@ public class Neo4jBatchGraph implements IndexableGraph {
     final BatchInserter inserter;
     final BatchInserterIndexProvider indexProvider;
 
-    final Map<String, Index<? extends Element>> indices = new HashMap<String, Index<? extends Element>>();
+    final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
     final Map<String, Neo4jBatchAutomaticIndex<? extends Element>> autoIndices = new HashMap<String, Neo4jBatchAutomaticIndex<? extends Element>>();
 
     public Neo4jBatchGraph(final String directory) {
@@ -44,7 +44,14 @@ public class Neo4jBatchGraph implements IndexableGraph {
     }
 
     public void shutdown() {
+        this.flushIndices();
         this.inserter.shutdown();
+    }
+
+    public void flushIndices() {
+        for (final Neo4jBatchIndex index : this.indices.values()) {
+            index.flush();
+        }
     }
 
     public void clear() {
@@ -112,24 +119,24 @@ public class Neo4jBatchGraph implements IndexableGraph {
     }
 
     public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
-        final Index<T> index;
+        final Neo4jBatchIndex<T> index;
 
         if (indexClass.equals(Vertex.class)) {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.nodeIndex(indexName, MapUtil.stringMap("type", "exact")), indexName, indexClass);
+            index = new Neo4jBatchIndex<T>(this, indexProvider.nodeIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT)), indexName, indexClass);
         } else {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.relationshipIndex(indexName, MapUtil.stringMap("type", "exact")), indexName, indexClass);
+            index = new Neo4jBatchIndex<T>(this, indexProvider.relationshipIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT)), indexName, indexClass);
         }
         this.indices.put(indexName, index);
         return index;
     }
 
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
-        final AutomaticIndex<T> index;
+        final Neo4jBatchAutomaticIndex<T> index;
 
         if (indexClass.equals(Vertex.class)) {
-            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.nodeIndex(indexName, MapUtil.stringMap("type", "exact")), indexName, indexClass, indexKeys);
+            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.nodeIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT)), indexName, indexClass, indexKeys);
         } else {
-            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.relationshipIndex(indexName, MapUtil.stringMap("type", "exact")), indexName, indexClass, indexKeys);
+            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.relationshipIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT)), indexName, indexClass, indexKeys);
         }
         this.indices.put(indexName, index);
         return index;
@@ -140,17 +147,17 @@ public class Neo4jBatchGraph implements IndexableGraph {
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return this.indices.values();
+        return (Iterable) this.indices.values();
     }
 
-    public void dropIndex(String indexName) {
+    public void dropIndex(final String indexName) {
         throw new UnsupportedOperationException();
     }
 
     private Map<String, Object> makePropertyMap(final Map<String, Object> map) {
-        Map<String, Object> properties = new HashMap<String, Object>();
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (!entry.getKey().equals("_id")) {
+        final Map<String, Object> properties = new HashMap<String, Object>();
+        for (final Map.Entry<String, Object> entry : map.entrySet()) {
+            if (!entry.getKey().equals(Neo4jBatchTokens.ID)) {
                 properties.put(entry.getKey(), entry.getValue());
             }
         }

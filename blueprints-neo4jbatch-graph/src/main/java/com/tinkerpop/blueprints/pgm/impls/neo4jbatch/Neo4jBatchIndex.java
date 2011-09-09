@@ -64,4 +64,8 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
     public Type getIndexType() {
         return Type.MANUAL;
     }
+
+    public void flush() {
+        this.rawIndex.flush();
+    }
 }
