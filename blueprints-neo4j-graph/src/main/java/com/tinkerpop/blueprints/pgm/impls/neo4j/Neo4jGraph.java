@@ -303,7 +303,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     public void shutdown() {
         if (null != tx.get()) {
             try {
-                tx.get().failure();
+                tx.get().success();
                 tx.get().finish();
                 tx.remove();
             } catch (TransactionFailureException e) {
@@ -363,10 +363,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         return indexNames;
     }
 
-    protected Iterable<Neo4jAutomaticIndex> getAutoIndices() {
+    protected Iterable<Neo4jAutomaticIndex> getAutomaticIndices(final Class indexClass) {
         final List<Neo4jAutomaticIndex> indices = new ArrayList<Neo4jAutomaticIndex>();
         for (final String indexName : this.getIndexNames()) {
-            final Index index = this.getIndex(indexName, null);
+            final Index index = this.getIndex(indexName, indexClass);
             if (null != index && index instanceof Neo4jAutomaticIndex) {
                 indices.add((Neo4jAutomaticIndex) index);
             }

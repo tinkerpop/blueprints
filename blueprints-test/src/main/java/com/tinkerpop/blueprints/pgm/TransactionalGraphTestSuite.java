@@ -384,7 +384,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void testRollbackOpenTxOnGraphClose() {
+    public void testSuccessfulCommitOnGraphClose() {
         if (graphTest.isPersistent) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
             Object v1id = graph.addVertex(null).getId();
@@ -394,7 +394,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph.shutdown();
             graph = (TransactionalGraph) graphTest.getGraphInstance();
             assertNotNull("Vertex 1 should be persisted", graph.getVertex(v1id));
-            assertNull("Vertex 2 should not be persisted", graph.getVertex(v2id));
+            assertNotNull("Vertex 2 should be persisted", graph.getVertex(v2id));
             graph.shutdown();
         }
     }

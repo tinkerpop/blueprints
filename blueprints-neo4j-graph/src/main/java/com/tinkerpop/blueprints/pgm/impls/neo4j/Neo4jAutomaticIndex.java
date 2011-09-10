@@ -35,7 +35,8 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (null == this.autoIndexKeys || this.autoIndexKeys.contains(key))) {
+        //if (this.getIndexClass().isAssignableFrom(element.getClass()) && (null == this.autoIndexKeys || this.autoIndexKeys.contains(key))) {
+        if (null == this.autoIndexKeys || this.autoIndexKeys.contains(key)) {
             if (oldValue != null)
                 this.removeBasic(key, oldValue, element);
             this.putBasic(key, newValue, element);
@@ -43,7 +44,8 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     }
 
     protected void autoRemove(final String key, final Object oldValue, final T element) {
-        if (this.getIndexClass().isAssignableFrom(element.getClass()) && (null == this.autoIndexKeys || this.autoIndexKeys.contains(key))) {
+        //if (this.getIndexClass().isAssignableFrom(element.getClass()) && (null == this.autoIndexKeys || this.autoIndexKeys.contains(key))) {
+        if (null == this.autoIndexKeys || this.autoIndexKeys.contains(key)) {
             this.removeBasic(key, oldValue, element);
         }
     }
@@ -68,24 +70,23 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
             this.getIndexManager().setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS, field);
 
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     private boolean loadKeyField() {
-        String keysString = this.getIndexManager().getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_AUTOKEYS);
+        final String keysString = this.getIndexManager().getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_AUTOKEYS);
         if (null != keysString) {
             if (keysString.equals("null")) {
                 this.autoIndexKeys = null;
             } else {
                 this.autoIndexKeys = new HashSet<String>();
-                String[] keys = keysString.split(Neo4jTokens.KEY_SEPARATOR);
-                for (String key : keys) {
+                for (final String key : keysString.split(Neo4jTokens.KEY_SEPARATOR)) {
                     if (key.length() > 0) {
                         this.autoIndexKeys.add(key);
                     }

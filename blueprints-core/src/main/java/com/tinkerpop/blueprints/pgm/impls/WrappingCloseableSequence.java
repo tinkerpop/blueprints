@@ -32,7 +32,7 @@ public class WrappingCloseableSequence<T> implements CloseableSequence<T> {
     }
 
     public void close() {
-        if (itty instanceof CloseableSequence) {
+        if (this.itty instanceof CloseableSequence) {
             ((CloseableSequence) itty).close();
         }
     }

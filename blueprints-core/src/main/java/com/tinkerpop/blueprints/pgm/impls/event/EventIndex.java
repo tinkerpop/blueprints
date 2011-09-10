@@ -19,7 +19,7 @@ public class EventIndex<T extends Element> implements Index<T> {
     protected final Index<T> index;
     protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventIndex(Index<T> index, List<GraphChangedListener> graphChangedListeners) {
+    public EventIndex(final Index<T> index, final List<GraphChangedListener> graphChangedListeners) {
         this.index = index;
         this.graphChangedListeners = graphChangedListeners;
     }

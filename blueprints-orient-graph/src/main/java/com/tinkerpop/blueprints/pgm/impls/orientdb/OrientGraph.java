@@ -476,7 +476,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         final OrientGraphContext context = getContext(false);
 
         if (context != null) {
-            context.rawGraph.rollback();
+            context.rawGraph.commit();
             context.rawGraph.close();
 
             for (Index<? extends Element> idx : getIndices()) {

@@ -45,7 +45,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public Class<T> getIndexClass() {
-        if (Vertex.class.isAssignableFrom(indexClass))
+        if (Vertex.class.isAssignableFrom(this.indexClass))
             return (Class) Vertex.class;
         else
             return (Class) Edge.class;

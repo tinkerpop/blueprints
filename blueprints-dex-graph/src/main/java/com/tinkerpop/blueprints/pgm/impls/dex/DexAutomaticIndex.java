@@ -88,8 +88,7 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
     }
 
     private Objects rawGet(final String key, final Object value) {
-        long attr = DexAttributes
-                .getAttributeId(graph.getRawGraph(), type, key);
+        long attr = DexAttributes.getAttributeId(graph.getRawGraph(), type, key);
         if (attr == Graph.INVALID_ATTRIBUTE) {
             throw new IllegalArgumentException(key + " is not a valid key");
         }

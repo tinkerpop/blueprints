@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class EventAutomaticIndex<T extends Element> extends EventIndex<T> implements AutomaticIndex<T> {
 
-    public EventAutomaticIndex(final AutomaticIndex autoIndex, List<GraphChangedListener> graphChangedListeners) {
+    public EventAutomaticIndex(final AutomaticIndex autoIndex, final List<GraphChangedListener> graphChangedListeners) {
         super(autoIndex, graphChangedListeners);
     }
 

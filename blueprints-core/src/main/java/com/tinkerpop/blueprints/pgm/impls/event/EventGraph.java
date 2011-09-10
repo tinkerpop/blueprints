@@ -32,7 +32,7 @@ public class EventGraph implements Graph {
         this.graphChangedListeners.clear();
     }
 
-    public void addListener(GraphChangedListener listener) {
+    public void addListener(final GraphChangedListener listener) {
         this.graphChangedListeners.add(listener);
     }
 
@@ -40,7 +40,7 @@ public class EventGraph implements Graph {
         return this.graphChangedListeners.iterator();
     }
 
-    public void removeListener(GraphChangedListener listener) {
+    public void removeListener(final GraphChangedListener listener) {
         this.graphChangedListeners.remove(listener);
     }
 
@@ -77,7 +77,7 @@ public class EventGraph implements Graph {
     /**
      * Raises a vertexAdded event.
      */
-    public Vertex addVertex(Object id) {
+    public Vertex addVertex(final Object id) {
         final Vertex vertex = this.graph.addVertex(id);
         if (vertex == null) {
             return null;
@@ -87,7 +87,7 @@ public class EventGraph implements Graph {
         }
     }
 
-    public Vertex getVertex(Object id) {
+    public Vertex getVertex(final Object id) {
         final Vertex vertex = this.graph.getVertex(id);
         if (vertex == null) {
             return null;
@@ -99,7 +99,7 @@ public class EventGraph implements Graph {
     /**
      * Raises a vertexRemoved event.
      */
-    public void removeVertex(Vertex vertex) {
+    public void removeVertex(final Vertex vertex) {
         Vertex vertexToRemove = vertex;
         if (vertex instanceof EventVertex) {
             vertexToRemove = ((EventVertex) vertex).getRawVertex();
@@ -116,7 +116,7 @@ public class EventGraph implements Graph {
     /**
      * Raises an edgeAdded event.
      */
-    public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         Vertex outVertexToSet = outVertex;
         if(outVertex instanceof EventVertex) {
             outVertexToSet = ((EventVertex) outVertex).getRawVertex();
@@ -135,7 +135,7 @@ public class EventGraph implements Graph {
         }
     }
 
-    public Edge getEdge(Object id) {
+    public Edge getEdge(final Object id) {
         final Edge edge = this.graph.getEdge(id);
         if (edge == null) {
             return null;
@@ -148,7 +148,7 @@ public class EventGraph implements Graph {
     /**
      * Raises an edgeRemoved event.
      */
-    public void removeEdge(Edge edge) {
+    public void removeEdge(final Edge edge) {
         Edge edgeToRemove = edge;
         if (edge instanceof EventEdge) {
             edgeToRemove = ((EventEdge) edge).getRawEdge();
