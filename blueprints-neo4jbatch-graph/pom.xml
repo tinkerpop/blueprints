@@ -27,6 +27,12 @@
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-neo4j-graph</artifactId>
+            <version>${blueprints.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
             <version>${blueprints.version}</version>
             <scope>test</scope>
@@ -88,7 +94,7 @@
                             <value>true</value>
                         </property>
                         <property>
-                            <name>neo4jGraphDirectory</name>
+                            <name>neo4jBatchGraphDirectory</name>
                             <value>/tmp/blueprints_test</value>
                         </property>
                     </systemProperties>

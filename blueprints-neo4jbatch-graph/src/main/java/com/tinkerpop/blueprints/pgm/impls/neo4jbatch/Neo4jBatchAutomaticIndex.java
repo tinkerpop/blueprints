@@ -25,13 +25,15 @@ public class Neo4jBatchAutomaticIndex<T extends Element> extends Neo4jBatchIndex
     }
 
     protected void autoUpdate(final T element, final Map<String, Object> properties) {
-        Map<String, Object> keyedProperties = new HashMap<String, Object>();
-        for (String key : properties.keySet()) {
-            if (this.getIndexClass().isAssignableFrom(element.getClass()) && (null == this.autoIndexKeys || this.autoIndexKeys.contains(key))) {
-                keyedProperties.put(key, properties.get(key));
+        final Map<String, Object> keyedProperties = new HashMap<String, Object>();
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            if (null == this.autoIndexKeys || this.autoIndexKeys.contains(entry.getKey())) {
+                keyedProperties.put(entry.getKey(), entry.getValue());
             }
         }
-        this.rawIndex.add((Long) element.getId(), keyedProperties);
+        if (keyedProperties.size() > 0) {
+            this.rawIndex.add((Long) element.getId(), keyedProperties);
+        }
 
     }
 

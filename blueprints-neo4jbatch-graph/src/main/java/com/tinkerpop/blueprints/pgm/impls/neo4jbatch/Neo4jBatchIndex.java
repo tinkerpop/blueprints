@@ -30,12 +30,12 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
 
     public void put(final String key, final Object value, final T element) {
         final Map<String, Object> map = new HashMap<String, Object>();
-        map.put(key, element.getProperty(key));
+        map.put(key, value);
         this.rawIndex.add((Long) element.getId(), map);
     }
 
     public CloseableSequence<T> get(final String key, final Object value) {
-        if (indexClass.equals(Vertex.class))
+        if (Vertex.class.isAssignableFrom(this.indexClass))
             return (CloseableSequence<T>) new VertexCloseableSequence(this.graph, this.rawIndex.get(key, value));
         else
             return (CloseableSequence<T>) new EdgeCloseableSequence(this.graph, this.rawIndex.get(key, value));

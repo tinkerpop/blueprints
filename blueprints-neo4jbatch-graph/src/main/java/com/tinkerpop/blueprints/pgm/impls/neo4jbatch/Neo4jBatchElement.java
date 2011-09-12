@@ -41,4 +41,12 @@ public abstract class Neo4jBatchElement implements Element {
         return clone;
 
     }
+
+    public int hashCode() {
+        return this.getId().hashCode();
+    }
+
+    public boolean equals(final Object object) {
+        return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+    }
 }
