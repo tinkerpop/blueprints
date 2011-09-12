@@ -67,6 +67,13 @@ public class Neo4jBatchGraph implements IndexableGraph {
         return this.rawGraph;
     }
 
+    /**
+     * The object id must be a Map&lt;String,Object&gt; or null.
+     * The map is the properties written when the vertex is created.
+     *
+     * @param map a map of properties which can be null
+     * @return the newly created vertex
+     */
     public Vertex addVertex(final Object map) {
         if (null != map && !(map instanceof Map)) {
             throw new IllegalArgumentException("Provided object id must be a Map<String,Object>");
@@ -118,6 +125,13 @@ public class Neo4jBatchGraph implements IndexableGraph {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * The object id must be a Map&lt;String,Object&gt; or null.
+     * The map is the properties written when the vertex is created.
+     *
+     * @param map a map of properties which can be null
+     * @return the newly created vertex
+     */
     public Edge addEdge(final Object map, final Vertex outVertex, final Vertex inVertex, final String label) {
         if (map != null && !(map instanceof Map)) {
             throw new IllegalArgumentException("Provided object id must be a Map<String,Object>");
