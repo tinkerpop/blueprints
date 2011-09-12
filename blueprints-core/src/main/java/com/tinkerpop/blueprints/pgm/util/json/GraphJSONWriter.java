@@ -14,6 +14,8 @@ import java.util.List;
 
 /**
  * GraphJSONWriter writes a Graph to a TinkerPop JSON OutputStream.
+ *
+ * @author Stephen Mallette
  */
 public class GraphJSONWriter {
     private final Graph graph;

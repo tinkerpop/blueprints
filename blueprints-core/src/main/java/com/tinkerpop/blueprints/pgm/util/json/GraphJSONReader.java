@@ -19,6 +19,8 @@ import java.util.Map;
 
 /**
  * GraphJSONReader reads the data from a TinkerPop JSON stream to a graph.
+ *
+ * @author Stephen Mallette
  */
 public class GraphJSONReader {
     private final Graph graph;

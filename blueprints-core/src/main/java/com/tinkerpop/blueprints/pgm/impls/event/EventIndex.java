@@ -13,7 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * An index that wraps graph elements in the "evented" way.
+ * An index that wraps graph elements in the "evented" way. This class does not directly raise graph events, but
+ * passes the GraphChangedListener to the edges and vertices returned from indices so that they may raise graph
+ * events.
+ *
+ * @author Stephen Mallette
  */
 public class EventIndex<T extends Element> implements Index<T> {
     protected final Index<T> index;

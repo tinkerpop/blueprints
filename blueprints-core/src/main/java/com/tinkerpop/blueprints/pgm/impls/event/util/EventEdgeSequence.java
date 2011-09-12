@@ -10,6 +10,8 @@ import java.util.List;
 
 /**
  * A sequence of edges that applies the list of listeners into each edge.
+ *
+ * @author Stephen Mallette
  */
 public class EventEdgeSequence implements CloseableSequence<Edge> {
 

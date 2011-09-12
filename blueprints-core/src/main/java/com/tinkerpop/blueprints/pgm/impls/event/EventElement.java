@@ -11,6 +11,8 @@ import java.util.Set;
 /**
  * An element with a GraphChangedListener attached.  Those listeners are notified when changes occur to
  * the properties of the element.
+ *
+ * @author Stephen Mallette
  */
 public class EventElement implements Element {
     protected final Element element;

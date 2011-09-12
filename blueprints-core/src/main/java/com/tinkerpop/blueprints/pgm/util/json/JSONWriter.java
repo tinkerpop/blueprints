@@ -24,9 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Helps write graph elements to TinkerPop JSON format.
- * <p/>
- * Contains methods to support both Jackson and Jettison for JSON processing.
+ * Helps write graph elements to TinkerPop JSON format. Contains methods to support both Jackson and Jettison
+ * for JSON processing.
+ *
+ * @author Stephen Mallette
  */
 public final class JSONWriter {
 

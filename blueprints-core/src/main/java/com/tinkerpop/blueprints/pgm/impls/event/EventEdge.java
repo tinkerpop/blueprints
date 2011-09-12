@@ -9,6 +9,8 @@ import java.util.List;
 /**
  * An edge with a GraphChangedListener attached.  Those listeners are notified when changes occur to
  * the properties of the edge.
+ *
+ * @author Stephen Mallette
  */
 public class EventEdge extends EventElement implements Edge {
 

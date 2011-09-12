@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.util.json;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette
  */
 public class JSONTokens {
 

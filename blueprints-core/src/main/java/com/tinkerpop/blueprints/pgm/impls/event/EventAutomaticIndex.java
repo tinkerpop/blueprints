@@ -8,7 +8,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An automatic index that wraps graph elements in the "evented" way.
+ * An automatic index that wraps graph elements in the "evented" way. This class does not directly raise graph events,
+ * but passes the GraphChangedListener to the edges and vertices returned from indices so that they may raise graph
+ * events.
+ *
+ * @author Stephen Mallette
  */
 public class EventAutomaticIndex<T extends Element> extends EventIndex<T> implements AutomaticIndex<T> {
 

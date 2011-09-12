@@ -10,7 +10,12 @@ import com.tinkerpop.blueprints.pgm.impls.event.util.EventIndexSequence;
 import java.util.Set;
 
 /**
- * EventIndexableGraph is merely a proxy to index methods exposing EventGraph methods in the "evented" way.
+ * EventIndexableGraph is merely a proxy to index methods exposing EventGraph methods in the "evented" way. Like the
+ * EventGraph it extends from, this graph implementations raise notifications to the listeners for the
+ * following events: new vertex/edge, vertex/edge property changed, vertex/edge property removed,
+ * vertex/edge removed.
+ *
+ * @author Stephen Mallette
  */
 public class EventIndexableGraph extends EventGraph implements IndexableGraph {
     public EventIndexableGraph(final IndexableGraph graph) {

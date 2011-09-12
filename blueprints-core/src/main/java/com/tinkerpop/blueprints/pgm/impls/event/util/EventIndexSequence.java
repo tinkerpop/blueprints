@@ -12,6 +12,8 @@ import java.util.List;
 
 /**
  * A sequence of indices that applies the list of listeners into each element.
+ *
+ * @author Stephen Mallette
  */
 public class EventIndexSequence<T extends Element> implements Iterator<Index<T>>, Iterable<Index<T>> {
 
