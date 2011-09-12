@@ -118,15 +118,15 @@ public class EventGraph implements Graph {
      */
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         Vertex outVertexToSet = outVertex;
-        if(outVertex instanceof EventVertex) {
+        if (outVertex instanceof EventVertex) {
             outVertexToSet = ((EventVertex) outVertex).getRawVertex();
         }
-        
+
         Vertex inVertexToSet = inVertex;
-        if(inVertex instanceof EventVertex) {
+        if (inVertex instanceof EventVertex) {
             inVertexToSet = ((EventVertex) inVertex).getRawVertex();
         }
-        
+
         final Edge edge = this.graph.addEdge(id, outVertexToSet, inVertexToSet, label);
         if (edge == null) {
             return null;

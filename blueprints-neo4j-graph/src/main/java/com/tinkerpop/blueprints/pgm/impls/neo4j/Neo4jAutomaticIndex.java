@@ -25,17 +25,11 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
         }
     }
 
-    public Neo4jAutomaticIndex(final String name, final Class<T> indexClass, final Neo4jGraph graph, final org.neo4j.graphdb.index.Index<S> rawIndex) {
-        super(name, indexClass, graph, rawIndex);
-        this.loadKeyField();
-    }
-
     public Type getIndexType() {
         return Type.AUTOMATIC;
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
-        //if (this.getIndexClass().isAssignableFrom(element.getClass()) && (null == this.autoIndexKeys || this.autoIndexKeys.contains(key))) {
         if (null == this.autoIndexKeys || this.autoIndexKeys.contains(key)) {
             if (oldValue != null)
                 this.removeBasic(key, oldValue, element);
@@ -44,7 +38,6 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
     }
 
     protected void autoRemove(final String key, final Object oldValue, final T element) {
-        //if (this.getIndexClass().isAssignableFrom(element.getClass()) && (null == this.autoIndexKeys || this.autoIndexKeys.contains(key))) {
         if (null == this.autoIndexKeys || this.autoIndexKeys.contains(key)) {
             this.removeBasic(key, oldValue, element);
         }

@@ -5,8 +5,6 @@ import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.Neo4jBatchEdge;
 import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.Neo4jBatchGraph;
 import org.neo4j.graphdb.index.IndexHits;
 
-import java.util.Iterator;
-
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

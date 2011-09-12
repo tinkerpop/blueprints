@@ -33,13 +33,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         this.generateIndex();
     }
 
-    public Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph, final org.neo4j.graphdb.index.Index<S> rawIndex) {
-        this.indexClass = indexClass;
-        this.indexName = indexName;
-        this.graph = graph;
-        this.rawIndex = rawIndex;
-    }
-
     public Type getIndexType() {
         return Type.MANUAL;
     }

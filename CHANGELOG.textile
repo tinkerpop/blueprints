@@ -30,7 +30,6 @@ h3. Version 1.0 (Blueprints -- NOT OFFICIALLY RELEASED YET)
 * Updated @TransactionalGraph@ API to support transaction buffers
 ** Removed @TransactionalGraphHelper.CommitManager@ as it is no longer relevant
 * Fixed a @ConcurrentModificationException@ in @TinkerGraph@ and added respective test cases for all graphs
-* Fixed thread consistency issue with @Neo4jGraph@ indices
 * Changed @TransactionalGraph.close()@ to @Conclusion.SUCCESS@ any open transactions
 
 ==<hr/>==

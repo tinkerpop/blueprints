@@ -20,7 +20,7 @@ public class Neo4jEdge extends Neo4jElement implements Edge {
         super(graph);
         this.rawElement = relationship;
         if (aNew) {
-            for (Neo4jAutomaticIndex autoIndex : this.graph.getAutomaticIndices(Neo4jEdge.class)) {
+            for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(Neo4jEdge.class)) {
                 autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
             }
         }
