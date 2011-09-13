@@ -18,7 +18,7 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
         final Map<String, Object> properties = this.getPropertyMapClone();
         final Object value = properties.remove(key);
         this.graph.getRawGraph().setNodeProperties(this.id, properties);
-        for (Neo4jBatchAutomaticIndex index : this.graph.getAutomaticVertexIndices()) {
+        for (final Neo4jBatchAutomaticIndex index : this.graph.getAutomaticVertexIndices()) {
             index.autoUpdate(this, properties);
         }
         return value;
@@ -29,15 +29,21 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
         final Map<String, Object> properties = this.getPropertyMapClone();
         properties.put(key, value);
         this.graph.getRawGraph().setNodeProperties(this.id, properties);
-        for (Neo4jBatchAutomaticIndex index : this.graph.getAutomaticVertexIndices()) {
+        for (final Neo4jBatchAutomaticIndex index : this.graph.getAutomaticVertexIndices()) {
             index.autoUpdate(this, properties);
         }
     }
 
+    /**
+     * @throws UnsupportedOperationException
+     */
     public Iterable<Edge> getOutEdges(String... labels) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @throws UnsupportedOperationException
+     */
     public Iterable<Edge> getInEdges(String... labels) {
         throw new UnsupportedOperationException();
     }

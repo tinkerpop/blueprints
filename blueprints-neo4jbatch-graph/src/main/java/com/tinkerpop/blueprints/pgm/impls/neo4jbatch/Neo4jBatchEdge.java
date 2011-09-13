@@ -42,10 +42,16 @@ public class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
         return this.graph.getRawGraph().getRelationshipProperties(this.id);
     }
 
+    /**
+     * @throws UnsupportedOperationException
+     */
     public Vertex getOutVertex() {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * @throws UnsupportedOperationException
+     */
     public Vertex getInVertex() {
         throw new UnsupportedOperationException();
     }

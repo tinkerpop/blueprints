@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class Neo4jBatchGraph implements IndexableGraph {
@@ -50,6 +52,10 @@ public class Neo4jBatchGraph implements IndexableGraph {
         this.rawGraph.shutdown();
     }
 
+    /**
+     * This is necessary prior to using indices to ensure that indexed data is available to index queries.
+     * This method is not part of the Blueprints Graph or IndexableGraph API.
+     */
     public void flushIndices() {
         for (final Neo4jBatchIndex index : this.indices.values()) {
             index.flush();
@@ -70,6 +76,7 @@ public class Neo4jBatchGraph implements IndexableGraph {
     /**
      * The object id must be a Map&lt;String,Object&gt; or null.
      * The map is the properties written when the vertex is created.
+     * If the map contains an _id key, then the value is a user provided long vertex id.
      *
      * @param map a map of properties which can be null
      * @return the newly created vertex

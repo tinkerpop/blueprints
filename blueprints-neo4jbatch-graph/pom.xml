@@ -25,6 +25,7 @@
             <version>1.5.M01</version>
             <type>pom</type>
         </dependency>
+        <!-- TESTING -->
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-neo4j-graph</artifactId>

@@ -43,12 +43,15 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
 
     public long count(final String key, final Object value) {
         long count = 0;
-        for (T t : this.get(key, value)) {
+        for (final T t : this.get(key, value)) {
             count++;
         }
         return count;
     }
 
+    /**
+     * @throws UnsupportedOperationException
+     */
     public void remove(final String key, final Object value, final T element) {
         throw new UnsupportedOperationException();
     }

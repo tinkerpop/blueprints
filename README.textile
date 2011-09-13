@@ -14,7 +14,8 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "Java Universal/Graph":http://jung.sourceforge.net/ interface
 ** "Sesame 2.0":http://www.openrdf.org Sail interface
 * Supporting utilities:
-** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ library
+** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ utility
+** GraphJSON Reader/Writer utility
 ** Blueprints helper utilities
 ** ReadOnlyGraph wrapper
 ** EventGraph wrapper
