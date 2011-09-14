@@ -400,30 +400,61 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testBulkTransactions() {
+        int dummyCounter = 0;
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         graph.setMaxBufferSize(15);
         for (int i = 0; i < 3; i++) {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+            assertTrue(graph.getCurrentBufferSize() > dummyCounter);
+            dummyCounter = graph.getCurrentBufferSize();
         }
         assertEquals(BaseTest.count(graph.getEdges()), 3);
         graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         assertEquals(BaseTest.count(graph.getEdges()), 0);
 
+        dummyCounter = 0;
         for (int i = 0; i < 3; i++) {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+            assertTrue(graph.getCurrentBufferSize() > dummyCounter);
+            dummyCounter = graph.getCurrentBufferSize();
         }
         assertEquals(BaseTest.count(graph.getEdges()), 3);
         graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
         assertEquals(BaseTest.count(graph.getEdges()), 0);
 
+        dummyCounter = 0;
         for (int i = 0; i < 3; i++) {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+            assertTrue(graph.getCurrentBufferSize() > dummyCounter);
+            dummyCounter = graph.getCurrentBufferSize();
         }
         assertEquals(BaseTest.count(graph.getEdges()), 3);
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(BaseTest.count(graph.getEdges()), 3);
 
         graph.shutdown();
+    }
+
+    public void testTransactionBufferSize() {
+        if (!graphTest.isRDFModel) {
+            TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 1);
+            graph.setMaxBufferSize(1000);
+            assertEquals(graph.getMaxBufferSize(), 1000);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+
+            for (int i = 1; i < 10; i++) {
+                graph.addVertex(null);
+                assertEquals(graph.getCurrentBufferSize(), i);
+            }
+
+            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            assertEquals(graph.getMaxBufferSize(), 1000);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            graph.shutdown();
+
+        }
     }
 
     public void testCompetingThreads() {

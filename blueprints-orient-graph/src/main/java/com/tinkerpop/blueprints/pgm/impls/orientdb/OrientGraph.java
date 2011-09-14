@@ -130,29 +130,24 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public Vertex addVertex(final Object id) {
         final OGraphDatabase db = getRawGraph();
-        final boolean txBegun = autoStartTransaction();
+        this.autoStartTransaction();
         try {
             final OrientVertex vertex = new OrientVertex(this, db.createVertex(null));
             vertex.save();
-
-            if (txBegun)
-                autoStopTransaction(Conclusion.SUCCESS);
-
+            autoStopTransaction(Conclusion.SUCCESS);
             return vertex;
         } catch (RuntimeException e) {
-            if (txBegun)
-                autoStopTransaction(Conclusion.FAILURE);
+            autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         final OGraphDatabase db = getRawGraph();
-        final boolean txBegun = autoStartTransaction();
+        this.autoStartTransaction();
         try {
             final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement());
             final OrientEdge edge = new OrientEdge(this, edgeDoc);
@@ -163,18 +158,14 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             db.save(((OrientVertex) inVertex).getRawElement());
             edge.save();
 
-            if (txBegun)
-                autoStopTransaction(Conclusion.SUCCESS);
-
+            autoStopTransaction(Conclusion.SUCCESS);
             return edge;
 
         } catch (RuntimeException e) {
-            if (txBegun)
-                autoStopTransaction(Conclusion.FAILURE);
+            autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -206,11 +197,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (oVertex == null || oVertex.getRawElement() == null)
             return;
 
-        final boolean txBegun = autoStartTransaction();
+        this.autoStartTransaction();
         try {
             AutomaticIndexHelper.removeElement(this, vertex);
 
-            for (Index<? extends Element> index : this.getManualIndices()) {
+            for (final Index<? extends Element> index : this.getManualIndices()) {
                 if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
                     @SuppressWarnings("unchecked")
                     OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;
@@ -219,16 +210,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             }
 
             getRawGraph().removeVertex(oVertex.rawElement);
-
-            if (txBegun)
-                autoStopTransaction(Conclusion.SUCCESS);
+            autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            if (txBegun)
-                autoStopTransaction(Conclusion.FAILURE);
+            autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -274,11 +261,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (oEdge == null || oEdge.getRawElement() == null)
             return;
 
-        final boolean txBegun = autoStartTransaction();
+        this.autoStartTransaction();
         try {
             AutomaticIndexHelper.removeElement(this, edge);
 
-            for (Index<? extends Element> index : this.getManualIndices()) {
+            for (final Index<? extends Element> index : this.getManualIndices()) {
                 if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                     @SuppressWarnings("unchecked")
                     OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
@@ -287,16 +274,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             }
 
             getRawGraph().removeEdge(oEdge.rawElement);
-
-            if (txBegun)
-                autoStopTransaction(Conclusion.SUCCESS);
+            autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            if (txBegun)
-                autoStopTransaction(Conclusion.FAILURE);
+            autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -347,10 +330,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.getRawGraph().rollback();
         } else
             this.getRawGraph().commit();
+        this.getContext(true).txCounter = 0;
     }
 
     public void setMaxBufferSize(final int bufferSize) {
         getRawGraph().commit();
+        getContext(true).txCounter = 0;
         getContext(true).txBuffer = bufferSize;
     }
 
@@ -366,26 +351,26 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         getRawGraph().getMetadata().getIndexManager().getConfiguration().save();
     }
 
-    protected boolean autoStartTransaction() {
-        if (getContext(true).txBuffer > 0) {
-            final OGraphDatabase db = getRawGraph();
-            if (db.getTransaction() instanceof OTransactionNoTx || db.getTransaction().getStatus() != TXSTATUS.BEGUN) {
-                db.begin();
-                return true;
+    protected void autoStartTransaction() {
+        final OrientGraphContext context = getContext(true);
+        if (context.txBuffer > 0) {
+            if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
+                context.rawGraph.begin();
             }
-            return false;
-        } else return false;
+        }
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
-        if (getContext(true).txBuffer > 0) {
-            getContext(true).txCounter = getContext(true).txCounter + 1;
+        final OrientGraphContext context = getContext(true);
+        if (context.txBuffer > 0) {
+            context.txCounter = getContext(true).txCounter + 1;
             final OGraphDatabase db = getRawGraph();
-            if (getContext(true).txBuffer == 0 || (getContext(true).txCounter % getContext(true).txBuffer == 0)) {
+            if (context.txBuffer == 0 || (context.txCounter % context.txBuffer == 0)) {
                 if (conclusion == Conclusion.SUCCESS)
                     db.commit();
                 else
                     db.rollback();
+                context.txCounter = 0;
             }
         }
     }

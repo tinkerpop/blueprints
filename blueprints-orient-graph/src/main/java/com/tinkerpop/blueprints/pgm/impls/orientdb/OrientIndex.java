@@ -73,20 +73,15 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         if (!doc.getIdentity().isValid())
             doc.save();
 
-        final boolean txBegun = graph.autoStartTransaction();
+        graph.autoStartTransaction();
         try {
             underlying.put(keyTemp, doc);
-
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -110,20 +105,15 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public void remove(final String key, final Object value, final T element) {
         final String keyTemp = key + SEPARATOR + value;
-
-        final boolean txBegun = graph.autoStartTransaction();
+        graph.autoStartTransaction();
         try {
             underlying.remove(keyTemp, element.getRawElement());
-
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -133,9 +123,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     protected void removeElement(final T vertex) {
+        graph.autoStartTransaction();
         final ORecord<?> vertexDoc = vertex.getRawElement();
-
         underlying.remove(vertexDoc);
+        graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     private void create(final String indexName, final Class<? extends Element> indexClass,
