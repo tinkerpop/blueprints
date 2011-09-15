@@ -393,20 +393,54 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void testCurrentBufferSizeConsistencyAfterMutatingOperations() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         assertEquals(graph.getMaxBufferSize(), 1);
+        assertEquals(graph.getCurrentBufferSize(), 0);
+        if (graph instanceof IndexableGraph) {
+            ((IndexableGraph) graph).dropIndex(Index.VERTICES);
+            ((IndexableGraph) graph).dropIndex(Index.EDGES);
+        }
+        assertEquals(graph.getCurrentBufferSize(), 0);
+
         graph.setMaxBufferSize(15);
         assertEquals(graph.getMaxBufferSize(), 15);
-        Vertex v = graph.addVertex(null);
+        // sail does not increment the buffer for vertex creation as there is no mutation
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+
+        int currentBuffer = graph.getCurrentBufferSize();
         assertEquals(graph.getMaxBufferSize(), 15);
-        Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+
+        Edge e = graph.addEdge(null, a, b, convertId("test"));
+        assertEquals(graph.getCurrentBufferSize(), currentBuffer + 1);
         assertEquals(graph.getMaxBufferSize(), 15);
+
         e.setProperty("ng", convertId("test2"));
+        assertEquals(graph.getCurrentBufferSize(), currentBuffer + 2);
         assertEquals(graph.getMaxBufferSize(), 15);
+
         graph.removeEdge(e);
+        assertEquals(graph.getCurrentBufferSize(), currentBuffer + 3);
         assertEquals(graph.getMaxBufferSize(), 15);
-        graph.removeVertex(v);
+
+        graph.removeVertex(a);
+        if (!graphTest.isRDFModel) {
+            assertEquals(graph.getCurrentBufferSize(), currentBuffer + 4);
+        }
         assertEquals(graph.getMaxBufferSize(), 15);
+
+        graph.removeVertex(b);
+        if (!graphTest.isRDFModel) {
+            assertEquals(graph.getCurrentBufferSize(), currentBuffer + 5);
+        }
+        assertEquals(graph.getMaxBufferSize(), 15);
+
         graph.clear();
+        assertEquals(graph.getCurrentBufferSize(), 0);
         assertEquals(graph.getMaxBufferSize(), 15);
+
+        if (!graphTest.isRDFModel) {
+
+        }
+
         graph.shutdown();
     }
 

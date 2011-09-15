@@ -358,12 +358,17 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         this.rawGraph.shutdown();
     }
 
+    /**
+     * This operation does not respect the transaction buffer. A clear will eradicate the graph and commit the results immediately.
+     */
     public void clear() {
         try {
+            this.autoStartTransaction();
             for (final Index index : this.getIndices()) {
                 this.dropIndex(index.getIndexName());
             }
-            this.autoStartTransaction();
+            this.stopTransaction(Conclusion.SUCCESS);
+            this.startTransaction();
             for (final Node node : this.rawGraph.getAllNodes()) {
                 for (final Relationship relationship : node.getRelationships()) {
                     try {
@@ -376,11 +381,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 } catch (IllegalStateException e) {
                 }
             }
-            this.autoStopTransaction(Conclusion.SUCCESS);
+            this.stopTransaction(Conclusion.SUCCESS);
+            this.autoStartTransaction();
             this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
             this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
+            this.stopTransaction(Conclusion.SUCCESS);
         } catch (Exception e) {
-            this.autoStopTransaction(Conclusion.FAILURE);
+            this.stopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

@@ -285,9 +285,10 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
+    /**
+     * This operation does not respect the transaction buffer. A clear will eradicate the graph and commit the results immediately.
+     */
     public void clear() {
-
-
         final OrientGraphContext context = getContext(true);
         final int previousMaxBufferSize = context.txBuffer;
         for (Index<? extends Element> index : this.getIndices()) {
