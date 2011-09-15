@@ -160,12 +160,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.indices.remove(indexName);
             this.automaticEdgeIndices.remove(indexName);
             this.automaticVertexIndices.remove(indexName);
-            this.autoStopTransaction(Conclusion.SUCCESS);
+            this.stopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            this.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            this.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

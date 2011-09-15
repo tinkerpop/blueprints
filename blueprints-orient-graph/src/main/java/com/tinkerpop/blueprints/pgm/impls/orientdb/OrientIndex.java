@@ -118,6 +118,14 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         }
     }
 
+    protected void removeBasic(final String key, final T element) {
+        underlying.remove(key, element.getRawElement());
+    }
+
+    protected void putBasic(final String key, final T element) {
+        underlying.put(key, element.getRawElement());
+    }
+
     public String toString() {
         return StringFactory.indexString(this);
     }

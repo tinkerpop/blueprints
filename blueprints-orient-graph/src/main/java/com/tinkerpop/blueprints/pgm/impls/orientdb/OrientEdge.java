@@ -14,6 +14,14 @@ import java.util.Set;
  */
 public class OrientEdge extends OrientElement implements Edge {
 
+    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
+        super(rawGraph, rawEdge);
+        this.rawElement.field(LABEL, label);
+        for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+            autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
+        }
+    }
+
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
         super(rawGraph, rawEdge);
     }
@@ -28,14 +36,6 @@ public class OrientEdge extends OrientElement implements Edge {
 
     public String getLabel() {
         return (String) this.rawElement.field(LABEL);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void setLabel(final String label) {
-        this.rawElement.field(LABEL, label);
-        for (OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-            autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
-        }
     }
 
     public Set<String> getPropertyKeys() {

@@ -35,15 +35,16 @@ public class OrientAutomaticIndex<T extends OrientElement> extends OrientIndex<T
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
+
             if (oldValue != null)
-                this.remove(key, oldValue, element);
-            this.put(key, newValue, element);
+                this.removeBasic(key + SEPARATOR + oldValue, element);
+            this.putBasic(key + SEPARATOR + newValue, element);
         }
     }
 
     protected void autoRemove(final String key, final Object oldValue, final T element) {
         if (this.getIndexClass().isAssignableFrom(element.getClass()) && (this.autoIndexKeys == null || this.autoIndexKeys.contains(key))) {
-            this.remove(key, oldValue, element);
+            this.removeBasic(key + SEPARATOR + oldValue, element);
         }
     }
 

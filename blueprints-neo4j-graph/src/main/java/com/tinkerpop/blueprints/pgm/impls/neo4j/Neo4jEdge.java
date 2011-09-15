@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.Relationship;
@@ -16,10 +17,10 @@ public class Neo4jEdge extends Neo4jElement implements Edge {
         this(relationship, graph, false);
     }
 
-    protected Neo4jEdge(final Relationship relationship, final Neo4jGraph graph, boolean aNew) {
+    protected Neo4jEdge(final Relationship relationship, final Neo4jGraph graph, boolean isNew) {
         super(graph);
         this.rawElement = relationship;
-        if (aNew) {
+        if (isNew) {
             for (final Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(Neo4jEdge.class)) {
                 autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
             }

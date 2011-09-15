@@ -397,50 +397,112 @@ public class TransactionalGraphTestSuite extends TestSuite {
         if (graph instanceof IndexableGraph) {
             ((IndexableGraph) graph).dropIndex(Index.VERTICES);
             ((IndexableGraph) graph).dropIndex(Index.EDGES);
+            assertEquals(count(((IndexableGraph) graph).getIndices()), 0);
+            assertNull(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class));
+            assertNull(((IndexableGraph) graph).getIndex(Index.EDGES, Edge.class));
         }
+
         assertEquals(graph.getCurrentBufferSize(), 0);
 
-        graph.setMaxBufferSize(15);
-        assertEquals(graph.getMaxBufferSize(), 15);
+        graph.setMaxBufferSize(11);
+        assertEquals(graph.getMaxBufferSize(), 11);
         // sail does not increment the buffer for vertex creation as there is no mutation
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
 
         int currentBuffer = graph.getCurrentBufferSize();
-        assertEquals(graph.getMaxBufferSize(), 15);
+        assertEquals(graph.getMaxBufferSize(), 11);
 
         Edge e = graph.addEdge(null, a, b, convertId("test"));
         assertEquals(graph.getCurrentBufferSize(), currentBuffer + 1);
-        assertEquals(graph.getMaxBufferSize(), 15);
+        assertEquals(graph.getMaxBufferSize(), 11);
 
         e.setProperty("ng", convertId("test2"));
         assertEquals(graph.getCurrentBufferSize(), currentBuffer + 2);
-        assertEquals(graph.getMaxBufferSize(), 15);
+        assertEquals(graph.getMaxBufferSize(), 11);
 
         graph.removeEdge(e);
         assertEquals(graph.getCurrentBufferSize(), currentBuffer + 3);
-        assertEquals(graph.getMaxBufferSize(), 15);
+        assertEquals(graph.getMaxBufferSize(), 11);
 
         graph.removeVertex(a);
         if (!graphTest.isRDFModel) {
             assertEquals(graph.getCurrentBufferSize(), currentBuffer + 4);
         }
-        assertEquals(graph.getMaxBufferSize(), 15);
+        assertEquals(graph.getMaxBufferSize(), 11);
 
         graph.removeVertex(b);
         if (!graphTest.isRDFModel) {
             assertEquals(graph.getCurrentBufferSize(), currentBuffer + 5);
         }
-        assertEquals(graph.getMaxBufferSize(), 15);
+        assertEquals(graph.getMaxBufferSize(), 11);
 
         graph.clear();
         assertEquals(graph.getCurrentBufferSize(), 0);
-        assertEquals(graph.getMaxBufferSize(), 15);
+        assertEquals(graph.getMaxBufferSize(), 11);
 
-        if (!graphTest.isRDFModel) {
-
+        if (graph instanceof IndexableGraph) {
+            ((IndexableGraph) graph).dropIndex(Index.VERTICES);
+            ((IndexableGraph) graph).dropIndex(Index.EDGES);
+            assertEquals(count(((IndexableGraph) graph).getIndices()), 0);
+            assertNull(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class));
+            assertNull(((IndexableGraph) graph).getIndex(Index.EDGES, Edge.class));
         }
 
+        if (!graphTest.isRDFModel) {
+            assertEquals(graph.getMaxBufferSize(), 11);
+            a = graph.addVertex(null);
+            assertEquals(graph.getCurrentBufferSize(), 1);
+            b = graph.addVertex(null);
+            assertEquals(graph.getCurrentBufferSize(), 2);
+            e = graph.addEdge(null, a, b, "test");
+            assertEquals(graph.getCurrentBufferSize(), 3);
+            a.setProperty("key", "value");
+            assertEquals(graph.getCurrentBufferSize(), 4);
+            a.removeProperty("key");
+            assertEquals(graph.getCurrentBufferSize(), 5);
+            a.removeProperty("key");
+            assertEquals(graph.getCurrentBufferSize(), 6);
+            e.setProperty("weight", 0.5);
+            assertEquals(graph.getCurrentBufferSize(), 7);
+            assertEquals(graph.getMaxBufferSize(), 11);
+        }
+
+        graph.clear();
+        if (graph instanceof IndexableGraph & !graphTest.isRDFModel) {
+            assertEquals(count(((IndexableGraph) graph).getIndices()), 2);
+            assertNotNull(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class));
+            assertNotNull(((IndexableGraph) graph).getIndex(Index.EDGES, Edge.class));
+
+            assertEquals(graph.getMaxBufferSize(), 11);
+            a = graph.addVertex(null);
+            assertEquals(graph.getCurrentBufferSize(), 1);
+            b = graph.addVertex(null);
+            assertEquals(graph.getCurrentBufferSize(), 2);
+            e = graph.addEdge(null, a, b, "test");
+            assertEquals(graph.getCurrentBufferSize(), 3);
+            a.setProperty("key", "value");
+            assertEquals(graph.getCurrentBufferSize(), 4);
+            a.removeProperty("key");
+            assertEquals(graph.getCurrentBufferSize(), 5);
+            a.removeProperty("key");
+            assertEquals(graph.getCurrentBufferSize(), 6);
+            e.setProperty("weight", 0.5);
+            assertEquals(graph.getCurrentBufferSize(), 7);
+
+            Index<Vertex> index = ((IndexableGraph) graph).createManualIndex("manual", Vertex.class);
+            assertEquals(graph.getCurrentBufferSize(), 7);
+            index.put("anotherKey", 1.5, a);
+            assertEquals(graph.getCurrentBufferSize(), 8);
+            index.put("yetAnotherKey", "blah", a);
+            assertEquals(graph.getCurrentBufferSize(), 9);
+            index.remove("yetAnotherKey", "blah", a);
+            assertEquals(graph.getCurrentBufferSize(), 10);
+            index.remove("yetAnotherKey", "blah", a);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 11);
+        }
+        assertEquals(graph.getMaxBufferSize(), 11);
         graph.shutdown();
     }
 

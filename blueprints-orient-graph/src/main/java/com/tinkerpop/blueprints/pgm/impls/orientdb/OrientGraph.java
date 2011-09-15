@@ -120,12 +120,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         return getContext(true).autoIndices.values();
     }
 
-    public void dropIndex(final String iIndexName) {
+    public void dropIndex(final String indexName) {
         final OrientGraphContext context = getContext(true);
-        if (context.manualIndices.remove(iIndexName) == null)
-            context.autoIndices.remove(iIndexName);
+        context.manualIndices.remove(indexName);
+        context.autoIndices.remove(indexName);
 
-        getRawGraph().getMetadata().getIndexManager().dropIndex(iIndexName);
+        getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
         saveIndexConfiguration();
     }
 
@@ -151,19 +151,17 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         this.autoStartTransaction();
         try {
             final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement());
-            final OrientEdge edge = new OrientEdge(this, edgeDoc);
-            edge.setLabel(label);
+            final OrientEdge edge = new OrientEdge(this, edgeDoc, label);
 
             // SAVE THE VERTICES TO ASSURE THEY ARE IN TX
             db.save(((OrientVertex) outVertex).getRawElement());
             db.save(((OrientVertex) inVertex).getRawElement());
             edge.save();
 
-            autoStopTransaction(Conclusion.SUCCESS);
+            this.autoStopTransaction(Conclusion.SUCCESS);
             return edge;
-
         } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
+            this.autoStopTransaction(Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
             autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
@@ -294,8 +292,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         for (Index<? extends Element> index : this.getIndices()) {
             this.dropIndex(index.getIndexName());
         }
-        context.manualIndices.clear();
-        context.autoIndices.clear();
         this.getRawGraph().delete();
         this.threadContext.set(null);
         openOrCreate(false);
@@ -368,12 +364,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         final OrientGraphContext context = getContext(true);
         if (context.txBuffer > 0) {
             context.txCounter = getContext(true).txCounter + 1;
-            final OGraphDatabase db = getRawGraph();
-            if (context.txBuffer == 0 || (context.txCounter % context.txBuffer == 0)) {
-                if (conclusion == Conclusion.SUCCESS)
-                    db.commit();
-                else
-                    db.rollback();
+            if (conclusion == Conclusion.FAILURE) {
+                final OGraphDatabase db = getRawGraph();
+                db.rollback();
+                context.txCounter = 0;
+            } else if (context.txCounter % context.txBuffer == 0) {
+                final OGraphDatabase db = getRawGraph();
+                db.commit();
                 context.txCounter = 0;
             }
         }
@@ -381,10 +378,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     protected OrientGraphContext getContext(final boolean create) {
         OrientGraphContext context = threadContext.get();
-
         if (context == null && create)
             context = openOrCreate(false);
-
         return context;
     }
 
