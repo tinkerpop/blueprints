@@ -366,9 +366,15 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.autoStartTransaction();
             for (final Node node : this.rawGraph.getAllNodes()) {
                 for (final Relationship relationship : node.getRelationships()) {
-                    relationship.delete();
+                    try {
+                        relationship.delete();
+                    } catch (IllegalStateException e) {
+                    }
                 }
-                node.delete();
+                try {
+                    node.delete();
+                } catch (IllegalStateException e) {
+                }
             }
             this.autoStopTransaction(Conclusion.SUCCESS);
             this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);

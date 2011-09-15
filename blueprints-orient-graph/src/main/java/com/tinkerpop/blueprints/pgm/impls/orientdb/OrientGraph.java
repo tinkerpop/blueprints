@@ -286,16 +286,19 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void clear() {
+
+
         final OrientGraphContext context = getContext(true);
-        for (Index<? extends Element> idx : getIndices()) {
-            ((OrientIndex<?>) idx).close();
+        final int previousMaxBufferSize = context.txBuffer;
+        for (Index<? extends Element> index : this.getIndices()) {
+            this.dropIndex(index.getIndexName());
         }
         context.manualIndices.clear();
         context.autoIndices.clear();
-
         this.getRawGraph().delete();
         this.threadContext.set(null);
         openOrCreate(false);
+        this.setMaxBufferSize(previousMaxBufferSize);
         this.createAutomaticIndex(Index.VERTICES, OrientVertex.class, null);
         this.createAutomaticIndex(Index.EDGES, OrientEdge.class, null);
     }

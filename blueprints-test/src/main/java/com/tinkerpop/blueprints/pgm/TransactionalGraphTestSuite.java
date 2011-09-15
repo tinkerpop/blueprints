@@ -390,6 +390,26 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testCurrentBufferSizeConsistencyAfterMutatingOperations() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        assertEquals(graph.getMaxBufferSize(), 1);
+        graph.setMaxBufferSize(15);
+        assertEquals(graph.getMaxBufferSize(), 15);
+        Vertex v = graph.addVertex(null);
+        assertEquals(graph.getMaxBufferSize(), 15);
+        Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("test"));
+        assertEquals(graph.getMaxBufferSize(), 15);
+        e.setProperty("ng", convertId("test2"));
+        assertEquals(graph.getMaxBufferSize(), 15);
+        graph.removeEdge(e);
+        assertEquals(graph.getMaxBufferSize(), 15);
+        graph.removeVertex(v);
+        assertEquals(graph.getMaxBufferSize(), 15);
+        graph.clear();
+        assertEquals(graph.getMaxBufferSize(), 15);
+        graph.shutdown();
+    }
+
     public void testSuccessfulCommitOnGraphClose() {
         if (graphTest.isPersistent) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
