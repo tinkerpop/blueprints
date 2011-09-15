@@ -9,18 +9,18 @@ import java.util.Set;
  */
 public class ReadOnlyElement implements Element {
 
-    protected final Element element;
+    protected final Element rawElement;
 
-    public ReadOnlyElement(final Element element) {
-        this.element = element;
+    public ReadOnlyElement(final Element rawElement) {
+        this.rawElement = rawElement;
     }
 
     public Set<String> getPropertyKeys() {
-        return this.element.getPropertyKeys();
+        return this.rawElement.getPropertyKeys();
     }
 
     public Object getId() {
-        return this.element.getId();
+        return this.rawElement.getId();
     }
 
     /**
@@ -31,7 +31,7 @@ public class ReadOnlyElement implements Element {
     }
 
     public Object getProperty(final String key) {
-        return this.element.getProperty(key);
+        return this.rawElement.getProperty(key);
     }
 
     /**
@@ -42,14 +42,14 @@ public class ReadOnlyElement implements Element {
     }
 
     public String toString() {
-        return this.element.toString();
+        return this.rawElement.toString();
     }
 
     public int hashCode() {
-        return this.element.hashCode();
+        return this.rawElement.hashCode();
     }
 
     public boolean equals(Object object) {
-        return (object.getClass().equals(this.getClass())) && this.element.getId().equals(((ReadOnlyElement) object).getId());
+        return (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((ReadOnlyElement) object).getId());
     }
 }

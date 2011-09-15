@@ -16,12 +16,12 @@ import java.util.Set;
  */
 public class EventAutomaticIndex<T extends Element> extends EventIndex<T> implements AutomaticIndex<T> {
 
-    public EventAutomaticIndex(final AutomaticIndex autoIndex, final List<GraphChangedListener> graphChangedListeners) {
-        super(autoIndex, graphChangedListeners);
+    public EventAutomaticIndex(final AutomaticIndex rawIndex, final List<GraphChangedListener> graphChangedListeners) {
+        super(rawIndex, graphChangedListeners);
     }
 
     public Set<String> getAutoIndexKeys() {
-        return ((AutomaticIndex) this.index).getAutoIndexKeys();
+        return ((AutomaticIndex) this.rawIndex).getAutoIndexKeys();
     }
 
     public Type getIndexType() {

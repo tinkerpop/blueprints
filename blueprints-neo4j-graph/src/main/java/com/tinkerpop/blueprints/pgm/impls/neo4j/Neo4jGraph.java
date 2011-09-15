@@ -131,7 +131,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
-        Neo4jAutomaticIndex index = new Neo4jAutomaticIndex(indexName, indexClass, this, keys);
+        final Neo4jAutomaticIndex index = new Neo4jAutomaticIndex(indexName, indexClass, this, keys);
         if (Vertex.class.isAssignableFrom(indexClass))
             this.automaticVertexIndices.put(index.getIndexName(), index);
         else
@@ -141,7 +141,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        Index index = this.indices.get(indexName);
+        final Index index = this.indices.get(indexName);
         // todo: be sure to do code for multiple connections interacting with graph
         if (null == index)
             return null;
@@ -156,6 +156,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.autoStartTransaction();
             this.rawGraph.index().forNodes(indexName).delete();
             this.rawGraph.index().forRelationships(indexName).delete();
+            this.indices.remove(indexName);
+            this.automaticEdgeIndices.remove(indexName);
+            this.automaticVertexIndices.remove(indexName);
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
@@ -164,10 +167,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        this.indices.remove(indexName);
-        this.automaticVertexIndices.remove(indexName);
-        this.automaticEdgeIndices.remove(indexName);
     }
 
     protected <T extends Neo4jElement> Iterable<Neo4jAutomaticIndex<T, PropertyContainer>> getAutoIndices(final Class<T> indexClass) {
@@ -179,7 +178,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Iterable<Index<? extends Element>> getIndices() {
         List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-        for (Index index : this.indices.values()) {
+        for (final Index index : this.indices.values()) {
             list.add(index);
         }
         return list;
@@ -206,9 +205,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             return null;
 
         try {
-            Long longId = Double.valueOf(id.toString()).longValue();
-            Node node = this.rawGraph.getNodeById(longId);
-            return new Neo4jVertex(node, this);
+            final Long longId;
+            if (id instanceof Long)
+                longId = (Long) id;
+            else
+                longId = Double.valueOf(id.toString()).longValue();
+            return new Neo4jVertex(this.rawGraph.getNodeById(longId), this);
         } catch (NotFoundException e) {
             return null;
         } catch (NumberFormatException e) {
@@ -250,10 +252,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        final Node outNode = ((Neo4jVertex) outVertex).getRawVertex();
-        final Node inNode = ((Neo4jVertex) inVertex).getRawVertex();
         try {
             this.autoStartTransaction();
+            final Node outNode = ((Neo4jVertex) outVertex).getRawVertex();
+            final Node inNode = ((Neo4jVertex) inVertex).getRawVertex();
             final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
             final Edge edge = new Neo4jEdge(relationship, this, true);
             this.autoStopTransaction(Conclusion.SUCCESS);
@@ -272,9 +274,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             return null;
 
         try {
-            final Long longId = Double.valueOf(id.toString()).longValue();
-            final Relationship relationship = this.rawGraph.getRelationshipById(longId);
-            return new Neo4jEdge(relationship, this);
+            final Long longId;
+            if (id instanceof Long)
+                longId = (Long) id;
+            else
+                longId = Double.valueOf(id.toString()).longValue();
+            return new Neo4jEdge(this.rawGraph.getRelationshipById(longId), this);
         } catch (NotFoundException e) {
             return null;
         } catch (NumberFormatException e) {
@@ -351,20 +356,31 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void clear() {
-        for (Vertex vertex : this.getVertices()) {
-            this.removeVertex(vertex);
+        try {
+            for (final Index index : this.getIndices()) {
+                this.dropIndex(index.getIndexName());
+            }
+            this.autoStartTransaction();
+            for (final Node node : this.rawGraph.getAllNodes()) {
+                for (final Relationship relationship : node.getRelationships()) {
+                    relationship.delete();
+                }
+                node.delete();
+            }
+            this.autoStopTransaction(Conclusion.SUCCESS);
+            this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
+            this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
+        } catch (Exception e) {
+            this.autoStopTransaction(Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
         }
-        for (Index index : this.getIndices()) {
-            this.dropIndex(index.getIndexName());
-        }
-        this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
-        this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
     }
 
     protected void autoStartTransaction() {
         if (this.txBuffer.get() > 0) {
             if (tx.get() == null) {
                 tx.set(this.rawGraph.beginTx());
+                txCounter.set(0);
             }
         }
     }
@@ -377,7 +393,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 tx.get().finish();
                 tx.remove();
                 txCounter.set(0);
-            } else if (this.txBuffer.get() == 0 || (this.txCounter.get() % this.txBuffer.get() == 0)) {
+            } else if (this.txCounter.get() % this.txBuffer.get() == 0) {
                 tx.get().success();
                 tx.get().finish();
                 tx.remove();

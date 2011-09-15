@@ -8,19 +8,19 @@ import com.tinkerpop.blueprints.pgm.Vertex;
  */
 public class ReadOnlyEdge extends ReadOnlyElement implements Edge {
 
-    public ReadOnlyEdge(final Edge edge) {
-        super(edge);
+    public ReadOnlyEdge(final Edge rawEdge) {
+        super(rawEdge);
     }
 
     public Vertex getOutVertex() {
-        return new ReadOnlyVertex(((Edge) this.element).getOutVertex());
+        return new ReadOnlyVertex(((Edge) this.rawElement).getOutVertex());
     }
 
     public Vertex getInVertex() {
-        return new ReadOnlyVertex(((Edge) this.element).getInVertex());
+        return new ReadOnlyVertex(((Edge) this.rawElement).getInVertex());
     }
 
     public String getLabel() {
-        return ((Edge) this.element).getLabel();
+        return ((Edge) this.rawElement).getLabel();
     }
 }

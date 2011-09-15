@@ -286,7 +286,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void clear() {
         final OrientGraphContext context = getContext(true);
-
         for (Index<? extends Element> idx : getIndices()) {
             ((OrientIndex<?>) idx).close();
         }

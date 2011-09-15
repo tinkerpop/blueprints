@@ -57,6 +57,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             count++;
             graph.dropIndex(index.getIndexName());
         }
+        assertEquals(count, 2);
         printPerformance(graph.toString(), count, "indices dropped", this.stopWatch());
         assertEquals(count(graph.getIndices()), 0);
 
@@ -83,18 +84,24 @@ public class IndexableGraphTestSuite extends TestSuite {
 
         this.stopWatch();
         graph.dropIndex(index1.getIndexName());
+        assertNull(graph.getIndex("index1", Vertex.class));
         assertEquals(count(graph.getIndices()), 2);
         for (Index index : graph.getIndices()) {
             assertTrue(index.getIndexName().equals(index2.getIndexName()) || index.getIndexName().equals(index3.getIndexName()));
         }
 
         graph.dropIndex(index2.getIndexName());
+        assertNull(graph.getIndex("index1", Vertex.class));
+        assertNull(graph.getIndex("index2", Edge.class));
         assertEquals(count(graph.getIndices()), 1);
         for (Index index : graph.getIndices()) {
             assertTrue(index.getIndexName().equals(index3.getIndexName()));
         }
 
         graph.dropIndex(index3.getIndexName());
+        assertNull(graph.getIndex("index1", Vertex.class));
+        assertNull(graph.getIndex("index2", Edge.class));
+        assertNull(graph.getIndex("index3", Vertex.class));
         assertEquals(count(graph.getIndices()), 0);
         printPerformance(graph.toString(), 3, "indices dropped and index iterable checked for consistency", this.stopWatch());
         graph.shutdown();

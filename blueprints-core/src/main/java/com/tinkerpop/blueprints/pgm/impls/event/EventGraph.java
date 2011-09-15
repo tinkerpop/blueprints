@@ -26,12 +26,12 @@ import java.util.List;
  * @author Stephen Mallette
  */
 public class EventGraph implements Graph {
-    protected final Graph graph;
+    protected final Graph rawGraph;
 
     protected final List<GraphChangedListener> graphChangedListeners = new ArrayList<GraphChangedListener>();
 
-    public EventGraph(final Graph graph) {
-        this.graph = graph;
+    public EventGraph(final Graph rawGraph) {
+        this.rawGraph = rawGraph;
     }
 
     public void removeAllListeners() {
@@ -84,7 +84,7 @@ public class EventGraph implements Graph {
      * Raises a vertexAdded event.
      */
     public Vertex addVertex(final Object id) {
-        final Vertex vertex = this.graph.addVertex(id);
+        final Vertex vertex = this.rawGraph.addVertex(id);
         if (vertex == null) {
             return null;
         } else {
@@ -94,7 +94,7 @@ public class EventGraph implements Graph {
     }
 
     public Vertex getVertex(final Object id) {
-        final Vertex vertex = this.graph.getVertex(id);
+        final Vertex vertex = this.rawGraph.getVertex(id);
         if (vertex == null) {
             return null;
         } else {
@@ -111,12 +111,12 @@ public class EventGraph implements Graph {
             vertexToRemove = ((EventVertex) vertex).getRawVertex();
         }
 
-        this.graph.removeVertex(vertexToRemove);
+        this.rawGraph.removeVertex(vertexToRemove);
         this.onVertexRemoved(vertex);
     }
 
     public Iterable<Vertex> getVertices() {
-        return new EventVertexSequence(this.graph.getVertices().iterator(), this.graphChangedListeners);
+        return new EventVertexSequence(this.rawGraph.getVertices().iterator(), this.graphChangedListeners);
     }
 
     /**
@@ -133,7 +133,7 @@ public class EventGraph implements Graph {
             inVertexToSet = ((EventVertex) inVertex).getRawVertex();
         }
 
-        final Edge edge = this.graph.addEdge(id, outVertexToSet, inVertexToSet, label);
+        final Edge edge = this.rawGraph.addEdge(id, outVertexToSet, inVertexToSet, label);
         if (edge == null) {
             return null;
         } else {
@@ -142,7 +142,7 @@ public class EventGraph implements Graph {
     }
 
     public Edge getEdge(final Object id) {
-        final Edge edge = this.graph.getEdge(id);
+        final Edge edge = this.rawGraph.getEdge(id);
         if (edge == null) {
             return null;
         } else {
@@ -160,28 +160,28 @@ public class EventGraph implements Graph {
             edgeToRemove = ((EventEdge) edge).getRawEdge();
         }
 
-        this.graph.removeEdge(edgeToRemove);
+        this.rawGraph.removeEdge(edgeToRemove);
         this.onEdgeRemoved(edge);
     }
 
     public Iterable<Edge> getEdges() {
-        return new EventEdgeSequence(this.graph.getEdges().iterator(), this.graphChangedListeners);
+        return new EventEdgeSequence(this.rawGraph.getEdges().iterator(), this.graphChangedListeners);
     }
 
     public void clear() {
-        this.graph.clear();
+        this.rawGraph.clear();
         this.onGraphCleared();
     }
 
     public void shutdown() {
-        this.graph.shutdown();
+        this.rawGraph.shutdown();
     }
 
     public String toString() {
-        return "(event)" + this.graph.toString();
+        return "(event)" + this.rawGraph.toString();
     }
 
     public Graph getRawGraph() {
-        return this.graph;
+        return this.rawGraph;
     }
 }

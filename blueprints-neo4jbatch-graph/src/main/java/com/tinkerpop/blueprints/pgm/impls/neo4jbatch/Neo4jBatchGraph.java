@@ -19,6 +19,8 @@ import java.util.Set;
 
 /**
  * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
+ * This is not a completely faithful Blueprints implementation.
+ * Many methods throw UnsupportedOperationExceptions and take unique arguments.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

@@ -20,32 +20,32 @@ import java.util.List;
  * @author Stephen Mallette
  */
 public class EventIndex<T extends Element> implements Index<T> {
-    protected final Index<T> index;
+    protected final Index<T> rawIndex;
     protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventIndex(final Index<T> index, final List<GraphChangedListener> graphChangedListeners) {
-        this.index = index;
+    public EventIndex(final Index<T> rawIndex, final List<GraphChangedListener> graphChangedListeners) {
+        this.rawIndex = rawIndex;
         this.graphChangedListeners = graphChangedListeners;
     }
 
     public void remove(final String key, final Object value, final T element) {
-        this.index.remove(key, value, element);
+        this.rawIndex.remove(key, value, element);
     }
 
     public void put(final String key, final Object value, final T element) {
-        this.index.put(key, value, element);
+        this.rawIndex.put(key, value, element);
     }
 
     public CloseableSequence<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (CloseableSequence<T>) new EventVertexSequence((Iterator<Vertex>) this.index.get(key, value).iterator(), this.graphChangedListeners);
+            return (CloseableSequence<T>) new EventVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator(), this.graphChangedListeners);
         } else {
-            return (CloseableSequence<T>) new EventEdgeSequence((Iterator<Edge>) this.index.get(key, value).iterator(), this.graphChangedListeners);
+            return (CloseableSequence<T>) new EventEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator(), this.graphChangedListeners);
         }
     }
 
     public long count(final String key, final Object value) {
-        return this.index.count(key, value);
+        return this.rawIndex.count(key, value);
     }
 
     public Index.Type getIndexType() {
@@ -53,15 +53,15 @@ public class EventIndex<T extends Element> implements Index<T> {
     }
 
     public String getIndexName() {
-        return this.index.getIndexName();
+        return this.rawIndex.getIndexName();
     }
 
     public Class<T> getIndexClass() {
-        return this.index.getIndexClass();
+        return this.rawIndex.getIndexClass();
     }
 
     public String toString() {
-        return "(event)" + this.index.toString();
+        return "(event)" + this.rawIndex.toString();
     }
 
 }

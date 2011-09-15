@@ -54,7 +54,7 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
             String field;
             if (null != this.autoIndexKeys) {
                 field = "";
-                for (String key : this.autoIndexKeys) {
+                for (final String key : this.autoIndexKeys) {
                     field = field + Neo4jTokens.KEY_SEPARATOR + key;
                 }
             } else {

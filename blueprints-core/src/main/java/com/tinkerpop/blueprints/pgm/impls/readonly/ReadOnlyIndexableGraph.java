@@ -42,7 +42,7 @@ public class ReadOnlyIndexableGraph extends ReadOnlyGraph implements IndexableGr
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        final Index<T> index = ((IndexableGraph) this.graph).getIndex(indexName, indexClass);
+        final Index<T> index = ((IndexableGraph) this.rawGraph).getIndex(indexName, indexClass);
         if (index.getIndexType().equals(Index.Type.MANUAL))
             return new ReadOnlyIndex<T>(index);
         else
@@ -50,10 +50,10 @@ public class ReadOnlyIndexableGraph extends ReadOnlyGraph implements IndexableGr
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new ReadOnlyIndexSequence(((IndexableGraph) this.graph).getIndices().iterator());
+        return new ReadOnlyIndexSequence(((IndexableGraph) this.rawGraph).getIndices().iterator());
     }
 
     public IndexableGraph getRawGraph() {
-        return (IndexableGraph) this.graph;
+        return (IndexableGraph) this.rawGraph;
     }
 }

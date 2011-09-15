@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.util.graphml;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
 import javax.xml.stream.XMLInputFactory;
@@ -110,6 +111,12 @@ public class GraphMLReader {
         try {
             XMLStreamReader reader = inputFactory.createXMLStreamReader(graphMLInputStream);
 
+            int previousMaxBufferSize = 0;
+            if (graph instanceof TransactionalGraph) {
+                previousMaxBufferSize = ((TransactionalGraph) graph).getMaxBufferSize();
+                ((TransactionalGraph) graph).setMaxBufferSize(bufferSize);
+            }
+
             Map<String, String> keyIdMap = new HashMap<String, String>();
             Map<String, String> keyTypesMaps = new HashMap<String, String>();
             // <Mapped ID String, ID Object>
@@ -210,14 +217,14 @@ public class GraphMLReader {
                                     vertexMappedIdMap.put(vertexId, value);
                                     vertexId = value;
                                 } else
-                                    vertexProps.put(key, typeCastValue(key, value, keyTypesMaps));
+                                    vertexProps.put(attributeName, typeCastValue(key, value, keyTypesMaps));
                             } else if (inEdge == true) {
                                 if ((edgeLabelKey != null) && (key.equals(edgeLabelKey)))
                                     edgeLabel = value;
                                 else if ((edgeIdKey != null) && (key.equals(edgeIdKey)))
                                     edgeId = value;
                                 else
-                                    edgeProps.put(key, typeCastValue(key, value, keyTypesMaps));
+                                    edgeProps.put(attributeName, typeCastValue(key, value, keyTypesMaps));
                             }
                         }
 
@@ -263,6 +270,10 @@ public class GraphMLReader {
             }
 
             reader.close();
+
+            if (graph instanceof TransactionalGraph) {
+                ((TransactionalGraph) graph).setMaxBufferSize(previousMaxBufferSize);
+            }
         } catch (XMLStreamException xse) {
             throw new IOException(xse);
         }
