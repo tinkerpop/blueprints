@@ -36,4 +36,8 @@ public class WrappingCloseableSequence<T> implements CloseableSequence<T> {
             ((CloseableSequence) itty).close();
         }
     }
+
+    public String toString() {
+        return this.itty.toString();
+    }
 }

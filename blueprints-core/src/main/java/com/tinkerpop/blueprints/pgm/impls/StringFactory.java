@@ -20,6 +20,7 @@ public class StringFactory {
     public static final String R_BRACKET = "]";
     public static final String DASH = "-";
     public static final String ARROW = "->";
+    public static final String COLON = ":";
 
     public static final String ID = "id";
     public static final String LABEL = "label";
@@ -35,13 +36,13 @@ public class StringFactory {
     }
 
     public static String graphString(final Graph graph, final String internalString) {
-        return graph.getClass().getSimpleName().toLowerCase() + "[" + internalString + "]";
+        return graph.getClass().getSimpleName().toLowerCase() + L_BRACKET + internalString + R_BRACKET;
     }
 
     public static String indexString(final Index index) {
-        String returnString = index.getIndexType() + "[" + index.getIndexName() + ":" + index.getIndexClass().getSimpleName() + "]";
+        String returnString = index.getIndexType() + L_BRACKET + index.getIndexName() + COLON + index.getIndexClass().getSimpleName() + R_BRACKET;
         if (index instanceof AutomaticIndex) {
-            returnString = returnString + "[autoIndexKeys:" + ((AutomaticIndex) index).getAutoIndexKeys() + "]";
+            returnString = returnString + "[autoIndexKeys:" + ((AutomaticIndex) index).getAutoIndexKeys() + R_BRACKET;
         }
         return returnString;
     }
