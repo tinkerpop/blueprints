@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     public TinkerGraph(final String directory) {
         this.directory = directory;
         try {
-            File file = new File(directory);
+            final File file = new File(directory);
             if (!file.exists()) {
                 file.mkdir();
                 this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
@@ -245,7 +246,10 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
 
     public String toString() {
-        return "tinkergraph[vertices:" + this.vertices.size() + " edges:" + this.edges.size() + "]";
+        if (null == this.directory)
+            return StringFactory.graphString(this, "vertices:" + this.vertices.size() + " edges:" + this.edges.size());
+        else
+            return StringFactory.graphString(this, "vertices:" + this.vertices.size() + " edges:" + this.edges.size() + " directory:" + this.directory);
     }
 
     public void clear() {

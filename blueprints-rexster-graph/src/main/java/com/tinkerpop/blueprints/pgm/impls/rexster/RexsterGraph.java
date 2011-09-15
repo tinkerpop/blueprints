@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
@@ -186,10 +187,8 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public String toString() {
-        JSONObject object = RestHelper.get(graphURI);
-        String graphName = object.optString(RexsterTokens.GRAPH);
-
-        return "rexstergraph[" + this.graphURI + "][" + graphName + "]";
+        final String graphName = RestHelper.get(graphURI).optString(RexsterTokens.GRAPH);
+        return StringFactory.graphString(this, this.graphURI + "(" + graphName + ")");
     }
 
     public JSONObject getRawGraph() {

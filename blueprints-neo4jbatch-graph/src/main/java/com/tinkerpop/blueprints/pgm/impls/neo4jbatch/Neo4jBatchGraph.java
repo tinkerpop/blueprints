@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.index.BatchInserterIndexProvider;
 import org.neo4j.helpers.collection.MapUtil;
@@ -21,6 +22,7 @@ import java.util.Set;
  * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
  * This is not a completely faithful Blueprints implementation.
  * Many methods throw UnsupportedOperationExceptions and take unique arguments.
+ * When the graph is created no default indices are provided. It is up to the developer to create desired indices.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -62,6 +64,10 @@ public class Neo4jBatchGraph implements IndexableGraph {
         for (final Neo4jBatchIndex index : this.indices.values()) {
             index.flush();
         }
+    }
+
+    public String toString() {
+        return StringFactory.graphString(this, this.rawGraph.toString());
     }
 
     /**

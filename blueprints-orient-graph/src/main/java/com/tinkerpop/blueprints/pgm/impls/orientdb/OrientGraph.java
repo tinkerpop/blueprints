@@ -17,6 +17,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
@@ -308,7 +309,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public String toString() {
-        return "orientgraph[" + getRawGraph().getURL() + "]";
+        return StringFactory.graphString(this, getRawGraph().getURL());
     }
 
     public OGraphDatabase getRawGraph() {

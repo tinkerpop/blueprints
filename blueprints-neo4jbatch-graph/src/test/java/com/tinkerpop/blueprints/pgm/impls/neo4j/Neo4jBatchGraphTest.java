@@ -48,16 +48,21 @@ public class Neo4jBatchGraphTest extends BaseTest {
             assertEquals(edge.getLabel(), idA + "-" + idB);
         }
 
+        assertNotNull(graph.getVertex(1L));
+        assertNull(graph.getVertex(100L));
+        assertNull(graph.getEdge(100L));
+
         graph.shutdown();
     }
 
     public void testAddingVerticesEdgesWithIndices() {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        assertEquals(0, count(batch.getIndices()));
         batch.createAutomaticIndex(Index.VERTICES, Vertex.class, new HashSet<String>(Arrays.asList("name", "age")));
+        assertEquals(1, count(batch.getIndices()));
         Index<Edge> edgeIndex = batch.createManualIndex(Index.EDGES, Edge.class);
-
-        assertEquals(count(batch.getIndices()), 2);
+        assertEquals(2, count(batch.getIndices()));
 
         final List<Long> ids = new ArrayList<Long>();
         for (int i = 0; i < 10; i++) {
@@ -89,10 +94,10 @@ public class Neo4jBatchGraphTest extends BaseTest {
             int age = (Integer) vertex.getProperty("age");
             assertEquals(vertex.getProperty("name"), (age / 10) + "");
 
-            assertEquals(count(vertexIndex.get("nothing", 0)), 0);
-            assertEquals(count(vertexIndex.get("age", age)), 1);
+            assertEquals(vertexIndex.count("nothing", 0), 0);
+            assertEquals(vertexIndex.count("age", age), 1);
             assertEquals(vertexIndex.get("age", age).iterator().next(), vertex);
-            assertEquals(count(vertexIndex.get("name", (age / 10) + "")), 1);
+            assertEquals(vertexIndex.count("name", (age / 10) + ""), 1);
             assertEquals(vertexIndex.get("name", (age / 10) + "").iterator().next(), vertex);
         }
         assertEquals(count(graph.getEdges()), 9);
@@ -109,8 +114,8 @@ public class Neo4jBatchGraphTest extends BaseTest {
             assertEquals(edge.getLabel(), idA + "-" + idB);
             assertEquals(edge.getProperty("weight"), 0.5f);
 
-            assertEquals(count(edgeIndex.get("weight", 0.5f)), 0);
-            assertEquals(count(edgeIndex.get("unique", idA + "-" + idB)), 1);
+            assertEquals(edgeIndex.count("weight", 0.5f), 0);
+            assertEquals(edgeIndex.count("unique", idA + "-" + idB), 1);
             assertEquals(edgeIndex.get("unique", idA + "-" + idB).iterator().next(), edge);
             assertTrue(edges.contains(edge));
         }

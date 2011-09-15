@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 
@@ -31,6 +32,10 @@ public class StringFactory {
 
     public static String edgeString(final Edge edge) {
         return E + L_BRACKET + edge.getId() + R_BRACKET + L_BRACKET + edge.getOutVertex().getId() + DASH + edge.getLabel() + ARROW + edge.getInVertex().getId() + R_BRACKET;
+    }
+
+    public static String graphString(final Graph graph, final String internalString) {
+        return graph.getClass().getSimpleName().toLowerCase() + "[" + internalString + "]";
     }
 
     public static String indexString(final Index index) {

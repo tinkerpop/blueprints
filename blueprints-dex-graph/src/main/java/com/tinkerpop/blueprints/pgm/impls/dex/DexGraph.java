@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 import edu.upc.dama.dex.core.DEX;
@@ -317,7 +318,7 @@ public class DexGraph implements IndexableGraph {
 
     @Override
     public String toString() {
-        return "dexgraph[" + db.getPath() + "]";
+        return StringFactory.graphString(this, db.getPath());
     }
 
     /*

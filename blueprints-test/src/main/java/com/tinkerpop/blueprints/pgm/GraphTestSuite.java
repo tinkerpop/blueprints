@@ -37,6 +37,7 @@ public class GraphTestSuite extends TestSuite {
         try {
             this.stopWatch();
             assertNotNull(graph.toString());
+            assertTrue(graph.toString().startsWith(graph.getClass().getSimpleName().toLowerCase()));
             printPerformance(graph.toString(), 1, "graph string representation generated", this.stopWatch());
         } catch (Exception e) {
             assertFalse(true);

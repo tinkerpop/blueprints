@@ -4,6 +4,7 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.nquads.NQuadsFormat;
@@ -447,8 +448,7 @@ public class SailGraph implements TransactionalGraph {
 
 
     public String toString() {
-        String type = this.rawGraph.getClass().getSimpleName().toLowerCase();
-        return "sailgraph[" + type + "]";
+        return StringFactory.graphString(this, this.rawGraph.getClass().getSimpleName().toLowerCase());
     }
 
     private String getPrefixes() {

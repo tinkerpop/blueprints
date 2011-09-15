@@ -12,7 +12,7 @@ public class MultiIterable<S> implements Iterable<S> {
 
     private final List<Iterable<S>> iterables;
 
-    public MultiIterable(List<Iterable<S>> iterables) {
+    public MultiIterable(final List<Iterable<S>> iterables) {
         this.iterables = iterables;
     }
 

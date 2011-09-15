@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.readonly;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyVertexSequence;
 
@@ -87,7 +88,7 @@ public class ReadOnlyGraph implements Graph {
     }
 
     public String toString() {
-        return "(readonly)" + this.rawGraph.toString();
+        return StringFactory.graphString(this, this.rawGraph.toString());
     }
 
     public Graph getRawGraph() {

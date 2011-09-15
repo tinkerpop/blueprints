@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.event;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventVertexSequence;
@@ -178,7 +179,7 @@ public class EventGraph implements Graph {
     }
 
     public String toString() {
-        return "(event)" + this.rawGraph.toString();
+        return StringFactory.graphString(this, this.rawGraph.toString());
     }
 
     public Graph getRawGraph() {
