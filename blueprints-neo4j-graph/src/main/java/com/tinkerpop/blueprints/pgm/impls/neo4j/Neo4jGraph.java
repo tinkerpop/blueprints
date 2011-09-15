@@ -119,7 +119,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+    public synchronized <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
@@ -128,7 +128,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         return index;
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys) {
+    public synchronized <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
@@ -152,7 +152,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
     }
 
-    public void dropIndex(final String indexName) {
+    public synchronized void dropIndex(final String indexName) {
         try {
             this.autoStartTransaction();
             this.rawGraph.index().forNodes(indexName).delete();
@@ -313,8 +313,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void stopTransaction(final Conclusion conclusion) {
-        if (null == tx.get())
-            throw new RuntimeException("There is no active transaction to stop");
+        if (null == tx.get()) {
+            txCounter.set(0);
+            return;
+        }
 
         if (conclusion == Conclusion.SUCCESS)
             tx.get().success();

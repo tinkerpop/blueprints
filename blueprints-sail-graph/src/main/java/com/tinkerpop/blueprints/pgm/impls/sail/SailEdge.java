@@ -53,11 +53,16 @@ public class SailEdge implements Edge {
 
     public void setProperty(final String key, final Object value) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
-            URI namedGraph = new URIImpl(this.graph.expandPrefix(value.toString()));
-            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
-            this.rawEdge = new ContextStatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject(), namedGraph);
-            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            try {
+                URI namedGraph = new URIImpl(this.graph.expandPrefix(value.toString()));
+                SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
+                this.rawEdge = new ContextStatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject(), namedGraph);
+                SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            } catch (Exception e) {
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                throw new RuntimeException(e.getMessage(), e);
+            }
         } else {
             throw new RuntimeException(NAMED_GRAPH_PROPERTY);
         }
@@ -65,12 +70,17 @@ public class SailEdge implements Edge {
 
     public Object removeProperty(final String key) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
-            Resource ng = this.rawEdge.getContext();
-            SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
-            this.rawEdge = new StatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject());
-            SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            return ng;
+            try {
+                Resource ng = this.rawEdge.getContext();
+                SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
+                this.rawEdge = new StatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject());
+                SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                return ng;
+            } catch (Exception e) {
+                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                throw new RuntimeException(e.getMessage(), e);
+            }
         } else {
             throw new RuntimeException(NAMED_GRAPH_PROPERTY);
         }

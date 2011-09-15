@@ -186,6 +186,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.get().removeStatements(null, null, vertexValue);
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (SailException e) {
+            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -197,18 +198,27 @@ public class SailGraph implements TransactionalGraph {
         if (!(outVertexValue instanceof Resource)) {
             throw new RuntimeException(outVertex.toString() + " is not a legal URI or blank node");
         }
-
-        URI labelURI = new URIImpl(this.expandPrefix(label));
-        Statement statement = new StatementImpl((Resource) outVertexValue, labelURI, inVertexValue);
-        SailHelper.addStatement(statement, this.sailConnection.get());
-        this.autoStopTransaction(Conclusion.SUCCESS);
-        return new SailEdge(statement, this);
+        try {
+            URI labelURI = new URIImpl(this.expandPrefix(label));
+            Statement statement = new StatementImpl((Resource) outVertexValue, labelURI, inVertexValue);
+            SailHelper.addStatement(statement, this.sailConnection.get());
+            this.autoStopTransaction(Conclusion.SUCCESS);
+            return new SailEdge(statement, this);
+        } catch (Exception e) {
+            this.autoStopTransaction(Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public void removeEdge(final Edge edge) {
         Statement statement = ((SailEdge) edge).getRawEdge();
-        SailHelper.removeStatement(statement, this.sailConnection.get());
-        this.autoStopTransaction(Conclusion.SUCCESS);
+        try {
+            SailHelper.removeStatement(statement, this.sailConnection.get());
+            this.autoStopTransaction(Conclusion.SUCCESS);
+        } catch (Exception e) {
+            this.autoStopTransaction(Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -231,6 +241,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.get().setNamespace(prefix, namespace);
             this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
+            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -245,6 +256,7 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.get().removeNamespace(prefix);
             this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
+            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -257,7 +269,7 @@ public class SailGraph implements TransactionalGraph {
     public Map<String, String> getNamespaces() {
         Map<String, String> namespaces = new HashMap<String, String>();
         try {
-            CloseableIteration<? extends Namespace, SailException> results = this.sailConnection.get().getNamespaces();
+            final CloseableIteration<? extends Namespace, SailException> results = this.sailConnection.get().getNamespaces();
             while (results.hasNext()) {
                 Namespace namespace = results.next();
                 namespaces.put(namespace.getPrefix(), namespace.getName());
@@ -301,17 +313,15 @@ public class SailGraph implements TransactionalGraph {
             this.sailConnection.get().clear();
             this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (SailException e) {
+            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     private synchronized SailConnection createConnection() throws SailException {
         cleanupConnections();
-
-        SailConnection sc = rawGraph.getConnection();
-
+        final SailConnection sc = rawGraph.getConnection();
         connections.add(sc);
-
         return sc;
     }
 
@@ -398,12 +408,12 @@ public class SailGraph implements TransactionalGraph {
 
     public void stopTransaction(final Conclusion conclusion) {
         try {
-            inTransaction.set(Boolean.FALSE);
             if (Conclusion.SUCCESS == conclusion) {
                 this.sailConnection.get().commit();
             } else {
                 this.sailConnection.get().rollback();
             }
+            this.inTransaction.set(Boolean.FALSE);
             this.txCounter.set(0);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -415,10 +425,10 @@ public class SailGraph implements TransactionalGraph {
             try {
                 txCounter.set(txCounter.get() + 1);
                 if (conclusion == Conclusion.FAILURE) {
-                    this.sailConnection.get().commit();
+                    this.sailConnection.get().rollback();
                     txCounter.set(0);
                     inTransaction.set(Boolean.FALSE);
-                } else if (this.txBuffer.get() == 0 || (this.txCounter.get() % this.txBuffer.get() == 0)) {
+                } else if (this.txCounter.get() % this.txBuffer.get() == 0) {
                     this.sailConnection.get().commit();
                     txCounter.set(0);
                     inTransaction.set(Boolean.FALSE);
@@ -430,10 +440,7 @@ public class SailGraph implements TransactionalGraph {
     }
 
     public void setMaxBufferSize(final int bufferSize) {
-        try {
-            this.sailConnection.get().commit();
-        } catch (SailException e) {
-        }
+        this.stopTransaction(Conclusion.SUCCESS);
         inTransaction.set(Boolean.FALSE);
         this.txBuffer.set(bufferSize);
     }

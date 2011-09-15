@@ -384,6 +384,12 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testStopTransactionEmptyBuffer() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.shutdown();
+    }
+
     public void testSuccessfulCommitOnGraphClose() {
         if (graphTest.isPersistent) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
@@ -447,13 +453,39 @@ public class TransactionalGraphTestSuite extends TestSuite {
             for (int i = 1; i < 10; i++) {
                 graph.addVertex(null);
                 assertEquals(graph.getCurrentBufferSize(), i);
+                assertEquals(count(graph.getVertices()), i);
             }
 
             graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
             assertEquals(graph.getMaxBufferSize(), 1000);
             assertEquals(graph.getCurrentBufferSize(), 0);
-            graph.shutdown();
+            assertEquals(count(graph.getVertices()), 0);
 
+            for (int i = 1; i < 10; i++) {
+                graph.addVertex(null);
+                assertEquals(graph.getCurrentBufferSize(), 1);
+                graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                assertEquals(count(graph.getVertices()), 0);
+                assertEquals(graph.getCurrentBufferSize(), 0);
+            }
+
+            assertEquals(graph.getMaxBufferSize(), 1000);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(count(graph.getVertices()), 0);
+
+            for (int i = 1; i < 10; i++) {
+                graph.addVertex(null);
+                assertEquals(graph.getCurrentBufferSize(), 1);
+                graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                assertEquals(count(graph.getVertices()), i);
+                assertEquals(graph.getCurrentBufferSize(), 0);
+            }
+
+            assertEquals(graph.getMaxBufferSize(), 1000);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(count(graph.getVertices()), 9);
+
+            graph.shutdown();
         }
     }
 
