@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.Map;
 
@@ -37,19 +38,23 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getOutEdges(String... labels) {
+    public Iterable<Edge> getOutEdges(final String... labels) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getInEdges(String... labels) {
+    public Iterable<Edge> getInEdges(final String... labels) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     protected Map<String, Object> getPropertyMap() {
         return this.graph.getRawGraph().getNodeProperties(this.id);
+    }
+
+    public String toString() {
+        return StringFactory.vertexString(this);
     }
 }
 

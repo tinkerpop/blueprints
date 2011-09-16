@@ -11,8 +11,8 @@ import java.util.Set;
  */
 public abstract class Neo4jBatchElement implements Element {
 
-    protected Neo4jBatchGraph graph;
-    protected Long id;
+    protected final Neo4jBatchGraph graph;
+    protected final Long id;
 
     protected Neo4jBatchElement(final Neo4jBatchGraph graph, final Long id) {
         this.graph = graph;

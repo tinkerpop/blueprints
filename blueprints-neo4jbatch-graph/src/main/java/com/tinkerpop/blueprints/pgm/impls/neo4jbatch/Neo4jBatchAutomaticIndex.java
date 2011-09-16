@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Index;
 import org.neo4j.graphdb.index.BatchInserterIndex;
 
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.Set;
  */
 public class Neo4jBatchAutomaticIndex<T extends Element> extends Neo4jBatchIndex<T> implements AutomaticIndex<T> {
 
-    final Set<String> autoIndexKeys;
+    protected final Set<String> autoIndexKeys;
 
     public Neo4jBatchAutomaticIndex(final Neo4jBatchGraph graph, final BatchInserterIndex index, final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
         super(graph, index, indexName, indexClass);
@@ -35,6 +36,10 @@ public class Neo4jBatchAutomaticIndex<T extends Element> extends Neo4jBatchIndex
             this.rawIndex.add((Long) element.getId(), keyedProperties);
         }
 
+    }
+
+    public Type getIndexType() {
+        return Type.AUTOMATIC;
     }
 
 }

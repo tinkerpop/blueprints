@@ -45,19 +45,23 @@ public class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
     /**
      * @throws UnsupportedOperationException
      */
-    public Vertex getOutVertex() {
+    public Vertex getOutVertex() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public Vertex getInVertex() {
+    public Vertex getInVertex() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     public String getLabel() {
         return this.label;
+    }
+
+    public String toString() {
+        return "e[" + this.id + "][?-" + this.label + "->?]";
     }
 
 }

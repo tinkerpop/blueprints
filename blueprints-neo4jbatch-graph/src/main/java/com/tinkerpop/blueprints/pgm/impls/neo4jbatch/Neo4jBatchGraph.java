@@ -20,20 +20,23 @@ import java.util.Set;
 
 /**
  * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
- * This is not a completely faithful Blueprints implementation.
- * Many methods throw UnsupportedOperationExceptions and take unique arguments.
+ * This is a single threaded, non-transactional bulk loader and should not be used for any other reason than for massive initial data loads.
+ * <p/>
+ * Neo4jBatchGraph is not a completely faithful Blueprints implementation.
+ * Many methods throw UnsupportedOperationExceptions and take unique arguments. Be sure to review each method's JavaDoc.
  * When the graph is created no default indices are provided. It is up to the developer to create desired indices.
+ * The "reference node" (vertex 0) is automatically created and, if so desired, must be manually deleted post data insertion.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class Neo4jBatchGraph implements IndexableGraph {
 
-    final BatchInserter rawGraph;
-    final BatchInserterIndexProvider indexProvider;
+    private final BatchInserter rawGraph;
+    private final BatchInserterIndexProvider indexProvider;
 
-    final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
-    protected Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>> automaticVertexIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>>();
-    protected Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>> automaticEdgeIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>>();
+    private final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
+    private final Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>> automaticVertexIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>>();
+    private final Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>> automaticEdgeIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>>();
 
     public Neo4jBatchGraph(final String directory) {
         this.rawGraph = new BatchInserterImpl(directory);
@@ -59,6 +62,7 @@ public class Neo4jBatchGraph implements IndexableGraph {
     /**
      * This is necessary prior to using indices to ensure that indexed data is available to index queries.
      * This method is not part of the Blueprints Graph or IndexableGraph API.
+     * Therefore, be sure to typecast your graph to a Neo4jBatchGraph to use this necessary index-based method.
      */
     public void flushIndices() {
         for (final Neo4jBatchIndex index : this.indices.values()) {
@@ -73,8 +77,8 @@ public class Neo4jBatchGraph implements IndexableGraph {
     /**
      * @throws UnsupportedOperationException
      */
-    public void clear() {
-        throw new UnsupportedOperationException();
+    public void clear() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     public BatchInserter getRawGraph() {
@@ -84,7 +88,9 @@ public class Neo4jBatchGraph implements IndexableGraph {
     /**
      * The object id must be a Map&lt;String,Object&gt; or null.
      * The map is the properties written when the vertex is created.
+     * While it is possible to Vertex.setProperty(), this method is faster.
      * If the map contains an _id key, then the value is a user provided long vertex id.
+     * In other words, Neo4jBatchGraph will not ignore the user provided id.
      *
      * @param map a map of properties which can be null
      * @return the newly created vertex
@@ -129,20 +135,21 @@ public class Neo4jBatchGraph implements IndexableGraph {
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Vertex> getVertices() {
+    public Iterable<Vertex> getVertices() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public void removeVertex(final Vertex vertex) {
-        throw new UnsupportedOperationException();
+    public void removeVertex(final Vertex vertex) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     /**
      * The object id must be a Map&lt;String,Object&gt; or null.
      * The map is the properties written when the vertex is created.
+     * While it is possible to Edge.setProperty(), this method is faster.
      *
      * @param map a map of properties which can be null
      * @return the newly created vertex
@@ -169,22 +176,22 @@ public class Neo4jBatchGraph implements IndexableGraph {
     /**
      * @throws UnsupportedOperationException
      */
-    public Edge getEdge(final Object id) {
+    public Edge getEdge(final Object id) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getEdges() {
+    public Iterable<Edge> getEdges() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public void removeEdge(final Edge edge) {
-        throw new UnsupportedOperationException();
+    public void removeEdge(final Edge edge) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
@@ -221,11 +228,11 @@ public class Neo4jBatchGraph implements IndexableGraph {
     }
 
     protected Iterable<Neo4jBatchAutomaticIndex<Neo4jBatchVertex>> getAutomaticVertexIndices() {
-        return automaticVertexIndices.values();
+        return this.automaticVertexIndices.values();
     }
 
     protected Iterable<Neo4jBatchAutomaticIndex<Neo4jBatchEdge>> getAutomaticEdgeIndices() {
-        return automaticEdgeIndices.values();
+        return this.automaticEdgeIndices.values();
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
@@ -235,8 +242,8 @@ public class Neo4jBatchGraph implements IndexableGraph {
     /**
      * @throws UnsupportedOperationException
      */
-    public void dropIndex(final String indexName) {
-        throw new UnsupportedOperationException();
+    public void dropIndex(final String indexName) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     private Map<String, Object> makePropertyMap(final Map<String, Object> map) {

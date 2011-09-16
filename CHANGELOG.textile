@@ -29,8 +29,8 @@ h3. Version 1.0 (Blueprints -- NOT OFFICIALLY RELEASED YET)
 * @GraphJSONReader@ and @GraphJSONWriter@ utility classes
 * Updated @TransactionalGraph@ API to support transaction buffers
 ** Removed @TransactionalGraphHelper.CommitManager@ as it is no longer relevant
+** Changed @TransactionalGraph.close()@ to @Conclusion.SUCCESS@ any open transactions
 * Fixed a @ConcurrentModificationException@ in @TinkerGraph@ and added respective test cases for all graphs
-* Changed @TransactionalGraph.close()@ to @Conclusion.SUCCESS@ any open transactions
 * Added @StringFactory.graphString()@ for a unified @String@ representation of a Blueprints graph
 * Added @Neo4jBatchGraph@ to support bulk inserting of graph data into a Neo4j instance
 

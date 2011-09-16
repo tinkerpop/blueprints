@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.EdgeCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.VertexCloseableSequence;
 import org.neo4j.graphdb.index.BatchInserterIndex;
@@ -16,10 +17,10 @@ import java.util.Map;
  */
 public class Neo4jBatchIndex<T extends Element> implements Index<T> {
 
-    final Neo4jBatchGraph graph;
-    final BatchInserterIndex rawIndex;
-    final String name;
-    final Class<T> indexClass;
+    private final Neo4jBatchGraph graph;
+    protected final BatchInserterIndex rawIndex;
+    private final String name;
+    private final Class<T> indexClass;
 
     public Neo4jBatchIndex(final Neo4jBatchGraph graph, final BatchInserterIndex index, final String name, final Class<T> indexClass) {
         this.graph = graph;
@@ -52,8 +53,8 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
     /**
      * @throws UnsupportedOperationException
      */
-    public void remove(final String key, final Object value, final T element) {
-        throw new UnsupportedOperationException();
+    public void remove(final String key, final Object value, final T element) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     public Class<T> getIndexClass() {
@@ -68,7 +69,15 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
         return Type.MANUAL;
     }
 
+    /**
+     * This is required before querying the index for data.
+     * This method is not a standard Index API method and thus, be sure to typecast the index to Neo4jBatchIndex.
+     */
     public void flush() {
         this.rawIndex.flush();
+    }
+
+    public String toString() {
+        return StringFactory.indexString(this);
     }
 }
