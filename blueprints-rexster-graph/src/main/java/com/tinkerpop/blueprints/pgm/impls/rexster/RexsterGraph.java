@@ -40,14 +40,27 @@ public class RexsterGraph implements IndexableGraph {
         return this.graphURI;
     }
 
+    /**
+     * This method does nothing. To shutdown a RexsterGraph, it must be shutdown locally on the Rexster server.
+     */
     public void shutdown() {
 
     }
 
+    /**
+     * Get the size of the communication buffer.
+     *
+     * @return the communication buffer size
+     */
     public int getBufferSize() {
         return this.bufferSize;
     }
 
+    /**
+     * This represents the communication buffer. The larger the buffer, the more information is marshaled back and forth.
+     *
+     * @param bufferSize the size of the buffer
+     */
     public void setBufferSize(final int bufferSize) {
         this.bufferSize = bufferSize;
     }
