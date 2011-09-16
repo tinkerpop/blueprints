@@ -188,7 +188,7 @@ public class RexsterGraph implements IndexableGraph {
 
     public String toString() {
         final String graphName = RestHelper.get(graphURI).optString(RexsterTokens.GRAPH);
-        return StringFactory.graphString(this, this.graphURI + "(" + graphName + ")");
+        return StringFactory.graphString(this, this.graphURI + "[" + graphName + "]");
     }
 
     public JSONObject getRawGraph() {

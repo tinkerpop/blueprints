@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.util.json;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
@@ -81,6 +82,12 @@ public class GraphJSONReader {
         JsonFactory jsonFactory = new MappingJsonFactory();
         JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
+        int previousMaxBufferSize = 0;
+        if (graph instanceof TransactionalGraph) {
+            previousMaxBufferSize = ((TransactionalGraph) graph).getMaxBufferSize();
+            ((TransactionalGraph) graph).setMaxBufferSize(bufferSize);
+        }
+
         Map<String, Object> vertexIdMap = new HashMap<String, Object>();
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
@@ -126,6 +133,10 @@ public class GraphJSONReader {
         }
 
         jp.close();
+
+        if (graph instanceof TransactionalGraph) {
+            ((TransactionalGraph) graph).setMaxBufferSize(previousMaxBufferSize);
+        }
     }
 
     private static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {

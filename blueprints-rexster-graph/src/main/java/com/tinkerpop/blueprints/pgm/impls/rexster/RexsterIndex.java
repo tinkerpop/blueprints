@@ -82,9 +82,7 @@ public class RexsterIndex<T extends Element> implements Index<T> {
     }
 
     public long count(final String key, final Object value) {
-        JSONObject countJson = RestHelper.get(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.SLASH_COUNT + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value));
-        long theSize = countJson.optLong("totalSize");
-
-        return theSize;
+        final JSONObject countJson = RestHelper.get(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.SLASH_COUNT + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value));
+        return countJson.optLong("totalSize");
     }
 }
