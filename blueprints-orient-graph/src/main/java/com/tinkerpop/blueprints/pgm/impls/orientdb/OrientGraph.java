@@ -121,12 +121,20 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public void dropIndex(final String indexName) {
-        final OrientGraphContext context = getContext(true);
-        context.manualIndices.remove(indexName);
-        context.autoIndices.remove(indexName);
 
-        getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
-        saveIndexConfiguration();
+        this.autoStartTransaction();
+        try {
+            final OrientGraphContext context = getContext(true);
+            context.manualIndices.remove(indexName);
+            context.autoIndices.remove(indexName);
+
+            getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
+            saveIndexConfiguration();
+            this.stopTransaction(Conclusion.SUCCESS);
+        } catch (Exception e) {
+            this.stopTransaction(Conclusion.FAILURE);
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public Vertex addVertex(final Object id) {

@@ -448,6 +448,8 @@ public class TransactionalGraphTestSuite extends TestSuite {
         if (graph instanceof IndexableGraph) {
             ((IndexableGraph) graph).dropIndex(Index.VERTICES);
             ((IndexableGraph) graph).dropIndex(Index.EDGES);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 11);
             assertEquals(count(((IndexableGraph) graph).getIndices()), 0);
             assertNull(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class));
             assertNull(((IndexableGraph) graph).getIndex(Index.EDGES, Edge.class));
@@ -519,6 +521,11 @@ public class TransactionalGraphTestSuite extends TestSuite {
             index.remove("yetAnotherKey", "blah", a);
             assertEquals(graph.getCurrentBufferSize(), 0);
             assertEquals(graph.getMaxBufferSize(), 11);
+
+            ((IndexableGraph) graph).dropIndex("manual");
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 11);
+
         }
         assertEquals(graph.getMaxBufferSize(), 11);
         graph.shutdown();
