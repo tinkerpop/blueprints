@@ -387,6 +387,10 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void testStopTransactionEmptyBuffer() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.setMaxBufferSize(15);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.setMaxBufferSize(0);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         graph.shutdown();
     }
 
@@ -447,6 +451,20 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals(count(((IndexableGraph) graph).getIndices()), 0);
             assertNull(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class));
             assertNull(((IndexableGraph) graph).getIndex(Index.EDGES, Edge.class));
+
+            // creating and dropping indices is non-transactional
+            ((IndexableGraph) graph).createManualIndex("aManualIndex", Edge.class);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 11);
+            ((IndexableGraph) graph).dropIndex("aManualIndex");
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 11);
+            ((IndexableGraph) graph).createAutomaticIndex("anAutomaticIndex", Vertex.class, null);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 11);
+            ((IndexableGraph) graph).dropIndex("anAutomaticIndex");
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 11);
         }
 
         if (!graphTest.isRDFModel) {
@@ -509,14 +527,47 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void testSuccessfulCommitOnGraphClose() {
         if (graphTest.isPersistent) {
             TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+            assertEquals(graph.getMaxBufferSize(), 1);
             Object v1id = graph.addVertex(null).getId();
             graph.setMaxBufferSize(0);
             graph.startTransaction();
             Object v2id = graph.addVertex(null).getId();
             graph.shutdown();
+
             graph = (TransactionalGraph) graphTest.getGraphInstance();
+            assertEquals(graph.getMaxBufferSize(), 1);
             assertNotNull("Vertex 1 should be persisted", graph.getVertex(v1id));
             assertNotNull("Vertex 2 should be persisted", graph.getVertex(v2id));
+            graph.setMaxBufferSize(10);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            Vertex v1 = graph.getVertex(v1id);
+            Vertex v2 = graph.getVertex(v2id);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            v1.setProperty("name", "puppy");
+            v2.setProperty("name", "mama");
+            assertEquals(graph.getCurrentBufferSize(), 2);
+            graph.shutdown();
+
+            graph = (TransactionalGraph) graphTest.getGraphInstance();
+            assertEquals(graph.getMaxBufferSize(), 1);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            if (graph instanceof IndexableGraph) {
+                assertEquals(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).count("name", "puppy"), 1);
+                assertEquals(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "puppy").iterator().next().getId(), v1id);
+                assertEquals(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).count("name", "mama"), 1);
+                assertEquals(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "mama").iterator().next().getId(), v2id);
+            }
+            assertNotNull("Vertex 1 should be persisted", graph.getVertex(v1id));
+            assertNotNull("Vertex 2 should be persisted", graph.getVertex(v2id));
+            assertEquals(graph.getVertex(v1id).getProperty("name"), "puppy");
+            assertEquals(graph.getVertex(v1id).getPropertyKeys().size(), 1);
+            assertEquals(graph.getVertex(v2id).getProperty("name"), "mama");
+            assertEquals(graph.getVertex(v2id).getPropertyKeys().size(), 1);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(count(graph.getVertices()), 2);
+            assertEquals(count(graph.getEdges()), 0);
+            assertEquals(graph.getCurrentBufferSize(), 0);
+            assertEquals(graph.getMaxBufferSize(), 1);
             graph.shutdown();
         }
     }

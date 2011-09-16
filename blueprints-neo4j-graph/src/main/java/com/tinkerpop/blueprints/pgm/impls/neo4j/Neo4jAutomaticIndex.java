@@ -49,8 +49,7 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
 
     private void saveKeyField() {
         try {
-            this.graph.autoStartTransaction();
-
+            //this.graph.autoStartTransaction();
             String field;
             if (null != this.autoIndexKeys) {
                 field = "";
@@ -62,12 +61,12 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
             }
             this.getIndexManager().setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_AUTOKEYS, field);
 
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            //this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (final RuntimeException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            //this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (final Exception e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            //this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
