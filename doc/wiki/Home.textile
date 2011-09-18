@@ -1,0 +1,88 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
+
+Blueprints is a collection of interfaces, implementations, ouplementations, and test suites for the property graph data model. Blueprints is analogous to the "JDBC":http://en.wikipedia.org/wiki/Java_Database_Connectivity, but for "graph databases":http://en.wikipedia.org/wiki/Graph_database. As such, it provides a common set of interfaces to allow developers to plug-and-play their graph database backend. Moreover, software written atop Blueprints works over all Blueprints-enabled graph databases (e.g. "Pipes":http://pipes.tinkerpop.com, "Gremlin":http://gremlin.tinkerpop.com, "Frames":http://frames.tinkerpop.com, "Rexster":http://rexster.tinkerpop.com, etc.). The documentation herein will provide information regarding the use of Blueprints.[1]
+
+Please join the Gremlin users group at "http://groups.google.com/group/gremlin-users":http://groups.google.com/group/gremlin-users for all "TinkerPop":http://tinkerpop.com related discussions. 
+
+* Blueprints 1.0 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/1.0/api/
+* Blueprints 0.9 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.9/api/
+* Blueprints 0.8 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.8/api/
+* Blueprints 0.7 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.7/api/
+* Blueprints 0.6 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.6/api/
+* Blueprints 0.5 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.5/api/
+* Blueprints 0.4 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.4/api/
+* Blueprints 0.3 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.3/api/
+* Blueprints 0.2 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.2/api/
+* Blueprints 0.1 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1/api/
+
+==<hr/>==
+
+```xml
+<!-- neo4j used in this example -->
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4j-graph</artifactId>
+   <version>1.0</version>
+</dependency>
+```
+
+For non-Maven users, *download the requisite jars*: 
+* "http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-core/1.0/blueprints-core-1.0.jar":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-core/1.0/blueprints-core-1.0.jar
+* "http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-neo4j-graph/1.0/blueprints-neo4j-graph-1.0.jar":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-neo4j-graph/1.0/blueprints-neo4j-graph-1.0.jar
+(The general schema is @blueprints-{impl}-graph-{version}@ or @blueprints-graph-{oupl}-{version}@)
+
+```java
+Graph graph = new Neo4jGraph("/tmp/my_graph");
+Vertex a = graph.addVertex(null);
+Vertex b = graph.addVertex(null);
+a.setProperty("name","marko");
+b.setProperty("name","peter");
+Edge e = graph.addEdge(null, a, b, "knows");
+e.setProperty("since", 2006);
+graph.shutdown();
+```
+
+==<hr/>==
+
+* Introduction
+  ** [[The Benefits of Blueprints]]
+  ** [[Property Graph Model]]
+  ** [[Graph Morphisms]]
+  ** [[Property Graph Model Test Suite]]
+  ** [[Code Examples]]
+* Advanced Graph Handling
+  ** [[Graph Transactions]]
+  ** [[Graph Indices]]
+    **** [[Graph Indices Helpers]]
+* [[Implementations]]
+  ** [[TinkerGraph]]
+  ** [[Neo4j Implementation]]
+    **** [[Neo4jBatch Implementation]]
+  ** [[Sail Implementation]]
+  ** [[OrientDB Implementation]]
+  ** [[Dex Implementation]]
+  ** [[Rexster Implementation]]
+  ** [[Desired Implementations]] (*help contribute*)
+* [[Ouplementations]]
+  ** [[JUNG Ouplementation]]
+  ** [[Sail Ouplementation]]
+* Utilities
+  ** [[GraphML Reader and Writer Library]]
+  ** [[JSON Reader and Writer Library]]
+  ** [[ReadOnly Implementation]]
+  ** [[Event Implementation]]
+* Conclusion
+  ** [[Acknowledgments]]
+  ** [[Release Notes]]
+
+==<hr/>==
+
+```xml
+<repository>
+   <id>tinkerpop-repository</id>
+   <name>TinkerPop Maven2 Repository</name>
+   <url>http://tinkerpop.com/maven2</url>
+</repository>
+```
+
+fn1. Blueprints documentation is up to date with the current Blueprints "codebase":http://github.com/tinkerpop/blueprints/tree/master, not with the latest Blueprints "release":http://github.com/tinkerpop/blueprints/downloads.

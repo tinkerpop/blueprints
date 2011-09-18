@@ -29,7 +29,7 @@ public abstract class OrientElement implements Element {
         if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
-       this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction();
 
         try {
             final Object oldValue = this.getProperty(key);
@@ -65,7 +65,7 @@ public abstract class OrientElement implements Element {
             return oldValue;
 
         } catch (RuntimeException e) {
-           this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);

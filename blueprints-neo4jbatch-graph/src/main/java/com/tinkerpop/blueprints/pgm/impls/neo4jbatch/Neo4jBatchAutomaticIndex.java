@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
 import org.neo4j.graphdb.index.BatchInserterIndex;
 
 import java.util.HashMap;

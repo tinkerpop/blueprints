@@ -1,0 +1,94 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/graph-example-1.jpg!
+
+Blueprints provides a set of interfaces for the property graph data model. An example instance is diagrammed above. In order to make a data management system "Blueprints-enabled," these interfaces must be implemented. Any applications that bind to the Blueprints property graph model API can make use of different data management systems (i.e. plug and play graph backends). 
+
+The property graph interfaces are itemized below and in the following sub-sections, their method signatures presented.
+
+# *graph*: an object that contains vertices and edges.
+ ** *transactional graph*: a graph that supports transactions
+ ** *indexable graph*: a graph that supports indices
+# *element*: an object that maintains properties (i.e. key/value pair map).
+  ** *vertex*: an object that is connected to other objects by edges.
+  ** *edge*: an object that connects two vertices.
+# *index*: an object that maintains a map structure of key/value pairs to elements.
+  ** *automatic index*: an index that manages itself as elements are updated.
+
+In order to aid in the understanding of the various methods defined below, the following diagram identifies the names of the different components of a graph.
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/property-graph-model.jpg!
+
+h2. Graph
+
+```java
+public Vertex addVertex(Object id);
+public Vertex getVertex(Object id);
+public Iterable<Vertex> getVertices();
+public void removeVertex(Vertex vertex);
+public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label);
+public Iterable<Edge> getEdges();
+public void removeEdge(Edge edge);
+public void clear();
+public void shutdown();
+```
+
+h3. TransactionalGraph (extends Graph)
+
+```java
+public void startTransaction();
+public void stopTransaction(Conclusion conclusion);
+public void setMaxBufferSize(int bufferSize);
+public int getMaxBufferSize();
+public int getCurrentBufferSize();
+```
+
+h3. IndexableGraph (extends Graph)
+
+```java
+public <T extends Element> Index<T> createManualIndex(String indexName, Class<T> indexClass);
+public <T extends Element> AutomaticIndex<T> createAutomaticIndex(String name, Class<T> indexClass);
+public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass);
+public Iterable<Index> getIndices();
+public void dropIndex(String indexName);
+```
+
+h2. Element
+
+```java
+public Object getProperty(String key);
+public Set<String> getPropertyKeys();
+public void setProperty(String key, Object value);
+public Object getId();
+```
+
+h3. Vertex (extends Element)
+
+```java
+public Iterable<Edge> getOutEdges(String... labels);
+public Iterable<Edge> getInEdges(String... labels);
+```
+
+h3. Edge (extends Element)
+
+```java
+public Vertex getOutVertex();
+public Vertex getInVertex();
+public String getLabel();
+```
+
+h2. Index [T extends Element]
+
+```java
+public long count(String key, Object value);
+public String getIndexName();
+public Class<T> getIndexClass();
+public Type getIndexType();
+public void put(String key, Object value, T element);
+public Iterable<T> get(String key, Object value);
+public void remove(String key, Object value, T element);
+```
+
+h3. AutomaticIndex (extends Index)
+
+```java
+public Set<String> getAutoIndexKeys();
+```

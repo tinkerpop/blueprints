@@ -1,0 +1,18 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-bob-the-builder.png!
+
+It is a time consuming process to maintain Blueprints implementations as graph database/framework versions and features change. Many developers focusing on a particular implementation is an ideal way of ensuring that Blueprints has wide reach and is always consistent with the latest developments. If there is a graph database/framework that is currently not supported by Blueprints and you are an expert with that system, please contribute an implementation. To get a feel of what is required, see [[Property Graph Model]] and [[Property Graph Model Test Suite]].
+
+Below is a list of desired implementations. This list is not intended to be exhaustive. Please feel free to add to the list.
+
+* "db4o":http://developer.db4o.com
+* "Versant Object Database":http://www.versant.com
+* "InfiniteGraph":http://www.infinitegraph.com/ (currently in development)
+* "InfoGrid":http://infogrid.org/
+* "sones":http://www.sones.com/
+* "vertexdb":http://www.dekorte.com/projects/opensource/vertexdb/
+* "Redis":http://code.google.com/p/redis/ (see "Blueredis":https://github.com/dmitriid/blueredis)
+* Sail-based RDF Stores (very easy to do as only a @Sail@ constructor is needed)
+** "4Store":http://4store.org/
+** "AllegroGraph":http://www.franz.com/agraph/allegrograph/
+** "OpenVirtuoso":http://virtuoso.openlinksw.com/
+** "OWLim":http://www.ontotext.com/owlim/

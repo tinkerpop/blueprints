@@ -1,0 +1,23 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/neotech-logo.png!:http://neotechnology.com
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4j-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new Neo4jGraph("/tmp/neo4j");
+```
+
+"Neo Technology":http://neotechnology.com are the developers of the "Neo4j graph database":http://neo4j.org. For a fine summary of the Neo4j graph database, please review the following presentation.
+
+<div style="width:425px" id="__ss_1766972"><strong style="display:block;margin:12px 0 4px"><a href="http://www.slideshare.net/emileifrem/neo4j-the-benefits-of-graph-databases-oscon-2009" title="Neo4j - The Benefits of Graph Databases (OSCON 2009)">Neo4j - The Benefits of Graph Databases (OSCON 2009)</a></strong><object id="__sse1766972" width="425" height="355"><param name="movie" value="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=neo4j-graph-databases-oscon-2009-090724211513-phpapp02&rel=0&stripped_title=neo4j-the-benefits-of-graph-databases-oscon-2009&userName=emileifrem" /><param name="allowFullScreen" value="true"/><param name="allowScriptAccess" value="always"/><embed name="__sse1766972" src="http://static.slidesharecdn.com/swf/ssplayer2.swf?doc=neo4j-graph-databases-oscon-2009-090724211513-phpapp02&rel=0&stripped_title=neo4j-the-benefits-of-graph-databases-oscon-2009&userName=emileifrem" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="355"></embed></object><div style="padding:5px 0 12px">View more <a href="http://www.slideshare.net/">presentations</a> from <a href="http://www.slideshare.net/emileifrem">Emil Eifrem</a>.</div></div>
+
+Neo4j natively supports the property graph data model. However, there are a few peculiarities in Neo4j that make it not completely faithful to the [[property graph model]] as specified by Blueprints. These are itemized below.
+
+# *No user defined element identifiers*: Neo4j is the gatekeeper and creator of vertex and edge identifiers. Thus, when creating a new vertex or edge, the provided object identifier is ignored.
+# *No self-loops*: Neo4j does not allow a vertex to have an outgoing or incoming edge to itself.
+# *Only primitive property values*: Neo4j requires that the value objects in the property map of an element be Java primitives, @java.lang.String@s, or arrays of primitives and @java.lang.String@s.

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tinkerpop.blueprints</groupId>
     <artifactId>blueprints</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
@@ -67,7 +67,7 @@
     </repositories>
 
     <properties>
-        <blueprints.version>1.0-SNAPSHOT</blueprints.version>
+        <blueprints.version>1.0</blueprints.version>
         <sesame.version>2.5.0</sesame.version>
         <junit.version>4.5</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -1,0 +1,13 @@
+This section provides a list of the people that have contributed in some way to the creation of Blueprints.
+
+# "Marko A. Rodriguez":http://markorodriguez.com -- designed, developed, tested, and documented Blueprints.
+# "Luca Garulli":http://orientechnologies.com -- developed the OrientDB implementatio (@OrientGraph@).
+# "Joshua Shinavier":http://fortytwo.net -- developed Blueprints Sail (@GraphSail@).
+# "Darrick Weibe":http://github.com/pangloss -- tests, bug fixes, and transaction work.
+# "Stephen Mallette":http://stephen.genoprime.com -- develops @RexsterGraph@.
+# "Sergio Gómez Villamor":http://personals.ac.upc.edu/sgomez -- developed the Dex implementation (@DexGraph@).
+# "Pierre De Wilde":http://www.linkedin.com/in/pierredewilde -- designs and tests new features.
+
+Please review Blueprints' "pom.xml":http://github.com/tinkerpop/blueprints/blob/master/pom.xml. Blueprints would not be possible without the work done by others to create these useful packages.
+
+<small>YourKit is kindly supporting open source projects with its full-featured Java Profiler. YourKit, LLC is the creator of innovative and intelligent tools for profiling Java and .NET applications. Take a look at YourKit's leading software products: <a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and <a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.</small>

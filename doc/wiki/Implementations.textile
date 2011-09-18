@@ -1,0 +1,5 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/impls.png!
+
+In order to connect a graph database to Blueprints, the Blueprints property graph interfaces must be implemented. As such, the graph database API and the Blueprints API need to be coupled. Each subsection discusses the various implementations of the Blueprints interfaces maintained by the main Blueprints distribution.
+
+*DEPENDENCY NOTE*: It is important to note that including a @<dependency/>@ to Blueprints does not entail all the respective graph database dependencies. The reason for this is that it allows users to include only those graph database implementations they wish for their particular projects (e.g. based on licensing, size, performance, etc.).

@@ -1,0 +1,22 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/tinkerpop-logo-small.jpg!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+TinkerGraph is a lightweight, "POJO":http://en.wikipedia.org/wiki/Plain_Old_Java_Object based, in-memory property graph that serves as the reference implementation for the [[property graph model]]. If you have a small graph that can be loaded and saved using the [[GraphML reader and writer library]], then TinkerGraph can be handy to use. TinkerGraph packaged with the core Blueprints distribution.
+
+```java
+Graph graph = new TinkerGraph();
+Graph graph = new TinkerGraph("/tmp/tinkergraph"); // on graph.shutdown() the graph is serialized to disk
+```
+
+There is a hardcoded representation of the graph diagrammed in [[Property Graph Model]]. This is useful as a small, play dataset to get acquainted with the Blueprints API.
+
+```java
+Graph graph = TinkerGraphFactory.createTinkerGraph();
+```

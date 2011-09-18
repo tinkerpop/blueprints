@@ -1,0 +1,181 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/openrdf-logo.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-graph-sail</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+
+"Sail":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/Sail.html is an "RDF":http://www.w3.org/RDF/ triple/quad store interface developed by "OpenRDF":http://openrdf.org. Any database the implements the Sail interfaces properly is a valid RDF triple/quad store. A graph database is a great way to build a triple/quad store because its possible to mix indexing and graph traversals to solve the RDF "pattern match" problem. To go from @Graph@ to @Sail@, simply use @GraphSail@. @GraphSail@ requires an @IndexableGraph@ (e.g. @TinkerGraph@, @Neo4jGraph@, @OrientGraph@). The examples below use [[TinkerGraph]] and expose it as a @GraphSail@ and thus, a @Sail@. While some basic examples are provided, please refer to the "OpenRDF":http://openrdf.org Sail documentation for a complete review of the framework.
+
+*NOTE ON TRANSACTIONS*: @Sail@ has its own transaction model that is different from the transaction model used by @TransactionalGraph@. @GraphSail@ provides the user the flexibility of using @TransactionalGraph@ transaction buffers (see [[Graph Transactions]]). If the transaction buffer is set to size 0, then the @Sail@ transaction semantics are as expected. If greater than 0, then the @Sail@ transaction semantics are ignored.
+
+h2. Basic Statement Handling
+
+A statement in RDF is a triple or quad. The components of a statement are called: subject, predicate, object, and graph/context. The subject can be a URI or blank node. The predicate can only be a URI. The object can be a URI, blank node, or literal. Finally, the graph (or context) can be a URI or blank node.
+
+```java
+Sail sail = new GraphSail(new TinkerGraph());
+sail.initialize();
+SailConnection sc = sail.getConnection();
+ValueFactory vf = sail.getValueFactory();
+sc.addStatement(vf.createURI("http://tinkerpop.com#1"), vf.createURI("http://tinkerpop.com#knows"), vf.createURI("http://tinkerpop.com#3"), vf.createURI("http://tinkerpop.com"));
+sc.addStatement(vf.createURI("http://tinkerpop.com#1"), vf.createURI("http://tinkerpop.com#name"), vf.createLiteral("marko"), vf.createURI("http://tinkerpop.com"));
+sc.addStatement(vf.createURI("http://tinkerpop.com#3"), vf.createURI("http://tinkerpop.com#name"), vf.createLiteral("josh"), vf.createURI("http://tinkerpop.com"));
+
+System.out.println("get statements: ?s ?p ?o ?g");
+CloseableIteration<? extends Statement, SailException> results = sc.getStatements(null, null, null, false);
+while(results.hasNext()) {
+    System.out.println(results.next());
+}
+
+System.out.println("\nget statements: http://tinkerpop.com#3 ?p ?o ?g");
+results = sc.getStatements(vf.createURI("http://tinkerpop.com#3"), null, null, false);
+while(results.hasNext()) {
+    System.out.println(results.next());
+}
+```
+
+```text
+get statements: ?s ?p ?o ?g
+(http://tinkerpop.com#1, http://tinkerpop.com#knows, http://tinkerpop.com#3) [http://tinkerpop.com]
+(http://tinkerpop.com#3, http://tinkerpop.com#name, "josh") [http://tinkerpop.com]
+(http://tinkerpop.com#1, http://tinkerpop.com#name, "marko") [http://tinkerpop.com]
+
+get statements: http://tinkerpop.com#3 ?p ?o ?g
+(http://tinkerpop.com#3, http://tinkerpop.com#name, "josh") [http://tinkerpop.com]
+```
+
+h2. Using SPARQL
+
+"SPARQL":http://www.w3.org/TR/rdf-sparql-query/ is the standard query language for RDF stores. OpenRDF provides a SPARQL query engine that can be used over any @Sail@. An example is provided below. Assume that the same statements from the previous example exist in the @GraphSail@ below.
+
+```java
+SPARQLParser parser = new SPARQLParser();
+CloseableIteration<? extends BindingSet, QueryEvaluationException> sparqlResults;
+String queryString = "SELECT ?x ?y WHERE { ?x <http://tinkerpop.com#knows> ?y }";
+ParsedQuery query = parser.parseQuery(queryString, "http://tinkerPop.com");
+
+System.out.println("\nSPARQL: " + queryString);
+sparqlResults = sc.evaluate(query.getTupleExpr(), query.getDataset(), new EmptyBindingSet(), false);
+while (sparqlResults.hasNext()) {
+    System.out.println(sparqlResults.next());
+}
+```
+
+```text
+SPARQL: SELECT ?x ?y WHERE { ?x <http://tinkerpop.com#knows> ?y }
+[y=http://tinkerpop.com#3;x=http://tinkerpop.com#1]
+```
+
+h2. Moving Between Sail and Graph
+
+Its possible to get the @Graph@ that is being modeled as a @Sail@ and work from the Blueprints API perspective. In this way, its possible to leverage the tools provided for both @Sail@ and Blueprints @Graph@.
+
+```java
+Graph graph = ((GraphSail) sail).getGraph();
+System.out.println();
+for (Vertex v : graph.getVertices()) {
+    System.out.println("------");
+    System.out.println(v);
+    for (String key : v.getPropertyKeys()) {
+        System.out.println(key + "=" + v.getProperty(key));
+    }
+}
+for (Edge e : graph.getEdges()) {
+System.out.println("------");
+System.out.println(e);
+for (String key : e.getPropertyKeys()) {
+    System.out.println(key + "=" + e.getProperty(key));
+}
+```
+
+```text
+------
+v[2]
+value=http://tinkerpop.com#3
+kind=uri
+------
+v[1]
+value=http://tinkerpop.com#1
+kind=uri
+------
+v[0]
+value=urn:com.tinkerpop.blueprints.pgm.oupls.sail:namespaces
+------
+v[6]
+value=josh
+kind=literal
+------
+v[4]
+value=marko
+kind=literal
+------
+e[3][1-http://tinkerpop.com#knows->2]
+cp=U http://tinkerpop.com U http://tinkerpop.com#knows
+c=U http://tinkerpop.com
+p=U http://tinkerpop.com#knows
+------
+e[7][2-http://tinkerpop.com#name->6]
+cp=U http://tinkerpop.com U http://tinkerpop.com#name
+c=U http://tinkerpop.com
+p=U http://tinkerpop.com#name
+------
+e[5][1-http://tinkerpop.com#name->4]
+cp=U http://tinkerpop.com U http://tinkerpop.com#name
+c=U http://tinkerpop.com
+p=U http://tinkerpop.com#name
+```
+
+h2. Inferencing support
+
+Blueprints Sail implements "NotifyingSail":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/NotifyingSail.html, produces "InferencerConnections":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/inferencer/InferencerConnection.html, and does all of the right things under the hood to support Sesame-based reasoning/inferencing tools such as "ForwardChainingRDFSInferencer":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/inferencer/fc/ForwardChainingRDFSInferencer.html, with no extra plumbing required.  For example:
+
+```java
+   Sail reasoner = new ForwardChainingRDFSInferencer(new GraphSail(new TinkerGraph()));
+   reasoner.initialize();
+```
+
+How it works: a reasoner such as @ForwardChainingRDFSInferencer@ is expected to listen for RDF statements added to or removed from the base @Sail@ (here: an instance of @GraphSail@) and to manage a collection of "inferred" statements accordingly.  The inferred statements are stored along with the explicitly asserted RDF statements in the base @Sail@.  In Blueprints Sail, these statements are marked with a special property, @inferred@, which when present has the boolean value @true@, so you can see which edges "you" have added, and which edges the reasoner has added, when traversing the underlying Property Graph.  The following is a more detailed example:
+
+```java
+Resource beijing = new URIImpl("http://example.org/things/Beijing");
+Resource city = new URIImpl("http://example.org/terms/city");
+Resource place = new URIImpl("http://example.org/terms/place");
+
+Sail reasoner = new ForwardChainingRDFSInferencer(new GraphSail(new TinkerGraph()));
+reasoner.initialize();
+
+try {
+    SailConnection c = reasoner.getConnection();
+    try {
+        c.addStatement(city, RDFS.SUBCLASSOF, place);
+        c.addStatement(beijing, RDF.TYPE, city);
+        c.commit();
+
+        CloseableIteration<? extends Statement, SailException> i
+                = c.getStatements(beijing, null, null, true);
+        try {
+            while (i.hasNext()) {
+                System.out.println("statement " + i.next());
+            }
+        } finally {
+            i.close();
+        }
+    } finally {
+        c.close();
+    }
+} finally {
+    reasoner.shutDown();
+}
+```
+
+Output of the example:
+```
+statement (http://example.org/things/Beijing, http://www.w3.org/1999/02/22-rdf-syntax-ns#type, http://www.w3.org/2000/01/rdf-schema#Resource)
+statement (http://example.org/things/Beijing, http://www.w3.org/1999/02/22-rdf-syntax-ns#type, http://example.org/terms/place)
+statement (http://example.org/things/Beijing, http://www.w3.org/1999/02/22-rdf-syntax-ns#type, http://example.org/terms/city)
+```

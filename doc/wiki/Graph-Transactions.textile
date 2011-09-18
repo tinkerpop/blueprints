@@ -1,0 +1,74 @@
+A @Graph@ that implements the @TransactionalGraph@ interface is a graph that supports Blueprints-style transactions. A @TransactionalGraph@ has the following methods:
+
+```java
+public void setMaxBufferSize(int bufferSize);
+public int getMaxBufferSize();
+public int getCurrentBufferSize();
+public void startTransaction();
+public void stopTransaction(Conclusion conclusion);
+```
+
+h2. Automatic Transactions
+
+A @TransactionalGraph@ supports a transactional buffer. When the buffer size is greater than 0, every X manipulations of the graph (e.g. set/remove property, add/remove vertex, add/remove edge) is automatically wrapped in a transaction and committed, where X is the transaction buffer size. In this way, the developer does not need to start and stop transactions as this is automatically handled by the implementation. Upon construction, every @TransactionalGraph@ has a transaction buffer size of 1. When the transaction buffer size is 0, the developer is required to manually start and stop transactions when editing the graph. That is done with the methods @startTransaction()@ and @stopTransaction()@.
+
+h2. Transaction Examples
+
+To put a graph in manual transaction model, evaluate the following:
+
+```java
+txGraph.setMaxBufferSize(0);
+```
+
+Upon doing so, any edit operation (or group of edit operations) must be wrapped in a transaction. This is done as follows.
+
+```java
+txGraph.startTransaction();
+// edit operations
+tx.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+```
+
+There are two types of conclusions: @Conclusion.SUCCESS@ and @Conclusion.FAILURE@. When a transaction is successful, it is committed to the underlying store. When the transaction is a failure, then all the edit operations up to the start of the transaction are rolled back. *Note*: Blueprints-enabled graphs do not require transactions for read-based operations.
+
+Finally, the relationship between automatic and manual transactions are explained with an example. When doing batch mutations using manual transactions, the code looks as follows:
+
+```java
+int counter = 0;
+txGraph.setMaxBufferSize(0);
+txGraph.startTransaction();
+
+while(doingStuff) {
+  // do a graph manipulation
+  counter++;
+  if(counter % 1000 == 0) {
+    System.out.print(".");
+    txGraph.stopTransaction(Conclusion.SUCCESS);
+    txGraph.startTransaction();
+  }
+}
+txGraph.stopTransaction(Conclusion.SUCCESS);
+```
+
+This code, using automatic transaction handling can be simplified with a transaction buffer size of 1000.
+
+```java
+txGraph.setMaxBufferSize(1000);
+while(doingStuff) {
+  // do a graph manipulation
+  if((txGraph.getCurrentBufferSize()-1) % 1000 == 0)
+    System.out.print(".");
+}
+```
+
+h2. Note on Automatic Transaction Semantics
+
+When the max buffer size of a @TransactionalGraph@ is greater than @0@ (i.e. automatic mode) and the buffer max has not been reached, it is possible to commit or rollback the buffer prematurely using @stopTransaction()@. From there, everything prior to the last commit will be committed (@Conclusion.SUCCESS@) or rolled back (@Conclusion.FAILURE@). Once the the transaction has been stopped, the current buffer size is reset to 0 and writes can occur again. Finally, when the graph is @shutdown()@, any open transactions are successfully committed.
+
+The following methods do not obey the standard transaction semantics. They are not subject to commit and rollback behavior. Moreover, the starred methods (*) will cause the complete transaction buffer to commit when evaluated.
+
+* @Graph.clear()@ *
+* @Graph.shutdown()@ *
+* @IndexableGraph.createManualIndex()@
+* @IndexableGraph.createAutomaticIndex()@
+* @IndexableGraph.dropIndex()@ *
+* @TransactionalGraph.setMaxBufferSize()@ *
