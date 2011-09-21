@@ -84,8 +84,6 @@ public interface Graph {
 
     /**
      * Remove all the edges and vertices from the graph.
-     * This will also remove all indices associated with the graph including the automatic indices VERTICES and EDGES.
-     * These can be reinstated by calling the relevant APIs, if desired.
      */
     public void clear();
 
