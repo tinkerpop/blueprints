@@ -1,5 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.id.ORID;
@@ -20,10 +25,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
@@ -207,6 +208,15 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         this.autoStartTransaction();
         try {
             AutomaticIndexHelper.removeElement(this, vertex);
+            
+            final Set<Edge> allEdges = new HashSet<Edge>();
+            for( Edge e : oVertex.getInEdges() )
+            	allEdges.add( e );
+            for( Edge e : oVertex.getOutEdges() )
+            	allEdges.add( e );
+            		
+            for( Edge e : allEdges )
+            	AutomaticIndexHelper.removeElement(this, e);
 
             for (final Index<? extends Element> index : this.getManualIndices()) {
                 if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
@@ -214,6 +224,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
                     OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;
                     idx.removeElement(oVertex);
                 }
+                
+                if (Edge.class.isAssignableFrom(index.getIndexClass())) {
+                  @SuppressWarnings("unchecked")
+                  OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
+                  for( Edge e : allEdges )
+                  	idx.removeElement((OrientEdge) e);
+              }
             }
 
             getRawGraph().removeVertex(oVertex.rawElement);
