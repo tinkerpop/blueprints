@@ -1,8 +1,10 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -312,5 +314,37 @@ public class IndexableGraphTestSuite extends TestSuite {
         }
 
         graph.shutdown();
+    }
+
+    public void testRemoveVertexRemoveEdgesRemoveEdgesFromIndices() {
+        IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        Vertex c = graph.addVertex(null);
+        Edge z = graph.addEdge(null, a, b, "test");
+        Edge y = graph.addEdge(null, b, c, "test");
+        Edge x = graph.addEdge(null, b, a, "test");
+
+        assertEquals(count(graph.getEdges()), 3);
+        assertEquals(count(graph.getVertices()), 3);
+
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label", "test")), 3);
+        List<Edge> edges = BaseTest.asList(graph.getIndex(Index.EDGES, Edge.class).get("label", "test"));
+        assertEquals(edges.size(), 3);
+        assertTrue(edges.contains(z));
+        assertTrue(edges.contains(y));
+        assertTrue(edges.contains(x));
+
+        graph.removeVertex(a);
+        assertEquals(count(graph.getEdges()), 1);
+        assertEquals(count(graph.getVertices()), 2);
+
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label", "test")), 1);
+        edges.clear();
+        edges = BaseTest.asList(graph.getIndex(Index.EDGES, Edge.class).get("label", "test"));
+        assertEquals(edges.size(), 1);
+        assertTrue(edges.contains(y));
+
+
     }
 }
