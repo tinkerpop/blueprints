@@ -344,6 +344,7 @@ public class IndexableGraphTestSuite extends TestSuite {
         edges = BaseTest.asList(graph.getIndex(Index.EDGES, Edge.class).get("label", "test"));
         assertEquals(edges.size(), 1);
         assertTrue(edges.contains(y));
+        graph.shutdown();
 
 
     }
