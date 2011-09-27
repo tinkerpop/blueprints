@@ -29,7 +29,7 @@
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ha</artifactId>
             <version>1.5.M01</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

@@ -11,6 +11,21 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
+h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>1.1</version>
+</dependency>
+```
+
+* Fixed index consistency issue in @OrientGraph@
+* Added @Neo4jHaGraph@ allowing a more direct way to utilize Neo4j High Availability mode.
+
+==<hr/>==
+
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-blueprints.png!
 
 h3. Version 1.0 (Blueprints -- September 18, 2011)

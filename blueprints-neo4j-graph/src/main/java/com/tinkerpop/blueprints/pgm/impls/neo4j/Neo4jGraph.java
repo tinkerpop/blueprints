@@ -21,6 +21,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.kernel.HighlyAvailableGraphDatabase;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -63,10 +64,27 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Neo4jGraph(final String directory, final Map<String, String> configuration) {
+        this(directory, configuration, false);
+    }
+
+    public Neo4jGraph(final GraphDatabaseService rawGraph) {
+        this.rawGraph = rawGraph;
+        this.loadIndices();
+    }
+
+    protected Neo4jGraph(final String directory, final Map<String, String> configuration, boolean highAvailabilityMode) {
+
+        if (highAvailabilityMode && configuration == null) {
+            throw new IllegalArgumentException("Configuration parameters must be supplied when using HA mode.");
+        }
+
         boolean fresh = !new File(directory).exists();
         try {
             if (null != configuration)
-                this.rawGraph = new EmbeddedGraphDatabase(directory, configuration);
+                if (highAvailabilityMode)
+                    this.rawGraph = new HighlyAvailableGraphDatabase(directory, configuration);
+                else
+                    this.rawGraph = new EmbeddedGraphDatabase(directory, configuration);
             else
                 this.rawGraph = new EmbeddedGraphDatabase(directory);
 
@@ -91,11 +109,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 this.rawGraph.shutdown();
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    public Neo4jGraph(final GraphDatabaseService rawGraph) {
-        this.rawGraph = rawGraph;
-        this.loadIndices();
     }
 
     private void loadIndices() {
