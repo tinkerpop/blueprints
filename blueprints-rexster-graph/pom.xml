@@ -74,7 +74,7 @@
                         </property>
                         <property>
                             <name>rexsterGraphURI</name>
-                            <value>http://127.0.0.1:8182/emptygraph</value>
+                            <value>http://127.0.0.1:8182/graphs/emptygraph</value>
                         </property>
                     </systemProperties>
                 </configuration>
