@@ -69,9 +69,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Neo4jGraph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
-        this.loadIndices();
+        this.loadIndices(true);
     }
 
+    public Neo4jGraph(final GraphDatabaseService rawGraph, boolean fresh) {
+        this.rawGraph = rawGraph;
+        this.loadIndices(fresh);
+    }
+    
     protected Neo4jGraph(final String directory, final Map<String, String> configuration, boolean highAvailabilityMode) {
 
         if (highAvailabilityMode && configuration == null) {
@@ -88,18 +93,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             else
                 this.rawGraph = new EmbeddedGraphDatabase(directory);
 
-            if (fresh) {
-                // remove reference node
-                try {
-                    this.removeVertex(this.getVertex(0));
-                } catch (Exception e) {
-                }
-                this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
-                this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
-            } else {
-                this.loadIndices();
-            }
-
+            this.loadIndices(fresh);
+            
         } catch (RuntimeException e) {
             if (this.rawGraph != null)
                 this.rawGraph.shutdown();
@@ -111,7 +106,17 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    private void loadIndices() {
+    private void loadIndices(boolean fresh) {
+        if (fresh) {
+            // remove reference node
+            try {
+                this.removeVertex(this.getVertex(0));
+            } catch (Exception e) {
+            }
+            this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
+            this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
+            return;
+        } 
         final IndexManager manager = this.rawGraph.index();
         for (final String indexName : manager.nodeIndexNames()) {
             final org.neo4j.graphdb.index.Index<Node> neo4jIndex = manager.forNodes(indexName);
