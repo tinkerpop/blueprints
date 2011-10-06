@@ -209,13 +209,14 @@ public final class JSONWriter {
 
         Object returnValue = value;
 
-        // type will be one of: map, list, string, long, int, double, float.
-        // in the event of a complex object it will call a toString and store as a
-        // string
-        String type = determineType(value);
-
         // if the includeType is set to true then show the data types of the properties
         if (includeType) {
+
+            // type will be one of: map, list, string, long, int, double, float.
+            // in the event of a complex object it will call a toString and store as a
+            // string
+            String type = determineType(value);
+
             ObjectNode valueAndType = jsonNodeFactory.objectNode();
             valueAndType.put(JSONTokens.TYPE, type);
 
