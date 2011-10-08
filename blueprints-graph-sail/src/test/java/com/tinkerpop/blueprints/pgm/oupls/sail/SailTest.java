@@ -1024,6 +1024,43 @@ public abstract class SailTest extends TestCase {
         }
     }
 
+    /*
+    @Test
+    public void testEvalNew() throws Exception {
+        Neo4jGraph graph;
+        Sail sail = null;
+        graph = new Neo4jGraph("/tmp/data/neo4j");
+        sail = new GraphSail(graph);
+        sail.initialize();
+        RepositoryConnection connection = new
+                SailRepository(sail).getConnection();
+        try {
+            System.out.println("Import the data");
+            System.out.println("Importing data");
+            connection.add(SailTest.class.getResourceAsStream("graph-example-sparql.ttl"), "http://example.org/baseURI/",
+                    RDFFormat.TURTLE);
+            connection.commit();
+            System.out.println("Execute SPARQL query");
+            TupleQuery query =
+                    connection.prepareTupleQuery(QueryLanguage.SPARQL,
+                            "PREFIX ctag: <http://commontag.org/ns#> " +
+                                    "SELECT ?tag ?label " +
+                                    "WHERE { " +
+                                    "?tag ctag:label ?label . " +
+                                    "}");
+            System.out.println("TupleQuery");
+            TupleQueryResult result = query.evaluate();
+            System.out.println("TupleQueryResults:");
+            while (result.hasNext()) {
+                System.out.println(result.next());
+            }
+        } finally {
+            connection.close();
+            sail.shutDown();
+        }
+    }
+    */
+
     @Test
     public void testJoins() throws Exception {
         SPARQLParser parser = new SPARQLParser();
@@ -1466,8 +1503,8 @@ public abstract class SailTest extends TestCase {
         }
     }
 
-    // TODO: concurrency testing ///////////////////////////////////////////////
-    // //////////////////////////////////////////////////////////////////////////
+// TODO: concurrency testing ///////////////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////
 
     private class TestListener implements SailConnectionListener {
         private int added = 0, removed = 0;
