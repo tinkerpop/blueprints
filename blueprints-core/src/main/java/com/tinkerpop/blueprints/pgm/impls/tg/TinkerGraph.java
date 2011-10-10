@@ -151,20 +151,18 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
-        else {
-            String idString = id.toString();
-            return this.vertices.get(idString);
-        }
+            throw new IllegalArgumentException("Element identifier cannot be null");
+
+        String idString = id.toString();
+        return this.vertices.get(idString);
     }
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
-        else {
-            String idString = id.toString();
-            return this.edges.get(idString);
-        }
+            throw new IllegalArgumentException("Element identifier cannot be null");
+
+        String idString = id.toString();
+        return this.edges.get(idString);
     }
 
 

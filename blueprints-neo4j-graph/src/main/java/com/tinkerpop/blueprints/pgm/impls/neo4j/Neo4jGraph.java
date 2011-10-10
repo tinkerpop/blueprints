@@ -221,7 +221,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         try {
             final Long longId;
@@ -233,7 +233,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         } catch (NotFoundException e) {
             return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Neo4j vertex ids must be convertible to a long value", e);
+            return null;
         }
     }
 
@@ -290,7 +290,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         try {
             final Long longId;
@@ -302,7 +302,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         } catch (NotFoundException e) {
             return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Neo4j edge ids must be convertible to a long value", e);
+            return null;
         }
     }
 

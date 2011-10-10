@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+import junit.framework.Assert;
 
 import java.util.HashSet;
 import java.util.List;
@@ -132,13 +133,19 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testGetNonExistantEdges() {
         Graph graph = graphTest.getGraphInstance();
-        try {
-            assertNull(graph.getEdge(null));
+
+        if (!graphTest.isRDFModel) {
+            try {
+                graph.getEdge(null);
+                fail("Getting an element with a null identifier must throw IllegalArgumentException");
+            } catch (IllegalArgumentException iae) {
+                assertTrue(true);
+            }
+
             assertNull(graph.getEdge("asbv"));
             assertNull(graph.getEdge(12.0d));
-        } catch (Exception e) {
-            assertTrue(true);
         }
+
         graph.shutdown();
     }
 

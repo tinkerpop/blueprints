@@ -180,13 +180,19 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         ORID rid;
         if (id instanceof ORID)
             rid = (ORID) id;
-        else
-            rid = new ORecordId(id.toString());
+        else {
+            try {
+                rid = new ORecordId(id.toString());
+            } catch (IllegalArgumentException iae) {
+                // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be: <cluster-id>:<cluster-position>
+                return null;
+            }
+        }
 
         if (!rid.isValid())
             return null;
@@ -264,13 +270,19 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         final ORID rid;
         if (id instanceof ORID)
             rid = (ORID) id;
-        else
-            rid = new ORecordId(id.toString());
+        else {
+            try {
+                rid = new ORecordId(id.toString());
+            } catch (IllegalArgumentException iae) {
+                // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be: <cluster-id>:<cluster-position>
+                return null;
+            }
+        }
 
         final ODocument doc = getRawGraph().load(rid);
         if (doc != null) {

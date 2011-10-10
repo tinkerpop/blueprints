@@ -82,7 +82,7 @@ public class RexsterGraph implements IndexableGraph {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         try {
             return new RexsterVertex(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(id)), this);
@@ -94,7 +94,7 @@ public class RexsterGraph implements IndexableGraph {
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         try {
             return new RexsterEdge(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id)), this);

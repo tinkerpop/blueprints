@@ -157,8 +157,13 @@ public class SailGraph implements TransactionalGraph {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
+            throw new IllegalArgumentException("Element identifier cannot be null");
+
+        try {
+            return createVertex(id.toString());
+        } catch (RuntimeException re) {
             return null;
-        return createVertex(id.toString());
+        }
     }
 
     public Edge getEdge(final Object id) {
