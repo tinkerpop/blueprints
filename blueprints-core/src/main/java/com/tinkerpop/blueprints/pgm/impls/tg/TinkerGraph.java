@@ -44,7 +44,10 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         try {
             final File file = new File(directory);
             if (!file.exists()) {
-                file.mkdir();
+                if (!file.mkdirs()) {
+                    throw new RuntimeException("Could not create directory.");
+                }
+
                 this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
                 this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
             } else {

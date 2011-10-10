@@ -23,6 +23,8 @@ h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
 
 * Fixed index consistency issue in @OrientGraph@
 * Added @Neo4jHaGraph@ allowing a more direct way to utilize Neo4j High Availability mode.
+* General API consistency improvements
+** Graphs attempt to create directories structures for graph persistence.
 
 ==<hr/>==
 

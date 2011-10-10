@@ -94,7 +94,16 @@ public class DexGraph implements IndexableGraph {
     public DexGraph(final String fileName) {
         try {
             final File db = new File(fileName);
-            boolean create = !db.exists();
+            final File dbPath = db.getParentFile();
+
+            if (!dbPath.exists()) {
+                if (!dbPath.mkdirs()) {
+                    throw new RuntimeException("Could not create directory.");
+                }
+            }
+
+            final boolean create = !db.exists();
+
             this.db = db;
             //DEX.Config cfg = new DEX.Config();
             //cfg.setCacheMaxSize(0); // use as much memory as possible
@@ -103,7 +112,7 @@ public class DexGraph implements IndexableGraph {
             gpool = (create ? dex.create(db) : dex.open(db));
             session = gpool.newSession();
             rawGraph = session.getDbGraph();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
