@@ -348,4 +348,58 @@ public class IndexableGraphTestSuite extends TestSuite {
 
 
     }
+
+    public void testIndicesPersist() {
+        if (graphTest.isPersistent) {
+            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            Vertex a = graph.addVertex(null);
+            Object aId = a.getId();
+            Vertex b = graph.addVertex(null);
+            Edge e = graph.addEdge(null, a, b, "related");
+            Object eId = e.getId();
+
+            graph.createAutomaticIndex("TEST-AUTO-VERTEX", Vertex.class, null);
+            Index index = graph.createManualIndex("TEST-MANUAL-VERTEX", Vertex.class);
+            index.put("boo", "blop", a);
+            graph.createAutomaticIndex("TEST-AUTO-EDGE", Edge.class, null);
+            index = graph.createManualIndex("TEST-MANUAL-EDGE", Edge.class);
+            index.put("boo", "blop", e);
+
+            if (!graphTest.isRDFModel) {
+                a.setProperty("hello", "josh");
+            }
+            if (!graphTest.isRDFModel) {
+                e.setProperty("hello", "josh");
+            }
+
+            graph.shutdown();
+
+            //// check persistence
+
+            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            assertEquals(graph.getIndex("TEST-AUTO-VERTEX", Vertex.class).getIndexType(), Index.Type.AUTOMATIC);
+            index = graph.getIndex("TEST-AUTO-VERTEX", Vertex.class);
+            if (!graphTest.isRDFModel) {
+                assertEquals(index.count("hello", "josh"), 1);
+                assertEquals(((Element) index.get("hello", "josh").next()).getId(), aId);
+            }
+
+            index = graph.getIndex("TEST-MANUAL-VERTEX", Vertex.class);
+            assertEquals(graph.getIndex("TEST-MANUAL-VERTEX", Vertex.class).getIndexType(), Index.Type.MANUAL);
+            assertEquals(index.get("boo", "blop").next(), a);
+
+
+            index = graph.getIndex("TEST-AUTO-EDGE", Edge.class);
+            assertEquals(graph.getIndex("TEST-AUTO-EDGE", Edge.class).getIndexType(), Index.Type.AUTOMATIC);
+            if (!graphTest.isRDFModel) {
+                assertEquals(index.count("hello", "josh"), 1);
+                assertEquals(((Element) index.get("hello", "josh").next()).getId(), eId);
+            }
+
+            index = graph.getIndex("TEST-MANUAL-EDGE", Edge.class);
+            assertEquals(graph.getIndex("TEST-MANUAL-EDGE", Edge.class).getIndexType(), Index.Type.MANUAL);
+            assertEquals(index.get("boo", "blop").next(), e);
+            graph.shutdown();
+        }
+    }
 }
