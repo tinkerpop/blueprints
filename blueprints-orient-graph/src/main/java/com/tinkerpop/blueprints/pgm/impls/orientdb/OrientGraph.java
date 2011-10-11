@@ -433,6 +433,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             this.threadContext.set(context);
 
             context.rawGraph = new OGraphDatabase(url);
+            context.rawGraph.setUseCustomTypes(false);
 
             if (url.startsWith("remote:") || context.rawGraph.exists()) {
                 context.rawGraph.open(username, password);
