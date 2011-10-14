@@ -1,5 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.Edge;
@@ -8,15 +14,13 @@ import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientVertex extends OrientElement implements Vertex {
+  	public OrientVertex() {
+    	super(null, new ODocument( ODatabaseRecordThreadLocal.INSTANCE.get() ));
+  	}
 
     public OrientVertex(final OrientGraph rawGraph, final ODocument rawVertex) {
         super(rawGraph, rawVertex);

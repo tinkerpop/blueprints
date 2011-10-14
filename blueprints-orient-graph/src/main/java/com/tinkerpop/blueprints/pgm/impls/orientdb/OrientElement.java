@@ -1,19 +1,23 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
+import com.orientechnologies.orient.core.exception.OSerializationException;
 import com.orientechnologies.orient.core.id.ORID;
+import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public abstract class OrientElement implements Element {
+public abstract class OrientElement implements Element, OSerializableStream {
 
     protected static final String LABEL = "label";
     protected final OrientGraph graph;
@@ -137,4 +141,16 @@ public abstract class OrientElement implements Element {
             return false;
         return true;
     }
+
+		@Override
+		public byte[] toStream() throws OSerializationException {
+				return rawElement.getIdentity().toString().getBytes();
+		}
+
+		@Override
+		public OSerializableStream fromStream(byte[] iStream) throws OSerializationException {
+				((ORecordId)rawElement.getIdentity()).fromString( new String(iStream) );
+				rawElement.setInternalStatus(STATUS.NOT_LOADED);
+				return this;
+		}
 }
