@@ -54,6 +54,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
             removeContext();
             context = new OrientGraphContext();
             context.rawGraph = iDatabase;
+            iDatabase.checkForGraphSchema();
             this.threadContext.set(context);
           }
        }

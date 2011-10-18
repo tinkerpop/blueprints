@@ -3,10 +3,12 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
 import com.orientechnologies.orient.core.exception.OSerializationException;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.pgm.Edge;
@@ -17,7 +19,7 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public abstract class OrientElement implements Element, OSerializableStream {
+public abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
 
     protected static final String LABEL = "label";
     protected final OrientGraph graph;
@@ -106,9 +108,7 @@ public abstract class OrientElement implements Element, OSerializableStream {
      * Returns the Element Id assuring to save it if it's transient yet.
      */
     public Object getId() {
-        ORID rid = this.rawElement.getIdentity();
-        this.save();
-        return rid;
+    	  return getIdentity();
     }
 
     protected void save() {
@@ -153,4 +153,35 @@ public abstract class OrientElement implements Element, OSerializableStream {
 				rawElement.setInternalStatus(STATUS.NOT_LOADED);
 				return this;
 		}
+
+		@Override
+		public ORID getIdentity() {
+      ORID rid = this.rawElement.getIdentity();
+      this.save();
+      return rid;
+	}
+
+		@Override
+		public ORecord<?> getRecord() {
+			return this.rawElement;
+		}
+
+		public int compare(final OIdentifiable iFirst, final OIdentifiable iSecond) {
+			if (iFirst == null || iSecond == null)
+				return -1;
+			return iFirst.compareTo(iSecond);
+		}
+
+		public int compareTo(final OIdentifiable iOther) {
+			if (iOther == null)
+				return 1;
+
+			final ORID myRID = getIdentity();
+			final ORID otherRID = iOther.getIdentity();
+			
+			if (myRID == null && otherRID == null)
+				return 0;
+
+			return myRID.compareTo(otherRID);
+		}		
 }
