@@ -27,6 +27,7 @@ h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
 ** Graphs attempt to create directories structures for graph persistence.
 ** GetVertex/Edge throw IllegalArgumentException if passed a null identifier as a parameter.
 ** GetVertex/Edge return null if the element cannot be found, if the identifier does not match the expected format of the underlying graph database or if the underlying graph database throws exceptions during the lookup.
+* RexsterGraph utilizes the @application/vnd.rexster.typed+json@ custom mime type.
 
 ==<hr/>==
 
@@ -52,7 +53,6 @@ h3. Version 1.0 (Blueprints -- September 18, 2011)
 * Fixed a @ConcurrentModificationException@ in @TinkerGraph@ and added respective test cases for all graphs
 * Added @StringFactory.graphString()@ for a unified @String@ representation of a Blueprints graph
 * Added @Neo4jBatchGraph@ to support bulk inserting of graph data into a Neo4j instance
-* RexsterGraph utilizes the @application/vnd.rexster.typed+json@ custom mime type.
 
 ==<hr/>==
 
