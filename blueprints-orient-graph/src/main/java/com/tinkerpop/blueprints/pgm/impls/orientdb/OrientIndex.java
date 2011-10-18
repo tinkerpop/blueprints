@@ -3,7 +3,8 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexTxAwareMultiValue;
-import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.index.OSimpleKeyIndexDefinition;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -138,11 +139,14 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     private void create(final String indexName, final Class<? extends Element> indexClass,
-                        final com.tinkerpop.blueprints.pgm.Index.Type indexType, final OType iKeyType) {
+                        final com.tinkerpop.blueprints.pgm.Index.Type indexType, OType iKeyType) {
         this.indexClass = indexClass;
 
+        if (iKeyType == null)
+            iKeyType = OType.STRING;
+
         // CREATE THE MAP
-        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), iKeyType, null, null, null, true));
+        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(), new OSimpleKeyIndexDefinition(iKeyType), null, null));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))

@@ -22,19 +22,19 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>1.5.M01</version>
+            <version>1.5.M02</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ha</artifactId>
-            <version>1.5.M01</version>
+            <version>1.5.M02</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-management</artifactId>
-            <version>1.5.M01</version>
+            <version>1.5.M02</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
