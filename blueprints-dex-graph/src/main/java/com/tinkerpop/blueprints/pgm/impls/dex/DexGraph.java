@@ -13,7 +13,6 @@ import edu.upc.dama.dex.core.DEX;
 import edu.upc.dama.dex.core.Objects;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

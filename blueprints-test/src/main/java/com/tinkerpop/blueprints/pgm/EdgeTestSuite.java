@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
-import junit.framework.Assert;
 
 import java.util.HashSet;
 import java.util.List;
