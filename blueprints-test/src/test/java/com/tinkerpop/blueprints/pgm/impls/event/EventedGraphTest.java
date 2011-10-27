@@ -128,4 +128,58 @@ public class EventedGraphTest extends BaseTest {
         assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
         assertEquals(index.getIndexName(), Index.VERTICES);
     }
+
+    public void testFireEdgeAdded() {
+        EventGraph graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
+        StubGraphChangedListener graphChangedListener = new StubGraphChangedListener();
+        graph.addListener(graphChangedListener);
+
+        Vertex v1 = graph.addVertex(null);
+        Vertex v2 = graph.addVertex(null);
+
+        Edge edge = graph.addEdge(null, v1, v2, "knows");
+
+        assertTrue(graphChangedListener.addEdgeEventRecorded());
+
+        graphChangedListener.reset();
+
+        graph.getEdge(edge.getId());
+
+        assertFalse(graphChangedListener.addEdgeEventRecorded());
+
+    }
+
 }
+
+class StubGraphChangedListener implements GraphChangedListener {
+    private boolean addEdgeEvent = false;
+
+    public void vertexAdded(Vertex vertex) {}
+
+    public void vertexPropertyChanged(Vertex vertex, String s, Object o) {}
+
+    public void vertexPropertyRemoved(Vertex vertex, String s, Object o) {}
+
+    public void vertexRemoved(Vertex vertex) {}
+
+    public void edgeAdded(Edge edge) {
+        addEdgeEvent = true;
+    }
+
+    public void edgePropertyChanged(Edge edge, String s, Object o) {}
+
+    public void edgePropertyRemoved(Edge edge, String s, Object o) {}
+
+    public void edgeRemoved(Edge edge) {}
+
+    public void graphCleared() {}
+
+    public boolean addEdgeEventRecorded() {
+        return addEdgeEvent;
+    }
+
+    public void reset() {
+        addEdgeEvent = false;
+    }
+}
+
