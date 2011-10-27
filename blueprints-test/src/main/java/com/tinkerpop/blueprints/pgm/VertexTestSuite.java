@@ -34,6 +34,7 @@ public class VertexTestSuite extends TestSuite {
 
         this.stopWatch();
         Vertex v = graph.addVertex(null);
+        assertFalse(v.equals(null));
         Vertex u = graph.getVertex(v.getId());
         printPerformance(graph.toString(), 1, "vertex added and retrieved", this.stopWatch());
 

@@ -104,6 +104,6 @@ public abstract class Neo4jElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+        return (null != object) && (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
     }
 }

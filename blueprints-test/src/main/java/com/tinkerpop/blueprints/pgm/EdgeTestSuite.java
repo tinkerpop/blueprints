@@ -27,6 +27,7 @@ public class EdgeTestSuite extends TestSuite {
         Vertex v = graph.addVertex(convertId(ids.get(0)));
         Vertex u = graph.addVertex(convertId(ids.get(1)));
         Edge e = graph.addEdge(null, v, u, convertId("test_label"));
+        assertFalse(e.equals(null));
         assertEquals(e, v.getOutEdges().iterator().next());
         assertEquals(e, u.getInEdges().iterator().next());
         assertEquals(v.getOutEdges().iterator().next(), u.getInEdges().iterator().next());
