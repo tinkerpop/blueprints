@@ -1,0 +1,18 @@
+package com.tinkerpop.blueprints.pgm.impls.event.tx;
+
+import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
+
+import java.util.Iterator;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: toby.orourke
+ * Date: 28/10/2011
+ * Time: 15:32
+ * To change this template use File | Settings | File Templates.
+ */
+abstract class Event {
+
+    public abstract void fireEvent(Iterator<GraphChangedListener> eventListeners);
+
+}

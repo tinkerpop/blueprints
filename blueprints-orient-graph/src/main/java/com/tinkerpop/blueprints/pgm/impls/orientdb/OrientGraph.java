@@ -10,13 +10,7 @@ import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
@@ -39,6 +33,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private String password;
 
     private final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
+    private TransactionStatusCallback transactionStatusCallback;
 
     static {
         //OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(false);
@@ -337,6 +332,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         this.createAutomaticIndex(Index.EDGES, OrientEdge.class, null);
     }
 
+    @Override
+    public void registerAutoStopCallback(TransactionStatusCallback callback) {
+        this.transactionStatusCallback = callback;
+    }
+
     public void shutdown() {
         removeContext();
 
@@ -358,6 +358,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
         if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             context.rawGraph.begin();
+            if (transactionStatusCallback != null) transactionStatusCallback.start();
         } else
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
     }
@@ -365,8 +366,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     public void stopTransaction(final Conclusion conclusion) {
         if (conclusion == Conclusion.FAILURE) {
             this.getRawGraph().rollback();
-        } else
+            if (transactionStatusCallback != null) transactionStatusCallback.failure();
+        } else {
             this.getRawGraph().commit();
+            if (transactionStatusCallback != null) transactionStatusCallback.success();
+        }
         this.getContext(true).txCounter = 0;
     }
 
@@ -393,6 +397,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (context.txBuffer > 0) {
             if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
                 context.rawGraph.begin();
+                if (transactionStatusCallback != null) transactionStatusCallback.start();
             }
         }
     }
@@ -405,10 +410,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
                 final OGraphDatabase db = getRawGraph();
                 db.rollback();
                 context.txCounter = 0;
+                if (transactionStatusCallback != null) transactionStatusCallback.failure();
             } else if (context.txCounter % context.txBuffer == 0) {
                 final OGraphDatabase db = getRawGraph();
                 db.commit();
                 context.txCounter = 0;
+                if (transactionStatusCallback != null) transactionStatusCallback.success();
             }
         }
     }
