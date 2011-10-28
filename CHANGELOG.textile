@@ -28,6 +28,7 @@ h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
 ** GetVertex/Edge throw IllegalArgumentException if passed a null identifier as a parameter.
 ** GetVertex/Edge return null if the element cannot be found, if the identifier does not match the expected format of the underlying graph database or if the underlying graph database throws exceptions during the lookup.
 * RexsterGraph utilizes the @application/vnd.rexster.typed+json@ custom mime type.
+* The EventGraph addEdge method now properly fires the onEdgeAdded event with improved test cases.
 
 ==<hr/>==
 
