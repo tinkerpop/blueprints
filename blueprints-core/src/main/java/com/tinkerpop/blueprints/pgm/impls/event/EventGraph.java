@@ -138,6 +138,7 @@ public class EventGraph implements Graph {
         if (edge == null) {
             return null;
         } else {
+            this.onEdgeAdded(edge);
             return new EventEdge(edge, this.graphChangedListeners);
         }
     }
@@ -147,7 +148,6 @@ public class EventGraph implements Graph {
         if (edge == null) {
             return null;
         } else {
-            this.onEdgeAdded(edge);
             return new EventEdge(edge, this.graphChangedListeners);
         }
     }

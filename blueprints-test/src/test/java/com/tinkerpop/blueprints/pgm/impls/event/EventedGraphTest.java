@@ -18,8 +18,17 @@ import java.util.Set;
 
 public class EventedGraphTest extends BaseTest {
 
+    private StubGraphChangedListener graphChangedListener;
+    private EventGraph graph;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        graphChangedListener = new StubGraphChangedListener();
+        graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
+    }
+
     public void testWrappedElementUniqueness() {
-        EventGraph graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
         graph.addListener(new ConsoleGraphChangedListener(graph));
 
         assertEquals(graph.getVertex(1), graph.getVertex(1));
@@ -32,7 +41,6 @@ public class EventedGraphTest extends BaseTest {
     }
 
     public void testEventedGraph() {
-        EventGraph graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
         graph.addListener(new ConsoleGraphChangedListener(graph));
         assertTrue(graph.getVertices() instanceof EventVertexSequence);
         assertTrue(graph.getEdges() instanceof EventEdgeSequence);
@@ -51,7 +59,6 @@ public class EventedGraphTest extends BaseTest {
     }
 
     public void testEventedElement() {
-        EventGraph graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
         graph.addListener(new ConsoleGraphChangedListener(graph));
         for (Vertex vertex : graph.getVertices()) {
             assertTrue(vertex instanceof EventVertex);
@@ -76,7 +83,7 @@ public class EventedGraphTest extends BaseTest {
     }
 
     public void testManageListeners() {
-        EventGraph graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
+        EventGraph graph = this.graph;
         ConsoleGraphChangedListener listener1 = new ConsoleGraphChangedListener(graph);
         ConsoleGraphChangedListener listener2 = new ConsoleGraphChangedListener(graph);
         graph.addListener(listener1);
@@ -128,4 +135,123 @@ public class EventedGraphTest extends BaseTest {
         assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
         assertEquals(index.getIndexName(), Index.VERTICES);
     }
+
+    public void testFireVertexAdded(){
+        graph.addListener(graphChangedListener);
+
+        Vertex vertex = createVertex();
+
+        assertTrue(graphChangedListener.addVertexEventRecorded());
+
+        graphChangedListener.reset();
+
+        graph.getVertex(vertex.getId());
+
+        assertFalse(graphChangedListener.addVertexEventRecorded());
+    }
+
+    public void testFireVertexPropertyChanged(){
+        graph.addListener(graphChangedListener);
+
+        Vertex vertex = createVertex();
+        vertex.setProperty("name", "marko");
+
+        assertTrue(graphChangedListener.vertexPropertyChangedEventRecorded());
+
+        graphChangedListener.reset();
+
+        vertex.getProperty("name");
+
+        assertFalse(graphChangedListener.vertexPropertyChangedEventRecorded());
+    }
+
+    public void testFireVertexPropertyRemoved(){
+        graph.addListener(graphChangedListener);
+
+        Vertex vertex = createVertex();
+        vertex.setProperty("name", "marko");
+        vertex.removeProperty("name");
+
+        assertTrue(graphChangedListener.vertexPropertyRemovedEventRecorded());
+    }
+
+    public void testFireVertexRemoved(){
+        graph.addListener(graphChangedListener);
+
+        Vertex vertex = createVertex();
+        graph.removeVertex(vertex);
+
+        assertTrue(graphChangedListener.vertexRemovedEventRecorded());
+    }
+
+    public void testFireEdgeAdded() {
+        graph.addListener(graphChangedListener);
+
+        Edge edge = createEdge();
+
+        assertTrue(graphChangedListener.addEdgeEventRecorded());
+
+        graphChangedListener.reset();
+
+        graph.getEdge(edge.getId());
+
+        assertFalse(graphChangedListener.addEdgeEventRecorded());
+
+    }
+
+    public void testFireEdgePropertyChanged(){
+        graph.addListener(graphChangedListener);
+
+        Edge edge = createEdge();
+
+        edge.setProperty("weight", System.currentTimeMillis());
+
+        assertTrue(graphChangedListener.edgePropertyChangedEventRecorded());
+
+        graphChangedListener.reset();
+
+        edge.getProperty("weight");
+
+        assertFalse(graphChangedListener.edgePropertyChangedEventRecorded());
+    }
+
+    public void testFireEdgePropertyRemoved(){
+        graph.addListener(graphChangedListener);
+
+        Edge edge = createEdge();
+
+        edge.setProperty("weight", System.currentTimeMillis());
+
+        edge.removeProperty("weight");
+
+        assertTrue(graphChangedListener.edgePropertyRemovedEventRecorded());
+    }
+
+    public void testFireEdgeRemoved(){
+        graph.addListener(graphChangedListener);
+
+        Edge edge = createEdge();
+
+        graph.removeEdge(edge);
+
+        assertTrue(graphChangedListener.edgeRemovedEventRecorded());
+    }
+
+    public void testFireGraphCleared(){
+        graph.addListener(graphChangedListener);
+
+        graph.clear();
+
+        assertTrue(graphChangedListener.graphClearedEventRecorded());
+    }
+
+    private Edge createEdge() {
+        return graph.addEdge(null, createVertex(), createVertex(), "knows");
+    }
+
+    private Vertex createVertex() {
+        return graph.addVertex(null);
+    }
+
 }
+
