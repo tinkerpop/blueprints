@@ -9,13 +9,6 @@ import com.tinkerpop.blueprints.pgm.impls.event.tx.Event;
 
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: toby.orourke
- * Date: 28/10/2011
- * Time: 12:01
- * To change this template use File | Settings | File Templates.
- */
 public class EventTransactionalEdge extends EventEdge implements Edge {
     private final ThreadLocal<List<Event>> eventBuffer;
 

@@ -9,13 +9,6 @@ import com.tinkerpop.blueprints.pgm.impls.event.tx.VertexPropertyRemovedEvent;
 
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: toby.orourke
- * Date: 28/10/2011
- * Time: 11:26
- * To change this template use File | Settings | File Templates.
- */
 public class EventTransactionalVertex extends EventVertex implements Vertex {
 
 

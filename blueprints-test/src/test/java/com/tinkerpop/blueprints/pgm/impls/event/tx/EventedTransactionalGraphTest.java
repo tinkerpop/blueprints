@@ -6,17 +6,9 @@ import com.tinkerpop.blueprints.pgm.TransactionStatusCallback;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.StubGraphChangedListener;
-import com.tinkerpop.blueprints.pgm.impls.event.tx.EventTransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: toby.orourke
- * Date: 28/10/2011
- * Time: 12:14
- * To change this template use File | Settings | File Templates.
- */
 public class EventedTransactionalGraphTest extends BaseTest {
 
     private StubGraphChangedListener graphChangedListener;

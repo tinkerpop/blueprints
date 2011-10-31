@@ -8,16 +8,13 @@ import com.tinkerpop.blueprints.pgm.impls.event.EventVertex;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: toby.orourke
- * Date: 28/10/2011
- * Time: 10:27
- * To change this template use File | Settings | File Templates.
- */
 public class EventTransactionalGraph extends EventGraph implements TransactionalGraph{
 
-    ThreadLocal<List<Event>> eventBuffer = new ThreadLocal<List<Event>>();
+    ThreadLocal<List<Event>> eventBuffer = new ThreadLocal<List<Event>>(){
+        protected List<Event> initialValue() {
+            return new LinkedList<Event>();
+        }
+    };
 
 
     public EventTransactionalGraph(final TransactionalGraph graph) {
@@ -26,7 +23,7 @@ public class EventTransactionalGraph extends EventGraph implements Transactional
 
             @Override
             public void success() {
-                for (Event event : getEventBuffer()) {
+                for (Event event : eventBuffer.get()) {
                     event.fireEvent(getListenerIterator());
                 }
                 eventBuffer.set(new LinkedList<Event>());
@@ -39,9 +36,7 @@ public class EventTransactionalGraph extends EventGraph implements Transactional
 
             @Override
             public void start() {
-                if (getEventBuffer() == null) {
-                    eventBuffer.set(new LinkedList<Event>());
-                }
+                eventBuffer.get();
             }
         });
     }
@@ -58,19 +53,12 @@ public class EventTransactionalGraph extends EventGraph implements Transactional
 
     @Override
     protected void onVertexAdded(Vertex vertex) {
-        getEventBuffer().add(new VertexAddedEvent(vertex));
+        eventBuffer.get().add(new VertexAddedEvent(vertex));
     }
 
     @Override
     protected void onEdgeAdded(Edge edge) {
-        getEventBuffer().add(new EdgeAddedEvent(edge));
-    }
-
-    private List<Event> getEventBuffer() {
-        if (eventBuffer.get() == null) {
-            eventBuffer.set(new LinkedList<Event>());
-        }
-        return eventBuffer.get();
+        eventBuffer.get().add(new EdgeAddedEvent(edge));
     }
 
 

@@ -1,19 +1,11 @@
 package com.tinkerpop.blueprints.pgm.impls.event.tx;
 
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.event.Event;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
 
-/**
- * Created by IntelliJ IDEA.
- * User: toby.orourke
- * Date: 28/10/2011
- * Time: 15:31
- * To change this template use File | Settings | File Templates.
- */
-abstract class VertexPropertyEvent extends Event {
+public abstract class VertexPropertyEvent implements Event {
 
     private final Vertex vertex;
     private final String key;
