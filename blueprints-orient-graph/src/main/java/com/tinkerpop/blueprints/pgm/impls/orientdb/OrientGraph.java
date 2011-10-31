@@ -33,7 +33,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private String password;
 
     private final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
-    private TransactionStatusCallback transactionStatusCallback;
+    private TransactionLifecycleCallback transactionLifecycleCallback;
 
     static {
         //OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(false);
@@ -333,8 +333,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     @Override
-    public void registerAutoStopCallback(TransactionStatusCallback callback) {
-        this.transactionStatusCallback = callback;
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback) {
+        this.transactionLifecycleCallback = callback;
     }
 
     public void shutdown() {
@@ -358,7 +358,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
         if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             context.rawGraph.begin();
-            if (transactionStatusCallback != null) transactionStatusCallback.start();
+            if (transactionLifecycleCallback != null) transactionLifecycleCallback.start();
         } else
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
     }
@@ -366,10 +366,10 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     public void stopTransaction(final Conclusion conclusion) {
         if (conclusion == Conclusion.FAILURE) {
             this.getRawGraph().rollback();
-            if (transactionStatusCallback != null) transactionStatusCallback.failure();
+            if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
         } else {
             this.getRawGraph().commit();
-            if (transactionStatusCallback != null) transactionStatusCallback.success();
+            if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
         }
         this.getContext(true).txCounter = 0;
     }
@@ -397,7 +397,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         if (context.txBuffer > 0) {
             if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
                 context.rawGraph.begin();
-                if (transactionStatusCallback != null) transactionStatusCallback.start();
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.start();
             }
         }
     }
@@ -410,12 +410,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
                 final OGraphDatabase db = getRawGraph();
                 db.rollback();
                 context.txCounter = 0;
-                if (transactionStatusCallback != null) transactionStatusCallback.failure();
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
             } else if (context.txCounter % context.txBuffer == 0) {
                 final OGraphDatabase db = getRawGraph();
                 db.commit();
                 context.txCounter = 0;
-                if (transactionStatusCallback != null) transactionStatusCallback.success();
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
             }
         }
     }

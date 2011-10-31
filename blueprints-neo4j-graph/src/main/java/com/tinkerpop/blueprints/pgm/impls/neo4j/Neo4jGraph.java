@@ -51,7 +51,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     protected Map<String, Neo4jIndex> indices = new HashMap<String, Neo4jIndex>();
     protected Map<String, Neo4jAutomaticIndex<Neo4jVertex, Node>> automaticVertexIndices = new HashMap<String, Neo4jAutomaticIndex<Neo4jVertex, Node>>();
     protected Map<String, Neo4jAutomaticIndex<Neo4jEdge, Relationship>> automaticEdgeIndices = new HashMap<String, Neo4jAutomaticIndex<Neo4jEdge, Relationship>>();
-    private TransactionStatusCallback transactionStatusCallback;
+    private TransactionLifecycleCallback transactionLifecycleCallback;
 
 
     public Neo4jGraph(final String directory) {
@@ -332,11 +332,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
         if (conclusion == Conclusion.SUCCESS) {
             tx.get().success();
-            if (transactionStatusCallback != null) transactionStatusCallback.success();
+            if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
         }
         else {
             tx.get().failure();
-            if (transactionStatusCallback != null) transactionStatusCallback.failure();
+            if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
         }
         tx.get().finish();
         tx.remove();
@@ -408,8 +408,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     @Override
-    public void registerAutoStopCallback(TransactionStatusCallback callback) {
-        this.transactionStatusCallback = callback;
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback) {
+        this.transactionLifecycleCallback = callback;
     }
 
     protected void autoStartTransaction() {
@@ -423,7 +423,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     private void beginTx() {
         tx.set(this.rawGraph.beginTx());
         txCounter.set(0);
-        if (transactionStatusCallback != null) transactionStatusCallback.start();
+        if (transactionLifecycleCallback != null) transactionLifecycleCallback.start();
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
@@ -434,13 +434,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 tx.get().finish();
                 tx.remove();
                 txCounter.set(0);
-                if (transactionStatusCallback != null) transactionStatusCallback.failure();
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
             } else if (this.txCounter.get() % this.txBuffer.get() == 0) {
                 tx.get().success();
                 tx.get().finish();
                 tx.remove();
                 txCounter.set(0);
-                if (transactionStatusCallback != null) transactionStatusCallback.success();
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
             }
         }
     }

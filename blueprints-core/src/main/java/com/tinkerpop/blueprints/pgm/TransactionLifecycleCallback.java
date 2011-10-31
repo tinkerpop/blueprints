@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.pgm;
 
-public interface TransactionStatusCallback {
+public interface TransactionLifecycleCallback {
 
     public void success();
 

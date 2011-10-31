@@ -76,5 +76,5 @@ public interface TransactionalGraph extends Graph {
     /**
      * Register an autotransaction callback so that events can be dealt with properly
      */
-    public void registerAutoStopCallback(TransactionStatusCallback callback);
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback);
 }

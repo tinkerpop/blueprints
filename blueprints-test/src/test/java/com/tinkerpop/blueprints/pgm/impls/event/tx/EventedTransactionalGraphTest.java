@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.event.tx;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.TransactionStatusCallback;
+import com.tinkerpop.blueprints.pgm.TransactionLifecycleCallback;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.event.StubGraphChangedListener;
@@ -174,7 +174,7 @@ public class EventedTransactionalGraphTest extends BaseTest {
 class TinkerTransactionalGraph extends TinkerGraph implements TransactionalGraph {
 
     private TinkerGraph graph;
-    private TransactionStatusCallback transactionStatusCallback;
+    private TransactionLifecycleCallback transactionLifecycleCallback;
     private int bufferSize;
     private int bufferCount = 0;
 
@@ -199,15 +199,15 @@ class TinkerTransactionalGraph extends TinkerGraph implements TransactionalGraph
 
     @Override
     public void startTransaction() {
-        if (transactionStatusCallback != null)  transactionStatusCallback.start();
+        if (transactionLifecycleCallback != null)  transactionLifecycleCallback.start();
     }
 
     @Override
     public void stopTransaction(Conclusion conclusion) {
         if(Conclusion.SUCCESS.equals(conclusion)) {
-            if (transactionStatusCallback != null)  transactionStatusCallback.success();
+            if (transactionLifecycleCallback != null)  transactionLifecycleCallback.success();
         } else {
-            if (transactionStatusCallback != null)  transactionStatusCallback.failure();
+            if (transactionLifecycleCallback != null)  transactionLifecycleCallback.failure();
         }
     }
 
@@ -222,8 +222,8 @@ class TinkerTransactionalGraph extends TinkerGraph implements TransactionalGraph
     }
 
     @Override
-    public void registerAutoStopCallback(TransactionStatusCallback callback) {
-        this.transactionStatusCallback = callback;
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback) {
+        this.transactionLifecycleCallback = callback;
     }
 }
 

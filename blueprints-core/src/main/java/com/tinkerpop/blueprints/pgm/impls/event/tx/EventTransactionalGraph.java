@@ -19,19 +19,19 @@ public class EventTransactionalGraph extends EventGraph implements Transactional
 
     public EventTransactionalGraph(final TransactionalGraph graph) {
         super(graph);
-        graph.registerAutoStopCallback(new TransactionStatusCallback() {
+        graph.registerTransactionLifecyleCallback(new TransactionLifecycleCallback() {
 
             @Override
             public void success() {
                 for (Event event : eventBuffer.get()) {
                     event.fireEvent(getListenerIterator());
                 }
-                eventBuffer.set(new LinkedList<Event>());
+                resetEventBuffer();
             }
 
             @Override
             public void failure() {
-                eventBuffer.set(new LinkedList<Event>());
+                resetEventBuffer();
             }
 
             @Override
@@ -39,6 +39,10 @@ public class EventTransactionalGraph extends EventGraph implements Transactional
                 eventBuffer.get();
             }
         });
+    }
+
+    private void resetEventBuffer() {
+        eventBuffer.set(new LinkedList<Event>());
     }
 
     @Override
@@ -88,8 +92,8 @@ public class EventTransactionalGraph extends EventGraph implements Transactional
     }
 
     @Override
-    public void registerAutoStopCallback(TransactionStatusCallback callback) {
-        ((TransactionalGraph) super.getRawGraph()).registerAutoStopCallback(callback);
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback) {
+        ((TransactionalGraph) super.getRawGraph()).registerTransactionLifecyleCallback(callback);
     }
 }
 
