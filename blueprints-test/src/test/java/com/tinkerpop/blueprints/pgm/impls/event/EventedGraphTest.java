@@ -136,7 +136,7 @@ public class EventedGraphTest extends BaseTest {
         assertEquals(index.getIndexName(), Index.VERTICES);
     }
 
-    public void testFireVertexAdded(){
+    public void testFireVertexAdded() {
         graph.addListener(graphChangedListener);
 
         Vertex vertex = createVertex();
@@ -150,7 +150,7 @@ public class EventedGraphTest extends BaseTest {
         assertFalse(graphChangedListener.addVertexEventRecorded());
     }
 
-    public void testFireVertexPropertyChanged(){
+    public void testFireVertexPropertyChanged() {
         graph.addListener(graphChangedListener);
 
         Vertex vertex = createVertex();
@@ -165,7 +165,7 @@ public class EventedGraphTest extends BaseTest {
         assertFalse(graphChangedListener.vertexPropertyChangedEventRecorded());
     }
 
-    public void testFireVertexPropertyRemoved(){
+    public void testFireVertexPropertyRemoved() {
         graph.addListener(graphChangedListener);
 
         Vertex vertex = createVertex();
@@ -175,7 +175,7 @@ public class EventedGraphTest extends BaseTest {
         assertTrue(graphChangedListener.vertexPropertyRemovedEventRecorded());
     }
 
-    public void testFireVertexRemoved(){
+    public void testFireVertexRemoved() {
         graph.addListener(graphChangedListener);
 
         Vertex vertex = createVertex();
@@ -199,7 +199,7 @@ public class EventedGraphTest extends BaseTest {
 
     }
 
-    public void testFireEdgePropertyChanged(){
+    public void testFireEdgePropertyChanged() {
         graph.addListener(graphChangedListener);
 
         Edge edge = createEdge();
@@ -215,7 +215,7 @@ public class EventedGraphTest extends BaseTest {
         assertFalse(graphChangedListener.edgePropertyChangedEventRecorded());
     }
 
-    public void testFireEdgePropertyRemoved(){
+    public void testFireEdgePropertyRemoved() {
         graph.addListener(graphChangedListener);
 
         Edge edge = createEdge();
@@ -227,7 +227,7 @@ public class EventedGraphTest extends BaseTest {
         assertTrue(graphChangedListener.edgePropertyRemovedEventRecorded());
     }
 
-    public void testFireEdgeRemoved(){
+    public void testFireEdgeRemoved() {
         graph.addListener(graphChangedListener);
 
         Edge edge = createEdge();
@@ -237,7 +237,7 @@ public class EventedGraphTest extends BaseTest {
         assertTrue(graphChangedListener.edgeRemovedEventRecorded());
     }
 
-    public void testFireGraphCleared(){
+    public void testFireGraphCleared() {
         graph.addListener(graphChangedListener);
 
         graph.clear();

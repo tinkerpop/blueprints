@@ -36,7 +36,7 @@ public class StubGraphChangedListener implements GraphChangedListener {
     }
 
     public void vertexPropertyRemoved(Vertex vertex, String s, Object o) {
-         vertexPropertyRemovedEvent = true;
+        vertexPropertyRemovedEvent = true;
     }
 
     public void vertexRemoved(Vertex vertex) {
