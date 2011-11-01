@@ -5,6 +5,8 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedVertexSequence;
 
 import java.util.Iterator;
 

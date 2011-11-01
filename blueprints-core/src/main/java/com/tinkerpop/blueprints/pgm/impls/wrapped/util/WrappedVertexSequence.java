@@ -1,18 +1,19 @@
-package com.tinkerpop.blueprints.pgm.impls.wrapped;
+package com.tinkerpop.blueprints.pgm.impls.wrapped.util;
 
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
-import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.wrapped.WrappedVertex;
 
 import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedEdgeSequence implements CloseableSequence<Edge> {
+public class WrappedVertexSequence implements CloseableSequence<Vertex> {
 
-    private final Iterator<Edge> itty;
+    private final Iterator<Vertex> itty;
 
-    public WrappedEdgeSequence(final Iterator<Edge> itty) {
+    public WrappedVertexSequence(final Iterator<Vertex> itty) {
         this.itty = itty;
     }
 
@@ -24,11 +25,11 @@ public class WrappedEdgeSequence implements CloseableSequence<Edge> {
         return this.itty.hasNext();
     }
 
-    public Edge next() {
-        return new WrappedEdge(itty.next());
+    public Vertex next() {
+        return new WrappedVertex(itty.next());
     }
 
-    public Iterator<Edge> iterator() {
+    public Iterator<Vertex> iterator() {
         return this;
     }
 

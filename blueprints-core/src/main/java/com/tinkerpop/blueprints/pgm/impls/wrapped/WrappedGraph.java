@@ -4,6 +4,8 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedVertexSequence;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.wrapped;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedEdgeSequence;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
