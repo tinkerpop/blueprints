@@ -17,4 +17,9 @@ public class WrappedAutomaticIndex<T extends Element> extends WrappedIndex<T> im
     public Set<String> getAutoIndexKeys() {
         return ((AutomaticIndex<T>) this.rawIndex).getAutoIndexKeys();
     }
+
+    public Type getIndexType() {
+        return Type.AUTOMATIC;
+    }
 }
+

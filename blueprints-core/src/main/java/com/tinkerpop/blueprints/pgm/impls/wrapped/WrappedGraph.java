@@ -66,6 +66,10 @@ public class WrappedGraph implements Graph {
         this.rawGraph.removeVertex(((WrappedVertex) vertex).getRawVertex());
     }
 
+    public Graph getRawGraph() {
+        return this.rawGraph;
+    }
+
     public String toString() {
         return StringFactory.graphString(this, this.rawGraph.toString());
     }
