@@ -72,4 +72,9 @@ public interface TransactionalGraph extends Graph {
      * This method is not under transaction support. A clear will clear the graph and finalize the operation.
      */
     public void clear();
+
+    /**
+     * Register an autotransaction callback so that events can be dealt with properly
+     */
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback);
 }

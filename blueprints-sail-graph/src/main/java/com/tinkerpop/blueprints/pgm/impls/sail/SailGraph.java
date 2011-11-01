@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.TransactionLifecycleCallback;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
@@ -51,6 +52,8 @@ import java.util.UUID;
 public class SailGraph implements TransactionalGraph {
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
+    private TransactionLifecycleCallback transactionLifecycleCallback;
+
 
     static {
         formats.put("rdf-xml", RDFFormat.RDFXML);
@@ -326,6 +329,11 @@ public class SailGraph implements TransactionalGraph {
         }
     }
 
+    @Override
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback) {
+        this.transactionLifecycleCallback = callback;
+    }
+
     private synchronized SailConnection createConnection() throws SailException {
         cleanupConnections();
         final SailConnection sc = rawGraph.getConnection();
@@ -412,14 +420,17 @@ public class SailGraph implements TransactionalGraph {
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
         inTransaction.set(Boolean.TRUE);
         this.txCounter.set(0);
+        if (transactionLifecycleCallback != null) transactionLifecycleCallback.start();
     }
 
     public void stopTransaction(final Conclusion conclusion) {
         try {
             if (Conclusion.SUCCESS == conclusion) {
                 this.sailConnection.get().commit();
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
             } else {
                 this.sailConnection.get().rollback();
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
             }
             this.inTransaction.set(Boolean.FALSE);
             this.txCounter.set(0);
@@ -436,10 +447,12 @@ public class SailGraph implements TransactionalGraph {
                     this.sailConnection.get().rollback();
                     txCounter.set(0);
                     inTransaction.set(Boolean.FALSE);
+                    if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
                 } else if (this.txCounter.get() % this.txBuffer.get() == 0) {
                     this.sailConnection.get().commit();
                     txCounter.set(0);
                     inTransaction.set(Boolean.FALSE);
+                    if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
                 }
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);

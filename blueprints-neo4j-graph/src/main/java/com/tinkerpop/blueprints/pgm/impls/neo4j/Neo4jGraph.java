@@ -1,12 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -57,6 +51,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     protected Map<String, Neo4jIndex> indices = new HashMap<String, Neo4jIndex>();
     protected Map<String, Neo4jAutomaticIndex<Neo4jVertex, Node>> automaticVertexIndices = new HashMap<String, Neo4jAutomaticIndex<Neo4jVertex, Node>>();
     protected Map<String, Neo4jAutomaticIndex<Neo4jEdge, Relationship>> automaticEdgeIndices = new HashMap<String, Neo4jAutomaticIndex<Neo4jEdge, Relationship>>();
+    private TransactionLifecycleCallback transactionLifecycleCallback;
 
 
     public Neo4jGraph(final String directory) {
@@ -324,8 +319,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public void startTransaction() {
         if (tx.get() == null) {
-            txCounter.set(0);
-            tx.set(this.rawGraph.beginTx());
+            beginTx();
         } else
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
     }
@@ -336,11 +330,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             return;
         }
 
-        if (conclusion == Conclusion.SUCCESS)
+        if (conclusion == Conclusion.SUCCESS) {
             tx.get().success();
-        else
+            if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
+        }
+        else {
             tx.get().failure();
-
+            if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
+        }
         tx.get().finish();
         tx.remove();
         txCounter.set(0);
@@ -410,13 +407,23 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
+    @Override
+    public void registerTransactionLifecyleCallback(TransactionLifecycleCallback callback) {
+        this.transactionLifecycleCallback = callback;
+    }
+
     protected void autoStartTransaction() {
         if (this.txBuffer.get() > 0) {
             if (tx.get() == null) {
-                tx.set(this.rawGraph.beginTx());
-                txCounter.set(0);
+                beginTx();
             }
         }
+    }
+
+    private void beginTx() {
+        tx.set(this.rawGraph.beginTx());
+        txCounter.set(0);
+        if (transactionLifecycleCallback != null) transactionLifecycleCallback.start();
     }
 
     protected void autoStopTransaction(final Conclusion conclusion) {
@@ -427,11 +434,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 tx.get().finish();
                 tx.remove();
                 txCounter.set(0);
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.failure();
             } else if (this.txCounter.get() % this.txBuffer.get() == 0) {
                 tx.get().success();
                 tx.get().finish();
                 tx.remove();
                 txCounter.set(0);
+                if (transactionLifecycleCallback != null) transactionLifecycleCallback.success();
             }
         }
     }
