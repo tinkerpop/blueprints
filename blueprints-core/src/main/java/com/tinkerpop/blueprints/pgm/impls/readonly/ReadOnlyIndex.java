@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyVertexSequence;
 
@@ -54,7 +55,7 @@ public class ReadOnlyIndex<T extends Element> implements Index<T> {
     }
 
     public String toString() {
-        return "(readonly)" + this.rawIndex.toString();
+        return StringFactory.indexString(this);
     }
 
 }

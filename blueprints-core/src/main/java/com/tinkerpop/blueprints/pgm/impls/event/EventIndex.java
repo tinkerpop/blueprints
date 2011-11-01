@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.event.util.EventVertexSequence;
@@ -61,7 +62,7 @@ public class EventIndex<T extends Element> implements Index<T> {
     }
 
     public String toString() {
-        return "(event)" + this.rawIndex.toString();
+        return StringFactory.indexString(this);
     }
 
 }

@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedVertexSequence;
 
@@ -50,5 +51,9 @@ public class WrappedIndex<T extends Element> implements Index<T> {
             return (CloseableSequence<T>) new WrappedVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator());
         else
             return (CloseableSequence<T>) new WrappedEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator());
+    }
+
+    public String toString() {
+        return StringFactory.indexString(this);
     }
 }
