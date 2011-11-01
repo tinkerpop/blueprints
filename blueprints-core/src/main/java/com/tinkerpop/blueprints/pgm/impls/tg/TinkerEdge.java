@@ -48,7 +48,7 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
     }
 
     public boolean equals(final Object object) {
-        return null != object && object instanceof TinkerEdge && ((TinkerEdge) object).getId().equals(this.getId());
+        return object instanceof TinkerEdge && ((TinkerEdge) object).getId().equals(this.getId());
     }
 
 }

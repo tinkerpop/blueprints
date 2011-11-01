@@ -31,7 +31,6 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(e, v.getOutEdges().iterator().next());
         assertEquals(e, u.getInEdges().iterator().next());
         assertEquals(v.getOutEdges().iterator().next(), u.getInEdges().iterator().next());
-        assertFalse(e.equals(null));
         Set<Edge> set = new HashSet<Edge>();
         set.add(e);
         set.add(e);
