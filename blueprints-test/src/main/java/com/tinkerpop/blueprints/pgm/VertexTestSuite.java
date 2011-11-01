@@ -42,6 +42,7 @@ public class VertexTestSuite extends TestSuite {
         assertEquals(graph.getVertex(u.getId()), graph.getVertex(u.getId()));
         assertEquals(graph.getVertex(v.getId()), graph.getVertex(u.getId()));
         assertEquals(graph.getVertex(v.getId()), graph.getVertex(v.getId()));
+        assertFalse(v.equals(null));
 
         graph.clear();
 

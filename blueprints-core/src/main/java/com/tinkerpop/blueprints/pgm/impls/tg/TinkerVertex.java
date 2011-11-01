@@ -62,6 +62,6 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
     }
 
     public boolean equals(final Object object) {
-        return object instanceof TinkerVertex && ((TinkerVertex) object).getId().equals(this.getId());
+        return null != object && object instanceof TinkerVertex && ((TinkerVertex) object).getId().equals(this.getId());
     }
 }
