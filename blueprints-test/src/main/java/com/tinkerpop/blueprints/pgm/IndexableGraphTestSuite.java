@@ -273,7 +273,7 @@ public class IndexableGraphTestSuite extends TestSuite {
 
     public void testAutomaticTransactionsOnIndices() {
         IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
-        if (graph instanceof TransactionalGraph) {
+        if (graphTest.supportsTransactions && graph instanceof TransactionalGraph) {
             TransactionalGraph txGraph = (TransactionalGraph) graph;
             assertEquals(txGraph.getCurrentBufferSize(), 0);
             graph.dropIndex(Index.VERTICES);
