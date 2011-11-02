@@ -16,11 +16,11 @@ public class Neo4jEdge extends Neo4jElement implements Edge {
         this(relationship, graph, false);
     }
 
-    protected Neo4jEdge(final Relationship relationship, final Neo4jGraph graph, boolean aNew) {
+    protected Neo4jEdge(final Relationship relationship, final Neo4jGraph graph, boolean isNew) {
         super(graph);
         this.rawElement = relationship;
-        if (aNew) {
-            for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+        if (isNew) {
+            for (final Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(Neo4jEdge.class)) {
                 autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
             }
         }

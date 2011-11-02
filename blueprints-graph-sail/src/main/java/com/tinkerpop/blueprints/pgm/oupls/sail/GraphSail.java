@@ -126,6 +126,10 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
         store.edges = graph.getIndex(Index.EDGES, Edge.class);
         store.values = getOrCreateValuesIndex(graph);
 
+        if (null == store.edges) {
+            throw new IllegalStateException("the provided graph has no '" + Index.EDGES + "' index");
+        }
+
         store.manualTransactions = store.graph instanceof TransactionalGraph && 0 == ((TransactionalGraph) store.graph).getMaxBufferSize();
 
         store.namespaces = store.getReferenceVertex();

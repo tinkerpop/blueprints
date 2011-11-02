@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyVertexSequence;
 
@@ -15,10 +16,10 @@ import java.util.Iterator;
  */
 public class ReadOnlyIndex<T extends Element> implements Index<T> {
 
-    protected final Index<T> index;
+    protected final Index<T> rawIndex;
 
-    public ReadOnlyIndex(Index<T> index) {
-        this.index = index;
+    public ReadOnlyIndex(Index<T> rawIndex) {
+        this.rawIndex = rawIndex;
     }
 
     public void remove(final String key, final Object value, final T element) {
@@ -31,14 +32,14 @@ public class ReadOnlyIndex<T extends Element> implements Index<T> {
 
     public CloseableSequence<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (CloseableSequence<T>) new ReadOnlyVertexSequence((Iterator<Vertex>) this.index.get(key, value).iterator());
+            return (CloseableSequence<T>) new ReadOnlyVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator());
         } else {
-            return (CloseableSequence<T>) new ReadOnlyEdgeSequence((Iterator<Edge>) this.index.get(key, value).iterator());
+            return (CloseableSequence<T>) new ReadOnlyEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator());
         }
     }
 
     public long count(final String key, final Object value) {
-        return this.index.count(key, value);
+        return this.rawIndex.count(key, value);
     }
 
     public Index.Type getIndexType() {
@@ -46,15 +47,15 @@ public class ReadOnlyIndex<T extends Element> implements Index<T> {
     }
 
     public String getIndexName() {
-        return this.index.getIndexName();
+        return this.rawIndex.getIndexName();
     }
 
     public Class<T> getIndexClass() {
-        return this.index.getIndexClass();
+        return this.rawIndex.getIndexClass();
     }
 
     public String toString() {
-        return "(readonly)" + this.index.toString();
+        return StringFactory.indexString(this);
     }
 
 }

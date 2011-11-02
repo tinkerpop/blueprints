@@ -28,7 +28,10 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
     }
 
     public Set<String> getAutoIndexKeys() {
-        return this.autoIndexKeys;
+        if (this.autoIndexKeys == null)
+            return null;
+        else
+            return new HashSet<String>(this.autoIndexKeys);
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {

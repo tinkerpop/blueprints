@@ -8,6 +8,8 @@ import com.tinkerpop.blueprints.pgm.Vertex;
  * <p/>
  * Implementations of this interface should be added to the list of listeners on the addListener method on
  * the EventGraph.
+ *
+ * @author Stephen Mallette
  */
 public interface GraphChangedListener {
 

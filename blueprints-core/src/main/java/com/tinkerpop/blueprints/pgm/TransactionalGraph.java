@@ -62,4 +62,14 @@ public interface TransactionalGraph extends Graph {
      * @param conclusion whether or not the current transaction was successful or not
      */
     public void stopTransaction(Conclusion conclusion);
+
+    /**
+     * When the graph is shutdown, any open transaction is committed successfully.
+     */
+    public void shutdown();
+
+    /**
+     * This method is not under transaction support. A clear will clear the graph and finalize the operation.
+     */
+    public void clear();
 }

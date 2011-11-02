@@ -1,8 +1,10 @@
 package com.tinkerpop.blueprints.pgm;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -57,6 +59,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             count++;
             graph.dropIndex(index.getIndexName());
         }
+        assertEquals(count, 2);
         printPerformance(graph.toString(), count, "indices dropped", this.stopWatch());
         assertEquals(count(graph.getIndices()), 0);
 
@@ -83,15 +86,24 @@ public class IndexableGraphTestSuite extends TestSuite {
 
         this.stopWatch();
         graph.dropIndex(index1.getIndexName());
+        assertNull(graph.getIndex("index1", Vertex.class));
         assertEquals(count(graph.getIndices()), 2);
-        assertTrue(asList(graph.getIndices()).contains(index2));
-        assertTrue(asList(graph.getIndices()).contains(index3));
+        for (Index index : graph.getIndices()) {
+            assertTrue(index.getIndexName().equals(index2.getIndexName()) || index.getIndexName().equals(index3.getIndexName()));
+        }
 
         graph.dropIndex(index2.getIndexName());
+        assertNull(graph.getIndex("index1", Vertex.class));
+        assertNull(graph.getIndex("index2", Edge.class));
         assertEquals(count(graph.getIndices()), 1);
-        assertTrue(asList(graph.getIndices()).contains(index3));
+        for (Index index : graph.getIndices()) {
+            assertTrue(index.getIndexName().equals(index3.getIndexName()));
+        }
 
         graph.dropIndex(index3.getIndexName());
+        assertNull(graph.getIndex("index1", Vertex.class));
+        assertNull(graph.getIndex("index2", Edge.class));
+        assertNull(graph.getIndex("index3", Vertex.class));
         assertEquals(count(graph.getIndices()), 0);
         printPerformance(graph.toString(), 3, "indices dropped and index iterable checked for consistency", this.stopWatch());
         graph.shutdown();
@@ -257,5 +269,137 @@ public class IndexableGraphTestSuite extends TestSuite {
             graph.shutdown();
         }
         printPerformance(graphName, loop, "attempt(s) to overwrite existing indices", this.stopWatch());
+    }
+
+    public void testAutomaticTransactionsOnIndices() {
+        IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        if (graph instanceof TransactionalGraph) {
+            TransactionalGraph txGraph = (TransactionalGraph) graph;
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            graph.dropIndex(Index.VERTICES);
+            graph.dropIndex(Index.EDGES);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            txGraph.setMaxBufferSize(5);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            Index<Vertex> index = graph.createManualIndex("aManualIndex", Vertex.class);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+
+            Vertex v = graph.addVertex(null);
+            assertEquals(txGraph.getCurrentBufferSize(), 1);
+            index.put("key", "value", v);
+            assertEquals(txGraph.getCurrentBufferSize(), 2);
+            assertEquals(count(index.get("key", "value")), 1);
+            assertEquals(index.get("key", "value").iterator().next(), v);
+            txGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(count(index.get("key", "value")), 0);
+            assertEquals(count(graph.getVertices()), 0);
+
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            txGraph.setMaxBufferSize(2);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            v = graph.addVertex(null);
+            assertEquals(txGraph.getCurrentBufferSize(), 1);
+            index.put("key", "value", v);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(count(index.get("key", "value")), 1);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            index.remove("key", "value", v);
+            assertEquals(txGraph.getCurrentBufferSize(), 1);
+            assertEquals(count(index.get("key", "value")), 0);
+            txGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(txGraph.getMaxBufferSize(), 2);
+            assertEquals(count(index.get("key", "value")), 1);
+        }
+
+        graph.shutdown();
+    }
+
+    public void testRemoveVertexRemoveEdgesRemoveEdgesFromIndices() {
+        IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        Vertex c = graph.addVertex(null);
+        Edge z = graph.addEdge(null, a, b, "test");
+        Edge y = graph.addEdge(null, b, c, "test");
+        Edge x = graph.addEdge(null, b, a, "test");
+
+        assertEquals(count(graph.getEdges()), 3);
+        assertEquals(count(graph.getVertices()), 3);
+
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label", "test")), 3);
+        List<Edge> edges = BaseTest.asList(graph.getIndex(Index.EDGES, Edge.class).get("label", "test"));
+        assertEquals(edges.size(), 3);
+        assertTrue(edges.contains(z));
+        assertTrue(edges.contains(y));
+        assertTrue(edges.contains(x));
+
+        graph.removeVertex(a);
+        assertEquals(count(graph.getEdges()), 1);
+        assertEquals(count(graph.getVertices()), 2);
+
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label", "test")), 1);
+        edges.clear();
+        edges = BaseTest.asList(graph.getIndex(Index.EDGES, Edge.class).get("label", "test"));
+        assertEquals(edges.size(), 1);
+        assertTrue(edges.contains(y));
+        graph.shutdown();
+
+
+    }
+
+    public void testIndicesPersist() {
+        if (graphTest.isPersistent) {
+            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            Vertex a = graph.addVertex(null);
+            Object aId = a.getId();
+            Vertex b = graph.addVertex(null);
+            Edge e = graph.addEdge(null, a, b, "related");
+            Object eId = e.getId();
+
+            graph.createAutomaticIndex("TEST-AUTO-VERTEX", Vertex.class, null);
+            Index index = graph.createManualIndex("TEST-MANUAL-VERTEX", Vertex.class);
+            index.put("boo", "blop", a);
+            graph.createAutomaticIndex("TEST-AUTO-EDGE", Edge.class, null);
+            index = graph.createManualIndex("TEST-MANUAL-EDGE", Edge.class);
+            index.put("boo", "blop", e);
+
+            if (!graphTest.isRDFModel) {
+                a.setProperty("hello", "josh");
+            }
+            if (!graphTest.isRDFModel) {
+                e.setProperty("hello", "josh");
+            }
+
+            graph.shutdown();
+
+            //// check persistence
+
+            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            assertEquals(graph.getIndex("TEST-AUTO-VERTEX", Vertex.class).getIndexType(), Index.Type.AUTOMATIC);
+            index = graph.getIndex("TEST-AUTO-VERTEX", Vertex.class);
+            if (!graphTest.isRDFModel) {
+                assertEquals(index.count("hello", "josh"), 1);
+                assertEquals(((Element) index.get("hello", "josh").next()).getId(), aId);
+            }
+
+            index = graph.getIndex("TEST-MANUAL-VERTEX", Vertex.class);
+            assertEquals(graph.getIndex("TEST-MANUAL-VERTEX", Vertex.class).getIndexType(), Index.Type.MANUAL);
+            assertEquals(index.get("boo", "blop").next(), a);
+
+
+            index = graph.getIndex("TEST-AUTO-EDGE", Edge.class);
+            assertEquals(graph.getIndex("TEST-AUTO-EDGE", Edge.class).getIndexType(), Index.Type.AUTOMATIC);
+            if (!graphTest.isRDFModel) {
+                assertEquals(index.count("hello", "josh"), 1);
+                assertEquals(((Element) index.get("hello", "josh").next()).getId(), eId);
+            }
+
+            index = graph.getIndex("TEST-MANUAL-EDGE", Edge.class);
+            assertEquals(graph.getIndex("TEST-MANUAL-EDGE", Edge.class).getIndexType(), Index.Type.MANUAL);
+            assertEquals(index.get("boo", "blop").next(), e);
+            graph.shutdown();
+        }
     }
 }

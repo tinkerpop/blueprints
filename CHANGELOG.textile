@@ -11,15 +11,36 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-blueprints.png!
-
-h3. Version 1.0 (Blueprints -- NOT OFFICIALLY RELEASED YET)
+h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1</version>
+</dependency>
+```
+
+* Fixed index consistency issue in @OrientGraph@
+* Added @Neo4jHaGraph@ allowing a more direct way to utilize Neo4j High Availability mode.
+* General API consistency improvements
+** Graphs attempt to create directories structures for graph persistence.
+** GetVertex/Edge throw IllegalArgumentException if passed a null identifier as a parameter.
+** GetVertex/Edge return null if the element cannot be found, if the identifier does not match the expected format of the underlying graph database or if the underlying graph database throws exceptions during the lookup.
+* RexsterGraph utilizes the @application/vnd.rexster.typed+json@ custom mime type.
+* The EventGraph addEdge method now properly fires the onEdgeAdded event with improved test cases.
+
+==<hr/>==
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-blueprints.png!
+
+h3. Version 1.0 (Blueprints -- September 18, 2011)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>1.0</version>
 </dependency>
 ```
 
@@ -29,7 +50,10 @@ h3. Version 1.0 (Blueprints -- NOT OFFICIALLY RELEASED YET)
 * @GraphJSONReader@ and @GraphJSONWriter@ utility classes
 * Updated @TransactionalGraph@ API to support transaction buffers
 ** Removed @TransactionalGraphHelper.CommitManager@ as it is no longer relevant
+** Changed @TransactionalGraph.close()@ to @Conclusion.SUCCESS@ any open transactions
 * Fixed a @ConcurrentModificationException@ in @TinkerGraph@ and added respective test cases for all graphs
+* Added @StringFactory.graphString()@ for a unified @String@ representation of a Blueprints graph
+* Added @Neo4jBatchGraph@ to support bulk inserting of graph data into a Neo4j instance
 
 ==<hr/>==
 

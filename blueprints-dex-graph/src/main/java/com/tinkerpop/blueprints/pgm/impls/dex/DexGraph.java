@@ -6,13 +6,13 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 import edu.upc.dama.dex.core.DEX;
 import edu.upc.dama.dex.core.Objects;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +50,7 @@ public class DexGraph implements IndexableGraph {
     private edu.upc.dama.dex.core.DEX dex = null;
     private edu.upc.dama.dex.core.GraphPool gpool = null;
     private edu.upc.dama.dex.core.Session session = null;
-    private edu.upc.dama.dex.core.DbGraph graph = null;
+    private edu.upc.dama.dex.core.DbGraph rawGraph = null;
 
     /**
      * Gets the DEX raw graph.
@@ -58,7 +58,7 @@ public class DexGraph implements IndexableGraph {
      * @return DEX raw graph.
      */
     edu.upc.dama.dex.core.Graph getRawGraph() {
-        return graph;
+        return rawGraph;
     }
 
     /**
@@ -93,7 +93,16 @@ public class DexGraph implements IndexableGraph {
     public DexGraph(final String fileName) {
         try {
             final File db = new File(fileName);
-            boolean create = !db.exists();
+            final File dbPath = db.getParentFile();
+
+            if (!dbPath.exists()) {
+                if (!dbPath.mkdirs()) {
+                    throw new RuntimeException("Could not create directory.");
+                }
+            }
+
+            final boolean create = !db.exists();
+
             this.db = db;
             //DEX.Config cfg = new DEX.Config();
             //cfg.setCacheMaxSize(0); // use as much memory as possible
@@ -101,8 +110,8 @@ public class DexGraph implements IndexableGraph {
             dex = new DEX();
             gpool = (create ? dex.create(db) : dex.open(db));
             session = gpool.newSession();
-            graph = session.getDbGraph();
-        } catch (FileNotFoundException e) {
+            rawGraph = session.getDbGraph();
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -127,14 +136,14 @@ public class DexGraph implements IndexableGraph {
             label = DEFAULT_DEX_VERTEX_LABEL;
         }
 
-        int type = DexTypes.getTypeId(graph, label);
+        int type = DexTypes.getTypeId(rawGraph, label);
         if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
             // First instance of this type, let's create it
-            type = graph.newNodeType(label);
+            type = rawGraph.newNodeType(label);
         }
         assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
         // create object instance
-        long oid = graph.newNode(type);
+        long oid = rawGraph.newNode(type);
         return new DexVertex(this, oid);
     }
 
@@ -146,16 +155,19 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
         try {
-            Long longId = Double.valueOf(id.toString()).longValue();
-            int type = graph.getType(longId);
+            final Long longId = Double.valueOf(id.toString()).longValue();
+            final int type = rawGraph.getType(longId);
             if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
                 return new DexVertex(this, longId);
             else
                 return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
+            return null;
+        } catch (IllegalArgumentException iae) {
+            // dex throws an illegal argument exception => [DEX: 12] Invalid object identifier.
+            return null;
         }
     }
 
@@ -169,7 +181,7 @@ public class DexGraph implements IndexableGraph {
     @Override
     public void removeVertex(final Vertex vertex) {
         assert vertex instanceof DexVertex;
-        graph.drop((Long) vertex.getId());
+        rawGraph.drop((Long) vertex.getId());
     }
 
     /*
@@ -180,8 +192,8 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Iterable<Vertex> getVertices() {
         Objects result = new Objects(session);
-        for (Integer type : graph.nodeTypes()) {
-            Objects objs = graph.select(type);
+        for (Integer type : rawGraph.nodeTypes()) {
+            Objects objs = rawGraph.select(type);
             result.union(objs);
             objs.close();
         }
@@ -199,15 +211,15 @@ public class DexGraph implements IndexableGraph {
       */
     @Override
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        int type = DexTypes.getTypeId(graph, label);
+        int type = DexTypes.getTypeId(rawGraph, label);
         if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
             // First instance of this type, let's create it
-            type = graph.newEdgeType(label, true, true);
+            type = rawGraph.newEdgeType(label, true, true);
         }
         assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
         // create object instance
         assert outVertex instanceof DexVertex && inVertex instanceof DexVertex;
-        long oid = graph.newEdge((Long) outVertex.getId(), (Long) inVertex.getId(), type);
+        long oid = rawGraph.newEdge((Long) outVertex.getId(), (Long) inVertex.getId(), type);
         return new DexEdge(this, oid);
     }
 
@@ -219,16 +231,19 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
         try {
             Long longId = Double.valueOf(id.toString()).longValue();
-            int type = graph.getType(longId);
+            int type = rawGraph.getType(longId);
             if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
                 return new DexEdge(this, longId);
             else
                 return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
+            return null;
+        } catch (IllegalArgumentException iae) {
+            // dex throws an illegal argument exception => [DEX: 12] Invalid object identifier.
+            return null;
         }
 
     }
@@ -243,7 +258,7 @@ public class DexGraph implements IndexableGraph {
     @Override
     public void removeEdge(final Edge edge) {
         assert edge instanceof DexEdge;
-        graph.drop((Long) edge.getId());
+        rawGraph.drop((Long) edge.getId());
     }
 
     /*
@@ -254,8 +269,8 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Iterable<Edge> getEdges() {
         Objects result = new Objects(session);
-        for (Integer type : graph.edgeTypes()) {
-            Objects objs = graph.select(type);
+        for (Integer type : rawGraph.edgeTypes()) {
+            Objects objs = rawGraph.select(type);
             result.union(objs);
             objs.close();
         }
@@ -271,17 +286,17 @@ public class DexGraph implements IndexableGraph {
     public void clear() {
         closeAllCollections();
 
-        for (Integer etype : graph.edgeTypes()) {
-            for (Long attr : graph.getAttributesFromType(etype)) {
-                graph.removeAttribute(attr);
+        for (Integer etype : rawGraph.edgeTypes()) {
+            for (Long attr : rawGraph.getAttributesFromType(etype)) {
+                rawGraph.removeAttribute(attr);
             }
-            graph.removeType(etype);
+            rawGraph.removeType(etype);
         }
-        for (Integer ntype : graph.nodeTypes()) {
-            for (Long attr : graph.getAttributesFromType(ntype)) {
-                graph.removeAttribute(attr);
+        for (Integer ntype : rawGraph.nodeTypes()) {
+            for (Long attr : rawGraph.getAttributesFromType(ntype)) {
+                rawGraph.removeAttribute(attr);
             }
-            graph.removeType(ntype);
+            rawGraph.removeType(ntype);
         }
 
         DexAttributes.clear();
@@ -306,7 +321,7 @@ public class DexGraph implements IndexableGraph {
     public void shutdown() {
         closeAllCollections();
 
-        graph = null;
+        rawGraph = null;
         session.close();
         gpool.close();
         dex.close();
@@ -317,7 +332,7 @@ public class DexGraph implements IndexableGraph {
 
     @Override
     public String toString() {
-        return "dexgraph[" + db.getPath() + "]";
+        return StringFactory.graphString(this, db.getPath());
     }
 
     /*

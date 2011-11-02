@@ -5,6 +5,7 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 * Implementations:
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
+**** "Neo4j Batch Inserter":http://docs.neo4j.org/chunked/stable/indexing-batchinsert.html support
 ** "OrientDB":http://www.orientechnologies.com/ graph database
 ** "DEX":http://www.sparsity-technologies.com/dex graph database
 ** "Rexster":http://rexster.tinkerpop.com RESTful graph shell
@@ -14,9 +15,10 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "Java Universal/Graph":http://jung.sourceforge.net/ interface
 ** "Sesame 2.0":http://www.openrdf.org Sail interface
 * Supporting utilities:
-** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ library
-** Blueprints helper utilities
+** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ utility
+** "GraphJSON":http://www.json.org/ Reader/Writer utility
 ** ReadOnlyGraph wrapper
 ** EventGraph wrapper
+** Various helper utilities
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

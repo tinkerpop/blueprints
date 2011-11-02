@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
@@ -39,14 +40,27 @@ public class RexsterGraph implements IndexableGraph {
         return this.graphURI;
     }
 
+    /**
+     * This method does nothing. To shutdown a RexsterGraph, it must be shutdown locally on the Rexster server.
+     */
     public void shutdown() {
 
     }
 
+    /**
+     * Get the size of the communication buffer.
+     *
+     * @return the communication buffer size
+     */
     public int getBufferSize() {
         return this.bufferSize;
     }
 
+    /**
+     * This represents the communication buffer. The larger the buffer, the more information is marshaled back and forth.
+     *
+     * @param bufferSize the size of the buffer
+     */
     public void setBufferSize(final int bufferSize) {
         this.bufferSize = bufferSize;
     }
@@ -68,7 +82,7 @@ public class RexsterGraph implements IndexableGraph {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         try {
             return new RexsterVertex(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(id)), this);
@@ -80,7 +94,7 @@ public class RexsterGraph implements IndexableGraph {
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
 
         try {
             return new RexsterEdge(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id)), this);
@@ -186,10 +200,8 @@ public class RexsterGraph implements IndexableGraph {
     }
 
     public String toString() {
-        JSONObject object = RestHelper.get(graphURI);
-        String graphName = object.optString(RexsterTokens.GRAPH);
-
-        return "rexstergraph[" + this.graphURI + "][" + graphName + "]";
+        final String graphName = RestHelper.get(graphURI).optString(RexsterTokens.GRAPH);
+        return StringFactory.graphString(this, this.graphURI + "[" + graphName + "]");
     }
 
     public JSONObject getRawGraph() {

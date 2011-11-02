@@ -50,6 +50,19 @@ public abstract class GraphSailTest extends SailTest {
         // Nothing to do.
     }
 
+    /*protected static void deleteDirectory(final File directory) {
+        if (directory.exists()) {
+            for (File file : directory.listFiles()) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+            directory.delete();
+        }
+    }*/
+
     public void testOrphanVerticesAutomaticallyDeleted() throws Exception {
         String ex = "http://example.org/ns#";
         URI ref = new URIImpl(ex + "Ref");

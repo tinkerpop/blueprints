@@ -3,10 +3,8 @@ package com.tinkerpop.blueprints.pgm.util.json;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.MappingJsonFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -15,7 +13,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,13 +21,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Helps write graph elements to TinkerPop JSON format.
- * <p/>
- * Contains methods to support both Jackson and Jettison for JSON processing.
+ * Helps write graph elements to TinkerPop JSON format. Contains methods to support both Jackson and Jettison
+ * for JSON processing.
+ *
+ * @author Stephen Mallette
  */
 public final class JSONWriter {
 
     private static JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+
+    private static ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Creates a Jettison JSONObject from a graph element. All property keys are serialized and types are not shown.
@@ -51,20 +51,10 @@ public final class JSONWriter {
     public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
         ObjectNode objectNode = createJSONElementAsObjectNode(element, propertyKeys, showTypes);
 
-        JsonFactory jsonFactory = new MappingJsonFactory();
-        StringWriter writer = new StringWriter();
-
         JSONObject jsonObject = null;
 
         try {
-            JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(writer);
-            jsonGenerator.writeTree(objectNode);
-            jsonGenerator.flush();
-            jsonGenerator.close();
-
-            writer.flush();
-
-            jsonObject = new JSONObject(new JSONTokener(writer.toString()));
+            jsonObject = new JSONObject(new JSONTokener(mapper.writeValueAsString(objectNode)));
         } catch (IOException ioe) {
             // repackage this as a JSONException...seems sensible as the caller will only know about
             // the jettison object not being created
@@ -219,13 +209,14 @@ public final class JSONWriter {
 
         Object returnValue = value;
 
-        // type will be one of: map, list, string, long, int, double, float.
-        // in the event of a complex object it will call a toString and store as a
-        // string
-        String type = determineType(value);
-
         // if the includeType is set to true then show the data types of the properties
         if (includeType) {
+
+            // type will be one of: map, list, string, long, int, double, float.
+            // in the event of a complex object it will call a toString and store as a
+            // string
+            String type = determineType(value);
+
             ObjectNode valueAndType = jsonNodeFactory.objectNode();
             valueAndType.put(JSONTokens.TYPE, type);
 

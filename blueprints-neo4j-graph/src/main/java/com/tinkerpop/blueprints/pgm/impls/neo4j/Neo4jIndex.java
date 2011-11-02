@@ -2,8 +2,10 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -36,7 +38,10 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public Class<T> getIndexClass() {
-        return indexClass;
+        if (Vertex.class.isAssignableFrom(this.indexClass))
+            return (Class) Vertex.class;
+        else
+            return (Class) Edge.class;
     }
 
     public String getIndexName() {
@@ -71,8 +76,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public long count(final String key, final Object value) {
-        IndexHits<S> itty = this.rawIndex.get(key, value);
-        return itty.size();
+        return this.rawIndex.get(key, value).size();
     }
 
     public void remove(final String key, final Object value, final T element) {
@@ -103,8 +107,8 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         else
             this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
 
-        IndexManager manager = this.getIndexManager();
-        String storedType = manager.getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
+        final IndexManager manager = this.getIndexManager();
+        final String storedType = manager.getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
         if (null == storedType) {
             if (this instanceof AutomaticIndex) {
                 this.getIndexManager().setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());

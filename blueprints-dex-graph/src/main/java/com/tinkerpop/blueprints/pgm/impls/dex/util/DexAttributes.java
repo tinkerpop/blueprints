@@ -52,7 +52,7 @@ public class DexAttributes {
         assert name != null;
 
         AttributeData adata = null;
-        Long attr = g.findAttribute(type, name);
+        final Long attr = g.findAttribute(type, name);
         if (attr != Graph.INVALID_ATTRIBUTE) {
             adata = g.getAttributeData(attr);
             assert adata != null;
@@ -74,10 +74,9 @@ public class DexAttributes {
     public static long getAttributeId(Graph g, int type, String name) {
         assert name != null;
 
-        AttributeData adata = null;
-        Long attr = g.findAttribute(type, name);
+        final Long attr = g.findAttribute(type, name);
         if (attr != Graph.INVALID_ATTRIBUTE) {
-            adata = g.getAttributeData(attr);
+            final AttributeData adata = g.getAttributeData(attr);
             assert adata != null;
             attrs.put(attr, adata);
         }

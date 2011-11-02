@@ -6,6 +6,8 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 
 /**
  * An example listener that writes a message to the console for each event that fires from the graph.
+ *
+ * @author Stephen Mallette
  */
 public class ConsoleGraphChangedListener implements GraphChangedListener {
 

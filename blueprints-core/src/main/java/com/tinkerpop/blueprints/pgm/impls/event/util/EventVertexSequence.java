@@ -10,6 +10,8 @@ import java.util.List;
 
 /**
  * A sequence of vertices that applies the list of listeners into each vertex.
+ *
+ * @author Stephen Mallette
  */
 public class EventVertexSequence implements CloseableSequence<Vertex> {
 

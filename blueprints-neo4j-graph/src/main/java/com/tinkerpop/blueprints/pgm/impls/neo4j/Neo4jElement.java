@@ -40,7 +40,7 @@ public abstract class Neo4jElement implements Element {
             this.graph.autoStartTransaction();
             Object oldValue = this.getProperty(key);
 
-            for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+            for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(this.getClass())) {
                 autoIndex.autoUpdate(key, value, oldValue, this);
             }
 
@@ -60,7 +60,7 @@ public abstract class Neo4jElement implements Element {
             this.graph.autoStartTransaction();
             Object oldValue = this.rawElement.removeProperty(key);
             if (null != oldValue) {
-                for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+                for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(this.getClass())) {
                     autoIndex.autoRemove(key, oldValue, this);
                 }
             }
@@ -104,6 +104,6 @@ public abstract class Neo4jElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+        return (null != object) && (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
     }
 }

@@ -3,7 +3,8 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexTxAwareMultiValue;
-import com.orientechnologies.orient.core.metadata.schema.OProperty;
+import com.orientechnologies.orient.core.index.OSimpleKeyIndexDefinition;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -73,20 +74,15 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         if (!doc.getIdentity().isValid())
             doc.save();
 
-        final boolean txBegun = graph.autoStartTransaction();
+        graph.autoStartTransaction();
         try {
             underlying.put(keyTemp, doc);
-
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -110,22 +106,25 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public void remove(final String key, final Object value, final T element) {
         final String keyTemp = key + SEPARATOR + value;
-
-        final boolean txBegun = graph.autoStartTransaction();
+        graph.autoStartTransaction();
         try {
             underlying.remove(keyTemp, element.getRawElement());
-
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (RuntimeException e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            if (txBegun)
-                graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    protected void removeBasic(final String key, final T element) {
+        underlying.remove(key, element.getRawElement());
+    }
+
+    protected void putBasic(final String key, final T element) {
+        underlying.put(key, element.getRawElement());
     }
 
     public String toString() {
@@ -133,17 +132,21 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     protected void removeElement(final T vertex) {
+        graph.autoStartTransaction();
         final ORecord<?> vertexDoc = vertex.getRawElement();
-
         underlying.remove(vertexDoc);
+        graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     private void create(final String indexName, final Class<? extends Element> indexClass,
-                        final com.tinkerpop.blueprints.pgm.Index.Type indexType, final OType iKeyType) {
+                        final com.tinkerpop.blueprints.pgm.Index.Type indexType, OType iKeyType) {
         this.indexClass = indexClass;
 
+        if (iKeyType == null)
+            iKeyType = OType.STRING;
+
         // CREATE THE MAP
-        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OProperty.INDEX_TYPE.NOTUNIQUE.toString(), iKeyType, null, null, null, true));
+        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(), new OSimpleKeyIndexDefinition(iKeyType), null, null));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))

@@ -66,8 +66,8 @@ public class SailVertex implements Vertex {
             }
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
-
         } catch (SailException e) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

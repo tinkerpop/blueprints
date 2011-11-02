@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.readonly;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyVertexSequence;
 
@@ -14,10 +15,10 @@ import com.tinkerpop.blueprints.pgm.impls.readonly.util.ReadOnlyVertexSequence;
  */
 public class ReadOnlyGraph implements Graph {
 
-    protected final Graph graph;
+    protected final Graph rawGraph;
 
-    public ReadOnlyGraph(final Graph graph) {
-        this.graph = graph;
+    public ReadOnlyGraph(final Graph rawGraph) {
+        this.rawGraph = rawGraph;
     }
 
     /**
@@ -35,7 +36,7 @@ public class ReadOnlyGraph implements Graph {
     }
 
     public Vertex getVertex(final Object id) {
-        final Vertex vertex = this.graph.getVertex(id);
+        final Vertex vertex = this.rawGraph.getVertex(id);
         if (null == vertex)
             return null;
         else
@@ -50,11 +51,11 @@ public class ReadOnlyGraph implements Graph {
     }
 
     public Iterable<Edge> getEdges() {
-        return new ReadOnlyEdgeSequence(this.graph.getEdges().iterator());
+        return new ReadOnlyEdgeSequence(this.rawGraph.getEdges().iterator());
     }
 
     public Edge getEdge(final Object id) {
-        final Edge edge = this.graph.getEdge(id);
+        final Edge edge = this.rawGraph.getEdge(id);
         if (null == edge)
             return null;
         else
@@ -62,7 +63,7 @@ public class ReadOnlyGraph implements Graph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new ReadOnlyVertexSequence(this.graph.getVertices().iterator());
+        return new ReadOnlyVertexSequence(this.rawGraph.getVertices().iterator());
     }
 
     /**
@@ -87,11 +88,11 @@ public class ReadOnlyGraph implements Graph {
     }
 
     public String toString() {
-        return "(readonly)" + this.graph.toString();
+        return StringFactory.graphString(this, this.rawGraph.toString());
     }
 
     public Graph getRawGraph() {
-        return this.graph;
+        return this.rawGraph;
     }
 
 }

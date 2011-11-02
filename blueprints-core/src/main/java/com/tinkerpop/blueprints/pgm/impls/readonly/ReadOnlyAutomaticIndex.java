@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,7 +17,7 @@ public class ReadOnlyAutomaticIndex<T extends Element> extends ReadOnlyIndex<T> 
     }
 
     public Set<String> getAutoIndexKeys() {
-        return ((AutomaticIndex) this.index).getAutoIndexKeys();
+        return new HashSet<String>(((AutomaticIndex) this.rawIndex).getAutoIndexKeys());
     }
 
     public Index.Type getIndexType() {

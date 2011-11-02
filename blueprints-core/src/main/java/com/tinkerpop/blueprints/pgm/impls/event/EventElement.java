@@ -11,13 +11,15 @@ import java.util.Set;
 /**
  * An element with a GraphChangedListener attached.  Those listeners are notified when changes occur to
  * the properties of the element.
+ *
+ * @author Stephen Mallette
  */
 public class EventElement implements Element {
-    protected final Element element;
+    protected final Element rawElement;
     protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventElement(final Element element, final List<GraphChangedListener> graphChangedListeners) {
-        this.element = element;
+    public EventElement(final Element rawElement, final List<GraphChangedListener> graphChangedListeners) {
+        this.rawElement = rawElement;
         this.graphChangedListeners = graphChangedListeners;
     }
 
@@ -46,18 +48,18 @@ public class EventElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        return this.element.getPropertyKeys();
+        return this.rawElement.getPropertyKeys();
     }
 
     public Object getId() {
-        return this.element.getId();
+        return this.rawElement.getId();
     }
 
     /**
      * Raises a vertexPropertyRemoved or edgePropertyRemoved event.
      */
     public Object removeProperty(final String key) {
-        Object propertyRemoved = element.removeProperty(key);
+        Object propertyRemoved = rawElement.removeProperty(key);
 
         if (this instanceof Vertex) {
             this.onVertexPropertyRemoved((Vertex) this, key, propertyRemoved);
@@ -65,18 +67,18 @@ public class EventElement implements Element {
             this.onEdgePropertyRemoved((Edge) this, key, propertyRemoved);
         }
 
-        return element.removeProperty(key);
+        return propertyRemoved;
     }
 
     public Object getProperty(final String key) {
-        return this.element.getProperty(key);
+        return this.rawElement.getProperty(key);
     }
 
     /**
      * Raises a vertexPropertyRemoved or edgePropertyChanged event.
      */
     public void setProperty(final String key, final Object value) {
-        this.element.setProperty(key, value);
+        this.rawElement.setProperty(key, value);
 
         if (this instanceof Vertex) {
             this.onVertexPropertyChanged((Vertex) this, key, value);
@@ -86,14 +88,18 @@ public class EventElement implements Element {
     }
 
     public String toString() {
-        return this.element.toString();
+        return this.rawElement.toString();
     }
 
     public int hashCode() {
-        return this.element.hashCode();
+        return this.rawElement.hashCode();
     }
 
-    public boolean equals(Object object) {
-        return (object.getClass().equals(this.getClass())) && this.element.getId().equals(((EventElement) object).getId());
+    public boolean equals(final Object object) {
+        return null != object && (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((EventElement) object).getId());
+    }
+
+    public Element getRawElement() {
+        return this.rawElement;
     }
 }
