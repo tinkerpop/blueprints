@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import junit.framework.TestCase;
 import org.junit.Test;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -11,33 +12,31 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.Sail;
 
-import java.io.File;
-
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Neo4jGraphSailTest extends GraphSailTest {
+public class Neo4jGraphSailTest extends TestCase { //GraphSailTest {
 
     protected IndexableGraph createGraph() {
-        String directory = this.getWorkingDirectory();
-
-        Neo4jGraph g = new Neo4jGraph(directory);
+        String directory = System.getProperty("neo4jGraphDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
         //g.clear();
-        g.setMaxBufferSize(0);
+        //g.setMaxBufferSize(0);
+        Neo4jGraph g = new Neo4jGraph(directory);
+
         return g;
     }
 
     private String getWorkingDirectory() {
-        String d = System.getProperty("neo4jGraphDirectory");
-        if (null == d) {
-            d = System.getProperty("os.name").toUpperCase().contains("WINDOWS")
-                    ? "C:/temp/blueprints_test"
-                    : "/tmp/blueprints_test";
+        String directory = System.getProperty("neo4jGraphDirectory");
+        if (directory == null) {
+            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
+                directory = "C:/temp/blueprints_test";
+            else
+                directory = "/tmp/blueprints_test";
         }
-
-        deleteDirectory(new File(d));
-
-        return d;
+        return directory;
     }
 
     /*
@@ -73,11 +72,11 @@ public class Neo4jGraphSailTest extends GraphSailTest {
             rc.commit();
             System.out.println("Execute SPARQL query");
             TupleQuery query = rc.prepareTupleQuery(QueryLanguage.SPARQL,
-                            "PREFIX ctag: <http://commontag.org/ns#> " +
-                                    "SELECT ?tag ?label " +
-                                    "WHERE { " +
-                                    "?tag ctag:label ?label . " +
-                                    "}");
+                    "PREFIX ctag: <http://commontag.org/ns#> " +
+                            "SELECT ?tag ?label " +
+                            "WHERE { " +
+                            "?tag ctag:label ?label . " +
+                            "}");
             System.out.println("TupleQuery");
             TupleQueryResult result = query.evaluate();
             System.out.println("TupleQueryResults:");
