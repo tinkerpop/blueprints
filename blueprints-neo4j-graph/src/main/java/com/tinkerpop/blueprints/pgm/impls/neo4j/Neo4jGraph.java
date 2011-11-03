@@ -76,7 +76,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         this.rawGraph = rawGraph;
         this.loadIndices(fresh);
     }
-    
+
     protected Neo4jGraph(final String directory, final Map<String, String> configuration, boolean highAvailabilityMode) {
 
         if (highAvailabilityMode && configuration == null) {
@@ -94,7 +94,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
                 this.rawGraph = new EmbeddedGraphDatabase(directory);
 
             this.loadIndices(fresh);
-            
+
         } catch (RuntimeException e) {
             if (this.rawGraph != null)
                 this.rawGraph.shutdown();
@@ -116,7 +116,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
             this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
             return;
-        } 
+        }
         final IndexManager manager = this.rawGraph.index();
         for (final String indexName : manager.nodeIndexNames()) {
             final org.neo4j.graphdb.index.Index<Node> neo4jIndex = manager.forNodes(indexName);

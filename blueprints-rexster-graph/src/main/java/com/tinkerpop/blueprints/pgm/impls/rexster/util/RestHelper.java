@@ -26,6 +26,7 @@ public class RestHelper {
         try {
             final URL url = new URL(safeUri(uri));
             final URLConnection connection = url.openConnection();
+            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
             connection.connect();
             final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
             final JSONObject object = new JSONObject(tokener);
@@ -49,6 +50,7 @@ public class RestHelper {
             URL url = new URL(postUri(uri));
             String data = postData(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(data); // post data with Content-Length automatically set
@@ -70,6 +72,7 @@ public class RestHelper {
             URL url = new URL(postUri(uri));
             String data = postData(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(data); // post data with Content-Length automatically set
@@ -109,6 +112,7 @@ public class RestHelper {
         try {
             final URL url = new URL(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
             connection.setRequestMethod(DELETE);
             final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
             reader.close();

@@ -21,8 +21,6 @@ import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
-import java.io.File;
-
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */

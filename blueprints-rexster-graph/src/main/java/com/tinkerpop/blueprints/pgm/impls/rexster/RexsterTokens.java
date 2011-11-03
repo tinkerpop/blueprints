@@ -63,4 +63,7 @@ public class RexsterTokens {
     public static final String DOUBLE = "double";
     public static final String LONG = "long";
 
+    public static final String ACCEPT = "Accept";
+    public static final String APPLICATION_REXSTER_TYPED_JSON = "application/vnd.rexster.typed+json";
+
 }
