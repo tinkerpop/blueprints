@@ -40,6 +40,7 @@ public class Neo4jGraphSailTest extends GraphSailTest {
         return d;
     }
 
+    /*
     public void testTemp() throws Exception {
         IndexableGraph graph;
         Sail sail;
@@ -54,6 +55,7 @@ public class Neo4jGraphSailTest extends GraphSailTest {
         sail.initialize();
         sail.shutDown();
     }
+    */
 
     @Test
     public void testEvalNew() throws Exception {
