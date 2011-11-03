@@ -53,7 +53,12 @@
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>
             <artifactId>nquads</artifactId>
-            <version>1.4</version>
+            <version>${sesametools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.fortytwo.sesametools</groupId>
+            <artifactId>reposail</artifactId>
+            <version>${sesametools.version}</version>
         </dependency>
         <!-- TESTING -->
         <dependency>
