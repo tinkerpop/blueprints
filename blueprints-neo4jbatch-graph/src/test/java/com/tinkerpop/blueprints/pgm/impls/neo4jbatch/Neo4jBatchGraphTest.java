@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.impls.neo4j;
+package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.Edge;
@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.Neo4jBatchGraph;
 
 import java.io.File;

@@ -10,7 +10,7 @@
     </parent>
     <artifactId>blueprints-neo4jbatch-graph</artifactId>
     <version>1.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Blueprints-Neo4jBatchGraph</name>
     <description>Blueprints property graph implementation for the Neo4j batch inserter</description>
     <dependencies>
@@ -114,4 +114,10 @@
             </plugin>
         </plugins>
     </build>
+    
+     <properties>
+        <import.package>*</import.package>
+        <export.package>com.tinkerpop.blueprints.pgm.impls.neo4jbatch, com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util</export.package>
+    </properties>
+    
 </project>

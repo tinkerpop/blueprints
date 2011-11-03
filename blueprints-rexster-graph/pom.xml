@@ -10,7 +10,7 @@
     </parent>
     <artifactId>blueprints-rexster-graph</artifactId>
     <version>1.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Blueprints-RexsterGraph</name>
     <description>Blueprints property graph implementation for Rexster</description>
     <dependencies>
@@ -92,4 +92,10 @@
             </plugin>
         </plugins>
     </build>
+    
+    <properties>
+        <import.package>*</import.package>
+        <export.package>com.tinkerpop.blueprints.pgm.impls.rexster, com.tinkerpop.blueprints.pgm.impls.rexster.util</export.package>
+    </properties>
+    
 </project>

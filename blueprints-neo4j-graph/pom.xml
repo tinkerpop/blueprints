@@ -10,7 +10,7 @@
     </parent>
     <artifactId>blueprints-neo4j-graph</artifactId>
     <version>1.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Blueprints-Neo4jGraph</name>
     <description>Blueprints property graph implementation for the Neo4j graph database</description>
     <dependencies>
@@ -119,4 +119,10 @@
             </plugin>
         </plugins>
     </build>
+    
+     <properties>
+        <import.package>*</import.package>
+        <export.package>com.tinkerpop.blueprints.pgm.impls.neo4j, com.tinkerpop.blueprints.pgm.impls.neo4j.util</export.package>
+    </properties>
+    
 </project>
