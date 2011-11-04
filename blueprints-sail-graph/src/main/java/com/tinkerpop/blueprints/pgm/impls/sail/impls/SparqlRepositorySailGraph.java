@@ -39,14 +39,14 @@ public class SparqlRepositorySailGraph extends SailGraph {
     }
 
     public static void main(final String[] args) throws Exception {
-        Repository r = new SPARQLRepository("http://flux.franz.com/catalogs/demos/repositories/iswc2010");
+        Repository r = new SPARQLRepository("http://dbpedia.org/sparql");
         Sail s = new RepositorySail(r);
         s.initialize();
         try {
             SailConnection sc = s.getConnection();
             try {
                 CloseableIteration<? extends Statement, SailException> iter
-                        = sc.getStatements(new URIImpl("http://twitlogic.fortytwo.net/person/twitter/20353953"), null, null, false);
+                        = sc.getStatements(new URIImpl("http://dbpedia.org/resource/Beijing"), null, null, false);
                 try {
                     while (iter.hasNext()) {
                         System.out.println("statement: " + iter.next());
