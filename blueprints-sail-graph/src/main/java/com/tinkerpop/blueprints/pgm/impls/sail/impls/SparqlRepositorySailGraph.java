@@ -1,10 +1,15 @@
 package com.tinkerpop.blueprints.pgm.impls.sail.impls;
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
+import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.reposail.RepositorySail;
+import org.openrdf.model.Statement;
+import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.sparql.SPARQLRepository;
 import org.openrdf.sail.Sail;
+import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.SailException;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -31,5 +36,29 @@ public class SparqlRepositorySailGraph extends SailGraph {
                 : new SPARQLRepository(queryEndpointUrl, updateEndpointUrl);
 
         return new RepositorySail(r);
+    }
+
+    public static void main(final String[] args) throws Exception {
+        Repository r = new SPARQLRepository("http://flux.franz.com/catalogs/demos/repositories/iswc2010");
+        Sail s = new RepositorySail(r);
+        s.initialize();
+        try {
+            SailConnection sc = s.getConnection();
+            try {
+                CloseableIteration<? extends Statement, SailException> iter
+                        = sc.getStatements(new URIImpl("http://twitlogic.fortytwo.net/person/twitter/20353953"), null, null, false);
+                try {
+                    while (iter.hasNext()) {
+                        System.out.println("statement: " + iter.next());
+                    }
+                } finally {
+                    iter.close();
+                }
+            } finally {
+                sc.close();
+            }
+        } finally {
+            s.shutDown();
+        }
     }
 }
