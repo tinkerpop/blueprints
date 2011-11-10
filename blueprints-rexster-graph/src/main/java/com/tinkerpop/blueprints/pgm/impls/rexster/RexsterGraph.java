@@ -87,7 +87,6 @@ public class RexsterGraph implements IndexableGraph {
         try {
             return new RexsterVertex(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(id)), this);
         } catch (Exception e) {
-            // todo: need to improve this.  respect http status codes is better.
             return null;
         }
     }
@@ -99,7 +98,6 @@ public class RexsterGraph implements IndexableGraph {
         try {
             return new RexsterEdge(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id)), this);
         } catch (Exception e) {
-            // todo: need to improve this.  respect http status codes is better.
             return null;
         }
     }
