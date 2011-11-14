@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
-
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
@@ -17,12 +16,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A in-memory, reference implementation of the property graph interfaces provided by Blueprints.
@@ -31,11 +31,11 @@ import java.util.Set;
  */
 public class TinkerGraph implements IndexableGraph, Serializable {
 
-    private Long currentId = 0l;
-    protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();
-    protected Map<String, Edge> edges = new HashMap<String, Edge>();
-    protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
-    protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
+    private AtomicLong currentId = new AtomicLong(0);
+    protected Map<String, Vertex> vertices = new ConcurrentHashMap<String, Vertex>();
+    protected Map<String, Edge> edges = new ConcurrentHashMap<String, Edge>();
+    protected Map<String, TinkerIndex> indices = new ConcurrentHashMap<String, TinkerIndex>();
+    protected Map<String, TinkerAutomaticIndex> autoIndices = new ConcurrentHashMap<String, TinkerAutomaticIndex>();
     private final String directory;
     private static final String GRAPH_FILE = "/tinkergraph.dat";
 
@@ -123,7 +123,6 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.autoIndices.remove(indexName);
     }
 
-
     public Vertex addVertex(final Object id) {
         String idString = null;
         Vertex vertex;
@@ -165,7 +164,6 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         return this.edges.get(idString);
     }
 
-
     public Iterable<Vertex> getVertices() {
         return new LinkedList<Vertex>(vertices.values());
     }
@@ -198,25 +196,21 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        String idString = null;
-        Edge edge;
+        String idString = null;        
         if (null != id) {
-            idString = id.toString();
-            edge = this.edges.get(idString);
-            if (null != edge) {
+            idString = id.toString();            
+            if (edges.get(idString) != null) {
                 throw new RuntimeException("Edge with id " + id + " already exists");
             }
         } else {
-            boolean done = false;
-            while (!done) {
-                idString = this.getNextId();
-                edge = this.edges.get(idString);
-                if (null == edge)
-                    done = true;
+            while (true) {
+                idString = this.getNextId();                
+                if (edges.get(idString) == null)
+                    break;
             }
         }
 
-        edge = new TinkerEdge(idString, outVertex, inVertex, label, this);
+        Edge edge = new TinkerEdge(idString, outVertex, inVertex, label, this);
         this.edges.put(edge.getId().toString(), edge);
         final TinkerVertex out = (TinkerVertex) outVertex;
         final TinkerVertex in = (TinkerVertex) inVertex;
@@ -245,7 +239,6 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.edges.remove(edge.getId().toString());
     }
 
-
     public String toString() {
         if (null == this.directory)
             return StringFactory.graphString(this, "vertices:" + this.vertices.size() + " edges:" + this.edges.size());
@@ -258,7 +251,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.edges.clear();
         this.indices.clear();
         this.autoIndices.clear();
-        this.currentId = 0l;
+        this.currentId = new AtomicLong(0l);
         this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
         this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
     }
@@ -281,14 +274,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     private String getNextId() {
-        String idString;
-        while (true) {
-            idString = this.currentId.toString();
-            this.currentId++;
-            if (null == this.vertices.get(idString) || null == this.edges.get(idString) || this.currentId == Long.MAX_VALUE)
-                break;
-        }
-        return idString;
+        return Long.toString(currentId.addAndGet(1));
     }
 
     public TinkerGraph getRawGraph() {
