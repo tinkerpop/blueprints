@@ -13,6 +13,7 @@ import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import javax.management.RuntimeErrorException;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -33,11 +34,10 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     /*public void testTinkerBenchmarkTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new TinkerBenchmarkTestSuite(this));
-        printTestPerformance("TinkerBenchmarkTestSuite", this.stopWatch());
+    this.stopWatch();
+    doTestSuite(new TinkerBenchmarkTestSuite(this));
+    printTestPerformance("TinkerBenchmarkTestSuite", this.stopWatch());
     }*/
-
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new VertexTestSuite(this));
@@ -113,5 +113,21 @@ public class TinkerGraphTest extends GraphTest {
                 }
             }
         }
+    }
+
+    public void testGraphCreationWithoutShutdown() throws Exception {
+        Graph g = new TinkerGraph("temp");
+        g = new TinkerGraph("temp");
+    }
+
+    public void testPersistentGraph() throws Exception {
+        deleteDirectory(new File("persist"));
+        Graph g = new TinkerGraph("persist");
+        g.addVertex("test").setProperty("prop", "now");
+        g.shutdown();
+        g = new TinkerGraph("persist");
+        assertEquals("now", g.getVertex("test").getProperty("prop"));
+        g.shutdown();
+        deleteDirectory(new File("persist"));
     }
 }

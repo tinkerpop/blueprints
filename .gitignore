@@ -6,3 +6,5 @@ target/
 *.DS_Store
 *.ipr
 
+nbactions.xml
+*~

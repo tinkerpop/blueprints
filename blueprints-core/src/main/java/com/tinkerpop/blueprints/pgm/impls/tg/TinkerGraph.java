@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * A in-memory, reference implementation of the property graph interfaces provided by Blueprints.
@@ -36,13 +37,14 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
     protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
     protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
-    private final String directory;
+    private final String directory;    
     private static final String GRAPH_FILE = "/tinkergraph.dat";
 
     public TinkerGraph(final String directory) {
         this.directory = directory;
         try {
             final File file = new File(directory);
+            final File graphFile = new File(directory + GRAPH_FILE);
             if (!file.exists()) {
                 if (!file.mkdirs()) {
                     throw new RuntimeException("Could not create directory.");
@@ -50,7 +52,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
                 this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
                 this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
-            } else {
+            } else if(graphFile.exists()) {
                 ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
                 TinkerGraph temp = (TinkerGraph) input.readObject();
                 input.close();
@@ -59,10 +61,12 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                 this.edges = temp.edges;
                 this.indices = temp.indices;
                 this.autoIndices = temp.autoIndices;
+            } else {
+                System.err.println("Probably shutdown was not called at previous graph creation");
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
-        }
+        }                
     }
 
     public TinkerGraph() {
