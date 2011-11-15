@@ -48,8 +48,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                     throw new RuntimeException("Could not create directory.");
                 }
 
-                this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
-                this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
+                createIndices();
             } else {
                 ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
                 TinkerGraph temp = (TinkerGraph) input.readObject();
@@ -66,7 +65,11 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public TinkerGraph() {
-        this.directory = null;
+        directory = null;
+        createIndices();
+    }
+
+    public void createIndices() {        
         this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
         this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
     }
@@ -196,15 +199,15 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        String idString = null;        
+        String idString = null;
         if (null != id) {
-            idString = id.toString();            
+            idString = id.toString();
             if (edges.get(idString) != null) {
                 throw new RuntimeException("Edge with id " + id + " already exists");
             }
         } else {
             while (true) {
-                idString = this.getNextId();                
+                idString = this.getNextId();
                 if (edges.get(idString) == null)
                     break;
             }
@@ -252,8 +255,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.indices.clear();
         this.autoIndices.clear();
         this.currentId = new AtomicLong(0l);
-        this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
-        this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
+        createIndices();
     }
 
     public void shutdown() {
@@ -273,7 +275,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         }
     }
 
-    private String getNextId() {
+    protected String getNextId() {
         return Long.toString(currentId.addAndGet(1));
     }
 
