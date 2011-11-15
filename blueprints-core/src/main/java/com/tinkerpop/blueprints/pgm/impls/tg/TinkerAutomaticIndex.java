@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 
+import com.tinkerpop.blueprints.pgm.impls.tg.util.MySet;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +19,7 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
         if (keys == null)
             this.autoIndexKeys = null;
         else {
-            this.autoIndexKeys = new HashSet<String>();
+            this.autoIndexKeys = MySet.<String>create();
             this.autoIndexKeys.addAll(keys);
         }
     }
@@ -31,7 +32,7 @@ public class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T
         if (this.autoIndexKeys == null)
             return null;
         else
-            return new HashSet<String>(this.autoIndexKeys);
+            return MySet.<String>create(this.autoIndexKeys);
     }
 
     protected void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {

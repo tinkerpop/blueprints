@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.tg.util.MySet;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
 import java.io.File;
@@ -76,7 +77,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     protected Iterable<TinkerIndex> getManualIndices() {
-        final HashSet<TinkerIndex> indices = new HashSet<TinkerIndex>(this.indices.values());
+        final Set<TinkerIndex> indices = MySet.<TinkerIndex>create(this.indices.values());
         indices.removeAll(this.autoIndices.values());
         return indices;
     }
@@ -173,7 +174,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public void removeVertex(final Vertex vertex) {
-        Set<Edge> toRemove = new HashSet<Edge>();
+        Set<Edge> toRemove = MySet.<Edge>create();
         for (Edge edge : vertex.getInEdges()) {
             toRemove.add(edge);
         }

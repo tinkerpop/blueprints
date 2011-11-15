@@ -6,19 +6,21 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 
+import com.tinkerpop.blueprints.pgm.impls.tg.util.MySet;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
-    private Map<String, Map<Object, Set<T>>> index = new HashMap<String, Map<Object, Set<T>>>();
+    private Map<String, Map<Object, Set<T>>> index = new ConcurrentHashMap<String, Map<Object, Set<T>>>();
     private final String indexName;
     private final Class<T> indexClass;
 
@@ -42,12 +44,12 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
     public void put(final String key, final Object value, final T element) {
         Map<Object, Set<T>> keyMap = this.index.get(key);
         if (keyMap == null) {
-            keyMap = new HashMap<Object, Set<T>>();
+            keyMap = new ConcurrentHashMap<Object, Set<T>>();
             this.index.put(key, keyMap);
         }
         Set<T> objects = keyMap.get(value);
         if (null == objects) {
-            objects = new HashSet<T>();
+            objects = MySet.<T>create();
             keyMap.put(value, objects);
         }
         objects.add(element);
@@ -57,11 +59,11 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
     public CloseableSequence<T> get(final String key, final Object value) {
         Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null == keyMap) {
-            return new WrappingCloseableSequence<T>(new HashSet<T>());
+            return new WrappingCloseableSequence<T>(MySet.<T>create());
         } else {
             Set<T> set = keyMap.get(value);
             if (null == set)
-                return new WrappingCloseableSequence<T>(new HashSet<T>());
+                return new WrappingCloseableSequence<T>(MySet.<T>create());
             else
                 return new WrappingCloseableSequence<T>(new LinkedList<T>(set));
         }
@@ -82,7 +84,7 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
     public void remove(final String key, final Object value, final T element) {
         Map<Object, Set<T>> keyMap = this.index.get(key);
-        if (null != keyMap) {
+        if (null != keyMap && null != value) {
             Set<T> objects = keyMap.get(value);
             if (null != objects) {
                 objects.remove(element);
