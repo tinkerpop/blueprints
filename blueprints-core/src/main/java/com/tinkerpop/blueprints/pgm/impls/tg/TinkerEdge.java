@@ -13,6 +13,7 @@ import java.io.Serializable;
  */
 public class TinkerEdge extends TinkerElement implements Edge, Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final String label;
     private final Vertex inVertex;
     private final Vertex outVertex;

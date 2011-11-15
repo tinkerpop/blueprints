@@ -18,6 +18,7 @@ import java.util.Set;
  */
 public class TinkerVertex extends TinkerElement implements Vertex, Serializable {
 
+    private static final long serialVersionUID = 1L;
     protected Set<Edge> outEdges = new HashSet<Edge>();
     protected Set<Edge> inEdges = new HashSet<Edge>();
 

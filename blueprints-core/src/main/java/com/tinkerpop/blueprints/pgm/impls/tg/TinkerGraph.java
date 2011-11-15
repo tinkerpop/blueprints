@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TinkerGraph implements IndexableGraph, Serializable {
 
+    private static final long serialVersionUID = 1L;
     private AtomicLong currentId = new AtomicLong(0);
     protected Map<String, Vertex> vertices = new ConcurrentHashMap<String, Vertex>();
     protected Map<String, Edge> edges = new ConcurrentHashMap<String, Edge>();
@@ -53,11 +54,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                 ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
                 TinkerGraph temp = (TinkerGraph) input.readObject();
                 input.close();
-                this.currentId = temp.currentId;
-                this.vertices = temp.vertices;
-                this.edges = temp.edges;
-                this.indices = temp.indices;
-                this.autoIndices = temp.autoIndices;
+                setObject(temp);
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -69,7 +66,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         createIndices();
     }
 
-    public void createIndices() {        
+    public void createIndices() {
         this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
         this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
     }
@@ -266,6 +263,7 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                     file.delete();
                 } else {
                 }
+
                 ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.directory + GRAPH_FILE));
                 out.writeObject(this);
                 out.close();
@@ -281,5 +279,13 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
     public TinkerGraph getRawGraph() {
         return this;
+    }
+
+    protected void setObject(TinkerGraph temp) throws Exception {
+        this.currentId = temp.currentId;
+        this.vertices = temp.vertices;
+        this.edges = temp.edges;
+        this.indices = temp.indices;
+        this.autoIndices = temp.autoIndices;
     }
 }
