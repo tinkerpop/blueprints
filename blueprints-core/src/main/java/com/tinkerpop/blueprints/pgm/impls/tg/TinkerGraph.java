@@ -17,7 +17,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,15 +43,15 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     public TinkerGraph(final String directory) {
         this.directory = directory;
         try {
-            final File file = new File(directory);
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    throw new RuntimeException("Could not create directory.");
-                }
+            File dir = new File(directory);
+            File file = new File(directory + GRAPH_FILE);
+            if (!dir.exists() && !dir.mkdirs())
+                throw new RuntimeException("Could not create directory.");
 
+            if (!file.exists())
                 createIndices();
-            } else {
-                ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
+            else {
+                ObjectInputStream input = new ObjectInputStream(new FileInputStream(file));
                 TinkerGraph temp = (TinkerGraph) input.readObject();
                 input.close();
                 setObject(temp);
@@ -256,14 +255,12 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         createIndices();
     }
 
-    public void shutdown() {
+    @Override public void shutdown() {
         if (null != this.directory) {
             try {
                 File file = new File(this.directory + GRAPH_FILE);
-                if (file.exists()) {
-                    file.delete();
-                } else {
-                }
+                if (file.exists())
+                    file.delete();              
 
                 ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.directory + GRAPH_FILE));
                 out.writeObject(this);
