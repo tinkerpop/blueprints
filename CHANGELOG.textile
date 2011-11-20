@@ -17,7 +17,7 @@ h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>1.1</version>
+  <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -25,10 +25,11 @@ h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
 * Added @Neo4jHaGraph@ allowing a more direct way to utilize Neo4j High Availability mode.
 * General API consistency improvements
 ** Graphs attempt to create directories structures for graph persistence.
-** GetVertex/Edge throw IllegalArgumentException if passed a null identifier as a parameter.
-** GetVertex/Edge return null if the element cannot be found, if the identifier does not match the expected format of the underlying graph database or if the underlying graph database throws exceptions during the lookup.
-* RexsterGraph utilizes the @application/vnd.rexster.typed+json@ custom mime type.
-* The EventGraph addEdge method now properly fires the onEdgeAdded event with improved test cases.
+** GetVertex/Edge throw @IllegalArgumentException@ if passed a null identifier as a parameter.
+** GetVertex/Edge return @null@ if the element cannot be found, if the identifier does not match the expected format of the underlying graph database or if the underlying graph database throws exceptions during the lookup.
+* @RexsterGraph@ utilizes the @application/vnd.rexster.typed+json@ custom mime type.
+* The @EventGraph.addEdge()@ method now properly fires the @onEdgeAdded@ event with improved test cases.
+* Added @WrappedGraph@ as a template for how to build stackable graph implementations
 
 ==<hr/>==
 
