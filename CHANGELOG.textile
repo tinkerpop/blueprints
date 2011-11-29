@@ -11,7 +11,9 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-blueberry.png!
+
+h3. Version 1.1 (Blueberry -- NOT RELEASED YET)
 
 ```xml
 <dependency>
@@ -22,14 +24,15 @@ h3. Version 1.1 (Blueprints -- NOT RELEASED YET)
 ```
 
 * Fixed index consistency issue in @OrientGraph@
-* Added @Neo4jHaGraph@ allowing a more direct way to utilize Neo4j High Availability mode.
+* Added @Neo4jHaGraph@ allowing a more direct way to utilize Neo4j High Availability mode
 * General API consistency improvements
-** Graphs attempt to create directories structures for graph persistence.
+** Graphs attempt to create directories structures for graph persistence
 ** GetVertex/Edge throw @IllegalArgumentException@ if passed a null identifier as a parameter.
 ** GetVertex/Edge return @null@ if the element cannot be found, if the identifier does not match the expected format of the underlying graph database or if the underlying graph database throws exceptions during the lookup.
-* @RexsterGraph@ utilizes the @application/vnd.rexster.typed+json@ custom mime type.
-* The @EventGraph.addEdge()@ method now properly fires the @onEdgeAdded@ event with improved test cases.
+* @RexsterGraph@ utilizes the @application/vnd.rexster.typed+json@ custom mime type
+* The @EventGraph.addEdge()@ method now properly fires the @onEdgeAdded@ event with improved test cases
 * Added @WrappedGraph@ as a template for how to build stackable graph implementations
+* Added @SparqlRepositorySailGraph@ to support a @Graph@ representation of any SPARQL endpoint
 
 ==<hr/>==
 

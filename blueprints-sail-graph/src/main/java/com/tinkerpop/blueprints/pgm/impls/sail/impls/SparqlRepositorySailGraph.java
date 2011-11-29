@@ -1,17 +1,14 @@
 package com.tinkerpop.blueprints.pgm.impls.sail.impls;
 
 import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
-import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.reposail.RepositorySail;
-import org.openrdf.model.Statement;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.sparql.SPARQLRepository;
 import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailException;
 
 /**
+ * SparqlRepositorySailGraph turns any SPARQL endpoint into a Blueprints SailGraph.
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SparqlRepositorySailGraph extends SailGraph {
@@ -38,7 +35,7 @@ public class SparqlRepositorySailGraph extends SailGraph {
         return new RepositorySail(r);
     }
 
-    public static void main(final String[] args) throws Exception {
+    /*public static void main(final String[] args) throws Exception {
         Repository r = new SPARQLRepository("http://dbpedia.org/sparql");
         Sail s = new RepositorySail(r);
         s.initialize();
@@ -60,5 +57,5 @@ public class SparqlRepositorySailGraph extends SailGraph {
         } finally {
             s.shutDown();
         }
-    }
+    }*/
 }
