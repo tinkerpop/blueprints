@@ -13,11 +13,13 @@ import java.io.Serializable;
  */
 public class TinkerEdge extends TinkerElement implements Edge, Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final String label;
     private final Vertex inVertex;
     private final Vertex outVertex;
 
-    protected TinkerEdge(final String id, final Vertex outVertex, final Vertex inVertex, final String label, final TinkerGraph graph) {
+    protected TinkerEdge(final String id, final Vertex outVertex, final Vertex inVertex, 
+            final String label, final TinkerGraph graph) {
         super(id, graph);
         this.label = label;
         this.outVertex = outVertex;
