@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class JSONWriterTest {
+public class GraphSONFactoryTest {
     private TinkerGraph graph = new TinkerGraph();
 
     @Before
@@ -32,32 +32,32 @@ public class JSONWriterTest {
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
 
-        JSONObject json = JSONWriter.createJSONElement(e);
+        JSONObject json = GraphSONFactory.createJSONElement(e);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(3, json.optInt(JSONTokens._ID));
-        Assert.assertTrue(json.has(JSONTokens._LABEL));
-        Assert.assertEquals("test", json.optString(JSONTokens._LABEL));
-        Assert.assertTrue(json.has(JSONTokens._TYPE));
-        Assert.assertEquals("edge", json.optString(JSONTokens._TYPE));
-        Assert.assertTrue(json.has(JSONTokens._IN_V));
-        Assert.assertEquals(2, json.optInt(JSONTokens._IN_V));
-        Assert.assertTrue(json.has(JSONTokens._OUT_V));
-        Assert.assertEquals(1, json.optInt(JSONTokens._OUT_V));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(3, json.optInt(GraphSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._LABEL));
+        Assert.assertEquals("test", json.optString(GraphSONTokens._LABEL));
+        Assert.assertTrue(json.has(GraphSONTokens._TYPE));
+        Assert.assertEquals("edge", json.optString(GraphSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._IN_V));
+        Assert.assertEquals(2, json.optInt(GraphSONTokens._IN_V));
+        Assert.assertTrue(json.has(GraphSONTokens._OUT_V));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._OUT_V));
     }
 
     @Test
     public void createJSONObjectVertexNoPropertiesNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
-        Assert.assertTrue(json.has(JSONTokens._TYPE));
-        Assert.assertEquals("vertex", json.optString(JSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._TYPE));
+        Assert.assertEquals("vertex", json.optString(GraphSONTokens._TYPE));
     }
 
     @Test
@@ -71,11 +71,11 @@ public class JSONWriterTest {
         v.setProperty("keyDouble", 4.4);
         v.setProperty("keyBoolean", true);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyString"));
         Assert.assertEquals("string", json.optString("keyString"));
         Assert.assertTrue(json.has("keyLong"));
@@ -101,11 +101,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyMap", map);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyMap"));
 
         JSONObject mapAsJSON = json.optJSONObject("keyMap");
@@ -127,11 +127,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyList"));
 
         JSONArray listAsJSON = json.optJSONArray("keyList");
@@ -146,11 +146,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyStringArray", stringArray);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyStringArray"));
 
         JSONArray stringArrayAsJSON = json.optJSONArray("keyStringArray");
@@ -165,11 +165,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyDoubleArray", doubleArray);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyDoubleArray"));
 
         JSONArray doubleArrayAsJSON = json.optJSONArray("keyDoubleArray");
@@ -184,11 +184,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyIntArray", intArray);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyIntArray"));
 
         JSONArray intArrayAsJSON = json.optJSONArray("keyIntArray");
@@ -203,11 +203,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyLongArray", longArray);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyLongArray"));
 
         JSONArray longArrayAsJSON = json.optJSONArray("keyLongArray");
@@ -222,11 +222,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyFloatArray", floatArray);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyFloatArray"));
 
         JSONArray floatArrayAsJSON = json.optJSONArray("keyFloatArray");
@@ -241,11 +241,11 @@ public class JSONWriterTest {
 
         v.setProperty("keyBooleanArray", booleanArray);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyBooleanArray"));
 
         JSONArray booleanArrayAsJSON = json.optJSONArray("keyBooleanArray");
@@ -258,11 +258,11 @@ public class JSONWriterTest {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("mycat", new Cat("smithers"));
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("mycat"));
         Assert.assertEquals("smithers", json.optString("mycat"));
     }
@@ -272,11 +272,11 @@ public class JSONWriterTest {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("mycat", new Cat("smithers"));
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("mycat"));
         JSONObject jsonObjectCat = json.optJSONObject("mycat");
         Assert.assertTrue(jsonObjectCat.has("value"));
@@ -292,11 +292,11 @@ public class JSONWriterTest {
 
         v.setProperty("cats", cats);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("cats"));
 
         JSONArray catListAsJson = json.optJSONArray("cats");
@@ -330,11 +330,11 @@ public class JSONWriterTest {
 
         v.setProperty("crazy-map", map);
 
-        JSONObject json = JSONWriter.createJSONElement(v);
+        JSONObject json = GraphSONFactory.createJSONElement(v);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("crazy-map"));
 
         JSONObject mapAsJson = json.optJSONObject("crazy-map");
@@ -368,13 +368,13 @@ public class JSONWriterTest {
 
         List<String> returnKeys = new ArrayList<String>();
         returnKeys.add("y");
-        JSONObject json = JSONWriter.createJSONElement(v, returnKeys, false);
+        JSONObject json = GraphSONFactory.createJSONElement(v, returnKeys, false);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
-        Assert.assertTrue(json.has(JSONTokens._TYPE));
-        Assert.assertEquals("vertex", json.optString(JSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._TYPE));
+        Assert.assertEquals("vertex", json.optString(GraphSONTokens._TYPE));
         Assert.assertFalse(json.has("x"));
         Assert.assertFalse(json.has("z"));
         Assert.assertTrue(json.has("y"));
@@ -398,13 +398,13 @@ public class JSONWriterTest {
         returnKeys.add("y");
         returnKeys.add("v");
 
-        JSONObject json = JSONWriter.createJSONElement(v, returnKeys, false);
+        JSONObject json = GraphSONFactory.createJSONElement(v, returnKeys, false);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
-        Assert.assertTrue(json.has(JSONTokens._TYPE));
-        Assert.assertEquals("vertex", json.optString(JSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._TYPE));
+        Assert.assertEquals("vertex", json.optString(GraphSONTokens._TYPE));
         Assert.assertFalse(json.has("x"));
         Assert.assertFalse(json.has("z"));
         Assert.assertTrue(json.has("y"));
@@ -427,54 +427,54 @@ public class JSONWriterTest {
         v.setProperty("keyDouble", 4.4);
         v.setProperty("keyBoolean", true);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyString"));
 
         JSONObject valueAsJson = json.optJSONObject("keyString");
         Assert.assertNotNull(valueAsJson);
-        Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_STRING, valueAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-        Assert.assertEquals("string", valueAsJson.optString(JSONTokens.VALUE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_STRING, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals("string", valueAsJson.optString(GraphSONTokens.VALUE));
 
         valueAsJson = json.optJSONObject("keyLong");
         Assert.assertNotNull(valueAsJson);
-        Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_LONG, valueAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-        Assert.assertEquals(1L, valueAsJson.optLong(JSONTokens.VALUE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LONG, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals(1L, valueAsJson.optLong(GraphSONTokens.VALUE));
 
         valueAsJson = json.optJSONObject("keyInt");
         Assert.assertNotNull(valueAsJson);
-        Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_INTEGER, valueAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-        Assert.assertEquals(2, valueAsJson.optInt(JSONTokens.VALUE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals(2, valueAsJson.optInt(GraphSONTokens.VALUE));
 
         valueAsJson = json.optJSONObject("keyFloat");
         Assert.assertNotNull(valueAsJson);
-        Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_FLOAT, valueAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-        Assert.assertEquals(3.3f, (float) valueAsJson.optDouble(JSONTokens.VALUE), 0);
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_FLOAT, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals(3.3f, (float) valueAsJson.optDouble(GraphSONTokens.VALUE), 0);
 
         valueAsJson = json.optJSONObject("keyDouble");
         Assert.assertNotNull(valueAsJson);
-        Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_DOUBLE, valueAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-        Assert.assertEquals(4.4, valueAsJson.optDouble(JSONTokens.VALUE), 0);
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_DOUBLE, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals(4.4, valueAsJson.optDouble(GraphSONTokens.VALUE), 0);
 
         valueAsJson = json.optJSONObject("keyBoolean");
         Assert.assertNotNull(valueAsJson);
-        Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_BOOLEAN, valueAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-        Assert.assertTrue(valueAsJson.optBoolean(JSONTokens.VALUE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_BOOLEAN, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertTrue(valueAsJson.optBoolean(GraphSONTokens.VALUE));
     }
 
     @Test
@@ -487,29 +487,29 @@ public class JSONWriterTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyList"));
 
         JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
         Assert.assertNotNull(listWithTypeAsJson);
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
-        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE);
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LIST, listWithTypeAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(GraphSONTokens.VALUE);
         Assert.assertNotNull(listAsJSON);
         Assert.assertEquals(3, listAsJSON.length());
 
         for (int ix = 0; ix < listAsJSON.length(); ix++) {
             JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
             Assert.assertNotNull(valueAsJson);
-            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-            Assert.assertEquals(JSONTokens.TYPE_STRING, valueAsJson.optString(JSONTokens.TYPE));
-            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-            Assert.assertEquals("this", valueAsJson.optString(JSONTokens.VALUE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+            Assert.assertEquals(GraphSONTokens.TYPE_STRING, valueAsJson.optString(GraphSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+            Assert.assertEquals("this", valueAsJson.optString(GraphSONTokens.VALUE));
         }
     }
 
@@ -523,29 +523,29 @@ public class JSONWriterTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyList"));
 
         JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
         Assert.assertNotNull(listWithTypeAsJson);
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
-        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE);
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LIST, listWithTypeAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(GraphSONTokens.VALUE);
         Assert.assertNotNull(listAsJSON);
         Assert.assertEquals(3, listAsJSON.length());
 
         for (int ix = 0; ix < listAsJSON.length(); ix++) {
             JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
             Assert.assertNotNull(valueAsJson);
-            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-            Assert.assertEquals(JSONTokens.TYPE_BOOLEAN, valueAsJson.optString(JSONTokens.TYPE));
-            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-            Assert.assertEquals(true, valueAsJson.optBoolean(JSONTokens.VALUE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+            Assert.assertEquals(GraphSONTokens.TYPE_BOOLEAN, valueAsJson.optString(GraphSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+            Assert.assertEquals(true, valueAsJson.optBoolean(GraphSONTokens.VALUE));
         }
     }
 
@@ -559,29 +559,29 @@ public class JSONWriterTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyList"));
 
         JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
         Assert.assertNotNull(listWithTypeAsJson);
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
-        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE);
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LIST, listWithTypeAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(GraphSONTokens.VALUE);
         Assert.assertNotNull(listAsJSON);
         Assert.assertEquals(3, listAsJSON.length());
 
         for (int ix = 0; ix < listAsJSON.length(); ix++) {
             JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
             Assert.assertNotNull(valueAsJson);
-            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-            Assert.assertEquals(JSONTokens.TYPE_LONG, valueAsJson.optString(JSONTokens.TYPE));
-            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-            Assert.assertEquals(1000L, valueAsJson.optLong(JSONTokens.VALUE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+            Assert.assertEquals(GraphSONTokens.TYPE_LONG, valueAsJson.optString(GraphSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+            Assert.assertEquals(1000L, valueAsJson.optLong(GraphSONTokens.VALUE));
         }
     }
 
@@ -595,29 +595,29 @@ public class JSONWriterTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyList"));
 
         JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
         Assert.assertNotNull(listWithTypeAsJson);
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
-        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE);
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LIST, listWithTypeAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(GraphSONTokens.VALUE);
         Assert.assertNotNull(listAsJSON);
         Assert.assertEquals(3, listAsJSON.length());
 
         for (int ix = 0; ix < listAsJSON.length(); ix++) {
             JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
             Assert.assertNotNull(valueAsJson);
-            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-            Assert.assertEquals(JSONTokens.TYPE_INTEGER, valueAsJson.optString(JSONTokens.TYPE));
-            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-            Assert.assertEquals(1, valueAsJson.optInt(JSONTokens.VALUE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+            Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, valueAsJson.optString(GraphSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+            Assert.assertEquals(1, valueAsJson.optInt(GraphSONTokens.VALUE));
         }
     }
 
@@ -634,29 +634,29 @@ public class JSONWriterTest {
 
         v.setProperty("keyList", listList);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyList"));
 
         JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
         Assert.assertNotNull(listWithTypeAsJson);
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_LIST, listWithTypeAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(listWithTypeAsJson.has(JSONTokens.VALUE));
-        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(JSONTokens.VALUE).optJSONObject(0).getJSONArray(JSONTokens.VALUE);
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LIST, listWithTypeAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(GraphSONTokens.VALUE).optJSONObject(0).getJSONArray(GraphSONTokens.VALUE);
         Assert.assertNotNull(listAsJSON);
         Assert.assertEquals(3, listAsJSON.length());
 
         for (int ix = 0; ix < listAsJSON.length(); ix++) {
             JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
             Assert.assertNotNull(valueAsJson);
-            Assert.assertTrue(valueAsJson.has(JSONTokens.TYPE));
-            Assert.assertEquals(JSONTokens.TYPE_INTEGER, valueAsJson.optString(JSONTokens.TYPE));
-            Assert.assertTrue(valueAsJson.has(JSONTokens.VALUE));
-            Assert.assertEquals(1, valueAsJson.optInt(JSONTokens.VALUE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+            Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, valueAsJson.optString(GraphSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+            Assert.assertEquals(1, valueAsJson.optInt(GraphSONTokens.VALUE));
         }
     }
 
@@ -671,34 +671,34 @@ public class JSONWriterTest {
 
         v.setProperty("keyMap", map);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
-        Assert.assertTrue(json.has(JSONTokens._ID));
-        Assert.assertEquals(1, json.optInt(JSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has("keyMap"));
 
         JSONObject mapWithTypeAsJSON = json.optJSONObject("keyMap");
         Assert.assertNotNull(mapWithTypeAsJSON);
-        Assert.assertTrue(mapWithTypeAsJSON.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_MAP, mapWithTypeAsJSON.optString(JSONTokens.TYPE));
+        Assert.assertTrue(mapWithTypeAsJSON.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_MAP, mapWithTypeAsJSON.optString(GraphSONTokens.TYPE));
 
-        Assert.assertTrue(mapWithTypeAsJSON.has(JSONTokens.VALUE));
-        JSONObject mapAsJSON = mapWithTypeAsJSON.optJSONObject(JSONTokens.VALUE);
+        Assert.assertTrue(mapWithTypeAsJSON.has(GraphSONTokens.VALUE));
+        JSONObject mapAsJSON = mapWithTypeAsJSON.optJSONObject(GraphSONTokens.VALUE);
 
         Assert.assertTrue(mapAsJSON.has("this"));
         JSONObject thisAsJson = mapAsJSON.optJSONObject("this");
-        Assert.assertTrue(thisAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_STRING, thisAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(thisAsJson.has(JSONTokens.VALUE));
-        Assert.assertEquals("some", thisAsJson.optString(JSONTokens.VALUE));
+        Assert.assertTrue(thisAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_STRING, thisAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(thisAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals("some", thisAsJson.optString(GraphSONTokens.VALUE));
 
         Assert.assertTrue(mapAsJSON.has("that"));
         JSONObject thatAsJson = mapAsJSON.optJSONObject("that");
-        Assert.assertTrue(thatAsJson.has(JSONTokens.TYPE));
-        Assert.assertEquals(JSONTokens.TYPE_INTEGER, thatAsJson.optString(JSONTokens.TYPE));
-        Assert.assertTrue(thatAsJson.has(JSONTokens.VALUE));
-        Assert.assertEquals(1, thatAsJson.optInt(JSONTokens.VALUE));
+        Assert.assertTrue(thatAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, thatAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(thatAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals(1, thatAsJson.optInt(GraphSONTokens.VALUE));
 
 
     }
@@ -724,7 +724,7 @@ public class JSONWriterTest {
         list.add("string");
         v.setProperty("keyList", list);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, false);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, false);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.isNull("key"));
@@ -765,30 +765,30 @@ public class JSONWriterTest {
         list.add("string");
         v.setProperty("keyList", list);
 
-        JSONObject json = JSONWriter.createJSONElement(v, null, true);
+        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
 
         Assert.assertNotNull(json);
         JSONObject jsonObjectKey = json.optJSONObject("key");
-        Assert.assertTrue(jsonObjectKey.isNull(JSONTokens.VALUE));
-        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectKey.optString(JSONTokens.TYPE));
+        Assert.assertTrue(jsonObjectKey.isNull(GraphSONTokens.VALUE));
+        Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectKey.optString(GraphSONTokens.TYPE));
 
-        JSONObject jsonMap = json.optJSONObject("keyMap").optJSONObject(JSONTokens.VALUE);
+        JSONObject jsonMap = json.optJSONObject("keyMap").optJSONObject(GraphSONTokens.VALUE);
         Assert.assertNotNull(jsonMap);
         JSONObject jsonObjectMap = jsonMap.optJSONObject("innerkey");
-        Assert.assertTrue(jsonObjectMap.isNull(JSONTokens.VALUE));
-        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectMap.optString(JSONTokens.TYPE));
+        Assert.assertTrue(jsonObjectMap.isNull(GraphSONTokens.VALUE));
+        Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectMap.optString(GraphSONTokens.TYPE));
 
-        JSONArray jsonInnerArray = jsonMap.getJSONObject("list").getJSONArray(JSONTokens.VALUE);
+        JSONArray jsonInnerArray = jsonMap.getJSONObject("list").getJSONArray(GraphSONTokens.VALUE);
         Assert.assertNotNull(jsonInnerArray);
         JSONObject jsonObjectInnerListFirst = jsonInnerArray.getJSONObject(0);
-        Assert.assertTrue(jsonObjectInnerListFirst.isNull(JSONTokens.VALUE));
-        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectInnerListFirst.optString(JSONTokens.TYPE));
+        Assert.assertTrue(jsonObjectInnerListFirst.isNull(GraphSONTokens.VALUE));
+        Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectInnerListFirst.optString(GraphSONTokens.TYPE));
 
-        JSONArray jsonArray = json.getJSONObject("keyList").getJSONArray(JSONTokens.VALUE);
+        JSONArray jsonArray = json.getJSONObject("keyList").getJSONArray(GraphSONTokens.VALUE);
         Assert.assertNotNull(jsonArray);
         JSONObject jsonObjectListFirst = jsonArray.getJSONObject(0);
-        Assert.assertTrue(jsonObjectListFirst.isNull(JSONTokens.VALUE));
-        Assert.assertEquals(JSONTokens.TYPE_UNKNOWN, jsonObjectListFirst.optString(JSONTokens.TYPE));
+        Assert.assertTrue(jsonObjectListFirst.isNull(GraphSONTokens.VALUE));
+        Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectListFirst.optString(GraphSONTokens.TYPE));
     }
 
     private class Cat {

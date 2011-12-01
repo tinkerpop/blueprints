@@ -12,7 +12,7 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class GraphJSONWriterTest {
+public class GraphSONWriterTest {
 
     @Test
     public void outputGraphNoEmbeddedTypes() throws JSONException, IOException {
@@ -20,7 +20,7 @@ public class GraphJSONWriterTest {
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        GraphJSONWriter writer = new GraphJSONWriter(g);
+        GraphSONWriter writer = new GraphSONWriter(g);
         writer.outputGraph(stream, null, null, false);
 
         stream.flush();
@@ -34,14 +34,14 @@ public class GraphJSONWriterTest {
         // ensure that the JSON conforms to basic structure and that the right
         // number of graph elements are present.  other tests already cover element formatting
         Assert.assertNotNull(rootNode);
-        Assert.assertTrue(rootNode.has(JSONTokens.VERTICES));
+        Assert.assertTrue(rootNode.has(GraphSONTokens.VERTICES));
 
-        ArrayNode vertices = (ArrayNode) rootNode.get(JSONTokens.VERTICES);
+        ArrayNode vertices = (ArrayNode) rootNode.get(GraphSONTokens.VERTICES);
         Assert.assertEquals(6, vertices.size());
 
-        Assert.assertTrue(rootNode.has(JSONTokens.EDGES));
+        Assert.assertTrue(rootNode.has(GraphSONTokens.EDGES));
 
-        ArrayNode edges = (ArrayNode) rootNode.get(JSONTokens.EDGES);
+        ArrayNode edges = (ArrayNode) rootNode.get(GraphSONTokens.EDGES);
         Assert.assertEquals(6, edges.size());
     }
 
@@ -51,7 +51,7 @@ public class GraphJSONWriterTest {
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        GraphJSONWriter writer = new GraphJSONWriter(g);
+        GraphSONWriter writer = new GraphSONWriter(g);
         writer.outputGraph(stream, null, null, true);
 
         stream.flush();
@@ -65,17 +65,17 @@ public class GraphJSONWriterTest {
         // ensure that the JSON conforms to basic structure and that the right
         // number of graph elements are present.  other tests already cover element formatting
         Assert.assertNotNull(rootNode);
-        Assert.assertTrue(rootNode.has(JSONTokens.EMBEDDED_TYPES));
-        Assert.assertTrue(rootNode.get(JSONTokens.EMBEDDED_TYPES).getBooleanValue());
+        Assert.assertTrue(rootNode.has(GraphSONTokens.EMBEDDED_TYPES));
+        Assert.assertTrue(rootNode.get(GraphSONTokens.EMBEDDED_TYPES).getBooleanValue());
 
-        Assert.assertTrue(rootNode.has(JSONTokens.VERTICES));
+        Assert.assertTrue(rootNode.has(GraphSONTokens.VERTICES));
 
-        ArrayNode vertices = (ArrayNode) rootNode.get(JSONTokens.VERTICES);
+        ArrayNode vertices = (ArrayNode) rootNode.get(GraphSONTokens.VERTICES);
         Assert.assertEquals(6, vertices.size());
 
-        Assert.assertTrue(rootNode.has(JSONTokens.EDGES));
+        Assert.assertTrue(rootNode.has(GraphSONTokens.EDGES));
 
-        ArrayNode edges = (ArrayNode) rootNode.get(JSONTokens.EDGES);
+        ArrayNode edges = (ArrayNode) rootNode.get(GraphSONTokens.EDGES);
         Assert.assertEquals(6, edges.size());
     }
 }
