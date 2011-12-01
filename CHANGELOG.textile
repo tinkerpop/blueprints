@@ -33,6 +33,7 @@ h3. Version 1.1 (Blueberry -- NOT RELEASED YET)
 * The @EventGraph.addEdge()@ method now properly fires the @onEdgeAdded@ event with improved test cases
 * Added @WrappedGraph@ as a template for how to build stackable graph implementations
 * Added @SparqlRepositorySailGraph@ to support a @Graph@ representation of any SPARQL endpoint
+* Renamed @GraphJSONxxx@ to @GraphSONxxx@ to promote as standardized JSON graph format
 
 ==<hr/>==
 
