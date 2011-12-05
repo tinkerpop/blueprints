@@ -1,8 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import junit.framework.TestCase;
 import org.junit.Test;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
@@ -12,21 +11,12 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.Sail;
 
+import java.io.File;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Neo4jGraphSailTest extends TestCase { //GraphSailTest {
-
-    protected IndexableGraph createGraph() {
-        String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null)
-            directory = this.getWorkingDirectory();
-        //g.clear();
-        //g.setMaxBufferSize(0);
-        Neo4jGraph g = new Neo4jGraph(directory);
-
-        return g;
-    }
+public class Neo4jGraphSailTest extends BaseTest { //GraphSailTest {
 
     private String getWorkingDirectory() {
         String directory = System.getProperty("neo4jGraphDirectory");
@@ -39,28 +29,12 @@ public class Neo4jGraphSailTest extends TestCase { //GraphSailTest {
         return directory;
     }
 
-    /*
-    public void testTemp() throws Exception {
-        IndexableGraph graph;
-        Sail sail;
-
-        graph = new Neo4jGraph("/tmp/neodebug");
-        sail = new GraphSail(graph);
-        sail.initialize();
-        sail.shutDown();
-
-        graph = new Neo4jGraph("/tmp/neodebug");
-        sail = new GraphSail(graph);
-        sail.initialize();
-        sail.shutDown();
-    }
-    */
-
     @Test
     public void testEvalNew() throws Exception {
         Neo4jGraph graph;
         Sail sail = null;
-        graph = new Neo4jGraph("/tmp/neo4j-data");
+        deleteDirectory(new File(getWorkingDirectory()));
+        graph = new Neo4jGraph(getWorkingDirectory());
         sail = new GraphSail(graph);
         sail.initialize();
         RepositoryConnection rc = new
