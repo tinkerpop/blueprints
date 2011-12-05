@@ -5,4 +5,8 @@ target/
 *.iws
 *.DS_Store
 *.ipr
-
+*.settings/
+*.project
+.classpath
+build.properties
+.gitignore

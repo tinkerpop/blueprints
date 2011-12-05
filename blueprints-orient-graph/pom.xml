@@ -10,7 +10,7 @@
     </parent>
     <artifactId>blueprints-orient-graph</artifactId>
     <version>1.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>Blueprints-OrientGraph</name>
     <description>Blueprints property graph implementation for the OrientDB graph database</description>
     <dependencies>
@@ -111,4 +111,10 @@
             </plugin>
         </plugins>
     </build>
+    
+     <properties>
+        <import.package>*</import.package>
+        <export.package>com.tinkerpop.blueprints.pgm.impls.orientdb, com.tinkerpop.blueprints.pgm.impls.orientdb.util</export.package>
+    </properties>
+    
 </project>
