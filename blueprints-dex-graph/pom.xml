@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-dex-graph</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
     <name>Blueprints-DexGraph</name>
     <description>Blueprints property graph implementation for the DEX graph database</description>

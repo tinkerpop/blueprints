@@ -1,0 +1,22 @@
+In order to connect a graph database to Blueprints, the Blueprints property graph interfaces must be implemented. As such, the graph database API and the Blueprints API need to be coupled. Each subsection discusses the various implementations of the Blueprints interfaces maintained by the main Blueprints distribution.
+
+*DEPENDENCY NOTE*: It is important to note that including a @<dependency/>@ to Blueprints does not entail all the respective graph database dependencies. The reason for this is that it allows users to include only those graph database implementations they wish for their particular projects (e.g. based on licensing, size, performance, etc.). However, if all dependencies are desired, then the following @<dependency/>@ can be added to your project's @pom.xml@.
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop</groupId>
+   <artifactId>graphdb-deps-all</artifactId>
+   <version>0.3</version>
+   <packaging>pom</packaging>
+</dependency>
+```
+
+To tailor to particular implementations, please see the @<dependency/>@ snippets in the subsections that follow in this documentation.
+
+```xml
+<repository>
+   <id>tinkerpop-repository</id>
+   <name>TinkerPop Maven2 Repository</name>
+   <url>http://tinkerpop.com/maven2</url>
+</repository>
+```

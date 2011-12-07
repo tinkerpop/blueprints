@@ -1,0 +1,15 @@
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4jbatch-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new Neo4jBatchGraph("/tmp/neo4j");
+```
+
+@Neo4jBatchGraph@ provides support for the bulk insertion of data into a "Neo4j":http://neo4j.org graph. This Blueprints implementation is single-threaded and non-transactional. It is meant for initial dumps of raw data into a Neo4j graph and is much faster than doing the equivalent process using @Neo4jGraph@ (see [[Neo4j Implementation]]).
+
+*Note*: This is not a pure Blueprints implementation as numerous methods throw an @UnsupportedOperationException@. Those that due are primarily delete methods. Be sure to review the respective JavaDoc for information on method peculiarities.

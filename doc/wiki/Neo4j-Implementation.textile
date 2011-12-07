@@ -1,0 +1,18 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/neotech-logo.png!:http://neotechnology.com
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4j-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new Neo4jGraph("/tmp/neo4j");
+```
+
+"Neo Technology":http://neotechnology.com are the developers of the "Neo4j graph database":http://neo4j.org. Neo4j natively supports the property graph data model. However, there are a few peculiarities in Neo4j that make it not completely faithful to the [[property graph model]] as specified by Blueprints. These are itemized below.
+
+# *No user defined element identifiers*: Neo4j is the gatekeeper and creator of vertex and edge identifiers. Thus, when creating a new vertex or edge, the provided object identifier is ignored.
+# *Only primitive property values*: Neo4j requires that the value objects in the property map of an element be Java primitives, @java.lang.String@s, or arrays of primitives and @java.lang.String@s.

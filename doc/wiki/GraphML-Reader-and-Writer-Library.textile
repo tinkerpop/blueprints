@@ -1,0 +1,196 @@
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+Besides being able to query and manipulate the underlying data management system with Blueprints, a "GraphML":http://graphml.graphdrawing.org reader and writer package is provided with Blueprints for streaming XML graph representations into and out of the underlying graph framework. The GraphML package uses "StAX":http://stax.codehaus.org to process a GraphML graph. This section discusses the use of the GraphML library for reading and writing XML-encoded graphs.
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/graph-example-1.jpg!
+
+Below is the GraphML representation of the graph diagrammed above. Here are some of the important XML elements to recognize.
+
+* *graphml*: the root element of the GraphML document
+  ** *key*: a type description for graph element properties
+  ** *graph*: the beginning of the graph representation
+    **** *node*: the beginning of a vertex representation
+    **** *edge*: the beginning of an edge representation
+      ****** *data*: the key/value data associated with a graph element
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+    <key id="weight" for="edge" attr.name="weight" attr.type="float"/>
+    <key id="name" for="node" attr.name="name" attr.type="string"/>
+    <key id="age" for="node" attr.name="age" attr.type="int"/>
+    <key id="lang" for="node" attr.name="lang" attr.type="string"/>
+    <graph id="G" edgedefault="directed">
+        <node id="1">
+            <data key="name">marko</data>
+            <data key="age">29</data>
+        </node>
+        <node id="2">
+            <data key="name">vadas</data>
+            <data key="age">27</data>
+        </node>
+        <node id="3">
+            <data key="name">lop</data>
+            <data key="lang">java</data>
+        </node>
+        <node id="4">
+            <data key="name">josh</data>
+            <data key="age">32</data>
+        </node>
+        <node id="5">
+            <data key="name">ripple</data>
+            <data key="lang">java</data>
+        </node>
+        <node id="6">
+            <data key="name">peter</data>
+            <data key="age">35</data>
+        </node>
+        <edge id="7" source="1" target="2" label="knows">
+            <data key="weight">0.5</data>
+        </edge>
+        <edge id="8" source="1" target="4" label="knows" >
+            <data key="weight">1.0</data>
+        </edge>
+        <edge id="9" source="1" target="3" label="created">
+            <data key="weight">0.4</data>
+        </edge>
+        <edge id="10" source="4" target="5" label="created">
+            <data key="weight">1.0</data>
+        </edge>
+        <edge id="11" source="4" target="3" label="created">
+            <data key="weight">0.4</data>
+        </edge>
+        <edge id="12" source="6" target="3" label="created">
+            <data key="weight">0.2</data>
+        </edge>
+    </graph>
+</graphml>
+```
+
+Note that line breaks and indentation have been added for clarity.  The default output contains no unnecessary whitespace, but @GraphMLWriter@ does include an option to actually insert the whitespace, as well as ordering elements in the output (see below).
+
+h2. Usage
+
+To read GraphML data into a graph, pass the graph into the @GraphMLReader@ constructor, then call @inputGraph@:
+
+```java
+Graph graph = ...
+InputStream in = ...
+
+GraphMLReader reader = new GraphMLReader(graph);
+reader.inputGraph(in);
+```
+
+Note that @inputGraph@ is also overloaded with a "buffer size" parameter.  Several setter methods are provided for customizing the property keys which @GraphMLReader@ uses to map the GraphML data into the Property Graphs model.  If used, these should be called before @inputGraph@, e.g.
+
+```java
+GraphMLReader reader = new GraphMLReader(graph);
+reader.setVertexIdKey("_id");
+reader.setEdgeIdKey("_id");
+reader.setEdgeLabelKey("_label");
+reader.inputGraph(in);
+```
+
+To output a graph in GraphML format, pass the graph into the @GraphMLWriter@ constructor, then call @outputGraph@:
+
+```java
+Graph graph = ...
+OutputStream out = ...
+
+GraphMLWriter writer = new GraphMLWriter(graph);
+writer.outputGraph(out);
+```
+
+If you have a large graph and you know the key and value type of all vertex and/or edge properties used in your graph, you can speed up @outputGraph@ by first specifying those properties, e.g.
+
+```java
+Map<String, String> vertexKeyTypes = new HashMap<String, String>();
+vertexKeyTypes.put("age", GraphMLTokens.INT);
+vertexKeyTypes.put("lang", GraphMLTokens.STRING);
+vertexKeyTypes.put("name", GraphMLTokens.STRING);
+Map<String, String> edgeKeyTypes = new HashMap<String, String>();
+edgeKeyTypes.put("weight", GraphMLTokens.FLOAT);
+
+GraphMLWriter writer = new GraphMLWriter(graph);
+writer.setVertexKeyTypes(vertexKeyTypes);
+writer.setEdgeKeyTypes(edgeKeyTypes);
+writer.outputGraph(out);
+```
+
+There is an additional @GraphMLWriter@ method, described below, for enabling normalized GraphML output for use with versioning tools.
+
+h2. Normalizing GraphMLWriter output
+
+@GraphMLWriter@ 's default output is sufficient for saving all of the information in a graph in an interoperable format, which can be loaded in @GraphMLReader@ in order to re-create the graph.  However, another important use case for @GraphMLWriter@ has to do with versioning and collaborative editing of graphs.  If you call the @setNormalize@ method before calling @outputGraph@, @GraphMLWriter@ will apply additional formatting and constraints to the output so as to make it compatible with line-based versioning tools such as "Subversion":http://subversion.apache.org/ and "Git":http://git-scm.com/, e.g.
+
+```java
+GraphMLWriter writer = new GraphMLWriter(graph);
+writer.setNormalize(true);
+writer.outputGraph(out);
+```
+
+The following is an example of normalized GraphML output.  Key definitions appear in alphabetical order, as do vertices and edges (according to the string representation of the id) and vertex and edge properties.  The XML is indented consistently, with one start and/or end tag per line:
+
+```xml
+<?xml version="1.0" ?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns">
+    <key id="age" for="node" attr.name="age" attr.type="int"></key>
+    <key id="lang" for="node" attr.name="lang" attr.type="string"></key>
+    <key id="name" for="node" attr.name="name" attr.type="string"></key>
+    <key id="weight" for="edge" attr.name="weight" attr.type="float"></key>
+    <graph id="G" edgedefault="directed">
+        <node id="1">
+            <data key="age">29</data>
+            <data key="name">marko</data>
+        </node>
+        <node id="2">
+            <data key="age">27</data>
+            <data key="name">vadas</data>
+        </node>
+        <node id="3">
+            <data key="lang">java</data>
+            <data key="name">lop</data>
+        </node>
+        <node id="4">
+            <data key="age">32</data>
+            <data key="name">josh</data>
+        </node>
+        <node id="5">
+            <data key="lang">java</data>
+            <data key="name">ripple</data>
+        </node>
+        <node id="6">
+            <data key="age">35</data>
+            <data key="name">peter</data>
+        </node>
+        <edge id="10" source="4" target="5" label="created">
+            <data key="weight">1.0</data>
+        </edge>
+        <edge id="11" source="4" target="3" label="created">
+            <data key="weight">0.4</data>
+        </edge>
+        <edge id="12" source="6" target="3" label="created">
+            <data key="weight">0.2</data>
+        </edge>
+        <edge id="7" source="1" target="2" label="knows">
+            <data key="weight">0.5</data>
+        </edge>
+        <edge id="8" source="1" target="4" label="knows">
+            <data key="weight">1.0</data>
+        </edge>
+        <edge id="9" source="1" target="3" label="created">
+            <data key="weight">0.4</data>
+        </edge>
+    </graph>
+</graphml>
+```
+
+This format permits line diffs to be used to capture incremental changes to graphs, so that graphs can be conveniently checked in to a version control repository.  You can then commit changes to the graph and roll back to previous versions of the graph, just as you would do with a piece of source code.  Forking and merging graphs is also possible within certain limits.
+
+Note that normalizing output in @GraphMLWriter@ is a memory-intensive process, so it is best used in connection with small to medium-sized graphs.
