@@ -44,7 +44,10 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         try {
             final File file = new File(directory);
             if (!file.exists()) {
-                file.mkdir();
+                if (!file.mkdirs()) {
+                    throw new RuntimeException("Could not create directory.");
+                }
+
                 this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
                 this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
             } else {
@@ -148,20 +151,18 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
-        else {
-            String idString = id.toString();
-            return this.vertices.get(idString);
-        }
+            throw new IllegalArgumentException("Element identifier cannot be null");
+
+        String idString = id.toString();
+        return this.vertices.get(idString);
     }
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
-        else {
-            String idString = id.toString();
-            return this.edges.get(idString);
-        }
+            throw new IllegalArgumentException("Element identifier cannot be null");
+
+        String idString = id.toString();
+        return this.edges.get(idString);
     }
 
 

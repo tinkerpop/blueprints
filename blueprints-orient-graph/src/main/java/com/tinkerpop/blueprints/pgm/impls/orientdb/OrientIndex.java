@@ -1,8 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexTxAwareMultiValue;
@@ -20,6 +17,9 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -142,11 +142,11 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
                         final com.tinkerpop.blueprints.pgm.Index.Type indexType, OType iKeyType) {
         this.indexClass = indexClass;
 
-        if( iKeyType == null )
-      	  iKeyType = OType.STRING;
-        
+        if (iKeyType == null)
+            iKeyType = OType.STRING;
+
         // CREATE THE MAP
-        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(),new OSimpleKeyIndexDefinition(iKeyType), null, null));
+        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(), new OSimpleKeyIndexDefinition(iKeyType), null, null));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))

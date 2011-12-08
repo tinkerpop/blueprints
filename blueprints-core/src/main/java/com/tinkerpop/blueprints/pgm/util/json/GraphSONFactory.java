@@ -3,10 +3,8 @@ package com.tinkerpop.blueprints.pgm.util.json;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.MappingJsonFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
@@ -15,7 +13,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,9 +26,11 @@ import java.util.Map;
  *
  * @author Stephen Mallette
  */
-public final class JSONWriter {
+public final class GraphSONFactory {
 
     private static JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+
+    private static ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Creates a Jettison JSONObject from a graph element. All property keys are serialized and types are not shown.
@@ -52,20 +51,10 @@ public final class JSONWriter {
     public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
         ObjectNode objectNode = createJSONElementAsObjectNode(element, propertyKeys, showTypes);
 
-        JsonFactory jsonFactory = new MappingJsonFactory();
-        StringWriter writer = new StringWriter();
-
         JSONObject jsonObject = null;
 
         try {
-            JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(writer);
-            jsonGenerator.writeTree(objectNode);
-            jsonGenerator.flush();
-            jsonGenerator.close();
-
-            writer.flush();
-
-            jsonObject = new JSONObject(new JSONTokener(writer.toString()));
+            jsonObject = new JSONObject(new JSONTokener(mapper.writeValueAsString(objectNode)));
         } catch (IOException ioe) {
             // repackage this as a JSONException...seems sensible as the caller will only know about
             // the jettison object not being created
@@ -94,16 +83,16 @@ public final class JSONWriter {
     public static ObjectNode createJSONElementAsObjectNode(final Element element, final List<String> propertyKeys, final boolean showTypes) {
 
         ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
-        putObject(jsonElement, JSONTokens._ID, element.getId());
+        putObject(jsonElement, GraphSONTokens._ID, element.getId());
 
         if (element instanceof Vertex) {
-            jsonElement.put(JSONTokens._TYPE, JSONTokens.VERTEX);
+            jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
         } else if (element instanceof Edge) {
             final Edge edge = (Edge) element;
-            jsonElement.put(JSONTokens._TYPE, JSONTokens.EDGE);
-            putObject(jsonElement, JSONTokens._OUT_V, edge.getOutVertex().getId());
-            putObject(jsonElement, JSONTokens._IN_V, edge.getInVertex().getId());
-            jsonElement.put(JSONTokens._LABEL, edge.getLabel());
+            jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
+            putObject(jsonElement, GraphSONTokens._OUT_V, edge.getOutVertex().getId());
+            putObject(jsonElement, GraphSONTokens._IN_V, edge.getInVertex().getId());
+            jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
         }
 
         return jsonElement;
@@ -220,17 +209,18 @@ public final class JSONWriter {
 
         Object returnValue = value;
 
-        // type will be one of: map, list, string, long, int, double, float.
-        // in the event of a complex object it will call a toString and store as a
-        // string
-        String type = determineType(value);
-
         // if the includeType is set to true then show the data types of the properties
         if (includeType) {
-            ObjectNode valueAndType = jsonNodeFactory.objectNode();
-            valueAndType.put(JSONTokens.TYPE, type);
 
-            if (type.equals(JSONTokens.TYPE_LIST)) {
+            // type will be one of: map, list, string, long, int, double, float.
+            // in the event of a complex object it will call a toString and store as a
+            // string
+            String type = determineType(value);
+
+            ObjectNode valueAndType = jsonNodeFactory.objectNode();
+            valueAndType.put(GraphSONTokens.TYPE, type);
+
+            if (type.equals(GraphSONTokens.TYPE_LIST)) {
 
                 // values of lists must be accumulated as ObjectNode objects under the value key.
                 // will return as a ArrayNode. called recursively to traverse the entire
@@ -238,14 +228,14 @@ public final class JSONWriter {
                 ArrayNode list = (ArrayNode) value;
 
                 // there is a set of values that must be accumulated as an array under a key
-                ArrayNode valueArray = valueAndType.putArray(JSONTokens.VALUE);
+                ArrayNode valueArray = valueAndType.putArray(GraphSONTokens.VALUE);
                 for (int ix = 0; ix < list.size(); ix++) {
                     // the value of each item in the array is a node object from an ArrayNode...must
                     // get the value of it.
                     addObject(valueArray, getValue(getTypedValueFromJsonNode(list.get(ix)), includeType));
                 }
 
-            } else if (type.equals(JSONTokens.TYPE_MAP)) {
+            } else if (type.equals(GraphSONTokens.TYPE_MAP)) {
 
                 // maps are converted to a ObjectNode.  called recursively to traverse
                 // the entire object graph within the map.
@@ -259,13 +249,13 @@ public final class JSONWriter {
                     convertedMap.put(key.toString(), jsonObject.get(key.toString()));
                 }
 
-                valueAndType.put(JSONTokens.VALUE, convertedMap);
+                valueAndType.put(GraphSONTokens.VALUE, convertedMap);
             } else {
 
                 // this must be a primitive value or a complex object.  if a complex
                 // object it will be handled by a call to toString and stored as a
                 // string value
-                putObject(valueAndType, JSONTokens.VALUE, value);
+                putObject(valueAndType, GraphSONTokens.VALUE, value);
             }
 
             // this goes back as a JSONObject with data type and value
@@ -338,23 +328,23 @@ public final class JSONWriter {
     }
 
     private static String determineType(final Object value) {
-        String type = JSONTokens.TYPE_STRING;
+        String type = GraphSONTokens.TYPE_STRING;
         if (value == null) {
             type = "unknown";
         } else if (value instanceof Double) {
-            type = JSONTokens.TYPE_DOUBLE;
+            type = GraphSONTokens.TYPE_DOUBLE;
         } else if (value instanceof Float) {
-            type = JSONTokens.TYPE_FLOAT;
+            type = GraphSONTokens.TYPE_FLOAT;
         } else if (value instanceof Integer) {
-            type = JSONTokens.TYPE_INTEGER;
+            type = GraphSONTokens.TYPE_INTEGER;
         } else if (value instanceof Long) {
-            type = JSONTokens.TYPE_LONG;
+            type = GraphSONTokens.TYPE_LONG;
         } else if (value instanceof Boolean) {
-            type = JSONTokens.TYPE_BOOLEAN;
+            type = GraphSONTokens.TYPE_BOOLEAN;
         } else if (value instanceof ArrayNode) {
-            type = JSONTokens.TYPE_LIST;
+            type = GraphSONTokens.TYPE_LIST;
         } else if (value instanceof ObjectNode) {
-            type = JSONTokens.TYPE_MAP;
+            type = GraphSONTokens.TYPE_MAP;
         }
 
         return type;

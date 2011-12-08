@@ -1,9 +1,18 @@
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
 
-Blueprints is a collection of interfaces, implementations, ouplementations, and test suites for the property graph data model. Blueprints is analogous to the "JDBC":http://en.wikipedia.org/wiki/Java_Database_Connectivity, but for "graph databases":http://en.wikipedia.org/wiki/Graph_database. As such, it provides a common set of interfaces to allow developers to plug-and-play their graph database backend. Moreover, software written atop Blueprints works over all Blueprints-enabled graph databases (e.g. "Pipes":http://pipes.tinkerpop.com, "Gremlin":http://gremlin.tinkerpop.com, "Frames":http://frames.tinkerpop.com, "Rexster":http://rexster.tinkerpop.com, etc.). The documentation herein will provide information regarding the use of Blueprints.[1]
+[[https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-system-arch.png|width=350px|align=right|float]]
 
-Please join the Gremlin users group at "http://groups.google.com/group/gremlin-users":http://groups.google.com/group/gremlin-users for all "TinkerPop":http://tinkerpop.com related discussions. 
+Blueprints is a collection of interfaces, implementations, ouplementations, and test suites for the property graph data model. Blueprints is analogous to the "JDBC":http://en.wikipedia.org/wiki/Java_Database_Connectivity, but for "graph databases":http://en.wikipedia.org/wiki/Graph_database. As such, it provides a common set of interfaces to allow developers to plug-and-play their graph database backend. Moreover, software written atop Blueprints works over all Blueprints-enabled graph databases. Within the TinkerPop software stack, Blueprints serves as the foundational technology for:
 
+* "Pipes":http://pipes.tinkerpop.com: A lazy, data flow framework
+* "Gremlin":http://gremlin.tinkerpop.com: A graph traversal language
+* "Frames":http://frames.tinkerpop.com: An object-to-graph mapper
+* "Furnace":http://furnace.tinkerpop.com: A graph algorithms package
+* "Rexster":http://rexster.tinkerpop.com: A graph server
+
+The documentation herein will provide information regarding the use of Blueprints.[1] Please join the Gremlin users group at "http://groups.google.com/group/gremlin-users":http://groups.google.com/group/gremlin-users for all "TinkerPop":http://tinkerpop.com related discussions. 
+
+* Blueprints 1.1 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/1.1/api/
 * Blueprints 1.0 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/1.0/api/
 * Blueprints 0.9 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.9/api/
 * Blueprints 0.8 "JavaDoc":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.8/api/
@@ -22,13 +31,13 @@ Please join the Gremlin users group at "http://groups.google.com/group/gremlin-u
 <dependency>
    <groupId>com.tinkerpop.blueprints</groupId>
    <artifactId>blueprints-neo4j-graph</artifactId>
-   <version>1.0</version>
+   <version>1.1</version>
 </dependency>
 ```
 
 For non-Maven users, *download the requisite jars*: 
-* "http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-core/1.0/blueprints-core-1.0.jar":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-core/1.0/blueprints-core-1.0.jar
-* "http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-neo4j-graph/1.0/blueprints-neo4j-graph-1.0.jar":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-neo4j-graph/1.0/blueprints-neo4j-graph-1.0.jar
+* "http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-core/1.1/blueprints-core-1.1.jar":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-core/1.1/blueprints-core-1.1.jar
+* "http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-neo4j-graph/1.1/blueprints-neo4j-graph-1.1.jar":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints-neo4j-graph/1.1/blueprints-neo4j-graph-1.1.jar
 (The general schema is @blueprints-{impl}-graph-{version}@ or @blueprints-graph-{oupl}-{version}@)
 
 ```java
@@ -57,6 +66,7 @@ graph.shutdown();
 * [[Implementations]]
   ** [[TinkerGraph]]
   ** [[Neo4j Implementation]]
+    **** [[Neo4j HA Implementation|Neo4jHa Implementation]]
     **** [[Neo4jBatch Implementation]]
   ** [[Sail Implementation]]
   ** [[OrientDB Implementation]]
@@ -68,7 +78,7 @@ graph.shutdown();
   ** [[Sail Ouplementation]]
 * Utilities
   ** [[GraphML Reader and Writer Library]]
-  ** [[JSON Reader and Writer Library]]
+  ** [[GraphSON Reader and Writer Library]]
   ** [[ReadOnly Implementation]]
   ** [[Event Implementation]]
 * Conclusion

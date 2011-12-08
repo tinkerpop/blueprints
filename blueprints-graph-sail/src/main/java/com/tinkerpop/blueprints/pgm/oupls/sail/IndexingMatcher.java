@@ -85,6 +85,8 @@ public class IndexingMatcher extends Matcher {
         //System.out.println("spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("\ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
 
+        //System.out.println("store = " + store);
+        //System.out.println("\tstore.edges = " + store.edges);
         CloseableSequence<Edge> results = store.edges.get(propertyName, sb.toString().substring(1));
 
         for (PartOfSpeechCriterion m : criteria) {

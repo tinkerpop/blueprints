@@ -125,9 +125,22 @@ public class Neo4jBatchGraph implements IndexableGraph {
     }
 
     public Vertex getVertex(final Object id) {
-        if (rawGraph.nodeExists((Long) id)) {
-            return new Neo4jBatchVertex(this, (Long) id);
-        } else {
+        if (null == id)
+            throw new IllegalArgumentException("Element identifier cannot be null");
+
+        try {
+            final Long longId;
+            if (id instanceof Long)
+                longId = (Long) id;
+            else
+                longId = Double.valueOf(id.toString()).longValue();
+
+            if (rawGraph.nodeExists(longId)) {
+                return new Neo4jBatchVertex(this, longId);
+            } else {
+                return null;
+            }
+        } catch (NumberFormatException e) {
             return null;
         }
     }

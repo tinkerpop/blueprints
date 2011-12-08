@@ -34,6 +34,7 @@ public class VertexTestSuite extends TestSuite {
 
         this.stopWatch();
         Vertex v = graph.addVertex(null);
+        assertFalse(v.equals(null));
         Vertex u = graph.getVertex(v.getId());
         printPerformance(graph.toString(), 1, "vertex added and retrieved", this.stopWatch());
 
@@ -79,7 +80,7 @@ public class VertexTestSuite extends TestSuite {
             assertEquals("\"1\"^^<datatype:int>", v2.getId());
             Vertex v3 = graph.addVertex("_:ABLANKNODE");
             assertEquals(v3.getId(), "_:ABLANKNODE");
-            Vertex v4 = graph.addVertex("\"2.24\"^^<xsd:double>");
+            Vertex v4 = graph.addVertex("\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>");
             assertEquals("\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>", v4.getId());
         }
         graph.shutdown();
@@ -138,13 +139,17 @@ public class VertexTestSuite extends TestSuite {
 
     public void testGetNonExistantVertices() {
         Graph graph = graphTest.getGraphInstance();
-        assertNull(graph.getVertex(null));
+
         try {
-            assertNull(graph.getVertex("asbv"));
-            assertNull(graph.getVertex(12.0d));
-        } catch (Exception e) {
-            assertTrue(true);
+            graph.getVertex(null);
+            fail("Getting an element with a null identifier must throw IllegalArgumentException");
+        } catch (IllegalArgumentException iae) {
+            assertNotNull(iae);
         }
+
+        assertNull(graph.getVertex("asbv"));
+        assertNull(graph.getVertex(12.0d));
+
         graph.shutdown();
     }
 

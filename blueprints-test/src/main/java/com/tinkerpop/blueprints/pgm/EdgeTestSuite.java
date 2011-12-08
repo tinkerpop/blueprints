@@ -27,6 +27,7 @@ public class EdgeTestSuite extends TestSuite {
         Vertex v = graph.addVertex(convertId(ids.get(0)));
         Vertex u = graph.addVertex(convertId(ids.get(1)));
         Edge e = graph.addEdge(null, v, u, convertId("test_label"));
+        assertFalse(e.equals(null));
         assertEquals(e, v.getOutEdges().iterator().next());
         assertEquals(e, u.getInEdges().iterator().next());
         assertEquals(v.getOutEdges().iterator().next(), u.getInEdges().iterator().next());
@@ -132,13 +133,19 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testGetNonExistantEdges() {
         Graph graph = graphTest.getGraphInstance();
-        try {
-            assertNull(graph.getEdge(null));
+
+        if (!graphTest.isRDFModel) {
+            try {
+                graph.getEdge(null);
+                fail("Getting an element with a null identifier must throw IllegalArgumentException");
+            } catch (IllegalArgumentException iae) {
+                assertTrue(true);
+            }
+
             assertNull(graph.getEdge("asbv"));
             assertNull(graph.getEdge(12.0d));
-        } catch (Exception e) {
-            assertTrue(true);
         }
+
         graph.shutdown();
     }
 

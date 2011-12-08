@@ -13,7 +13,6 @@ import edu.upc.dama.dex.core.DEX;
 import edu.upc.dama.dex.core.Objects;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -94,7 +93,16 @@ public class DexGraph implements IndexableGraph {
     public DexGraph(final String fileName) {
         try {
             final File db = new File(fileName);
-            boolean create = !db.exists();
+            final File dbPath = db.getParentFile();
+
+            if (!dbPath.exists()) {
+                if (!dbPath.mkdirs()) {
+                    throw new RuntimeException("Could not create directory.");
+                }
+            }
+
+            final boolean create = !db.exists();
+
             this.db = db;
             //DEX.Config cfg = new DEX.Config();
             //cfg.setCacheMaxSize(0); // use as much memory as possible
@@ -103,7 +111,7 @@ public class DexGraph implements IndexableGraph {
             gpool = (create ? dex.create(db) : dex.open(db));
             session = gpool.newSession();
             rawGraph = session.getDbGraph();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -147,16 +155,19 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Vertex getVertex(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
         try {
-            Long longId = Double.valueOf(id.toString()).longValue();
-            int type = rawGraph.getType(longId);
+            final Long longId = Double.valueOf(id.toString()).longValue();
+            final int type = rawGraph.getType(longId);
             if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
                 return new DexVertex(this, longId);
             else
                 return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
+            return null;
+        } catch (IllegalArgumentException iae) {
+            // dex throws an illegal argument exception => [DEX: 12] Invalid object identifier.
+            return null;
         }
     }
 
@@ -220,7 +231,7 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Edge getEdge(final Object id) {
         if (null == id)
-            return null;
+            throw new IllegalArgumentException("Element identifier cannot be null");
         try {
             Long longId = Double.valueOf(id.toString()).longValue();
             int type = rawGraph.getType(longId);
@@ -229,7 +240,10 @@ public class DexGraph implements IndexableGraph {
             else
                 return null;
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Dex vertex ids must be convertible to a long value", e);
+            return null;
+        } catch (IllegalArgumentException iae) {
+            // dex throws an illegal argument exception => [DEX: 12] Invalid object identifier.
+            return null;
         }
 
     }

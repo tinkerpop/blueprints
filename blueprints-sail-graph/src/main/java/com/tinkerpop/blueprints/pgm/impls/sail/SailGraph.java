@@ -119,14 +119,20 @@ public class SailGraph implements TransactionalGraph {
         try {
             this.rawGraph = sail;
             sail.initialize();
-            this.addNamespace(SailTokens.RDF_PREFIX, SailTokens.RDF_NS);
-            this.addNamespace(SailTokens.RDFS_PREFIX, SailTokens.RDFS_NS);
-            this.addNamespace(SailTokens.OWL_PREFIX, SailTokens.OWL_NS);
-            this.addNamespace(SailTokens.XSD_PREFIX, SailTokens.XSD_NS);
-            this.addNamespace(SailTokens.FOAF_PREFIX, SailTokens.FOAF_NS);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Defines a few commonly-used namespace prefixes.
+     */
+    public void addDefaultNamespaces() {
+        this.addNamespace(SailTokens.RDF_PREFIX, SailTokens.RDF_NS);
+        this.addNamespace(SailTokens.RDFS_PREFIX, SailTokens.RDFS_NS);
+        this.addNamespace(SailTokens.OWL_PREFIX, SailTokens.OWL_NS);
+        this.addNamespace(SailTokens.XSD_PREFIX, SailTokens.XSD_NS);
+        this.addNamespace(SailTokens.FOAF_PREFIX, SailTokens.FOAF_NS);
     }
 
     public Sail getRawGraph() {
@@ -157,8 +163,13 @@ public class SailGraph implements TransactionalGraph {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
+            throw new IllegalArgumentException("Element identifier cannot be null");
+
+        try {
+            return createVertex(id.toString());
+        } catch (RuntimeException re) {
             return null;
-        return createVertex(id.toString());
+        }
     }
 
     public Edge getEdge(final Object id) {

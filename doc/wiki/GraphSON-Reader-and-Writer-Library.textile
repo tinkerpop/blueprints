@@ -6,7 +6,7 @@
 </dependency>
 ```
 
-The "JSON":http://json.org reader and writer package allows an entire graph to be streamed to and from the standard JSON format utilized across the TinkerPop stack.  The format comes in two flavors: one that uses explicit data typing within the JSON and one that does not.  For most scenarios, standard JSON without data typing should generally be acceptable.  Using the more verbose outputting of explicit data types only provides the added value of ensuring that numeric values are converted properly (ie. float versus double).
+The "JSON":http://json.org reader and writer package allows an entire graph to be streamed to and from the standard JSON format utilized across the TinkerPop stack called GraphSON.  The format comes in two flavors: one that uses explicit data typing within the JSON and one that does not.  For most scenarios, standard JSON without data typing should generally be acceptable.  Using the more verbose outputting of explicit data types only provides the added value of ensuring that numeric values are converted properly (ie. float versus double).
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/graph-example-1.jpg!
 
@@ -275,24 +275,24 @@ Please note that complex objects stored as properties will be converted to strin
 
 h1. Usage
 
-To output a graph in JSON format, pass the graph into the @GraphJSONWriter@ constructor, then call @outputGraph@:
+To output a graph in JSON format, pass the graph into the @GraphSONWriter@ constructor, then call @outputGraph@:
 
 ```java
 Graph graph = ...
 OutputStream out = ...
 
-GraphJSONWriter writer = new GraphJSONWriter(graph);
+GraphSONWriter writer = new GraphSONWriter(graph);
 writer.outputGraph(out);
 ```
 
-The @GraphJSONReader@ works in a similar format.  Simply pass what would likely be an empty graph into the constructor, then call @inputGraph@:
+The @GraphSONReader@ works in a similar format.  Simply pass what would likely be an empty graph into the constructor, then call @inputGraph@:
 
 ```java
 Graph graph = ...
 InputStream in = ...
 
-GraphJSONReader reader = new GraphJSONReader(graph);
-writer.inputGraph(in);
+GraphSONReader reader = new GraphSONReader(graph);
+reader.inputGraph(in);
 ```
 
 There are a number of static method overloads that offer more options and control.

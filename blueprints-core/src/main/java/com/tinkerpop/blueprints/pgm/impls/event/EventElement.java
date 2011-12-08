@@ -67,7 +67,7 @@ public class EventElement implements Element {
             this.onEdgePropertyRemoved((Edge) this, key, propertyRemoved);
         }
 
-        return rawElement.removeProperty(key);
+        return propertyRemoved;
     }
 
     public Object getProperty(final String key) {
@@ -96,6 +96,10 @@ public class EventElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((EventElement) object).getId());
+        return null != object && (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((EventElement) object).getId());
+    }
+
+    public Element getRawElement() {
+        return this.rawElement;
     }
 }

@@ -1,0 +1,4 @@
+@prefix ctag: <http://commontag.org/ns#> .
+
+<http://example.com/tag/1> ctag:label "red"@en .
+<http://example.com/tag/8> ctag:label "green"@en .
