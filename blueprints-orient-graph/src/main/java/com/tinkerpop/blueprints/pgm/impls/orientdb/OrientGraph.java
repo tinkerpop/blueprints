@@ -377,8 +377,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void setMaxBufferSize(final int bufferSize) {
         getRawGraph().commit();
-        getContext(true).txCounter = 0;
-        getContext(true).txBuffer = bufferSize;
+        final OrientGraphContext context = getContext(true);
+        context.txCounter = 0;
+        context.txBuffer = bufferSize;
     }
 
     public int getMaxBufferSize() {
@@ -405,7 +406,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     protected void autoStopTransaction(final Conclusion conclusion) {
         final OrientGraphContext context = getContext(true);
         if (context.txBuffer > 0) {
-            context.txCounter = getContext(true).txCounter + 1;
+            context.txCounter = context.txCounter + 1;
             if (conclusion == Conclusion.FAILURE) {
                 final OGraphDatabase db = getRawGraph();
                 db.rollback();
