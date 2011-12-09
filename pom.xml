@@ -18,6 +18,12 @@
         suites, and supporting utilities.
     </description>
     <inceptionYear>2010</inceptionYear>
+    <licenses>
+        <license>
+            <name>BSD 3-Clause</name>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
     <scm>
         <connection>scm:git:git@github.com:tinkerpop/blueprints.git</connection>
         <developerConnection>scm:git:git@github.com:tinkerpop/blueprints.git</developerConnection>
