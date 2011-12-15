@@ -5,20 +5,21 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 * Implementations:
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
+**** "Neo4j High Availability":http://docs.neo4j.org/chunked/stable/ha-setup-tutorial.html support
 **** "Neo4j Batch Inserter":http://docs.neo4j.org/chunked/stable/indexing-batchinsert.html support
 ** "OrientDB":http://www.orientechnologies.com/ graph database
 ** "DEX":http://www.sparsity-technologies.com/dex graph database
-** "Rexster":http://rexster.tinkerpop.com RESTful graph shell
+** "Rexster":http://rexster.tinkerpop.com graph server
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
-**** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail
+**** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail, "SPARQLRepository":http://www.openrdf.org/doc/sesame2/api/org/openrdf/repository/sparql/SPARQLRepository.html
 * Ouplementations:
 ** "Java Universal/Graph":http://jung.sourceforge.net/ interface
 ** "Sesame 2.0":http://www.openrdf.org Sail interface
 * Supporting utilities:
 ** "GraphML Reader/Writer":http://graphml.graphdrawing.org/ utility
 ** "GraphJSON":http://www.json.org/ Reader/Writer utility
-** ReadOnlyGraph wrapper
-** EventGraph wrapper
+** @ReadOnlyGraph@ wrapper
+** @EventGraph@ wrapper
 ** Various helper utilities
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

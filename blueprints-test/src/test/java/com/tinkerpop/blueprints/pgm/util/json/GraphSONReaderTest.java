@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class GraphJSONReaderTest {
+public class GraphSONReaderTest {
 
     @Test
     public void inputGraphWithTypes() throws IOException {
@@ -27,7 +27,7 @@ public class GraphJSONReaderTest {
         byte[] bytes = json.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
 
-        GraphJSONReader.inputGraph(graph, inputStream);
+        GraphSONReader.inputGraph(graph, inputStream);
 
         Assert.assertEquals(2, getIterableCount(graph.getVertices()));
         Assert.assertEquals(1, getIterableCount(graph.getEdges()));
@@ -78,7 +78,7 @@ public class GraphJSONReaderTest {
         byte[] bytes = json.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
 
-        GraphJSONReader.inputGraph(graph, inputStream);
+        GraphSONReader.inputGraph(graph, inputStream);
 
         Assert.assertEquals(2, getIterableCount(graph.getVertices()));
         Assert.assertEquals(1, getIterableCount(graph.getEdges()));
@@ -126,7 +126,7 @@ public class GraphJSONReaderTest {
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-        GraphJSONWriter writer = new GraphJSONWriter(graph);
+        GraphSONWriter writer = new GraphSONWriter(graph);
         writer.outputGraph(stream, null, null, true);
 
         stream.flush();
@@ -138,7 +138,7 @@ public class GraphJSONReaderTest {
         InputStream inputStream = new ByteArrayInputStream(bytes);
 
         TinkerGraph emptyGraph = new TinkerGraph();
-        GraphJSONReader.inputGraph(emptyGraph, inputStream);
+        GraphSONReader.inputGraph(emptyGraph, inputStream);
 
         Assert.assertEquals(6, getIterableCount(emptyGraph.getVertices()));
         Assert.assertEquals(6, getIterableCount(emptyGraph.getEdges()));

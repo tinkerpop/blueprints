@@ -25,7 +25,7 @@ Upon doing so, any edit operation (or group of edit operations) must be wrapped 
 ```java
 txGraph.startTransaction();
 // edit operations
-tx.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+txGraph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 ```
 
 There are two types of conclusions: @Conclusion.SUCCESS@ and @Conclusion.FAILURE@. When a transaction is successful, it is committed to the underlying store. When the transaction is a failure, then all the edit operations up to the start of the transaction are rolled back. *Note*: Blueprints-enabled graphs do not require transactions for read-based operations.

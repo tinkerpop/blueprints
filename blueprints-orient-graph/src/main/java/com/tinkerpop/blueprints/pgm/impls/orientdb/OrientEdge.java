@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.Set;
+
+import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
@@ -7,12 +10,13 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
-import java.util.Set;
-
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientEdge extends OrientElement implements Edge {
+		public OrientEdge() {
+				super(null, new ODocument( ODatabaseRecordThreadLocal.INSTANCE.get()));
+		}
 
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
@@ -48,5 +52,4 @@ public class OrientEdge extends OrientElement implements Edge {
     public String toString() {
         return StringFactory.edgeString(this);
     }
-
 }

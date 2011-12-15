@@ -13,17 +13,17 @@ import java.io.OutputStream;
 import java.util.List;
 
 /**
- * GraphJSONWriter writes a Graph to a TinkerPop JSON OutputStream.
+ * GraphSONWriter writes a Graph to a TinkerPop JSON OutputStream.
  *
  * @author Stephen Mallette
  */
-public class GraphJSONWriter {
+public class GraphSONWriter {
     private final Graph graph;
 
     /**
      * @param graph the Graph to pull the data from
      */
-    public GraphJSONWriter(final Graph graph) {
+    public GraphSONWriter(final Graph graph) {
         this.graph = graph;
     }
 
@@ -44,19 +44,19 @@ public class GraphJSONWriter {
         jg.writeStartObject();
 
         if (showTypes) {
-            jg.writeBooleanField(JSONTokens.EMBEDDED_TYPES, showTypes);
+            jg.writeBooleanField(GraphSONTokens.EMBEDDED_TYPES, showTypes);
         }
 
-        jg.writeArrayFieldStart(JSONTokens.VERTICES);
+        jg.writeArrayFieldStart(GraphSONTokens.VERTICES);
         for (Vertex v : this.graph.getVertices()) {
-            jg.writeTree(JSONWriter.createJSONElementAsObjectNode(v, vertexPropertyKeys, showTypes));
+            jg.writeTree(GraphSONFactory.createJSONElementAsObjectNode(v, vertexPropertyKeys, showTypes));
         }
 
         jg.writeEndArray();
 
-        jg.writeArrayFieldStart(JSONTokens.EDGES);
+        jg.writeArrayFieldStart(GraphSONTokens.EDGES);
         for (Edge e : this.graph.getEdges()) {
-            jg.writeTree(JSONWriter.createJSONElementAsObjectNode(e, edgePropertyKeys, showTypes));
+            jg.writeTree(GraphSONFactory.createJSONElementAsObjectNode(e, edgePropertyKeys, showTypes));
         }
         jg.writeEndArray();
 
@@ -74,7 +74,7 @@ public class GraphJSONWriter {
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream) throws IOException {
-        GraphJSONWriter writer = new GraphJSONWriter(graph);
+        GraphSONWriter writer = new GraphSONWriter(graph);
         writer.outputGraph(jsonOutputStream, null, null, false);
     }
 
@@ -87,7 +87,7 @@ public class GraphJSONWriter {
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final boolean showTypes) throws IOException {
-        GraphJSONWriter writer = new GraphJSONWriter(graph);
+        GraphSONWriter writer = new GraphSONWriter(graph);
         writer.outputGraph(jsonOutputStream, null, null, showTypes);
     }
 
@@ -102,7 +102,7 @@ public class GraphJSONWriter {
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys, final boolean showTypes) throws IOException {
-        GraphJSONWriter writer = new GraphJSONWriter(graph);
+        GraphSONWriter writer = new GraphSONWriter(graph);
         writer.outputGraph(jsonOutputStream, edgePropertyKeys, vertexPropertyKeys, showTypes);
     }
 

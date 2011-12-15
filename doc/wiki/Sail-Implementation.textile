@@ -28,6 +28,12 @@ Graph graph = new LinkedDataSailGraph(new MemoryStoreSailGraph());
 Vertex v = graph.getVertex("http://dbpedia.org/resource/Graph_Database");
 ```
 
+* "SPARQL Repository":http://www.openrdf.org/doc/sesame2/api/org/openrdf/repository/sparql/SPARQLRepository.html
+
+```java
+Graph graph = new SparqlRepositorySailGraph("http://dbpedia.org/sparql");
+```
+
 Any of these stores can be manipulated with Blueprints through their Sail interfaces. Here is a list of aspects of RDF that should be understood when dealing with Blueprints over an RDF store.
 
 # *No duplicate edges*: RDF considers two edges the same if they share the same subject, predicate, object, and graph. Thus, edges with these in common are, in fact, the same edge.

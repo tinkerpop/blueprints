@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-sail-graph</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>bundle</packaging>
     <name>Blueprints-SailGraph</name>
     <description>Blueprints property graph implementation for Sesame RDF Sail</description>
@@ -53,7 +53,12 @@
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>
             <artifactId>nquads</artifactId>
-            <version>1.4</version>
+            <version>${sesametools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.fortytwo.sesametools</groupId>
+            <artifactId>reposail</artifactId>
+            <version>${sesametools.version}</version>
         </dependency>
         <!-- TESTING -->
         <dependency>

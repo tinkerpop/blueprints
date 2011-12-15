@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-neo4jbatch-graph</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>bundle</packaging>
     <name>Blueprints-Neo4jBatchGraph</name>
     <description>Blueprints property graph implementation for the Neo4j batch inserter</description>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>1.5.M01</version>
+            <version>1.5</version>
             <type>pom</type>
         </dependency>
         <!-- TESTING -->

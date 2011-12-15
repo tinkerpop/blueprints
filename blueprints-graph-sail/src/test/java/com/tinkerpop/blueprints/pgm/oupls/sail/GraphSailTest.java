@@ -21,6 +21,8 @@ import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
+import java.io.File;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -254,5 +256,18 @@ public abstract class GraphSailTest extends SailTest {
         }
 
         return count;
+    }
+
+    protected static void deleteDirectory(final File directory) {
+        if (directory.exists()) {
+            for (File file : directory.listFiles()) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+            directory.delete();
+        }
     }
 }

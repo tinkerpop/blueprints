@@ -80,7 +80,7 @@ public class VertexTestSuite extends TestSuite {
             assertEquals("\"1\"^^<datatype:int>", v2.getId());
             Vertex v3 = graph.addVertex("_:ABLANKNODE");
             assertEquals(v3.getId(), "_:ABLANKNODE");
-            Vertex v4 = graph.addVertex("\"2.24\"^^<xsd:double>");
+            Vertex v4 = graph.addVertex("\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>");
             assertEquals("\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>", v4.getId());
         }
         graph.shutdown();

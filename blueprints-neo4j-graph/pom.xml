@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-neo4j-graph</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>bundle</packaging>
     <name>Blueprints-Neo4jGraph</name>
     <description>Blueprints property graph implementation for the Neo4j graph database</description>
@@ -22,19 +22,19 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>1.5.M02</version>
+            <version>1.5</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ha</artifactId>
-            <version>1.5.M02</version>
+            <version>1.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-management</artifactId>
-            <version>1.5.M02</version>
+            <version>1.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

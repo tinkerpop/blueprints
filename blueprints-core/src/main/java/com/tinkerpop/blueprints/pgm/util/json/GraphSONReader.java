@@ -19,17 +19,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * GraphJSONReader reads the data from a TinkerPop JSON stream to a graph.
+ * GraphSONReader reads the data from a TinkerPop JSON stream to a graph.
  *
  * @author Stephen Mallette
  */
-public class GraphJSONReader {
+public class GraphSONReader {
     private final Graph graph;
 
     /**
      * @param graph the graph to populate with the JSON data
      */
-    public GraphJSONReader(final Graph graph) {
+    public GraphSONReader(final Graph graph) {
         this.graph = graph;
     }
 
@@ -41,7 +41,7 @@ public class GraphJSONReader {
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public void inputGraph(final InputStream jsonInputStream) throws IOException {
-        GraphJSONReader.inputGraph(this.graph, jsonInputStream, 1000);
+        GraphSONReader.inputGraph(this.graph, jsonInputStream, 1000);
     }
 
     /**
@@ -53,7 +53,7 @@ public class GraphJSONReader {
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public void inputGraph(final InputStream jsonInputStream, int bufferSize) throws IOException {
-        GraphJSONReader.inputGraph(this.graph, jsonInputStream, bufferSize);
+        GraphSONReader.inputGraph(this.graph, jsonInputStream, bufferSize);
     }
 
     /**
@@ -65,7 +65,7 @@ public class GraphJSONReader {
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph graph, final InputStream jsonInputStream) throws IOException {
-        GraphJSONReader.inputGraph(graph, jsonInputStream, 1000);
+        GraphSONReader.inputGraph(graph, jsonInputStream, 1000);
     }
 
     /**
@@ -92,16 +92,16 @@ public class GraphJSONReader {
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
             String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();
-            if (fieldname.equals(JSONTokens.EMBEDDED_TYPES)) {
+            if (fieldname.equals(GraphSONTokens.EMBEDDED_TYPES)) {
                 jp.nextToken();
                 hasEmbeddedTypes = jp.getBooleanValue();
-            } else if (fieldname.equals(JSONTokens.VERTICES)) {
+            } else if (fieldname.equals(GraphSONTokens.VERTICES)) {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
                     JsonNode node = jp.readValueAsTree();
                     Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
-                    String vertexId = node.get(JSONTokens._ID).getValueAsText();
+                    String vertexId = node.get(GraphSONTokens._ID).getValueAsText();
                     Vertex v = graph.addVertex(vertexId);
                     vertexIdMap.put(vertexId, v.getId());
 
@@ -109,16 +109,16 @@ public class GraphJSONReader {
                         v.setProperty(entry.getKey(), entry.getValue());
                     }
                 }
-            } else if (fieldname.equals(JSONTokens.EDGES)) {
+            } else if (fieldname.equals(GraphSONTokens.EDGES)) {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
                     JsonNode node = jp.readValueAsTree();
                     Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
-                    String edgeId = node.get(JSONTokens._ID).getValueAsText();
-                    Object inVertexKey = vertexIdMap.get(node.get(JSONTokens._IN_V).getValueAsText());
-                    Object outVertexKey = vertexIdMap.get(node.get(JSONTokens._OUT_V).getValueAsText());
-                    String label = node.get(JSONTokens._LABEL).getValueAsText();
+                    String edgeId = node.get(GraphSONTokens._ID).getValueAsText();
+                    Object inVertexKey = vertexIdMap.get(node.get(GraphSONTokens._IN_V).getValueAsText());
+                    Object outVertexKey = vertexIdMap.get(node.get(GraphSONTokens._OUT_V).getValueAsText());
+                    String label = node.get(GraphSONTokens._LABEL).getValueAsText();
 
                     Vertex inV = graph.getVertex(inVertexKey);
                     Vertex outV = graph.getVertex(outVertexKey);
@@ -155,32 +155,32 @@ public class GraphJSONReader {
     }
 
     private static boolean isReservedKey(final String key) {
-        return key.equals(JSONTokens._ID) || key.equals(JSONTokens._TYPE) || key.equals(JSONTokens._LABEL)
-                || key.equals(JSONTokens._OUT_V) || key.equals(JSONTokens._IN_V);
+        return key.equals(GraphSONTokens._ID) || key.equals(GraphSONTokens._TYPE) || key.equals(GraphSONTokens._LABEL)
+                || key.equals(GraphSONTokens._OUT_V) || key.equals(GraphSONTokens._IN_V);
     }
 
     private static Object readProperty(final JsonNode node, final boolean hasEmbeddedTypes) {
         Object propertyValue;
 
         if (hasEmbeddedTypes) {
-            if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_UNKNOWN)) {
+            if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_UNKNOWN)) {
                 propertyValue = null;
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_BOOLEAN)) {
-                propertyValue = node.get(JSONTokens.VALUE).getBooleanValue();
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_FLOAT)) {
-                propertyValue = Float.parseFloat(node.get(JSONTokens.VALUE).getValueAsText());
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_DOUBLE)) {
-                propertyValue = node.get(JSONTokens.VALUE).getDoubleValue();
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_INTEGER)) {
-                propertyValue = node.get(JSONTokens.VALUE).getIntValue();
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_LONG)) {
-                propertyValue = node.get(JSONTokens.VALUE).getLongValue();
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_STRING)) {
-                propertyValue = node.get(JSONTokens.VALUE).getTextValue();
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_LIST)) {
-                propertyValue = readProperties(node.get(JSONTokens.VALUE).getElements(), hasEmbeddedTypes);
-            } else if (node.get(JSONTokens.TYPE).getValueAsText().equals(JSONTokens.TYPE_MAP)) {
-                propertyValue = readProperties(node.get(JSONTokens.VALUE), false, hasEmbeddedTypes);
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_BOOLEAN)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getBooleanValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_FLOAT)) {
+                propertyValue = Float.parseFloat(node.get(GraphSONTokens.VALUE).getValueAsText());
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_DOUBLE)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getDoubleValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_INTEGER)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getIntValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_LONG)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getLongValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_STRING)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getTextValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_LIST)) {
+                propertyValue = readProperties(node.get(GraphSONTokens.VALUE).getElements(), hasEmbeddedTypes);
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_MAP)) {
+                propertyValue = readProperties(node.get(GraphSONTokens.VALUE), false, hasEmbeddedTypes);
             } else {
                 propertyValue = node.getValueAsText();
             }
