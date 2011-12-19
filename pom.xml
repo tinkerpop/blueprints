@@ -70,18 +70,6 @@
         <module>blueprints-test</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>tinkerpop-repository</id>
-            <name>TinkerPop Maven2 Repository</name>
-            <url>http://tinkerpop.com/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <properties>
         <blueprints.version>1.2-SNAPSHOT</blueprints.version>
         <sesame.version>2.6.0</sesame.version>
