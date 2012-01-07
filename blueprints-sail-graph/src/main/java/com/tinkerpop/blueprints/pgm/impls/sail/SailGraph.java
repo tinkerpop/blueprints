@@ -366,6 +366,7 @@ public class SailGraph implements TransactionalGraph {
 
     public synchronized void shutdown() {
         try {
+            this.stopTransaction(Conclusion.SUCCESS);
             closeAllConnections();
             this.rawGraph.shutDown();
         } catch (Throwable e) {
