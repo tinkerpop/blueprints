@@ -19,13 +19,11 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
-import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.HighlyAvailableGraphDatabase;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,11 +52,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     };
 
-    protected Map<String, Neo4jIndex> indices = new HashMap<String, Neo4jIndex>();
-    protected Map<String, Neo4jAutomaticIndex<Neo4jVertex, Node>> automaticVertexIndices = new HashMap<String, Neo4jAutomaticIndex<Neo4jVertex, Node>>();
-    protected Map<String, Neo4jAutomaticIndex<Neo4jEdge, Relationship>> automaticEdgeIndices = new HashMap<String, Neo4jAutomaticIndex<Neo4jEdge, Relationship>>();
-
-
     public Neo4jGraph(final String directory) {
         this(directory, null);
     }
@@ -69,12 +62,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Neo4jGraph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
-        this.loadIndices(true);
+        this.freshLoad();
     }
 
     public Neo4jGraph(final GraphDatabaseService rawGraph, boolean fresh) {
         this.rawGraph = rawGraph;
-        this.loadIndices(fresh);
+        if (fresh)
+            this.freshLoad();
     }
 
     protected Neo4jGraph(final String directory, final Map<String, String> configuration, boolean highAvailabilityMode) {
@@ -93,7 +87,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             else
                 this.rawGraph = new EmbeddedGraphDatabase(directory);
 
-            this.loadIndices(fresh);
+            if (fresh)
+                this.freshLoad();
 
         } catch (RuntimeException e) {
             if (this.rawGraph != null)
@@ -106,68 +101,63 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
-    private void loadIndices(boolean fresh) {
-        if (fresh) {
-            // remove reference node
-            try {
-                this.removeVertex(this.getVertex(0));
-            } catch (Exception e) {
-            }
-            this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
-            this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
-            return;
+    private void freshLoad() {
+        // remove reference node
+        try {
+            this.removeVertex(this.getVertex(0));
+        } catch (Exception e) {
         }
-        final IndexManager manager = this.rawGraph.index();
-        for (final String indexName : manager.nodeIndexNames()) {
-            final org.neo4j.graphdb.index.Index<Node> neo4jIndex = manager.forNodes(indexName);
-            final String type = manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
-            if (null != type && type.equals(Index.Type.AUTOMATIC.toString()))
-                this.createAutomaticIndex(indexName, Neo4jVertex.class, null);
-            else
-                this.createManualIndex(indexName, Neo4jVertex.class);
-        }
+        this.createAutomaticIndex(Index.VERTICES, Neo4jVertex.class, null);
+        this.createAutomaticIndex(Index.EDGES, Neo4jEdge.class, null);
+    }
 
-        for (final String indexName : manager.relationshipIndexNames()) {
-            final org.neo4j.graphdb.index.Index<Relationship> neo4jIndex = manager.forRelationships(indexName);
-            final String type = manager.getConfiguration(neo4jIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
-            if (null != type && type.equals(Index.Type.AUTOMATIC.toString()))
-                this.createAutomaticIndex(indexName, Neo4jEdge.class, null);
-            else
-                this.createManualIndex(indexName, Neo4jEdge.class);
-        }
+    private boolean isAutomaticIndex(final org.neo4j.graphdb.index.Index rawIndex) {
+        final String type = this.rawGraph.index().getConfiguration(rawIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
+        return (null != type && type.equals(Index.Type.AUTOMATIC.toString()));
     }
 
     public synchronized <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
-        if (this.indices.containsKey(indexName))
+        if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw new RuntimeException("Index already exists: " + indexName);
+        }
 
-        Neo4jIndex index = new Neo4jIndex(indexName, indexClass, this);
-        this.indices.put(index.getIndexName(), index);
-        return index;
+        return new Neo4jIndex(indexName, indexClass, this);
     }
 
     public synchronized <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys) {
-        if (this.indices.containsKey(indexName))
+        if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw new RuntimeException("Index already exists: " + indexName);
+        }
 
-        final Neo4jAutomaticIndex index = new Neo4jAutomaticIndex(indexName, indexClass, this, keys);
-        if (Vertex.class.isAssignableFrom(indexClass))
-            this.automaticVertexIndices.put(index.getIndexName(), index);
-        else
-            this.automaticEdgeIndices.put(index.getIndexName(), index);
-        this.indices.put(index.getIndexName(), index);
-        return index;
+        return new Neo4jAutomaticIndex(indexName, indexClass, this, keys);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        final Index index = this.indices.get(indexName);
-        // todo: be sure to do code for multiple connections interacting with graph
-        if (null == index)
+        if (Vertex.class.isAssignableFrom(indexClass)) {
+            if (this.rawGraph.index().existsForNodes(indexName)) {
+                if (isAutomaticIndex(this.rawGraph.index().forNodes(indexName)))
+                    return new Neo4jAutomaticIndex(indexName, indexClass, this, null);
+                else
+                    return new Neo4jIndex(indexName, indexClass, this);
+            } else if (this.rawGraph.index().existsForRelationships(indexName)) {
+                throw new RuntimeException("Can not convert existing " + indexName + " index to a " + indexClass + " index");
+            } else {
+                return null;
+            }
+        } else if (Edge.class.isAssignableFrom(indexClass)) {
+            if (this.rawGraph.index().existsForRelationships(indexName)) {
+                if (isAutomaticIndex(this.rawGraph.index().forRelationships(indexName)))
+                    return new Neo4jAutomaticIndex(indexName, indexClass, this, null);
+                else
+                    return new Neo4jIndex(indexName, indexClass, this);
+            } else if (this.rawGraph.index().existsForNodes(indexName)) {
+                throw new RuntimeException("Can not convert existing " + indexName + " index to a " + indexClass + " index");
+            } else {
+                return null;
+            }
+        } else {
             return null;
-        else if (indexClass.isAssignableFrom(index.getIndexClass()))
-            return (Index<T>) index;
-        else
-            throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
+        }
     }
 
     public synchronized void dropIndex(final String indexName) {
@@ -175,9 +165,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             this.autoStartTransaction();
             this.rawGraph.index().forNodes(indexName).delete();
             this.rawGraph.index().forRelationships(indexName).delete();
-            this.indices.remove(indexName);
-            this.automaticEdgeIndices.remove(indexName);
-            this.automaticVertexIndices.remove(indexName);
             this.stopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             this.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
@@ -189,18 +176,46 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     protected <T extends Neo4jElement> Iterable<Neo4jAutomaticIndex<T, PropertyContainer>> getAutoIndices(final Class<T> indexClass) {
-        if (Vertex.class.isAssignableFrom(indexClass))
-            return (Iterable) automaticVertexIndices.values();
-        else
-            return (Iterable) automaticEdgeIndices.values();
+        final String[] names;
+        final boolean forVertices = Vertex.class.isAssignableFrom(indexClass);
+        if (forVertices) {
+            names = this.rawGraph.index().nodeIndexNames();
+        } else {
+            names = this.rawGraph.index().relationshipIndexNames();
+        }
+        final List<Neo4jAutomaticIndex<T, PropertyContainer>> indices = new ArrayList<Neo4jAutomaticIndex<T, PropertyContainer>>();
+        for (final String name : names) {
+            if (forVertices) {
+                if (isAutomaticIndex(this.rawGraph.index().forNodes(name))) {
+                    indices.add(new Neo4jAutomaticIndex(name, Vertex.class, this, null));
+                }
+            } else {
+                if (isAutomaticIndex(this.rawGraph.index().forRelationships(name))) {
+                    indices.add(new Neo4jAutomaticIndex(name, Edge.class, this, null));
+                }
+            }
+        }
+        return indices;
+
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-        for (final Index index : this.indices.values()) {
-            list.add(index);
+        final List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
+        for (final String name : this.rawGraph.index().nodeIndexNames()) {
+            if (isAutomaticIndex(this.rawGraph.index().forNodes(name))) {
+                indices.add(new Neo4jAutomaticIndex(name, Vertex.class, this, null));
+            } else {
+                indices.add(new Neo4jIndex(name, Vertex.class, this));
+            }
         }
-        return list;
+        for (final String name : this.rawGraph.index().relationshipIndexNames()) {
+            if (isAutomaticIndex(this.rawGraph.index().forRelationships(name))) {
+                indices.add(new Neo4jAutomaticIndex(name, Edge.class, this, null));
+            } else {
+                indices.add(new Neo4jIndex(name, Edge.class, this));
+            }
+        }
+        return indices;
     }
 
 

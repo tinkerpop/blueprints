@@ -21,6 +21,9 @@ h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Fixed @Neo4jGraph@ indexing caching bug
+* Fixed @SailGraph@ to now commit transactions on shutdown
+
 ==<hr/>==
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-blueberry.png!
