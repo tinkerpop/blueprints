@@ -8,7 +8,7 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jGraphEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -21,6 +21,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.HighlyAvailableGraphDatabase;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -253,11 +254,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new Neo4jVertexSequence(this.rawGraph.getAllNodes(), this);
+        return new Neo4jVertexSequence(GlobalGraphOperations.at(rawGraph).getAllNodes(), this);
     }
 
     public Iterable<Edge> getEdges() {
-        return new Neo4jGraphEdgeSequence(this.rawGraph.getAllNodes(), this);
+        return new Neo4jEdgeSequence(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this);
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -402,7 +403,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
             }
             this.stopTransaction(Conclusion.SUCCESS);
             this.startTransaction();
-            for (final Node node : this.rawGraph.getAllNodes()) {
+            for (final Node node : GlobalGraphOperations.at(this.rawGraph).getAllNodes()) {
                 for (final Relationship relationship : node.getRelationships()) {
                     try {
                         relationship.delete();
