@@ -24,6 +24,7 @@ h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
 * Fixed @Neo4jGraph@ index object caching bug which was made salient with multiple threads
 * Fixed @SailGraph@ to now commit transactions on shutdown
 * Updated @Neo4jGraph@ to use @GlobalGraphOperations@ methods for @getAllNodes()@ and @getAllRelationships()@
+* Bumped to support Neo4j 1.6.M03
 
 ==<hr/>==
 
