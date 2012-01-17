@@ -1,12 +1,13 @@
-package com.tinkerpop.blueprints.pgm.impls.neo4j;
+package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.Neo4jBatchGraph;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,6 +66,26 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertEquals(1, count(batch.getIndices()));
         Index<Edge> edgeIndex = batch.createManualIndex(Index.EDGES, Edge.class);
         assertEquals(2, count(batch.getIndices()));
+        batch.createAutomaticIndex("fakeIndex", Vertex.class, null);
+        assertEquals(3, count(batch.getIndices()));
+        for (final Index index : batch.getIndices()) {
+            if (index.getIndexName().equals(Index.VERTICES)) {
+                assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
+                assertEquals(index.getIndexClass(), Vertex.class);
+                assertEquals(((AutomaticIndex) index).getAutoIndexKeys().size(), 2);
+                assertTrue(((AutomaticIndex) index).getAutoIndexKeys().contains("name"));
+                assertTrue(((AutomaticIndex) index).getAutoIndexKeys().contains("age"));
+            } else if (index.getIndexName().equals(Index.EDGES)) {
+                assertEquals(index.getIndexType(), Index.Type.MANUAL);
+                assertEquals(index.getIndexClass(), Edge.class);
+            } else if (index.getIndexName().equals("fakeIndex")) {
+                assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
+                assertEquals(index.getIndexClass(), Vertex.class);
+                assertNull(((AutomaticIndex) index).getAutoIndexKeys());
+            } else {
+                throw new RuntimeException("There should not be a forth index.");
+            }
+        }
 
         final List<Long> ids = new ArrayList<Long>();
         for (int i = 0; i < 10; i++) {
@@ -87,9 +108,22 @@ public class Neo4jBatchGraphTest extends BaseTest {
         batch.shutdown();
 
         final IndexableGraph graph = new Neo4jGraph(directory);
-        assertEquals(count(graph.getIndices()), 2);
+        assertEquals(count(graph.getIndices()), 3);
         Index<Vertex> vertexIndex = graph.getIndex(Index.VERTICES, Vertex.class);
+        assertEquals(vertexIndex.getIndexType(), Index.Type.AUTOMATIC);
+        assertEquals(vertexIndex.getIndexClass(), Vertex.class);
+        assertEquals(((AutomaticIndex) vertexIndex).getAutoIndexKeys().size(), 2);
+        assertTrue(((AutomaticIndex) vertexIndex).getAutoIndexKeys().contains("name"));
+        assertTrue(((AutomaticIndex) vertexIndex).getAutoIndexKeys().contains("age"));
         edgeIndex = graph.getIndex(Index.EDGES, Edge.class);
+        assertEquals(edgeIndex.getIndexType(), Index.Type.MANUAL);
+        assertEquals(edgeIndex.getIndexClass(), Edge.class);
+        Index<Vertex> fakeIndex = graph.getIndex("fakeIndex", Vertex.class);
+        assertEquals(fakeIndex.getIndexType(), Index.Type.AUTOMATIC);
+        assertEquals(fakeIndex.getIndexClass(), Vertex.class);
+        assertNull(((AutomaticIndex) fakeIndex).getAutoIndexKeys());
+
+
         graph.removeVertex(graph.getVertex(0)); // remove reference node
         assertEquals(count(graph.getVertices()), 10);
 

@@ -17,6 +17,7 @@ public class Neo4jBatchAutomaticIndex<T extends Element> extends Neo4jBatchIndex
 
     public Neo4jBatchAutomaticIndex(final Neo4jBatchGraph graph, final BatchInserterIndex index, final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
         super(graph, index, indexName, indexClass);
+
         this.autoIndexKeys = indexKeys;
     }
 
@@ -40,5 +41,4 @@ public class Neo4jBatchAutomaticIndex<T extends Element> extends Neo4jBatchIndex
     public Type getIndexType() {
         return Type.AUTOMATIC;
     }
-
 }
