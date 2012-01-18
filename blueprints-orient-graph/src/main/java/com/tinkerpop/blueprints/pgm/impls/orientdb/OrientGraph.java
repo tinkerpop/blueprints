@@ -1,5 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.id.ORID;
@@ -21,11 +26,6 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
  *
@@ -39,26 +39,14 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private String password;
 
     private final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
-  
+      
     /**
-     * Reuses the underlying database avoiding to create and open it every time.
+     * Constructs a new object using an existent OGraphDatabase instance.
      * 
-     * @param iDatabase Underlying OGraphDatabase object
+     * @param iDatabase Underlying OGraphDatabase object to attach
      */
-    public OrientGraph reuse(final OGraphDatabase iDatabase) {
-       this.url = iDatabase.getURL();
-       this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
-       synchronized (this) {
-          OrientGraphContext context = threadContext.get();
-          if (context == null || context.rawGraph != iDatabase ){
-            removeContext();
-            context = new OrientGraphContext();
-            context.rawGraph = iDatabase;
-            iDatabase.checkForGraphSchema();
-            this.threadContext.set(context);
-          }
-       }
-       return this;
+    public OrientGraph(final OGraphDatabase iDatabase) {
+       reuse(iDatabase);
    }
 
     public OrientGraph(final String url) {
@@ -337,6 +325,26 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
         }
     }
 
+    /**
+     * Reuses the underlying database avoiding to create and open it every time.
+     * 
+     * @param iDatabase Underlying OGraphDatabase object
+     */
+    public OrientGraph reuse(final OGraphDatabase iDatabase) {
+       this.url = iDatabase.getURL();
+       this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
+       synchronized (this) {
+          OrientGraphContext context = threadContext.get();
+          if (context == null || context.rawGraph != iDatabase ){
+            removeContext();
+            context = new OrientGraphContext();
+            context.rawGraph = iDatabase;
+            iDatabase.checkForGraphSchema();
+            this.threadContext.set(context);
+          }
+       }
+       return this;
+   }
     /**
      * This operation does not respect the transaction buffer. A clear will eradicate the graph and commit the results immediately.
      */
