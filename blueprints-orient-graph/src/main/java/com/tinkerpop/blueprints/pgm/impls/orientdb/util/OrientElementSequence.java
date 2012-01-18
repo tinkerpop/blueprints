@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb.util;
 
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
@@ -36,8 +37,8 @@ public class OrientElementSequence<T extends Element> implements CloseableSequen
         if (null == current)
             throw new NoSuchElementException();
 
-        if (current instanceof ORID)
-            current = graph.getRawGraph().load((ORID) current);
+        if (current instanceof OIdentifiable)
+            current = ((OIdentifiable) current).getRecord();
 
         if (current instanceof ODocument) {
             final ODocument currentDocument = (ODocument) current;
