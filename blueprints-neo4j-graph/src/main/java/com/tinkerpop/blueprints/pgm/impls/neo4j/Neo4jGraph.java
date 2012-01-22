@@ -63,7 +63,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
 
     public Neo4jGraph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
-        this.freshLoad();
     }
 
     public Neo4jGraph(final GraphDatabaseService rawGraph, boolean fresh) {
@@ -103,7 +102,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     }
 
     private void freshLoad() {
-        // remove reference node
+        // remove reference node and create default indices
         try {
             this.removeVertex(this.getVertex(0));
         } catch (Exception e) {
