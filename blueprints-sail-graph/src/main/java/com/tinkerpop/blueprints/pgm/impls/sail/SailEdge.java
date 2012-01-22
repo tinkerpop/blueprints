@@ -37,6 +37,18 @@ public class SailEdge implements Edge {
         return this.rawEdge.getPredicate().stringValue();
     }
 
+    public String getNamedGraph() {
+        return (String) this.getProperty(SailTokens.NAMED_GRAPH);
+    }
+
+    public void setNamedGraph(final String namedGraph) {
+        this.setProperty(SailTokens.NAMED_GRAPH, namedGraph);
+    }
+
+    public boolean hasNamedGraph() {
+        return this.getProperty(SailTokens.NAMED_GRAPH) != null;
+    }
+
     public Set<String> getPropertyKeys() {
         Set<String> keys = new HashSet<String>();
         if (null != this.rawEdge.getContext())
@@ -45,9 +57,13 @@ public class SailEdge implements Edge {
     }
 
     public Object getProperty(final String key) {
-        if (key.equals(SailTokens.NAMED_GRAPH))
-            return this.rawEdge.getContext().stringValue();
-        else
+        if (key.equals(SailTokens.NAMED_GRAPH)) {
+            Resource resource = this.rawEdge.getContext();
+            if (null == resource)
+                return null;
+            else
+                return resource.stringValue();
+        } else
             return null;
     }
 

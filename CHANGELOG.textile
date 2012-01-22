@@ -25,6 +25,9 @@ h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
 * Fixed @SailGraph@ to now commit transactions on shutdown
 * Updated @Neo4jGraph@ to use @GlobalGraphOperations@ methods for @getAllNodes()@ and @getAllRelationships()@
 * Bumped to support Neo4j 1.6.M03
+* Fixed "fresh"-constructor bug in @Neo4jGraph@
+* Added method support for named graphs in @SailGraph@
+* Fixed named graph bug in @SailGraph@
 
 ==<hr/>==
 

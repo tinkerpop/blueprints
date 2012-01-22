@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
+import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
@@ -150,6 +151,21 @@ public class SailGraphTest extends GraphTest {
             assertTrue(map.get("y").equals(graph.getVertex("tg:2")) || map.get("y").equals(graph.getVertex("tg:4")));
         }
         graph.shutdown();
+    }
+
+    public void testNamedGraphs() {
+        SailGraph graph = new MemoryStoreSailGraph();
+        SailGraphFactory.createTinkerGraph(graph);
+        for (Edge edge : graph.getEdges()) {
+            SailEdge se = (SailEdge) edge;
+            assertNull(se.getNamedGraph());
+            assertNull(se.getProperty(SailTokens.NAMED_GRAPH));
+            assertFalse(se.hasNamedGraph());
+            se.setNamedGraph("http://agraph");
+            assertEquals(se.getNamedGraph(), "http://agraph");
+            assertEquals(se.getNamedGraph(), se.getProperty(SailTokens.NAMED_GRAPH));
+            assertTrue(se.hasNamedGraph());
+        }
     }
 
     //// TEST SUITES
