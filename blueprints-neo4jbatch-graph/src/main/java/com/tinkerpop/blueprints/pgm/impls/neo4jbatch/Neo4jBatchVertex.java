@@ -49,7 +49,7 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
         throw new UnsupportedOperationException();
     }
 
-    protected Map<String, Object> getPropertyMap() {
+    public Map<String, Object> getPropertyMap() {
         return this.graph.getRawGraph().getNodeProperties(this.id);
     }
 

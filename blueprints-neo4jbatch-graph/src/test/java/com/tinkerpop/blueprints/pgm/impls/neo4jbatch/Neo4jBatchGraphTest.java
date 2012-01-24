@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,9 +33,11 @@ public class Neo4jBatchGraphTest extends BaseTest {
         for (int i = 0; i < 10; i++) {
             ids.add((Long) batch.addVertex(null).getId());
         }
+        //System.out.println(ids);
         for (int i = 1; i < ids.size(); i++) {
             long idA = ids.get(i - 1);
             long idB = ids.get(i);
+            //System.out.println(batch.getVertex(idA) + "--" + batch.getVertex(idB));
             batch.addEdge(null, batch.getVertex(idA), batch.getVertex(idB), idA + "-" + idB);
         }
         batch.shutdown();
@@ -56,6 +59,67 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertNull(graph.getEdge(100L));
 
         graph.shutdown();
+    }
+
+    public void testAddingVerticesWithUserIdsThenSettingProperties() {
+        List<Long> ids = new ArrayList<Long>(Arrays.asList(100L, 5L, 10L, 4L, 10000L));
+        final String directory = this.getWorkingDirectory();
+        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        for (final Long id : ids) {
+            Vertex v = batch.addVertex(id);
+            v.setProperty("theKey", id);
+        }
+        for (final Long id : ids) {
+            assertNotNull(batch.getVertex(id));
+            assertEquals(batch.getVertex(id).getProperty("theKey"), id);
+        }
+        assertNull(batch.getVertex(1L));
+        assertNull(batch.getVertex(2L));
+        assertNull(batch.getVertex(200000L));
+        batch.shutdown();
+
+        final Graph graph = new Neo4jGraph(directory);
+        graph.removeVertex(graph.getVertex(0)); // remove reference node
+        assertEquals(count(graph.getVertices()), ids.size());
+        for (final Long id : ids) {
+            assertNotNull(graph.getVertex(id));
+            assertEquals(graph.getVertex(id).getProperty("theKey"), id);
+            assertEquals(graph.getVertex(id).getPropertyKeys().size(), 1);
+        }
+        assertNull(graph.getVertex(1L));
+        assertNull(graph.getVertex(2L));
+        assertNull(graph.getVertex(200000L));
+        graph.shutdown();
+    }
+
+    public void testAddingVerticesWithUserIdsAsStringsThenSettingProperties() {
+        List<Object> ids = new ArrayList<Object>(Arrays.asList(100L, 5.0d, "10", 4.0f, "10000.00"));
+        final String directory = this.getWorkingDirectory();
+        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        for (final Object id : ids) {
+            Vertex v = batch.addVertex(id);
+            v.setProperty("theKey", id);
+        }
+        for (final Object id : ids) {
+            assertNotNull(batch.getVertex(id));
+            assertEquals(batch.getVertex(id).getProperty("theKey"), id);
+        }
+        assertNull(batch.getVertex(1L));
+        assertNull(batch.getVertex(2L));
+        assertNull(batch.getVertex(200000L));
+        batch.shutdown();
+
+        final Graph graph = new Neo4jGraph(directory);
+        graph.removeVertex(graph.getVertex(0)); // remove reference node
+        assertEquals(count(graph.getVertices()), ids.size());
+        assertNotNull(graph.getVertex(100l));
+        assertNotNull(graph.getVertex(5l));
+        assertNotNull(graph.getVertex(10l));
+        assertNotNull(graph.getVertex(4l));
+        assertNotNull(graph.getVertex(10000));
+
+        graph.shutdown();
+
     }
 
     public void testAddingVerticesEdgesWithIndices() {
@@ -254,6 +318,56 @@ public class Neo4jBatchGraphTest extends BaseTest {
         System.out.println(batch.addVertex(null));
         System.out.println(batch.addEdge(null, batch.addVertex(null), batch.addVertex(null), "label"));
         batch.shutdown();
+    }
+
+    public void testGraphMLLoad() throws Exception {
+        final String directory = this.getWorkingDirectory();
+        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        new GraphMLReader(batch).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+        assertNotNull(batch.getVertex(1));
+        assertNotNull(batch.getVertex(2));
+        assertNotNull(batch.getVertex(3));
+        assertNotNull(batch.getVertex(4));
+        assertNotNull(batch.getVertex(5));
+        assertNotNull(batch.getVertex(6));
+        assertNull(batch.getVertex(7));
+        assertEquals(batch.getVertex(1).getProperty("name"), "marko");
+        assertEquals(batch.getVertex(2).getProperty("name"), "vadas");
+        assertEquals(batch.getVertex(3).getProperty("name"), "lop");
+        assertEquals(batch.getVertex(4).getProperty("name"), "josh");
+        assertEquals(batch.getVertex(5).getProperty("name"), "ripple");
+        assertEquals(batch.getVertex(6).getProperty("name"), "peter");
+        batch.shutdown();
+
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        graph.removeVertex(graph.getVertex(0)); // remove reference vertex
+        assertEquals(count(graph.getVertices()), 6);
+        assertEquals(count(graph.getEdges()), 6);
+        assertEquals(count(graph.getVertex("1").getOutEdges()), 3);
+        assertEquals(count(graph.getVertex("1").getInEdges()), 0);
+        Vertex marko = graph.getVertex("1");
+        assertEquals(marko.getProperty("name"), "marko");
+        assertEquals(marko.getProperty("age"), 29);
+        int counter = 0;
+
+        assertEquals(count(graph.getVertex("4").getOutEdges()), 2);
+        assertEquals(count(graph.getVertex("4").getInEdges()), 1);
+        Vertex josh = graph.getVertex("4");
+        assertEquals(josh.getProperty("name"), "josh");
+        assertEquals(josh.getProperty("age"), 32);
+        for (Edge e : graph.getVertex("4").getOutEdges()) {
+            if (e.getInVertex().getId().equals(3l)) {
+                assertEquals(Math.round((Float) e.getProperty("weight")), 0);
+                assertEquals(e.getLabel(), "created");
+                counter++;
+            } else if (e.getInVertex().getId().equals(5l)) {
+                assertEquals(Math.round((Float) e.getProperty("weight")), 1);
+                assertEquals(e.getLabel(), "created");
+                counter++;
+            }
+        }
+        assertEquals(counter, 2);
+        graph.shutdown();
     }
 
     private String getWorkingDirectory() {

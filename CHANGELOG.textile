@@ -28,6 +28,7 @@ h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
 * Fixed "fresh"-constructor bug in @Neo4jGraph@
 * Added method support for named graphs in @SailGraph@
 * Fixed named graph bug in @SailGraph@
+* @Neo4jBatchGraph@ now has nearly analogous behavior to any @IndexableGraph@ except for the ability to delete
 
 ==<hr/>==
 

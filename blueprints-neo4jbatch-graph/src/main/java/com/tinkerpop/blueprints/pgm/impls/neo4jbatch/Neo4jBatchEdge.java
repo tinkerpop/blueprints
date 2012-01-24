@@ -37,8 +37,7 @@ public class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
         }
     }
 
-
-    protected Map<String, Object> getPropertyMap() {
+    public Map<String, Object> getPropertyMap() {
         return this.graph.getRawGraph().getRelationshipProperties(this.id);
     }
 

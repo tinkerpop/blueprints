@@ -23,7 +23,7 @@ public abstract class Neo4jBatchElement implements Element {
         return id;
     }
 
-    protected abstract Map<String, Object> getPropertyMap();
+    public abstract Map<String, Object> getPropertyMap();
 
     public Set<String> getPropertyKeys() {
         return this.getPropertyMap().keySet();

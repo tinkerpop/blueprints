@@ -22,10 +22,9 @@ import java.util.Set;
  * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
  * This is a single threaded, non-transactional bulk loader and should not be used for any other reason than for massive initial data loads.
  * <p/>
- * Neo4jBatchGraph is not a completely faithful Blueprints implementation.
+ * Neo4jBatchGraph is <b>not</b> a completely faithful Blueprints implementation.
  * Many methods throw UnsupportedOperationExceptions and take unique arguments. Be sure to review each method's JavaDoc.
- * When the graph is created no default indices are provided. It is up to the developer to create desired indices.
- * The "reference node" (vertex 0) is automatically created and, if so desired, must be manually deleted post data insertion.
+ * The Neo4j "reference node" (vertex 0) is automatically created and, if so desired, must be manually deleted post data insertion.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -37,6 +36,8 @@ public class Neo4jBatchGraph implements IndexableGraph {
     private final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
     private final Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>> automaticVertexIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>>();
     private final Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>> automaticEdgeIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>>();
+
+    private Long idCounter = 0l;
 
     public Neo4jBatchGraph(final String directory) {
         this.rawGraph = new BatchInserterImpl(directory);
@@ -86,40 +87,49 @@ public class Neo4jBatchGraph implements IndexableGraph {
     }
 
     /**
-     * The object id must be a Map&lt;String,Object&gt; or null.
-     * The map is the properties written when the vertex is created.
-     * While it is possible to Vertex.setProperty(), this method is faster.
-     * If the map contains an _id key, then the value is a user provided long vertex id.
-     * In other words, Neo4jBatchGraph will not ignore the user provided id.
+     * The object id can either be null, a long id, or a Map&lt;String,Object&gt;.
+     * If null, then an internal long is provided on the construction of the vertex.
+     * If a long id is provided, then the vertex is constructed with that long id.
+     * If a map is provided, then the map serves as the properties of the vertex.
+     * Moreover, if the map contains an _id key, then the value is a user provided long vertex id.
      *
-     * @param map a map of properties which can be null
+     * @param id a id of properties which can be null
      * @return the newly created vertex
      */
-    public Vertex addVertex(final Object map) {
-        if (null != map && !(map instanceof Map)) {
-            throw new IllegalArgumentException("Provided object id must be a Map<String,Object>");
+    public Vertex addVertex(final Object id) {
+
+        final Long finalId;
+        Map<String, Object> finalProperties = new HashMap<String, Object>();
+        if (null == id) {
+            rawGraph.createNode(++this.idCounter, finalProperties);
+            finalId = this.idCounter;
+        } else if (id instanceof Long) {
+            rawGraph.createNode((Long) id, finalProperties);
+            finalId = (Long) id;
+        } else if (id instanceof Map) {
+            finalProperties = makePropertyMap((Map<String, Object>) id);
+            final Long providedId = (Long) ((Map<String, Object>) id).get(Neo4jBatchTokens.ID);
+            finalProperties.remove(Neo4jBatchTokens.ID);
+            if (providedId == null)
+                finalId = rawGraph.createNode(finalProperties);
+            else {
+                rawGraph.createNode(providedId, finalProperties);
+                finalId = providedId;
+            }
+        } else {
+            try {
+                finalId = Double.valueOf(id.toString()).longValue();
+                rawGraph.createNode(finalId, finalProperties);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("The provided object must be null, a long id, an object convertible to long, or a Map<String,Object>");
+            }
         }
 
-        final Map<String, Object> properties;
-        Long providedId = null;
-        if (map == null)
-            properties = new HashMap<String, Object>();
-        else {
-            properties = makePropertyMap((Map<String, Object>) map);
-            providedId = (Long) ((Map<String, Object>) map).get(Neo4jBatchTokens.ID);
-        }
-
-        final Long id;
-        if (providedId == null)
-            id = rawGraph.createNode(properties);
-        else {
-            rawGraph.createNode(providedId, properties);
-            id = providedId;
-        }
-
-        final Neo4jBatchVertex vertex = new Neo4jBatchVertex(this, id);
-        for (final Neo4jBatchAutomaticIndex<Neo4jBatchVertex> index : this.automaticVertexIndices.values()) {
-            index.autoUpdate(vertex, properties);
+        final Neo4jBatchVertex vertex = new Neo4jBatchVertex(this, finalId);
+        if (finalProperties.size() > 0) {
+            for (final Neo4jBatchAutomaticIndex<Neo4jBatchVertex> index : this.automaticVertexIndices.values()) {
+                index.autoUpdate(vertex, finalProperties);
+            }
         }
         return vertex;
     }
@@ -161,27 +171,25 @@ public class Neo4jBatchGraph implements IndexableGraph {
 
     /**
      * The object id must be a Map&lt;String,Object&gt; or null.
-     * The map is the properties written when the vertex is created.
+     * The id is the properties written when the vertex is created.
      * While it is possible to Edge.setProperty(), this method is faster.
      *
-     * @param map a map of properties which can be null
+     * @param id a id of properties which can be null
      * @return the newly created vertex
      */
-    public Edge addEdge(final Object map, final Vertex outVertex, final Vertex inVertex, final String label) {
-        if (map != null && !(map instanceof Map)) {
-            throw new IllegalArgumentException("Provided object id must be a Map<String,Object>");
-        }
-
-        final Map<String, Object> properties;
-        if (map == null)
-            properties = new HashMap<String, Object>();
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        final Map<String, Object> finalProperties;
+        if (id == null || !(id instanceof Map))
+            finalProperties = new HashMap<String, Object>();
         else
-            properties = makePropertyMap((Map<String, Object>) map);
-        final Long id = rawGraph.createRelationship((Long) outVertex.getId(), (Long) inVertex.getId(), DynamicRelationshipType.withName(label), properties);
+            finalProperties = makePropertyMap((Map<String, Object>) id);
+        final Long finalId = this.rawGraph.createRelationship((Long) outVertex.getId(), (Long) inVertex.getId(), DynamicRelationshipType.withName(label), finalProperties);
 
-        final Neo4jBatchEdge edge = new Neo4jBatchEdge(this, id, label);
-        for (final Neo4jBatchAutomaticIndex<Neo4jBatchEdge> index : this.automaticEdgeIndices.values()) {
-            index.autoUpdate(edge, properties);
+        final Neo4jBatchEdge edge = new Neo4jBatchEdge(this, finalId, label);
+        if (finalProperties.size() > 0) {
+            for (final Neo4jBatchAutomaticIndex<Neo4jBatchEdge> index : this.automaticEdgeIndices.values()) {
+                index.autoUpdate(edge, finalProperties);
+            }
         }
         return edge;
     }
