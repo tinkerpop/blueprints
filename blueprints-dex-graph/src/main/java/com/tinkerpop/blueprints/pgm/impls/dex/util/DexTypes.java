@@ -1,13 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.dex.util;
 
-import edu.upc.dama.dex.core.Graph;
-import edu.upc.dama.dex.core.Graph.TypeData;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Caches info about DEX types.
+ * Caches info about Dex types.
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
@@ -15,27 +12,27 @@ import java.util.Map;
 public class DexTypes {
 
     /**
-     * DEX type identifier --> {@link TypeData}
+     * Dex type identifier --> {@link com.sparsity.dex.gdb.Type}
      */
-    private static Map<Integer, TypeData> types = new HashMap<Integer, TypeData>();
+    private static Map<Integer, com.sparsity.dex.gdb.Type> types = new HashMap<Integer, com.sparsity.dex.gdb.Type>();
     /**
-     * Type name --> DEX type identifier
+     * Type name --> Dex type identifier
      */
     private static Map<String, Integer> names = new HashMap<String, Integer>();
 
     /**
-     * Gets corresponding {@link TypeData} for the given type identifier.
+     * Gets corresponding {@link com.sparsity.dex.gdb.Type} for the given type identifier.
      *
-     * @param g    DEX Graph.
-     * @param type DEX type identifier.
-     * @return {@link TypeData} or null if the type does not exist.
+     * @param g    Dex {@link com.sparsity.dex.gdb.Graph}.
+     * @param type Dex type identifier.
+     * @return {@link com.sparsity.dex.gdb.Type} or null if the type does not exist.
      */
-    public static TypeData getTypeData(Graph g, int type) {
-        assert type != Graph.INVALID_TYPE;
+    public static com.sparsity.dex.gdb.Type getTypeData(com.sparsity.dex.gdb.Graph g, int type) {
+        assert type != com.sparsity.dex.gdb.Type.InvalidType;
 
-        TypeData tdata = types.get(type);
+        com.sparsity.dex.gdb.Type tdata = types.get(type);
         if (tdata == null) {
-            tdata = g.getTypeData(type);
+            tdata = g.getType(type);
             if (tdata != null) {
                 types.put(type, tdata);
             }
@@ -44,21 +41,21 @@ public class DexTypes {
     }
 
     /**
-     * Gets corresponding {@link TypeData} for the given type identifier name.
+     * Gets corresponding {@link com.sparsity.dex.gdb.Type} for the given type identifier name.
      *
-     * @param g    DEX Graph.
-     * @param name DEX type identifier name.
-     * @return {@link TypeData} or null if the type does not exist.
+     * @param g    Dex {@link com.sparsity.dex.gdb.Graph}.
+     * @param name Dex type identifier name.
+     * @return {@link com.sparsity.dex.gdb.Type} or null if the type does not exist.
      */
-    public static TypeData getTypeData(Graph g, String name) {
+    public static com.sparsity.dex.gdb.Type getTypeData(com.sparsity.dex.gdb.Graph g, String name) {
         assert name != null;
 
-        TypeData tdata = null;
+        com.sparsity.dex.gdb.Type tdata = null;
         Integer type = names.get(name);
         if (type == null) {
             type = g.findType(name);
-            if (type != Graph.INVALID_TYPE) {
-                tdata = g.getTypeData(type);
+            if (type != com.sparsity.dex.gdb.Type.InvalidType) {
+                tdata = g.getType(type);
                 assert tdata != null;
                 types.put(type, tdata);
                 names.put(tdata.getName(), type);
@@ -70,19 +67,19 @@ public class DexTypes {
     /**
      * Gets corresponding type identifier for the given type identifier name.
      *
-     * @param g    DEX Graph.
-     * @param name DEX type identifier name.
-     * @return The type identifier or INVALID_TYPE if the type does not exist.
+     * @param g    Dex {@link com.sparsity.dex.gdb.Graph}.
+     * @param name Dex type identifier name.
+     * @return The type identifier or {@link Type#InvalidType} if the type does not exist.
      */
-    public static Integer getTypeId(Graph g, String name) {
+    public static Integer getTypeId(com.sparsity.dex.gdb.Graph g, String name) {
         assert name != null;
 
-        TypeData tdata = null;
+        com.sparsity.dex.gdb.Type tdata = null;
         Integer type = names.get(name);
         if (type == null) {
             type = g.findType(name);
-            if (type != Graph.INVALID_TYPE) {
-                tdata = g.getTypeData(type);
+            if (type != com.sparsity.dex.gdb.Type.InvalidType) {
+                tdata = g.getType(type);
                 assert tdata != null;
                 types.put(type, tdata);
                 names.put(tdata.getName(), type);
