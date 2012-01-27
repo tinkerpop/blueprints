@@ -20,9 +20,9 @@
             <version>${blueprints.version}</version>
         </dependency>
         <dependency>
-            <groupId>edu.upc.dama</groupId>
-            <artifactId>jdex</artifactId>
-            <version>4.1.1</version>
+            <groupId>com.sparsity</groupId>
+            <artifactId>dexjava</artifactId>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

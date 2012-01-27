@@ -3,20 +3,17 @@
  */
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
-import edu.upc.dama.dex.core.Graph;
-import edu.upc.dama.dex.core.Graph.AttributeData;
-import edu.upc.dama.dex.core.Value;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * {@link Element} implementation for DEX.
+ * {@link Element} implementation for Dex.
  * <p/>
  * All elements are typed or labeled. The way to get the type or label for an
  * element is retrieving the property {@link DexElement#LABEL_PROPERTY}. This
@@ -39,28 +36,28 @@ public class DexElement implements Element {
      */
     protected DexGraph graph = null;
     /**
-     * DEX OID.
+     * Dex OID.
      */
-    protected long oid = Graph.INVALID_OID;
+    protected long oid = com.sparsity.dex.gdb.Objects.InvalidOID;
     /**
-     * DEX object type.
+     * Dex object type.
      * <p/>
      * It is loaded as late as possible (and just if required).
      *
      * @see #getObjectType()
      */
-    private int type = Graph.INVALID_TYPE;
+    private int type = com.sparsity.dex.gdb.Type.InvalidType;
 
     /**
-     * Gets the DEX object type.
+     * Gets the Dex object type.
      * <p/>
-     * If it has not been loaded yet, it is retrieved from DEX database.
+     * If it has not been loaded yet, it is retrieved from Dex database.
      *
      * @return The element type.
      */
     protected int getObjectType() {
-        if (type == Graph.INVALID_TYPE) {
-            type = graph.getRawGraph().getType(oid);
+        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+            type = graph.getRawGraph().getObjectType(oid);
         }
         return type;
     }
@@ -68,7 +65,7 @@ public class DexElement implements Element {
     /**
      * Gets the type or label of the element.
      * <p/>
-     * The label is the name of the DEX object type.
+     * The label is the name of the Dex object type.
      *
      * @return Type or label of the element.
      */
@@ -81,11 +78,11 @@ public class DexElement implements Element {
      * Creates a new instance.
      *
      * @param g   DexGraph.
-     * @param oid DEX OID.
+     * @param oid Dex OID.
      */
     protected DexElement(final DexGraph g, final long oid) {
         assert g != null;
-        assert oid != Graph.INVALID_OID;
+        assert oid != com.sparsity.dex.gdb.Objects.InvalidOID;
 
         this.graph = g;
         this.oid = oid;
@@ -98,35 +95,35 @@ public class DexElement implements Element {
       */
     @Override
     public Object getProperty(final String key) {
-        AttributeData adata = DexAttributes.getAttributeData(graph.getRawGraph(), getObjectType(), key);
+    	com.sparsity.dex.gdb.Attribute adata = DexAttributes.getAttributeData(graph.getRawGraph(), getObjectType(), key);
         if (adata == null) {
             return null;
         }
 
-        Long attr = DexAttributes.getAttributeId(graph.getRawGraph(),
+        Integer attr = DexAttributes.getAttributeId(graph.getRawGraph(),
                 getObjectType(), key);
-        assert attr != null && attr.longValue() != Graph.INVALID_ATTRIBUTE;
+        assert attr != null && attr.longValue() != com.sparsity.dex.gdb.Attribute.InvalidAttribute;
 
-        Value v = graph.getRawGraph().getAttribute(oid, attr);
+        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+        graph.getRawGraph().getAttribute(oid, attr, v);
         Object result = null;
-        switch (v.getType()) {
-            case Value.NULL:
-                result = null;
-                break;
-            case Value.BOOL:
-                result = v.getBool();
-                break;
-            case Value.INT:
-                result = v.getInt();
-                break;
-            case Value.STRING:
-                result = v.getString();
-                break;
-            case Value.DOUBLE:
-                result = v.getDouble();
-                break;
-            default:
-                throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+        if (!v.isNull()) {
+        	switch (v.getDataType()) {
+        	case Boolean:
+        		result = v.getBoolean();
+        		break;
+        	case Integer:
+        		result = v.getInteger();
+        		break;
+        	case String:
+        		result = v.getString();
+        		break;
+        	case Double:
+        		result = v.getDouble();
+        		break;
+        	default:
+        		throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+        	}
         }
         return result;
     }
@@ -138,12 +135,13 @@ public class DexElement implements Element {
       */
     @Override
     public Set<String> getPropertyKeys() {
-        Set<Long> attrs = graph.getRawGraph().getAttributes(oid);
+    	com.sparsity.dex.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
         Set<String> attrKeys = new HashSet<String>();
-        for (Long attr : attrs) {
-            String key = graph.getRawGraph().getAttributeData(attr).getName();
+        for (Integer attr : alist) {
+            String key = graph.getRawGraph().getAttribute(attr).getName();
             attrKeys.add(key);
         }
+        alist = null;
         return attrKeys;
     }
 
@@ -164,50 +162,50 @@ public class DexElement implements Element {
                     + " property cannot be set.");
         }
 
-        Long attr = DexAttributes.getAttributeId(graph.getRawGraph(), getObjectType(), key);
-        short datatype = Value.NULL;
-        if (attr == Graph.INVALID_ATTRIBUTE) {
+        Integer attr = DexAttributes.getAttributeId(graph.getRawGraph(), getObjectType(), key);
+        com.sparsity.dex.gdb.DataType datatype = null;
+        if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
             //
             // First time we set this attribute, let's create it.
             //
             if (value instanceof Boolean) {
-                datatype = Value.BOOL;
+                datatype = com.sparsity.dex.gdb.DataType.Boolean;
             } else if (value instanceof Integer) {
-                datatype = Value.INT;
+                datatype = com.sparsity.dex.gdb.DataType.Integer;
             } else if (value instanceof String) {
-                datatype = Value.STRING;
+                datatype = com.sparsity.dex.gdb.DataType.String;
             } else if (value instanceof Double || value instanceof Float) {
-                datatype = Value.DOUBLE;
-            } else if (value instanceof Value) {
-                datatype = ((Value) value).getType();
+                datatype = com.sparsity.dex.gdb.DataType.Double;
+            } else if (value instanceof com.sparsity.dex.gdb.Value) {
+                datatype = ((com.sparsity.dex.gdb.Value) value).getDataType();
             } else {
                 throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
             }
-            assert datatype != Value.NULL;
-            attr = graph.getRawGraph().newAttribute(type, key, datatype, Graph.ATTR_KIND_INDEXED);
-            assert attr != Graph.INVALID_ATTRIBUTE;
+            assert datatype != null;
+            attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.dex.gdb.AttributeKind.Indexed);
+            assert attr != com.sparsity.dex.gdb.Attribute.InvalidAttribute;
         } else {
-            datatype = DexAttributes.getAttributeData(graph.getRawGraph(), attr).getDatatype();
+            datatype = DexAttributes.getAttributeData(graph.getRawGraph(), attr).getDataType();
         }
         //
         // Set the Value
         //
-        Value v = new Value();
-        if (value instanceof Value) {
-            v = (Value) value;
+        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+        if (value instanceof com.sparsity.dex.gdb.Value) {
+            v = (com.sparsity.dex.gdb.Value) value;
         } else {
             // from Object to Value
             switch (datatype) {
-                case Value.BOOL:
-                    v.setBool((Boolean) value);
+                case Boolean:
+                    v.setBooleanVoid((Boolean) value);
                     break;
-                case Value.INT:
-                    v.setInt((Integer) value);
+                case Integer:
+                    v.setIntegerVoid((Integer) value);
                     break;
-                case Value.STRING:
+                case String:
                     v.setString((String) value);
                     break;
-                case Value.DOUBLE:
+                case Double:
                     if (value instanceof Double) {
                         v.setDouble((Double) value);
                     }
@@ -237,7 +235,7 @@ public class DexElement implements Element {
     @Override
     public Object removeProperty(final String key) {
         Object ret = getProperty(key);
-        Value v = new Value();
+        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
         v.setNull();
         setProperty(key, v);
         return ret;
