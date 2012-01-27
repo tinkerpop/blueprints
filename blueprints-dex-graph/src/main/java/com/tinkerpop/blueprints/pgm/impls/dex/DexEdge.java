@@ -6,10 +6,9 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import edu.upc.dama.dex.core.Graph;
 
 /**
- * {@link Edge} implementation for DEX.
+ * {@link Edge} implementation for Dex.
  * <p/>
  * It computes "in vertex" and "out vertex" just when it is necessary.
  * <p/>
@@ -27,23 +26,24 @@ public class DexEdge extends DexElement implements Edge {
      *
      * @see #setEdges()
      */
-    private long in = Graph.INVALID_NODE;
+    private long in = com.sparsity.dex.gdb.Objects.InvalidOID;
 
     /**
      * Out vertex.
      *
      * @see #setEdges()
      */
-    private long out = Graph.INVALID_NODE;
+    private long out = com.sparsity.dex.gdb.Objects.InvalidOID;
 
     /**
      * Sets in vertex and out vertex in case they have not been set before.
      */
     private void setEdges() {
-        if (in == Graph.INVALID_NODE || out == Graph.INVALID_NODE) {
-            long edge[] = graph.getRawGraph().getEdge(oid);
-            out = edge[0];
-            in = edge[1];
+        if (in == com.sparsity.dex.gdb.Objects.InvalidOID || out == com.sparsity.dex.gdb.Objects.InvalidOID) {
+        	com.sparsity.dex.gdb.EdgeData edata = graph.getRawGraph().getEdgeData(oid);
+            out = edata.getTail();
+            in = edata.getHead();
+            edata = null;
         }
     }
 
@@ -51,12 +51,12 @@ public class DexEdge extends DexElement implements Edge {
      * Creates a new instance.
      *
      * @param g   DexGraph.
-     * @param oid DEX OID.
+     * @param oid Dex OID.
      */
     protected DexEdge(final DexGraph g, final long oid) {
         super(g, oid);
-        this.in = Graph.INVALID_NODE;
-        this.out = Graph.INVALID_NODE;
+        this.in = com.sparsity.dex.gdb.Objects.InvalidOID;
+        this.out = com.sparsity.dex.gdb.Objects.InvalidOID;
     }
 
     /*
