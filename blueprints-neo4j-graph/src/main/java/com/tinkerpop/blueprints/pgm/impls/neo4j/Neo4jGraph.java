@@ -19,6 +19,7 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
+import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.kernel.HighlyAvailableGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -163,8 +164,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
     public synchronized void dropIndex(final String indexName) {
         try {
             this.autoStartTransaction();
-            this.rawGraph.index().forNodes(indexName).delete();
-            this.rawGraph.index().forRelationships(indexName).delete();
+            org.neo4j.graphdb.index.Index<Node> nodeIndex = this.rawGraph.index().forNodes(indexName);
+            if(nodeIndex.isWriteable()){
+                nodeIndex.delete();
+            }
+            RelationshipIndex relationshipIndex = this.rawGraph.index().forRelationships(indexName);
+            if(relationshipIndex.isWriteable()){
+                relationshipIndex.delete();
+            }
             this.stopTransaction(Conclusion.SUCCESS);
         } catch (RuntimeException e) {
             this.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
