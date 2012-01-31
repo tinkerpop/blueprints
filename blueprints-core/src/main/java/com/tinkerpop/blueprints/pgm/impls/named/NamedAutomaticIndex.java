@@ -10,8 +10,8 @@ import java.util.Set;
  */
 public class NamedAutomaticIndex<T extends Element> extends NamedIndex<T> implements AutomaticIndex<T> {
 
-    public NamedAutomaticIndex(final AutomaticIndex<T> rawIndex) {
-        super(rawIndex);
+    public NamedAutomaticIndex(final AutomaticIndex<T> rawIndex, final NamedGraph graph) {
+        super(rawIndex, graph);
     }
 
     public Set<String> getAutoIndexKeys() {

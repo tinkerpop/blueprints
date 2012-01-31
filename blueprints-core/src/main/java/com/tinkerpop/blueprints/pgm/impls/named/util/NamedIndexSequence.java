@@ -3,8 +3,9 @@ package com.tinkerpop.blueprints.pgm.impls.named.util;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.impls.wrapped.WrappedAutomaticIndex;
-import com.tinkerpop.blueprints.pgm.impls.wrapped.WrappedIndex;
+import com.tinkerpop.blueprints.pgm.impls.named.NamedAutomaticIndex;
+import com.tinkerpop.blueprints.pgm.impls.named.NamedGraph;
+import com.tinkerpop.blueprints.pgm.impls.named.NamedIndex;
 
 import java.util.Iterator;
 
@@ -14,9 +15,11 @@ import java.util.Iterator;
 public class NamedIndexSequence<T extends Element> implements Iterator<Index<T>>, Iterable<Index<T>> {
 
     protected Iterator<Index<T>> itty;
+    private final NamedGraph graph;
 
-    public NamedIndexSequence(final Iterator<Index<T>> itty) {
+    public NamedIndexSequence(final Iterator<Index<T>> itty, final NamedGraph graph) {
         this.itty = itty;
+        this.graph = graph;
     }
 
     public void remove() {
@@ -30,9 +33,9 @@ public class NamedIndexSequence<T extends Element> implements Iterator<Index<T>>
     public Index<T> next() {
         final Index<T> index = itty.next();
         if (index.getIndexType().equals(Index.Type.MANUAL)) {
-            return new WrappedIndex<T>(index);
+            return new NamedIndex<T>(index, this.graph);
         } else {
-            return new WrappedAutomaticIndex<T>((AutomaticIndex<T>) index);
+            return new NamedAutomaticIndex<T>((AutomaticIndex<T>) index, this.graph);
         }
     }
 

@@ -46,4 +46,8 @@ public class WrappedElement implements Element {
     public Element getRawElement() {
         return this.rawElement;
     }
+
+    public String toString() {
+        return this.rawElement.toString();
+    }
 }

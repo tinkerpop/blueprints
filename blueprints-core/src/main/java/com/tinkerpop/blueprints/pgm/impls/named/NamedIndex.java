@@ -6,8 +6,8 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedEdgeSequence;
-import com.tinkerpop.blueprints.pgm.impls.wrapped.util.WrappedVertexSequence;
+import com.tinkerpop.blueprints.pgm.impls.named.util.NamedEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.named.util.NamedVertexSequence;
 
 import java.util.Iterator;
 
@@ -17,9 +17,11 @@ import java.util.Iterator;
 public class NamedIndex<T extends Element> implements Index<T> {
 
     protected Index<T> rawIndex;
+    protected NamedGraph graph;
 
-    public NamedIndex(final Index<T> rawIndex) {
+    public NamedIndex(final Index<T> rawIndex, final NamedGraph graph) {
         this.rawIndex = rawIndex;
+        this.graph = graph;
     }
 
     public String getIndexName() {
@@ -48,9 +50,9 @@ public class NamedIndex<T extends Element> implements Index<T> {
 
     public CloseableSequence<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass()))
-            return (CloseableSequence<T>) new WrappedVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator());
+            return (CloseableSequence<T>) new NamedVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator(), this.graph);
         else
-            return (CloseableSequence<T>) new WrappedEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator());
+            return (CloseableSequence<T>) new NamedEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator(), this.graph);
     }
 
     public String toString() {

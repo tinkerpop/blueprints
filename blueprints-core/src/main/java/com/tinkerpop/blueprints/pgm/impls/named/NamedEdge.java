@@ -8,16 +8,16 @@ import com.tinkerpop.blueprints.pgm.Vertex;
  */
 public class NamedEdge extends NamedElement implements Edge {
 
-    public NamedEdge(final Edge rawEdge) {
-        super(rawEdge);
+    public NamedEdge(final Edge rawEdge, final NamedGraph graph) {
+        super(rawEdge, graph);
     }
 
     public Vertex getInVertex() {
-        return new NamedVertex(((Edge) rawElement).getInVertex());
+        return new NamedVertex(((Edge) rawElement).getInVertex(), this.graph);
     }
 
     public Vertex getOutVertex() {
-        return new NamedVertex(((Edge) rawElement).getOutVertex());
+        return new NamedVertex(((Edge) rawElement).getOutVertex(), this.graph);
     }
 
     public String getLabel() {
