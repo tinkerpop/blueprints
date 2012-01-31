@@ -15,10 +15,13 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
+import org.neo4j.kernel.Config;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -197,5 +200,48 @@ public class Neo4jGraphTest extends GraphTest {
 
         graph.shutdown();
         deleteDirectory(new File(directory));
+    }
+
+    public void testShouldNotDeleteAutomaticNeo4jIndexes() {
+        String directory = System.getProperty("neo4jGraphDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
+        Map<String, String> config;
+        config = new HashMap<String, String>();
+        config.put(Config.NODE_KEYS_INDEXABLE, "name");
+        config.put(Config.RELATIONSHIP_KEYS_INDEXABLE, "rel1");
+        config.put(Config.NODE_AUTO_INDEXING, "true");
+        config.put(Config.RELATIONSHIP_AUTO_INDEXING, "true");
+        Neo4jGraph graph = new Neo4jGraph(directory, config);
+        Vertex a = graph.addVertex(null);
+        a.setProperty("name", "foo");
+        graph.shutdown();
+
+        graph = new Neo4jGraph(directory);
+        graph.clear();
+        assertTrue(null != graph.getRawGraph().index().getNodeAutoIndexer().getAutoIndex());
+        graph.shutdown();
+
+    }
+
+    public void testShouldNotDeleteAutomaticBlueprintsIndexes() {
+        String directory = System.getProperty("neo4jGraphDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        Vertex a = graph.addVertex(null);
+        a.setProperty("name", "foo");
+        graph.shutdown();
+
+        graph = new Neo4jGraph(directory);
+        graph.clear();
+        a = graph.addVertex(null);
+        a.setProperty("name", "foo");
+        assertNotNull(graph.getRawGraph().index().getNodeAutoIndexer().getAutoIndex());
+
     }
 }
