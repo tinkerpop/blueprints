@@ -40,7 +40,7 @@ public class DexEdge extends DexElement implements Edge {
      */
     private void setEdges() {
         if (in == com.sparsity.dex.gdb.Objects.InvalidOID || out == com.sparsity.dex.gdb.Objects.InvalidOID) {
-        	com.sparsity.dex.gdb.EdgeData edata = graph.getRawGraph().getEdgeData(oid);
+            com.sparsity.dex.gdb.EdgeData edata = graph.getRawGraph().getEdgeData(oid);
             out = edata.getTail();
             in = edata.getHead();
             edata = null;

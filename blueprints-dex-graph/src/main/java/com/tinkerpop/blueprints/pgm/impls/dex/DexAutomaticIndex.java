@@ -3,14 +3,14 @@
  */
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@link AutomaticIndex} implementation for Dex.

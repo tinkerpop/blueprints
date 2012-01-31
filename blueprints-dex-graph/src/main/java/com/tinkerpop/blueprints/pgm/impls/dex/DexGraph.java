@@ -1,10 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
@@ -14,6 +9,11 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Dex is a graph database developed by Sparsity Technologies.
@@ -58,14 +58,14 @@ public class DexGraph implements IndexableGraph {
     com.sparsity.dex.gdb.Graph getRawGraph() {
         return rawGraph;
     }
-    
+
     /**
      * Gets the Dex {@link edu.upc.dama.dex.gdb.Session}.
-     * 
+     *
      * @return The Dex {@link edu.upc.dama.dex.gdb.Session.
      */
     com.sparsity.dex.gdb.Session getRawSession() {
-    	return session;
+        return session;
     }
 
     /**
@@ -195,10 +195,10 @@ public class DexGraph implements IndexableGraph {
       */
     @Override
     public Iterable<Vertex> getVertices() {
-    	com.sparsity.dex.gdb.Objects result = session.newObjects();
+        com.sparsity.dex.gdb.Objects result = session.newObjects();
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
         for (Integer type : tlist) {
-        	com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
+            com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
             result.union(objs);
             objs.close();
         }
@@ -274,10 +274,10 @@ public class DexGraph implements IndexableGraph {
       */
     @Override
     public Iterable<Edge> getEdges() {
-    	com.sparsity.dex.gdb.Objects result = session.newObjects();
+        com.sparsity.dex.gdb.Objects result = session.newObjects();
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
         for (Integer type : tlist) {
-        	com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
+            com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
             result.union(objs);
             objs.close();
         }
@@ -296,7 +296,7 @@ public class DexGraph implements IndexableGraph {
 
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
         for (Integer etype : tlist) {
-        	com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(etype);
+            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(etype);
             for (Integer attr : alist) {
                 rawGraph.removeAttribute(attr);
             }
@@ -306,7 +306,7 @@ public class DexGraph implements IndexableGraph {
         tlist = null;
         tlist = rawGraph.findNodeTypes();
         for (Integer ntype : tlist) {
-        	com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(ntype);
+            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(ntype);
             for (Integer attr : alist) {
                 rawGraph.removeAttribute(attr);
             }

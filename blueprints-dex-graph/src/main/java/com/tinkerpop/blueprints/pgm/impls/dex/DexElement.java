@@ -3,14 +3,14 @@
  */
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@link Element} implementation for Dex.
@@ -95,7 +95,7 @@ public class DexElement implements Element {
       */
     @Override
     public Object getProperty(final String key) {
-    	com.sparsity.dex.gdb.Attribute adata = DexAttributes.getAttributeData(graph.getRawGraph(), getObjectType(), key);
+        com.sparsity.dex.gdb.Attribute adata = DexAttributes.getAttributeData(graph.getRawGraph(), getObjectType(), key);
         if (adata == null) {
             return null;
         }
@@ -108,22 +108,22 @@ public class DexElement implements Element {
         graph.getRawGraph().getAttribute(oid, attr, v);
         Object result = null;
         if (!v.isNull()) {
-        	switch (v.getDataType()) {
-        	case Boolean:
-        		result = v.getBoolean();
-        		break;
-        	case Integer:
-        		result = v.getInteger();
-        		break;
-        	case String:
-        		result = v.getString();
-        		break;
-        	case Double:
-        		result = v.getDouble();
-        		break;
-        	default:
-        		throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
-        	}
+            switch (v.getDataType()) {
+                case Boolean:
+                    result = v.getBoolean();
+                    break;
+                case Integer:
+                    result = v.getInteger();
+                    break;
+                case String:
+                    result = v.getString();
+                    break;
+                case Double:
+                    result = v.getDouble();
+                    break;
+                default:
+                    throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+            }
         }
         return result;
     }
@@ -135,7 +135,7 @@ public class DexElement implements Element {
       */
     @Override
     public Set<String> getPropertyKeys() {
-    	com.sparsity.dex.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
+        com.sparsity.dex.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
         Set<String> attrKeys = new HashSet<String>();
         for (Integer attr : alist) {
             String key = graph.getRawGraph().getAttribute(attr).getName();

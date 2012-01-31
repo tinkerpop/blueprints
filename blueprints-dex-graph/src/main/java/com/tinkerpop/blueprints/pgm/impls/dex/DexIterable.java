@@ -3,13 +3,13 @@
  */
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * {@link Iterable} {@link com.tinkerpop.blueprints.pgm.impls.dex.DexElement} collection implementation for Dex.

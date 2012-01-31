@@ -3,14 +3,14 @@
  */
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link Vertex} implementation for Dex.
@@ -30,10 +30,10 @@ public class DexVertex extends DexElement implements Vertex {
     }
 
     private Iterable<Edge> getOutEdgesNoLabels() {
-    	com.sparsity.dex.gdb.Objects result = graph.getRawSession().newObjects();
-    	com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
+        com.sparsity.dex.gdb.Objects result = graph.getRawSession().newObjects();
+        com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         for (Integer etype : tlist) {
-        	com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, etype, com.sparsity.dex.gdb.EdgesDirection.Outgoing);
+            com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, etype, com.sparsity.dex.gdb.EdgesDirection.Outgoing);
             result.union(objs);
             objs.close();
         }
@@ -43,10 +43,10 @@ public class DexVertex extends DexElement implements Vertex {
     }
 
     private Iterable<Edge> getInEdgesNoLabels() {
-    	com.sparsity.dex.gdb.Objects result = graph.getRawSession().newObjects();
-    	com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
+        com.sparsity.dex.gdb.Objects result = graph.getRawSession().newObjects();
+        com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         for (Integer etype : tlist) {
-        	com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, etype, com.sparsity.dex.gdb.EdgesDirection.Ingoing);
+            com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, etype, com.sparsity.dex.gdb.EdgesDirection.Ingoing);
             result.union(objs);
             objs.close();
         }
