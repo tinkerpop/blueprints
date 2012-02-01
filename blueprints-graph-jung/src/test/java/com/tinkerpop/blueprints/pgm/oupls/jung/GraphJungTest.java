@@ -130,6 +130,7 @@ public class GraphJungTest extends TestCase {
         assertTrue(graph.findEdgeSet(marko, josh).contains(graph.findEdge(marko, josh)));
         assertEquals(graph.getDefaultEdgeType(), EdgeType.DIRECTED);
         for (Edge edge : graph.getEdges()) {
+            assertTrue(graph.containsEdge(edge));
             assertEquals(graph.getEdgeType(edge), EdgeType.DIRECTED);
             assertEquals(graph.getIncidentCount(edge), 2);
         }

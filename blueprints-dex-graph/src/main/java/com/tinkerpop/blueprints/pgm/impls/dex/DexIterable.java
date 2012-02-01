@@ -7,15 +7,14 @@ import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import edu.upc.dama.dex.core.Objects;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * {@link Iterable} {@link com.tinkerpop.blueprints.pgm.impls.dex.DexElement} collection implementation for DEX.
+ * {@link Iterable} {@link com.tinkerpop.blueprints.pgm.impls.dex.DexElement} collection implementation for Dex.
  * <p/>
- * It is just a wrapper for DEX Objects class.
+ * It is just a wrapper for Dex Objects class.
  * <p/>
  * This collections are registered into the {@link com.tinkerpop.blueprints.pgm.impls.dex.DexGraph} to be automatically
  * closed when the database is stopped.
@@ -27,11 +26,11 @@ import java.util.NoSuchElementException;
 public class DexIterable<T extends Element> implements CloseableSequence<T> {
 
     private DexGraph graph;
-    private Objects objs;
+    private com.sparsity.dex.gdb.Objects objs;
     private Class<T> clazz;
-    private Objects.Iterator itty;
+    private com.sparsity.dex.gdb.ObjectsIterator itty;
 
-    public DexIterable(final DexGraph g, final Objects objs, final Class<T> clazz) {
+    public DexIterable(final DexGraph g, final com.sparsity.dex.gdb.Objects objs, final Class<T> clazz) {
         this.graph = g;
         this.objs = objs;
         this.clazz = clazz;
@@ -49,7 +48,7 @@ public class DexIterable<T extends Element> implements CloseableSequence<T> {
      */
     public void close() {
         itty.close();
-        objs.close(); // this closes DEX Objects.Iterator instances
+        objs.close();
         graph.unregister(this);
 
         objs = null;

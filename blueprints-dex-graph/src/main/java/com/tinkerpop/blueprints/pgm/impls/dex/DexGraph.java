@@ -9,8 +9,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
-import edu.upc.dama.dex.core.DEX;
-import edu.upc.dama.dex.core.Objects;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,13 +16,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * DEX is a graph database developed by Sparsity Technologies.
- * DEX natively supports the property graph data model defined by Blueprints. However, there are a few peculiarities.
- * No user defined element identifiers: DEX is the gatekeeper and creator of vertex and edge identifiers.
+ * Dex is a graph database developed by Sparsity Technologies.
+ * Dex natively supports the property graph data model defined by Blueprints. However, there are a few peculiarities.
+ * No user defined element identifiers: Dex is the gatekeeper and creator of vertex and edge identifiers.
  * Thus, when creating a new vertex or edge instance, the provided object identifier is ignored.
- * Vertices are labeled too: When adding vertices, the user can set DEXGraph#LABEL to be used as the label of the vertex to be created.
+ * Vertices are labeled too: When adding vertices, the user can set DexGraph#LABEL to be used as the label of the vertex to be created.
  * Also, the label of a vertex (or even an element) can be retrieved through the DEXElement#LABEL_PROPERTY property.
- * DexGraph implements IndexableGraph. However, the use of indices is limited when working with DEX and is explained as follows:
+ * DexGraph implements IndexableGraph. However, the use of indices is limited when working with Dex and is explained as follows:
  * There is no support to create indices. By default, there is an AutomaticIndex for each existing label which corresponds to the name of the index.
  * Also, each index contains a key for each existing property.
  *
@@ -47,18 +45,27 @@ public class DexGraph implements IndexableGraph {
      */
     private File db = null;
 
-    private edu.upc.dama.dex.core.DEX dex = null;
-    private edu.upc.dama.dex.core.GraphPool gpool = null;
-    private edu.upc.dama.dex.core.Session session = null;
-    private edu.upc.dama.dex.core.DbGraph rawGraph = null;
+    private com.sparsity.dex.gdb.Dex dex = null;
+    private com.sparsity.dex.gdb.Database gpool = null;
+    private com.sparsity.dex.gdb.Session session = null;
+    private com.sparsity.dex.gdb.Graph rawGraph = null;
 
     /**
-     * Gets the DEX raw graph.
+     * Gets the Dex raw graph.
      *
-     * @return DEX raw graph.
+     * @return Dex raw graph.
      */
-    edu.upc.dama.dex.core.Graph getRawGraph() {
+    com.sparsity.dex.gdb.Graph getRawGraph() {
         return rawGraph;
+    }
+
+    /**
+     * Gets the Dex {@link edu.upc.dama.dex.gdb.Session}.
+     *
+     * @return The Dex {@link edu.upc.dama.dex.gdb.Session.
+     */
+    com.sparsity.dex.gdb.Session getRawSession() {
+        return session;
     }
 
     /**
@@ -104,13 +111,10 @@ public class DexGraph implements IndexableGraph {
             final boolean create = !db.exists();
 
             this.db = db;
-            //DEX.Config cfg = new DEX.Config();
-            //cfg.setCacheMaxSize(0); // use as much memory as possible
-            //dex = new DEX(cfg);
-            dex = new DEX();
-            gpool = (create ? dex.create(db) : dex.open(db));
+            dex = new com.sparsity.dex.gdb.Dex(new com.sparsity.dex.gdb.DexConfig());
+            gpool = (create ? dex.create(db.getPath(), db.getName()) : dex.open(db.getPath(), false));
             session = gpool.newSession();
-            rawGraph = session.getDbGraph();
+            rawGraph = session.getGraph();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -137,11 +141,11 @@ public class DexGraph implements IndexableGraph {
         }
 
         int type = DexTypes.getTypeId(rawGraph, label);
-        if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
+        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newNodeType(label);
         }
-        assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
+        assert type != com.sparsity.dex.gdb.Type.InvalidType;
         // create object instance
         long oid = rawGraph.newNode(type);
         return new DexVertex(this, oid);
@@ -158,15 +162,15 @@ public class DexGraph implements IndexableGraph {
             throw new IllegalArgumentException("Element identifier cannot be null");
         try {
             final Long longId = Double.valueOf(id.toString()).longValue();
-            final int type = rawGraph.getType(longId);
-            if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
+            final int type = rawGraph.getObjectType(longId);
+            if (type != com.sparsity.dex.gdb.Type.InvalidType)
                 return new DexVertex(this, longId);
             else
                 return null;
         } catch (NumberFormatException e) {
             return null;
-        } catch (IllegalArgumentException iae) {
-            // dex throws an illegal argument exception => [DEX: 12] Invalid object identifier.
+        } catch (RuntimeException re) {
+            // dex throws a runtime exception => [DEX: 12] Invalid object identifier.
             return null;
         }
     }
@@ -191,12 +195,14 @@ public class DexGraph implements IndexableGraph {
       */
     @Override
     public Iterable<Vertex> getVertices() {
-        Objects result = new Objects(session);
-        for (Integer type : rawGraph.nodeTypes()) {
-            Objects objs = rawGraph.select(type);
+        com.sparsity.dex.gdb.Objects result = session.newObjects();
+        com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
+        for (Integer type : tlist) {
+            com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
             result.union(objs);
             objs.close();
         }
+        tlist = null;
         Iterable<Vertex> ret = new DexIterable<Vertex>(this, result,
                 Vertex.class);
         return ret;
@@ -212,14 +218,14 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         int type = DexTypes.getTypeId(rawGraph, label);
-        if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
+        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newEdgeType(label, true, true);
         }
-        assert type != edu.upc.dama.dex.core.Graph.INVALID_TYPE;
+        assert type != com.sparsity.dex.gdb.Type.InvalidType;
         // create object instance
         assert outVertex instanceof DexVertex && inVertex instanceof DexVertex;
-        long oid = rawGraph.newEdge((Long) outVertex.getId(), (Long) inVertex.getId(), type);
+        long oid = rawGraph.newEdge(type, (Long) outVertex.getId(), (Long) inVertex.getId());
         return new DexEdge(this, oid);
     }
 
@@ -234,15 +240,15 @@ public class DexGraph implements IndexableGraph {
             throw new IllegalArgumentException("Element identifier cannot be null");
         try {
             Long longId = Double.valueOf(id.toString()).longValue();
-            int type = rawGraph.getType(longId);
-            if (type != edu.upc.dama.dex.core.Graph.INVALID_TYPE)
+            int type = rawGraph.getObjectType(longId);
+            if (type != com.sparsity.dex.gdb.Type.InvalidType)
                 return new DexEdge(this, longId);
             else
                 return null;
         } catch (NumberFormatException e) {
             return null;
-        } catch (IllegalArgumentException iae) {
-            // dex throws an illegal argument exception => [DEX: 12] Invalid object identifier.
+        } catch (RuntimeException re) {
+            // dex throws an runtime exception => [DEX: 12] Invalid object identifier.
             return null;
         }
 
@@ -268,12 +274,14 @@ public class DexGraph implements IndexableGraph {
       */
     @Override
     public Iterable<Edge> getEdges() {
-        Objects result = new Objects(session);
-        for (Integer type : rawGraph.edgeTypes()) {
-            Objects objs = rawGraph.select(type);
+        com.sparsity.dex.gdb.Objects result = session.newObjects();
+        com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
+        for (Integer type : tlist) {
+            com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
             result.union(objs);
             objs.close();
         }
+        tlist = null;
         return new DexIterable<Edge>(this, result, Edge.class);
     }
 
@@ -286,16 +294,23 @@ public class DexGraph implements IndexableGraph {
     public void clear() {
         closeAllCollections();
 
-        for (Integer etype : rawGraph.edgeTypes()) {
-            for (Long attr : rawGraph.getAttributesFromType(etype)) {
+        com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
+        for (Integer etype : tlist) {
+            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(etype);
+            for (Integer attr : alist) {
                 rawGraph.removeAttribute(attr);
             }
+            alist = null;
             rawGraph.removeType(etype);
         }
-        for (Integer ntype : rawGraph.nodeTypes()) {
-            for (Long attr : rawGraph.getAttributesFromType(ntype)) {
+        tlist = null;
+        tlist = rawGraph.findNodeTypes();
+        for (Integer ntype : tlist) {
+            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(ntype);
+            for (Integer attr : alist) {
                 rawGraph.removeAttribute(attr);
             }
+            alist = null;
             rawGraph.removeType(ntype);
         }
 
@@ -372,12 +387,12 @@ public class DexGraph implements IndexableGraph {
             return null;
 
         int type = DexTypes.getTypeId(getRawGraph(), indexName);
-        if (type == edu.upc.dama.dex.core.Graph.INVALID_TYPE) {
+        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             throw new IllegalArgumentException();
         }
-        edu.upc.dama.dex.core.Graph.TypeData tdata = DexTypes.getTypeData(getRawGraph(), indexName);
+        com.sparsity.dex.gdb.Type tdata = DexTypes.getTypeData(getRawGraph(), indexName);
         Index<T> index = null;
-        if (tdata.isNodeType()) {
+        if (tdata.getObjectType() == com.sparsity.dex.gdb.ObjectType.Node) {
             index = (Index<T>) new DexAutomaticIndex<Vertex>(this, Vertex.class, type);
         } else {
             index = (Index<T>) new DexAutomaticIndex<Edge>(this, Edge.class, type);
@@ -393,12 +408,16 @@ public class DexGraph implements IndexableGraph {
     @Override
     public Iterable<Index<? extends Element>> getIndices() {
         List<Index<? extends Element>> ret = new ArrayList<Index<? extends Element>>();
-        for (Integer ntype : getRawGraph().nodeTypes()) {
+        com.sparsity.dex.gdb.TypeList tlist = getRawGraph().findNodeTypes();
+        for (Integer ntype : tlist) {
             ret.add(new DexAutomaticIndex<Vertex>(this, Vertex.class, ntype));
         }
-        for (Integer etype : getRawGraph().edgeTypes()) {
+        tlist = null;
+        tlist = getRawGraph().findEdgeTypes();
+        for (Integer etype : tlist) {
             ret.add(new DexAutomaticIndex<Edge>(this, Edge.class, etype));
         }
+        tlist = null;
         return ret;
     }
 

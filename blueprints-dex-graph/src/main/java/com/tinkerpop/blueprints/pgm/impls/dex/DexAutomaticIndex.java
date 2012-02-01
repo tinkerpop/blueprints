@@ -8,16 +8,12 @@ import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
-import edu.upc.dama.dex.core.Graph;
-import edu.upc.dama.dex.core.Graph.AttributeData;
-import edu.upc.dama.dex.core.Objects;
-import edu.upc.dama.dex.core.Value;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * {@link AutomaticIndex} implementation for DEX.
+ * {@link AutomaticIndex} implementation for Dex.
  * <p/>
  * There is an index for each node or edge type. Each of the attributes of the
  * node or edge type corresponds to a key of the index. Thus, indexName
@@ -31,11 +27,11 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
 
     private DexGraph graph = null;
     private Class<T> clazz = null;
-    private int type = Graph.INVALID_TYPE;
+    private int type = com.sparsity.dex.gdb.Type.InvalidType;
     private String name = null;
 
     public DexAutomaticIndex(final DexGraph g, final Class<T> clazz, final int type) {
-        assert type != Graph.INVALID_ATTRIBUTE;
+        assert type != com.sparsity.dex.gdb.Type.InvalidType;
 
         this.graph = g;
         this.clazz = clazz;
@@ -81,43 +77,45 @@ public class DexAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
     @Override
     public Set<String> getAutoIndexKeys() {
         Set<String> ret = new HashSet<String>();
-        for (Long attr : graph.getRawGraph().getAttributesFromType(type)) {
+        com.sparsity.dex.gdb.AttributeList alist = graph.getRawGraph().findAttributes(type);
+        for (Integer attr : alist) {
             ret.add(DexAttributes.getAttributeData(graph.getRawGraph(), attr).getName());
         }
+        alist = null;
         return ret;
     }
 
-    private Objects rawGet(final String key, final Object value) {
-        long attr = DexAttributes.getAttributeId(graph.getRawGraph(), type, key);
-        if (attr == Graph.INVALID_ATTRIBUTE) {
+    private com.sparsity.dex.gdb.Objects rawGet(final String key, final Object value) {
+        int attr = DexAttributes.getAttributeId(graph.getRawGraph(), type, key);
+        if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
             throw new IllegalArgumentException(key + " is not a valid key");
         }
 
-        AttributeData adata = DexAttributes.getAttributeData(this.graph.getRawGraph(), attr);
-        Value v = new Value();
-        switch (adata.getDatatype()) {
-            case Value.BOOL:
-                v.setBool((Boolean) value);
+        com.sparsity.dex.gdb.Attribute adata = DexAttributes.getAttributeData(this.graph.getRawGraph(), attr);
+        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+        switch (adata.getDataType()) {
+            case Boolean:
+                v.setBooleanVoid((Boolean) value);
                 break;
-            case Value.INT:
-                v.setInt((Integer) value);
+            case Integer:
+                v.setIntegerVoid((Integer) value);
                 break;
-            case Value.LONG:
-                v.setLong((Long) value);
+            case Long:
+                v.setLongVoid((Long) value);
                 break;
-            case Value.STRING:
-                v.setString((String) value);
+            case String:
+                v.setStringVoid((String) value);
                 break;
-            case Value.DOUBLE:
+            case Double:
                 if (value instanceof Double) {
-                    v.setDouble((Double) value);
+                    v.setDoubleVoid((Double) value);
                 } else if (value instanceof Float) {
-                    v.setDouble(((Float) value).doubleValue());
+                    v.setDoubleVoid(((Float) value).doubleValue());
                 }
                 break;
             default:
                 throw new UnsupportedOperationException();
         }
-        return graph.getRawGraph().select(attr, Graph.OPERATION_EQ, v);
+        return graph.getRawGraph().select(attr, com.sparsity.dex.gdb.Condition.Equal, v);
     }
 }

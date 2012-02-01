@@ -8,14 +8,12 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
-import edu.upc.dama.dex.core.Graph;
-import edu.upc.dama.dex.core.Objects;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link Vertex} implementation for DEX.
+ * {@link Vertex} implementation for Dex.
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
@@ -25,52 +23,56 @@ public class DexVertex extends DexElement implements Vertex {
      * Creates a new instance.
      *
      * @param g   DexGraph.
-     * @param oid DEX OID.
+     * @param oid Dex OID.
      */
     protected DexVertex(final DexGraph g, final long oid) {
         super(g, oid);
     }
 
     private Iterable<Edge> getOutEdgesNoLabels() {
-        Objects result = new Objects(graph.getRawGraph().getSession());
-        for (Integer etype : graph.getRawGraph().edgeTypes()) {
-            Objects objs = graph.getRawGraph().explode(oid, etype, Graph.EDGES_OUT);
+        com.sparsity.dex.gdb.Objects result = graph.getRawSession().newObjects();
+        com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
+        for (Integer etype : tlist) {
+            com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, etype, com.sparsity.dex.gdb.EdgesDirection.Outgoing);
             result.union(objs);
             objs.close();
         }
+        tlist = null;
         Iterable<Edge> ret = new DexIterable<Edge>(graph, result, Edge.class);
         return ret;
     }
 
     private Iterable<Edge> getInEdgesNoLabels() {
-        Objects result = new Objects(graph.getRawGraph().getSession());
-        for (Integer etype : graph.getRawGraph().edgeTypes()) {
-            Objects objs = graph.getRawGraph().explode(oid, etype, Graph.EDGES_IN);
+        com.sparsity.dex.gdb.Objects result = graph.getRawSession().newObjects();
+        com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
+        for (Integer etype : tlist) {
+            com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, etype, com.sparsity.dex.gdb.EdgesDirection.Ingoing);
             result.union(objs);
             objs.close();
         }
+        tlist = null;
         Iterable<Edge> ret = new DexIterable<Edge>(graph, result, Edge.class);
         return ret;
     }
 
     private Iterable<Edge> getOutEdgesSingleLabel(final String label) {
         int type = DexTypes.getTypeId(graph.getRawGraph(), label);
-        if (type == Graph.INVALID_TYPE) {
+        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             return new ArrayList<Edge>();
         }
 
-        Objects objs = graph.getRawGraph().explode(oid, type, Graph.EDGES_OUT);
+        com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, type, com.sparsity.dex.gdb.EdgesDirection.Outgoing);
         Iterable<Edge> ret = new DexIterable<Edge>(graph, objs, Edge.class);
         return ret;
     }
 
     private Iterable<Edge> getInEdgesSingleLabel(final String label) {
         int type = DexTypes.getTypeId(graph.getRawGraph(), label);
-        if (type == Graph.INVALID_TYPE) {
+        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             return new ArrayList<Edge>();
         }
 
-        Objects objs = graph.getRawGraph().explode(oid, type, Graph.EDGES_IN);
+        com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, type, com.sparsity.dex.gdb.EdgesDirection.Ingoing);
         Iterable<Edge> ret = new DexIterable<Edge>(graph, objs, Edge.class);
         return ret;
     }

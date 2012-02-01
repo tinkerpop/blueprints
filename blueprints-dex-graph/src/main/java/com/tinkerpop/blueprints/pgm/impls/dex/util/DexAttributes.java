@@ -1,37 +1,34 @@
 package com.tinkerpop.blueprints.pgm.impls.dex.util;
 
-import edu.upc.dama.dex.core.Graph;
-import edu.upc.dama.dex.core.Graph.AttributeData;
-
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Caches info about DEX attributes.
+ * Caches info about Dex attributes.
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
 public class DexAttributes {
     /**
-     * DEX attribute identifier --> {@link AttributeData}
+     * Dex attribute identifier --> {@link com.sparsity.dex.gdb.Attribute}
      */
-    private static Map<Long, AttributeData> attrs = new HashMap<Long, AttributeData>();
+    private static Map<Integer, com.sparsity.dex.gdb.Attribute> attrs = new HashMap<Integer, com.sparsity.dex.gdb.Attribute>();
 
     /**
-     * Gets corresponding {@link AttributeData} for the given attribute
+     * Gets corresponding {@link com.sparsity.dex.gdb.Attribute} for the given attribute
      * identifier.
      *
-     * @param g    DEX Graph.
-     * @param attr DEX attribute identifier.
-     * @return {@link AttributeData} or null if the attribute does not exist.
+     * @param g    Dex {@link com.sparsity.dex.gdb.Graph}.
+     * @param attr Dex attribute identifier.
+     * @return {@link com.sparsity.dex.gdb.Attribute} or null if the attribute does not exist.
      */
-    public static AttributeData getAttributeData(Graph g, long attr) {
-        assert attr != Graph.INVALID_ATTRIBUTE;
+    public static com.sparsity.dex.gdb.Attribute getAttributeData(com.sparsity.dex.gdb.Graph g, int attr) {
+        assert attr != com.sparsity.dex.gdb.Attribute.InvalidAttribute;
 
-        AttributeData adata = attrs.get(attr);
+        com.sparsity.dex.gdb.Attribute adata = attrs.get(attr);
         if (adata == null) {
-            adata = g.getAttributeData(attr);
+            adata = g.getAttribute(attr);
             if (adata != null) {
                 attrs.put(attr, adata);
             }
@@ -40,21 +37,21 @@ public class DexAttributes {
     }
 
     /**
-     * Gets corresponding {@link AttributeData} for the given attribute
+     * Gets corresponding {@link com.sparsity.dex.gdb.Attribute} for the given attribute
      * identifier name.
      *
-     * @param g    DEX Graph.
-     * @param type DEX type identifier.
-     * @param name DEX attribute identifier name.
-     * @return {@link AttributeData} or null if the attribute does not exist.
+     * @param g    Dex {@link com.sparsity.dex.gdb.Graph}.
+     * @param type Dex type identifier.
+     * @param name Dex attribute identifier name.
+     * @return {@link com.sparsity.dex.gdb.Attribute} or null if the attribute does not exist.
      */
-    public static AttributeData getAttributeData(Graph g, int type, String name) {
+    public static com.sparsity.dex.gdb.Attribute getAttributeData(com.sparsity.dex.gdb.Graph g, int type, String name) {
         assert name != null;
 
-        AttributeData adata = null;
-        final Long attr = g.findAttribute(type, name);
-        if (attr != Graph.INVALID_ATTRIBUTE) {
-            adata = g.getAttributeData(attr);
+        com.sparsity.dex.gdb.Attribute adata = null;
+        final Integer attr = g.findAttribute(type, name);
+        if (attr != com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
+            adata = g.getAttribute(attr);
             assert adata != null;
             attrs.put(attr, adata);
         }
@@ -65,18 +62,18 @@ public class DexAttributes {
      * Gets corresponding attribute identifier for the given attribute
      * identifier name.
      *
-     * @param g    DEX Graph.
-     * @param type DEX type identifier.
-     * @param name DEX attribute identifier name.
-     * @return The attribute identifier or INVALID_ATTRIBUTE if the attribute
+     * @param g    Dex {@link com.sparsity.dex.gdb.Graph}.
+     * @param type Dex type identifier.
+     * @param name Dex attribute identifier name.
+     * @return The attribute identifier or {@link com.sparsity.dex.gdb.Attribute#InvalidAttribute} if the attribute
      *         does not exist.
      */
-    public static long getAttributeId(Graph g, int type, String name) {
+    public static int getAttributeId(com.sparsity.dex.gdb.Graph g, int type, String name) {
         assert name != null;
 
-        final Long attr = g.findAttribute(type, name);
-        if (attr != Graph.INVALID_ATTRIBUTE) {
-            final AttributeData adata = g.getAttributeData(attr);
+        final Integer attr = g.findAttribute(type, name);
+        if (attr != com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
+            final com.sparsity.dex.gdb.Attribute adata = g.getAttribute(attr);
             assert adata != null;
             attrs.put(attr, adata);
         }

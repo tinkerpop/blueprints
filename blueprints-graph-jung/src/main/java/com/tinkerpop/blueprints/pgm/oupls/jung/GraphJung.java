@@ -47,7 +47,11 @@ public class GraphJung implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, Gr
     }
 
     public boolean containsVertex(final Vertex vertex) {
+<<<<<<< HEAD
     	return getGraph().getVertex(vertex.getId()) != null;
+=======
+        return this.graph.getVertex(vertex.getId()) != null;
+>>>>>>> e24e7dbe03756622f577b1910209deeabb5f4512
     }
 
     public int getEdgeCount(final EdgeType edgeType) {
@@ -84,7 +88,11 @@ public class GraphJung implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, Gr
     }
 
     public boolean containsEdge(final Edge edge) {
+<<<<<<< HEAD
     	return getGraph().getEdge(edge.getId()) != null;
+=======
+        return this.graph.getEdge(edge.getId()) != null;
+>>>>>>> e24e7dbe03756622f577b1910209deeabb5f4512
     }
 
     public Collection<Edge> getEdges(final EdgeType edgeType) {

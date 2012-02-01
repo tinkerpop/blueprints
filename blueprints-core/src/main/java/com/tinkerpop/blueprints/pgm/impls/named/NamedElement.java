@@ -1,34 +1,44 @@
-package com.tinkerpop.blueprints.pgm.impls.wrapped;
+package com.tinkerpop.blueprints.pgm.impls.named;
 
 import com.tinkerpop.blueprints.pgm.Element;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedElement implements Element {
+public class NamedElement implements Element {
 
     protected Element rawElement;
+    protected NamedGraph graph;
 
-    public WrappedElement(final Element rawElement) {
+    public NamedElement(final Element rawElement, final NamedGraph graph) {
         this.rawElement = rawElement;
+        this.graph = graph;
     }
 
     public void setProperty(final String key, final Object value) {
-        this.rawElement.setProperty(key, value);
+        if (!key.equals(this.graph.getWriteGraphKey()))
+            this.rawElement.setProperty(key, value);
     }
 
     public Object getProperty(final String key) {
+        if (key.equals(this.graph.getWriteGraphKey()))
+            return null;
         return this.rawElement.getProperty(key);
     }
 
     public Object removeProperty(final String key) {
+        if (key.equals(this.graph.getWriteGraphKey()))
+            return null;
         return this.rawElement.removeProperty(key);
     }
 
     public Set<String> getPropertyKeys() {
-        return this.rawElement.getPropertyKeys();
+        final Set<String> keys = new HashSet<String>(this.rawElement.getPropertyKeys());
+        keys.remove(this.graph.getWriteGraphKey());
+        return keys;
     }
 
     public Object getId() {
@@ -45,6 +55,14 @@ public class WrappedElement implements Element {
 
     public Element getRawElement() {
         return this.rawElement;
+    }
+
+    public String getWriteGraph() {
+        return (String) this.rawElement.getProperty(this.graph.getWriteGraphKey());
+    }
+
+    public void setWriteGraph(final String writeGraph) {
+        this.rawElement.setProperty(this.graph.getWriteGraphKey(), writeGraph);
     }
 
     public String toString() {
