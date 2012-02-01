@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import java.util.Set;
 
-import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
@@ -15,7 +14,7 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
  */
 public class OrientEdge extends OrientElement implements Edge {
 		public OrientEdge() {
-				super(null, new ODocument( ODatabaseRecordThreadLocal.INSTANCE.get()));
+				super(null, new ODocument());
 		}
 
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
