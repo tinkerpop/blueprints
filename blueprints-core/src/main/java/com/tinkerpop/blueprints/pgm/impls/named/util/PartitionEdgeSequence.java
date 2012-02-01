@@ -2,8 +2,8 @@ package com.tinkerpop.blueprints.pgm.impls.named.util;
 
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.impls.named.NamedEdge;
-import com.tinkerpop.blueprints.pgm.impls.named.NamedGraph;
+import com.tinkerpop.blueprints.pgm.impls.named.PartitionEdge;
+import com.tinkerpop.blueprints.pgm.impls.named.PartitionGraph;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -11,13 +11,13 @@ import java.util.NoSuchElementException;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedEdgeSequence implements CloseableSequence<Edge> {
+public class PartitionEdgeSequence implements CloseableSequence<Edge> {
 
     private final Iterator<Edge> itty;
-    private final NamedGraph graph;
-    private NamedEdge nextEdge;
+    private final PartitionGraph graph;
+    private PartitionEdge nextEdge;
 
-    public NamedEdgeSequence(final Iterator<Edge> itty, final NamedGraph graph) {
+    public PartitionEdgeSequence(final Iterator<Edge> itty, final PartitionGraph graph) {
         this.itty = itty;
         this.graph = graph;
     }
@@ -33,7 +33,7 @@ public class NamedEdgeSequence implements CloseableSequence<Edge> {
         while (this.itty.hasNext()) {
             final Edge edge = this.itty.next();
             if (this.graph.isInGraph(edge)) {
-                nextEdge = new NamedEdge(edge, this.graph);
+                nextEdge = new PartitionEdge(edge, this.graph);
                 return true;
             }
         }
@@ -43,14 +43,14 @@ public class NamedEdgeSequence implements CloseableSequence<Edge> {
 
     public Edge next() {
         if (null != this.nextEdge) {
-            final NamedEdge temp = this.nextEdge;
+            final PartitionEdge temp = this.nextEdge;
             this.nextEdge = null;
             return temp;
         } else {
             while (this.itty.hasNext()) {
                 final Edge edge = this.itty.next();
                 if (this.graph.isInGraph(edge)) {
-                    return new NamedEdge(edge, this.graph);
+                    return new PartitionEdge(edge, this.graph);
                 }
             }
             throw new NoSuchElementException();

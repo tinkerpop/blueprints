@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
+import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
@@ -21,9 +22,9 @@ import java.util.HashSet;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedGraphTest extends GraphTest {
+public class PartitionGraphTest extends GraphTest {
 
-    public NamedGraphTest() {
+    public PartitionGraphTest() {
         this.allowsDuplicateEdges = true;
         this.allowsSelfLoops = true;
         this.ignoresSuppliedIds = false;
@@ -79,7 +80,7 @@ public class NamedGraphTest extends GraphTest {
     }
 
     public Graph getGraphInstance() {
-        return new NamedIndexableGraph(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph")));
+        return new PartitionIndexableGraph(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph")));
     }
 
 
@@ -94,26 +95,26 @@ public class NamedGraphTest extends GraphTest {
 
     public void testSpecificBehavior() {
         TinkerGraph rawGraph = new TinkerGraph();
-        NamedGraph graph = new NamedGraph(rawGraph, "_writeGraph", "a");
+        PartitionIndexableGraph graph = new PartitionIndexableGraph(rawGraph, "_writeGraph", "a");
         Vertex marko = graph.addVertex(null);
-        Vertex rawMarko = ((NamedVertex) marko).getRawVertex();
+        Vertex rawMarko = ((PartitionVertex) marko).getRawVertex();
         assertEquals(marko.getPropertyKeys().size(), 0);
         assertEquals(rawMarko.getPropertyKeys().size(), 1);
         assertNull(marko.getProperty("_writeGraph"));
         assertEquals(rawMarko.getProperty("_writeGraph"), "a");
-        assertEquals(((NamedVertex) marko).getWriteGraph(), "a");
+        assertEquals(((PartitionVertex) marko).getWriteGraph(), "a");
         assertEquals(count(graph.getVertices()), 1);
         assertEquals(graph.getVertices().iterator().next(), marko);
         assertEquals(count(graph.getEdges()), 0);
 
-        graph.setWriteGraph("b");
+        graph.setWritePartition("b");
         Vertex peter = graph.addVertex(null);
-        Vertex rawPeter = ((NamedVertex) peter).getRawVertex();
+        Vertex rawPeter = ((PartitionVertex) peter).getRawVertex();
         assertEquals(peter.getPropertyKeys().size(), 0);
         assertEquals(rawPeter.getPropertyKeys().size(), 1);
         assertNull(peter.getProperty("_writeGraph"));
         assertEquals(rawPeter.getProperty("_writeGraph"), "b");
-        assertEquals(((NamedVertex) peter).getWriteGraph(), "b");
+        assertEquals(((PartitionVertex) peter).getWriteGraph(), "b");
         assertEquals(count(graph.getVertices()), 1);
         assertEquals(graph.getVertices().iterator().next(), marko);
         assertEquals(count(graph.getEdges()), 0);
@@ -130,9 +131,9 @@ public class NamedGraphTest extends GraphTest {
         assertEquals(count(graph.getVertices()), 2);
         assertEquals(count(graph.getEdges()), 0);
 
-        graph.setWriteGraph("c");
+        graph.setWritePartition("c");
         Edge knows = graph.addEdge(null, marko, peter, "knows");
-        Edge rawKnows = ((NamedEdge) knows).getRawEdge();
+        Edge rawKnows = ((PartitionEdge) knows).getRawEdge();
         assertEquals(count(graph.getVertices()), 2);
         assertEquals(count(graph.getEdges()), 0);
         graph.addReadGraph("c");
@@ -142,7 +143,7 @@ public class NamedGraphTest extends GraphTest {
         assertEquals(rawKnows.getPropertyKeys().size(), 1);
         assertNull(knows.getProperty("_writeGraph"));
         assertEquals(rawKnows.getProperty("_writeGraph"), "c");
-        assertEquals(((NamedEdge) knows).getWriteGraph(), "c");
+        assertEquals(((PartitionEdge) knows).getWriteGraph(), "c");
         assertEquals(graph.getEdges().iterator().next(), knows);
 
         graph.removeReadGraph("a");
@@ -152,6 +153,28 @@ public class NamedGraphTest extends GraphTest {
         assertEquals(knows.getInVertex(), peter);
         assertEquals(knows.getOutVertex(), marko);
         
+        // testing indices
+        marko.setProperty("name","marko");
+        peter.setProperty("name","peter");
+        assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 0);
+        graph.addReadGraph("a");
+        assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name","marko")), 1);
+        assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name","peter")), 0);
+        assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).get("name","marko").next(), marko);
+        graph.removeReadGraph("a");
+        graph.addReadGraph("b");
+        assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name","peter")), 1);
+        assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name","marko")), 0);
+        assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).get("name","peter").next(), peter);
+        graph.addReadGraph("a");
+        assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name","peter")), 1);
+        assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name","marko")), 1);
+        
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label","knows")), 1);
+        assertEquals(graph.getIndex(Index.EDGES, Edge.class).get("label","knows").next(), knows);
+        graph.removeReadGraph("c");
+        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label","knows")), 0);
+
         graph.shutdown();
     }
 }

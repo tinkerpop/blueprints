@@ -2,23 +2,23 @@ package com.tinkerpop.blueprints.pgm.impls.named;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.named.util.NamedEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.named.util.PartitionEdgeSequence;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedVertex extends NamedElement implements Vertex {
+public class PartitionVertex extends PartitionElement implements Vertex {
 
-    public NamedVertex(final Vertex rawVertex, final NamedGraph graph) {
+    public PartitionVertex(final Vertex rawVertex, final PartitionGraph graph) {
         super(rawVertex, graph);
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
-        return new NamedEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator(), this.graph);
+        return new PartitionEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator(), this.graph);
     }
 
     public Iterable<Edge> getInEdges(final String... labels) {
-        return new NamedEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator(), this.graph);
+        return new PartitionEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator(), this.graph);
     }
 
     public Vertex getRawVertex() {

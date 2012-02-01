@@ -3,21 +3,21 @@ package com.tinkerpop.blueprints.pgm.impls.named.util;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.impls.named.NamedAutomaticIndex;
-import com.tinkerpop.blueprints.pgm.impls.named.NamedGraph;
-import com.tinkerpop.blueprints.pgm.impls.named.NamedIndex;
+import com.tinkerpop.blueprints.pgm.impls.named.PartitionAutomaticIndex;
+import com.tinkerpop.blueprints.pgm.impls.named.PartitionGraph;
+import com.tinkerpop.blueprints.pgm.impls.named.PartitionIndex;
 
 import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedIndexSequence<T extends Element> implements Iterator<Index<T>>, Iterable<Index<T>> {
+public class PartitionIndexSequence<T extends Element> implements Iterator<Index<T>>, Iterable<Index<T>> {
 
     protected Iterator<Index<T>> itty;
-    private final NamedGraph graph;
+    private final PartitionGraph graph;
 
-    public NamedIndexSequence(final Iterator<Index<T>> itty, final NamedGraph graph) {
+    public PartitionIndexSequence(final Iterator<Index<T>> itty, final PartitionGraph graph) {
         this.itty = itty;
         this.graph = graph;
     }
@@ -33,9 +33,9 @@ public class NamedIndexSequence<T extends Element> implements Iterator<Index<T>>
     public Index<T> next() {
         final Index<T> index = itty.next();
         if (index.getIndexType().equals(Index.Type.MANUAL)) {
-            return new NamedIndex<T>(index, this.graph);
+            return new PartitionIndex<T>(index, this.graph);
         } else {
-            return new NamedAutomaticIndex<T>((AutomaticIndex<T>) index, this.graph);
+            return new PartitionAutomaticIndex<T>((AutomaticIndex<T>) index, this.graph);
         }
     }
 

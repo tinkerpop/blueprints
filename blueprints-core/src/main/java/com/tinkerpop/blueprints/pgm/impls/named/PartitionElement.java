@@ -8,36 +8,36 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedElement implements Element {
+public class PartitionElement implements Element {
 
     protected Element rawElement;
-    protected NamedGraph graph;
+    protected PartitionGraph graph;
 
-    public NamedElement(final Element rawElement, final NamedGraph graph) {
+    public PartitionElement(final Element rawElement, final PartitionGraph graph) {
         this.rawElement = rawElement;
         this.graph = graph;
     }
 
     public void setProperty(final String key, final Object value) {
-        if (!key.equals(this.graph.getWriteGraphKey()))
+        if (!key.equals(this.graph.getPartitionKey()))
             this.rawElement.setProperty(key, value);
     }
 
     public Object getProperty(final String key) {
-        if (key.equals(this.graph.getWriteGraphKey()))
+        if (key.equals(this.graph.getPartitionKey()))
             return null;
         return this.rawElement.getProperty(key);
     }
 
     public Object removeProperty(final String key) {
-        if (key.equals(this.graph.getWriteGraphKey()))
+        if (key.equals(this.graph.getPartitionKey()))
             return null;
         return this.rawElement.removeProperty(key);
     }
 
     public Set<String> getPropertyKeys() {
         final Set<String> keys = new HashSet<String>(this.rawElement.getPropertyKeys());
-        keys.remove(this.graph.getWriteGraphKey());
+        keys.remove(this.graph.getPartitionKey());
         return keys;
     }
 
@@ -58,11 +58,11 @@ public class NamedElement implements Element {
     }
 
     public String getWriteGraph() {
-        return (String) this.rawElement.getProperty(this.graph.getWriteGraphKey());
+        return (String) this.rawElement.getProperty(this.graph.getPartitionKey());
     }
 
     public void setWriteGraph(final String writeGraph) {
-        this.rawElement.setProperty(this.graph.getWriteGraphKey(), writeGraph);
+        this.rawElement.setProperty(this.graph.getPartitionKey(), writeGraph);
     }
 
     public String toString() {

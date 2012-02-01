@@ -6,18 +6,18 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedEdge extends NamedElement implements Edge {
+public class PartitionEdge extends PartitionElement implements Edge {
 
-    public NamedEdge(final Edge rawEdge, final NamedGraph graph) {
+    public PartitionEdge(final Edge rawEdge, final PartitionGraph graph) {
         super(rawEdge, graph);
     }
 
     public Vertex getInVertex() {
-        return new NamedVertex(((Edge) rawElement).getInVertex(), this.graph);
+        return new PartitionVertex(((Edge) rawElement).getInVertex(), this.graph);
     }
 
     public Vertex getOutVertex() {
-        return new NamedVertex(((Edge) rawElement).getOutVertex(), this.graph);
+        return new PartitionVertex(((Edge) rawElement).getOutVertex(), this.graph);
     }
 
     public String getLabel() {

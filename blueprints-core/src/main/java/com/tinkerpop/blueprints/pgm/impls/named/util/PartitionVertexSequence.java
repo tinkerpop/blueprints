@@ -2,8 +2,8 @@ package com.tinkerpop.blueprints.pgm.impls.named.util;
 
 import com.tinkerpop.blueprints.pgm.CloseableSequence;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.named.NamedGraph;
-import com.tinkerpop.blueprints.pgm.impls.named.NamedVertex;
+import com.tinkerpop.blueprints.pgm.impls.named.PartitionGraph;
+import com.tinkerpop.blueprints.pgm.impls.named.PartitionVertex;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -11,13 +11,13 @@ import java.util.NoSuchElementException;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedVertexSequence implements CloseableSequence<Vertex> {
+public class PartitionVertexSequence implements CloseableSequence<Vertex> {
 
     private final Iterator<Vertex> itty;
-    private final NamedGraph graph;
-    private NamedVertex nextVertex;
+    private final PartitionGraph graph;
+    private PartitionVertex nextVertex;
 
-    public NamedVertexSequence(final Iterator<Vertex> itty, final NamedGraph graph) {
+    public PartitionVertexSequence(final Iterator<Vertex> itty, final PartitionGraph graph) {
         this.itty = itty;
         this.graph = graph;
     }
@@ -33,7 +33,7 @@ public class NamedVertexSequence implements CloseableSequence<Vertex> {
         while (this.itty.hasNext()) {
             final Vertex vertex = this.itty.next();
             if (this.graph.isInGraph(vertex)) {
-                nextVertex = new NamedVertex(vertex, this.graph);
+                this.nextVertex = new PartitionVertex(vertex, this.graph);
                 return true;
             }
         }
@@ -43,14 +43,14 @@ public class NamedVertexSequence implements CloseableSequence<Vertex> {
 
     public Vertex next() {
         if (null != this.nextVertex) {
-            final NamedVertex temp = this.nextVertex;
+            final PartitionVertex temp = this.nextVertex;
             this.nextVertex = null;
             return temp;
         } else {
             while (this.itty.hasNext()) {
                 final Vertex vertex = this.itty.next();
                 if (this.graph.isInGraph(vertex)) {
-                    return new NamedVertex(vertex, this.graph);
+                    return new PartitionVertex(vertex, this.graph);
                 }
             }
             throw new NoSuchElementException();

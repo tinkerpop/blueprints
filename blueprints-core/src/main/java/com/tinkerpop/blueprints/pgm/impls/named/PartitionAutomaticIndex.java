@@ -8,9 +8,9 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class NamedAutomaticIndex<T extends Element> extends NamedIndex<T> implements AutomaticIndex<T> {
+public class PartitionAutomaticIndex<T extends Element> extends PartitionIndex<T> implements AutomaticIndex<T> {
 
-    public NamedAutomaticIndex(final AutomaticIndex<T> rawIndex, final NamedGraph graph) {
+    public PartitionAutomaticIndex(final AutomaticIndex<T> rawIndex, final PartitionGraph graph) {
         super(rawIndex, graph);
     }
 
