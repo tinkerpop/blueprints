@@ -47,11 +47,13 @@ public class GraphJung implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, Gr
     }
 
     public boolean containsVertex(final Vertex vertex) {
-        for (Vertex v : this.graph.getVertices()) {
-            if (vertex.equals(v))
-                return true;
-        }
-        return false;
+    	return getGraph().getVertex(vertex.getId()) != null;
+    	
+//        for (Vertex v : this.graph.getVertices()) {
+//            if (vertex.equals(v))
+//                return true;
+//        }
+//        return false;
     }
 
     public int getEdgeCount(final EdgeType edgeType) {
@@ -88,11 +90,12 @@ public class GraphJung implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, Gr
     }
 
     public boolean containsEdge(final Edge edge) {
-        for (Edge e : this.graph.getEdges()) {
-            if (edge.equals(e))
-                return true;
-        }
-        return false;
+    	return getGraph().getEdge(edge.getId()) != null;
+//        for (Edge e : this.graph.getEdges()) {
+//            if (edge.equals(e))
+//                return true;
+//        }
+//        return false;
     }
 
     public Collection<Edge> getEdges(final EdgeType edgeType) {
