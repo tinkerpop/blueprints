@@ -1,8 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
 import com.orientechnologies.orient.core.exception.OSerializationException;
@@ -15,6 +12,9 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -108,7 +108,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
      * Returns the Element Id assuring to save it if it's transient yet.
      */
     public Object getId() {
-    	  return getIdentity();
+        return getIdentity();
     }
 
     protected void save() {
@@ -142,46 +142,46 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
         return true;
     }
 
-		@Override
-		public byte[] toStream() throws OSerializationException {
-				return rawElement.getIdentity().toString().getBytes();
-		}
+    @Override
+    public byte[] toStream() throws OSerializationException {
+        return rawElement.getIdentity().toString().getBytes();
+    }
 
-		@Override
-		public OSerializableStream fromStream(byte[] iStream) throws OSerializationException {
-				((ORecordId)rawElement.getIdentity()).fromString( new String(iStream) );
-				rawElement.setInternalStatus(STATUS.NOT_LOADED);
-				return this;
-		}
+    @Override
+    public OSerializableStream fromStream(byte[] iStream) throws OSerializationException {
+        ((ORecordId) rawElement.getIdentity()).fromString(new String(iStream));
+        rawElement.setInternalStatus(STATUS.NOT_LOADED);
+        return this;
+    }
 
-		@Override
-		public ORID getIdentity() {
-      ORID rid = this.rawElement.getIdentity();
-      this.save();
-      return rid;
-	}
+    @Override
+    public ORID getIdentity() {
+        ORID rid = this.rawElement.getIdentity();
+        this.save();
+        return rid;
+    }
 
-		@Override
-		public ORecord<?> getRecord() {
-			return this.rawElement;
-		}
+    @Override
+    public ORecord<?> getRecord() {
+        return this.rawElement;
+    }
 
-		public int compare(final OIdentifiable iFirst, final OIdentifiable iSecond) {
-			if (iFirst == null || iSecond == null)
-				return -1;
-			return iFirst.compareTo(iSecond);
-		}
+    public int compare(final OIdentifiable iFirst, final OIdentifiable iSecond) {
+        if (iFirst == null || iSecond == null)
+            return -1;
+        return iFirst.compareTo(iSecond);
+    }
 
-		public int compareTo(final OIdentifiable iOther) {
-			if (iOther == null)
-				return 1;
+    public int compareTo(final OIdentifiable iOther) {
+        if (iOther == null)
+            return 1;
 
-			final ORID myRID = getIdentity();
-			final ORID otherRID = iOther.getIdentity();
-			
-			if (myRID == null && otherRID == null)
-				return 0;
+        final ORID myRID = getIdentity();
+        final ORID otherRID = iOther.getIdentity();
 
-			return myRID.compareTo(otherRID);
-		}		
+        if (myRID == null && otherRID == null)
+            return 0;
+
+        return myRID.compareTo(otherRID);
+    }
 }

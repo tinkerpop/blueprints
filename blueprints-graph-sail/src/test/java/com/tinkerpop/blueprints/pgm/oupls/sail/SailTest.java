@@ -408,7 +408,7 @@ public abstract class SailTest extends TestCase {
             count = countStatements(sc, uriA, null, null);
             assertEquals(2, count);
 
-            // Get statements from a specific named context.
+            // Get statements from a specific partition context.
             count = countStatements(sc, null, null, null, uriA);
             assertEquals(1, count);
 
@@ -452,7 +452,7 @@ public abstract class SailTest extends TestCase {
             count = countStatements(sc, uriA, null, null);
             assertEquals(0, count);
 
-            // Remove from one named context.
+            // Remove from one partition context.
             sc.removeStatements(uriA, null, null);
             sc.commit();
             count = countStatements(sc, uriA, null, null);

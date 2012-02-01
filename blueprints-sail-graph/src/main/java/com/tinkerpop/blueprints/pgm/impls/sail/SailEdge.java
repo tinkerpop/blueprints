@@ -22,7 +22,7 @@ public class SailEdge implements Edge {
     protected Statement rawEdge;
     protected SailGraph graph;
 
-    private static final String NAMED_GRAPH_PROPERTY = "RDF graph edges can only have named graph (ng) properties";
+    private static final String NAMED_GRAPH_PROPERTY = "RDF graph edges can only have partition graph (ng) properties";
 
     public SailEdge(final Statement rawEdge, final SailGraph graph) {
         this.rawEdge = rawEdge;

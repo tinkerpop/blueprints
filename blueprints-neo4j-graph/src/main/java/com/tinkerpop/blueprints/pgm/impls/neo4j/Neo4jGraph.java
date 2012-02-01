@@ -165,11 +165,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         try {
             this.autoStartTransaction();
             org.neo4j.graphdb.index.Index<Node> nodeIndex = this.rawGraph.index().forNodes(indexName);
-            if(nodeIndex.isWriteable()){
+            if (nodeIndex.isWriteable()) {
                 nodeIndex.delete();
             }
             RelationshipIndex relationshipIndex = this.rawGraph.index().forRelationships(indexName);
-            if(relationshipIndex.isWriteable()){
+            if (relationshipIndex.isWriteable()) {
                 relationshipIndex.delete();
             }
             this.stopTransaction(Conclusion.SUCCESS);

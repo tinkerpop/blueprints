@@ -39,27 +39,27 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private String password;
 
     private final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
-  
+
     /**
      * Reuses the underlying database avoiding to create and open it every time.
-     * 
+     *
      * @param iDatabase Underlying OGraphDatabase object
      */
     public OrientGraph reuse(final OGraphDatabase iDatabase) {
-       this.url = iDatabase.getURL();
-       this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
-       synchronized (this) {
-          OrientGraphContext context = threadContext.get();
-          if (context == null || context.rawGraph != iDatabase ){
-            removeContext();
-            context = new OrientGraphContext();
-            context.rawGraph = iDatabase;
-            iDatabase.checkForGraphSchema();
-            this.threadContext.set(context);
-          }
-       }
-       return this;
-   }
+        this.url = iDatabase.getURL();
+        this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
+        synchronized (this) {
+            OrientGraphContext context = threadContext.get();
+            if (context == null || context.rawGraph != iDatabase) {
+                removeContext();
+                context = new OrientGraphContext();
+                context.rawGraph = iDatabase;
+                iDatabase.checkForGraphSchema();
+                this.threadContext.set(context);
+            }
+        }
+        return this;
+    }
 
     public OrientGraph(final String url) {
         this(url, ADMIN, ADMIN);

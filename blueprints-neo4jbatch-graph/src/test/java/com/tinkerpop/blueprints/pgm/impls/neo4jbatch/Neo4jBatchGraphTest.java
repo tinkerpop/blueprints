@@ -8,7 +8,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReader;
+import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReader;
 
 import java.io.File;
 import java.util.ArrayList;

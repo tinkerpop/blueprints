@@ -14,7 +14,7 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
-import com.tinkerpop.blueprints.pgm.util.graphml.GraphMLReaderTestSuite;
+import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
 import org.neo4j.kernel.Config;
 
 import java.io.File;
