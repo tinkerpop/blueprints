@@ -32,7 +32,7 @@ public class PartitionVertexSequence implements CloseableSequence<Vertex> {
         }
         while (this.itty.hasNext()) {
             final Vertex vertex = this.itty.next();
-            if (this.graph.isInGraph(vertex)) {
+            if (this.graph.isInPartition(vertex)) {
                 this.nextVertex = new PartitionVertex(vertex, this.graph);
                 return true;
             }
@@ -49,7 +49,7 @@ public class PartitionVertexSequence implements CloseableSequence<Vertex> {
         } else {
             while (this.itty.hasNext()) {
                 final Vertex vertex = this.itty.next();
-                if (this.graph.isInGraph(vertex)) {
+                if (this.graph.isInPartition(vertex)) {
                     return new PartitionVertex(vertex, this.graph);
                 }
             }

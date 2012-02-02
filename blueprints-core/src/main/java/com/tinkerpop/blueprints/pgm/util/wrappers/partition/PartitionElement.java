@@ -57,12 +57,12 @@ public class PartitionElement implements Element {
         return this.rawElement;
     }
 
-    public String getWriteGraph() {
+    public String getPartition() {
         return (String) this.rawElement.getProperty(this.graph.getPartitionKey());
     }
 
-    public void setWriteGraph(final String writeGraph) {
-        this.rawElement.setProperty(this.graph.getPartitionKey(), writeGraph);
+    public void setPartition(final String partition) {
+        this.rawElement.setProperty(this.graph.getPartitionKey(), partition);
     }
 
     public String toString() {

@@ -61,10 +61,10 @@ public class PartitionGraph implements Graph {
         return this.partitionKey;
     }
 
-    public boolean isInGraph(final Element element) {
+    public boolean isInPartition(final Element element) {
         final String writeGraph;
         if (element instanceof PartitionElement)
-            writeGraph = ((PartitionElement) element).getWriteGraph();
+            writeGraph = ((PartitionElement) element).getPartition();
         else
             writeGraph = (String) element.getProperty(this.partitionKey);
         return (null == writeGraph || this.readPartitions.contains(writeGraph));
@@ -80,7 +80,7 @@ public class PartitionGraph implements Graph {
 
     public Vertex addVertex(final Object id) {
         final PartitionVertex vertex = new PartitionVertex(this.rawGraph.addVertex(id), this);
-        vertex.setWriteGraph(this.writePartition);
+        vertex.setPartition(this.writePartition);
         return vertex;
     }
 
@@ -89,7 +89,7 @@ public class PartitionGraph implements Graph {
         if (null == vertex)
             return null;
         else {
-            if (isInGraph(vertex))
+            if (isInPartition(vertex))
                 return new PartitionVertex(vertex, this);
             else
                 return null;
@@ -102,7 +102,7 @@ public class PartitionGraph implements Graph {
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         final PartitionEdge edge = new PartitionEdge(this.rawGraph.addEdge(id, ((PartitionVertex) outVertex).getRawVertex(), ((PartitionVertex) inVertex).getRawVertex(), label), this);
-        edge.setWriteGraph(this.writePartition);
+        edge.setPartition(this.writePartition);
         return edge;
     }
 

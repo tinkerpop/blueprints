@@ -32,7 +32,7 @@ public class PartitionEdgeSequence implements CloseableSequence<Edge> {
         }
         while (this.itty.hasNext()) {
             final Edge edge = this.itty.next();
-            if (this.graph.isInGraph(edge)) {
+            if (this.graph.isInPartition(edge)) {
                 nextEdge = new PartitionEdge(edge, this.graph);
                 return true;
             }
@@ -49,7 +49,7 @@ public class PartitionEdgeSequence implements CloseableSequence<Edge> {
         } else {
             while (this.itty.hasNext()) {
                 final Edge edge = this.itty.next();
-                if (this.graph.isInGraph(edge)) {
+                if (this.graph.isInPartition(edge)) {
                     return new PartitionEdge(edge, this.graph);
                 }
             }
