@@ -29,6 +29,18 @@ public class RexsterGraphTest extends GraphTest {
         this.supportsEdgeIteration = true;
         this.supportsVertexIndex = true;
         this.supportsEdgeIndex = true;
+
+        // RexsterGraph will toString anything it can't convert to a standard Rexster type.
+        this.allowSerializableObjectProperty = true;
+        this.allowBooleanProperty = true;
+        this.allowDoubleProperty = true;
+        this.allowFloatProperty = true;
+        this.allowIntegerProperty = true;
+        this.allowPrimitiveArrayProperty = true;
+        this.allowListProperty = true;
+        this.allowLongProperty = true;
+        this.allowMapProperty = true;
+        this.allowStringProperty = true;
     }
 
     public void testVertexTestSuite() throws Exception {

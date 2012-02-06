@@ -179,7 +179,7 @@ public class DexElement implements Element {
             } else if (value instanceof com.sparsity.dex.gdb.Value) {
                 datatype = ((com.sparsity.dex.gdb.Value) value).getDataType();
             } else {
-                throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+                throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
             }
             assert datatype != null;
             attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.dex.gdb.AttributeKind.Indexed);
@@ -214,7 +214,7 @@ public class DexElement implements Element {
                     }
                     break;
                 default:
-                    throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+                    throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
             }
         }
         //try {

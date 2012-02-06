@@ -3,9 +3,13 @@ package com.tinkerpop.blueprints.pgm;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -116,6 +120,90 @@ public class GraphTestSuite extends TestSuite {
             }
         }
         graph.shutdown();
+    }
+
+    public void testDataTypeValidationOnProperties() {
+        Graph graph = graphTest.getGraphInstance();
+        if (!graphTest.isRDFModel && !graphTest.isWrapper) {
+            Vertex vertexA = graph.addVertex(null);
+            Vertex vertexB = graph.addVertex(null);
+            Edge edge = graph.addEdge(null, vertexA, vertexB, convertId("knows"));
+
+            trySetProperty(vertexA, "keyString", "value", graphTest.allowStringProperty);
+            trySetProperty(edge, "keyString", "value", graphTest.allowStringProperty);
+
+            trySetProperty(vertexA, "keyInteger", 100, graphTest.allowIntegerProperty);
+            trySetProperty(edge, "keyInteger", 100, graphTest.allowIntegerProperty);
+
+            trySetProperty(vertexA, "keyLong", 10000L, graphTest.allowLongProperty);
+            trySetProperty(edge, "keyLong", 10000L, graphTest.allowLongProperty);
+
+            trySetProperty(vertexA, "keyDouble", 100.321d, graphTest.allowDoubleProperty);
+            trySetProperty(edge, "keyDouble", 100.321d, graphTest.allowDoubleProperty);
+
+            trySetProperty(vertexA, "keyFloat", 100.321f, graphTest.allowFloatProperty);
+            trySetProperty(edge, "keyFloat", 100.321f, graphTest.allowFloatProperty);
+
+            trySetProperty(vertexA, "keyBoolean", true, graphTest.allowBooleanProperty);
+            trySetProperty(edge, "keyBoolean", true, graphTest.allowBooleanProperty);
+
+            trySetProperty(vertexA, "keyDate", new Date(), graphTest.allowSerializableObjectProperty);
+            trySetProperty(edge, "keyDate", new Date(), graphTest.allowSerializableObjectProperty);
+
+            trySetProperty(vertexA, "keyListString", new ArrayList<String>() {{ add("try1"); add("try2"); }}, graphTest.allowListProperty);
+            trySetProperty(edge, "keyListString", new ArrayList<String>() {{ add("try1"); add("try2"); }}, graphTest.allowListProperty);
+
+            trySetProperty(vertexA, "keyArrayString", new String[] { "try1", "try2" }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayString", new String[] { "try1", "try2"}, graphTest.allowPrimitiveArrayProperty);
+
+            trySetProperty(vertexA, "keyArrayInteger", new int[] { 1, 2 }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayInteger", new int[] { 1, 2 }, graphTest.allowPrimitiveArrayProperty);
+
+            trySetProperty(vertexA, "keyArrayLong", new long[] { 1000l, 2000l }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayLong", new long[] { 1000l, 2000l }, graphTest.allowPrimitiveArrayProperty);
+
+            trySetProperty(vertexA, "keyArrayFloat", new float[] { 1000.321f, 2000.321f }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayFloat", new float[] { 1000.321f, 2000.321f }, graphTest.allowPrimitiveArrayProperty);
+
+            trySetProperty(vertexA, "keyArrayDouble", new double[] { 1000.321d, 2000.321d }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayDouble", new double[] { 1000.321d, 2000.321d }, graphTest.allowPrimitiveArrayProperty);
+
+            trySetProperty(vertexA, "keyArrayBoolean", new boolean[] { false, true }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayBoolean", new boolean[] { false, true }, graphTest.allowPrimitiveArrayProperty);
+
+            final Map map = new HashMap() {{
+                put("testString", "try");
+                put("testInteger", "string");
+            }};
+            trySetProperty(vertexA, "keyMap", map, graphTest.allowMapProperty);
+            trySetProperty(edge, "keyMap", map, graphTest.allowMapProperty);
+
+            MockSerializable mockSerializable = new MockSerializable();
+            mockSerializable.setTestField("test");
+            trySetProperty(vertexA, "keySerializable", mockSerializable, graphTest.allowSerializableObjectProperty);
+            trySetProperty(edge, "keySerializable", mockSerializable, graphTest.allowSerializableObjectProperty);
+
+        }
+
+        // TODO: clearing the graph until serialization issues for map with TinkerGraph are sorted.
+        graph.clear();
+        graph.shutdown();
+    }
+    
+    private void trySetProperty(final Element e, final String propertyKey, final Object propertyValue, final boolean allowDataType) {
+        boolean exceptionTossed = false;
+        try {
+            e.setProperty(propertyKey, propertyValue);
+        } catch (Throwable t) {
+            exceptionTossed = true;
+            if (!allowDataType) {
+                assertTrue(t instanceof IllegalArgumentException);
+            }
+        }
+
+        if (!allowDataType && !exceptionTossed) {
+            fail("setProperty threw an exception but the data type should have been accepted.");
+        }
     }
 
     public void testRemovingEdges() {
@@ -496,5 +584,18 @@ public class GraphTestSuite extends TestSuite {
             }
             graph.shutdown();
         }
+    }
+    
+    protected class MockSerializable implements Serializable {
+        private String testField;
+        
+        public String getTestField() {
+            return this.testField;
+        }
+        
+        public void setTestField(String testField) {
+            this.testField = testField;
+        }
+        
     }
 }

@@ -40,6 +40,18 @@ public class Neo4jGraphTest extends GraphTest {
         this.supportsEdgeIndex = true;
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = true;
+
+        this.allowSerializableObjectProperty = false;
+        this.allowBooleanProperty = true;
+        this.allowDoubleProperty = true;
+        this.allowFloatProperty = true;
+        this.allowIntegerProperty = true;
+        this.allowPrimitiveArrayProperty = true;
+        this.allowListProperty = false;
+        this.allowLongProperty = true;
+        this.allowMapProperty = false;
+        this.allowStringProperty = true;
+
     }
 
     /*public void testNeo4jBenchmarkTestSuite() throws Exception {

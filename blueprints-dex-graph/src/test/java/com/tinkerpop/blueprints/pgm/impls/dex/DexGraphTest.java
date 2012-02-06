@@ -28,6 +28,17 @@ public class DexGraphTest extends GraphTest {
         this.supportsEdgeIndex = false;
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = false;
+
+        this.allowSerializableObjectProperty = false;
+        this.allowBooleanProperty = true;
+        this.allowDoubleProperty = true;
+        this.allowFloatProperty = true;
+        this.allowIntegerProperty = true;
+        this.allowPrimitiveArrayProperty = false;
+        this.allowListProperty = false;
+        this.allowLongProperty = false;
+        this.allowMapProperty = false;
+        this.allowStringProperty = true;
     }
 
     /*public void testDexBenchmarkTestSuite() throws Exception {

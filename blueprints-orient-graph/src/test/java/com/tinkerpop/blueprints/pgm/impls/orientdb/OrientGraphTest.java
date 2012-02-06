@@ -36,6 +36,19 @@ public class OrientGraphTest extends GraphTest {
         this.supportsEdgeIndex = true;
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = true;
+
+        // The blueprints tests don't test everything OrientDB support
+        // http://code.google.com/p/orient/wiki/Types
+        this.allowSerializableObjectProperty = true;
+        this.allowBooleanProperty = true;
+        this.allowDoubleProperty = true;
+        this.allowFloatProperty = true;
+        this.allowIntegerProperty = true;
+        this.allowPrimitiveArrayProperty = true;
+        this.allowListProperty = true;
+        this.allowLongProperty = true;
+        this.allowMapProperty = true;
+        this.allowStringProperty = true;
     }
 
     /*public void testOrientBenchmarkTestSuite() throws Exception {

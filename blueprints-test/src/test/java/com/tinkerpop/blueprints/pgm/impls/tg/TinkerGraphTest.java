@@ -30,6 +30,17 @@ public class TinkerGraphTest extends GraphTest {
         this.supportsVertexIndex = true;
         this.supportsEdgeIndex = true;
         this.supportsTransactions = false;
+
+        this.allowSerializableObjectProperty = true;
+        this.allowBooleanProperty = true;
+        this.allowDoubleProperty = true;
+        this.allowFloatProperty = true;
+        this.allowIntegerProperty = true;
+        this.allowPrimitiveArrayProperty = true;
+        this.allowListProperty = true;
+        this.allowLongProperty = true;
+        this.allowMapProperty = true;
+        this.allowStringProperty = true;
     }
 
     /*public void testTinkerBenchmarkTestSuite() throws Exception {

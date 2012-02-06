@@ -25,6 +25,7 @@ public class WrappedGraphTest extends GraphTest {
         this.ignoresSuppliedIds = false;
         this.isPersistent = false;
         this.isRDFModel = false;
+        this.isWrapper = true;
         this.supportsVertexIteration = true;
         this.supportsEdgeIteration = true;
         this.supportsVertexIndex = true;
