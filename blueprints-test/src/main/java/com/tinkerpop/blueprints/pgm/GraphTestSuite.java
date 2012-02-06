@@ -182,9 +182,9 @@ public class GraphTestSuite extends TestSuite {
         for (Vertex v : vertices) {
             counter = counter + 1;
             graph.removeVertex(v);
-            if (counter + 1 % 2 == 0) {
+            if ((counter + 1) % 2 == 0) {
                 if (graphTest.supportsEdgeIteration) {
-                    assertEquals(edges.size() - counter, count(graph.getEdges()));
+                    assertEquals(edges.size() - ((counter + 1) / 2), count(graph.getEdges()));
                 }
             }
 
