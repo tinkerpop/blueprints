@@ -41,24 +41,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     private final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
 
     /**
-     * Reuses the underlying database avoiding to create and open it every time.
+     * Constructs a new object using an existent OGraphDatabase instance.
      *
-     * @param iDatabase Underlying OGraphDatabase object
+     * @param iDatabase Underlying OGraphDatabase object to attach
      */
-    public OrientGraph reuse(final OGraphDatabase iDatabase) {
-        this.url = iDatabase.getURL();
-        this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
-        synchronized (this) {
-            OrientGraphContext context = threadContext.get();
-            if (context == null || context.rawGraph != iDatabase) {
-                removeContext();
-                context = new OrientGraphContext();
-                context.rawGraph = iDatabase;
-                iDatabase.checkForGraphSchema();
-                this.threadContext.set(context);
-            }
-        }
-        return this;
+    public OrientGraph(final OGraphDatabase iDatabase) {
+        reuse(iDatabase);
     }
 
     public OrientGraph(final String url) {
@@ -338,6 +326,27 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     }
 
     /**
+     * Reuses the underlying database avoiding to create and open it every time.
+     *
+     * @param iDatabase Underlying OGraphDatabase object
+     */
+    public OrientGraph reuse(final OGraphDatabase iDatabase) {
+        this.url = iDatabase.getURL();
+        this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
+        synchronized (this) {
+            OrientGraphContext context = threadContext.get();
+            if (context == null || context.rawGraph != iDatabase) {
+                removeContext();
+                context = new OrientGraphContext();
+                context.rawGraph = iDatabase;
+                iDatabase.checkForGraphSchema();
+                this.threadContext.set(context);
+            }
+        }
+        return this;
+    }
+
+    /**
      * This operation does not respect the transaction buffer. A clear will eradicate the graph and commit the results immediately.
      */
     public void clear() {
@@ -389,8 +398,9 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
 
     public void setMaxBufferSize(final int bufferSize) {
         getRawGraph().commit();
-        getContext(true).txCounter = 0;
-        getContext(true).txBuffer = bufferSize;
+        final OrientGraphContext context = getContext(true);
+        context.txCounter = 0;
+        context.txBuffer = bufferSize;
     }
 
     public int getMaxBufferSize() {
@@ -417,7 +427,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph {
     protected void autoStopTransaction(final Conclusion conclusion) {
         final OrientGraphContext context = getContext(true);
         if (context.txBuffer > 0) {
-            context.txCounter = getContext(true).txCounter + 1;
+            context.txCounter = context.txCounter + 1;
             if (conclusion == Conclusion.FAILURE) {
                 final OGraphDatabase db = getRawGraph();
                 db.rollback();
