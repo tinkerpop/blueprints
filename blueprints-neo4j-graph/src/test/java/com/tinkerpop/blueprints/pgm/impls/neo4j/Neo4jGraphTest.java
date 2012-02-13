@@ -14,7 +14,9 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
+import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 import org.neo4j.kernel.Config;
 
 import java.io.File;
@@ -179,6 +181,8 @@ public class Neo4jGraphTest extends GraphTest {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
         IndexableGraph graph = new Neo4jGraph(directory);
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
@@ -214,6 +218,37 @@ public class Neo4jGraphTest extends GraphTest {
         deleteDirectory(new File(directory));
     }
 
+    public void testIndexParameters() throws Exception {
+        String directory = System.getProperty("neo4jGraphDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
+        IndexableGraph graph = new Neo4jGraph(directory);
+        graph.dropIndex(Index.VERTICES);
+        graph.createAutomaticIndex(Index.VERTICES, Vertex.class, null, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+        Vertex a = graph.addVertex(null);
+        a.setProperty("name", "marko");
+        Iterator itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        int counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), a);
+        }
+        assertEquals(counter, 1);
+
+        itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "\"MaRkO\"").iterator();
+        counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), a);
+        }
+        assertEquals(counter, 1);
+
+        graph.shutdown();
+        deleteDirectory(new File(directory));
+    }
+
     public void testShouldNotDeleteAutomaticNeo4jIndexes() {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
@@ -235,6 +270,7 @@ public class Neo4jGraphTest extends GraphTest {
         graph.clear();
         assertTrue(null != graph.getRawGraph().index().getNodeAutoIndexer().getAutoIndex());
         graph.shutdown();
+        deleteDirectory(new File(directory));
 
     }
 
@@ -254,6 +290,9 @@ public class Neo4jGraphTest extends GraphTest {
         a = graph.addVertex(null);
         a.setProperty("name", "foo");
         assertNotNull(graph.getRawGraph().index().getNodeAutoIndexer().getAutoIndex());
+
+        graph.shutdown();
+        deleteDirectory(new File(directory));
 
     }
 }

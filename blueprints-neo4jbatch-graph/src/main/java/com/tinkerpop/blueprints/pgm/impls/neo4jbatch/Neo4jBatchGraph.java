@@ -6,10 +6,10 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.index.BatchInserterIndexProvider;
-import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.index.impl.lucene.LuceneBatchInserterIndexProvider;
 import org.neo4j.kernel.impl.batchinsert.BatchInserter;
 import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
@@ -219,29 +219,38 @@ public class Neo4jBatchGraph implements IndexableGraph {
         return (Index<T>) this.indices.get(indexName);
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         final Neo4jBatchIndex<T> index;
 
+        final Map<String, String> map = generateParameterMap(indexParameters);
+        if (indexParameters.length == 0) {
+            map.put(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT);
+        }
+        map.put(Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.MANUAL.toString());
+
         if (Vertex.class.isAssignableFrom(indexClass)) {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.nodeIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT, Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.MANUAL.toString())), indexName, indexClass);
+            index = new Neo4jBatchIndex<T>(this, indexProvider.nodeIndex(indexName, map), indexName, indexClass);
         } else {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.relationshipIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT, Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.MANUAL.toString())), indexName, indexClass);
+            index = new Neo4jBatchIndex<T>(this, indexProvider.relationshipIndex(indexName, map), indexName, indexClass);
         }
         this.indices.put(indexName, index);
         return index;
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys, final Parameter... indexParameters) {
         final Neo4jBatchAutomaticIndex<T> index;
 
+        final Map<String, String> map = generateParameterMap(indexParameters);
+        if (indexParameters.length == 0) {
+            map.put(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT);
+        }
+        map.put(Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.AUTOMATIC.toString());
+        map.put(Neo4jBatchTokens.BLUEPRINTS_AUTOKEYS, makeAutoIndexKeys(indexKeys));
+
         if (indexClass.equals(Vertex.class)) {
-            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.nodeIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT,
-                    Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.AUTOMATIC.toString(),
-                    Neo4jBatchTokens.BLUEPRINTS_AUTOKEYS, makeAutoIndexKeys(indexKeys))), indexName, indexClass, indexKeys);
+            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.nodeIndex(indexName, map), indexName, indexClass, indexKeys);
         } else {
-            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.relationshipIndex(indexName, MapUtil.stringMap(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT,
-                    Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.AUTOMATIC.toString(),
-                    Neo4jBatchTokens.BLUEPRINTS_AUTOKEYS, makeAutoIndexKeys(indexKeys))), indexName, indexClass, indexKeys);
+            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.relationshipIndex(indexName, map), indexName, indexClass, indexKeys);
         }
         this.indices.put(indexName, index);
         if (Vertex.class.isAssignableFrom(indexClass)) {
@@ -292,5 +301,13 @@ public class Neo4jBatchGraph implements IndexableGraph {
             field = "null";
         }
         return field;
+    }
+
+    private static Map<String, String> generateParameterMap(final Parameter<Object, Object>... indexParameters) {
+        final Map<String, String> map = new HashMap<String, String>();
+        for (final Parameter<Object, Object> parameter : indexParameters) {
+            map.put(parameter.getA().toString(), parameter.getB().toString());
+        }
+        return map;
     }
 }

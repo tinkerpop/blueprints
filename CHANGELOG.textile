@@ -32,6 +32,7 @@ h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
 * Fixed issue with Neo4j's native automatic index and @Neo4jGraph.dropIndex()@
 * Added @NamedGraph@ utility to allow for graph partitions
 * Renamed packages where there is no @util.io@ and @util.wrappers@ for I/O and wrapper-based utilities
+* Added support for index parameters in @IndexableGraph@ (provided as optional parameters, thus backwards compatible)
 
 ==<hr/>==
 

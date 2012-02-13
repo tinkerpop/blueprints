@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexSequence;
 
 import java.util.Set;
@@ -26,12 +27,12 @@ public class EventIndexableGraph extends EventGraph implements IndexableGraph {
         this.getRawGraph().dropIndex(name);
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
-        return new EventIndex<T>(this.getRawGraph().createManualIndex(indexName, indexClass), this.graphChangedListeners);
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+        return new EventIndex<T>(this.getRawGraph().createManualIndex(indexName, indexClass, indexParameters), this.graphChangedListeners);
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys) {
-        return new EventAutomaticIndex<T>(this.getRawGraph().createAutomaticIndex(indexName, indexClass, autoIndexKeys), this.graphChangedListeners);
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys, final Parameter... indexParameters) {
+        return new EventAutomaticIndex<T>(this.getRawGraph().createAutomaticIndex(indexName, indexClass, autoIndexKeys, indexParameters), this.graphChangedListeners);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {

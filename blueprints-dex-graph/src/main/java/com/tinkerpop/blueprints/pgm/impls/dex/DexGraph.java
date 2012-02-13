@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -60,9 +61,9 @@ public class DexGraph implements IndexableGraph {
     }
 
     /**
-     * Gets the Dex {@link edu.upc.dama.dex.gdb.Session}.
+     * Gets the Dex
      *
-     * @return The Dex {@link edu.upc.dama.dex.gdb.Session.
+     * @return The Dex
      */
     com.sparsity.dex.gdb.Session getRawSession() {
         return session;
@@ -355,10 +356,10 @@ public class DexGraph implements IndexableGraph {
     *
     * @see
     * com.tinkerpop.blueprints.pgm.IndexableGraph#createManualIndex(java.lang
-    * .String, java.lang.Class)
+    * .String, java.lang.Class, Parameter...)
     */
     @Override
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         throw new UnsupportedOperationException();
     }
 
@@ -367,10 +368,10 @@ public class DexGraph implements IndexableGraph {
       *
       * @see
       * com.tinkerpop.blueprints.pgm.IndexableGraph#createAutomaticIndex(java
-      * .lang.String, java.lang.Class, java.util.Set)
+      * .lang.String, java.lang.Class, java.util.Set, Parameter...)
       */
     @Override
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys) {
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys, final Parameter... indexParameters) {
         throw new UnsupportedOperationException();
     }
 

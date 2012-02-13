@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionIndexSequence;
 
 import java.util.Set;
@@ -42,12 +43,12 @@ public class PartitionIndexableGraph extends PartitionGraph implements Indexable
         }
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
-        return new PartitionIndex<T>(((IndexableGraph) rawGraph).createManualIndex(indexName, indexClass), this);
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+        return new PartitionIndex<T>(((IndexableGraph) rawGraph).createManualIndex(indexName, indexClass, indexParameters), this);
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys) {
-        return new PartitionAutomaticIndex<T>(((IndexableGraph) rawGraph).createAutomaticIndex(indexName, indexClass, autoIndexKeys), this);
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys, final Parameter... indexParameters) {
+        return new PartitionAutomaticIndex<T>(((IndexableGraph) rawGraph).createAutomaticIndex(indexName, indexClass, autoIndexKeys, indexParameters), this);
     }
 
 

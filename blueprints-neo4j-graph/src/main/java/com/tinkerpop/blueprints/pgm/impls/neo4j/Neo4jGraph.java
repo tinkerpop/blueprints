@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -117,20 +118,21 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
         return (null != type && type.equals(Index.Type.AUTOMATIC.toString()));
     }
 
-    public synchronized <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
+
+    public synchronized <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw new RuntimeException("Index already exists: " + indexName);
         }
 
-        return new Neo4jIndex(indexName, indexClass, this);
+        return new Neo4jIndex(indexName, indexClass, this, indexParameters);
     }
 
-    public synchronized <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys) {
+    public synchronized <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> keys, final Parameter... indexParameters) {
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw new RuntimeException("Index already exists: " + indexName);
         }
 
-        return new Neo4jAutomaticIndex(indexName, indexClass, this, keys);
+        return new Neo4jAutomaticIndex(indexName, indexClass, this, keys, indexParameters);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {

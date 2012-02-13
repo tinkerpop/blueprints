@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedIndexSequence;
 
 import java.util.Set;
@@ -38,12 +39,12 @@ public class WrappedIndexableGraph extends WrappedGraph implements IndexableGrap
         }
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass) {
-        return new WrappedIndex<T>(((IndexableGraph) rawGraph).createManualIndex(indexName, indexClass));
+    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+        return new WrappedIndex<T>(((IndexableGraph) rawGraph).createManualIndex(indexName, indexClass, indexParameters));
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys) {
-        return new WrappedAutomaticIndex<T>(((IndexableGraph) rawGraph).createAutomaticIndex(indexName, indexClass, autoIndexKeys));
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys, final Parameter... indexParameters) {
+        return new WrappedAutomaticIndex<T>(((IndexableGraph) rawGraph).createAutomaticIndex(indexName, indexClass, autoIndexKeys, indexParameters));
     }
 
 

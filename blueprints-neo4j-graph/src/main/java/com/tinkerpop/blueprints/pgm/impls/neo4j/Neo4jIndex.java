@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -14,6 +15,9 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.IndexManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -26,11 +30,11 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     private final String indexName;
     protected org.neo4j.graphdb.index.Index<S> rawIndex;
 
-    public Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph) {
+    public Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph, final Parameter... indexParameters) {
         this.indexClass = indexClass;
         this.graph = graph;
         this.indexName = indexName;
-        this.generateIndex();
+        this.generateIndex(indexParameters);
     }
 
     public Type getIndexType() {
@@ -101,11 +105,18 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         this.rawIndex.add((S) element.getRawElement(), key, value);
     }
 
-    private void generateIndex() {
-        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
-        else
-            this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+    private void generateIndex(final Parameter<Object, Object>... indexParameters) {
+        if (this.indexClass.isAssignableFrom(Neo4jVertex.class)) {
+            if (indexParameters.length > 0)
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName, generateParameterMap(indexParameters));
+            else
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
+        } else {
+            if (indexParameters.length > 0)
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName, generateParameterMap(indexParameters));
+            else
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+        }
 
         final IndexManager manager = this.getIndexManager();
         final String storedType = manager.getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
@@ -125,5 +136,13 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
 
     public String toString() {
         return StringFactory.indexString(this);
+    }
+
+    private static Map<String, String> generateParameterMap(final Parameter<Object, Object>... indexParameters) {
+        final Map<String, String> map = new HashMap<String, String>();
+        for (final Parameter<Object, Object> parameter : indexParameters) {
+            map.put(parameter.getA().toString(), parameter.getB().toString());
+        }
+        return map;
     }
 }

@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.HashSet;
@@ -13,8 +14,8 @@ public class Neo4jAutomaticIndex<T extends Neo4jElement, S extends PropertyConta
 
     Set<String> autoIndexKeys;
 
-    public Neo4jAutomaticIndex(final String name, final Class<T> indexClass, final Neo4jGraph graph, final Set<String> keys) {
-        super(name, indexClass, graph);
+    public Neo4jAutomaticIndex(final String name, final Class<T> indexClass, final Neo4jGraph graph, final Set<String> keys, final Parameter... indexParameters) {
+        super(name, indexClass, graph, indexParameters);
         if (!this.loadKeyField()) {
             if (null != keys) {
                 this.autoIndexKeys = new HashSet<String>();
