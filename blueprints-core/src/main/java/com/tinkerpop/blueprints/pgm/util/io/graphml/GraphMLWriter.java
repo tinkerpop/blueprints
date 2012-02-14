@@ -281,7 +281,7 @@ public class GraphMLWriter {
             return GraphMLTokens.LONG;
         else if (object instanceof Float)
             return GraphMLTokens.FLOAT;
-        else if (object instanceof Double)
+        else if (object instanceof Number)
             return GraphMLTokens.DOUBLE;
         else if (object instanceof Boolean)
             return GraphMLTokens.BOOLEAN;
