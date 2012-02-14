@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.pgm.TestSuite;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
+import com.tinkerpop.blueprints.pgm.util.io.graphson.GraphSONReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -89,6 +90,12 @@ public class TinkerGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
+    }
+
+    public void testGraphSONReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphSONReaderTestSuite(this));
+        printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
     }
 
     public Graph getGraphInstance() {
