@@ -306,7 +306,7 @@ public class Neo4jBatchGraph implements IndexableGraph {
     private static Map<String, String> generateParameterMap(final Parameter<Object, Object>... indexParameters) {
         final Map<String, String> map = new HashMap<String, String>();
         for (final Parameter<Object, Object> parameter : indexParameters) {
-            map.put(parameter.getA().toString(), parameter.getB().toString());
+            map.put(parameter.getKey().toString(), parameter.getValue().toString());
         }
         return map;
     }

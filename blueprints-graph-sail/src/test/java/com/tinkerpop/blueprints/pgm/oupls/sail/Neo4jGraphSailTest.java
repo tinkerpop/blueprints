@@ -1,22 +1,13 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import org.junit.Test;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.sail.Sail;
-
-import java.io.File;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Neo4jGraphSailTest extends BaseTest { //GraphSailTest {
+public class Neo4jGraphSailTest {//extends GraphSailTest {
 
     private String getWorkingDirectory() {
         String directory = System.getProperty("neo4jGraphDirectory");
@@ -29,6 +20,7 @@ public class Neo4jGraphSailTest extends BaseTest { //GraphSailTest {
         return directory;
     }
 
+    /*
     @Test
     public void testEvalNew() throws Exception {
         Neo4jGraph graph;
@@ -61,5 +53,18 @@ public class Neo4jGraphSailTest extends BaseTest { //GraphSailTest {
             rc.close();
             sail.shutDown();
         }
+    }
+    */
+
+    @Test
+    public void testSelfEdgesNotSupported() throws Exception {
+
+    }
+
+    protected IndexableGraph createGraph() {
+        String directory = System.getProperty("neo4jGraphDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        return new Neo4jGraph(directory);
     }
 }

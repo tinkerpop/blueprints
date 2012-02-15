@@ -1,31 +1,38 @@
 package com.tinkerpop.blueprints.pgm.impls;
 
+import java.util.Map;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Parameter<A, B> {
+public class Parameter<K, V> implements Map.Entry<K, V>  {
 
-    private final A a;
-    private final B b;
+    private final K key;
+    private V value;
 
-    public Parameter(final A a, final B b) {
-        this.a = a;
-        this.b = b;
+    public Parameter(final K key, final V value) {
+        this.key = key;
+        this.value = value;
     }
 
-    public A getA() {
-        return a;
+    public K getKey() {
+        return key;
     }
 
-    public B getB() {
-        return b;
+    public V getValue() {
+        return value;
+    }
+
+    public V setValue(V value) {
+        this.value = value;
+        return value;
     }
 
     public boolean equals(Object object) {
-        return (object.getClass().equals(Parameter.class) && ((Parameter) object).getA().equals(this.a) && ((Parameter) object).getB().equals(this.b));
+        return (object.getClass().equals(Parameter.class) && ((Parameter) object).getKey().equals(this.key) && ((Parameter) object).getValue().equals(this.value));
     }
 
     public String toString() {
-        return "parameter[" + a.toString() + "," + b.toString() + "]";
+        return "parameter[" + key.toString() + "," + value.toString() + "]";
     }
 }
