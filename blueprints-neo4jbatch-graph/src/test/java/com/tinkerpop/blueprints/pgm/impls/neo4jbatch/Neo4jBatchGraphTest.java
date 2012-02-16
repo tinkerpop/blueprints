@@ -7,14 +7,18 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jTokens;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReader;
+import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -367,6 +371,35 @@ public class Neo4jBatchGraphTest extends BaseTest {
             }
         }
         assertEquals(counter, 2);
+        graph.shutdown();
+    }
+
+    public void testIndexParameters() throws Exception {
+        final String directory = this.getWorkingDirectory();
+        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        batch.createAutomaticIndex(Index.VERTICES, Vertex.class, null, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+        Vertex a = batch.addVertex(null);
+        a.setProperty("name", "marko");
+        batch.flushIndices();
+        batch.shutdown();
+
+        IndexableGraph graph = new Neo4jGraph(directory);
+        Iterator<Vertex> itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        int counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next().getProperty("name"), "marko");
+        }
+        assertEquals(counter, 1);
+
+        itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "MaRkO").iterator();
+        counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next().getProperty("name"), "marko");
+        }
+        assertEquals(counter, 1);
+
         graph.shutdown();
     }
 

@@ -237,7 +237,7 @@ public class Neo4jGraphTest extends GraphTest {
         }
         assertEquals(counter, 1);
 
-        itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "\"MaRkO\"").iterator();
+        itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "MaRkO").iterator();
         counter = 0;
         while (itty.hasNext()) {
             counter++;
