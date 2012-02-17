@@ -75,13 +75,13 @@ public interface ExtraTypeHandler<T> {
 	/**
 	 * 
 	 * @param targetGraph the graph where the value should be stored
-	 * @param value
+	 * @param propertyValue
 	 * @return
 	 */
-	public T unmarshalValue (Graph targetGraph, Object value);
+	public T unmarshal (Graph targetGraph, Object propertyValue);
 	
-	public boolean canHandle (Graph targetGraph, Object value);
+	public boolean canHandle (Graph targetGraph, Object propertyValue);
 	
-	public String marshalValue (Graph targetGraph, Object value);
+	public String marshal (Graph targetGraph, Object elementId, String propertyName, Object propertyValue);
 
 }

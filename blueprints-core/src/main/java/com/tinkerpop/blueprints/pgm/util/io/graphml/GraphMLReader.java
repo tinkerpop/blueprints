@@ -367,7 +367,7 @@ public class GraphMLReader {
                             if (manualIndexMap != null)
                                 manualIndexName = reader.getAttributeValue(null, manualIndexAttributeName);
                                 String valueAsString = reader.getElementText();
-                                Object value = typeCastValue(keyTypesMaps.get(key), valueAsString, extraTypeHandlerMap);
+                                Object value = typeCastValue(keyTypesMaps.get(key), valueAsString, extraTypeHandlerMap, graph);
                             if (inVertex == true) {
                                 if ((vertexIdKey != null) && (key.equals(vertexIdKey))) {
                                     // Should occur at most once per Vertex
@@ -517,7 +517,7 @@ public class GraphMLReader {
     }
 
     @SuppressWarnings("rawtypes")
-    private static Object typeCastValue(String type, String value, Map<String, ExtraTypeHandler> extraTypeManagers) {
+    private static Object typeCastValue(String type, String value, Map<String, ExtraTypeHandler> extraTypeManagers, Graph graph) {
         ExtraTypeHandler<?> extraTypeManager;
         if (null == type || type.equals(GraphMLTokens.STRING))
             return value;
@@ -532,7 +532,7 @@ public class GraphMLReader {
         else if (type.equals(GraphMLTokens.LONG))
             return Long.valueOf(value);
         else if ((extraTypeManager = extraTypeManagers.get(type)) != null)
-            return extraTypeManager.castValue(null, value);
+            return extraTypeManager.unmarshal(graph, value);
         else
             return value;
     }

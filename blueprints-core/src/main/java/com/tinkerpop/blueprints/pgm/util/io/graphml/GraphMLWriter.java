@@ -368,7 +368,7 @@ public class GraphMLWriter {
         ExtraTypeHandler<?> currentHandler = null;
         while (!found && handlerIterator.hasNext()) {
             currentHandler = handlerIterator.next();
-            found = currentHandler.canHandle(value);
+            found = currentHandler.canHandle(graph, value);
         }
         if (found) {
             this.extraTypeHandlerMap.put(key, currentHandler);
