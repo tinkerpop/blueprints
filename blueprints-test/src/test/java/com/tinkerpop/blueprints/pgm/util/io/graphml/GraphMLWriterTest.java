@@ -33,7 +33,7 @@ public class GraphMLWriterTest extends TestCase {
 
         String expected = streamToString(GraphMLWriterTest.class.getResourceAsStream("graph-example-1-normalized.xml"));
         //System.out.println(expected);
-        assertEquals(expected, bos.toString());
+        assertEquals(expected.replace("\n", "").replace("\r", ""), bos.toString().replace("\n", "").replace("\r", ""));
     }
 
     private String streamToString(final InputStream in) throws IOException {
