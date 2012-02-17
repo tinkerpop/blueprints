@@ -31,5 +31,6 @@ public class GraphMLTokens {
     public static final String BOOLEAN = "boolean";
     public static final String INT = "int";
     public static final String _DEFAULT = "_default";
+	public static final String ALL = "all";
 
 }

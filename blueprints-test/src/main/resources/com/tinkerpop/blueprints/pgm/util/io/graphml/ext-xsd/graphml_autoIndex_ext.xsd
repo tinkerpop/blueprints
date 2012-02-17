@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://graphml.graphdrawing.org/xmlns"
+   xmlns="http://graphml.graphdrawing.org/xmlns"  
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   elementFormDefault="qualified"
+   attributeFormDefault="unqualified"
+>
+  <xs:redefine schemaLocation="http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd">
+   <xs:attributeGroup name="key.extra.attrib">
+      <xs:attributeGroup ref="key.extra.attrib"/>
+      <!-- This attribute reports the name of the manual index the graph element holding this data should be added to -->
+      <xs:attribute name="autoIndexName" use="optional" type="xs:NMTOKEN"></xs:attribute>
+    </xs:attributeGroup>
+  </xs:redefine>
+</xs:schema>

@@ -1,41 +1,64 @@
 package com.tinkerpop.blueprints.pgm.util.io.graphml;
 
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
+import com.tinkerpop.blueprints.pgm.AutomaticIndex;
+import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.Index.Type;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.ExtraTypeHandler;
+import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.ExtraTypeHandlerHelper;
+import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.IndexTokens;
 
 /**
  * GraphMLWriter writes a Graph to a GraphML OutputStream.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Joshua Shinavier (http://fortytwo.net)
+ * @author Salvatore Piccione (salvo.picci@gmail.com)
  */
 public class GraphMLWriter {
     private final Graph graph;
     private boolean normalize = false;
+    private String edgeLabelKey = null;
     private Map<String, String> vertexKeyTypes = null;
     private Map<String, String> edgeKeyTypes = null;
+    private Map<String, String> commonKeyTypes = null;
 
+    //NEW
+    private Map<String,ExtraTypeHandler> extraTypeHandlerMap = null;
+    private Collection<ExtraTypeHandler> extraTypeHandlers = null;
+    private String automaticIndexKey = null;
+    private String manualIndexKey = null;
+    
     /**
      * @param graph the Graph to pull the data from
      */
     public GraphMLWriter(final Graph graph) {
         this.graph = graph;
+        this.extraTypeHandlerMap = ExtraTypeHandlerHelper.buildExtraTypeHadlerMap();
+        this.extraTypeHandlers = this.extraTypeHandlerMap.values();
     }
 
     /**
@@ -61,6 +84,30 @@ public class GraphMLWriter {
     public void setEdgeKeyTypes(final Map<String, String> edgeKeyTypes) {
         this.edgeKeyTypes = edgeKeyTypes;
     }
+    /*
+     * Adds a new {@link ExtraTypeHandler}.
+     * 
+     * @param manager
+     * @return <code>true</code> if a handler for the given extra type does not exist and the given handler
+     * has been successfully registered, <code>false</code> if a handler for the given extra type already exists
+     * so the given handler has not been registered
+     * @throws NullPointerException
+     *
+    public boolean addExtraTypeManager(ExtraTypeHandler<?> manager) throws NullPointerException{
+        return this.extraTypeHandlerSet.add(manager);
+    }*/
+
+    public void setAutomaticIndexKey(String automaticIndexKey) {
+        this.automaticIndexKey = automaticIndexKey;
+    }
+
+    public void setManualIndexKey(String manualIndexKey) {
+        this.manualIndexKey = manualIndexKey;
+    }
+
+    public void setEdgeLabelKey(String edgeLabelKey) {
+        this.edgeLabelKey = edgeLabelKey;
+    }
 
     /**
      * Write the data in a Graph to a GraphML OutputStream.
@@ -69,21 +116,63 @@ public class GraphMLWriter {
      * @throws IOException thrown if there is an error generating the GraphML data
      */
     public void outputGraph(final OutputStream graphMLOutputStream) throws IOException {
+        
+        HashMap<String,Set<String>> automaticIndexMap = null;
+        boolean checkManualIndex = false;
+        if (graph instanceof IndexableGraph) {
+            checkManualIndex = true;
+            if (this.automaticIndexKey ==  null)
+                this.automaticIndexKey = IndexTokens.DEFAUL_AUTO_INDEX_KEY;
+            
+            if (this.manualIndexKey == null)
+                this.manualIndexKey = IndexTokens.DEFAUL_MANUAL_INDEX_KEY;
+            
+            automaticIndexMap = new HashMap<String, Set<String>>();
+            Iterator<Index<? extends Element>> indices = ((IndexableGraph)graph).getIndices().iterator();
+            Index index;
+            Set<String> indexSet;
+            while (indices.hasNext()) {
+                index = indices.next();
+                if (Type.AUTOMATIC == index.getIndexType() && !Index.EDGES.equals(index.getIndexName())
+                        && !Index.VERTICES.equals(index.getIndexName())) {
+                    for (Object indexedField : ((AutomaticIndex) index).getAutoIndexKeys()) {
+                        indexSet = automaticIndexMap.get(indexedField);
+                        if (indexSet == null) {
+                            indexSet = new HashSet<String>();
+                            automaticIndexMap.put(indexedField.toString(), indexSet);
+                        }
+                        indexSet.add(index.getIndexName());
+                    }
+                }
+            }
+        }    
+        
 
-        if (null == this.vertexKeyTypes || null == this.edgeKeyTypes) {
+        if (null == this.vertexKeyTypes || null == this.edgeKeyTypes || null == this.commonKeyTypes) {
             Map<String, String> vertexKeyTypes = new HashMap<String, String>();
             Map<String, String> edgeKeyTypes = new HashMap<String, String>();
-
+            Map<String, String> commonKeyTypes = new HashMap<String, String>();
+            Object value;
             for (Vertex vertex : graph.getVertices()) {
                 for (String key : vertex.getPropertyKeys()) {
                     if (!vertexKeyTypes.containsKey(key)) {
-                        vertexKeyTypes.put(key, GraphMLWriter.getStringType(vertex.getProperty(key)));
+                        value = vertex.getProperty(key);
+                        vertexKeyTypes.put(key, GraphMLWriter.getStringType(value));
+                        if (!this.extraTypeHandlers.isEmpty())
+                            this.addExtraTypeAttribute(key, value);
                     }
                 }
                 for (Edge edge : vertex.getOutEdges()) {
                     for (String key : edge.getPropertyKeys()) {
-                        if (!edgeKeyTypes.containsKey(key)) {
-                            edgeKeyTypes.put(key, GraphMLWriter.getStringType(edge.getProperty(key)));
+                        //check if the property has been used also for a vertex
+                        if (vertexKeyTypes.containsKey(key))
+                            //if yes, we put it in the common map
+                            commonKeyTypes.put(key, vertexKeyTypes.remove(key));
+                        else if (!edgeKeyTypes.containsKey(key)) {
+                            value = edge.getProperty(key);
+                            edgeKeyTypes.put(key, GraphMLWriter.getStringType(value));
+                            if (!this.extraTypeHandlers.isEmpty())
+                                this.addExtraTypeAttribute(key, value);
                         }
                     }
                 }
@@ -95,6 +184,13 @@ public class GraphMLWriter {
 
             if (null == this.edgeKeyTypes) {
                 this.edgeKeyTypes = edgeKeyTypes;
+            }
+            if (this.edgeLabelKey != null) {
+                this.edgeKeyTypes.put(this.edgeLabelKey, GraphMLTokens.STRING);
+            }
+            
+            if (null == this.commonKeyTypes) {
+                this.commonKeyTypes = commonKeyTypes;
             }
         }
 
@@ -109,41 +205,12 @@ public class GraphMLWriter {
             writer.writeStartDocument();
             writer.writeStartElement(GraphMLTokens.GRAPHML);
             writer.writeAttribute(GraphMLTokens.XMLNS, GraphMLTokens.GRAPHML_XMLNS);
-
+            //TODO ADD XML-SCHEMA INFO??
+            
             //<key id="weight" for="edge" attr.name="weight" attr.type="float"/>
-            Collection<String> keyset;
-
-            if (normalize) {
-                keyset = new LinkedList<String>();
-                keyset.addAll(vertexKeyTypes.keySet());
-                Collections.sort((List<String>) keyset);
-            } else {
-                keyset = vertexKeyTypes.keySet();
-            }
-            for (String key : keyset) {
-                writer.writeStartElement(GraphMLTokens.KEY);
-                writer.writeAttribute(GraphMLTokens.ID, key);
-                writer.writeAttribute(GraphMLTokens.FOR, GraphMLTokens.NODE);
-                writer.writeAttribute(GraphMLTokens.ATTR_NAME, key);
-                writer.writeAttribute(GraphMLTokens.ATTR_TYPE, vertexKeyTypes.get(key));
-                writer.writeEndElement();
-            }
-
-            if (normalize) {
-                keyset = new LinkedList<String>();
-                keyset.addAll(edgeKeyTypes.keySet());
-                Collections.sort((List<String>) keyset);
-            } else {
-                keyset = edgeKeyTypes.keySet();
-            }
-            for (String key : keyset) {
-                writer.writeStartElement(GraphMLTokens.KEY);
-                writer.writeAttribute(GraphMLTokens.ID, key);
-                writer.writeAttribute(GraphMLTokens.FOR, GraphMLTokens.EDGE);
-                writer.writeAttribute(GraphMLTokens.ATTR_NAME, key);
-                writer.writeAttribute(GraphMLTokens.ATTR_TYPE, edgeKeyTypes.get(key));
-                writer.writeEndElement();
-            }
+            this.writeKeys(writer, GraphMLTokens.NODE, vertexKeyTypes, automaticIndexMap);
+            this.writeKeys(writer, GraphMLTokens.EDGE, edgeKeyTypes, automaticIndexMap);
+            this.writeKeys(writer, GraphMLTokens.ALL, commonKeyTypes, automaticIndexMap);
 
             writer.writeStartElement(GraphMLTokens.GRAPH);
             writer.writeAttribute(GraphMLTokens.ID, GraphMLTokens.G);
@@ -174,6 +241,9 @@ public class GraphMLWriter {
                     writer.writeStartElement(GraphMLTokens.DATA);
                     writer.writeAttribute(GraphMLTokens.KEY, key);
                     Object value = vertex.getProperty(key);
+                    if (checkManualIndex) {
+                        this.checkManualIndex((IndexableGraph) graph, writer, vertex, key, value);
+                    }
                     if (null != value)
                         writer.writeCharacters(value.toString());
                     writer.writeEndElement();
@@ -190,46 +260,10 @@ public class GraphMLWriter {
                 }
                 Collections.sort(edges, new ElementComparator());
 
-                for (Edge edge : edges) {
-                    writer.writeStartElement(GraphMLTokens.EDGE);
-                    writer.writeAttribute(GraphMLTokens.ID, edge.getId().toString());
-                    writer.writeAttribute(GraphMLTokens.SOURCE, edge.getOutVertex().getId().toString());
-                    writer.writeAttribute(GraphMLTokens.TARGET, edge.getInVertex().getId().toString());
-                    writer.writeAttribute(GraphMLTokens.LABEL, edge.getLabel());
-
-                    List<String> keys = new LinkedList<String>();
-                    keys.addAll(edge.getPropertyKeys());
-                    Collections.sort(keys);
-
-                    for (String key : keys) {
-                        writer.writeStartElement(GraphMLTokens.DATA);
-                        writer.writeAttribute(GraphMLTokens.KEY, key);
-                        Object value = edge.getProperty(key);
-                        if (null != value)
-                            writer.writeCharacters(value.toString());
-                        writer.writeEndElement();
-                    }
-                    writer.writeEndElement();
-                }
+                writeEdges(edges.iterator(), writer, checkManualIndex);
             } else {
                 for (Vertex vertex : graph.getVertices()) {
-                    for (Edge edge : vertex.getOutEdges()) {
-                        writer.writeStartElement(GraphMLTokens.EDGE);
-                        writer.writeAttribute(GraphMLTokens.ID, edge.getId().toString());
-                        writer.writeAttribute(GraphMLTokens.SOURCE, edge.getOutVertex().getId().toString());
-                        writer.writeAttribute(GraphMLTokens.TARGET, edge.getInVertex().getId().toString());
-                        writer.writeAttribute(GraphMLTokens.LABEL, edge.getLabel());
-
-                        for (String key : edge.getPropertyKeys()) {
-                            writer.writeStartElement(GraphMLTokens.DATA);
-                            writer.writeAttribute(GraphMLTokens.KEY, key);
-                            Object value = edge.getProperty(key);
-                            if (null != value)
-                                writer.writeCharacters(value.toString());
-                            writer.writeEndElement();
-                        }
-                        writer.writeEndElement();
-                    }
+                    this.writeEdges(vertex.getOutEdges().iterator(), writer, checkManualIndex);
                 }
             }
 
@@ -242,6 +276,128 @@ public class GraphMLWriter {
         } catch (XMLStreamException xse) {
             throw new IOException(xse);
         }
+    }
+    
+    private void writeEdges (Iterator<Edge> iterator, XMLStreamWriter writer, boolean checkManualIndex) throws XMLStreamException {
+        Edge edge;
+        while (iterator.hasNext()) {
+            edge = iterator.next();
+            writer.writeStartElement(GraphMLTokens.EDGE);
+            writer.writeAttribute(GraphMLTokens.ID, edge.getId().toString());
+            writer.writeAttribute(GraphMLTokens.SOURCE, edge.getOutVertex().getId().toString());
+            writer.writeAttribute(GraphMLTokens.TARGET, edge.getInVertex().getId().toString());
+            if (this.edgeLabelKey == null)
+                writer.writeAttribute(GraphMLTokens.LABEL, edge.getLabel());
+            else {
+                writer.writeStartElement(GraphMLTokens.DATA);
+                writer.writeAttribute(GraphMLTokens.KEY, edgeLabelKey);
+                if (checkManualIndex) {
+                    this.checkManualIndex((IndexableGraph) graph, writer, edge, edgeLabelKey, edge.getLabel());
+                }
+                writer.writeCharacters(edge.getLabel());
+                writer.writeEndElement();
+            }
+            Collection<String> keys;
+            if (normalize)  {
+                keys = new LinkedList<String>();
+                keys.addAll(edge.getPropertyKeys());
+                Collections.sort((List<String>)keys);
+            } else
+                keys = edge.getPropertyKeys();
+    
+            for (String key : keys) {
+                writer.writeStartElement(GraphMLTokens.DATA);
+                writer.writeAttribute(GraphMLTokens.KEY, key);
+                Object value = edge.getProperty(key);
+                if (checkManualIndex) {
+                    this.checkManualIndex((IndexableGraph) graph, writer, edge, key, value);
+                }
+                if (null != value)
+                    writer.writeCharacters(value.toString());
+                writer.writeEndElement();
+            }
+            writer.writeEndElement();
+        }
+    }
+    
+    private void writeKeys (XMLStreamWriter writer, String forAttributeValue, Map<String, String> keyTypes, 
+            Map<String,Set<String>> autoIndexMap) throws XMLStreamException {
+        ExtraTypeHandler<?> handler;
+        Collection<String> keyset;
+        if (normalize) {
+            keyset = new LinkedList<String>();
+            keyset.addAll(keyTypes.keySet());
+            Collections.sort((List<String>) keyset);
+        } else {
+            keyset = keyTypes.keySet();
+        }
+        for (String key : keyset) {
+            writer.writeStartElement(GraphMLTokens.KEY);
+            writer.writeAttribute(GraphMLTokens.ID, key);
+            writer.writeAttribute(GraphMLTokens.FOR, forAttributeValue);
+            writer.writeAttribute(GraphMLTokens.ATTR_NAME, key);
+            writer.writeAttribute(GraphMLTokens.ATTR_TYPE, keyTypes.get(key));
+            
+            if ((handler = this.extraTypeHandlerMap.get(key)) != null)
+                writer.writeAttribute(handler.getAttributeName(), handler.getAttributeValue());
+           
+            if (autoIndexMap != null) {
+                Set<String> indexSet = autoIndexMap.get(key);
+                if (indexSet != null) {
+                    writer.writeAttribute(automaticIndexKey, getIndexNameList(indexSet));
+                }
+            }
+            
+            writer.writeEndElement();
+        }
+    }
+    
+    private static String getIndexNameList (Collection<String> indexList) {
+        StringBuilder indexBuffer = new StringBuilder ();
+        for (String index : indexList)  {
+            if (indexBuffer.length() > 0)
+                indexBuffer.append(IndexTokens.INDEX_SEPARATOR);
+            indexBuffer.append(index);
+        }
+        return indexBuffer.toString();
+    }
+
+    private void addExtraTypeAttribute (String key, Object value) {
+        boolean found = false;
+        Iterator<ExtraTypeHandler> handlerIterator = this.extraTypeHandlers.iterator();
+        ExtraTypeHandler<?> currentHandler = null;
+        while (!found && handlerIterator.hasNext()) {
+            currentHandler = handlerIterator.next();
+            found = currentHandler.canHandle(value);
+        }
+        if (found) {
+            this.extraTypeHandlerMap.put(key, currentHandler);
+        }
+    }
+    
+    private void checkManualIndex (IndexableGraph graph, XMLStreamWriter writer, Element graphElement, 
+            String attributeName, Object attributeValue) throws XMLStreamException {
+        Iterator<Index<? extends Element>> indices = graph.getIndices().iterator();
+        Index index;
+        CloseableSequence indexedElements;
+        Collection<String> indexSet = new LinkedList<String> ();
+        boolean stop;
+        while (indices.hasNext()) {
+            index = indices.next();
+            stop = false;
+            if (index.getIndexType() == Type.MANUAL && index.getIndexClass().isInstance(graphElement)) {
+                indexedElements = index.get(attributeName, attributeValue);
+                while (indexedElements.hasNext() && !stop) {
+                    if (graphElement.getId().equals(((Element)indexedElements.next()).getId())) {
+                        indexSet.add(index.getIndexName());
+                        stop = true;
+                    }
+                }
+                indexedElements.close();
+            }
+        }
+        if (!indexSet.isEmpty())
+            writer.writeAttribute(manualIndexKey, getIndexNameList(indexSet));
     }
 
     /**
@@ -288,7 +444,7 @@ public class GraphMLWriter {
         else
             return GraphMLTokens.STRING;
     }
-
+    
     // Note: elements are sorted in lexicographical, not in numerical, order of IDs.
     private static class ElementComparator implements Comparator<Element> {
 
