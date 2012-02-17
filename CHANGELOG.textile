@@ -1,14 +1,6 @@
 Blueprints: A Property Graph Model Interface
 "http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
 
-```xml
-<repository>
-  <id>tinkerpop-repository</id>
-  <name>TinkerPop Maven2 Repository</name>
-  <url>http://tinkerpop.com/maven2</url>
-</repository>
-```
-
 ==<hr/>==
 
 h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
