@@ -4,6 +4,7 @@ package com.tinkerpop.blueprints.pgm.util.io.graphml;
  * A collection of tokens used for GraphML related data.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Salvatore Piccione (TXT e-solutions SpA)
  */
 public class GraphMLTokens {
     public static final String GRAPHML = "graphml";
@@ -31,6 +32,8 @@ public class GraphMLTokens {
     public static final String BOOLEAN = "boolean";
     public static final String INT = "int";
     public static final String _DEFAULT = "_default";
-	public static final String ALL = "all";
-
+    public static final String ALL = "all";
+    public static final String XML_SCHEMA_NAMESPACE_TAG = "xsi";
+    public static final String DEFAULT_GRAPHML_SCHEMA_LOCATION = "http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd";
+    public static final String XML_SCHEMA_LOCATION_ATTRIBUTE = "schemaLocation";
 }

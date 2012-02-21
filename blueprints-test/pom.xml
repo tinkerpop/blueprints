@@ -25,6 +25,12 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
         </dependency>
+        <dependency>
+          <groupId>org.example.graph</groupId>
+          <artifactId>date-type-handler</artifactId>
+          <version>0.1</version>
+          <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <directory>${basedir}/target</directory>

@@ -26,7 +26,7 @@
 package com.tinkerpop.blueprints.pgm.util.io.graphml.extra;
 
 /**
- * @author Salvatore Piccione (salvo.picci@gmail.com)
+ * @author Salvatore Piccione (TXT e-solutions SpA)
  *
  */
 public class IndexTokens {

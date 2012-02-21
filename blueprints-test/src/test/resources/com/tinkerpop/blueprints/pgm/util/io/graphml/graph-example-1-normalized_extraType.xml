@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
-<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd">
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns ../../../../../../../../../main/resources/com/tinkerpop/blueprints/pgm/util/io/graphml/ext-xsd/graphml_extraType_ext.xsd">
     <key id="age" for="node" attr.name="age" attr.type="int"></key>
+    <key id="date" for="node" attr.name="date" attr.type="string" isDate="true"></key>
     <key id="lang" for="node" attr.name="lang" attr.type="string"></key>
     <key id="name" for="node" attr.name="name" attr.type="string"></key>
     <key id="label" for="edge" attr.name="label" attr.type="string"></key>
@@ -8,10 +9,12 @@
     <graph id="G" edgedefault="directed">
         <node id="1">
             <data key="age">29</data>
+            <data key="date">19830210</data>
             <data key="name">marko</data>
         </node>
         <node id="2">
             <data key="age">27</data>
+            <data key="date">19851010</data>
             <data key="name">vadas</data>
         </node>
         <node id="3">
@@ -20,6 +23,7 @@
         </node>
         <node id="4">
             <data key="age">32</data>
+            <data key="date">19800807</data>
             <data key="name">josh</data>
         </node>
         <node id="5">

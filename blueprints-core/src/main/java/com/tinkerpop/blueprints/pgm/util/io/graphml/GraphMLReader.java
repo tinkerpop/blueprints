@@ -34,29 +34,20 @@ import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.IndexTokens;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Alex Averbuch (alex.averbuch@gmail.com)
  * @author Joshua Shinavier (http://fortytwo.net)
- * @author Salvatore Piccione (salvo.picci@gmail.com)
+ * @author Salvatore Piccione (TXT e-solutions SpA)
  */
-public class GraphMLReader {
+public class GraphMLReader extends GraphMLHandler{
     private final Graph graph;
 
     private String vertexIdKey = null;
     private String edgeIdKey = null;
-    private String edgeLabelKey = null;
-    
-    //NEW
-    @SuppressWarnings("rawtypes")
-    private Map<String, ExtraTypeHandler> extraTypeHandlerMap = null;
-    private String automaticIndexKey = null;
-    private String manualIndexKey = null;
 
     /**
      * @param graph the graph to populate with the GraphML data
      */
     public GraphMLReader(Graph graph) {
+        super();
         this.graph = graph;
-        
-        //Use a class loader to get the ExtraTypeHandler list
-        this.extraTypeHandlerMap = ExtraTypeHandlerHelper.buildExtraTypeHadlerMap();
     }
 
     /**
@@ -71,51 +62,6 @@ public class GraphMLReader {
      */
     public void setEdgeIdKey(String edgeIdKey) {
         this.edgeIdKey = edgeIdKey;
-    }
-
-    /**
-     * @param edgeLabelKey if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
-     */
-    public void setEdgeLabelKey(String edgeLabelKey) {
-        this.edgeLabelKey = edgeLabelKey;
-    }
-    
-    /*
-     * Adds a new {@link ExtraTypeHandler}.
-     * 
-     * @param manager
-     * @return <code>true</code> if a handler for the given extra type does not exist and the given handler
-     * has been successfully registered, <code>false</code> if a handler for the given extra type already exists
-     * so the given handler has not been registered
-     * @throws NullPointerException
-     *
-    public boolean reloadExtraTypeManager(ExtraTypeHandler<?> manager) throws NullPointerException{
-        String typeName = manager.getTypeName();
-        if (this.extraTypeHandlerMap.containsKey(typeName))
-            return false;
-        this.extraTypeHandlerMap.put(typeName, manager);
-        return true;
-    }*/
-
-    /**
-     * 
-     * @param automaticIndexKey the name of the <code>key</code> attribute holding the name of the
-     * automatic index to be associated to every graph element property represented by this <code>key</code>
-     * element.
-     * 
-     */
-    public void setAutomaticIndexKey(String automaticIndexKey) {
-        this.automaticIndexKey = automaticIndexKey;
-    }
-
-    /**
-     * 
-     * @param manualIndexKey the name of the <code>data</code> attribute holding the name of the
-     * manual index to be associated to the specific graph element property represented
-     * by this <code>data</code> element.
-     */
-    public void setManualIndexKey(String manualIndexKey) {
-        this.manualIndexKey = manualIndexKey;
     }
 
     /**

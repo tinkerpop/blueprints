@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -28,7 +29,6 @@ import com.tinkerpop.blueprints.pgm.Index.Type;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.ExtraTypeHandler;
-import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.ExtraTypeHandlerHelper;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.IndexTokens;
 
 /**
@@ -36,28 +36,25 @@ import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.IndexTokens;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Joshua Shinavier (http://fortytwo.net)
- * @author Salvatore Piccione (salvo.picci@gmail.com)
+ * @author Salvatore Piccione (TXT e-solutions SpA)
  */
-public class GraphMLWriter {
+public class GraphMLWriter extends GraphMLHandler {
     private final Graph graph;
     private boolean normalize = false;
-    private String edgeLabelKey = null;
     private Map<String, String> vertexKeyTypes = null;
     private Map<String, String> edgeKeyTypes = null;
     private Map<String, String> commonKeyTypes = null;
 
-    //NEW
-    private Map<String,ExtraTypeHandler> extraTypeHandlerMap = null;
+    @SuppressWarnings("rawtypes")
     private Collection<ExtraTypeHandler> extraTypeHandlers = null;
-    private String automaticIndexKey = null;
-    private String manualIndexKey = null;
+    private String xmlSchemaLocation = null;
     
     /**
      * @param graph the Graph to pull the data from
      */
     public GraphMLWriter(final Graph graph) {
+        super();
         this.graph = graph;
-        this.extraTypeHandlerMap = ExtraTypeHandlerHelper.buildExtraTypeHadlerMap();
         this.extraTypeHandlers = this.extraTypeHandlerMap.values();
     }
 
@@ -84,29 +81,13 @@ public class GraphMLWriter {
     public void setEdgeKeyTypes(final Map<String, String> edgeKeyTypes) {
         this.edgeKeyTypes = edgeKeyTypes;
     }
-    /*
-     * Adds a new {@link ExtraTypeHandler}.
+    
+    /**
      * 
-     * @param manager
-     * @return <code>true</code> if a handler for the given extra type does not exist and the given handler
-     * has been successfully registered, <code>false</code> if a handler for the given extra type already exists
-     * so the given handler has not been registered
-     * @throws NullPointerException
-     *
-    public boolean addExtraTypeManager(ExtraTypeHandler<?> manager) throws NullPointerException{
-        return this.extraTypeHandlerSet.add(manager);
-    }*/
-
-    public void setAutomaticIndexKey(String automaticIndexKey) {
-        this.automaticIndexKey = automaticIndexKey;
-    }
-
-    public void setManualIndexKey(String manualIndexKey) {
-        this.manualIndexKey = manualIndexKey;
-    }
-
-    public void setEdgeLabelKey(String edgeLabelKey) {
-        this.edgeLabelKey = edgeLabelKey;
+     * @param xmlSchemaLocation the location of the GraphML XML Schema instance
+     */
+    public void setXmlSchemaLocation(String xmlSchemaLocation) {
+        this.xmlSchemaLocation = xmlSchemaLocation;
     }
 
     /**
@@ -205,7 +186,13 @@ public class GraphMLWriter {
             writer.writeStartDocument();
             writer.writeStartElement(GraphMLTokens.GRAPHML);
             writer.writeAttribute(GraphMLTokens.XMLNS, GraphMLTokens.GRAPHML_XMLNS);
-            //TODO ADD XML-SCHEMA INFO??
+            //XML Schema instance namespace definition (xsi)
+            writer.writeAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":" + GraphMLTokens.XML_SCHEMA_NAMESPACE_TAG,
+                XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+            //XML Schema location
+            writer.writeAttribute(GraphMLTokens.XML_SCHEMA_NAMESPACE_TAG + ":" + GraphMLTokens.XML_SCHEMA_LOCATION_ATTRIBUTE,
+                GraphMLTokens.GRAPHML_XMLNS + " " + (this.xmlSchemaLocation == null ? 
+                        GraphMLTokens.DEFAULT_GRAPHML_SCHEMA_LOCATION : this.xmlSchemaLocation));
             
             //<key id="weight" for="edge" attr.name="weight" attr.type="float"/>
             this.writeKeys(writer, GraphMLTokens.NODE, vertexKeyTypes, automaticIndexMap);
@@ -226,6 +213,7 @@ public class GraphMLWriter {
             } else {
                 vertices = graph.getVertices();
             }
+            ExtraTypeHandler<?> extraTypeHandler;
             for (Vertex vertex : vertices) {
                 writer.writeStartElement(GraphMLTokens.NODE);
                 writer.writeAttribute(GraphMLTokens.ID, vertex.getId().toString());
@@ -244,8 +232,13 @@ public class GraphMLWriter {
                     if (checkManualIndex) {
                         this.checkManualIndex((IndexableGraph) graph, writer, vertex, key, value);
                     }
-                    if (null != value)
-                        writer.writeCharacters(value.toString());
+                    if (null != value) {
+                        extraTypeHandler = this.extraTypeHandlerMap.get(key);
+                        if (extraTypeHandler == null)
+                            writer.writeCharacters(value.toString());
+                        else
+                            writer.writeCharacters(extraTypeHandler.marshal(graph, vertex, key));
+                    }
                     writer.writeEndElement();
                 }
                 writer.writeEndElement();
@@ -280,6 +273,7 @@ public class GraphMLWriter {
     
     private void writeEdges (Iterator<Edge> iterator, XMLStreamWriter writer, boolean checkManualIndex) throws XMLStreamException {
         Edge edge;
+        ExtraTypeHandler<?> extraTypeHandler;
         while (iterator.hasNext()) {
             edge = iterator.next();
             writer.writeStartElement(GraphMLTokens.EDGE);
@@ -312,8 +306,13 @@ public class GraphMLWriter {
                 if (checkManualIndex) {
                     this.checkManualIndex((IndexableGraph) graph, writer, edge, key, value);
                 }
-                if (null != value)
-                    writer.writeCharacters(value.toString());
+                if (null != value) {
+                    extraTypeHandler = this.extraTypeHandlerMap.get(key);
+                    if (extraTypeHandler == null)
+                        writer.writeCharacters(value.toString());
+                    else
+                        writer.writeCharacters(extraTypeHandler.marshal(graph, edge, key));
+                }
                 writer.writeEndElement();
             }
             writer.writeEndElement();
@@ -375,6 +374,10 @@ public class GraphMLWriter {
         }
     }
     
+    /*
+     * Checks if the given attributeName - attributeValue mapping is manually indexed. If yes, it appends each
+     * manual index to the value of the <data> attribute holding the list of manual index.
+     */
     private void checkManualIndex (IndexableGraph graph, XMLStreamWriter writer, Element graphElement, 
             String attributeName, Object attributeValue) throws XMLStreamException {
         Iterator<Index<? extends Element>> indices = graph.getIndices().iterator();

@@ -12,8 +12,10 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +34,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
- * @author Salvatore Piccione (salvo.picci@gmail.com)
+ * @author Salvatore Piccione (TXT e-solutions SpA)
  */
 public class GraphMLWriterTest extends TestCase {
     
@@ -127,6 +129,7 @@ public class GraphMLWriterTest extends TestCase {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GraphMLWriter w = new GraphMLWriter(g);
         w.setNormalize(true);
+        w.setXmlSchemaLocation("../../../../../../../../../main/resources/com/tinkerpop/blueprints/pgm/util/io/graphml/ext-xsd/graphml_autoIndex_ext.xsd");
         w.setEdgeLabelKey(edgeLabelKey);
         w.outputGraph(bos);
 
@@ -199,6 +202,7 @@ public class GraphMLWriterTest extends TestCase {
         GraphMLWriter w = new GraphMLWriter(g);
         w.setNormalize(true);
         w.setEdgeLabelKey(edgeLabelKey);
+        w.setXmlSchemaLocation("../../../../../../../../../main/resources/com/tinkerpop/blueprints/pgm/util/io/graphml/ext-xsd/graphml_manualIndex_ext.xsd");
         w.outputGraph(bos);
         //System.out.print(bos.toString());
         
@@ -206,7 +210,7 @@ public class GraphMLWriterTest extends TestCase {
         assertEquals(expected.replace("\n", "").replace("\r", ""), bos.toString().replace("\n", "").replace("\r", ""));
     }
     
-    private <T extends Element>void checkManualIndex (String manualIndexName, IndexableGraph g, 
+    private <T extends Element> void checkManualIndex (String manualIndexName, IndexableGraph g, 
             String[] keys, Object[] values, String[] indexedElementPropertyNames, 
             List<Collection<Object>> indexedElementPropertyValues, Class<T> indexClass) {
         Index<T> manualIndex = g.getIndex(manualIndexName, indexClass);
@@ -258,6 +262,48 @@ public class GraphMLWriterTest extends TestCase {
             in.close();
         }
         return writer.toString();
+    }
+    
+    public void testExtraType () throws Exception {
+        String edgeLabelKey = "label";
+        TinkerGraph g = new TinkerGraph();
+        GraphMLReader reader = new GraphMLReader(g);
+        reader.setEdgeLabelKey(edgeLabelKey);
+        reader.inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1_extraType.xml"));
+        
+        String propertyName = "date";
+        String dateFormat = "yyyyMMdd";
+        Object propertyValue;
+        
+        //check the date for vertex 1
+        Vertex v = g.getVertex("1");
+        propertyValue = v.getProperty(propertyName);
+        assertTrue("The property '" + propertyName + "' is not a date!", propertyValue instanceof Date);
+        assertEquals("The value of the property '" + propertyName + "' of the vertex '" + v.getId() + 
+                "'does not match the expected value", new SimpleDateFormat(dateFormat).parse("19830210"), propertyValue);
+        
+        v = g.getVertex("2");
+        propertyValue = v.getProperty(propertyName);
+        assertTrue("The property '" + propertyName + "' is not a date!", propertyValue instanceof Date);
+        assertEquals("The value of the property '" + propertyName + "' of the vertex '" + v.getId() + 
+                "'does not match the expected value", new SimpleDateFormat(dateFormat).parse("19851010"), propertyValue);
+        
+        v = g.getVertex("4");
+        propertyValue = v.getProperty(propertyName);
+        assertTrue("The property '" + propertyName + "' is not a date!", propertyValue instanceof Date);
+        assertEquals("The value of the property '" + propertyName + "' of the vertex '" + v.getId() + 
+                "'does not match the expected value", new SimpleDateFormat(dateFormat).parse("19800807"), propertyValue);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        GraphMLWriter w = new GraphMLWriter(g);
+        w.setNormalize(true);
+        w.setEdgeLabelKey(edgeLabelKey);
+        w.setXmlSchemaLocation("../../../../../../../../../main/resources/com/tinkerpop/blueprints/pgm/util/io/graphml/ext-xsd/graphml_extraType_ext.xsd");
+        w.outputGraph(bos);
+        //System.out.print(bos.toString());
+        
+        String expected = streamToString(GraphMLWriterTest.class.getResourceAsStream("graph-example-1-normalized_extraType.xml"));
+        assertEquals(expected.replace("\n", "").replace("\r", ""), bos.toString().replace("\n", "").replace("\r", ""));
     }
 
 }
