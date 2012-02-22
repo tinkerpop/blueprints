@@ -3,7 +3,9 @@ Blueprints: A Property Graph Model Interface
 
 ==<hr/>==
 
-h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-bluesky.png!
+
+h3. Version 1.2 (Blue Sky -- NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
