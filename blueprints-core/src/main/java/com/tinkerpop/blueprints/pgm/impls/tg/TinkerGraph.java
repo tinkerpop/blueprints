@@ -176,14 +176,10 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     }
 
     public void removeVertex(final Vertex vertex) {
-        Set<Edge> toRemove = new HashSet<Edge>();
         for (Edge edge : vertex.getInEdges()) {
-            toRemove.add(edge);
+            this.removeEdge(edge);
         }
         for (Edge edge : vertex.getOutEdges()) {
-            toRemove.add(edge);
-        }
-        for (Edge edge : toRemove) {
             this.removeEdge(edge);
         }
 
