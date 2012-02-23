@@ -51,14 +51,7 @@ public class GraphMLHandler {
      */
     @SuppressWarnings("rawtypes")
     protected GraphMLHandler() {
-        ServiceLoader<ExtraTypeHandler> serviceLoader = ServiceLoader.load(ExtraTypeHandler.class,ClassLoader.getSystemClassLoader());
-        Iterator<ExtraTypeHandler> iterator = serviceLoader.iterator();
-        ExtraTypeHandler handler;
-        extraTypeHandlerMap = new HashMap<String, ExtraTypeHandler>();
-        while (iterator.hasNext()) {
-            handler = iterator.next();
-            extraTypeHandlerMap.put(handler.getTypeName(), handler);
-        }
+        this.extraTypeHandlerMap = buildExtraTypeHadlerMap();
     }
 
     /**
@@ -93,5 +86,17 @@ public class GraphMLHandler {
         this.edgeLabelKey = edgeLabelKey;
     }
 
+    @SuppressWarnings("rawtypes")
+    protected static Map<String, ExtraTypeHandler> buildExtraTypeHadlerMap() {
+        ServiceLoader<ExtraTypeHandler> serviceLoader = ServiceLoader.load(ExtraTypeHandler.class,ClassLoader.getSystemClassLoader());
+        Iterator<ExtraTypeHandler> iterator = serviceLoader.iterator();
+        ExtraTypeHandler handler;
+        Map<String,ExtraTypeHandler> extraTypeHandlerMap = new HashMap<String, ExtraTypeHandler>();
+        while (iterator.hasNext()) {
+            handler = iterator.next();
+            extraTypeHandlerMap.put(handler.getTypeName(), handler);
+        }
+        return extraTypeHandlerMap;
+    }
 
 }

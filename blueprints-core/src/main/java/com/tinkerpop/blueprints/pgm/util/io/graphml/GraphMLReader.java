@@ -25,7 +25,6 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.ExtraTypeHandler;
-import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.ExtraTypeHandlerHelper;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.extra.IndexTokens;
 
 /**
@@ -101,7 +100,7 @@ public class GraphMLReader extends GraphMLHandler{
      */
     public static void inputGraph(final Graph graph, final InputStream graphMLInputStream) throws IOException {
         //TODO How to pass the ExtraTypeManager map?
-        GraphMLReader.inputGraph(graph, graphMLInputStream, 1000, null, null, GraphMLTokens.LABEL, ExtraTypeHandlerHelper.buildExtraTypeHadlerMap(), 
+        GraphMLReader.inputGraph(graph, graphMLInputStream, 1000, null, null, GraphMLTokens.LABEL, GraphMLReader.buildExtraTypeHadlerMap(), 
                 IndexTokens.DEFAUL_AUTO_INDEX_KEY, IndexTokens.DEFAUL_MANUAL_INDEX_KEY);
     }
 
