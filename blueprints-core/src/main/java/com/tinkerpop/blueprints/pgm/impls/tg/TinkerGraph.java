@@ -221,8 +221,8 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.edges.put(edge.getId().toString(), edge);
         final TinkerVertex out = (TinkerVertex) outVertex;
         final TinkerVertex in = (TinkerVertex) inVertex;
-        out.outEdges.add(edge);
-        in.inEdges.add(edge);
+        out.addOutEdge(label, edge);
+        in.addInEdge(label, edge);
         return edge;
 
     }
@@ -230,10 +230,16 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     public void removeEdge(final Edge edge) {
         TinkerVertex outVertex = (TinkerVertex) edge.getOutVertex();
         TinkerVertex inVertex = (TinkerVertex) edge.getInVertex();
-        if (null != outVertex && null != outVertex.outEdges)
-            outVertex.outEdges.remove(edge);
-        if (null != inVertex && null != inVertex.inEdges)
-            inVertex.inEdges.remove(edge);
+        if (null != outVertex && null != outVertex.outEdges) {
+            final Set<Edge> edges = outVertex.outEdges.get(edge.getLabel());
+            if (null != edges)
+                edges.remove(edge);
+        }
+        if (null != inVertex && null != inVertex.inEdges) {
+            final Set<Edge> edges = inVertex.inEdges.get(edge.getLabel());
+            if (null != edges)
+                edges.remove(edge);
+        }
 
         AutomaticIndexHelper.removeElement(this, edge);
         for (Index index : this.getManualIndices()) {

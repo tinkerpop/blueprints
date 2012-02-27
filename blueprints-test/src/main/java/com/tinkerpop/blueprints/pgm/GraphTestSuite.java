@@ -150,26 +150,32 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyDate", new Date(), graphTest.allowSerializableObjectProperty);
             trySetProperty(edge, "keyDate", new Date(), graphTest.allowSerializableObjectProperty);
 
-            trySetProperty(vertexA, "keyListString", new ArrayList<String>() {{ add("try1"); add("try2"); }}, graphTest.allowListProperty);
-            trySetProperty(edge, "keyListString", new ArrayList<String>() {{ add("try1"); add("try2"); }}, graphTest.allowListProperty);
+            trySetProperty(vertexA, "keyListString", new ArrayList<String>() {{
+                add("try1");
+                add("try2");
+            }}, graphTest.allowListProperty);
+            trySetProperty(edge, "keyListString", new ArrayList<String>() {{
+                add("try1");
+                add("try2");
+            }}, graphTest.allowListProperty);
 
-            trySetProperty(vertexA, "keyArrayString", new String[] { "try1", "try2" }, graphTest.allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayString", new String[] { "try1", "try2"}, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayString", new String[]{"try1", "try2"}, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayString", new String[]{"try1", "try2"}, graphTest.allowPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayInteger", new int[] { 1, 2 }, graphTest.allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayInteger", new int[] { 1, 2 }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayInteger", new int[]{1, 2}, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayInteger", new int[]{1, 2}, graphTest.allowPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayLong", new long[] { 1000l, 2000l }, graphTest.allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayLong", new long[] { 1000l, 2000l }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayLong", new long[]{1000l, 2000l}, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayLong", new long[]{1000l, 2000l}, graphTest.allowPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayFloat", new float[] { 1000.321f, 2000.321f }, graphTest.allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayFloat", new float[] { 1000.321f, 2000.321f }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayFloat", new float[]{1000.321f, 2000.321f}, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayFloat", new float[]{1000.321f, 2000.321f}, graphTest.allowPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayDouble", new double[] { 1000.321d, 2000.321d }, graphTest.allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayDouble", new double[] { 1000.321d, 2000.321d }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayDouble", new double[]{1000.321d, 2000.321d}, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayDouble", new double[]{1000.321d, 2000.321d}, graphTest.allowPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayBoolean", new boolean[] { false, true }, graphTest.allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayBoolean", new boolean[] { false, true }, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayBoolean", new boolean[]{false, true}, graphTest.allowPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayBoolean", new boolean[]{false, true}, graphTest.allowPrimitiveArrayProperty);
 
             final Map map = new HashMap() {{
                 put("testString", "try");
@@ -189,7 +195,7 @@ public class GraphTestSuite extends TestSuite {
         graph.clear();
         graph.shutdown();
     }
-    
+
     private void trySetProperty(final Element e, final String propertyKey, final Object propertyValue, final boolean allowDataType) {
         boolean exceptionTossed = false;
         try {
@@ -585,17 +591,17 @@ public class GraphTestSuite extends TestSuite {
             graph.shutdown();
         }
     }
-    
+
     protected class MockSerializable implements Serializable {
         private String testField;
-        
+
         public String getTestField() {
             return this.testField;
         }
-        
+
         public void setTestField(String testField) {
             this.testField = testField;
         }
-        
+
     }
 }

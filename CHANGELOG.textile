@@ -24,9 +24,10 @@ h3. Version 1.2 (Blue Sky -- NOT OFFICIALLY RELEASED YET)
 * Fixed named graph bug in @SailGraph@
 * @Neo4jBatchGraph@ now has nearly analogous behavior to any @IndexableGraph@ except for the ability to delete
 * Fixed issue with Neo4j's native automatic index and @Neo4jGraph.dropIndex()@
-* Added @NamedGraph@ utility to allow for graph partitions
-* Renamed packages where there is no @util.io@ and @util.wrappers@ for I/O and wrapper-based utilities
+* Added @PartitionGraph@ utility to allow for graph partitions
+* Renamed packages where there is now @util.io@ and @util.wrappers@ for I/O and wrapper-based utilities
 * Added support for index parameters in @IndexableGraph@ (provided as optional parameters, thus backwards compatible)
+* Optimized how @TinkerGraph@ stores its vertices' edges in memory (grouping on label)
 
 ==<hr/>==
 

@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
