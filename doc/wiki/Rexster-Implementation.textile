@@ -1,0 +1,15 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-rexster-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+"Rexster":http://rexster.tinkerpop.com is a RESTful graph shell that exposes any Blueprints graph through a standalone HTTP server. @RexsterGraph@ talks to a Rexster-exposed graph via the "Rexster RESTful API":https://github.com/tinkerpop/rexster/wiki/Basic-REST-API. Thus, @RexsterGraph@ can be used to communicate with a remote graph with complete HTTP-transparency to the user. @RexsterGraph@ is composed of HTTP calls (through @java.net.*@) and "JSON":http://json.org/ parsing (through "JSON-simple":http://code.google.com/p/json-simple/).
+
+```java
+Graph graph = new RexsterGraph("http://localhost:8182/graphs/tinkergraph");
+```

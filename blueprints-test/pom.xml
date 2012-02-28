@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-test</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
     <packaging>jar</packaging>
     <name>Blueprints-Test</name>
     <description>Reusable test suites for Blueprints</description>
@@ -67,17 +67,6 @@
                         </property>
                     </systemProperties>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.5</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.wagon</groupId>
-                        <artifactId>wagon-ftp</artifactId>
-                        <version>1.0-alpha-6</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

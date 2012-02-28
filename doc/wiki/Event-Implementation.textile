@@ -1,0 +1,53 @@
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+@EventGraph@ and @EventIndexableGraph@ wrap any @Graph@ or @IndexableGraph@, respectively. The purpose of an @EventGraph@ is to raise events to one or more @GraphChangedListener@ as changes to the underlying @Graph@ occur.  The obvious limitation is that events will only be raised to listeners if the changes to the @Graph@ occur within the same process.
+
+The following events are raised:
+
+* New vertex
+* New edge
+* Vertex property changed
+* Edge property changed
+* Vertex property removed
+* Edge property removed
+* Vertex removed
+* Edge removed
+* Graph cleared
+
+To start processing events from a @Graph@ first implement the @GraphChangedListener@ interface.  An example of this implementation is the @ConsoleGraphChangedListener@ which writes output to the console for each event.
+
+To add a listener to the @EventGraph@:
+
+```java
+EventGraph graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
+graph.addListener(new ConsoleGraphChangedListener(graph));
+
+Vertex v = graph.addVertex(100);
+v.setProperty("name", "noname");
+
+for (Edge edge : graph.getEdges()) {
+    edge.removeProperty("weight");
+}
+
+graph.clear();
+```
+
+The following output would appear in the console:
+
+```text
+Vertex [v[100]] added to graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Vertex [v[4]] property [name] set to value of [noname] in graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Edge [e[10][4-created->5]] property [weight] with value of [1.0] removed in graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Edge [e[7][1-knows->2]] property [weight] with value of [0.5] removed in graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Edge [e[9][1-created->3]] property [weight] with value of [0.4] removed in graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Edge [e[8][1-knows->4]] property [weight] with value of [1.0] removed in graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Edge [e[11][4-created->3]] property [weight] with value of [0.4] removed in graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Edge [e[12][6-created->3]] property [weight] with value of [0.2] removed in graph [eventgraph[tinkergraph[vertices:6 edges:6]]]
+Graph [eventgraph[tinkergraph[vertices:6 edges:6]]] cleared.
+```

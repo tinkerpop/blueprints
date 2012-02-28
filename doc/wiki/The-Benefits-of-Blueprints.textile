@@ -1,0 +1,12 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
+
+Blueprints is a generic graph Java API that binds to various graph backends (i.e. frameworks and "databases":http://en.wikipedia.org/wiki/Graph_database). Below is a list of reasons for using Blueprints.
+
+* Blueprints makes it relatively easy to swap in and out different graph backends. In this way, its possible to avoid "vendor lock-in":http://en.wikipedia.org/wiki/Vendor_lock-in.
+* Any software built for Blueprints will work with any Blueprints-enabled graph backend (e.g "Gremlin":http://gremlin.tinkerpop.com).
+* Blueprints comes with a large library of utilities to make it easy to manipulate a graph.
+* Blueprints can turn any graph databases into a "RDF store":http://en.wikipedia.org/wiki/Triplestore (see [[Sail Ouplementation]]).
+* Blueprints can turn any RDF store into a graph database (see [[Sail Implementation]]).
+* Blueprints can turn any graph into a "JUNG":http://jung.sourceforge.net/ graph (see [[JUNG Ouplementation]]).
+* Blueprints has support for "GraphML":http://graphml.graphdrawing.org/ reading and writing (see [[GraphML Reader and Writer Library]]).
+* Its open source and free to use under a liberal "BSD license":http://en.wikipedia.org/wiki/BSD_licenses.

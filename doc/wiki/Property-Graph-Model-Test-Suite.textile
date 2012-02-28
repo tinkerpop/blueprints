@@ -1,0 +1,105 @@
+Blueprints comes with a suite of test cases to ensure that any implementation of the [[property graph model]] interfaces behaves as required in order to work seamlessly within applications that depend on Blueprints. This section will discuss the test suites and how to build a simple JUnit test class to validate an implementation of this model.
+
+There currently exists the following test suites:
+
+# *AutomaticIndexTestSuite*: ensures that automatic indices are managed properly.
+# *EdgeTestSuite*: ensure that edges and their properties are added and removed properly.
+# *GraphMLReaderTestSuite*: ensure that GraphML files are read properly from disk and represented properly.
+# *GraphTestSuite*: ensure that vertices and edges work together properly.
+# *IndexableGraphTestSuite*: ensures that graphs that support indices behave properly.
+# *IndexTestSuite*: ensure that the index system works properly.
+# *TransactionalGraphTestSuite*: ensures that graphs that support transactions behave properly.
+# *VertexTestSuite*: ensure that vertices and their properties are added and removed properly.
+
+h2. Blueprints-Tests Dependency
+
+It is necessary that the Blueprints test suite is depended when testing a Blueprints-enabled graph framework. Simply import the @blueprints-tests@. With this dependency the test suite is available.
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop</groupId>
+  <artifactId>blueprints-tests</artifactId>
+  <version>0.5</version>
+  <scope>test</scope>
+</dependency>
+```
+
+h2. Testing a Property Graph Model Implementation
+
+To ensure that an implementation of the [[property graph model]] is implemented correctly, a simple "JUnit":http://www.junit.org/ test case of the following form will determine its compliance. Unfortunately, there is no perfect general interface solution that will work regardless of the underlying graph framework, while being specific enough to be useful. For this reason, a @GraphTest@ has public boolean fields that need to be set that specify the peculiarities of the graph framework.
+
+```java
+public class TinkerGraphTest extends GraphTest {
+
+    public TinkerGraphTest() {
+        this.allowsDuplicateEdges = true;
+        this.allowsSelfLoops = true;
+        this.ignoresSuppliedIds = false;
+        this.isPersistent = false;
+        this.isRDFModel = false;
+        this.supportsVertexIteration = true;
+        this.supportsEdgeIteration = true;
+        this.supportsVertexIndex = true;
+        this.supportsEdgeIndex = true;
+        this.supportsTransactions = false;
+    }
+
+    public void testVertexTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new VertexTestSuite(this));
+        printTestPerformance("VertexTestSuite", this.stopWatch());
+    }
+
+    public void testEdgeTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new EdgeTestSuite(this));
+        printTestPerformance("EdgeTestSuite", this.stopWatch());
+    }
+
+    public void testGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphTestSuite(this));
+        printTestPerformance("GraphTestSuite", this.stopWatch());
+    }
+
+    public void testIndexableGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new IndexableGraphTestSuite(this));
+        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
+    }
+
+    public void testIndexTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new IndexTestSuite(this));
+        printTestPerformance("IndexTestSuite", this.stopWatch());
+    }
+
+    public void testAutomaticIndexTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new AutomaticIndexTestSuite(this));
+        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
+    }
+
+    public void testGraphMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphMLReaderTestSuite(this));
+        printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
+    }
+
+    public Graph getGraphInstance() {
+        return new TinkerGraph();
+    }
+
+    public void doTestSuite(final TestSuite testSuite) throws Exception {
+        String doTest = System.getProperty("testTinkerGraph");
+        if (doTest == null || doTest.equals("true")) {
+            for (Method method : testSuite.getClass().getDeclaredMethods()) {
+                if (method.getName().startsWith("test")) {
+                    System.out.println("Testing " + method.getName() + "...");
+                    method.invoke(testSuite);
+                }
+            }
+        }
+    }
+}
+```

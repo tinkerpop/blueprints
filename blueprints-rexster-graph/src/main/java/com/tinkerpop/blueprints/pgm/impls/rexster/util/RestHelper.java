@@ -20,6 +20,7 @@ import java.net.URLEncoder;
 public class RestHelper {
 
     private static final String POST = "POST";
+    private static final String PUT = "PUT";
     private static final String DELETE = "DELETE";
 
     public static JSONObject get(final String uri) {
@@ -114,6 +115,19 @@ public class RestHelper {
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
             connection.setRequestMethod(DELETE);
+            final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+            reader.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public static void put(final String uri) {
+        try {
+            final URL url = new URL(uri);
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            connection.setRequestMethod(PUT);
             final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
             reader.close();
         } catch (Exception e) {
