@@ -142,5 +142,20 @@ public class ElementHelper {
         }
     }
 
+    /**
+     * Set the properties of the provided element using the provided key value pairs.
+     * The var args of Objects must be divisible by 2. All odd elements in the array must be a String key.
+     *
+     * @param element    the element to set the properties of
+     * @param keysValues the key value pairs of the properties
+     */
+    public static void setProperties(final Element element, final Object... keysValues) {
+        if (keysValues.length % 2 != 0)
+            throw new IllegalArgumentException("The object var args must be divisible by 2");
+        for (int i = 0; i < keysValues.length; i = i + 2) {
+            element.setProperty((String) keysValues[i], keysValues[i + 1]);
+        }
+    }
+
 
 }

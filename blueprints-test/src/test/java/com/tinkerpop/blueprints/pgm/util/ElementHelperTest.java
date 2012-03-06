@@ -134,4 +134,26 @@ public class ElementHelperTest extends BaseTest {
 
 
     }
+
+    public void testSetPropertiesVarArgs() {
+        Graph graph = new TinkerGraph();
+        Vertex vertex = graph.addVertex(null);
+        ElementHelper.setProperties(vertex, "name", "pierre");
+        assertEquals(vertex.getPropertyKeys().size(), 1);
+        assertEquals(vertex.getProperty("name"), "pierre");
+
+        ElementHelper.setProperties(vertex, "name", "dewilde", "country", "belgium", "age", 50);
+        assertEquals(vertex.getPropertyKeys().size(), 3);
+        assertEquals(vertex.getProperty("name"), "dewilde");
+        assertEquals(vertex.getProperty("country"), "belgium");
+        assertEquals(vertex.getProperty("age"), 50);
+
+        try {
+            ElementHelper.setProperties(vertex, "a", 12, "b");
+            assertTrue(false);
+        } catch (IllegalArgumentException e) {
+            assertFalse(false);
+        }
+
+    }
 }
