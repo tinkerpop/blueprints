@@ -52,6 +52,11 @@ public class GMLReader {
 
 	private String edgeLabelKey = GMLTokens.LABEL;
 
+    /**
+     * Map of the the IDs used in the GML to the IDs used by the underlying graph implementation.
+     */
+    private Map<Object, Object> vertexIdMap = new HashMap<Object, Object>();
+
 	/**
 	 * Create a new GML reader
 	 * 
@@ -212,9 +217,11 @@ public class GMLReader {
 	private void addNode(Map<String, Object> map) throws IOException {
 		Object id = map.remove(GMLTokens.ID);
 		if (id != null) {
-			Vertex vertex;
-			vertex = createVertex(map, id);
+			final Vertex vertex = createVertex(map, id);
 			addProperties(vertex, map);
+            
+            // keep track of the identifiers created by the graph.
+            vertexIdMap.put(vertexIds.get(id), vertex.getId());
 		} else {
 			throw new IOException("No id found for node");
 		}
@@ -227,9 +234,11 @@ public class GMLReader {
 				vertexIds.put(id, vertexId);
 				return graph.addVertex(vertexId);
 			}
-			// if no id try to use default id this will fail if not unique
-			vertexIds.put(id, id);
 		}
+
+        // if no id try to use default id this will fail if not unique
+        vertexIds.put(id, id);
+
 		// Use default id system
 		return graph.addVertex(id);
 	}
@@ -247,9 +256,14 @@ public class GMLReader {
 			source = vertexIds.get(source);
 			target = vertexIds.get(target);
 		}
+        
+        // grab the identifiers used by the graph itself
+        final Object sourceId = vertexIdMap.get(source);
+        final Object targetId = vertexIdMap.get(target);
 
-		Vertex outVertex = graph.getVertex(source);
-		Vertex inVertex = graph.getVertex(target);
+        final Vertex outVertex = graph.getVertex(sourceId);
+		final Vertex inVertex = graph.getVertex(targetId);
+        
 		if (outVertex == null) {
 			throw new IOException("Edge source " + source + " not found");
 		}
