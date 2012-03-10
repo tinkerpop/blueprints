@@ -11,13 +11,11 @@ public interface Graph {
      * Create a new vertex, add it to the graph, and return the newly created vertex.
      * The provided object identifier is a recommendation for the identifier to use.
      * It is not required that the implementation use this identifier.
-     * If the object identifier is already being used by the graph to reference a vertex,
-     * then that reference vertex is returned and no vertex is created.
      * If the identifier is a vertex (perhaps from another graph),
      * then the vertex is duplicated for this graph. Thus, a vertex can not be an identifier.
      *
      * @param id the recommended object identifier
-     * @return the newly created vertex or the vertex already referenced by the provided identifier.
+     * @return the newly created vertex
      */
     public Vertex addVertex(Object id);
 
@@ -48,7 +46,7 @@ public interface Graph {
 
     /**
      * Add an edge to the graph. The added edges requires a recommended identifier, a tail vertex, an head vertex, and a label.
-     * Like adding a vertex, the provided object identifier is can be ignored by the implementation.
+     * Like adding a vertex, the provided object identifier may be ignored by the implementation.
      *
      * @param id        the recommended object identifier
      * @param outVertex the vertex on the tail of the edge
