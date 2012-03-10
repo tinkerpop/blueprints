@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexSequence;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionGraph<T extends Graph> implements Graph, WrappingGraph<T> {
+public class PartitionGraph<T extends Graph> implements Graph, WrappableGraph<T> {
 
     protected T rawGraph;
     private String writePartition;

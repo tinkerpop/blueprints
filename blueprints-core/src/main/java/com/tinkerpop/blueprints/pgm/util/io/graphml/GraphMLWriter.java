@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.util.io.graphml;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.LexicographicalElementComparator;
+import com.tinkerpop.blueprints.pgm.util.io.LexicographicalElementComparator;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;

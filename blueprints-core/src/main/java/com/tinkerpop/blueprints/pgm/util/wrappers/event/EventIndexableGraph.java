@@ -5,8 +5,8 @@ import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexSequence;
 
 import java.util.Set;
@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * @author Stephen Mallette
  */
-public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T> implements IndexableGraph, WrappingGraph<T> {
+public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T> implements IndexableGraph, WrappableGraph<T> {
 
     public EventIndexableGraph(final T graph) {
         super(graph);

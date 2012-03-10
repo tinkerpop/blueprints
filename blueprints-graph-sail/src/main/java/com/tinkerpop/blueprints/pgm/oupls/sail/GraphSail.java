@@ -7,7 +7,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase implements WrappingGraph<T> {
+public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase implements WrappableGraph<T> {
     public static final String SEPARATOR = " ";
 
     public static final String

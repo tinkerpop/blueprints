@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyIndexSequence;
 
 import java.util.Set;
@@ -16,7 +16,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGraph<T> implements IndexableGraph, WrappingGraph<T> {
+public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGraph<T> implements IndexableGraph, WrappableGraph<T> {
 
     public ReadOnlyIndexableGraph(final T graph) {
         super(graph);

@@ -4,8 +4,8 @@ import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionIndexSequence;
 
 import java.util.Set;
@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionIndexableGraph<T extends IndexableGraph> extends PartitionGraph<T> implements IndexableGraph, WrappingGraph<T> {
+public class PartitionIndexableGraph<T extends IndexableGraph> extends PartitionGraph<T> implements IndexableGraph, WrappableGraph<T> {
 
     public PartitionIndexableGraph(final T rawIndexableGraph, final String writeGraphKey, final String writeGraph, final Set<String> readGraphs) {
         super(rawIndexableGraph, writeGraphKey, writeGraph, readGraphs);

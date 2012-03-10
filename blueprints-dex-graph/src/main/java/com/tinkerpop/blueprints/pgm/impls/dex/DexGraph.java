@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
+import com.sparsity.dex.gdb.Graph;
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
@@ -10,7 +11,7 @@ import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.Set;
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity Technologies</a>
  */
-public class DexGraph implements IndexableGraph, WrappingGraph<com.sparsity.dex.gdb.Graph> {
+public class DexGraph implements IndexableGraph, WrappableGraph<Graph> {
 
     /**
      * Default Vertex label. Just used when invoked addVertex with a null parameter.

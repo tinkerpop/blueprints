@@ -21,7 +21,7 @@ import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraph implements TransactionalGraph, IndexableGraph, WrappingGraph<OGraphDatabase> {
+public class OrientGraph implements TransactionalGraph, IndexableGraph, WrappableGraph<OGraphDatabase> {
     private final static String ADMIN = "admin";
 
     private String url;

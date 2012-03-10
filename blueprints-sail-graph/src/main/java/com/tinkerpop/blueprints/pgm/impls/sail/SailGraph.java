@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.nquads.NQuadsFormat;
 import org.apache.log4j.PropertyConfigurator;
@@ -49,7 +49,7 @@ import java.util.UUID;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class SailGraph implements TransactionalGraph, WrappingGraph<Sail> {
+public class SailGraph implements TransactionalGraph, WrappableGraph<Sail> {
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
 

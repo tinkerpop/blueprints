@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexSequence;
 
@@ -14,7 +14,7 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexSequ
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedGraph<T extends Graph> implements Graph, WrappingGraph<T> {
+public class WrappedGraph<T extends Graph> implements Graph, WrappableGraph<T> {
 
     protected T rawGraph;
 

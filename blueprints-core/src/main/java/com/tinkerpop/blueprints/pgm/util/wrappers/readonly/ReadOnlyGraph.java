@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSequence;
 
@@ -14,7 +14,7 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSe
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyGraph<T extends Graph> implements Graph, WrappingGraph<T> {
+public class ReadOnlyGraph<T extends Graph> implements Graph, WrappableGraph<T> {
 
     protected final T rawGraph;
 

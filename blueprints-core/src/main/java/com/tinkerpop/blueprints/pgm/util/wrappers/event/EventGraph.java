@@ -3,8 +3,8 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexSequence;
@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventGraph<T extends Graph> implements Graph, WrappingGraph<T> {
+public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     protected final T rawGraph;
 
     protected final List<GraphChangedListener> graphChangedListeners = new ArrayList<GraphChangedListener>();
