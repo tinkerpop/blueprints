@@ -32,7 +32,7 @@ public class GMLWriterTest extends TestCase {
 		String expected = streamToByteArray(GMLWriterTest.class.getResourceAsStream("writer.gml"));
 
         // ignore carriage return character...not really relevant to the test
-		assertEquals(expected.replace("\r", ""), actual.replace("\r", ""));
+		assertEquals(expected, actual);
 		
 	}
 	
@@ -50,7 +50,7 @@ public class GMLWriterTest extends TestCase {
 		String expected = streamToByteArray(GMLWriterTest.class.getResourceAsStream("writer2.gml"));
 
         // ignore carriage return character...not really relevant to the test
-        assertEquals(expected.replace("\r", ""), actual.replace("\r", ""));
+        assertEquals(expected, actual);
 		
 	}
 

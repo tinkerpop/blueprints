@@ -33,7 +33,7 @@ public class GMLWriter {
 
 	private static final String DELIMITER = " ";
 	private static final String TAB = "\t";
-	private static final String NEW_LINE = "\r\n";
+	private static final String NEW_LINE = System.getProperty("line.separator");
 	private static final String OPEN_LIST = " [" + NEW_LINE;
 	private static final String CLOSE_LIST = "]" + NEW_LINE;
 	private final Graph graph;
