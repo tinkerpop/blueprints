@@ -384,5 +384,4 @@ public class GMLReader {
     public static void inputGraph(Graph graph, InputStream inputStream, String defaultEdgeLabel) throws IOException {
         new GMLReader(graph, defaultEdgeLabel).inputGraph(inputStream, DEFAULT_BUFFER_SIZE);
     }
-
 }
