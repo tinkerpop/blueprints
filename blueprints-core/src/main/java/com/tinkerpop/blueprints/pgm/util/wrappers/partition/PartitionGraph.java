@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.wrappers.GraphWrapper;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexSequence;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionGraph implements Graph {
+public class PartitionGraph implements GraphWrapper {
 
     protected Graph rawGraph;
     private String writePartition;
@@ -126,6 +127,7 @@ public class PartitionGraph implements Graph {
         this.rawGraph.removeVertex(((PartitionVertex) vertex).getRawVertex());
     }
 
+    @Override
     public Graph getRawGraph() {
         return this.rawGraph;
     }
