@@ -4,13 +4,14 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.wrappers.GraphWrapper;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexSequence;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedGraph implements Graph {
+public class WrappedGraph implements GraphWrapper {
 
     protected Graph rawGraph;
 
@@ -66,6 +67,7 @@ public class WrappedGraph implements Graph {
         this.rawGraph.removeVertex(((WrappedVertex) vertex).getRawVertex());
     }
 
+    @Override
     public Graph getRawGraph() {
         return this.rawGraph;
     }

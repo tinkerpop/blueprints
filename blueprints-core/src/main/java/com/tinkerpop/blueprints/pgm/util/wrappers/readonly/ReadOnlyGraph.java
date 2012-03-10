@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.wrappers.GraphWrapper;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSequence;
 
@@ -13,7 +14,7 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSe
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyGraph implements Graph {
+public class ReadOnlyGraph implements GraphWrapper {
 
     protected final Graph rawGraph;
 
@@ -91,6 +92,7 @@ public class ReadOnlyGraph implements Graph {
         return StringFactory.graphString(this, this.rawGraph.toString());
     }
 
+    @Override
     public Graph getRawGraph() {
         return this.rawGraph;
     }
