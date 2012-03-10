@@ -14,6 +14,7 @@ h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Added a var args based @ElementHelper.setProperties()@ method
+* GML Reader/Writer utility
 
 ==<hr/>==
 
