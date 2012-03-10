@@ -7,7 +7,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSail extends NotifyingSailBase implements GraphSource {
+public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase implements WrappingGraph<T> {
     public static final String SEPARATOR = " ";
 
     public static final String
@@ -99,7 +99,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
      * @param graph the storage layer.  If the provided graph implements TransactionalGraph and is in manual transaction
      *              mode, then this Sail will also be transactional.
      */
-    public GraphSail(final IndexableGraph graph) {
+    public GraphSail(final T graph) {
         this(graph, "p,c,pc");
         //this(graph, "s,p,o,c,sp,so,sc,po,pc,oc,spo,spc,soc,poc,spoc");
     }
@@ -113,7 +113,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
      * @param indexedPatterns a comma-delimited list of triple patterns for index-based statement matching.  Only p,c are required,
      *                        while the default patterns are p,c,pc.
      */
-    public GraphSail(final IndexableGraph graph, final String indexedPatterns) {
+    public GraphSail(final T graph, final String indexedPatterns) {
         //if (graph instanceof TransactionalGraph)
         //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
         //printGraphInfo(graph);
@@ -166,21 +166,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
         return graph.createAutomaticIndex(VALUES, Vertex.class, keys);
     }
 
-    /*
-    private void printGraphInfo(final IndexableGraph graph) {
-        boolean trans = graph instanceof TransactionalGraph;
-
-        StringBuilder sb = new StringBuilder("graph ").append(graph).append("\n");
-        sb.append("\ttransactional: ").append(trans).append("\n");
-        if (trans) {
-            sb.append("\tmode: ").append(((TransactionalGraph) graph).getTransactionMode()).append("\n");
-        }
-
-        System.out.println(sb.toString());
-    }
-    //*/
-
-    public IndexableGraph getGraph() {
+    public T getRawGraph() {
         return this.store.getGraph();
     }
 
@@ -251,7 +237,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
      * A context object which is shared between the Blueprints Sail and its connections.
      */
     class DataStore {
-        public IndexableGraph graph;
+        public T graph;
         public NotifyingSailBase sail;
 
         // We don't need a special ValueFactory implementation.
@@ -368,7 +354,7 @@ public class GraphSail extends NotifyingSailBase implements GraphSource {
             return (String) v.getProperty(VALUE);
         }
 
-        public IndexableGraph getGraph() {
+        public T getGraph() {
             return this.graph;
         }
 

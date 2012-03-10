@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ import java.util.Set;
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity Technologies</a>
  */
-public class DexGraph implements IndexableGraph {
+public class DexGraph implements IndexableGraph, WrappingGraph<com.sparsity.dex.gdb.Graph> {
 
     /**
      * Default Vertex label. Just used when invoked addVertex with a null parameter.
@@ -56,7 +57,7 @@ public class DexGraph implements IndexableGraph {
      *
      * @return Dex raw graph.
      */
-    com.sparsity.dex.gdb.Graph getRawGraph() {
+    public com.sparsity.dex.gdb.Graph getRawGraph() {
         return rawGraph;
     }
 

@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.oupls.jung;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import junit.framework.TestCase;
@@ -12,7 +13,7 @@ import junit.framework.TestCase;
 public class GraphJungTest extends TestCase {
 
     public void testTinkerGraph() {
-        GraphJung graph = new GraphJung(TinkerGraphFactory.createTinkerGraph());
+        GraphJung<TinkerGraph> graph = new GraphJung<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
         assertEquals(graph.getVertices().size(), 6);
         assertEquals(graph.getEdges().size(), 6);
         assertEquals(graph.getVertexCount(), 6);

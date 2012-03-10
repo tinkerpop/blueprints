@@ -11,6 +11,7 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -23,7 +24,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterGraph implements IndexableGraph {
+public class RexsterGraph implements IndexableGraph, WrappingGraph<JSONObject> {
 
     private final String graphURI;
     private int bufferSize;

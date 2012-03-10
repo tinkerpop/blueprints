@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.GraphWrapper;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexSequence;
@@ -27,12 +27,12 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventGraph implements GraphWrapper {
-    protected final Graph rawGraph;
+public class EventGraph<T extends Graph> implements Graph, WrappingGraph<T> {
+    protected final T rawGraph;
 
     protected final List<GraphChangedListener> graphChangedListeners = new ArrayList<GraphChangedListener>();
 
-    public EventGraph(final Graph rawGraph) {
+    public EventGraph(final T rawGraph) {
         this.rawGraph = rawGraph;
     }
 
@@ -184,7 +184,7 @@ public class EventGraph implements GraphWrapper {
     }
 
     @Override
-    public Graph getRawGraph() {
+    public T getRawGraph() {
         return this.rawGraph;
     }
 }

@@ -4,18 +4,21 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.GraphWrapper;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexSequence;
 
 /**
+ * WrappedGraph serves as a template for writing a wrapper graph.
+ * The intention is that the code in this template is copied and adjusted accordingly.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedGraph implements GraphWrapper {
+public class WrappedGraph<T extends Graph> implements Graph, WrappingGraph<T> {
 
-    protected Graph rawGraph;
+    protected T rawGraph;
 
-    public WrappedGraph(final Graph rawGraph) {
+    public WrappedGraph(final T rawGraph) {
         this.rawGraph = rawGraph;
     }
 
@@ -68,7 +71,7 @@ public class WrappedGraph implements GraphWrapper {
     }
 
     @Override
-    public Graph getRawGraph() {
+    public T getRawGraph() {
         return this.rawGraph;
     }
 

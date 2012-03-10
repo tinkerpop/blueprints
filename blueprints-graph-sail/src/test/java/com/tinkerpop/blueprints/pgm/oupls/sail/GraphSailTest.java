@@ -206,7 +206,7 @@ public abstract class GraphSailTest extends SailTest {
                     sparqlResults.close();
                 }
 
-                Graph graph = ((GraphSail) sail).getGraph();
+                Graph graph = ((GraphSail) sail).getRawGraph();
                 System.out.println();
                 for (Vertex v : graph.getVertices()) {
                     System.out.println("------");

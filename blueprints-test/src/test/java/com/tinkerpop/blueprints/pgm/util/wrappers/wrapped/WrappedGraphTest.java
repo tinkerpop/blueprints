@@ -76,7 +76,7 @@ public class WrappedGraphTest extends GraphTest {
     }
 
     public Graph getGraphInstance() {
-        return new WrappedIndexableGraph(new TinkerGraph());
+        return new WrappedIndexableGraph<TinkerGraph>(new TinkerGraph());
     }
 
 

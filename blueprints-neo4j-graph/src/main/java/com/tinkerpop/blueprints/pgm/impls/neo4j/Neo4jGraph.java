@@ -12,6 +12,7 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -36,7 +37,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraph implements TransactionalGraph, IndexableGraph {
+public class Neo4jGraph implements TransactionalGraph, IndexableGraph, WrappingGraph<GraphDatabaseService> {
 
     private GraphDatabaseService rawGraph;
     private final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {

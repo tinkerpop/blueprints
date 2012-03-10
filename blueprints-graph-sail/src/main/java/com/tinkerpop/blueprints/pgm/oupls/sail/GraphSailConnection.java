@@ -220,7 +220,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 edge.setProperty(GraphSail.INFERRED, inferred);
             }
 
-            for (IndexingMatcher m : store.indexers) {
+            for (IndexingMatcher m : (Collection<IndexingMatcher>) store.indexers) {
                 //System.out.println("\t\tindexing with: " + m);
                 m.indexStatement(edge, subject, predicate, object, c);
             }

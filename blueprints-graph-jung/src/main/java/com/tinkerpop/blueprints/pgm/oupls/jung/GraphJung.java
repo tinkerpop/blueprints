@@ -4,7 +4,7 @@ package com.tinkerpop.blueprints.pgm.oupls.jung;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.oupls.GraphSource;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 
@@ -23,15 +23,15 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class GraphJung implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, GraphSource {
+public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, WrappingGraph<T> {
 
-    private final Graph graph;
+    private final T graph;
 
-    public GraphJung(final Graph graph) {
+    public GraphJung(final T graph) {
         this.graph = graph;
     }
 
-    public Graph getGraph() {
+    public T getRawGraph() {
         return this.graph;
     }
 

@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexSequence;
 
 import java.util.Set;
@@ -18,8 +19,9 @@ import java.util.Set;
  *
  * @author Stephen Mallette
  */
-public class EventIndexableGraph extends EventGraph implements IndexableGraph {
-    public EventIndexableGraph(final IndexableGraph graph) {
+public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T> implements IndexableGraph, WrappingGraph<T> {
+
+    public EventIndexableGraph(final T graph) {
         super(graph);
     }
 
@@ -36,7 +38,7 @@ public class EventIndexableGraph extends EventGraph implements IndexableGraph {
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        final Index<T> index = ((IndexableGraph) this.rawGraph).getIndex(indexName, indexClass);
+        final Index<T> index = this.rawGraph.getIndex(indexName, indexClass);
         if (null == index)
             return null;
         else {
@@ -48,10 +50,6 @@ public class EventIndexableGraph extends EventGraph implements IndexableGraph {
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new EventIndexSequence(((IndexableGraph) this.rawGraph).getIndices().iterator(), this.graphChangedListeners);
-    }
-
-    public IndexableGraph getRawGraph() {
-        return (IndexableGraph) this.rawGraph;
+        return new EventIndexSequence(this.rawGraph.getIndices().iterator(), this.graphChangedListeners);
     }
 }

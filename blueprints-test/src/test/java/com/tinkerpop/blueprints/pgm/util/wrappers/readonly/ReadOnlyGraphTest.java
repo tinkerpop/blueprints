@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyIndexSequence;
@@ -20,7 +21,7 @@ import java.util.Set;
 public class ReadOnlyGraphTest extends BaseTest {
 
     public void testWrappedElementUniqueness() {
-        Graph graph = new ReadOnlyGraph(TinkerGraphFactory.createTinkerGraph());
+        Graph graph = new ReadOnlyGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
         assertEquals(graph.getVertex(1), graph.getVertex(1));
         Set<Vertex> set = new HashSet<Vertex>();
         set.add(graph.getVertex(2));
@@ -31,7 +32,7 @@ public class ReadOnlyGraphTest extends BaseTest {
     }
 
     public void testReadOnlyGraph() {
-        Graph graph = new ReadOnlyGraph(TinkerGraphFactory.createTinkerGraph());
+        Graph graph = new ReadOnlyGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
         assertTrue(graph.getVertices() instanceof ReadOnlyVertexSequence);
         assertTrue(graph.getEdges() instanceof ReadOnlyEdgeSequence);
         assertEquals(count(graph.getVertices()), 6);

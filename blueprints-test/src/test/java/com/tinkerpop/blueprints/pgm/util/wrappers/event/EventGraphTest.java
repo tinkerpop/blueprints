@@ -31,7 +31,7 @@ import java.util.Set;
 public class EventGraphTest extends GraphTest {
 
     private StubGraphChangedListener graphChangedListener;
-    private EventGraph graph;
+    private EventGraph<TinkerGraph> graph;
 
     public EventGraphTest() {
         this.allowsDuplicateEdges = true;
@@ -107,7 +107,7 @@ public class EventGraphTest extends GraphTest {
     public void setUp() throws Exception {
         super.setUp();
         graphChangedListener = new StubGraphChangedListener();
-        graph = new EventGraph(TinkerGraphFactory.createTinkerGraph());
+        graph = new EventGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
     }
 
     public void testWrappedElementUniqueness() {

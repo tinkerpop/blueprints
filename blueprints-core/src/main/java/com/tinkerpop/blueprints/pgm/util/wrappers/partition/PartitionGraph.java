@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.GraphWrapper;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrappingGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexSequence;
 
@@ -16,21 +16,21 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionGraph implements GraphWrapper {
+public class PartitionGraph<T extends Graph> implements Graph, WrappingGraph<T> {
 
-    protected Graph rawGraph;
+    protected T rawGraph;
     private String writePartition;
     private Set<String> readPartitions = new HashSet<String>();
     private String partitionKey;
 
-    public PartitionGraph(final Graph rawGraph, final String partitionKey, final String writePartition, final Set<String> readPartitions) {
+    public PartitionGraph(final T rawGraph, final String partitionKey, final String writePartition, final Set<String> readPartitions) {
         this.rawGraph = rawGraph;
         this.partitionKey = partitionKey;
         this.writePartition = writePartition;
         this.readPartitions.addAll(readPartitions);
     }
 
-    public PartitionGraph(final Graph rawGraph, final String partitionKey, final String readWriteGraph) {
+    public PartitionGraph(final T rawGraph, final String partitionKey, final String readWriteGraph) {
         this(rawGraph, partitionKey, readWriteGraph, new HashSet<String>(Arrays.asList(readWriteGraph)));
     }
 
@@ -128,7 +128,7 @@ public class PartitionGraph implements GraphWrapper {
     }
 
     @Override
-    public Graph getRawGraph() {
+    public T getRawGraph() {
         return this.rawGraph;
     }
 
