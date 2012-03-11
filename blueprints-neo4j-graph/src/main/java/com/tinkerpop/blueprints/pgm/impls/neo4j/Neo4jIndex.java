@@ -106,28 +106,34 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     private void generateIndex(final Parameter<Object, Object>... indexParameters) {
-        if (this.indexClass.isAssignableFrom(Neo4jVertex.class)) {
+        final boolean alreadyExists;
+        final IndexManager manager = this.getIndexManager();
+        if (Vertex.class.isAssignableFrom(this.indexClass)) {
+            alreadyExists = manager.existsForNodes(this.indexName);
             if (indexParameters.length > 0)
-                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName, generateParameterMap(indexParameters));
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forNodes(this.indexName, generateParameterMap(indexParameters));
             else
-                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forNodes(this.indexName);
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forNodes(this.indexName);
         } else {
+            alreadyExists = manager.existsForRelationships(this.indexName);
             if (indexParameters.length > 0)
-                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName, generateParameterMap(indexParameters));
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forRelationships(this.indexName, generateParameterMap(indexParameters));
             else
-                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) graph.getRawGraph().index().forRelationships(this.indexName);
+                this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forRelationships(this.indexName);
         }
 
-        final IndexManager manager = this.getIndexManager();
-        final String storedType = manager.getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
-        if (null == storedType) {
-            if (this instanceof AutomaticIndex) {
-                this.getIndexManager().setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
-            } else {
-                this.getIndexManager().setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
-            }
-        } else if (this.getIndexType() != Type.valueOf(storedType))
-            throw new RuntimeException("Stored index is " + storedType + " and is being loaded as a " + this.getIndexType() + " index");
+        if (!alreadyExists) {
+            final String storedType = manager.getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
+            if (null == storedType) {
+                if (this instanceof AutomaticIndex) {
+                    manager.setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
+                    this.graph.setKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX, Boolean.TRUE);
+                } else {
+                    manager.setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
+                }
+            } else if (this.getIndexType() != Type.valueOf(storedType))
+                throw new RuntimeException("Stored index is " + storedType + " and is being loaded as a " + this.getIndexType() + " index");
+        }
     }
 
     protected IndexManager getIndexManager() {

@@ -8,4 +8,5 @@ public class Neo4jTokens {
     public static final String BLUEPRINTS_AUTOKEYS = "_blueprints:autokeys";
     public static final String KEY_SEPARATOR = "!=!";
     public static final String QUERY_HEADER = "%query%";
+    public static final String BLUEPRINTS_HASAUTOINDEX = "_blueprints:hasAutoIndex";
 }
