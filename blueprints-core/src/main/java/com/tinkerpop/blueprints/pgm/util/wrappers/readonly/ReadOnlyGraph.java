@@ -3,8 +3,8 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.WrappableGraph;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSequence;
 

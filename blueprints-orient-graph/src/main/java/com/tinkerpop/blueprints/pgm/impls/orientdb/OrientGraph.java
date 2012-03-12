@@ -17,11 +17,11 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
 
 import java.util.ArrayList;
 import java.util.HashSet;
