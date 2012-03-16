@@ -22,19 +22,19 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>1.6.1</version>
+            <version>1.7.M01</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ha</artifactId>
-            <version>1.6.1</version>
+            <version>1.7.M01</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-management</artifactId>
-            <version>1.6.1</version>
+            <version>1.7.M01</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -44,17 +44,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <repositories>
-        <repository>
-            <id>neo4j-public-repository</id>
-            <name>Publicly available Maven 2 repository for Neo4j</name>
-            <url>http://m2.neo4j.org/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
     <build>
         <directory>${basedir}/target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
