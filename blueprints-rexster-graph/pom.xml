@@ -25,6 +25,11 @@
             <version>${blueprints.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
+        </dependency>
     </dependencies>
     <build>
         <directory>${basedir}/target</directory>
@@ -53,19 +58,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4.2</version>
+                <version>2.5</version>
+
                 <configuration>
-                    <systemProperties>
-                        <!-- REXSTERGRAPH TEST PROPERTIES -->
-                        <property>
-                            <name>testRexsterGraph</name>
-                            <value>false</value>
-                        </property>
-                        <property>
-                            <name>rexsterGraphURI</name>
-                            <value>http://127.0.0.1:8182/graphs/emptygraph</value>
-                        </property>
-                    </systemProperties>
+                    <argLine>-DtestRexsterGraph=false -Dusername=rexster -Dpassword=rexster -DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph</argLine>
                 </configuration>
             </plugin>
         </plugins>

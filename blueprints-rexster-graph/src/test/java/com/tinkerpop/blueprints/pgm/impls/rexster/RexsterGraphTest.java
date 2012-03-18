@@ -17,6 +17,9 @@ import java.lang.reflect.Method;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterGraphTest extends GraphTest {
+    
+    private String username = null;
+    private String password = null;
 
     public RexsterGraphTest() {
         // intended to be used with TinkerGraph as the endpoint graph
@@ -89,12 +92,16 @@ public class RexsterGraphTest extends GraphTest {
 
 
     public Graph getGraphInstance() {
-        return new RexsterGraph(this.getWorkingUri());
+        return new RexsterGraph(this.getWorkingUri(), this.username, this.password);
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String doTest = System.getProperty("testRexsterGraph");
-        if (doTest == null || doTest.equals("true")) {
+        String doTest = System.getProperty("testRexsterGraph", "http://127.0.0.1:8182/graphs/emptygraph");
+        if (doTest.equals("true")) {
+
+            this.username = System.getProperty("username");
+            this.password = System.getProperty("password");
+            
             this.resetGraph();
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
@@ -107,15 +114,11 @@ public class RexsterGraphTest extends GraphTest {
     }
 
     private void resetGraph() {
-        IndexableGraph graph = new RexsterGraph(this.getWorkingUri());
+        IndexableGraph graph = new RexsterGraph(this.getWorkingUri(), this.username, this.password);
         graph.clear();
     }
 
     private String getWorkingUri() {
-        String uri = System.getProperty("rexsterGraphURI");
-        if (uri == null) {
-            uri = "http://127.0.0.1:8182/graphs/emptygraph";
-        }
-        return uri;
+        return System.getProperty("rexsterGraphURI", "http://127.0.0.1:8182/graphs/emptygraph");
     }
 }

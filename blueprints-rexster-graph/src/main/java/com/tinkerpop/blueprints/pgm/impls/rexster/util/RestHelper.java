@@ -19,7 +19,7 @@ import java.net.URLEncoder;
  */
 public class RestHelper {
 
-    private static final String POST = "POST";
+    public static RexsterAuthentication Authentication;
     private static final String PUT = "PUT";
     private static final String DELETE = "DELETE";
 
@@ -28,6 +28,9 @@ public class RestHelper {
             final URL url = new URL(safeUri(uri));
             final URLConnection connection = url.openConnection();
             connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            if (Authentication.isAuthenticationEnabled()) {
+                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
+            }
             connection.connect();
             final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
             final JSONObject object = new JSONObject(tokener);
@@ -52,6 +55,9 @@ public class RestHelper {
             String data = postData(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            if (Authentication.isAuthenticationEnabled()) {
+                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
+            }
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(data); // post data with Content-Length automatically set
@@ -74,6 +80,9 @@ public class RestHelper {
             String data = postData(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            if (Authentication.isAuthenticationEnabled()) {
+                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
+            }
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(data); // post data with Content-Length automatically set
@@ -114,6 +123,9 @@ public class RestHelper {
             final URL url = new URL(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            if (Authentication.isAuthenticationEnabled()) {
+                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
+            }
             connection.setRequestMethod(DELETE);
             final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
             reader.close();
@@ -127,6 +139,9 @@ public class RestHelper {
             final URL url = new URL(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            if (Authentication.isAuthenticationEnabled()) {
+                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
+            }
             connection.setRequestMethod(PUT);
             final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
             reader.close();

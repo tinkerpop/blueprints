@@ -17,6 +17,7 @@ h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
 * GML Reader/Writer utility
 * Bumped to support Neo4j 1.7.M01
 * Neo4jGraph makes use of the kernel properties for more efficient index handling
+* RexsterGraph supports Rexster Authentication.
 
 ==<hr/>==
 

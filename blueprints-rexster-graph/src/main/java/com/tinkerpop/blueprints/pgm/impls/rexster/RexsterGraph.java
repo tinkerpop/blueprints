@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterAuthentication;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
 import org.codehaus.jettison.json.JSONArray;
@@ -20,22 +21,46 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A Blueprints implementation of the RESTful API of Rexster (http://rexster.tinkerpop.com)
+ * A Blueprints implementation of the RESTful API of Rexster (http://rexster.tinkerpop.com).
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterGraph implements IndexableGraph, WrappableGraph<JSONObject> {
 
+    public static final int DEFAULT_BUFFER_SIZE = 100;
     private final String graphURI;
     private int bufferSize;
 
+    /**
+     * Construct a RexsterGraph with no authentication and default buffer size.
+     */
     public RexsterGraph(final String graphURI) {
-        this(graphURI, 100);
+        this(graphURI, DEFAULT_BUFFER_SIZE);
     }
 
+    /**
+     * Construct a RexsterGraph with authentication enabled (assuming username and password are
+     * both non-null values) and default buffer size.
+     */
+    public RexsterGraph(final String graphURI, final String username, final String password) {
+        this(graphURI, DEFAULT_BUFFER_SIZE, username, password);
+    }
+
+    /**
+     * Construct a RexsterGraph with no authentication.
+     */
     public RexsterGraph(final String graphURI, final int bufferSize) {
+        this(graphURI, bufferSize, null, null);
+    }
+
+    /**
+     * Construct a RexsterGraph with authentication enabled (assuming username and password are
+     * both non-null values).
+     */
+    public RexsterGraph(final String graphURI, final int bufferSize, final String username, final String password) {
         this.graphURI = graphURI;
         this.bufferSize = bufferSize;
+        RestHelper.Authentication = new RexsterAuthentication(username, password);
     }
 
     public String getGraphURI() {
