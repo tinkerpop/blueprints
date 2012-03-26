@@ -126,7 +126,7 @@ public class OrientGraphTest extends GraphTest {
                     } catch (Exception e) {
                     }
                     ODatabaseGraphTx g = new ODatabaseGraphTx("local:" + directory + "/graph");
-                    if( g.exists())
+                    if( g.exists() )
                     	g.open("admin", "admin").drop();
                 }
             }
