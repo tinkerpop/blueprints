@@ -13,6 +13,13 @@
     <packaging>jar</packaging>
     <name>Blueprints-OrientGraph</name>
     <description>Blueprints property graph implementation for the OrientDB graph database</description>
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
