@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.io.File;
+import java.lang.reflect.Method;
+
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
 import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
@@ -12,9 +15,6 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
-
-import java.io.File;
-import java.lang.reflect.Method;
 
 /**
  * Test suite for OrientDB graph implementation.
@@ -125,7 +125,9 @@ public class OrientGraphTest extends GraphTest {
                             this.currentGraph.shutdown();
                     } catch (Exception e) {
                     }
-                    new ODatabaseGraphTx("local:" + directory + "/graph").delete();
+                    ODatabaseGraphTx g = new ODatabaseGraphTx("local:" + directory + "/graph");
+                    if( g.exists())
+                    	g.open("admin", "admin").drop();
                 }
             }
         }
