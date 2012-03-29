@@ -35,7 +35,8 @@ public class DexGraphTest extends GraphTest {
         this.allowFloatProperty = true;
         this.allowIntegerProperty = true;
         this.allowPrimitiveArrayProperty = false;
-        this.allowListProperty = false;
+        this.allowUniformListProperty = false;
+        this.allowMixedListProperty = false;
         this.allowLongProperty = false;
         this.allowMapProperty = false;
         this.allowStringProperty = true;

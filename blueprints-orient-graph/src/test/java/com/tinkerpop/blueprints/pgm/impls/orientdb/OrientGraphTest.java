@@ -45,7 +45,8 @@ public class OrientGraphTest extends GraphTest {
         this.allowFloatProperty = true;
         this.allowIntegerProperty = true;
         this.allowPrimitiveArrayProperty = true;
-        this.allowListProperty = true;
+        this.allowUniformListProperty = true;
+        this.allowMixedListProperty = true;
         this.allowLongProperty = true;
         this.allowMapProperty = true;
         this.allowStringProperty = true;

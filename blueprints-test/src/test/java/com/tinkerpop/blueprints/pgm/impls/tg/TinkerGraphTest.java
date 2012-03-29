@@ -39,7 +39,8 @@ public class TinkerGraphTest extends GraphTest {
         allowFloatProperty = true;
         allowIntegerProperty = true;
         allowPrimitiveArrayProperty = true;
-        allowListProperty = true;
+        allowUniformListProperty = true;
+        this.allowMixedListProperty = true;
         allowLongProperty = true;
         allowMapProperty = true;
         allowStringProperty = true;

@@ -10,7 +10,10 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -37,15 +40,22 @@ public abstract class Neo4jElement implements Element {
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
         try {
+
+            // attempts to take a collection and convert it to an array so that Neo4j can consume it
+            final Object convertedValue = tryConvertCollectionToArray(value);
+            
             this.graph.autoStartTransaction();
             Object oldValue = this.getProperty(key);
 
             for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(this.getClass())) {
-                autoIndex.autoUpdate(key, value, oldValue, this);
+                autoIndex.autoUpdate(key, convertedValue, oldValue, this);
             }
 
-            this.rawElement.setProperty(key, value);
+            this.rawElement.setProperty(key, convertedValue);
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        } catch (IllegalArgumentException iae) {
+            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            throw iae;
         } catch (RuntimeException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
@@ -105,5 +115,35 @@ public abstract class Neo4jElement implements Element {
 
     public boolean equals(final Object object) {
         return (null != object) && (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+    }
+    
+    private Object tryConvertCollectionToArray(final Object value) {
+        if (value instanceof Collection<?>)
+        {
+            // convert this collection to an array.  the collection must
+            // be all of the same type.
+            try {
+                final Collection<?> collection = (Collection<?>) value;
+                Object[] array = null;
+                final Iterator<?> objects = collection.iterator();
+                for (int i = 0; objects.hasNext(); i++)
+                {
+                    Object object = objects.next();
+                    if (array == null) {
+                        array = (Object[]) Array.newInstance(object.getClass(), collection.size());
+                    }
+
+                    array[i] = object;
+                }
+                return array;
+            } catch (ArrayStoreException ase) {
+                // this fires off if the collection is not all of the same type
+                return value;
+            }
+        }
+        else
+        {
+            return value;
+        }
     }
 }

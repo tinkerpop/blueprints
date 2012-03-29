@@ -42,9 +42,15 @@ public abstract class GraphTest extends BaseTest {
      */
     public boolean allowPrimitiveArrayProperty;
     /**
-     * Graph allows list to be used as a property value for a graph element.
+     * Graph allows list (all objects with the list have the same data types) to be used as a property
+     * value for a graph element.
      */
-    public boolean allowListProperty;
+    public boolean allowUniformListProperty;
+    /**
+     * Graph allows a mixed list (different data types within the same list) to be used as a
+     * property value for a graph element.
+     */
+    public boolean allowMixedListProperty;
     /**
      * Graph allows long to be used as a property value for a graph element.
      */

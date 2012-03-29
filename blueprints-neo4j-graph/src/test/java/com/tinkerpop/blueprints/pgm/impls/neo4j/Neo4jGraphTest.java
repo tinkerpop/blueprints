@@ -49,7 +49,8 @@ public class Neo4jGraphTest extends GraphTest {
         this.allowFloatProperty = true;
         this.allowIntegerProperty = true;
         this.allowPrimitiveArrayProperty = true;
-        this.allowListProperty = false;
+        this.allowUniformListProperty = true;
+        this.allowMixedListProperty = false;
         this.allowLongProperty = true;
         this.allowMapProperty = false;
         this.allowStringProperty = true;

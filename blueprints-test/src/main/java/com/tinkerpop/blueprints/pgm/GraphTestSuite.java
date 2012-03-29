@@ -150,14 +150,23 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyDate", new Date(), graphTest.allowSerializableObjectProperty);
             trySetProperty(edge, "keyDate", new Date(), graphTest.allowSerializableObjectProperty);
 
-            trySetProperty(vertexA, "keyListString", new ArrayList<String>() {{
+            trySetProperty(vertexA, "keyListString", new ArrayList() {{
                 add("try1");
                 add("try2");
-            }}, graphTest.allowListProperty);
-            trySetProperty(edge, "keyListString", new ArrayList<String>() {{
+            }}, graphTest.allowUniformListProperty);
+            trySetProperty(edge, "keyListString", new ArrayList() {{
                 add("try1");
                 add("try2");
-            }}, graphTest.allowListProperty);
+            }}, graphTest.allowUniformListProperty);
+
+            trySetProperty(vertexA, "keyListMixed", new ArrayList() {{
+                add("try1");
+                add(2);
+            }}, graphTest.allowMixedListProperty);
+            trySetProperty(edge, "keyListMixed", new ArrayList() {{
+                add("try1");
+                add(2);
+            }}, graphTest.allowMixedListProperty);
 
             trySetProperty(vertexA, "keyArrayString", new String[]{"try1", "try2"}, graphTest.allowPrimitiveArrayProperty);
             trySetProperty(edge, "keyArrayString", new String[]{"try1", "try2"}, graphTest.allowPrimitiveArrayProperty);
@@ -204,6 +213,8 @@ public class GraphTestSuite extends TestSuite {
             exceptionTossed = true;
             if (!allowDataType) {
                 assertTrue(t instanceof IllegalArgumentException);
+            } else {
+                fail("setProperty should not have thrown an exception as this data type is accepted according to the GraphTest settings.");
             }
         }
 
