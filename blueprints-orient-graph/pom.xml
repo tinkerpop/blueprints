@@ -15,7 +15,7 @@
     <description>Blueprints property graph implementation for the OrientDB graph database</description>
     <repositories>
         <repository>
-            <id>sonatype-nexus-snapshots</id>
+            <id>sonatype-nexus-releases</id>
             <name>Sonatype Nexus Snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/releases</url>
         </repository>
