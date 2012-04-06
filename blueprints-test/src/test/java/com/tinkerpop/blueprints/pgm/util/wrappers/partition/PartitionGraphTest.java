@@ -127,12 +127,12 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(graph.getVertices().iterator().next(), marko);
         assertEquals(count(graph.getEdges()), 0);
 
-        graph.removeReadGraph("a");
+        graph.removeReadPartition("a");
         assertEquals(graph.getReadPartitions().size(), 0);
         assertEquals(graph.getWritePartition(), "b");
         assertEquals(count(graph.getVertices()), 0);
         assertEquals(count(graph.getEdges()), 0);
-        graph.addReadGraph("b");
+        graph.addReadPartition("b");
         assertEquals(graph.getReadPartitions().size(), 1);
         assertTrue(graph.getReadPartitions().contains("b"));
         assertEquals(graph.getWritePartition(), "b");
@@ -140,7 +140,7 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(graph.getVertices().iterator().next(), peter);
         assertEquals(count(graph.getEdges()), 0);
 
-        graph.addReadGraph("a");
+        graph.addReadPartition("a");
         assertEquals(graph.getReadPartitions().size(), 2);
         assertTrue(graph.getReadPartitions().contains("a"));
         assertTrue(graph.getReadPartitions().contains("b"));
@@ -157,7 +157,7 @@ public class PartitionGraphTest extends GraphTest {
         Edge rawKnows = ((PartitionEdge) knows).getRawEdge();
         assertEquals(count(graph.getVertices()), 2);
         assertEquals(count(graph.getEdges()), 0);
-        graph.addReadGraph("c");
+        graph.addReadPartition("c");
         assertEquals(count(graph.getVertices()), 2);
         assertEquals(count(graph.getEdges()), 1);
         assertEquals(knows.getPropertyKeys().size(), 0);
@@ -167,8 +167,8 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(((PartitionEdge) knows).getPartition(), "c");
         assertEquals(graph.getEdges().iterator().next(), knows);
 
-        graph.removeReadGraph("a");
-        graph.removeReadGraph("b");
+        graph.removeReadPartition("a");
+        graph.removeReadPartition("b");
         assertEquals(graph.getReadPartitions().size(), 1);
         assertTrue(graph.getReadPartitions().contains("c"));
         assertEquals(graph.getWritePartition(), "c");
@@ -181,22 +181,22 @@ public class PartitionGraphTest extends GraphTest {
         marko.setProperty("name", "marko");
         peter.setProperty("name", "peter");
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 0);
-        graph.addReadGraph("a");
+        graph.addReadPartition("a");
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 1);
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "peter")), 0);
         assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko").next(), marko);
-        graph.removeReadGraph("a");
-        graph.addReadGraph("b");
+        graph.removeReadPartition("a");
+        graph.addReadPartition("b");
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "peter")), 1);
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 0);
         assertEquals(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "peter").next(), peter);
-        graph.addReadGraph("a");
+        graph.addReadPartition("a");
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "peter")), 1);
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 1);
 
         assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label", "knows")), 1);
         assertEquals(graph.getIndex(Index.EDGES, Edge.class).get("label", "knows").next(), knows);
-        graph.removeReadGraph("c");
+        graph.removeReadPartition("c");
         assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label", "knows")), 0);
 
         graph.shutdown();

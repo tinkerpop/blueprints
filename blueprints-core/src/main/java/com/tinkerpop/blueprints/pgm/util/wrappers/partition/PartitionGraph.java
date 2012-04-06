@@ -30,8 +30,8 @@ public class PartitionGraph<T extends Graph> implements Graph, WrappableGraph<T>
         this.readPartitions.addAll(readPartitions);
     }
 
-    public PartitionGraph(final T rawGraph, final String partitionKey, final String readWriteGraph) {
-        this(rawGraph, partitionKey, readWriteGraph, new HashSet<String>(Arrays.asList(readWriteGraph)));
+    public PartitionGraph(final T rawGraph, final String partitionKey, final String readWritePartition) {
+        this(rawGraph, partitionKey, readWritePartition, new HashSet<String>(Arrays.asList(readWritePartition)));
     }
 
     public String getWritePartition() {
@@ -46,12 +46,12 @@ public class PartitionGraph<T extends Graph> implements Graph, WrappableGraph<T>
         return new HashSet<String>(this.readPartitions);
     }
 
-    public void removeReadGraph(final String readGraph) {
-        this.readPartitions.remove(readGraph);
+    public void removeReadPartition(final String readPartition) {
+        this.readPartitions.remove(readPartition);
     }
 
-    public void addReadGraph(final String readGraph) {
-        this.readPartitions.add(readGraph);
+    public void addReadPartition(final String readPartition) {
+        this.readPartitions.add(readPartition);
     }
 
     public void setPartitionKey(final String partitionKey) {
@@ -63,12 +63,12 @@ public class PartitionGraph<T extends Graph> implements Graph, WrappableGraph<T>
     }
 
     public boolean isInPartition(final Element element) {
-        final String writeGraph;
+        final String writePartition;
         if (element instanceof PartitionElement)
-            writeGraph = ((PartitionElement) element).getPartition();
+            writePartition = ((PartitionElement) element).getPartition();
         else
-            writeGraph = (String) element.getProperty(this.partitionKey);
-        return (null == writeGraph || this.readPartitions.contains(writeGraph));
+            writePartition = (String) element.getProperty(this.partitionKey);
+        return (null == writePartition || this.readPartitions.contains(writePartition));
     }
 
     public void clear() {
