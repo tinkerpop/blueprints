@@ -2,20 +2,25 @@ package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.dex.DexGraph;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class DexGraphSailTest extends TestCase {//extends GraphSailTest {
+public class DexGraphSailTest {//} extends GraphSailTest {
 
+    @Test
     public void testTrue() {
         assertTrue(true);
     }
 
-    protected IndexableGraph createGraph() {
+    protected IndexableGraph createGraph() throws IOException {
+        /*
         File directory = new File(getWorkingDirectory());
         if (!directory.exists()) {
             directory.mkdirs();
@@ -24,9 +29,14 @@ public class DexGraphSailTest extends TestCase {//extends GraphSailTest {
         File f = new File(directory, "data");
         if (f.exists()) {
             f.delete();
-        }
+        }*/
 
-        DexGraph g = new DexGraph(f.getAbsolutePath());
+        File dir = File.createTempFile("blueprints", "-dex-test");
+        String path = dir.getPath();
+        dir.delete();
+        //dir.mkdir();
+
+        DexGraph g = new DexGraph(path);
         g.clear();
         return g;
     }

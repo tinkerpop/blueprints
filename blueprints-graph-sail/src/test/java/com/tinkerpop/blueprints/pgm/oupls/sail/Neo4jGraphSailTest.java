@@ -4,20 +4,20 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import org.junit.Test;
 
+import java.io.File;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class Neo4jGraphSailTest {//extends GraphSailTest {
 
-    private String getWorkingDirectory() {
-        String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null) {
-            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-                directory = "C:/temp/blueprints_test";
-            else
-                directory = "/tmp/blueprints_test";
-        }
-        return directory;
+    private String getWorkingDirectory() throws Exception {
+        File dir = File.createTempFile("blueprints", "-neo4j-test");
+        String path = dir.getPath();
+        dir.delete();
+        dir.mkdir();
+
+        return path;
     }
 
     /*
@@ -61,10 +61,13 @@ public class Neo4jGraphSailTest {//extends GraphSailTest {
 
     }
 
-    protected IndexableGraph createGraph() {
+    protected IndexableGraph createGraph() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
-        return new Neo4jGraph(directory);
+        Neo4jGraph g = new Neo4jGraph(directory);
+        g.clear();
+        g.setMaxBufferSize(0);
+        return g;
     }
 }

@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import info.aduna.iteration.CloseableIteration;
+import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
@@ -23,11 +24,14 @@ import org.openrdf.sail.SailException;
 
 import java.io.File;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class GraphSailTest extends SailTest {
-    protected abstract IndexableGraph createGraph();
+    protected abstract IndexableGraph createGraph() throws Exception;
 
     protected IndexableGraph graph;
 
@@ -37,9 +41,7 @@ public abstract class GraphSailTest extends SailTest {
 
         graph = createGraph();
         GraphSail g = new GraphSail(graph);
-        if (uniqueStatements) {
-            g.enforceUniqueStatements(true);
-        }
+        g.enforceUniqueStatements(uniqueStatements);
 
         return g;
     }
@@ -65,6 +67,8 @@ public abstract class GraphSailTest extends SailTest {
         }
     }*/
 
+
+    @Test
     public void testOrphanVerticesAutomaticallyDeleted() throws Exception {
         String ex = "http://example.org/ns#";
         URI ref = new URIImpl(ex + "Ref");
@@ -109,6 +113,7 @@ public abstract class GraphSailTest extends SailTest {
         }
     }
 
+    @Test
     public void testBlankNodesUnique() throws Exception {
         String ex = "http://example.org/ns#";
         URI class1 = new URIImpl(ex + "Class1");
@@ -151,6 +156,7 @@ public abstract class GraphSailTest extends SailTest {
         }
     }
 
+    @Test
     public void testIndexPatterns() throws Exception {
         assertTriplePattern("spoc", true);
         assertTriplePattern("poc", true);
@@ -161,6 +167,7 @@ public abstract class GraphSailTest extends SailTest {
         assertTriplePattern("sspo", false);
     }
 
+    @Test
     public void testCodePlay() throws Exception {
         Sail sail = new GraphSail(new TinkerGraph());
         sail.initialize();

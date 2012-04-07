@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import info.aduna.iteration.CloseableIteration;
-import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,10 +45,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public abstract class SailTest extends TestCase {
+public abstract class SailTest {
     protected Sail sail = null;
     protected ForwardChainingRDFSInferencer inferencer;
 

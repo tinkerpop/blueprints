@@ -724,4 +724,37 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    /* TODO: uncomment this.  It should pass, but doesn't.
+    public void testTransactionalClear() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
+        graph.setMaxBufferSize(1);
+        graph.clear();
+        graph.setMaxBufferSize(0);
+        
+        assertEquals(0, count(graph.getEdges()));
+
+        graph.startTransaction();
+        Vertex v1 = graph.addVertex(null);
+        Vertex v2 = graph.addVertex(null);
+        Edge e1 = graph.addEdge(null, v1, v2, "link");
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
+        assertEquals(1, count(graph.getEdges()));
+        
+        graph.startTransaction();
+        graph.removeEdge(e1);
+        // We have removed an edge and not yet committed the change.
+        // However, the edge should appear to be removed until the end of the transaction.
+        assertEquals(0, count(graph.getEdges()));
+        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        
+        assertEquals(1, count(graph.getEdges()));
+        
+        graph.startTransaction();
+        graph.removeEdge(e1);
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        
+        assertEquals(0, count(graph.getEdges()));
+    }
+    */
 }
