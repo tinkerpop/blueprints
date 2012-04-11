@@ -68,6 +68,7 @@
         <module>blueprints-rexster-graph</module>
         <module>blueprints-sail-graph</module>
         <module>blueprints-test</module>
+        <module>blueprints-datomic-graph</module>
     </modules>
 
     <properties>
