@@ -67,11 +67,11 @@ public class DatomicGraphTest extends GraphTest {
     //    printTestPerformance("IndexTestSuite", this.stopWatch());
     //}
 
-    //public void testAutomaticIndexTestSuite() throws Exception {
-    //    this.stopWatch();
-    //    doTestSuite(new AutomaticIndexTestSuite(this));
-    //    printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
-    //}
+    public void testAutomaticIndexTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new AutomaticIndexTestSuite(this));
+        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
+    }
 
     //public void testTransactionalGraphTestSuite() throws Exception {
     //    this.stopWatch();

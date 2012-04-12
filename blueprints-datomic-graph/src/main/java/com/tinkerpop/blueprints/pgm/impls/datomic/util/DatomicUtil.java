@@ -1,8 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.datomic.util;
 
 import clojure.lang.Keyword;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.datomic.DatomicGraph;
 import datomic.Peer;
 import datomic.Util;
@@ -43,7 +41,7 @@ public class DatomicUtil {
         if (property.toString().contains(".")) {
             return property.toString().substring(1, property.toString().lastIndexOf(".")).replace("$","_");
         }
-        return "";
+        return null;
     }
 
     // Retrieve the Datomic to for the Java equivalent
@@ -80,13 +78,22 @@ public class DatomicUtil {
         return attributekeysize != 0;
     }
 
+    // Checks whether a new attribute defintion needs to be created on the fly
+    public static boolean existingAttributeDefinition(final Keyword key, DatomicGraph graph) {
+        int attributekeysize = Peer.q("[:find ?attribute " +
+                                       ":in $ ?key " +
+                                       ":where [?attribute :db/ident ?key] ]", graph.getRawGraph(), key).size();
+        // Existing attribute
+        return attributekeysize != 0;
+    }
+
     // Creates a unique key for each key-valuetype attribute (as only one attribute with the same name can be specified)
     public static Keyword createKey(final String key, final Object value) {
         return Keyword.intern(key.replace("_","$") + "." + mapJavaTypeToDatomicType(value).split("/")[1]);
     }
 
     // Creates an edge sequence
-    public static Iterable<Edge> getEdgeSequence(Iterator<List<Object>> edgesit, DatomicGraph graph) {
+    public static DatomicEdgeSequence getEdgeSequence(Iterator<List<Object>> edgesit, DatomicGraph graph) {
         List<Object> edges = new ArrayList<Object>();
         while (edgesit.hasNext()) {
             edges.add(edgesit.next().get(0));
@@ -95,7 +102,7 @@ public class DatomicUtil {
     }
 
     // Creates an vertex sequence
-    public static Iterable<Vertex> getVertexSequence(Iterator<List<Object>> verticessit, DatomicGraph graph) {
+    public static DatomicVertexSequence getVertexSequence(Iterator<List<Object>> verticessit, DatomicGraph graph) {
         List<Object> vertices = new ArrayList<Object>();
         while (verticessit.hasNext()) {
             vertices.add(verticessit.next().get(0));

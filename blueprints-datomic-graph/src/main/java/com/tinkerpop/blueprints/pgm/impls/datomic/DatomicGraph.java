@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.datomic;
 
 import com.tinkerpop.blueprints.pgm.*;
+import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.datomic.util.DatomicUtil;
 import datomic.Connection;
@@ -15,11 +16,12 @@ import java.util.concurrent.ExecutionException;
  *
  * @author Davy Suvee (http://datablend.be)
  */
-public class DatomicGraph implements Graph, WrappableGraph<Database> {
+public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
 
     private final String graphURI;
     private final Connection connection;
     public static final String DATOMIC_ERROR_EXCEPTION_MESSAGE = "An error occured within the Datomic datastore";
+    private Map<String, DatomicAutomaticIndex> autoIndices = new HashMap<String, DatomicAutomaticIndex>();
 
     private final ThreadLocal<List> tx = new ThreadLocal<List>() {
         protected List initialValue() {
@@ -39,6 +41,8 @@ public class DatomicGraph implements Graph, WrappableGraph<Database> {
         this.graphURI = graphURI;
         Peer.createDatabase(graphURI);
         this.connection = Peer.connect(graphURI);
+        this.autoIndices.put(Index.VERTICES, new DatomicAutomaticIndex(Index.VERTICES, this, DatomicVertex.class));
+        this.autoIndices.put(Index.EDGES, new DatomicAutomaticIndex(Index.EDGES, this, DatomicEdge.class));
         try {
             setupMetaModel();
         } catch (ExecutionException e) {
@@ -188,6 +192,33 @@ public class DatomicGraph implements Graph, WrappableGraph<Database> {
             }
         }
         this.checkpoint.set(transaction);
+    }
+
+    public <T extends Element> Index<T> createManualIndex(String indexName, Class<T> indexClass, Parameter... indexParameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(String indexName, Class<T> indexClass, Set<String> indexKeys, Parameter... indexParameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
+        if (((Index.VERTICES.equals(indexName) && indexClass.isAssignableFrom(DatomicVertex.class)) || (Index.EDGES.equals(indexName) && indexClass.isAssignableFrom(DatomicEdge.class)))) {
+            return autoIndices.get(indexName);
+        }
+        return null;
+    }
+
+    public Iterable<Index<? extends Element>> getIndices() {
+        final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
+        for (Index index : autoIndices.values()) {
+            list.add(index);
+        }
+        return list;
+    }
+
+    public void dropIndex(String indexName) {
+        throw new UnsupportedOperationException();
     }
 
     // Setup of the various attribute types required for DatomicGraph
