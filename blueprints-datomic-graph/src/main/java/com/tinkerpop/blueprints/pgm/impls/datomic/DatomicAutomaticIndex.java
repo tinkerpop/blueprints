@@ -15,6 +15,7 @@ public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<
     private DatomicGraph graph = null;
     private Class<T> clazz = null;
     private String name = null;
+    private Set<String> indexKeys = null;
 
     public DatomicAutomaticIndex(final String name, final DatomicGraph g, final Class<T> clazz) {
         this.name = name;
@@ -22,28 +23,31 @@ public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<
         this.clazz = clazz;
     }
 
-    @Override
+    public DatomicAutomaticIndex(final String name, final DatomicGraph g, final Class<T> clazz, Set<String> indexKeys) {
+        this.name = name;
+        this.graph = g;
+        this.clazz = clazz;
+        this.indexKeys = indexKeys;
+    }
+
     public String getIndexName() {
         return name;
     }
 
-    @Override
     public Class<T> getIndexClass() {
         return clazz;
     }
 
-    @Override
     public Type getIndexType() {
         return Type.AUTOMATIC;
     }
 
-    @Override
     public void put(final String key, final Object value, final T element) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public CloseableSequence<T> get(final String key, final Object value) {
+        boolean matched = ((indexKeys == null) || ((indexKeys != null) && indexKeys.contains(key)));
         Keyword attribute = null;
         if ((this.getIndexClass().isAssignableFrom(DatomicEdge.class)) && (AutomaticIndex.LABEL.equals(key))) {
             attribute = Keyword.intern("graph.edge/label");
@@ -51,7 +55,7 @@ public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<
         else {
             attribute = DatomicUtil.createKey(key, value);
         }
-        if (DatomicUtil.existingAttributeDefinition(attribute, graph)) {
+        if (matched && DatomicUtil.existingAttributeDefinition(attribute, graph)) {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
                 return DatomicUtil.getVertexSequence(getElements(attribute, value, Keyword.intern("graph.element.type/vertex")).iterator(), graph);
             }
@@ -71,8 +75,8 @@ public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<
         }
     }
 
-    @Override
     public long count(final String key, final Object value) {
+       boolean matched = ((indexKeys == null) || ((indexKeys != null) && indexKeys.contains(key)));
        Keyword attribute = null;
         if ((this.getIndexClass().isAssignableFrom(DatomicEdge.class)) && (AutomaticIndex.LABEL.equals(key))) {
             attribute = Keyword.intern("graph.edge/label");
@@ -80,7 +84,7 @@ public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<
         else {
             attribute = DatomicUtil.createKey(key, value);
         }
-        if (DatomicUtil.existingAttributeDefinition(attribute, graph)) {
+        if (matched && DatomicUtil.existingAttributeDefinition(attribute, graph)) {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
                 return getElements(attribute, value, Keyword.intern("graph.element.type/vertex")).size();
             }
@@ -94,35 +98,38 @@ public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<
         }
     }
 
-    @Override
     public void remove(final String key, final Object value, final T element) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
     public Set<String> getAutoIndexKeys() {
-        Set<String> keys = new HashSet<String>();
-        Iterator<List<Object>> attributesit = null;
-        if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
-            attributesit = getAttributes(Keyword.intern("graph.element.type/vertex")).iterator();
-        }
-        if (this.getIndexClass().isAssignableFrom(DatomicEdge.class)) {
-            attributesit = getAttributes(Keyword.intern("graph.element.type/edge")).iterator();
-        }
-        if (attributesit != null) {
-            while (attributesit.hasNext()) {
-                Keyword attribute = (Keyword)attributesit.next().get(0);
-                if (attribute.toString().equals(":graph.edge/label")) {
-                    keys.add(AutomaticIndex.LABEL);
-                }
-                else {
-                    if (!DatomicUtil.isReservedKey(attribute.toString())) {
-                        keys.add(DatomicUtil.getPropertyName(attribute));
+        if (this.indexKeys == null) {
+            Set<String> keys = new HashSet<String>();
+            Iterator<List<Object>> attributesit = null;
+            if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
+                attributesit = getAttributes(Keyword.intern("graph.element.type/vertex")).iterator();
+            }
+            if (this.getIndexClass().isAssignableFrom(DatomicEdge.class)) {
+                attributesit = getAttributes(Keyword.intern("graph.element.type/edge")).iterator();
+            }
+            if (attributesit != null) {
+                while (attributesit.hasNext()) {
+                    Keyword attribute = (Keyword)attributesit.next().get(0);
+                    if (attribute.toString().equals(":graph.edge/label")) {
+                        keys.add(AutomaticIndex.LABEL);
+                    }
+                    else {
+                        if (!DatomicUtil.isReservedKey(attribute.toString())) {
+                            keys.add(DatomicUtil.getPropertyName(attribute));
+                        }
                     }
                 }
             }
+            return keys;
         }
-        return keys;
+        else {
+            return indexKeys;
+        }
     }
 
     private Collection<List<Object>> getElements(Keyword attribute, Object value, Keyword type) {

@@ -199,14 +199,21 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
     }
 
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(String indexName, Class<T> indexClass, Set<String> indexKeys, Parameter... indexParameters) {
-        throw new UnsupportedOperationException();
+        if (this.autoIndices.containsKey(indexName))
+            throw new RuntimeException("Index already exists: " + indexName);
+        final DatomicAutomaticIndex<T> newindex = new DatomicAutomaticIndex(indexName, this, indexClass, indexKeys);
+        this.autoIndices.put(indexName, newindex);
+        return newindex;
     }
 
     public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
-        if (((Index.VERTICES.equals(indexName) && indexClass.isAssignableFrom(DatomicVertex.class)) || (Index.EDGES.equals(indexName) && indexClass.isAssignableFrom(DatomicEdge.class)))) {
-            return autoIndices.get(indexName);
-        }
-        return null;
+        Index index = this.autoIndices.get(indexName);
+        if (null == index)
+            return null;
+        if (!indexClass.isAssignableFrom(index.getIndexClass()))
+            throw new RuntimeException(indexClass + " is not assignable from " + index.getIndexClass());
+        else
+            return (Index<T>) index;
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
@@ -218,7 +225,7 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
     }
 
     public void dropIndex(String indexName) {
-        throw new UnsupportedOperationException();
+         this.autoIndices.remove(indexName);
     }
 
     // Setup of the various attribute types required for DatomicGraph

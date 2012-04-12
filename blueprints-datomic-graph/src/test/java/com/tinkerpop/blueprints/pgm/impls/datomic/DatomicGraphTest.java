@@ -18,8 +18,8 @@ public class DatomicGraphTest extends GraphTest {
         this.isRDFModel = false;
         this.supportsVertexIteration = true;
         this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = false;
-        this.supportsEdgeIndex = false;
+        this.supportsVertexIndex = true;
+        this.supportsEdgeIndex = true;
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = false;
 
