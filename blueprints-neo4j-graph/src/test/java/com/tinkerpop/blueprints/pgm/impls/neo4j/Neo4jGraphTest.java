@@ -17,13 +17,10 @@ import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
-import org.neo4j.kernel.Config;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -250,7 +247,7 @@ public class Neo4jGraphTest extends GraphTest {
         deleteDirectory(new File(directory));
     }
 
-    public void testShouldNotDeleteAutomaticNeo4jIndexes() {
+    /*public void testShouldNotDeleteAutomaticNeo4jIndexes() {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
@@ -273,7 +270,7 @@ public class Neo4jGraphTest extends GraphTest {
         graph.shutdown();
         deleteDirectory(new File(directory));
 
-    }
+    }*/
 
     public void testShouldNotDeleteAutomaticBlueprintsIndexes() {
         String directory = System.getProperty("neo4jGraphDirectory");
