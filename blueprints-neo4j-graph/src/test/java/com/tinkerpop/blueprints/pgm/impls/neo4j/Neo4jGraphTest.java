@@ -16,6 +16,9 @@ import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.factory.GraphDatabaseSetting;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
@@ -247,19 +250,19 @@ public class Neo4jGraphTest extends GraphTest {
         deleteDirectory(new File(directory));
     }
 
-    /*public void testShouldNotDeleteAutomaticNeo4jIndexes() {
+    public void testShouldNotDeleteAutomaticNeo4jIndexes() {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
         deleteDirectory(new File(directory));
 
-        Map<String, String> config;
-        config = new HashMap<String, String>();
-        config.put(Config.NODE_KEYS_INDEXABLE, "name");
-        config.put(Config.RELATIONSHIP_KEYS_INDEXABLE, "rel1");
-        config.put(Config.NODE_AUTO_INDEXING, "true");
-        config.put(Config.RELATIONSHIP_AUTO_INDEXING, "true");
-        Neo4jGraph graph = new Neo4jGraph(directory, config);
+        Neo4jGraph graph = new Neo4jGraph(new GraphDatabaseFactory().
+                newEmbeddedDatabaseBuilder(directory).
+                setConfig(GraphDatabaseSettings.node_keys_indexable, "name").
+                setConfig(GraphDatabaseSettings.relationship_keys_indexable, "rel1").
+                setConfig(GraphDatabaseSettings.node_auto_indexing, GraphDatabaseSetting.TRUE).
+                setConfig(GraphDatabaseSettings.relationship_auto_indexing, GraphDatabaseSetting.TRUE).
+                newGraphDatabase());
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "foo");
         graph.shutdown();
@@ -270,7 +273,7 @@ public class Neo4jGraphTest extends GraphTest {
         graph.shutdown();
         deleteDirectory(new File(directory));
 
-    }*/
+    }
 
     public void testShouldNotDeleteAutomaticBlueprintsIndexes() {
         String directory = System.getProperty("neo4jGraphDirectory");
@@ -291,6 +294,55 @@ public class Neo4jGraphTest extends GraphTest {
 
         graph.shutdown();
         deleteDirectory(new File(directory));
+
+    }
+
+    public void testAutomaticIndexKernalPropertyValue() {
+        String directory = System.getProperty("neo4jGraphDirectory");
+        if (directory == null)
+            directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        assertEquals(count(graph.getIndices()), 2);
+        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.dropIndex(Index.VERTICES);
+        assertEquals(count(graph.getIndices()), 1);
+        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.dropIndex(Index.EDGES);
+        assertEquals(count(graph.getIndices()), 0);
+        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.shutdown();
+
+        graph = new Neo4jGraph(directory);
+        assertEquals(count(graph.getIndices()), 0);
+        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.shutdown();
+
+        graph = new Neo4jGraph(directory);
+        assertEquals(count(graph.getIndices()), 0);
+        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.createAutomaticIndex("anIndex", Edge.class, null);
+        assertEquals(count(graph.getIndices()), 1);
+        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.dropIndex("anIndex");
+        assertEquals(count(graph.getIndices()), 0);
+        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.shutdown();
+
+        graph = new Neo4jGraph(directory);
+        assertEquals(count(graph.getIndices()), 0);
+        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.createAutomaticIndex("anIndex", Vertex.class, null);
+        assertEquals(count(graph.getIndices()), 1);
+        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.dropIndex("anIndex");
+        assertEquals(count(graph.getIndices()), 0);
+        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
+        graph.shutdown();
+
+        deleteDirectory(new File(directory));
+
 
     }
 }

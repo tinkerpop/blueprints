@@ -62,7 +62,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, Wrappable
     };
 
     protected void setKernalProperty(final String key, final Object value) {
-        final Transaction tx = rawGraph.beginTx();
+        final Transaction tx = this.rawGraph.beginTx();
         try {
             this.kernalData.setProperty(key, value);
             tx.success();
@@ -91,6 +91,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, Wrappable
     public Neo4jGraph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
         this.kernalData = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
+        this.updateAutomaticIndexKernalProperty();
     }
 
     public Neo4jGraph(final GraphDatabaseService rawGraph, boolean fresh) {
@@ -114,6 +115,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, Wrappable
                 this.rawGraph = new EmbeddedGraphDatabase(directory);
 
             this.kernalData = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
+            // determine if automatic indices were created manually in some other way except via the Blueprints API
+            this.updateAutomaticIndexKernalProperty();
+
             if (fresh)
                 this.freshLoad();
 
@@ -126,6 +130,28 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, Wrappable
                 this.rawGraph.shutdown();
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    private void updateAutomaticIndexKernalProperty() {
+        boolean hasAutoIndex = false;
+        for (final String indexName : this.rawGraph.index().nodeIndexNames()) {
+            final String type = this.rawGraph.index().getConfiguration(this.rawGraph.index().forNodes(indexName)).get(Neo4jTokens.BLUEPRINTS_TYPE);
+            if (null != type && type.equals(Index.Type.AUTOMATIC.toString())) {
+                hasAutoIndex = true;
+                break;
+            }
+        }
+
+        if (!hasAutoIndex) {
+            for (final String indexName : this.rawGraph.index().relationshipIndexNames()) {
+                final String type = this.rawGraph.index().getConfiguration(this.rawGraph.index().forRelationships(indexName)).get(Neo4jTokens.BLUEPRINTS_TYPE);
+                if (null != type && type.equals(Index.Type.AUTOMATIC.toString())) {
+                    hasAutoIndex = true;
+                    break;
+                }
+            }
+        }
+        this.setKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX, hasAutoIndex);
     }
 
     private void freshLoad() {
@@ -190,14 +216,21 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, Wrappable
 
     public synchronized void dropIndex(final String indexName) {
         final Transaction tx = this.rawGraph.beginTx();
+        boolean isAutomaticIndex = false;
         try {
-            org.neo4j.graphdb.index.Index<Node> nodeIndex = this.rawGraph.index().forNodes(indexName);
-            if (nodeIndex.isWriteable()) {
-                nodeIndex.delete();
-            }
-            RelationshipIndex relationshipIndex = this.rawGraph.index().forRelationships(indexName);
-            if (relationshipIndex.isWriteable()) {
-                relationshipIndex.delete();
+
+            if (this.rawGraph.index().existsForNodes(indexName)) {
+                org.neo4j.graphdb.index.Index<Node> nodeIndex = this.rawGraph.index().forNodes(indexName);
+                isAutomaticIndex = this.isAutomaticIndex(nodeIndex);
+                if (nodeIndex.isWriteable()) {
+                    nodeIndex.delete();
+                }
+            } else if (this.rawGraph.index().existsForRelationships(indexName)) {
+                RelationshipIndex relationshipIndex = this.rawGraph.index().forRelationships(indexName);
+                isAutomaticIndex = this.isAutomaticIndex(relationshipIndex);
+                if (relationshipIndex.isWriteable()) {
+                    relationshipIndex.delete();
+                }
             }
             tx.success();
         } catch (RuntimeException e) {
@@ -209,11 +242,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, Wrappable
         } finally {
             tx.finish();
         }
+
+        if (isAutomaticIndex)
+            this.updateAutomaticIndexKernalProperty();
     }
 
     protected <T extends Neo4jElement> Iterable<Neo4jAutomaticIndex<T, PropertyContainer>> getAutoIndices(final Class<T> indexClass) {
-        final Boolean hasAutoIndices = (Boolean) this.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX);
-        if (null != hasAutoIndices && hasAutoIndices) {
+        if ((Boolean) this.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX)) {
             final String[] names;
             final boolean forVertices = Vertex.class.isAssignableFrom(indexClass);
             if (forVertices) {
