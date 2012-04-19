@@ -4,12 +4,11 @@ import clojure.lang.Keyword;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.datomic.util.DatomicUtil;
 import datomic.Peer;
-
 import java.util.*;
 
 /**
- * @author Davy Suvee (http://datablend.be)
- */
+* @author Davy Suvee (http://datablend.be)
+*/
 public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<T> {
 
     private DatomicGraph graph = null;
@@ -133,11 +132,10 @@ public class DatomicAutomaticIndex<T extends Element> implements AutomaticIndex<
     }
 
     private Collection<List<Object>> getElements(Keyword attribute, Object value, Keyword type) {
-        return Peer.q("[:find ?uuid " +
+        return Peer.q("[:find ?element " +
                        ":in $ ?attribute ?value ?type " +
                        ":where [?element :graph.element/type ?type] " +
-                              "[?element ?attribute ?value] " +
-                              "[?element :db/ident ?uuid] ] ", graph.getRawGraph(), attribute, value, type);
+                              "[?element ?attribute ?value] ]", graph.getRawGraph(), attribute, value, type);
     }
 
     private Collection<List<Object>> getAttributes(Keyword type) {

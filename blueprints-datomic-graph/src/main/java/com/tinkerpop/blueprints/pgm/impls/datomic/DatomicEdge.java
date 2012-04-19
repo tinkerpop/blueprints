@@ -1,10 +1,9 @@
 package com.tinkerpop.blueprints.pgm.impls.datomic;
 
-import clojure.lang.Keyword;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import datomic.Peer;
+import datomic.Database;
 import datomic.Util;
 
 /**
@@ -14,16 +13,15 @@ public class DatomicEdge extends DatomicElement implements Edge {
 
     public DatomicEdge(final DatomicGraph graph) {
         super(graph);
-        graph.addToTransaction(Util.map(":db/id", datomicId,
+        graph.addToTransaction(Util.map(":db/id", id,
                                         ":graph.element/type", ":graph.element.type/edge",
                                         ":db/ident", uuid));
     }
 
     public DatomicEdge(final DatomicGraph graph, final Object id) {
         super(graph);
-        if (id instanceof Keyword) {
-            uuid = id;
-            datomicId = graph.getRawGraph().entid(uuid);
+        if (id instanceof Long) {
+            this.id = id;
         }
         else {
             throw new RuntimeException(ID_EXCEPTION_MESSAGE);
@@ -31,23 +29,17 @@ public class DatomicEdge extends DatomicElement implements Edge {
     }
 
     public Vertex getOutVertex() {
-        return new DatomicVertex(graph, Peer.q("[:find ?uuid " +
-                                                ":in $ ?edge " +
-                                                ":where [?edge :graph.edge/outVertex ?vertex] " +
-                                                       "[?vertex :db/ident ?uuid] ]", graph.getRawGraph(), datomicId).iterator().next().get(0));
+        // Use the raw index to retrieve the out vertex of an particular edge
+        return new DatomicVertex(graph, graph.getRawGraph().datoms(Database.EAVT, getId(), graph.GRAPH_EDGE_OUT_VERTEX).iterator().next().v());
     }
 
     public Vertex getInVertex() {
-        return new DatomicVertex(graph, Peer.q("[:find ?uuid " +
-                                                ":in $ ?edge " +
-                                                ":where [?edge :graph.edge/inVertex ?vertex] " +
-                                                       "[?vertex :db/ident ?uuid] ]", graph.getRawGraph(), datomicId).iterator().next().get(0));
+        // Use the raw index to retrieve the in vertex of an particular edge
+        return new DatomicVertex(graph, graph.getRawGraph().datoms(Database.EAVT, getId(), graph.GRAPH_EDGE_IN_VERTEX).iterator().next().v());
     }
 
     public String getLabel() {
-       return (String)Peer.q("[:find ?label " +
-                              ":in $ ?edge " +
-                              ":where [?edge :graph.edge/label ?label] ]", graph.getRawGraph(), datomicId).iterator().next().get(0);
+       return (String)graph.getRawGraph().datoms(Database.EAVT, getId(), graph.GRAPH_EDGE_LABEL).iterator().next().v();
     }
 
     public String toString() {

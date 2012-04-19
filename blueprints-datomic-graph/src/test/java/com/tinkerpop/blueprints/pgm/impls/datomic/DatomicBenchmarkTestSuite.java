@@ -21,7 +21,7 @@ public class DatomicBenchmarkTestSuite extends TestSuite {
         super(graphTest);
     }
 
-    public void testDexGraph() throws Exception {
+    public void testDatomicGraph() throws Exception {
         double totalTime = 0.0d;
         Graph graph = graphTest.getGraphInstance();
         GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
@@ -32,19 +32,19 @@ public class DatomicBenchmarkTestSuite extends TestSuite {
             this.stopWatch();
             int counter = 0;
             for (final Vertex vertex : graph.getVertices()) {
-                System.out.println(counter++);
+                counter++;
                 for (final Edge edge : vertex.getOutEdges()) {
-                    System.out.println(counter++);
+                    counter++;
                     final Vertex vertex2 = edge.getInVertex();
-                    System.out.println(counter++);
+                    counter++;
                     for (final Edge edge2 : vertex2.getOutEdges()) {
-                        System.out.println(counter++);
+                        counter++;
                         final Vertex vertex3 = edge2.getInVertex();
-                        System.out.println(counter++);
+                        counter++;
                         for (final Edge edge3 : vertex3.getOutEdges()) {
-                            System.out.println(counter++);
+                            counter++;
                             edge3.getOutVertex();
-                            System.out.println(counter++);
+                            counter++;
                         }
                     }
                 }

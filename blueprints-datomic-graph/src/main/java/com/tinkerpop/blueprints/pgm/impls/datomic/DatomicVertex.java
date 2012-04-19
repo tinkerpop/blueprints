@@ -1,12 +1,15 @@
 package com.tinkerpop.blueprints.pgm.impls.datomic;
 
-import clojure.lang.Keyword;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.impls.datomic.util.DatomicEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.datomic.util.DatomicUtil;
+import datomic.Database;
+import datomic.Datom;
 import datomic.Peer;
 import datomic.Util;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,16 +20,15 @@ public class DatomicVertex extends DatomicElement implements Vertex {
 
     public DatomicVertex(final DatomicGraph graph) {
         super(graph);
-        graph.addToTransaction(Util.map(":db/id", datomicId,
+        graph.addToTransaction(Util.map(":db/id", id,
                                         ":graph.element/type", ":graph.element.type/vertex",
                                         ":db/ident", uuid));
     }
 
     public DatomicVertex(final DatomicGraph graph, final Object id) {
         super(graph);
-        if (id instanceof Keyword) {
-            uuid = id;
-            datomicId = graph.getRawGraph().entid(uuid);
+        if (id instanceof Long) {
+            this.id = id;
         }
         else {
             throw new RuntimeException(ID_EXCEPTION_MESSAGE);
@@ -37,42 +39,42 @@ public class DatomicVertex extends DatomicElement implements Vertex {
         if (labels.length == 0) {
             return getInEdges();
         }
-        Iterator<List<Object>> edgesit = Peer.q("[:find ?uuid " +
+        Iterator<List<Object>> edgesit = Peer.q("[:find ?edge " +
                                                  ":in $ ?vertex [?label ...] " +
                                                  ":where [?edge :graph.edge/inVertex ?vertex] " +
-                                                        "[?edge :db/ident ?uuid] " +
-                                                        "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), datomicId, labels).iterator();
+                                                        "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), id, labels).iterator();
         return DatomicUtil.getEdgeSequence(edgesit, graph);
     }
 
 
 
     public Iterable<Edge> getInEdges() {
-        Iterator<List<Object>> edgesit = Peer.q("[:find ?uuid " +
-                                                 ":in $ ?vertex " +
-                                                 ":where [?edge :graph.edge/inVertex ?vertex] " +
-                                                        "[?edge :db/ident ?uuid] ]", graph.getRawGraph(), datomicId).iterator();
-        return DatomicUtil.getEdgeSequence(edgesit, graph);
+        Iterator<Datom> edgesit = graph.getRawGraph().datoms(Database.AVET, graph.GRAPH_EDGE_IN_VERTEX, getId()).iterator();
+        List<Object> edges = new ArrayList<Object>();
+        while (edgesit.hasNext()) {
+            edges.add(edgesit.next().e());
+        }
+        return new DatomicEdgeSequence(edges, this.graph);
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
         if (labels.length == 0) {
             return getOutEdges();
         }
-        Iterator<List<Object>> edgesit = Peer.q("[:find ?uuid " +
+        Iterator<List<Object>> edgesit = Peer.q("[:find ?edge " +
                                                  ":in $ ?vertex [?label ...] " +
                                                  ":where [?edge :graph.edge/outVertex ?vertex] " +
-                                                        "[?edge :db/ident ?uuid] " +
-                                                        "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), datomicId, labels).iterator();
+                                                        "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), id, labels).iterator();
         return DatomicUtil.getEdgeSequence(edgesit, graph);
     }
 
     public Iterable<Edge> getOutEdges() {
-        Iterator<List<Object>> edgesit = Peer.q("[:find ?uuid " +
-                                                 ":in $ ?vertex " +
-                                                 ":where [?edge :graph.edge/outVertex ?vertex] " +
-                                                        "[?edge :db/ident ?uuid] ]", graph.getRawGraph(), datomicId).iterator();
-        return DatomicUtil.getEdgeSequence(edgesit, graph);
+        Iterator<Datom> edgesit = graph.getRawGraph().datoms(Database.AVET, graph.GRAPH_EDGE_OUT_VERTEX, getId()).iterator();
+        List<Object> edges = new ArrayList<Object>();
+        while (edgesit.hasNext()) {
+            edges.add(edgesit.next().e());
+        }
+        return new DatomicEdgeSequence(edges, this.graph);
     }
 
     public boolean equals(final Object object) {

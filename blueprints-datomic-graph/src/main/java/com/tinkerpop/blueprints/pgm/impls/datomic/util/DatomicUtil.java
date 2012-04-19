@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.datomic.util;
 
 import clojure.lang.Keyword;
 import com.tinkerpop.blueprints.pgm.impls.datomic.DatomicGraph;
+import datomic.Datom;
 import datomic.Peer;
 import datomic.Util;
 import java.util.*;

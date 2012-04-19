@@ -1,13 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.datomic;
 
+import clojure.lang.Keyword;
 import com.tinkerpop.blueprints.pgm.*;
 import com.tinkerpop.blueprints.pgm.impls.Parameter;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.datomic.util.DatomicUtil;
-import datomic.Connection;
-import datomic.Database;
-import datomic.Peer;
-import datomic.Util;
+import com.tinkerpop.blueprints.pgm.impls.datomic.util.DatomicEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.datomic.util.DatomicVertexSequence;
+import datomic.*;
+
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -22,6 +22,13 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
     private final Connection connection;
     public static final String DATOMIC_ERROR_EXCEPTION_MESSAGE = "An error occured within the Datomic datastore";
     private Map<String, DatomicAutomaticIndex> autoIndices = new HashMap<String, DatomicAutomaticIndex>();
+
+    public final Object GRAPH_ELEMENT_TYPE;
+    public final Object GRAPH_ELEMENT_TYPE_VERTEX;
+    public final Object GRAPH_ELEMENT_TYPE_EDGE;
+    public final Object GRAPH_EDGE_IN_VERTEX;
+    public final Object GRAPH_EDGE_OUT_VERTEX;
+    public final Object GRAPH_EDGE_LABEL;
 
     private final ThreadLocal<List> tx = new ThreadLocal<List>() {
         protected List initialValue() {
@@ -45,6 +52,13 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
         this.autoIndices.put(Index.EDGES, new DatomicAutomaticIndex(Index.EDGES, this, DatomicEdge.class));
         try {
             setupMetaModel();
+            // Retrieve the relevant id for the properties (for raw index access later on)
+            GRAPH_ELEMENT_TYPE = getIdForAttribute("graph.element/type");
+            GRAPH_ELEMENT_TYPE_VERTEX = getIdForAttribute("graph.element.type/vertex");
+            GRAPH_ELEMENT_TYPE_EDGE = getIdForAttribute("graph.element.type/edge");
+            GRAPH_EDGE_IN_VERTEX = getIdForAttribute("graph.edge/inVertex");
+            GRAPH_EDGE_OUT_VERTEX = getIdForAttribute("graph.edge/outVertex");
+            GRAPH_EDGE_LABEL = getIdForAttribute("graph.edge/label");
         } catch (ExecutionException e) {
             throw new RuntimeException(DatomicGraph.DATOMIC_ERROR_EXCEPTION_MESSAGE);
         } catch (InterruptedException e) {
@@ -75,20 +89,22 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
     }
 
     public Iterable<Edge> getEdges() {
-        Iterator<List<Object>> elementit = Peer.q("[:find ?uuid ?tx " +
-                                                   ":where [?element :graph.element/type :graph.element.type/edge ?tx] " +
-                                                          "[?element :db/ident ?uuid] ]", getRawGraph()).iterator();
-        return DatomicUtil.getEdgeSequence(elementit, this);
+        Iterator<Datom> edgesit = getRawGraph().datoms(Database.AVET, GRAPH_ELEMENT_TYPE, GRAPH_ELEMENT_TYPE_EDGE).iterator();
+        List<Object> edges = new ArrayList<Object>();
+        while (edgesit.hasNext()) {
+            edges.add(edgesit.next().e());
+        }
+        return new DatomicEdgeSequence(edges, this);
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         final DatomicEdge edge = new DatomicEdge(this);
-        tx.get().add(Util.map(":db/id", edge.datomicId,
-                ":graph.edge/label", label,
-                ":graph.edge/inVertex", ((DatomicVertex) inVertex).getDatomicId(),
-                ":graph.edge/outVertex", ((DatomicVertex) outVertex).getDatomicId()));
+        tx.get().add(Util.map(":db/id", edge.id,
+                              ":graph.edge/label", label,
+                              ":graph.edge/inVertex", inVertex.getId(),
+                              ":graph.edge/outVertex", outVertex.getId()));
         transact();
-        edge.setDatomicId(getRawGraph().entid(edge.uuid));
+        edge.setId(getRawGraph().entid(edge.uuid));
         return edge;
     }
 
@@ -98,14 +114,14 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
 
     public void removeEdge(final Edge edge, boolean transact) {
         DatomicEdge theedge =  (DatomicEdge)edge;
-        tx.get().add(Util.list(":db.fn/retractEntity", theedge.datomicId));
+        tx.get().add(Util.list(":db.fn/retractEntity", theedge.id));
         if (transact) transact();
     }
 
     public Vertex addVertex(final Object id) {
         DatomicVertex vertex = new DatomicVertex(this);
         transact();
-        vertex.setDatomicId(getRawGraph().entid(vertex.uuid));
+        vertex.setId(getRawGraph().entid(vertex.uuid));
         return vertex;
     }
 
@@ -120,10 +136,12 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
     }
 
     public Iterable<Vertex> getVertices() {
-        Iterator<List<Object>> elementit = Peer.q("[:find ?uuid " +
-                                                   ":where [?element :graph.element/type :graph.element.type/vertex] " +
-                                                          "[?element :db/ident ?uuid] ]", getRawGraph()).iterator();
-        return DatomicUtil.getVertexSequence(elementit, this);
+        Iterator<Datom> verticesit = getRawGraph().datoms(Database.AVET, this.GRAPH_ELEMENT_TYPE, this.GRAPH_ELEMENT_TYPE_VERTEX).iterator();
+        List<Object> vertices = new ArrayList<Object>();
+        while (verticesit.hasNext()) {
+            vertices.add(verticesit.next().e());
+        }
+        return new DatomicVertexSequence(vertices, this);
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -140,7 +158,7 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
         while (outedgesit.hasNext()) {
             removeEdge(outedgesit.next(), false);
         }
-        tx.get().add(Util.list(":db.fn/retractEntity", thevertex.datomicId));
+        tx.get().add(Util.list(":db.fn/retractEntity", thevertex.id));
         if (transact) transact();
     }
 
@@ -275,6 +293,12 @@ public class DatomicGraph implements IndexableGraph, WrappableGraph<Database> {
                         ":db.install/_attribute", ":db.part/db"));
 
         transact();
+    }
+
+    private Object getIdForAttribute(String attribute) {
+        return Peer.q("[:find ?entity " +
+                       ":in $ ?attribute " +
+                       ":where [?entity :db/ident ?attribute] ] ", getRawGraph(), Keyword.intern(attribute)).iterator().next().get(0);
     }
 
     public String toString() {

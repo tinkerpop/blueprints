@@ -86,7 +86,7 @@ public class DatomicGraphTest extends GraphTest {
     }
 
     public Graph getGraphInstance() {
-        return new DatomicGraph("datomic:mem://tinkerpop"+ UUID.randomUUID());
+        return new DatomicGraph("datomic:mem://tinkerpop" + UUID.randomUUID());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
@@ -94,7 +94,6 @@ public class DatomicGraphTest extends GraphTest {
             if (method.getName().startsWith("test")) {
                 System.out.println("Testing " + method.getName() + "...");
                 method.invoke(testSuite);
-                //getGraphInstance().clear();
             }
         }
     }

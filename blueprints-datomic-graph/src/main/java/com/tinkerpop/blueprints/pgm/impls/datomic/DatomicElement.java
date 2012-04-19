@@ -14,35 +14,30 @@ import java.util.*;
  */
 public abstract class DatomicElement implements Element {
 
-    protected static final String ID_EXCEPTION_MESSAGE = "Id should be of type UUID";
+    protected static final String ID_EXCEPTION_MESSAGE = "Id should be of type long";
 
     protected final DatomicGraph graph;
     protected Object uuid;
-    protected Object datomicId;
+    protected Object id;
 
     protected DatomicElement(final DatomicGraph graph) {
         this.graph = graph;
+        // UUID used to retrieve the actual datomic id later on
         uuid = Keyword.intern(UUID.randomUUID().toString());
-        datomicId = Peer.tempid(":db.part/user");
+        id = Peer.tempid(":db.part/user");
     }
 
-    // Each graph element is assigned an UUID. (Used for retrieving the final com.tinkerpop.blueprints.pgm.impl.com.tinkerpop.blueprints.pgm.impls.datomic id once persisted)
     public Object getId() {
-        return uuid;
+        return id;
     }
 
-    public Object getDatomicId() {
-        return datomicId;
-    }
-
-
-    public void setDatomicId(Object datomicId) {
-        this.datomicId = datomicId;
+    public void setId(Object id) {
+        this.id = id;
     }
 
     public Set<String> getPropertyKeys() {
         Set<String> finalproperties = new HashSet<String>();
-        Set properties = graph.getRawGraph().entity(datomicId).keySet();
+        Set properties = graph.getRawGraph().entity(id).keySet();
         Iterator<Keyword> propertiesit = properties.iterator();
         while (propertiesit.hasNext()) {
             Keyword property = propertiesit.next();
@@ -55,21 +50,21 @@ public abstract class DatomicElement implements Element {
 
     public Object getProperty(final String key) {
         if (!DatomicUtil.isReservedKey(key)) {
-            Set properties = graph.getRawGraph().entity(datomicId).keySet();
+            Set properties = graph.getRawGraph().entity(id).keySet();
             Iterator<Keyword> propertiesit = properties.iterator();
             // We need to iterate, as we don't know the exact type (although we ensured that only one attribute will have that name)
             while (propertiesit.hasNext()) {
                 Keyword property = propertiesit.next();
                 String propertyname = DatomicUtil.getPropertyName(property);
                 if (key.equals(propertyname)) {
-                    return  graph.getRawGraph().entity(datomicId).get(property);
+                    return  graph.getRawGraph().entity(id).get(property);
                 }
             }
             // We didn't find the value
             return null;
         }
         else {
-            return graph.getRawGraph().entity(datomicId).get(key);
+            return graph.getRawGraph().entity(id).get(key);
         }
     }
 
@@ -82,27 +77,27 @@ public abstract class DatomicElement implements Element {
             if (getProperty(key) == null) {
                 // We first need to create the new attribute on the fly
                 DatomicUtil.createAttributeDefinition(key, value, graph);
-                this.graph.addToTransaction(Util.map(":db/id", datomicId,
+                this.graph.addToTransaction(Util.map(":db/id", id,
                                                       DatomicUtil.createKey(key, value), value));
             }
             else {
                 // Value types match, just perform an update
                 if (getProperty(key).getClass().equals(value.getClass())) {
-                    this.graph.addToTransaction(Util.map(":db/id", datomicId,
+                    this.graph.addToTransaction(Util.map(":db/id", id,
                                                           DatomicUtil.createKey(key, value), value));
                 }
                 // Value types do not match. Retract original fact and add new one
                 else {
                     DatomicUtil.createAttributeDefinition(key, value, graph);
-                    this.graph.addToTransaction(Util.list(":db/retract", datomicId, DatomicUtil.createKey(key, value), getProperty(key)));
-                    this.graph.addToTransaction(Util.map(":db/id", datomicId,
+                    this.graph.addToTransaction(Util.list(":db/retract", id, DatomicUtil.createKey(key, value), getProperty(key)));
+                    this.graph.addToTransaction(Util.map(":db/id", id,
                                                           DatomicUtil.createKey(key, value), value));
                 }
             }
         }
-        // A com.tinkerpop.blueprints.pgm.impl.com.tinkerpop.blueprints.pgm.impls.datomic graph specific property
+        // A datomic graph specific property
         else {
-            this.graph.addToTransaction(Util.map(":db/id", datomicId,
+            this.graph.addToTransaction(Util.map(":db/id", id,
                                                   key, value));
         }
         this.graph.transact();
@@ -112,7 +107,7 @@ public abstract class DatomicElement implements Element {
         Object oldvalue = getProperty(key);
         if (oldvalue != null) {
             if (!DatomicUtil.isReservedKey(key)) {
-                this.graph.addToTransaction(Util.list(":db/retract", datomicId,
+                this.graph.addToTransaction(Util.list(":db/retract", id,
                                                        DatomicUtil.createKey(key, oldvalue), oldvalue));
             }
         }
