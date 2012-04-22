@@ -1,5 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.id.ORID;
@@ -23,11 +28,6 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
  *
@@ -40,7 +40,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, Wrappabl
     private String username;
     private String password;
 
-    private final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
+    private static final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
+    private static final List<OrientGraphContext> contexts = new ArrayList<OrientGraphContext>();
 
     /**
      * Constructs a new object using an existent OGraphDatabase instance.
@@ -65,31 +66,43 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, Wrappabl
     @SuppressWarnings("unchecked")
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys, final Parameter... indexParameters) {
         final OrientGraphContext context = getContext(true);
-        if (context.autoIndices.containsKey(indexName))
-            throw new RuntimeException("Index already exists: " + indexName);
-
-        final OrientAutomaticIndex<? extends Element> index = new OrientAutomaticIndex<OrientElement>(this, indexName, (Class<OrientElement>) indexClass, indexKeys);
-        context.autoIndices.put(index.getIndexName(), index);
-
-        // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
-        saveIndexConfiguration();
-
-        return (AutomaticIndex<T>) index;
+        
+        synchronized( contexts ){
+		        if (context.autoIndices.containsKey(indexName))
+		            throw new RuntimeException("Index already exists: " + indexName);
+		
+		        final OrientAutomaticIndex<? extends Element> index = new OrientAutomaticIndex<OrientElement>(this, indexName, (Class<OrientElement>) indexClass, indexKeys);
+		        
+		        // ADD THE INDEX IN ALL CURRENT CONTEXTS
+		        for( OrientGraphContext ctx : contexts )
+		        		ctx.autoIndices.put(index.getIndexName(), index);
+		
+		        // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
+		        saveIndexConfiguration();
+		
+		        return (AutomaticIndex<T>) index;
+        }
     }
 
     @SuppressWarnings("unchecked")
     public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         final OrientGraphContext context = getContext(true);
-        if (context.manualIndices.containsKey(indexName))
-            throw new RuntimeException("Index already exists: " + indexName);
 
-        final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(this, indexName, indexClass, Index.Type.MANUAL, null);
-        context.manualIndices.put(index.getIndexName(), index);
-
-        // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
-        saveIndexConfiguration();
-
-        return (Index<T>) index;
+        synchronized( contexts ){
+		        if (context.manualIndices.containsKey(indexName))
+		            throw new RuntimeException("Index already exists: " + indexName);
+		
+		        final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(this, indexName, indexClass, Index.Type.MANUAL, null);
+		        
+		        // ADD THE INDEX IN ALL CURRENT CONTEXTS
+		        for( OrientGraphContext ctx : contexts )
+		        	ctx.manualIndices.put(index.getIndexName(), index);
+		
+		        // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
+		        saveIndexConfiguration();
+		        
+		        return (Index<T>) index;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -132,9 +145,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, Wrappabl
 
         this.autoStartTransaction();
         try {
-            final OrientGraphContext context = getContext(true);
-            context.manualIndices.remove(indexName);
-            context.autoIndices.remove(indexName);
+            synchronized( contexts ){            	
+	  		        for( OrientGraphContext ctx : contexts ) {
+			            	ctx.manualIndices.remove(indexName);
+			            	ctx.autoIndices.remove(indexName);
+	  		        }
+            }
 
             getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
             saveIndexConfiguration();
@@ -459,7 +475,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, Wrappabl
                 removeContext();
 
             context = new OrientGraphContext();
-            this.threadContext.set(context);
+            threadContext.set(context);
+            
+            synchronized (contexts) {
+            		contexts.add( context );
+						}
 
             context.rawGraph = new OGraphDatabase(url);
             context.rawGraph.setUseCustomTypes(false);
@@ -533,10 +553,15 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, Wrappabl
             for (Index<? extends Element> idx : getIndices()) {
                 ((OrientIndex<?>) idx).close();
             }
-            context.manualIndices.clear();
-            context.autoIndices.clear();
+            
+        		context.manualIndices.clear();
+					  context.autoIndices.clear();
+					  
+            synchronized (contexts) {
+		            contexts.remove( context );
+						}
 
-            this.threadContext.set(null);
+            threadContext.set(null);
         }
     }
 }
