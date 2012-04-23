@@ -33,7 +33,7 @@ public class Neo4jGraphTest extends GraphTest {
 
     public Neo4jGraphTest() {
         this.allowsDuplicateEdges = true;
-        this.allowsSelfLoops = false;
+        this.allowsSelfLoops = true;
         this.isPersistent = true;
         this.isRDFModel = false;
         this.supportsVertexIteration = true;
