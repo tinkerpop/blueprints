@@ -1,11 +1,14 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Filter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.FilteredEdgeIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,21 +33,35 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         return this;
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        if (labels.length == 0) {
+    public Iterable<Edge> getInEdges(final Object... filters) {
+        if (filters.length == 0) {
             final List<Edge> totalEdges = new LinkedList<Edge>();
             for (final Collection<Edge> edges : this.inEdges.values()) {
                 totalEdges.addAll(edges);
             }
             return totalEdges;
-        } else if (labels.length == 1) {
-            final Set<Edge> edges = this.inEdges.get(labels[0]);
-            if (null == edges) {
-                return new LinkedList<Edge>();
+        } else if (filters.length == 1) {
+            if (filters[0] instanceof String) {
+                final Set<Edge> edges = this.inEdges.get(filters[0]);
+                if (null == edges) {
+                    return Collections.emptyList();
+                } else {
+                    return new LinkedList<Edge>(edges);
+                }
+            } else if (filters[0] instanceof Filter) {
+                final List<Edge> totalEdges = new LinkedList<Edge>();
+                for (final Collection<Edge> edges : this.inEdges.values()) {
+                    totalEdges.addAll(edges);
+                }
+
+                return new FilteredEdgeIterable(totalEdges, FilteredEdgeIterable.getFilter(filters));
             } else {
-                return new LinkedList<Edge>(edges);
+                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
             }
         } else {
+            final Filter filter = FilteredEdgeIterable.getFilter(filters);
+            final List<String> labels = FilteredEdgeIterable.getLabels(filters);
+
             final List<Edge> totalEdges = new LinkedList<Edge>();
             for (final String label : labels) {
                 final Set<Edge> edges = this.inEdges.get(label);
@@ -52,25 +69,52 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
                     totalEdges.addAll(edges);
                 }
             }
-            return totalEdges;
+
+            if (labels.size() == filters.length)
+                return totalEdges;
+
+            if (labels.isEmpty()) {
+                for (final Collection<Edge> edges : this.inEdges.values()) {
+                    totalEdges.addAll(edges);
+                }
+            }
+
+            if (null == filter)
+                return totalEdges;
+            else
+                return new FilteredEdgeIterable(totalEdges, filter);
         }
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        if (labels.length == 0) {
+    public Iterable<Edge> getOutEdges(final Object... filters) {
+        if (filters.length == 0) {
             final List<Edge> totalEdges = new LinkedList<Edge>();
             for (final Collection<Edge> edges : this.outEdges.values()) {
                 totalEdges.addAll(edges);
             }
             return totalEdges;
-        } else if (labels.length == 1) {
-            final Set<Edge> edges = this.outEdges.get(labels[0]);
-            if (null == edges) {
-                return new LinkedList<Edge>();
+        } else if (filters.length == 1) {
+            if (filters[0] instanceof String) {
+                final Set<Edge> edges = this.outEdges.get(filters[0]);
+                if (null == edges) {
+                    return Collections.emptyList();
+                } else {
+                    return new LinkedList<Edge>(edges);
+                }
+            } else if (filters[0] instanceof Filter) {
+                final List<Edge> totalEdges = new LinkedList<Edge>();
+                for (final Collection<Edge> edges : this.outEdges.values()) {
+                    totalEdges.addAll(edges);
+                }
+
+                return new FilteredEdgeIterable(totalEdges, FilteredEdgeIterable.getFilter(filters));
             } else {
-                return new LinkedList<Edge>(edges);
+                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
             }
         } else {
+            final Filter filter = FilteredEdgeIterable.getFilter(filters);
+            final List<String> labels = FilteredEdgeIterable.getLabels(filters);
+
             final List<Edge> totalEdges = new LinkedList<Edge>();
             for (final String label : labels) {
                 final Set<Edge> edges = this.outEdges.get(label);
@@ -78,7 +122,20 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
                     totalEdges.addAll(edges);
                 }
             }
-            return totalEdges;
+
+            if (labels.size() == filters.length)
+                return totalEdges;
+
+            if (labels.isEmpty()) {
+                for (final Collection<Edge> edges : this.outEdges.values()) {
+                    totalEdges.addAll(edges);
+                }
+            }
+
+            if (null == filter)
+                return totalEdges;
+            else
+                return new FilteredEdgeIterable(totalEdges, filter);
         }
     }
 

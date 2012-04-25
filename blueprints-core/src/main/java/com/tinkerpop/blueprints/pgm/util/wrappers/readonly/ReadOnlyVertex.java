@@ -13,12 +13,12 @@ public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
         super(rawVertex);
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator());
+    public Iterable<Edge> getInEdges(final Object... filters) {
+        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getInEdges(filters).iterator());
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator());
+    public Iterable<Edge> getOutEdges(final Object... filters) {
+        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getOutEdges(filters).iterator());
     }
 
 

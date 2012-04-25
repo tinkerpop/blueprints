@@ -4,7 +4,9 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Filter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.FilteredEdgeIterable;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -38,8 +40,7 @@ public class DexVertex extends DexElement implements Vertex {
             objs.close();
         }
         tlist = null;
-        Iterable<Edge> ret = new DexIterable<Edge>(graph, result, Edge.class);
-        return ret;
+        return new DexIterable<Edge>(graph, result, Edge.class);
     }
 
     private Iterable<Edge> getInEdgesNoLabels() {
@@ -51,8 +52,7 @@ public class DexVertex extends DexElement implements Vertex {
             objs.close();
         }
         tlist = null;
-        Iterable<Edge> ret = new DexIterable<Edge>(graph, result, Edge.class);
-        return ret;
+        return new DexIterable<Edge>(graph, result, Edge.class);
     }
 
     private Iterable<Edge> getOutEdgesSingleLabel(final String label) {
@@ -62,8 +62,7 @@ public class DexVertex extends DexElement implements Vertex {
         }
 
         com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, type, com.sparsity.dex.gdb.EdgesDirection.Outgoing);
-        Iterable<Edge> ret = new DexIterable<Edge>(graph, objs, Edge.class);
-        return ret;
+        return new DexIterable<Edge>(graph, objs, Edge.class);
     }
 
     private Iterable<Edge> getInEdgesSingleLabel(final String label) {
@@ -73,39 +72,68 @@ public class DexVertex extends DexElement implements Vertex {
         }
 
         com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, type, com.sparsity.dex.gdb.EdgesDirection.Ingoing);
-        Iterable<Edge> ret = new DexIterable<Edge>(graph, objs, Edge.class);
-        return ret;
+        return new DexIterable<Edge>(graph, objs, Edge.class);
     }
 
     public String toString() {
         return StringFactory.vertexString(this);
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        if (labels.length == 0)
+    public Iterable<Edge> getInEdges(final Object... filters) {
+        if (filters.length == 0)
             return this.getInEdgesNoLabels();
-        else if (labels.length == 1) {
-            return this.getInEdgesSingleLabel(labels[0]);
+        else if (filters.length == 1) {
+            if (filters[0] instanceof String)
+                return this.getInEdgesSingleLabel((String) filters[0]);
+            else if (filters[0] instanceof Filter)
+                return new FilteredEdgeIterable(this.getInEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
+            else
+                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
-            for (final String label : labels) {
-                edges.add(this.getInEdgesSingleLabel(label));
+            int counter = 0;
+            for (final Object filter : filters) {
+                if (filter instanceof String) {
+                    counter++;
+                    edges.add(this.getInEdgesSingleLabel((String) filter));
+                }
             }
-            return new MultiIterable<Edge>(edges);
+
+            if (edges.size() == filters.length)
+                return new MultiIterable<Edge>(edges);
+            else if (counter == 0)
+                return new FilteredEdgeIterable(this.getInEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
+            else
+                return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
         }
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        if (labels.length == 0)
+    public Iterable<Edge> getOutEdges(final Object... filters) {
+        if (filters.length == 0)
             return this.getOutEdgesNoLabels();
-        else if (labels.length == 1) {
-            return this.getOutEdgesSingleLabel(labels[0]);
+        else if (filters.length == 1) {
+            if (filters[0] instanceof String)
+                return this.getOutEdgesSingleLabel((String) filters[0]);
+            else if (filters[0] instanceof Filter)
+                return new FilteredEdgeIterable(this.getOutEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
+            else
+                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
-            for (final String label : labels) {
-                edges.add(this.getOutEdgesSingleLabel(label));
+            int counter = 0;
+            for (final Object filter : filters) {
+                if (filter instanceof String) {
+                    counter++;
+                    edges.add(this.getOutEdgesSingleLabel((String) filter));
+                }
             }
-            return new MultiIterable<Edge>(edges);
+
+            if (edges.size() == filters.length)
+                return new MultiIterable<Edge>(edges);
+            else if (counter == 0)
+                return new FilteredEdgeIterable(this.getOutEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
+            else
+                return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
         }
     }
 }

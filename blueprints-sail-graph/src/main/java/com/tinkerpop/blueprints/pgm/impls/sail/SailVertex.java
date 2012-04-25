@@ -2,8 +2,10 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Filter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.FilteredEdgeIterable;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
@@ -149,19 +151,33 @@ public class SailVertex implements Vertex {
         return keys;
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
+    public Iterable<Edge> getOutEdges(final Object... filters) {
         if (this.rawVertex instanceof Resource) {
             try {
-                if (labels.length == 0) {
+                if (filters.length == 0) {
                     return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph);
-                } else if (labels.length == 1) {
-                    return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix(labels[0])), null, false), this.graph);
+                } else if (filters.length == 1) {
+                    if (filters[0] instanceof String)
+                        return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix((String) filters[0])), null, false), this.graph);
+                    else if (filters[0] instanceof Filter)
+                        return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph), FilteredEdgeIterable.getFilter(filters));
+                    else
+                        throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
                 } else {
                     final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
-                    for (final String label : labels) {
-                        edges.add(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix(label)), null, false), this.graph));
+                    int counter = 0;
+                    for (final Object filter : filters) {
+                        if (filter instanceof String) {
+                            edges.add(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix((String) filter)), null, false), this.graph));
+                            counter++;
+                        }
                     }
-                    return new MultiIterable<Edge>(edges);
+                    if (edges.size() == filters.length)
+                        return new MultiIterable<Edge>(edges);
+                    else if (counter == 0)
+                        return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph), FilteredEdgeIterable.getFilter(filters));
+                    else
+                        return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
                 }
             } catch (SailException e) {
                 throw new RuntimeException(e.getMessage(), e);
@@ -173,18 +189,32 @@ public class SailVertex implements Vertex {
     }
 
 
-    public Iterable<Edge> getInEdges(final String... labels) {
+    public Iterable<Edge> getInEdges(final Object... filters) {
         try {
-            if (labels.length == 0) {
+            if (filters.length == 0) {
                 return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph);
-            } else if (labels.length == 1) {
-                return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix(labels[0])), (Resource) this.rawVertex, false), this.graph);
+            } else if (filters.length == 1) {
+                if (filters[0] instanceof String)
+                    return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix((String) filters[0])), (Resource) this.rawVertex, false), this.graph);
+                else if (filters[0] instanceof Filter)
+                    return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph), FilteredEdgeIterable.getFilter(filters));
+                else
+                    throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
             } else {
                 final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
-                for (final String label : labels) {
-                    edges.add(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix(label)), (Resource) this.rawVertex, false), this.graph));
+                int counter = 0;
+                for (final Object filter : filters) {
+                    if (filter instanceof String) {
+                        edges.add(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix((String) filter)), (Resource) this.rawVertex, false), this.graph));
+                        counter++;
+                    }
                 }
-                return new MultiIterable<Edge>(edges);
+                if (edges.size() == filters.length)
+                    return new MultiIterable<Edge>(edges);
+                else if (counter == 0)
+                    return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph), FilteredEdgeIterable.getFilter(filters));
+                else
+                    return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
             }
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);

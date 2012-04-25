@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class FilteredEdgeSequenceTest extends BaseTest {
+public class FilteredEdgeIterableTest extends BaseTest {
 
     private final static TinkerGraph graph = new TinkerGraph();
     private final static Vertex marko;
@@ -32,7 +32,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
 
     public void testNoFilter() {
         Vertex marko = graph.getVertex("marko");
-        FilteredEdgeSequence edges = new FilteredEdgeSequence(marko.getOutEdges().iterator());
+        FilteredEdgeIterable edges = new FilteredEdgeIterable(marko.getOutEdges());
         int count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -43,7 +43,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
 
     public void testStringFilters() {
         Vertex marko = graph.getVertex("marko");
-        FilteredEdgeSequence edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), "likes");
+        FilteredEdgeIterable edges = new FilteredEdgeIterable(marko.getOutEdges(), "likes");
         int count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -53,9 +53,9 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         assertEquals(count, 1);
     }
 
-    public void testFilterPredicates() {
+    public void testPropertyFilters() {
         Vertex marko = graph.getVertex("marko");
-        FilteredEdgeSequence edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 1));
+        FilteredEdgeIterable edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 1));
         int count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -64,7 +64,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 1, Filter.Compare.EQUAL));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 1, Filter.Compare.EQUAL));
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -73,7 +73,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 1, Filter.Compare.GREATER_THAN));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 1, Filter.Compare.GREATER_THAN));
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -82,7 +82,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 1, Filter.Compare.GREATER_THAN_EQUAL));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 1, Filter.Compare.GREATER_THAN_EQUAL));
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -90,7 +90,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 2);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 2, Filter.Compare.LESS_THAN));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 2, Filter.Compare.LESS_THAN));
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -99,7 +99,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 2, Filter.Compare.LESS_THAN_EQUAL));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 2, Filter.Compare.LESS_THAN_EQUAL));
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -107,7 +107,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 2);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 2, Filter.Compare.NOT_EQUAL));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 2, Filter.Compare.NOT_EQUAL));
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -116,7 +116,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("stars", 4, Filter.Compare.EQUAL));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("stars", 4, Filter.Compare.EQUAL));
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -126,10 +126,10 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         assertEquals(count, 1);
     }
 
-    public void testStringAndFilterFilters() {
+    public void testStringAndPropertyFilters() {
         Vertex marko = graph.getVertex("marko");
 
-        FilteredEdgeSequence edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 1), "likes");
+        FilteredEdgeIterable edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 1), "likes");
         int count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -138,7 +138,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 1), "likes", "knows");
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 1), "likes", "knows");
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -147,7 +147,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("date", 1), "likes", "knows", new Filter("stars", 4, Filter.Compare.GREATER_THAN_EQUAL));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("date", 1).property("stars", 4, Filter.Compare.GREATER_THAN_EQUAL), "likes", "knows");
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -156,7 +156,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 1);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("blah", null), "likes", "knows");
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("blah", null), "likes", "knows");
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -164,7 +164,7 @@ public class FilteredEdgeSequenceTest extends BaseTest {
         }
         assertEquals(count, 2);
 
-        edges = new FilteredEdgeSequence(marko.getOutEdges().iterator(), new Filter("blah", null), "likes", "knows", new Filter("date", 2, Filter.Compare.EQUAL), new Filter("weight", 0.8f));
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().property("blah", null).property("date", 2, Filter.Compare.EQUAL).property("weight", 0.8f), "likes", "knows");
         count = 0;
         for (final Edge edge : edges) {
             count++;
@@ -172,5 +172,65 @@ public class FilteredEdgeSequenceTest extends BaseTest {
             assertNotSame(edge, likes);
         }
         assertEquals(count, 1);
+    }
+
+    public void testRangeFilter() {
+        Vertex marko = graph.getVertex("marko");
+        FilteredEdgeIterable edges = new FilteredEdgeIterable(marko.getOutEdges(), "knows", new Filter().range("date", 1, 3));
+        int count = 0;
+        for (final Edge edge : edges) {
+            count++;
+            assertEquals(edge, knows);
+        }
+        assertEquals(count, 1);
+
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), "knows", new Filter().range("date", 5, 10));
+        count = 0;
+        for (final Edge edge : edges) {
+            count++;
+        }
+        assertEquals(count, 0);
+    }
+
+    public void testLabelFilter() {
+        Vertex marko = graph.getVertex("marko");
+        FilteredEdgeIterable edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().label("knows"));
+        int count = 0;
+        for (final Edge edge : edges) {
+            count++;
+            assertEquals(edge, knows);
+        }
+        assertEquals(count, 1);
+
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().label(Filter.Compare.NOT_EQUAL, "knows"));
+        count = 0;
+        for (final Edge edge : edges) {
+            count++;
+            assertEquals(edge, likes);
+        }
+        assertEquals(count, 1);
+
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().label(Filter.Compare.NOT_EQUAL, "knows", "blah", "bloop"));
+        count = 0;
+        for (final Edge edge : edges) {
+            count++;
+            assertEquals(edge, likes);
+        }
+        assertEquals(count, 1);
+
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().label("knows").property("date", 2));
+        count = 0;
+        for (final Edge edge : edges) {
+            count++;
+            assertEquals(edge, knows);
+        }
+        assertEquals(count, 1);
+
+        edges = new FilteredEdgeIterable(marko.getOutEdges(), new Filter().label("knows").property("stars", 4));
+        count = 0;
+        for (final Edge edge : edges) {
+            count++;
+        }
+        assertEquals(count, 0);
     }
 }

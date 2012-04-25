@@ -428,6 +428,122 @@ public class GraphTestSuite extends TestSuite {
 
     }
 
+    public void testVertexEdgeFilters() {
+        if (!graphTest.isRDFModel) {
+
+            Graph graph = graphTest.getGraphInstance();
+            Vertex a = graph.addVertex(null);
+            Vertex b = graph.addVertex(null);
+            Vertex c = graph.addVertex(null);
+            Edge aFriendB = graph.addEdge(null, a, b, convertId("friend"));
+            Edge aFriendC = graph.addEdge(null, a, c, convertId("friend"));
+            Edge aHateC = graph.addEdge(null, a, c, convertId("hate"));
+            Edge cHateA = graph.addEdge(null, c, a, convertId("hate"));
+            Edge cHateB = graph.addEdge(null, c, b, convertId("hate"));
+            aFriendB.setProperty("amount", 1.0);
+            aFriendB.setProperty("date", 10);
+            aFriendC.setProperty("amount", 0.5);
+            aHateC.setProperty("amount", 1.0);
+            cHateA.setProperty("amount", 1.0);
+            cHateB.setProperty("amount", 0.4);
+
+            // out edges
+
+            List<Edge> results = asList(a.getOutEdges("friend", new Filter().property("amount", 1.0)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendB));
+
+            results = asList(a.getOutEdges("blah", new Filter().property("amount", 1.0)));
+            assertEquals(results.size(), 0);
+
+            results = asList(a.getOutEdges(new Filter().property("amount", 1.0)));
+            assertEquals(results.size(), 2);
+            assertTrue(results.contains(aFriendB));
+            assertTrue(results.contains(aHateC));
+
+            results = asList(a.getOutEdges("friend", new Filter().property("amount", 1.0).property("amount", 1.0)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendB));
+
+            results = asList(a.getOutEdges("friend", new Filter().property("amount", 1.0), "hate"));
+            assertEquals(results.size(), 2);
+            assertTrue(results.contains(aFriendB));
+            assertTrue(results.contains(aHateC));
+
+            results = asList(a.getOutEdges(new Filter().property("amount", 1.0).property("date", 10)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendB));
+
+            results = asList(a.getOutEdges(new Filter().property("amount", 1.0).property("date", 10).label("friend")));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendB));
+
+            results = asList(a.getOutEdges(new Filter().property("amount", 1.0).property("date", 10), "hate"));
+            assertEquals(results.size(), 0);
+
+            results = asList(a.getOutEdges(new Filter().range("date", 5, 12)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendB));
+
+            results = asList(a.getOutEdges(new Filter().range("date", 5, 9)));
+            assertEquals(results.size(), 0);
+
+            results = asList(a.getOutEdges(new Filter().property("amount", 0.6, Filter.Compare.LESS_THAN)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendC));
+
+            results = asList(a.getOutEdges(new Filter().property("amount", 0.5, Filter.Compare.LESS_THAN_EQUAL)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendC));
+
+            results = asList(a.getOutEdges(new Filter().property("amount", 0.49, Filter.Compare.LESS_THAN_EQUAL)));
+            assertEquals(results.size(), 0);
+
+            // in edges
+
+            results = asList(b.getInEdges(new Filter().property("amount", 1.0)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendB));
+
+            results = asList(b.getInEdges(new Filter().property("amount", 0.4, Filter.Compare.GREATER_THAN_EQUAL)));
+            assertEquals(results.size(), 2);
+            assertTrue(results.contains(aFriendB));
+            assertTrue(results.contains(cHateB));
+
+            results = asList(c.getInEdges("friend", new Filter().property("amount", 0.4, Filter.Compare.GREATER_THAN)));
+            assertEquals(results.size(), 1);
+            assertTrue(results.contains(aFriendC));
+
+            results = asList(c.getInEdges("friend", "hate", new Filter().property("amount", 0.4, Filter.Compare.GREATER_THAN)));
+            assertEquals(results.size(), 2);
+            assertTrue(results.contains(aHateC));
+            assertTrue(results.contains(aFriendC));
+
+            // test object type exceptions
+
+            try {
+                a.getOutEdges(1, "hello");
+                assertTrue(false);
+            } catch (Exception e) {
+                assertTrue(true);
+                assertTrue(e instanceof IllegalArgumentException);
+
+            }
+
+            try {
+                a.getInEdges(1, "hello");
+                assertTrue(false);
+            } catch (Exception e) {
+                assertTrue(true);
+                assertTrue(e instanceof IllegalArgumentException);
+
+            }
+
+            graph.shutdown();
+        }
+    }
+
+
     public void testVertexEdgeLabels2() {
         Graph graph = graphTest.getGraphInstance();
         Vertex a = graph.addVertex(null);

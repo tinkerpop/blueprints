@@ -186,7 +186,7 @@ public class RestHelper {
         return uri.replace(" ", "%20");
     }
 
-    private static String convertStreamToString(InputStream is) throws Exception {
+    private static String convertStreamToString(final InputStream is) throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
         String line = null;
@@ -197,7 +197,7 @@ public class RestHelper {
         return sb.toString();
     }
 
-    public static String encode(Object id) {
+    public static String encode(final Object id) {
         if (id instanceof String)
             return URLEncoder.encode(id.toString());
         else

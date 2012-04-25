@@ -31,7 +31,7 @@ public class MultiIterable<S> implements Iterable<S> {
 
         public MultiIterator(final List<Iterable<S>> iterables) {
             for (final Iterable<S> iterable : iterables) {
-                iterators.add(iterable.iterator());
+                this.iterators.add(iterable.iterator());
             }
         }
 

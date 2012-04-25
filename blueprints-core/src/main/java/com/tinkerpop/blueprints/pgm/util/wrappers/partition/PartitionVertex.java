@@ -13,12 +13,12 @@ public class PartitionVertex extends PartitionElement implements Vertex {
         super(rawVertex, graph);
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        return new PartitionEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator(), this.graph);
+    public Iterable<Edge> getOutEdges(final Object... filters) {
+        return new PartitionEdgeSequence(((Vertex) this.rawElement).getOutEdges(filters).iterator(), this.graph);
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        return new PartitionEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator(), this.graph);
+    public Iterable<Edge> getInEdges(final Object... filters) {
+        return new PartitionEdgeSequence(((Vertex) this.rawElement).getInEdges(filters).iterator(), this.graph);
     }
 
     public Vertex getRawVertex() {

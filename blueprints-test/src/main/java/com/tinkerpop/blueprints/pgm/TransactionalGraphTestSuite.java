@@ -724,11 +724,9 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /* TODO: uncomment this.  It should pass, but doesn't.
-    public void testTransactionalClear() {
+    // TODO: uncomment this.  It should pass, but doesn't.
+    /*public void testTransactionalClear() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.getGraphInstance();
-        graph.setMaxBufferSize(1);
-        graph.clear();
         graph.setMaxBufferSize(0);
         
         assertEquals(0, count(graph.getEdges()));
@@ -755,6 +753,6 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         
         assertEquals(0, count(graph.getEdges()));
-    }
-    */
+    }*/
+
 }

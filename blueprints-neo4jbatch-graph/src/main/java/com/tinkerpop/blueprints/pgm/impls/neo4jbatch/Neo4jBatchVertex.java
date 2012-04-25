@@ -38,14 +38,14 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getOutEdges(final String... labels) throws UnsupportedOperationException {
+    public Iterable<Edge> getOutEdges(final Object... filters) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getInEdges(final String... labels) throws UnsupportedOperationException {
+    public Iterable<Edge> getInEdges(final Object... filters) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

@@ -18,12 +18,12 @@ public class EventVertex extends EventElement implements Vertex {
         super(rawVertex, graphChangedListeners);
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        return new EventEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator(), this.graphChangedListeners);
+    public Iterable<Edge> getInEdges(final Object... filters) {
+        return new EventEdgeSequence(((Vertex) this.rawElement).getInEdges(filters).iterator(), this.graphChangedListeners);
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        return new EventEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator(), this.graphChangedListeners);
+    public Iterable<Edge> getOutEdges(final Object... filters) {
+        return new EventEdgeSequence(((Vertex) this.rawElement).getOutEdges(filters).iterator(), this.graphChangedListeners);
     }
 
     public Vertex getRawVertex() {
