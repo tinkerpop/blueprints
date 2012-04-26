@@ -5,12 +5,12 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Filter;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.FilteredEdgeIterable;
-import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,20 +37,20 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
             else
                 throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
         } else {
-            final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
+            final List<RelationshipType> edgeLabels = new ArrayList<RelationshipType>();
             int counter = 0;
             for (final Object filter : filters) {
                 if (filter instanceof String) {
-                    edges.add(new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(DynamicRelationshipType.withName((String) filter), Direction.INCOMING), this.graph));
+                    edgeLabels.add(DynamicRelationshipType.withName((String) filter));
                     counter++;
                 }
             }
-            if (edges.size() == filters.length)
-                return new MultiIterable<Edge>(edges);
+            if (edgeLabels.size() == filters.length)
+                return new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.INCOMING, edgeLabels.toArray(new RelationshipType[edgeLabels.size()])), this.graph);
             else if (counter == 0)
                 return new FilteredEdgeIterable(new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.INCOMING), this.graph), FilteredEdgeIterable.getFilter(filters));
             else
-                return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
+                return new FilteredEdgeIterable(new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.INCOMING, edgeLabels.toArray(new RelationshipType[edgeLabels.size()])), this.graph), FilteredEdgeIterable.getFilter(filters));
         }
     }
 
@@ -65,20 +65,20 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
             else
                 throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
         } else {
-            final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
+            final List<RelationshipType> edgeLabels = new ArrayList<RelationshipType>();
             int counter = 0;
             for (final Object filter : filters) {
                 if (filter instanceof String) {
-                    edges.add(new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(DynamicRelationshipType.withName((String) filter), Direction.OUTGOING), this.graph));
+                    edgeLabels.add(DynamicRelationshipType.withName((String) filter));
                     counter++;
                 }
             }
-            if (edges.size() == filters.length)
-                return new MultiIterable<Edge>(edges);
+            if (edgeLabels.size() == filters.length)
+                return new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.OUTGOING, edgeLabels.toArray(new RelationshipType[edgeLabels.size()])), this.graph);
             else if (counter == 0)
                 return new FilteredEdgeIterable(new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.OUTGOING), this.graph), FilteredEdgeIterable.getFilter(filters));
             else
-                return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
+                return new FilteredEdgeIterable(new Neo4jEdgeSequence(((Node) this.rawElement).getRelationships(Direction.OUTGOING, edgeLabels.toArray(new RelationshipType[edgeLabels.size()])), this.graph), FilteredEdgeIterable.getFilter(filters));
         }
     }
 

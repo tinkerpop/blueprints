@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.impls.Parameter;
+import com.tinkerpop.blueprints.pgm.Parameter;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.HashSet;

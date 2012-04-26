@@ -1,11 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
+ * A helper class that is used to combine multiple iterables into a single iterable.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class MultiIterable<S> implements Iterable<S> {
@@ -18,44 +20,49 @@ public class MultiIterable<S> implements Iterable<S> {
 
     public Iterator<S> iterator() {
         if (this.iterables.size() == 0) {
-            return new ArrayList<S>().iterator();
+            return (Iterator<S>) Collections.emptyList().iterator();
         } else {
-            return new MultiIterator<S>(iterables);
+            return new MultiIterator();
         }
     }
 
-    protected class MultiIterator<S> implements Iterator<S> {
+    protected class MultiIterator implements Iterator<S> {
 
-        private final List<Iterator<S>> iterators = new ArrayList<Iterator<S>>();
+        private Iterator<S> currentIterator;
         private int current = 0;
 
-        public MultiIterator(final List<Iterable<S>> iterables) {
-            for (final Iterable<S> iterable : iterables) {
-                this.iterators.add(iterable.iterator());
-            }
+        public MultiIterator() {
+            currentIterator = iterables.get(0).iterator();
         }
 
         public void remove() {
-            this.iterators.get(this.current).remove();
+            currentIterator.remove();
         }
 
         public boolean hasNext() {
-            while (this.current < this.iterators.size()) {
-                if (this.iterators.get(this.current).hasNext()) {
+            while (true) {
+                if (currentIterator.hasNext()) {
                     return true;
+                } else {
+                    this.current++;
+                    if (this.current >= iterables.size())
+                        break;
+                    this.currentIterator = iterables.get(this.current).iterator();
                 }
-                this.current++;
             }
             return false;
         }
 
         public S next() {
-            while (this.current < this.iterators.size()) {
-                final Iterator<S> temp = this.iterators.get(this.current);
-                if (temp.hasNext()) {
-                    return temp.next();
+            while (true) {
+                if (currentIterator.hasNext()) {
+                    return currentIterator.next();
+                } else {
+                    this.current++;
+                    if (this.current >= iterables.size())
+                        break;
+                    this.currentIterator = iterables.get(current).iterator();
                 }
-                this.current++;
             }
             throw new NoSuchElementException();
         }

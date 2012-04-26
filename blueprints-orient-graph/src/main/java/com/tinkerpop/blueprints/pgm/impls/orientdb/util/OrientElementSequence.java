@@ -16,22 +16,22 @@ import java.util.NoSuchElementException;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientElementSequence<T extends Element> implements CloseableSequence<T> {
-    private final Iterator<?> underlying;
+    private final Iterator<?> rawIterator;
     private final OrientGraph graph;
 
     public OrientElementSequence(final OrientGraph graph, final Iterator<?> rawIterator) {
         this.graph = graph;
-        this.underlying = rawIterator;
+        this.rawIterator = rawIterator;
     }
 
     public boolean hasNext() {
-        return this.underlying.hasNext();
+        return this.rawIterator.hasNext();
     }
 
     @SuppressWarnings("unchecked")
     public T next() {
         OrientElement currentElement = null;
-        Object current = this.underlying.next();
+        Object current = this.rawIterator.next();
 
         if (null == current)
             throw new NoSuchElementException();

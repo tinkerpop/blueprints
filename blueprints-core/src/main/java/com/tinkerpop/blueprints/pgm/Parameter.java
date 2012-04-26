@@ -1,8 +1,11 @@
-package com.tinkerpop.blueprints.pgm.impls;
+package com.tinkerpop.blueprints.pgm;
 
 import java.util.Map;
 
 /**
+ * A Parameter is simply a pair of objects of type K and of type V.
+ * This is used in situations where a key/value pair is needed for configuration.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class Parameter<K, V> implements Map.Entry<K, V> {

@@ -40,10 +40,9 @@ public abstract class Neo4jElement implements Element {
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
         try {
-
             // attempts to take a collection and convert it to an array so that Neo4j can consume it
             final Object convertedValue = tryConvertCollectionToArray(value);
-            
+
             this.graph.autoStartTransaction();
             Object oldValue = this.getProperty(key);
 
@@ -116,18 +115,16 @@ public abstract class Neo4jElement implements Element {
     public boolean equals(final Object object) {
         return (null != object) && (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
     }
-    
+
     private Object tryConvertCollectionToArray(final Object value) {
-        if (value instanceof Collection<?>)
-        {
+        if (value instanceof Collection<?>) {
             // convert this collection to an array.  the collection must
             // be all of the same type.
             try {
                 final Collection<?> collection = (Collection<?>) value;
                 Object[] array = null;
                 final Iterator<?> objects = collection.iterator();
-                for (int i = 0; objects.hasNext(); i++)
-                {
+                for (int i = 0; objects.hasNext(); i++) {
                     Object object = objects.next();
                     if (array == null) {
                         array = (Object[]) Array.newInstance(object.getClass(), collection.size());
@@ -140,9 +137,7 @@ public abstract class Neo4jElement implements Element {
                 // this fires off if the collection is not all of the same type
                 return value;
             }
-        }
-        else
-        {
+        } else {
             return value;
         }
     }

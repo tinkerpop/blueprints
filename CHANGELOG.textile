@@ -20,6 +20,9 @@ h3. Version 1.3 (NOT OFFICIALLY RELEASED YET)
 * @RexsterGraph@ supports Rexster Authentication
 * @Neo4jElement@ will accept a @Collection@ as a property (as long as all items within it are of the same data type), internally converting it to an array for storage in Neo4j
 * Fixed a couple of API naming convention errors in @PartitionGraph@
+* Updated core @Vertex@ API to support the notion of 'push down predicates' (lower level element filtering)
+* Added internal support for Neo4j's @Node@ var args of @RelationshipTypes@
+* Speed improvements to the much used @MultiIterable@
 
 ==<hr/>==
 
