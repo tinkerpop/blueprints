@@ -160,7 +160,7 @@ public class SailVertex implements Vertex {
                     if (filters[0] instanceof String)
                         return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, new URIImpl(this.graph.expandPrefix((String) filters[0])), null, false), this.graph);
                     else if (filters[0] instanceof Filter)
-                        return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph), FilteredEdgeIterable.getFilter(filters));
+                        return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements((Resource) this.rawVertex, null, null, false), this.graph), (Filter)filters[0]);
                     else
                         throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
                 } else {
@@ -197,7 +197,7 @@ public class SailVertex implements Vertex {
                 if (filters[0] instanceof String)
                     return new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, new URIImpl(this.graph.expandPrefix((String) filters[0])), (Resource) this.rawVertex, false), this.graph);
                 else if (filters[0] instanceof Filter)
-                    return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph), FilteredEdgeIterable.getFilter(filters));
+                    return new FilteredEdgeIterable(new SailEdgeSequence(this.graph.getSailConnection().get().getStatements(null, null, this.rawVertex, false), this.graph), (Filter)filters[0]);
                 else
                     throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
             } else {
