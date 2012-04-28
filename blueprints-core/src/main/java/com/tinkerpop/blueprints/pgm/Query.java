@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
 /**
- * A Query object defines a collection of filters and modifies that are used to intelligent select edges from a vertex.
+ * A Query object defines a collection of filters and modifiers that are used to intelligently select edges from a vertex.
  *
  * @author Matthias Brocheler (http://matthiasb.com)
  * @author Marko A. Rodriguez (http://markorodriguez.com)

@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
+import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
@@ -195,7 +195,7 @@ public class SailVertex implements Vertex {
     }
 
     public Query query() {
-        return new BasicQuery(this);
+        return new DefaultQuery(this);
     }
 
     public String toString() {

@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
+import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
@@ -55,7 +55,7 @@ public class RexsterVertex extends RexsterElement implements Vertex {
     }
 
     public Query query() {
-        return new BasicQuery(this);
+        return new DefaultQuery(this);
     }
 
     public String toString() {

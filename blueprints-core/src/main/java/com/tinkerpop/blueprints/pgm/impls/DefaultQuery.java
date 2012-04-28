@@ -12,9 +12,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
+ * For those graph engines that do not support the low-level querying of the outgoing edges of a vertex, then DefaultQuery can be used.
+ * DefaultQuery assumes, at minimum, that Vertex.getOutEdges() and Vertex.getInEdges() is implemented by the respective Graph.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class BasicQuery implements Query {
+public class DefaultQuery implements Query {
 
     private static final String[] EMPTY_LABELS = new String[]{};
 
@@ -24,7 +27,7 @@ public class BasicQuery implements Query {
     public long limit = Long.MAX_VALUE;
     public List<HasContainer> hasContainers = new LinkedList<HasContainer>();
 
-    public BasicQuery(final Vertex vertex) {
+    public DefaultQuery(final Vertex vertex) {
         this.vertex = vertex;
     }
 

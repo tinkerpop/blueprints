@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
+import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
 
 /**
@@ -24,7 +24,7 @@ public class PartitionVertex extends PartitionElement implements Vertex {
     }
 
     public Query query() {
-        return new BasicQuery(this);
+        return new DefaultQuery(this);
     }
 
     public Vertex getBaseVertex() {

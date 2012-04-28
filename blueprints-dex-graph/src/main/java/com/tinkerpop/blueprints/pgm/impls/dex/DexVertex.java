@@ -6,7 +6,7 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
+import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -108,6 +108,6 @@ public class DexVertex extends DexElement implements Vertex {
     }
 
     public Query query() {
-        return new BasicQuery(this);
+        return new DefaultQuery(this);
     }
 }
