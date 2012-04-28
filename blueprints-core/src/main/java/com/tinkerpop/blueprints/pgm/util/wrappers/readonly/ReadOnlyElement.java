@@ -50,6 +50,6 @@ public class ReadOnlyElement implements Element {
     }
 
     public boolean equals(Object object) {
-        return (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((ReadOnlyElement) object).getId());
+        return null != object && (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((ReadOnlyElement) object).getId());
     }
 }

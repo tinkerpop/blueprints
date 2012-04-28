@@ -31,14 +31,6 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         return this;
     }
 
-    private static List<Edge> getAllEdges(final Map<String, Set<Edge>> theEdges) {
-        final List<Edge> totalEdges = new LinkedList<Edge>();
-        for (final Collection<Edge> edges : theEdges.values()) {
-            totalEdges.addAll(edges);
-        }
-        return totalEdges;
-    }
-
     public Iterable<Edge> getInEdges(final String... labels) {
         if (labels.length == 0) {
             final List<Edge> totalEdges = new LinkedList<Edge>();

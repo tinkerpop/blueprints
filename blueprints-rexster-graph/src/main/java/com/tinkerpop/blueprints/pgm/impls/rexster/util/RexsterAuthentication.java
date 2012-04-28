@@ -23,8 +23,8 @@ public class RexsterAuthentication {
     public String getPassword() {
         return password;
     }
-    
-    public String getAuthenticationHeaderValue(){
+
+    public String getAuthenticationHeaderValue() {
         return "Basic " + Base64.encodeBase64URLSafeString((username + ":" + password).getBytes());
     }
 }

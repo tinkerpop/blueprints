@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class RexsterGraphTest extends GraphTest {
-    
+
     private String username = null;
     private String password = null;
 
@@ -102,7 +102,7 @@ public class RexsterGraphTest extends GraphTest {
 
             this.username = System.getProperty("username");
             this.password = System.getProperty("password");
-            
+
             this.resetGraph();
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {

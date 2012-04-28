@@ -36,7 +36,7 @@ public class WrappedElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return null != object && this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId());
+        return null != object && (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((WrappedElement) object).getId());
     }
 
     public int hashCode() {

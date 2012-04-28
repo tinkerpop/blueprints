@@ -16,7 +16,7 @@ public class TinkerGraphSailTest extends GraphSailTest {
         System.out.println(b.stringValue());
         System.exit(1);
         */
-        
+
         return new TinkerGraph();
     }
 }
