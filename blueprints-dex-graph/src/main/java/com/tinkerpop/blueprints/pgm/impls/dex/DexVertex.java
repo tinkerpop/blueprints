@@ -4,9 +4,9 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Filter;
+import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.FilteredEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
 import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -79,61 +79,35 @@ public class DexVertex extends DexElement implements Vertex {
         return StringFactory.vertexString(this);
     }
 
-    public Iterable<Edge> getInEdges(final Object... filters) {
-        if (filters.length == 0)
+    public Iterable<Edge> getInEdges(final String... labels) {
+        if (labels.length == 0)
             return this.getInEdgesNoLabels();
-        else if (filters.length == 1) {
-            if (filters[0] instanceof String)
-                return this.getInEdgesSingleLabel((String) filters[0]);
-            else if (filters[0] instanceof Filter)
-                return new FilteredEdgeIterable(this.getInEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
-            else
-                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
+        else if (labels.length == 1) {
+            return this.getInEdgesSingleLabel(labels[0]);
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
-            int counter = 0;
-            for (final Object filter : filters) {
-                if (filter instanceof String) {
-                    counter++;
-                    edges.add(this.getInEdgesSingleLabel((String) filter));
-                }
+            for (final String label : labels) {
+                edges.add(this.getInEdgesSingleLabel(label));
             }
-
-            if (edges.size() == filters.length)
-                return new MultiIterable<Edge>(edges);
-            else if (counter == 0)
-                return new FilteredEdgeIterable(this.getInEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
-            else
-                return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
+            return new MultiIterable<Edge>(edges);
         }
     }
 
-    public Iterable<Edge> getOutEdges(final Object... filters) {
-        if (filters.length == 0)
+    public Iterable<Edge> getOutEdges(final String... labels) {
+        if (labels.length == 0)
             return this.getOutEdgesNoLabels();
-        else if (filters.length == 1) {
-            if (filters[0] instanceof String)
-                return this.getOutEdgesSingleLabel((String) filters[0]);
-            else if (filters[0] instanceof Filter)
-                return new FilteredEdgeIterable(this.getOutEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
-            else
-                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
+        else if (labels.length == 1) {
+            return this.getOutEdgesSingleLabel(labels[0]);
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
-            int counter = 0;
-            for (final Object filter : filters) {
-                if (filter instanceof String) {
-                    counter++;
-                    edges.add(this.getOutEdgesSingleLabel((String) filter));
-                }
+            for (final String label : labels) {
+                edges.add(this.getOutEdgesSingleLabel(label));
             }
-
-            if (edges.size() == filters.length)
-                return new MultiIterable<Edge>(edges);
-            else if (counter == 0)
-                return new FilteredEdgeIterable(this.getOutEdgesNoLabels(), FilteredEdgeIterable.getFilter(filters));
-            else
-                return new FilteredEdgeIterable(new MultiIterable<Edge>(edges), FilteredEdgeIterable.getFilter(filters));
+            return new MultiIterable<Edge>(edges);
         }
+    }
+
+    public Query query() {
+        return new BasicQuery(this);
     }
 }

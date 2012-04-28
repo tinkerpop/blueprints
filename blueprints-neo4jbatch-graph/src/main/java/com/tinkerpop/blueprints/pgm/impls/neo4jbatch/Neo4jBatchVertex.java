@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
@@ -38,14 +39,21 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getOutEdges(final Object... filters) throws UnsupportedOperationException {
+    public Iterable<Edge> getOutEdges(final String... labels) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getInEdges(final Object... filters) throws UnsupportedOperationException {
+    public Iterable<Edge> getInEdges(final String... labels) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @throws UnsupportedOperationException
+     */
+    public Query query() {
         throw new UnsupportedOperationException();
     }
 

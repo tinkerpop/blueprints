@@ -1,7 +1,9 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
 
 /**
@@ -13,12 +15,16 @@ public class PartitionVertex extends PartitionElement implements Vertex {
         super(rawVertex, graph);
     }
 
-    public Iterable<Edge> getOutEdges(final Object... filters) {
-        return new PartitionEdgeSequence(((Vertex) this.rawElement).getOutEdges(filters).iterator(), this.graph);
+    public Iterable<Edge> getOutEdges(final String... labels) {
+        return new PartitionEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator(), this.graph);
     }
 
-    public Iterable<Edge> getInEdges(final Object... filters) {
-        return new PartitionEdgeSequence(((Vertex) this.rawElement).getInEdges(filters).iterator(), this.graph);
+    public Iterable<Edge> getInEdges(final String... labels) {
+        return new PartitionEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator(), this.graph);
+    }
+
+    public Query query() {
+        return new BasicQuery(this);
     }
 
     public Vertex getRawVertex() {

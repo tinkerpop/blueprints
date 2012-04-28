@@ -428,7 +428,7 @@ public class GraphTestSuite extends TestSuite {
 
     }
 
-    public void testVertexEdgeFilters() {
+    /*public void testVertexEdgeFilters() {
         if (!graphTest.isRDFModel) {
 
             Graph graph = graphTest.getGraphInstance();
@@ -541,7 +541,7 @@ public class GraphTestSuite extends TestSuite {
 
             graph.shutdown();
         }
-    }
+    }*/
 
 
     public void testVertexEdgeLabels2() {

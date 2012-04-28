@@ -1,7 +1,9 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
 
 /**
@@ -13,12 +15,16 @@ public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
         super(rawVertex);
     }
 
-    public Iterable<Edge> getInEdges(final Object... filters) {
-        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getInEdges(filters).iterator());
+    public Iterable<Edge> getInEdges(final String... labels) {
+        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator());
     }
 
-    public Iterable<Edge> getOutEdges(final Object... filters) {
-        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getOutEdges(filters).iterator());
+    public Iterable<Edge> getOutEdges(final String... labels) {
+        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator());
+    }
+
+    public Query query() {
+        return new BasicQuery(this);
     }
 
 

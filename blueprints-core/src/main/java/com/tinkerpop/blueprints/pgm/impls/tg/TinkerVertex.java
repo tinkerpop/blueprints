@@ -1,14 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Filter;
+import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.FilteredEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.BasicQuery;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -40,88 +39,60 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         return totalEdges;
     }
 
-    public Iterable<Edge> getInEdges(final Object... filters) {
-        if (filters.length == 0) {
-            return getAllEdges(this.inEdges);
-        } else if (filters.length == 1) {
-            if (filters[0] instanceof String) {
-                final Set<Edge> edges = this.inEdges.get(filters[0]);
-                if (null == edges) {
-                    return Collections.emptyList();
-                } else {
-                    return new LinkedList<Edge>(edges);
-                }
-            } else if (filters[0] instanceof Filter) {
-                return new FilteredEdgeIterable(getAllEdges(this.inEdges), (Filter) filters[0]);
+    public Iterable<Edge> getInEdges(final String... labels) {
+        if (labels.length == 0) {
+            final List<Edge> totalEdges = new LinkedList<Edge>();
+            for (final Collection<Edge> edges : this.inEdges.values()) {
+                totalEdges.addAll(edges);
+            }
+            return totalEdges;
+        } else if (labels.length == 1) {
+            final Set<Edge> edges = this.inEdges.get(labels[0]);
+            if (null == edges) {
+                return new LinkedList<Edge>();
             } else {
-                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
+                return new LinkedList<Edge>(edges);
             }
         } else {
-            final Filter filter = FilteredEdgeIterable.getFilter(filters);
-            final List<String> labels = FilteredEdgeIterable.getLabels(filters);
-
-            List<Edge> totalEdges = new LinkedList<Edge>();
+            final List<Edge> totalEdges = new LinkedList<Edge>();
             for (final String label : labels) {
                 final Set<Edge> edges = this.inEdges.get(label);
                 if (null != edges) {
                     totalEdges.addAll(edges);
                 }
             }
-
-            if (labels.size() == filters.length)
-                return totalEdges;
-
-            if (labels.isEmpty()) {
-                totalEdges = getAllEdges(this.inEdges);
-            }
-
-            if (null == filter)
-                return totalEdges;
-            else
-                return new FilteredEdgeIterable(totalEdges, filter);
+            return totalEdges;
         }
     }
 
-    public Iterable<Edge> getOutEdges(final Object... filters) {
-        if (filters.length == 0) {
-            return getAllEdges(this.outEdges);
-        } else if (filters.length == 1) {
-            if (filters[0] instanceof String) {
-                final Set<Edge> edges = this.outEdges.get(filters[0]);
-                if (null == edges) {
-                    return Collections.emptyList();
-                } else {
-                    return new LinkedList<Edge>(edges);
-                }
-            } else if (filters[0] instanceof Filter) {
-                return new FilteredEdgeIterable(getAllEdges(this.outEdges), (Filter) filters[0]);
+    public Iterable<Edge> getOutEdges(final String... labels) {
+        if (labels.length == 0) {
+            final List<Edge> totalEdges = new LinkedList<Edge>();
+            for (final Collection<Edge> edges : this.outEdges.values()) {
+                totalEdges.addAll(edges);
+            }
+            return totalEdges;
+        } else if (labels.length == 1) {
+            final Set<Edge> edges = this.outEdges.get(labels[0]);
+            if (null == edges) {
+                return new LinkedList<Edge>();
             } else {
-                throw new IllegalArgumentException(Vertex.TYPE_ERROR_MESSAGE);
+                return new LinkedList<Edge>(edges);
             }
         } else {
-            final Filter filter = FilteredEdgeIterable.getFilter(filters);
-            final List<String> labels = FilteredEdgeIterable.getLabels(filters);
-
-            List<Edge> totalEdges = new LinkedList<Edge>();
+            final List<Edge> totalEdges = new LinkedList<Edge>();
             for (final String label : labels) {
                 final Set<Edge> edges = this.outEdges.get(label);
                 if (null != edges) {
                     totalEdges.addAll(edges);
                 }
             }
-
-            if (labels.size() == filters.length)
-                return totalEdges;
-
-            if (labels.isEmpty()) {
-                totalEdges = getAllEdges(this.outEdges);
-            }
-
-            if (null == filter)
-                return totalEdges;
-            else
-                return new FilteredEdgeIterable(totalEdges, filter);
+            return totalEdges;
         }
+    }
+
+    public Query query() {
+        return new BasicQuery(this);
     }
 
     public String toString() {
