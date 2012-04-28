@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSequence;
@@ -14,12 +14,12 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSe
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyGraph<T extends Graph> implements Graph, WrappableGraph<T> {
+public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
-    protected final T rawGraph;
+    protected final T baseGraph;
 
-    public ReadOnlyGraph(final T rawGraph) {
-        this.rawGraph = rawGraph;
+    public ReadOnlyGraph(final T baseGraph) {
+        this.baseGraph = baseGraph;
     }
 
     /**
@@ -37,7 +37,7 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrappableGraph<T> 
     }
 
     public Vertex getVertex(final Object id) {
-        final Vertex vertex = this.rawGraph.getVertex(id);
+        final Vertex vertex = this.baseGraph.getVertex(id);
         if (null == vertex)
             return null;
         else
@@ -52,11 +52,11 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrappableGraph<T> 
     }
 
     public Iterable<Edge> getEdges() {
-        return new ReadOnlyEdgeSequence(this.rawGraph.getEdges().iterator());
+        return new ReadOnlyEdgeSequence(this.baseGraph.getEdges().iterator());
     }
 
     public Edge getEdge(final Object id) {
-        final Edge edge = this.rawGraph.getEdge(id);
+        final Edge edge = this.baseGraph.getEdge(id);
         if (null == edge)
             return null;
         else
@@ -64,7 +64,7 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrappableGraph<T> 
     }
 
     public Iterable<Vertex> getVertices() {
-        return new ReadOnlyVertexSequence(this.rawGraph.getVertices().iterator());
+        return new ReadOnlyVertexSequence(this.baseGraph.getVertices().iterator());
     }
 
     /**
@@ -89,12 +89,12 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrappableGraph<T> 
     }
 
     public String toString() {
-        return StringFactory.graphString(this, this.rawGraph.toString());
+        return StringFactory.graphString(this, this.baseGraph.toString());
     }
 
     @Override
-    public T getRawGraph() {
-        return this.rawGraph;
+    public T getBaseGraph() {
+        return this.baseGraph;
     }
 
 }

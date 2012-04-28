@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyIndexSequence;
 
 import java.util.Set;
@@ -16,10 +16,10 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGraph<T> implements IndexableGraph, WrappableGraph<T> {
+public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGraph<T> implements IndexableGraph, WrapperGraph<T> {
 
-    public ReadOnlyIndexableGraph(final T graph) {
-        super(graph);
+    public ReadOnlyIndexableGraph(final T baseIndexableGraph) {
+        super(baseIndexableGraph);
     }
 
     /**
@@ -44,7 +44,7 @@ public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGr
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        final Index<T> index = this.rawGraph.getIndex(indexName, indexClass);
+        final Index<T> index = this.baseGraph.getIndex(indexName, indexClass);
         if (index.getIndexType().equals(Index.Type.MANUAL))
             return new ReadOnlyIndex<T>(index);
         else
@@ -52,6 +52,6 @@ public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGr
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new ReadOnlyIndexSequence(this.rawGraph.getIndices().iterator());
+        return new ReadOnlyIndexSequence(this.baseGraph.getIndices().iterator());
     }
 }

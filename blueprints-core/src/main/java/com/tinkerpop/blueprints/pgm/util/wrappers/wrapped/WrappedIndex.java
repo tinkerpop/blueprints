@@ -39,11 +39,11 @@ public class WrappedIndex<T extends Element> implements Index<T> {
     }
 
     public void remove(final String key, final Object value, final T element) {
-        this.rawIndex.remove(key, value, (T) ((WrappedElement) element).getRawElement());
+        this.rawIndex.remove(key, value, (T) ((WrappedElement) element).getBaseElement());
     }
 
     public void put(final String key, final Object value, final T element) {
-        this.rawIndex.put(key, value, (T) ((WrappedElement) element).getRawElement());
+        this.rawIndex.put(key, value, (T) ((WrappedElement) element).getBaseElement());
     }
 
     public CloseableSequence<T> get(final String key, final Object value) {

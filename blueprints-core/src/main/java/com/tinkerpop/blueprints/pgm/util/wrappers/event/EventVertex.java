@@ -32,7 +32,7 @@ public class EventVertex extends EventElement implements Vertex {
         return new BasicQuery(this);
     }
 
-    public Vertex getRawVertex() {
+    public Vertex getBaseVertex() {
         return (Vertex) this.rawElement;
     }
 }

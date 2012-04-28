@@ -102,7 +102,7 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(graph.getWritePartition(), "a");
 
         Vertex marko = graph.addVertex(null);
-        Vertex rawMarko = ((PartitionVertex) marko).getRawVertex();
+        Vertex rawMarko = ((PartitionVertex) marko).getBaseVertex();
         assertEquals(marko.getPropertyKeys().size(), 0);
         assertEquals(rawMarko.getPropertyKeys().size(), 1);
         assertNull(marko.getProperty("_writeGraph"));
@@ -117,7 +117,7 @@ public class PartitionGraphTest extends GraphTest {
         assertTrue(graph.getReadPartitions().contains("a"));
         assertEquals(graph.getWritePartition(), "b");
         Vertex peter = graph.addVertex(null);
-        Vertex rawPeter = ((PartitionVertex) peter).getRawVertex();
+        Vertex rawPeter = ((PartitionVertex) peter).getBaseVertex();
         assertEquals(peter.getPropertyKeys().size(), 0);
         assertEquals(rawPeter.getPropertyKeys().size(), 1);
         assertNull(peter.getProperty("_writeGraph"));
@@ -154,7 +154,7 @@ public class PartitionGraphTest extends GraphTest {
         assertTrue(graph.getReadPartitions().contains("b"));
         assertEquals(graph.getWritePartition(), "c");
         Edge knows = graph.addEdge(null, marko, peter, "knows");
-        Edge rawKnows = ((PartitionEdge) knows).getRawEdge();
+        Edge rawKnows = ((PartitionEdge) knows).getBaseEdge();
         assertEquals(count(graph.getVertices()), 2);
         assertEquals(count(graph.getEdges()), 0);
         graph.addReadPartition("c");

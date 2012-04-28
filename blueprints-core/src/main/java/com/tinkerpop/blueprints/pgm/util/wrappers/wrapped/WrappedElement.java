@@ -43,7 +43,7 @@ public class WrappedElement implements Element {
         return this.rawElement.hashCode();
     }
 
-    public Element getRawElement() {
+    public Element getBaseElement() {
         return this.rawElement;
     }
 

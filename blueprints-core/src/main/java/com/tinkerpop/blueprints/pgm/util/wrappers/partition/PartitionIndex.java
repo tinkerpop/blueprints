@@ -45,11 +45,11 @@ public class PartitionIndex<T extends Element> implements Index<T> {
     }
 
     public void remove(final String key, final Object value, final T element) {
-        this.rawIndex.remove(key, value, (T) ((PartitionElement) element).getRawElement());
+        this.rawIndex.remove(key, value, (T) ((PartitionElement) element).getBaseElement());
     }
 
     public void put(final String key, final Object value, final T element) {
-        this.rawIndex.put(key, value, (T) ((PartitionElement) element).getRawElement());
+        this.rawIndex.put(key, value, (T) ((PartitionElement) element).getBaseElement());
     }
 
     public CloseableSequence<T> get(final String key, final Object value) {

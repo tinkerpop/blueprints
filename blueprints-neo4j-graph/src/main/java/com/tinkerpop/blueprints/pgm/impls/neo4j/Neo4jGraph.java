@@ -5,10 +5,10 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
@@ -35,11 +35,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A Blueprints implementation of the graph database Neo4j (http://neo4j.org)
+ * A Blueprints implementation of the graph database Neo4j (http://neo4j.o
+ * rg)
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraph implements TransactionalGraph, IndexableGraph, WrappableGraph<GraphDatabaseService> {
+public class Neo4jGraph implements TransactionalGraph, IndexableGraph, MetaGraph<GraphDatabaseService> {
 
     private GraphDatabaseService rawGraph;
     private PropertyContainer kernalData;

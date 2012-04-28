@@ -26,6 +26,4 @@ public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
     public Query query() {
         return new BasicQuery(this);
     }
-
-
 }

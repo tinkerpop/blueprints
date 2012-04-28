@@ -6,9 +6,9 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity Technologies</a>
  */
-public class DexGraph implements IndexableGraph, WrappableGraph<Graph> {
+public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
 
     /**
      * Default Vertex label. Just used when invoked addVertex with a null parameter.

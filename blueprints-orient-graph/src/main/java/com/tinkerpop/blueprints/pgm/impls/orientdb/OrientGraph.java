@@ -15,10 +15,10 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
 import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraph implements TransactionalGraph, IndexableGraph, WrappableGraph<OGraphDatabase> {
+public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGraph<OGraphDatabase> {
     private final static String ADMIN = "admin";
 
     private String url;

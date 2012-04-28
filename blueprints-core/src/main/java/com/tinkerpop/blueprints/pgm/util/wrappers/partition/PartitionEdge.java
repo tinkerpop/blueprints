@@ -24,7 +24,7 @@ public class PartitionEdge extends PartitionElement implements Edge {
         return ((Edge) this.rawElement).getLabel();
     }
 
-    public Edge getRawEdge() {
+    public Edge getBaseEdge() {
         return (Edge) this.rawElement;
     }
 }

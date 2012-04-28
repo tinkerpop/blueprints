@@ -28,6 +28,4 @@ public interface Vertex extends Element {
 
 
     public Query query();
-
-    //public T getRawVertex();
 }

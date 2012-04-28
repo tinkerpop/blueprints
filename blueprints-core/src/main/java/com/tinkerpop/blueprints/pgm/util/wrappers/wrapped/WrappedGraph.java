@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.wrapped;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeSequence;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexSequence;
@@ -14,28 +14,28 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexSequ
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedGraph<T extends Graph> implements Graph, WrappableGraph<T> {
+public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
-    protected T rawGraph;
+    protected T baseGraph;
 
-    public WrappedGraph(final T rawGraph) {
-        this.rawGraph = rawGraph;
+    public WrappedGraph(final T baseGraph) {
+        this.baseGraph = baseGraph;
     }
 
     public void clear() {
-        this.rawGraph.clear();
+        this.baseGraph.clear();
     }
 
     public void shutdown() {
-        this.rawGraph.shutdown();
+        this.baseGraph.shutdown();
     }
 
     public Vertex addVertex(final Object id) {
-        return new WrappedVertex(this.rawGraph.addVertex(id));
+        return new WrappedVertex(this.baseGraph.addVertex(id));
     }
 
     public Vertex getVertex(final Object id) {
-        final Vertex vertex = this.rawGraph.getVertex(id);
+        final Vertex vertex = this.baseGraph.getVertex(id);
         if (null == vertex)
             return null;
         else
@@ -43,15 +43,15 @@ public class WrappedGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new WrappedVertexSequence(this.rawGraph.getVertices().iterator());
+        return new WrappedVertexSequence(this.baseGraph.getVertices().iterator());
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        return new WrappedEdge(this.rawGraph.addEdge(id, ((WrappedVertex) outVertex).getRawVertex(), ((WrappedVertex) inVertex).getRawVertex(), label));
+        return new WrappedEdge(this.baseGraph.addEdge(id, ((WrappedVertex) outVertex).getBaseVertex(), ((WrappedVertex) inVertex).getBaseVertex(), label));
     }
 
     public Edge getEdge(final Object id) {
-        final Edge edge = this.rawGraph.getEdge(id);
+        final Edge edge = this.baseGraph.getEdge(id);
         if (null == edge)
             return null;
         else
@@ -59,23 +59,23 @@ public class WrappedGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     }
 
     public Iterable<Edge> getEdges() {
-        return new WrappedEdgeSequence(this.rawGraph.getEdges().iterator());
+        return new WrappedEdgeSequence(this.baseGraph.getEdges().iterator());
     }
 
     public void removeEdge(final Edge edge) {
-        this.rawGraph.removeEdge(((WrappedEdge) edge).getRawEdge());
+        this.baseGraph.removeEdge(((WrappedEdge) edge).getBaseEdge());
     }
 
     public void removeVertex(final Vertex vertex) {
-        this.rawGraph.removeVertex(((WrappedVertex) vertex).getRawVertex());
+        this.baseGraph.removeVertex(((WrappedVertex) vertex).getBaseVertex());
     }
 
     @Override
-    public T getRawGraph() {
-        return this.rawGraph;
+    public T getBaseGraph() {
+        return this.baseGraph;
     }
 
     public String toString() {
-        return StringFactory.graphString(this, this.rawGraph.toString());
+        return StringFactory.graphString(this, this.baseGraph.toString());
     }
 }

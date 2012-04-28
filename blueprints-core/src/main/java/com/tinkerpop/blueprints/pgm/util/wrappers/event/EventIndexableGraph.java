@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexSequence;
 
 import java.util.Set;
@@ -19,26 +19,26 @@ import java.util.Set;
  *
  * @author Stephen Mallette
  */
-public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T> implements IndexableGraph, WrappableGraph<T> {
+public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T> implements IndexableGraph, WrapperGraph<T> {
 
     public EventIndexableGraph(final T graph) {
         super(graph);
     }
 
     public void dropIndex(final String name) {
-        this.getRawGraph().dropIndex(name);
+        this.getBaseGraph().dropIndex(name);
     }
 
     public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        return new EventIndex<T>(this.getRawGraph().createManualIndex(indexName, indexClass, indexParameters), this.graphChangedListeners);
+        return new EventIndex<T>(this.getBaseGraph().createManualIndex(indexName, indexClass, indexParameters), this.graphChangedListeners);
     }
 
     public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys, final Parameter... indexParameters) {
-        return new EventAutomaticIndex<T>(this.getRawGraph().createAutomaticIndex(indexName, indexClass, autoIndexKeys, indexParameters), this.graphChangedListeners);
+        return new EventAutomaticIndex<T>(this.getBaseGraph().createAutomaticIndex(indexName, indexClass, autoIndexKeys, indexParameters), this.graphChangedListeners);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        final Index<T> index = this.rawGraph.getIndex(indexName, indexClass);
+        final Index<T> index = this.baseGraph.getIndex(indexName, indexClass);
         if (null == index)
             return null;
         else {
@@ -50,6 +50,6 @@ public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T>
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new EventIndexSequence(this.rawGraph.getIndices().iterator(), this.graphChangedListeners);
+        return new EventIndexSequence(this.baseGraph.getIndices().iterator(), this.graphChangedListeners);
     }
 }

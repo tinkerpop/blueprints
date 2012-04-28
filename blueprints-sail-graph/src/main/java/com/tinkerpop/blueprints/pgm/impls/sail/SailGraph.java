@@ -2,9 +2,9 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
@@ -49,7 +49,7 @@ import java.util.UUID;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class SailGraph implements TransactionalGraph, WrappableGraph<Sail> {
+public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
 

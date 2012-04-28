@@ -5,9 +5,9 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.index.BatchInserterIndexProvider;
@@ -29,7 +29,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchGraph implements IndexableGraph, WrappableGraph<BatchInserter> {
+public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter> {
 
     private final BatchInserter rawGraph;
     private final BatchInserterIndexProvider indexProvider;

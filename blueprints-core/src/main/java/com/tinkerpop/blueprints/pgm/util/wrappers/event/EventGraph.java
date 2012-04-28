@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.WrappableGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeSequence;
@@ -27,13 +27,13 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
-    protected final T rawGraph;
+public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
+    protected final T baseGraph;
 
     protected final List<GraphChangedListener> graphChangedListeners = new ArrayList<GraphChangedListener>();
 
-    public EventGraph(final T rawGraph) {
-        this.rawGraph = rawGraph;
+    public EventGraph(final T baseGraph) {
+        this.baseGraph = baseGraph;
     }
 
     public void removeAllListeners() {
@@ -86,7 +86,7 @@ public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
      * Raises a vertexAdded event.
      */
     public Vertex addVertex(final Object id) {
-        final Vertex vertex = this.rawGraph.addVertex(id);
+        final Vertex vertex = this.baseGraph.addVertex(id);
         if (vertex == null) {
             return null;
         } else {
@@ -96,7 +96,7 @@ public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     }
 
     public Vertex getVertex(final Object id) {
-        final Vertex vertex = this.rawGraph.getVertex(id);
+        final Vertex vertex = this.baseGraph.getVertex(id);
         if (vertex == null) {
             return null;
         } else {
@@ -110,15 +110,15 @@ public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     public void removeVertex(final Vertex vertex) {
         Vertex vertexToRemove = vertex;
         if (vertex instanceof EventVertex) {
-            vertexToRemove = ((EventVertex) vertex).getRawVertex();
+            vertexToRemove = ((EventVertex) vertex).getBaseVertex();
         }
 
-        this.rawGraph.removeVertex(vertexToRemove);
+        this.baseGraph.removeVertex(vertexToRemove);
         this.onVertexRemoved(vertex);
     }
 
     public Iterable<Vertex> getVertices() {
-        return new EventVertexSequence(this.rawGraph.getVertices().iterator(), this.graphChangedListeners);
+        return new EventVertexSequence(this.baseGraph.getVertices().iterator(), this.graphChangedListeners);
     }
 
     /**
@@ -127,15 +127,15 @@ public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         Vertex outVertexToSet = outVertex;
         if (outVertex instanceof EventVertex) {
-            outVertexToSet = ((EventVertex) outVertex).getRawVertex();
+            outVertexToSet = ((EventVertex) outVertex).getBaseVertex();
         }
 
         Vertex inVertexToSet = inVertex;
         if (inVertex instanceof EventVertex) {
-            inVertexToSet = ((EventVertex) inVertex).getRawVertex();
+            inVertexToSet = ((EventVertex) inVertex).getBaseVertex();
         }
 
-        final Edge edge = this.rawGraph.addEdge(id, outVertexToSet, inVertexToSet, label);
+        final Edge edge = this.baseGraph.addEdge(id, outVertexToSet, inVertexToSet, label);
         if (edge == null) {
             return null;
         } else {
@@ -145,7 +145,7 @@ public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     }
 
     public Edge getEdge(final Object id) {
-        final Edge edge = this.rawGraph.getEdge(id);
+        final Edge edge = this.baseGraph.getEdge(id);
         if (edge == null) {
             return null;
         } else {
@@ -159,32 +159,32 @@ public class EventGraph<T extends Graph> implements Graph, WrappableGraph<T> {
     public void removeEdge(final Edge edge) {
         Edge edgeToRemove = edge;
         if (edge instanceof EventEdge) {
-            edgeToRemove = ((EventEdge) edge).getRawEdge();
+            edgeToRemove = ((EventEdge) edge).getBaseEdge();
         }
 
-        this.rawGraph.removeEdge(edgeToRemove);
+        this.baseGraph.removeEdge(edgeToRemove);
         this.onEdgeRemoved(edge);
     }
 
     public Iterable<Edge> getEdges() {
-        return new EventEdgeSequence(this.rawGraph.getEdges().iterator(), this.graphChangedListeners);
+        return new EventEdgeSequence(this.baseGraph.getEdges().iterator(), this.graphChangedListeners);
     }
 
     public void clear() {
-        this.rawGraph.clear();
+        this.baseGraph.clear();
         this.onGraphCleared();
     }
 
     public void shutdown() {
-        this.rawGraph.shutdown();
+        this.baseGraph.shutdown();
     }
 
     public String toString() {
-        return StringFactory.graphString(this, this.rawGraph.toString());
+        return StringFactory.graphString(this, this.baseGraph.toString());
     }
 
     @Override
-    public T getRawGraph() {
-        return this.rawGraph;
+    public T getBaseGraph() {
+        return this.baseGraph;
     }
 }

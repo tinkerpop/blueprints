@@ -99,7 +99,7 @@ public class EventElement implements Element {
         return null != object && (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((EventElement) object).getId());
     }
 
-    public Element getRawElement() {
+    public Element getBaseElement() {
         return this.rawElement;
     }
 }

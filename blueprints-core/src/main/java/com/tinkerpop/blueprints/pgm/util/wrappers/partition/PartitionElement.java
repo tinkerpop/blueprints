@@ -53,7 +53,7 @@ public class PartitionElement implements Element {
         return this.rawElement.hashCode();
     }
 
-    public Element getRawElement() {
+    public Element getBaseElement() {
         return this.rawElement;
     }
 

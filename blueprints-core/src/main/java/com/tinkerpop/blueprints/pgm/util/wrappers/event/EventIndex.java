@@ -30,11 +30,11 @@ public class EventIndex<T extends Element> implements Index<T> {
     }
 
     public void remove(final String key, final Object value, final T element) {
-        this.rawIndex.remove(key, value, (T) ((EventElement) element).getRawElement());
+        this.rawIndex.remove(key, value, (T) ((EventElement) element).getBaseElement());
     }
 
     public void put(final String key, final Object value, final T element) {
-        this.rawIndex.put(key, value, (T) ((EventElement) element).getRawElement());
+        this.rawIndex.put(key, value, (T) ((EventElement) element).getBaseElement());
     }
 
     public CloseableSequence<T> get(final String key, final Object value) {
