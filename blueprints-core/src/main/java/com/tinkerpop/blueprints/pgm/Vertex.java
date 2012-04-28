@@ -26,6 +26,11 @@ public interface Vertex extends Element {
      */
     public Iterable<Edge> getInEdges(String... labels);
 
-
+    /**
+     * Use to query the incoming and/or outgoing edges of the vertex.
+     * The returned query object can be configured to support intelligent filtering and modifying of results.
+     *
+     * @return a configurable query object
+     */
     public Query query();
 }
