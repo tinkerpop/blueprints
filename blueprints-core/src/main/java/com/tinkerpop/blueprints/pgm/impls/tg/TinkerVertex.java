@@ -7,10 +7,11 @@ import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
 
     public Iterable<Edge> getInEdges(final String... labels) {
         if (labels.length == 0) {
-            final List<Edge> totalEdges = new LinkedList<Edge>();
+            final List<Edge> totalEdges = new ArrayList<Edge>();
             for (final Collection<Edge> edges : this.inEdges.values()) {
                 totalEdges.addAll(edges);
             }
@@ -41,12 +42,12 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         } else if (labels.length == 1) {
             final Set<Edge> edges = this.inEdges.get(labels[0]);
             if (null == edges) {
-                return new LinkedList<Edge>();
+                return Collections.emptyList();
             } else {
-                return new LinkedList<Edge>(edges);
+                return new ArrayList<Edge>(edges);
             }
         } else {
-            final List<Edge> totalEdges = new LinkedList<Edge>();
+            final List<Edge> totalEdges = new ArrayList<Edge>();
             for (final String label : labels) {
                 final Set<Edge> edges = this.inEdges.get(label);
                 if (null != edges) {
@@ -59,7 +60,7 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
 
     public Iterable<Edge> getOutEdges(final String... labels) {
         if (labels.length == 0) {
-            final List<Edge> totalEdges = new LinkedList<Edge>();
+            final List<Edge> totalEdges = new ArrayList<Edge>();
             for (final Collection<Edge> edges : this.outEdges.values()) {
                 totalEdges.addAll(edges);
             }
@@ -67,12 +68,12 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         } else if (labels.length == 1) {
             final Set<Edge> edges = this.outEdges.get(labels[0]);
             if (null == edges) {
-                return new LinkedList<Edge>();
+                return Collections.emptyList();
             } else {
-                return new LinkedList<Edge>(edges);
+                return new ArrayList<Edge>(edges);
             }
         } else {
-            final List<Edge> totalEdges = new LinkedList<Edge>();
+            final List<Edge> totalEdges = new ArrayList<Edge>();
             for (final String label : labels) {
                 final Set<Edge> edges = this.outEdges.get(label);
                 if (null != edges) {

@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -168,11 +167,11 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
 
     public Iterable<Vertex> getVertices() {
-        return new LinkedList<Vertex>(vertices.values());
+        return new ArrayList<Vertex>(vertices.values());
     }
 
     public Iterable<Edge> getEdges() {
-        return new LinkedList<Edge>(edges.values());
+        return new ArrayList<Edge>(edges.values());
     }
 
     public void removeVertex(final Vertex vertex) {

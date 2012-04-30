@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -25,7 +24,7 @@ public class DefaultQuery implements Query {
     public Direction direction = Direction.BOTH;
     public String[] labels = EMPTY_LABELS;
     public long limit = Long.MAX_VALUE;
-    public List<HasContainer> hasContainers = new LinkedList<HasContainer>();
+    public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
 
     public DefaultQuery(final Vertex vertex) {
         this.vertex = vertex;

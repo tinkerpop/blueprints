@@ -10,10 +10,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +112,7 @@ public class GraphMLWriter {
             Collection<String> keyset;
 
             if (normalize) {
-                keyset = new LinkedList<String>();
+                keyset = new ArrayList<String>();
                 keyset.addAll(vertexKeyTypes.keySet());
                 Collections.sort((List<String>) keyset);
             } else {
@@ -128,7 +128,7 @@ public class GraphMLWriter {
             }
 
             if (normalize) {
-                keyset = new LinkedList<String>();
+                keyset = new ArrayList<String>();
                 keyset.addAll(edgeKeyTypes.keySet());
                 Collections.sort((List<String>) keyset);
             } else {
@@ -149,7 +149,7 @@ public class GraphMLWriter {
 
             Iterable<Vertex> vertices;
             if (normalize) {
-                vertices = new LinkedList<Vertex>();
+                vertices = new ArrayList<Vertex>();
                 for (Vertex v : graph.getVertices()) {
                     ((Collection<Vertex>) vertices).add(v);
                 }
@@ -162,7 +162,7 @@ public class GraphMLWriter {
                 writer.writeAttribute(GraphMLTokens.ID, vertex.getId().toString());
                 Collection<String> keys;
                 if (normalize) {
-                    keys = new LinkedList<String>();
+                    keys = new ArrayList<String>();
                     keys.addAll(vertex.getPropertyKeys());
                     Collections.sort((List<String>) keys);
                 } else {
@@ -181,7 +181,7 @@ public class GraphMLWriter {
             }
 
             if (normalize) {
-                List<Edge> edges = new LinkedList<Edge>();
+                List<Edge> edges = new ArrayList<Edge>();
                 for (Vertex vertex : graph.getVertices()) {
                     for (Edge edge : vertex.getOutEdges()) {
                         edges.add(edge);
@@ -196,7 +196,7 @@ public class GraphMLWriter {
                     writer.writeAttribute(GraphMLTokens.TARGET, edge.getInVertex().getId().toString());
                     writer.writeAttribute(GraphMLTokens.LABEL, edge.getLabel());
 
-                    List<String> keys = new LinkedList<String>();
+                    List<String> keys = new ArrayList<String>();
                     keys.addAll(edge.getPropertyKeys());
                     Collections.sort(keys);
 

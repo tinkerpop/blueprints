@@ -7,9 +7,10 @@ import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,20 +56,20 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
     }
 
     public CloseableSequence<T> get(final String key, final Object value) {
-        Map<Object, Set<T>> keyMap = this.index.get(key);
+        final Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null == keyMap) {
-            return new WrappingCloseableSequence<T>(new HashSet<T>());
+            return new WrappingCloseableSequence<T>((Iterable) Collections.emptyList());
         } else {
             Set<T> set = keyMap.get(value);
             if (null == set)
-                return new WrappingCloseableSequence<T>(new HashSet<T>());
+                return new WrappingCloseableSequence<T>((Iterable) Collections.emptyList());
             else
-                return new WrappingCloseableSequence<T>(new LinkedList<T>(set));
+                return new WrappingCloseableSequence<T>(new ArrayList<T>(set));
         }
     }
 
     public long count(final String key, final Object value) {
-        Map<Object, Set<T>> keyMap = this.index.get(key);
+        final Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null == keyMap) {
             return 0;
         } else {
@@ -81,7 +82,7 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
     }
 
     public void remove(final String key, final Object value, final T element) {
-        Map<Object, Set<T>> keyMap = this.index.get(key);
+        final Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null != keyMap) {
             Set<T> objects = keyMap.get(value);
             if (null != objects) {
