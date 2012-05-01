@@ -181,7 +181,7 @@ public class DefaultQuery implements Query {
                             else if (direction == Direction.IN)
                                 return (T) temp.getOutVertex();
                             else {
-                                if (temp.getInVertex() == vertex) {
+                                if (temp.getInVertex().equals(vertex)) {
                                     return (T) temp.getOutVertex();
                                 } else {
                                     return (T) temp.getInVertex();

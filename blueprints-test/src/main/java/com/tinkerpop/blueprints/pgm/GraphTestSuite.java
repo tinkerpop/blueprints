@@ -577,7 +577,7 @@ public class GraphTestSuite extends TestSuite {
             assertEquals(results.size(), 4);
             assertTrue(results.contains(b));
             assertTrue(results.contains(c));
-            // TODO: need to wrap vertex: assertFalse(results.contains(a));
+            assertFalse(results.contains(a));
             assertEquals(a.query().direction(Query.Direction.BOTH).labels("friend", "hate").count(), 4);
 
             results = asList(a.query().labels("friend", "hate").limit(2).edges());
