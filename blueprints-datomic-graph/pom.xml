@@ -22,11 +22,11 @@
     </repositories>
     <dependencies>
         <!-- datomic (use mvn install:install-file from the datomic download to install datomic into your local maven repo) -->
-        <!-- mvn install:install-file -DgroupId=com.datomic -DartifactId=datomic -Dfile=datomic-0.1.2753.jar -DpomFile=pom.xml -->
+        <!-- mvn install:install-file -DgroupId=com.datomic -DartifactId=datomic -Dfile=datomic-0.1.3065.jar -DpomFile=pom.xml -->
         <dependency>
             <groupId>com.datomic</groupId>
             <artifactId>datomic</artifactId>
-            <version>0.1.3007</version>
+            <version>0.1.3065</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
