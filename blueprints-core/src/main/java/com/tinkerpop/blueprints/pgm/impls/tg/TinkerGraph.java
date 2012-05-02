@@ -292,8 +292,4 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         }
         return idString;
     }
-
-    public TinkerGraph getRawGraph() {
-        return this;
-    }
 }

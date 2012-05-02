@@ -27,10 +27,6 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
         }
     }
 
-    public TinkerEdge getRawEdge() {
-        return this;
-    }
-
     public String getLabel() {
         return this.label;
     }

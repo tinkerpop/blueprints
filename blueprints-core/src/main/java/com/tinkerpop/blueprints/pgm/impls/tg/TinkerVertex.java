@@ -28,10 +28,6 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         super(id, graph);
     }
 
-    public TinkerVertex getRawVertex() {
-        return this;
-    }
-
     public Iterable<Edge> getInEdges(final String... labels) {
         if (labels.length == 0) {
             final List<Edge> totalEdges = new ArrayList<Edge>();
