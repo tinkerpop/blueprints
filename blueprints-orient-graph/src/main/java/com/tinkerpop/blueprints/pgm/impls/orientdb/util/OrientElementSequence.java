@@ -31,6 +31,10 @@ public class OrientElementSequence<T extends Element> implements CloseableSequen
     @SuppressWarnings("unchecked")
     public T next() {
         OrientElement currentElement = null;
+        
+        if (!hasNext())
+            throw new NoSuchElementException();
+
         Object current = this.rawIterator.next();
 
         if (null == current)
