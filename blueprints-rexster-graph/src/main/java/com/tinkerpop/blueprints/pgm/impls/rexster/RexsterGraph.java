@@ -94,10 +94,6 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         this.bufferSize = bufferSize;
     }
 
-    public void clear() {
-        RestHelper.delete(this.graphURI);
-    }
-
     public Iterable<Vertex> getVertices() {
         return new RexsterVertexIterable(this.graphURI + RexsterTokens.SLASH_VERTICES, this);
     }

@@ -325,19 +325,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         }
     }
 
-    /**
-     * This operation does not respect the transaction buffer. A clear will eradicate the graph and commit the results immediately.
-     */
-    public void clear() {
-        try {
-            this.sailConnection.get().clear();
-            this.stopTransaction(Conclusion.SUCCESS);
-        } catch (SailException e) {
-            this.stopTransaction(Conclusion.FAILURE);
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     private synchronized SailConnection createConnection() throws SailException {
         cleanupConnections();
         final SailConnection sc = rawGraph.getConnection();

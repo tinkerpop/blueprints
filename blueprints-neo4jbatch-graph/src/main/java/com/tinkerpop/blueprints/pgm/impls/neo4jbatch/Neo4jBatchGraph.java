@@ -73,13 +73,6 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
         return StringFactory.graphString(this, this.rawGraph.toString());
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
-    public void clear() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
-    }
-
     public BatchInserter getRawGraph() {
         return this.rawGraph;
     }

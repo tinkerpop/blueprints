@@ -85,13 +85,6 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     /**
      * @throws UnsupportedOperationException
      */
-    public void clear() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
-    }
-
-    /**
-     * @throws UnsupportedOperationException
-     */
     public void shutdown() throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
