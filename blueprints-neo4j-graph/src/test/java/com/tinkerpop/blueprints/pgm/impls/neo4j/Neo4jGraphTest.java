@@ -1,29 +1,18 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
-import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
-import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
-import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TestSuite;
 import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.factory.GraphDatabaseSetting;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -42,6 +31,7 @@ public class Neo4jGraphTest extends GraphTest {
         this.supportsEdgeIndex = true;
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = true;
+        this.supportsManualIndices = true;
 
         this.allowSerializableObjectProperty = false;
         this.allowBooleanProperty = true;
@@ -91,12 +81,6 @@ public class Neo4jGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
     public void testTransactionalGraphTestSuite() throws Exception {
@@ -178,7 +162,7 @@ public class Neo4jGraphTest extends GraphTest {
         }
     }
 
-    public void testQueryIndex() throws Exception {
+    /*public void testQueryIndex() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
@@ -217,20 +201,20 @@ public class Neo4jGraphTest extends GraphTest {
 
         graph.shutdown();
         deleteDirectory(new File(directory));
-    }
+    }*/
 
-    public void testIndexParameters() throws Exception {
+    /*public void testIndexParameters() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
         deleteDirectory(new File(directory));
 
         IndexableGraph graph = new Neo4jGraph(directory);
-        graph.dropIndex(Index.VERTICES);
-        graph.createAutomaticIndex(Index.VERTICES, Vertex.class, null, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+        Index<Vertex> index = graph.createIndex("luceneIdx", Vertex.class, null, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
-        Iterator itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        index.put("name", "marko", a);
+        Iterator itty = index.get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
         int counter = 0;
         while (itty.hasNext()) {
             counter++;
@@ -238,7 +222,7 @@ public class Neo4jGraphTest extends GraphTest {
         }
         assertEquals(counter, 1);
 
-        itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "MaRkO").iterator();
+        itty = index.get("name", Neo4jTokens.QUERY_HEADER + "MaRkO").iterator();
         counter = 0;
         while (itty.hasNext()) {
             counter++;
@@ -248,101 +232,7 @@ public class Neo4jGraphTest extends GraphTest {
 
         graph.shutdown();
         deleteDirectory(new File(directory));
-    }
-
-    public void testShouldNotDeleteAutomaticNeo4jIndexes() {
-        String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null)
-            directory = this.getWorkingDirectory();
-        deleteDirectory(new File(directory));
-
-        Neo4jGraph graph = new Neo4jGraph(new GraphDatabaseFactory().
-                newEmbeddedDatabaseBuilder(directory).
-                setConfig(GraphDatabaseSettings.node_keys_indexable, "name").
-                setConfig(GraphDatabaseSettings.relationship_keys_indexable, "rel1").
-                setConfig(GraphDatabaseSettings.node_auto_indexing, GraphDatabaseSetting.TRUE).
-                setConfig(GraphDatabaseSettings.relationship_auto_indexing, GraphDatabaseSetting.TRUE).
-                newGraphDatabase());
-        Vertex a = graph.addVertex(null);
-        a.setProperty("name", "foo");
-        graph.shutdown();
-
-        graph = new Neo4jGraph(directory);
-        graph.clear();
-        assertTrue(null != graph.getRawGraph().index().getNodeAutoIndexer().getAutoIndex());
-        graph.shutdown();
-        deleteDirectory(new File(directory));
-
-    }
-
-    public void testShouldNotDeleteAutomaticBlueprintsIndexes() {
-        String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null)
-            directory = this.getWorkingDirectory();
-        deleteDirectory(new File(directory));
-
-        Neo4jGraph graph = new Neo4jGraph(directory);
-        Vertex a = graph.addVertex(null);
-        a.setProperty("name", "foo");
-        graph.shutdown();
-
-        graph = new Neo4jGraph(directory);
-        graph.clear();
-        a = graph.addVertex(null);
-        a.setProperty("name", "foo");
-        assertNotNull(graph.getRawGraph().index().getNodeAutoIndexer().getAutoIndex());
-
-        graph.shutdown();
-        deleteDirectory(new File(directory));
-
-    }
-
-    public void testAutomaticIndexKernalPropertyValue() {
-        String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null)
-            directory = this.getWorkingDirectory();
-        deleteDirectory(new File(directory));
-
-        Neo4jGraph graph = new Neo4jGraph(directory);
-        assertEquals(count(graph.getIndices()), 2);
-        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.dropIndex(Index.VERTICES);
-        assertEquals(count(graph.getIndices()), 1);
-        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.dropIndex(Index.EDGES);
-        assertEquals(count(graph.getIndices()), 0);
-        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.shutdown();
-
-        graph = new Neo4jGraph(directory);
-        assertEquals(count(graph.getIndices()), 0);
-        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.shutdown();
-
-        graph = new Neo4jGraph(directory);
-        assertEquals(count(graph.getIndices()), 0);
-        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.createAutomaticIndex("anIndex", Edge.class, null);
-        assertEquals(count(graph.getIndices()), 1);
-        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.dropIndex("anIndex");
-        assertEquals(count(graph.getIndices()), 0);
-        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.shutdown();
-
-        graph = new Neo4jGraph(directory);
-        assertEquals(count(graph.getIndices()), 0);
-        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.createAutomaticIndex("anIndex", Vertex.class, null);
-        assertEquals(count(graph.getIndices()), 1);
-        assertTrue((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.dropIndex("anIndex");
-        assertEquals(count(graph.getIndices()), 0);
-        assertFalse((Boolean) graph.getKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX));
-        graph.shutdown();
-
-        deleteDirectory(new File(directory));
+    }*/
 
 
-    }
 }

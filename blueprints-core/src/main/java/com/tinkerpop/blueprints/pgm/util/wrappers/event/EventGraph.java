@@ -6,8 +6,8 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexIterable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +28,7 @@ import java.util.List;
  * @author Stephen Mallette
  */
 public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
+
     protected final T baseGraph;
 
     protected final List<GraphChangedListener> graphChangedListeners = new ArrayList<GraphChangedListener>();
@@ -76,12 +77,6 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         }
     }
 
-    protected void onGraphCleared() {
-        for (GraphChangedListener listener : this.graphChangedListeners) {
-            listener.graphCleared();
-        }
-    }
-
     /**
      * Raises a vertexAdded event.
      */
@@ -118,7 +113,11 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new EventVertexSequence(this.baseGraph.getVertices().iterator(), this.graphChangedListeners);
+        return new EventVertexIterable(this.baseGraph.getVertices(), this.graphChangedListeners);
+    }
+
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        return new EventVertexIterable(this.baseGraph.getVertices(key, value), this.graphChangedListeners);
     }
 
     /**
@@ -167,12 +166,11 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Edge> getEdges() {
-        return new EventEdgeSequence(this.baseGraph.getEdges().iterator(), this.graphChangedListeners);
+        return new EventEdgeIterable(this.baseGraph.getEdges(), this.graphChangedListeners);
     }
 
-    public void clear() {
-        this.baseGraph.clear();
-        this.onGraphCleared();
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        return new EventEdgeIterable(this.baseGraph.getEdges(key, value), this.graphChangedListeners);
     }
 
     public void shutdown() {

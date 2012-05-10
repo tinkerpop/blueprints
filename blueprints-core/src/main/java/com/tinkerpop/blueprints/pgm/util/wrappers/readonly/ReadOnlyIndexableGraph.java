@@ -1,12 +1,11 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyIndexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyIndexIterable;
 
 import java.util.Set;
 
@@ -32,26 +31,28 @@ public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGr
     /**
      * @throws UnsupportedOperationException
      */
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
-    }
-
-    /**
-     * @throws UnsupportedOperationException
-     */
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys, final Parameter... indexParameters) throws UnsupportedOperationException {
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
         final Index<T> index = this.baseGraph.getIndex(indexName, indexClass);
-        if (index.getIndexType().equals(Index.Type.MANUAL))
-            return new ReadOnlyIndex<T>(index);
-        else
-            return new ReadOnlyAutomaticIndex<T>((AutomaticIndex<T>) index);
+        return new ReadOnlyIndex<T>(index);
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new ReadOnlyIndexSequence(this.baseGraph.getIndices().iterator());
+        return new ReadOnlyIndexIterable(this.baseGraph.getIndices());
+    }
+
+    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+        this.baseGraph.dropKeyIndex(key, elementClass);
+    }
+
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+        this.baseGraph.createKeyIndex(key, elementClass);
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return this.baseGraph.getIndexedKeys(elementClass);
     }
 }

@@ -23,6 +23,8 @@ h3. Version 1.3 (NOT OFFICIALLY RELEASED YET)
 * Updated core @Vertex@ API to support the notion of 'push down predicates' (lower level element filtering)
 * Added internal support for Neo4j's @Node@ var args of @RelationshipTypes@
 * Speed improvements to the much used @MultiIterable@
+* Removed @CloseableSequence@ and replaced with @CloseableIterable@ (now real Java @Iterable@ semantics respected)
+* Redesign to @IndexableGraph@ where @AutomaticIndex@ no longer exists as is default
 
 ==<hr/>==
 

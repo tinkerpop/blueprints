@@ -39,16 +39,18 @@ public abstract class TinkerElement implements Element, Serializable {
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
 
         Object oldValue = this.properties.put(key, value);
-        for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
-            index.autoUpdate(key, value, oldValue, this);
-        }
+        if (this instanceof TinkerVertex)
+            this.graph.vertexIndex.autoUpdate(key, value, oldValue, (TinkerVertex) this);
+        else
+            this.graph.edgeIndex.autoUpdate(key, value, oldValue, (TinkerEdge) this);
     }
 
     public Object removeProperty(final String key) {
         Object oldValue = this.properties.remove(key);
-        for (TinkerAutomaticIndex index : this.graph.getAutoIndices()) {
-            index.autoRemove(key, oldValue, this);
-        }
+        if (this instanceof TinkerVertex)
+            this.graph.vertexIndex.autoRemove(key, oldValue, (TinkerVertex) this);
+        else
+            this.graph.edgeIndex.autoRemove(key, oldValue, (TinkerEdge) this);
         return oldValue;
     }
 

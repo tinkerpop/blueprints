@@ -1,15 +1,14 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.AutomaticIndexHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,7 +34,10 @@ public class TinkerGraph implements IndexableGraph, Serializable {
     protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
     protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
-    protected Map<String, TinkerAutomaticIndex> autoIndices = new HashMap<String, TinkerAutomaticIndex>();
+
+    protected TinkerAutomaticIndex<TinkerVertex> vertexIndex = new TinkerAutomaticIndex<TinkerVertex>(TinkerVertex.class, this);
+    protected TinkerAutomaticIndex<TinkerEdge> edgeIndex = new TinkerAutomaticIndex<TinkerEdge>(TinkerEdge.class, this);
+
     private final String directory;
     private static final String GRAPH_FILE = "/tinkergraph.dat";
 
@@ -47,9 +49,6 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                 if (!file.mkdirs()) {
                     throw new RuntimeException("Could not create directory.");
                 }
-
-                this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
-                this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
             } else {
                 ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
                 TinkerGraph temp = (TinkerGraph) input.readObject();
@@ -58,7 +57,8 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                 this.vertices = temp.vertices;
                 this.edges = temp.edges;
                 this.indices = temp.indices;
-                this.autoIndices = temp.autoIndices;
+                this.vertexIndex = temp.vertexIndex;
+                this.edgeIndex = temp.edgeIndex;
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -67,31 +67,55 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
     public TinkerGraph() {
         this.directory = null;
-        this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
-        this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
     }
 
-    protected Iterable<TinkerAutomaticIndex> getAutoIndices() {
-        return this.autoIndices.values();
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        if (vertexIndex.getIndexedKeys().contains(key)) {
+            return (Iterable) vertexIndex.get(key, value);
+        } else {
+            return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
+        }
     }
 
-    protected Iterable<TinkerIndex> getManualIndices() {
-        final HashSet<TinkerIndex> indices = new HashSet<TinkerIndex>(this.indices.values());
-        indices.removeAll(this.autoIndices.values());
-        return indices;
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        if (edgeIndex.getIndexedKeys().contains(key)) {
+            return (Iterable) edgeIndex.get(key, value);
+        } else {
+            return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
+        }
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, Set<String> keys, final Parameter... indexParameters) {
-        if (this.indices.containsKey(indexName))
-            throw new RuntimeException("Index already exists: " + indexName);
-
-        final TinkerAutomaticIndex index = new TinkerAutomaticIndex(indexName, indexClass, keys);
-        this.autoIndices.put(index.getIndexName(), index);
-        this.indices.put(index.getIndexName(), index);
-        return index;
+    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            this.vertexIndex.createKeyIndex(key);
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
+            this.edgeIndex.createKeyIndex(key);
+        } else {
+            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+        }
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            this.vertexIndex.dropKeyIndex(key);
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
+            this.edgeIndex.dropKeyIndex(key);
+        } else {
+            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+        }
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            return this.vertexIndex.getIndexedKeys();
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
+            return this.edgeIndex.getIndexedKeys();
+        } else {
+            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+        }
+    }
+
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         if (this.indices.containsKey(indexName))
             throw new RuntimeException("Index already exists: " + indexName);
 
@@ -120,7 +144,6 @@ public class TinkerGraph implements IndexableGraph, Serializable {
 
     public void dropIndex(final String indexName) {
         this.indices.remove(indexName);
-        this.autoIndices.remove(indexName);
     }
 
 
@@ -182,8 +205,8 @@ public class TinkerGraph implements IndexableGraph, Serializable {
             this.removeEdge(edge);
         }
 
-        AutomaticIndexHelper.removeElement(this, vertex);
-        for (Index index : this.getManualIndices()) {
+        this.vertexIndex.removeElement((TinkerVertex) vertex);
+        for (Index index : this.getIndices()) {
             if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>) index;
                 idx.removeElement((TinkerVertex) vertex);
@@ -236,8 +259,9 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                 edges.remove(edge);
         }
 
-        AutomaticIndexHelper.removeElement(this, edge);
-        for (Index index : this.getManualIndices()) {
+
+        this.edgeIndex.removeElement((TinkerEdge) edge);
+        for (Index index : this.getIndices()) {
             if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>) index;
                 idx.removeElement((TinkerEdge) edge);
@@ -259,10 +283,9 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         this.vertices.clear();
         this.edges.clear();
         this.indices.clear();
-        this.autoIndices.clear();
         this.currentId = 0l;
-        this.createAutomaticIndex(Index.VERTICES, TinkerVertex.class, null);
-        this.createAutomaticIndex(Index.EDGES, TinkerEdge.class, null);
+        this.vertexIndex = new TinkerAutomaticIndex<TinkerVertex>(TinkerVertex.class, this);
+        this.edgeIndex = new TinkerAutomaticIndex<TinkerEdge>(TinkerEdge.class, this);
     }
 
     public void shutdown() {
@@ -271,7 +294,6 @@ public class TinkerGraph implements IndexableGraph, Serializable {
                 File file = new File(this.directory + GRAPH_FILE);
                 if (file.exists()) {
                     file.delete();
-                } else {
                 }
                 ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.directory + GRAPH_FILE));
                 out.writeObject(this);
@@ -292,4 +314,63 @@ public class TinkerGraph implements IndexableGraph, Serializable {
         }
         return idString;
     }
+
+    protected class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements Serializable {
+
+        private final Set<String> indexedKeys = new HashSet<String>();
+        private TinkerGraph graph;
+
+        public TinkerAutomaticIndex(final Class<T> indexClass, final TinkerGraph graph) {
+            super(null, indexClass);
+            this.graph = graph;
+        }
+
+        public void autoUpdate(final String key, final Object newValue, final Object oldValue, final T element) {
+            if (this.indexedKeys.contains(key)) {
+                if (oldValue != null)
+                    this.remove(key, oldValue, element);
+                this.put(key, newValue, element);
+            }
+        }
+
+        public void autoRemove(final String key, final Object oldValue, final T element) {
+            if (this.indexedKeys.contains(key)) {
+                this.remove(key, oldValue, element);
+            }
+        }
+
+        public void createKeyIndex(final String key) {
+            if (this.indexedKeys.contains(key))
+                return;
+
+            this.indexedKeys.add(key);
+            if (TinkerVertex.class.equals(this.indexClass)) {
+                for (final Vertex vertex : graph.getVertices()) {
+                    if (vertex.getPropertyKeys().contains(key)) {
+                        this.put(key, vertex.getProperty(key), (T) vertex);
+                    }
+                }
+            } else {
+                for (final Edge edge : graph.getEdges()) {
+                    if (edge.getPropertyKeys().contains(key)) {
+                        this.put(key, edge.getProperty(key), (T) edge);
+                    }
+                }
+            }
+        }
+
+        public void dropKeyIndex(final String key) {
+            if (!this.indexedKeys.contains(key))
+                return;
+
+            this.indexedKeys.remove(key);
+            this.index.remove(key);
+
+        }
+
+        public Set<String> getIndexedKeys() {
+            return new HashSet<String>(this.indexedKeys);
+        }
+    }
+
 }

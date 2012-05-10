@@ -2,12 +2,14 @@ package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -49,31 +51,37 @@ public class GraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void testClear() {
+    /*public void testSemanticallyCorrectIterables() {
         Graph graph = graphTest.getGraphInstance();
-        this.stopWatch();
-        for (int i = 0; i < 25; i++) {
-            Vertex a = graph.addVertex(null);
-            Vertex b = graph.addVertex(null);
-            graph.addEdge(null, a, b, convertId("knows"));
+        for (int i = 0; i < 15; i++) {
+            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("knows"));
         }
-        printPerformance(graph.toString(), 75, "elements added", this.stopWatch());
-
-        if (graphTest.supportsVertexIteration)
-            assertEquals(50, count(graph.getVertices()));
-        if (graphTest.supportsEdgeIteration)
-            assertEquals(25, count(graph.getEdges()));
-
-        this.stopWatch();
-        graph.clear();
-        printPerformance(graph.toString(), 75, "elements deleted", this.stopWatch());
-
-        if (graphTest.supportsVertexIteration)
-            assertEquals(0, count(graph.getVertices()));
-        if (graphTest.supportsEdgeIteration)
-            assertEquals(0, count(graph.getEdges()));
+        if (graphTest.supportsVertexIteration) {
+            Iterable<Vertex> vertices = graph.getVertices();
+            assertEquals(count(vertices), 30);
+            assertEquals(count(vertices), 30);
+            Iterator<Vertex> itty = vertices.iterator();
+            int counter = 0;
+            while (itty.hasNext()) {
+                itty.next();
+                counter++;
+            }
+            assertEquals(counter, 30);
+        }
+        if (graphTest.supportsEdgeIteration) {
+            Iterable<Edge> edges = graph.getEdges();
+            assertEquals(count(edges), 15);
+            assertEquals(count(edges), 15);
+            Iterator<Edge> itty = edges.iterator();
+            int counter = 0;
+            while (itty.hasNext()) {
+                itty.next();
+                counter++;
+            }
+            assertEquals(counter, 15);
+        }
         graph.shutdown();
-    }
+    }*/
 
     public void testAddingVerticesAndEdges() {
         Graph graph = graphTest.getGraphInstance();
@@ -201,7 +209,9 @@ public class GraphTestSuite extends TestSuite {
         }
 
         // TODO: clearing the graph until serialization issues for map with TinkerGraph are sorted.
-        graph.clear();
+        if (graph instanceof TinkerGraph) {
+            ((TinkerGraph) graph).clear();
+        }
         graph.shutdown();
     }
 

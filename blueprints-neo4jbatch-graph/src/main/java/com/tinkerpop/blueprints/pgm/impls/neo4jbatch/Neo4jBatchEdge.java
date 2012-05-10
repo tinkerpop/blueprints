@@ -21,9 +21,6 @@ public class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
         final Map<String, Object> properties = this.getPropertyMapClone();
         final Object value = properties.remove(key);
         this.graph.getRawGraph().setRelationshipProperties(this.id, properties);
-        for (final Neo4jBatchAutomaticIndex index : this.graph.getAutomaticEdgeIndices()) {
-            index.autoUpdate(this, properties);
-        }
         return value;
 
     }
@@ -32,9 +29,6 @@ public class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
         final Map<String, Object> properties = this.getPropertyMapClone();
         properties.put(key, value);
         this.graph.getRawGraph().setRelationshipProperties(this.id, properties);
-        for (final Neo4jBatchAutomaticIndex index : this.graph.getAutomaticEdgeIndices()) {
-            index.autoUpdate(this, properties);
-        }
     }
 
     public Map<String, Object> getPropertyMap() {

@@ -15,7 +15,5 @@ public class OrientGraphContext {
     public int txCounter = 0;
 
     public Map<String, OrientIndex<? extends OrientElement>> manualIndices = new HashMap<String, OrientIndex<? extends OrientElement>>();
-    public Map<String, OrientAutomaticIndex<? extends OrientElement>> autoIndices = new HashMap<String, OrientAutomaticIndex<? extends OrientElement>>();
-
     public OGraphDatabase rawGraph;
 }

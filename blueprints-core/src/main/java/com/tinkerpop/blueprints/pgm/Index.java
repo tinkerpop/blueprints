@@ -2,28 +2,12 @@ package com.tinkerpop.blueprints.pgm;
 
 /**
  * An index maintains a mapping between some key/value pair and an element.
- * A manual index requires that the developers code explicitly put elements of the graph into the index.
+ * An index requires that the developer explicitly put elements of the graph into the index.
  * A the key/value pair need not be specific to the element properties.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface Index<T extends Element> {
-
-    /**
-     * For IndexableGraphs that support vertex indexing, an AutomaticIndex must exist at construction partition "vertices."
-     */
-    public static final String VERTICES = "vertices";
-    /**
-     * For IndexableGraphs that support edge indexing, an AutomaticIndex must exist at construction partition "edges."
-     */
-    public static final String EDGES = "edges";
-
-    /**
-     * An Index is either manual or automatic. Automatic types must implement AutomaticIndex.
-     */
-    enum Type {
-        MANUAL, AUTOMATIC
-    }
 
     /**
      * Get the name of the index.
@@ -38,13 +22,6 @@ public interface Index<T extends Element> {
      * @return the class this index is indexing
      */
     public Class<T> getIndexClass();
-
-    /**
-     * Get the type of the index. This can be determined using instanceof on the interface names as well.
-     *
-     * @return the index type
-     */
-    public Type getIndexType();
 
     /**
      * Index an element by a key and a value.
@@ -62,7 +39,18 @@ public interface Index<T extends Element> {
      * @param value the value of the indexed elements
      * @return an iterable of elements that have a particular key/value in the index
      */
-    public CloseableSequence<T> get(String key, Object value);
+    public CloseableIterable<T> get(String key, Object value);
+
+    /**
+     * Get all the elements that are indexed by the provided key and specified query object.
+     * This is useful for graph implementations that support complex query capabilities.
+     * If querying is not supported, simply throw an UnsupportedOperationException.
+     *
+     * @param key   the key of the indexed elements
+     * @param query the query object for the indexed elements' keys
+     * @return an iterable of elements that have a particular key/value in the index that match the query object
+     */
+    public CloseableIterable<T> query(String key, Object query);
 
     /**
      * Get a count of elements with a particular key/value pair.

@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.wrapped;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
@@ -61,12 +60,6 @@ public class WrappedGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
     public void testGraphMLReaderTestSuite() throws Exception {

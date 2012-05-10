@@ -1,12 +1,12 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
+import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.io.gml.GMLReaderTestSuite;
@@ -27,6 +27,7 @@ public class TinkerGraphTest extends GraphTest {
         ignoresSuppliedIds = false;
         isPersistent = true;
         isRDFModel = false;
+        supportsManualIndices = true;
         supportsVertexIteration = true;
         supportsEdgeIteration = true;
         supportsVertexIndex = true;
@@ -40,7 +41,7 @@ public class TinkerGraphTest extends GraphTest {
         allowIntegerProperty = true;
         allowPrimitiveArrayProperty = true;
         allowUniformListProperty = true;
-        this.allowMixedListProperty = true;
+        allowMixedListProperty = true;
         allowLongProperty = true;
         allowMapProperty = true;
         allowStringProperty = true;
@@ -82,12 +83,6 @@ public class TinkerGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
     public void testGraphMLReaderTestSuite() throws Exception {
@@ -146,5 +141,28 @@ public class TinkerGraphTest extends GraphTest {
                 }
             }
         }
+    }
+
+    public void testClear() {
+        TinkerGraph graph = (TinkerGraph) this.getGraphInstance();
+        this.stopWatch();
+        for (int i = 0; i < 25; i++) {
+            Vertex a = graph.addVertex(null);
+            Vertex b = graph.addVertex(null);
+            graph.addEdge(null, a, b, "knows");
+        }
+        printPerformance(graph.toString(), 75, "elements added", this.stopWatch());
+
+        assertEquals(50, count(graph.getVertices()));
+        assertEquals(25, count(graph.getEdges()));
+
+        this.stopWatch();
+        graph.clear();
+        printPerformance(graph.toString(), 75, "elements deleted", this.stopWatch());
+
+        assertEquals(0, count(graph.getVertices()));
+        assertEquals(0, count(graph.getEdges()));
+
+        graph.shutdown();
     }
 }

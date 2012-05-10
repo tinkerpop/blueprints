@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
+import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableIterable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ import java.util.Set;
  */
 public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
-    private Map<String, Map<Object, Set<T>>> index = new HashMap<String, Map<Object, Set<T>>>();
-    private final String indexName;
-    private final Class<T> indexClass;
+    protected Map<String, Map<Object, Set<T>>> index = new HashMap<String, Map<Object, Set<T>>>();
+    protected final String indexName;
+    protected final Class<T> indexClass;
 
     public TinkerIndex(final String indexName, final Class<T> indexClass) {
         this.indexName = indexName;
@@ -34,10 +34,6 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
     public Class<T> getIndexClass() {
         return this.indexClass;
-    }
-
-    public Type getIndexType() {
-        return Type.MANUAL;
     }
 
     public void put(final String key, final Object value, final T element) {
@@ -55,17 +51,21 @@ public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
+    public CloseableIterable<T> get(final String key, final Object value) {
         final Map<Object, Set<T>> keyMap = this.index.get(key);
         if (null == keyMap) {
-            return new WrappingCloseableSequence<T>((Iterable) Collections.emptyList());
+            return new WrappingCloseableIterable<T>((Iterable) Collections.emptyList());
         } else {
             Set<T> set = keyMap.get(value);
             if (null == set)
-                return new WrappingCloseableSequence<T>((Iterable) Collections.emptyList());
+                return new WrappingCloseableIterable<T>((Iterable) Collections.emptyList());
             else
-                return new WrappingCloseableSequence<T>(new ArrayList<T>(set));
+                return new WrappingCloseableIterable<T>(new ArrayList<T>(set));
         }
+    }
+
+    public CloseableIterable<T> query(final String key, final Object query) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
     }
 
     public long count(final String key, final Object value) {

@@ -5,8 +5,8 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexIterable;
 
 /**
  * WrappedGraph serves as a template for writing a wrapper graph.
@@ -20,10 +20,6 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     public WrappedGraph(final T baseGraph) {
         this.baseGraph = baseGraph;
-    }
-
-    public void clear() {
-        this.baseGraph.clear();
     }
 
     public void shutdown() {
@@ -43,7 +39,11 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new WrappedVertexSequence(this.baseGraph.getVertices().iterator());
+        return new WrappedVertexIterable(this.baseGraph.getVertices());
+    }
+
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        return new WrappedVertexIterable(this.baseGraph.getVertices(key, value));
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
@@ -59,7 +59,11 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Edge> getEdges() {
-        return new WrappedEdgeSequence(this.baseGraph.getEdges().iterator());
+        return new WrappedEdgeIterable(this.baseGraph.getEdges());
+    }
+
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        return new WrappedEdgeIterable(this.baseGraph.getEdges(key, value));
     }
 
     public void removeEdge(final Edge edge) {

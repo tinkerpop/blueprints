@@ -1,15 +1,13 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexSequence;
-
-import java.util.Iterator;
+import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -32,10 +30,6 @@ public class PartitionIndex<T extends Element> implements Index<T> {
         return this.rawIndex.getIndexClass();
     }
 
-    public Type getIndexType() {
-        return this.rawIndex.getIndexType();
-    }
-
     public long count(final String key, final Object value) {
         long counter = 0;
         for (Element element : this.get(key, value)) {
@@ -52,12 +46,21 @@ public class PartitionIndex<T extends Element> implements Index<T> {
         this.rawIndex.put(key, value, (T) ((PartitionElement) element).getBaseElement());
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
+    public CloseableIterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass()))
-            return (CloseableSequence<T>) new PartitionVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator(), this.graph);
+            return (CloseableIterable<T>) new PartitionVertexIterable((Iterable<Vertex>) this.rawIndex.get(key, value), this.graph);
         else
-            return (CloseableSequence<T>) new PartitionEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator(), this.graph);
+            return (CloseableIterable<T>) new PartitionEdgeIterable((Iterable<Edge>) this.rawIndex.get(key, value), this.graph);
     }
+
+    public CloseableIterable<T> query(final String key, final Object query) {
+        if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
+            return (CloseableIterable<T>) new PartitionVertexIterable((Iterable<Vertex>) this.rawIndex.query(key, query), this.graph);
+        } else {
+            return (CloseableIterable<T>) new PartitionEdgeIterable((Iterable<Edge>) this.rawIndex.query(key, query), this.graph);
+        }
+    }
+
 
     public String toString() {
         return StringFactory.indexString(this);

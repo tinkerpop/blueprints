@@ -43,11 +43,15 @@ public class VertexTestSuite extends TestSuite {
         assertEquals(graph.getVertex(v.getId()), graph.getVertex(u.getId()));
         assertEquals(graph.getVertex(v.getId()), graph.getVertex(v.getId()));
 
-        graph.clear();
+        graph.shutdown();
+    }
 
+    public void testVertexEqualityForSuppliedIds() {
         if (!graphTest.ignoresSuppliedIds) {
-            v = graph.addVertex(convertId(ids.get(0)));
-            u = graph.getVertex(convertId(ids.get(0)));
+            Graph graph = graphTest.getGraphInstance();
+            List<String> ids = generateIds(1);
+            Vertex v = graph.addVertex(convertId(ids.get(0)));
+            Vertex u = graph.getVertex(convertId(ids.get(0)));
             Set<Vertex> set = new HashSet<Vertex>();
             set.add(v);
             set.add(v);
@@ -58,8 +62,8 @@ public class VertexTestSuite extends TestSuite {
             if (graphTest.supportsVertexIndex)
                 set.add(graph.getVertices().iterator().next());
             assertEquals(1, set.size());
+            graph.shutdown();
         }
-        graph.shutdown();
     }
 
     public void testAddVertex() {

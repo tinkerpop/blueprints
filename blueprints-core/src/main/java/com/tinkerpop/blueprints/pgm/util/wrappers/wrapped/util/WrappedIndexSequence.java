@@ -1,9 +1,7 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.WrappedAutomaticIndex;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.WrappedIndex;
 
 import java.util.Iterator;
@@ -11,32 +9,34 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedIndexSequence<T extends Element> implements Iterator<Index<T>>, Iterable<Index<T>> {
+public class WrappedIndexSequence<T extends Element> implements Iterable<Index<T>> {
 
-    protected Iterator<Index<T>> itty;
+    private Iterable<Index<T>> iterable;
 
-    public WrappedIndexSequence(final Iterator<Index<T>> itty) {
-        this.itty = itty;
-    }
-
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean hasNext() {
-        return this.itty.hasNext();
-    }
-
-    public Index<T> next() {
-        final Index<T> index = itty.next();
-        if (index.getIndexType().equals(Index.Type.MANUAL)) {
-            return new WrappedIndex<T>(index);
-        } else {
-            return new WrappedAutomaticIndex<T>((AutomaticIndex<T>) index);
-        }
+    public WrappedIndexSequence(final Iterable<Index<T>> iterable) {
+        this.iterable = iterable;
     }
 
     public Iterator<Index<T>> iterator() {
-        return this;
+        return new WrappedIndexIterator();
     }
+
+    private class WrappedIndexIterator implements Iterator<Index<T>> {
+
+        private final Iterator<Index<T>> itty = iterable.iterator();
+
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean hasNext() {
+            return this.itty.hasNext();
+        }
+
+        public Index<T> next() {
+            return new WrappedIndex<T>(this.itty.next());
+        }
+    }
+
+
 }

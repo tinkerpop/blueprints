@@ -1,13 +1,12 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexIterable;
 
 import java.util.Set;
 
@@ -21,35 +20,39 @@ import java.util.Set;
  */
 public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T> implements IndexableGraph, WrapperGraph<T> {
 
-    public EventIndexableGraph(final T graph) {
-        super(graph);
+    public EventIndexableGraph(final T baseIndexableGraph) {
+        super(baseIndexableGraph);
     }
 
     public void dropIndex(final String name) {
         this.getBaseGraph().dropIndex(name);
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        return new EventIndex<T>(this.getBaseGraph().createManualIndex(indexName, indexClass, indexParameters), this.graphChangedListeners);
-    }
-
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys, final Parameter... indexParameters) {
-        return new EventAutomaticIndex<T>(this.getBaseGraph().createAutomaticIndex(indexName, indexClass, autoIndexKeys, indexParameters), this.graphChangedListeners);
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+        return new EventIndex<T>(this.getBaseGraph().createIndex(indexName, indexClass, indexParameters), this.graphChangedListeners);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
         final Index<T> index = this.baseGraph.getIndex(indexName, indexClass);
         if (null == index)
             return null;
-        else {
-            if (index.getIndexType().equals(Index.Type.MANUAL))
-                return new EventIndex<T>(index, this.graphChangedListeners);
-            else
-                return new EventAutomaticIndex<T>((AutomaticIndex<T>) index, this.graphChangedListeners);
-        }
+        else
+            return new EventIndex<T>(index, this.graphChangedListeners);
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new EventIndexSequence(this.baseGraph.getIndices().iterator(), this.graphChangedListeners);
+        return new EventIndexIterable(this.baseGraph.getIndices(), this.graphChangedListeners);
+    }
+
+    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+        this.baseGraph.dropKeyIndex(key, elementClass);
+    }
+
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+        this.baseGraph.createKeyIndex(key, elementClass);
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return this.baseGraph.getIndexedKeys(elementClass);
     }
 }

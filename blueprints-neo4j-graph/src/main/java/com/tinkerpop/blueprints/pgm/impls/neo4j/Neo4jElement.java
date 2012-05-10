@@ -42,14 +42,7 @@ public abstract class Neo4jElement implements Element {
         try {
             // attempts to take a collection and convert it to an array so that Neo4j can consume it
             final Object convertedValue = tryConvertCollectionToArray(value);
-
             this.graph.autoStartTransaction();
-            Object oldValue = this.getProperty(key);
-
-            for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(this.getClass())) {
-                autoIndex.autoUpdate(key, convertedValue, oldValue, this);
-            }
-
             this.rawElement.setProperty(key, convertedValue);
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (IllegalArgumentException iae) {
@@ -68,13 +61,7 @@ public abstract class Neo4jElement implements Element {
         try {
             this.graph.autoStartTransaction();
             Object oldValue = this.rawElement.removeProperty(key);
-            if (null != oldValue) {
-                for (Neo4jAutomaticIndex autoIndex : this.graph.getAutoIndices(this.getClass())) {
-                    autoIndex.autoRemove(key, oldValue, this);
-                }
-            }
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-
             return oldValue;
         } catch (NotFoundException e) {
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);

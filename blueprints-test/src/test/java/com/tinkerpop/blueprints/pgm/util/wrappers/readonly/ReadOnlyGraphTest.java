@@ -8,9 +8,10 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyIndexSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyIndexIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexIterable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,8 +34,8 @@ public class ReadOnlyGraphTest extends BaseTest {
 
     public void testReadOnlyGraph() {
         Graph graph = new ReadOnlyGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
-        assertTrue(graph.getVertices() instanceof ReadOnlyVertexSequence);
-        assertTrue(graph.getEdges() instanceof ReadOnlyEdgeSequence);
+        assertTrue(graph.getVertices() instanceof ReadOnlyVertexIterable);
+        assertTrue(graph.getEdges() instanceof ReadOnlyEdgeIterable);
         assertEquals(count(graph.getVertices()), 6);
         assertEquals(count(graph.getEdges()), 6);
         try {
@@ -62,12 +63,6 @@ public class ReadOnlyGraphTest extends BaseTest {
             assertTrue(true);
         }
         try {
-            graph.clear();
-            assertTrue(false);
-        } catch (UnsupportedOperationException e) {
-            assertTrue(true);
-        }
-        try {
             graph.shutdown();
             assertTrue(false);
         } catch (UnsupportedOperationException e) {
@@ -87,10 +82,10 @@ public class ReadOnlyGraphTest extends BaseTest {
             }
             vertex.getProperty("name");
             vertex.getPropertyKeys();
-            assertTrue(vertex.getOutEdges() instanceof ReadOnlyEdgeSequence);
-            assertTrue(vertex.getInEdges() instanceof ReadOnlyEdgeSequence);
-            assertTrue(vertex.getOutEdges("knows") instanceof ReadOnlyEdgeSequence);
-            assertTrue(vertex.getInEdges("created") instanceof ReadOnlyEdgeSequence);
+            assertTrue(vertex.getOutEdges() instanceof ReadOnlyEdgeIterable);
+            assertTrue(vertex.getInEdges() instanceof ReadOnlyEdgeIterable);
+            assertTrue(vertex.getOutEdges("knows") instanceof ReadOnlyEdgeIterable);
+            assertTrue(vertex.getInEdges("created") instanceof ReadOnlyEdgeIterable);
         }
         for (Edge edge : graph.getEdges()) {
             assertTrue(edge instanceof ReadOnlyEdge);
@@ -109,11 +104,12 @@ public class ReadOnlyGraphTest extends BaseTest {
 
     public void testReadOnlyIndices() {
         IndexableGraph graph = new ReadOnlyIndexableGraph(TinkerGraphFactory.createTinkerGraph());
-        assertTrue(graph.getIndices() instanceof ReadOnlyIndexSequence);
-        Index<Vertex> index = graph.getIndex(Index.VERTICES, Vertex.class);
+        Index<Vertex> index = ((WrapperGraph<IndexableGraph>) graph).getBaseGraph().createIndex("blah", Vertex.class);
+        index.put("name", "marko", graph.getVertex(1));
+        assertTrue(graph.getIndices() instanceof ReadOnlyIndexIterable);
+        index = graph.getIndex("blah", Vertex.class);
         assertTrue(index instanceof ReadOnlyIndex);
-        assertTrue(index instanceof ReadOnlyAutomaticIndex);
-        assertTrue(index.get("name", "marko") instanceof ReadOnlyVertexSequence);
+        assertTrue(index.get("name", "marko") instanceof ReadOnlyVertexIterable);
         try {
             index.put("name", "noname", graph.getVertex(1));
             assertTrue(false);
@@ -127,7 +123,6 @@ public class ReadOnlyGraphTest extends BaseTest {
             assertTrue(true);
         }
         assertTrue(Vertex.class.isAssignableFrom(index.getIndexClass()));
-        assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
-        assertEquals(index.getIndexName(), Index.VERTICES);
+        assertEquals(index.getIndexName(), "blah");
     }
 }

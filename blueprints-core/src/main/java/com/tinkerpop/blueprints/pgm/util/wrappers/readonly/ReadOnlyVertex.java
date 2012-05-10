@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -16,11 +16,11 @@ public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
     }
 
     public Iterable<Edge> getInEdges(final String... labels) {
-        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator());
+        return new ReadOnlyEdgeIterable(((Vertex) this.rawElement).getInEdges(labels));
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
-        return new ReadOnlyEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator());
+        return new ReadOnlyEdgeIterable(((Vertex) this.rawElement).getOutEdges(labels));
     }
 
     public Query query() {

@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
@@ -10,10 +9,10 @@ import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.index.BatchInserterIndexProvider;
-import org.neo4j.index.impl.lucene.LuceneBatchInserterIndexProvider;
-import org.neo4j.kernel.impl.batchinsert.BatchInserter;
-import org.neo4j.kernel.impl.batchinsert.BatchInserterImpl;
+import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
+import org.neo4j.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,18 +34,16 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
     private final BatchInserterIndexProvider indexProvider;
 
     private final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
-    private final Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>> automaticVertexIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchVertex>>();
-    private final Map<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>> automaticEdgeIndices = new HashMap<String, Neo4jBatchAutomaticIndex<Neo4jBatchEdge>>();
 
     private Long idCounter = 0l;
 
     public Neo4jBatchGraph(final String directory) {
-        this.rawGraph = new BatchInserterImpl(directory);
+        this.rawGraph = BatchInserters.inserter(directory);
         this.indexProvider = new LuceneBatchInserterIndexProvider(rawGraph);
     }
 
     public Neo4jBatchGraph(final String directory, final Map<String, String> parameters) {
-        this.rawGraph = new BatchInserterImpl(directory, parameters);
+        this.rawGraph = BatchInserters.inserter(directory, parameters);
         this.indexProvider = new LuceneBatchInserterIndexProvider(rawGraph);
     }
 
@@ -126,13 +123,7 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
             }
         }
 
-        final Neo4jBatchVertex vertex = new Neo4jBatchVertex(this, finalId);
-        if (finalProperties.size() > 0) {
-            for (final Neo4jBatchAutomaticIndex<Neo4jBatchVertex> index : this.automaticVertexIndices.values()) {
-                index.autoUpdate(vertex, finalProperties);
-            }
-        }
-        return vertex;
+        return new Neo4jBatchVertex(this, finalId);
     }
 
     public Vertex getVertex(final Object id) {
@@ -166,6 +157,13 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
     /**
      * @throws UnsupportedOperationException
      */
+    public Iterable<Vertex> getVertices(final String key, final Object value) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @throws UnsupportedOperationException
+     */
     public void removeVertex(final Vertex vertex) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
@@ -186,13 +184,7 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
             finalProperties = makePropertyMap((Map<String, Object>) id);
         final Long finalId = this.rawGraph.createRelationship((Long) outVertex.getId(), (Long) inVertex.getId(), DynamicRelationshipType.withName(label), finalProperties);
 
-        final Neo4jBatchEdge edge = new Neo4jBatchEdge(this, finalId, label);
-        if (finalProperties.size() > 0) {
-            for (final Neo4jBatchAutomaticIndex<Neo4jBatchEdge> index : this.automaticEdgeIndices.values()) {
-                index.autoUpdate(edge, finalProperties);
-            }
-        }
-        return edge;
+        return new Neo4jBatchEdge(this, finalId, label);
     }
 
     /**
@@ -212,6 +204,13 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
     /**
      * @throws UnsupportedOperationException
      */
+    public Iterable<Edge> getEdges(final String key, final Object value) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @throws UnsupportedOperationException
+     */
     public void removeEdge(final Edge edge) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
@@ -220,14 +219,13 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
         return (Index<T>) this.indices.get(indexName);
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         final Neo4jBatchIndex<T> index;
 
         final Map<String, String> map = generateParameterMap(indexParameters);
         if (indexParameters.length == 0) {
             map.put(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT);
         }
-        map.put(Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.MANUAL.toString());
 
         if (Vertex.class.isAssignableFrom(indexClass)) {
             index = new Neo4jBatchIndex<T>(this, indexProvider.nodeIndex(indexName, map), indexName, indexClass);
@@ -236,38 +234,6 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
         }
         this.indices.put(indexName, index);
         return index;
-    }
-
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys, final Parameter... indexParameters) {
-        final Neo4jBatchAutomaticIndex<T> index;
-
-        final Map<String, String> map = generateParameterMap(indexParameters);
-        if (indexParameters.length == 0) {
-            map.put(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT);
-        }
-        map.put(Neo4jBatchTokens.BLUEPRINTS_TYPE, Index.Type.AUTOMATIC.toString());
-        map.put(Neo4jBatchTokens.BLUEPRINTS_AUTOKEYS, makeAutoIndexKeys(indexKeys));
-
-        if (indexClass.equals(Vertex.class)) {
-            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.nodeIndex(indexName, map), indexName, indexClass, indexKeys);
-        } else {
-            index = new Neo4jBatchAutomaticIndex<T>(this, indexProvider.relationshipIndex(indexName, map), indexName, indexClass, indexKeys);
-        }
-        this.indices.put(indexName, index);
-        if (Vertex.class.isAssignableFrom(indexClass)) {
-            this.automaticVertexIndices.put(indexName, (Neo4jBatchAutomaticIndex<Neo4jBatchVertex>) index);
-        } else {
-            this.automaticEdgeIndices.put(indexName, (Neo4jBatchAutomaticIndex<Neo4jBatchEdge>) index);
-        }
-        return index;
-    }
-
-    protected Iterable<Neo4jBatchAutomaticIndex<Neo4jBatchVertex>> getAutomaticVertexIndices() {
-        return this.automaticVertexIndices.values();
-    }
-
-    protected Iterable<Neo4jBatchAutomaticIndex<Neo4jBatchEdge>> getAutomaticEdgeIndices() {
-        return this.automaticEdgeIndices.values();
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
@@ -310,5 +276,17 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
             map.put(parameter.getKey().toString(), parameter.getValue().toString());
         }
         return map;
+    }
+
+    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
     }
 }

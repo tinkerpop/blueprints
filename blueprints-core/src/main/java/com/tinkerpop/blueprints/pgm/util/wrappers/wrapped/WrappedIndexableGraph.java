@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.wrapped;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
@@ -15,8 +14,8 @@ import java.util.Set;
  */
 public class WrappedIndexableGraph<T extends IndexableGraph> extends WrappedGraph<T> implements IndexableGraph, WrapperGraph<T> {
 
-    public WrappedIndexableGraph(final T rawIndexableGraph) {
-        super(rawIndexableGraph);
+    public WrappedIndexableGraph(final T baseIndexableGraph) {
+        super(baseIndexableGraph);
     }
 
     public void dropIndex(final String indexName) {
@@ -24,7 +23,7 @@ public class WrappedIndexableGraph<T extends IndexableGraph> extends WrappedGrap
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new WrappedIndexSequence(baseGraph.getIndices().iterator());
+        return new WrappedIndexSequence(baseGraph.getIndices());
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
@@ -32,20 +31,24 @@ public class WrappedIndexableGraph<T extends IndexableGraph> extends WrappedGrap
         if (null == index)
             return null;
         else {
-            if (index.getIndexType().equals(Index.Type.MANUAL)) {
-                return new WrappedIndex<T>(index);
-            } else {
-                return new WrappedAutomaticIndex<T>((AutomaticIndex<T>) index);
-            }
+            return new WrappedIndex<T>(index);
         }
     }
 
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        return new WrappedIndex<T>(baseGraph.createManualIndex(indexName, indexClass, indexParameters));
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+        return new WrappedIndex<T>(baseGraph.createIndex(indexName, indexClass, indexParameters));
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> autoIndexKeys, final Parameter... indexParameters) {
-        return new WrappedAutomaticIndex<T>(baseGraph.createAutomaticIndex(indexName, indexClass, autoIndexKeys, indexParameters));
+    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+        this.baseGraph.dropKeyIndex(key, elementClass);
+    }
+
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+        this.baseGraph.createKeyIndex(key, elementClass);
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return this.baseGraph.getIndexedKeys(elementClass);
     }
 
 

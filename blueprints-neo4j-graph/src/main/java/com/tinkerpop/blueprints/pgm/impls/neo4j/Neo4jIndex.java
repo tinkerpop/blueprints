@@ -1,15 +1,14 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeSequence;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexSequence;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexIterable;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
@@ -37,10 +36,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         this.generateIndex(indexParameters);
     }
 
-    public Type getIndexType() {
-        return Type.MANUAL;
-    }
-
     public Class<T> getIndexClass() {
         if (Vertex.class.isAssignableFrom(this.indexClass))
             return (Class) Vertex.class;
@@ -66,21 +61,27 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         }
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
-        final IndexHits<S> itty;
-        if (value instanceof String && ((String) value).startsWith(Neo4jTokens.QUERY_HEADER)) {
-            itty = this.rawIndex.query(key, ((String) value).substring(Neo4jTokens.QUERY_HEADER.length()));
-        } else {
-            itty = this.rawIndex.get(key, value);
-        }
+    public CloseableIterable<T> get(final String key, final Object value) {
+        final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexSequence((Iterable<Node>) itty, this.graph);
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph);
         else
-            return new Neo4jEdgeSequence((Iterable<Relationship>) itty, this.graph);
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph);
+    }
+
+    public CloseableIterable<T> query(final String key, final Object query) {
+        final IndexHits<S> itty = this.rawIndex.query(key, query);
+        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph);
+        else
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph);
     }
 
     public long count(final String key, final Object value) {
-        return this.rawIndex.get(key, value).size();
+        final IndexHits hits = this.rawIndex.get(key, value);
+        final long count = hits.size();
+        hits.close();
+        return count;
     }
 
     public void remove(final String key, final Object value, final T element) {
@@ -97,47 +98,19 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         }
     }
 
-    protected void removeBasic(final String key, final Object value, final T element) {
-        this.rawIndex.remove((S) element.getRawElement(), key, value);
-    }
-
-    protected void putBasic(final String key, final Object value, final T element) {
-        this.rawIndex.add((S) element.getRawElement(), key, value);
-    }
-
     private void generateIndex(final Parameter<Object, Object>... indexParameters) {
-        final boolean alreadyExists;
-        final IndexManager manager = this.getIndexManager();
+        final IndexManager manager = this.graph.getRawGraph().index();
         if (Vertex.class.isAssignableFrom(this.indexClass)) {
-            alreadyExists = manager.existsForNodes(this.indexName);
             if (indexParameters.length > 0)
                 this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forNodes(this.indexName, generateParameterMap(indexParameters));
             else
                 this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forNodes(this.indexName);
         } else {
-            alreadyExists = manager.existsForRelationships(this.indexName);
             if (indexParameters.length > 0)
                 this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forRelationships(this.indexName, generateParameterMap(indexParameters));
             else
                 this.rawIndex = (org.neo4j.graphdb.index.Index<S>) manager.forRelationships(this.indexName);
         }
-
-        if (!alreadyExists) {
-            final String storedType = manager.getConfiguration(this.rawIndex).get(Neo4jTokens.BLUEPRINTS_TYPE);
-            if (null == storedType) {
-                if (this instanceof AutomaticIndex) {
-                    manager.setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.AUTOMATIC.toString());
-                    this.graph.setKernalProperty(Neo4jTokens.BLUEPRINTS_HASAUTOINDEX, Boolean.TRUE);
-                } else {
-                    manager.setConfiguration(this.rawIndex, Neo4jTokens.BLUEPRINTS_TYPE, Type.MANUAL.toString());
-                }
-            } else if (this.getIndexType() != Type.valueOf(storedType))
-                throw new RuntimeException("Stored index is " + storedType + " and is being loaded as a " + this.getIndexType() + " index");
-        }
-    }
-
-    protected IndexManager getIndexManager() {
-        return this.graph.getRawGraph().index();
     }
 
     public String toString() {

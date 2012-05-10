@@ -8,15 +8,15 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableSequence;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementSequence;
+import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableIterable;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementIterable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,11 +38,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected Class<? extends Element> indexClass;
 
-    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass,
-                final com.tinkerpop.blueprints.pgm.Index.Type indexType, final OType iType) {
+    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass, final OType iType) {
         this.graph = graph;
         this.indexClass = indexClass;
-        create(indexName, this.indexClass, indexType, iType);
+        create(indexName, this.indexClass, iType);
     }
 
     public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
@@ -61,10 +60,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public Class<T> getIndexClass() {
         return (Class<T>) this.indexClass;
-    }
-
-    public Type getIndexType() {
-        return Type.MANUAL;
     }
 
     public void put(final String key, final Object value, final T element) {
@@ -88,14 +83,18 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     @SuppressWarnings("rawtypes")
-    public CloseableSequence<T> get(final String key, final Object value) {
+    public CloseableIterable<T> get(final String key, final Object value) {
         final String keyTemp = key + SEPARATOR + value;
         final Collection<OIdentifiable> records = (Collection<OIdentifiable>) underlying.get(keyTemp);
 
         if (records.isEmpty())
-            return new WrappingCloseableSequence(Collections.emptySet());
+            return new WrappingCloseableIterable(Collections.emptySet());
 
-        return new OrientElementSequence<T>(graph, records.iterator());
+        return new OrientElementIterable<T>(graph, records.iterator());
+    }
+
+    public CloseableIterable<T> query(final String key, final Object query) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException();
     }
 
     public long count(final String key, final Object value) {
@@ -138,8 +137,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
-    private void create(final String indexName, final Class<? extends Element> indexClass,
-                        final com.tinkerpop.blueprints.pgm.Index.Type indexType, OType iKeyType) {
+    private void create(final String indexName, final Class<? extends Element> indexClass, OType iKeyType) {
         this.indexClass = indexClass;
 
         if (iKeyType == null)
@@ -158,7 +156,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
         underlying.getConfiguration().field(CONFIG_CLASSNAME, className);
-        underlying.getConfiguration().field(CONFIG_TYPE, indexType.toString());
     }
 
     private void load(final ODocument indexConfiguration) {

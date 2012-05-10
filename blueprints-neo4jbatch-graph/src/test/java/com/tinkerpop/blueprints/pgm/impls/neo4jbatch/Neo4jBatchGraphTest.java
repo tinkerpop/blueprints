@@ -1,28 +1,19 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.BaseTest;
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jTokens;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReader;
-import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -130,28 +121,16 @@ public class Neo4jBatchGraphTest extends BaseTest {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
         assertEquals(0, count(batch.getIndices()));
-        batch.createAutomaticIndex(Index.VERTICES, Vertex.class, new HashSet<String>(Arrays.asList("name", "age")));
-        assertEquals(1, count(batch.getIndices()));
-        Index<Edge> edgeIndex = batch.createManualIndex(Index.EDGES, Edge.class);
-        assertEquals(2, count(batch.getIndices()));
-        batch.createAutomaticIndex("fakeIndex", Vertex.class, null);
-        assertEquals(3, count(batch.getIndices()));
-        for (final Index index : batch.getIndices()) {
-            if (index.getIndexName().equals(Index.VERTICES)) {
-                assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
-                assertEquals(index.getIndexClass(), Vertex.class);
-                assertEquals(((AutomaticIndex) index).getAutoIndexKeys().size(), 2);
-                assertTrue(((AutomaticIndex) index).getAutoIndexKeys().contains("name"));
-                assertTrue(((AutomaticIndex) index).getAutoIndexKeys().contains("age"));
-            } else if (index.getIndexName().equals(Index.EDGES)) {
-                assertEquals(index.getIndexType(), Index.Type.MANUAL);
+        //batch.createKeyIndex("name", Vertex.class);
+        //batch.createKeyIndex("age", Vertex.class);
+        //Index<Edge> edgeIndex = batch.createIndex("edgeIdx", Edge.class);
+        //assertEquals(1, count(batch.getIndices()));
+
+        /*for (final Index index : batch.getIndices()) {
+            if (index.getIndexName().equals("edgeIdx")) {
                 assertEquals(index.getIndexClass(), Edge.class);
-            } else if (index.getIndexName().equals("fakeIndex")) {
-                assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
-                assertEquals(index.getIndexClass(), Vertex.class);
-                assertNull(((AutomaticIndex) index).getAutoIndexKeys());
             } else {
-                throw new RuntimeException("There should not be a forth index.");
+                throw new RuntimeException("There should not be another index.");
             }
         }
 
@@ -171,26 +150,18 @@ public class Neo4jBatchGraphTest extends BaseTest {
             final Edge edge = batch.addEdge(map, batch.getVertex(idA), batch.getVertex(idB), idA + "-" + idB);
             edgeIndex.put("unique", idA + "-" + idB, edge);
             edgeIndex.put("full", "blah", edge);
-        }
+        }*/
         batch.flushIndices();
         batch.shutdown();
 
-        final IndexableGraph graph = new Neo4jGraph(directory);
+        /*final Neo4jGraph graph = new Neo4jGraph(directory);
         assertEquals(count(graph.getIndices()), 3);
-        Index<Vertex> vertexIndex = graph.getIndex(Index.VERTICES, Vertex.class);
-        assertEquals(vertexIndex.getIndexType(), Index.Type.AUTOMATIC);
-        assertEquals(vertexIndex.getIndexClass(), Vertex.class);
-        assertEquals(((AutomaticIndex) vertexIndex).getAutoIndexKeys().size(), 2);
-        assertTrue(((AutomaticIndex) vertexIndex).getAutoIndexKeys().contains("name"));
-        assertTrue(((AutomaticIndex) vertexIndex).getAutoIndexKeys().contains("age"));
-        edgeIndex = graph.getIndex(Index.EDGES, Edge.class);
-        assertEquals(edgeIndex.getIndexType(), Index.Type.MANUAL);
-        assertEquals(edgeIndex.getIndexClass(), Edge.class);
-        Index<Vertex> fakeIndex = graph.getIndex("fakeIndex", Vertex.class);
-        assertEquals(fakeIndex.getIndexType(), Index.Type.AUTOMATIC);
-        assertEquals(fakeIndex.getIndexClass(), Vertex.class);
-        assertNull(((AutomaticIndex) fakeIndex).getAutoIndexKeys());
 
+        assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
+        assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
+        assertTrue(graph.getIndexedKeys(Vertex.class).contains("age"));
+        edgeIndex = graph.getIndex("edgeIdx", Edge.class);
+        assertEquals(edgeIndex.getIndexClass(), Edge.class);
 
         graph.removeVertex(graph.getVertex(0)); // remove reference node
         assertEquals(count(graph.getVertices()), 10);
@@ -199,11 +170,11 @@ public class Neo4jBatchGraphTest extends BaseTest {
             int age = (Integer) vertex.getProperty("age");
             assertEquals(vertex.getProperty("name"), (age / 10) + "");
 
-            assertEquals(vertexIndex.count("nothing", 0), 0);
-            assertEquals(vertexIndex.count("age", age), 1);
-            assertEquals(vertexIndex.get("age", age).iterator().next(), vertex);
-            assertEquals(vertexIndex.count("name", (age / 10) + ""), 1);
-            assertEquals(vertexIndex.get("name", (age / 10) + "").iterator().next(), vertex);
+            assertFalse(graph.getVertices("nothing", 0).iterator().hasNext());
+            assertEquals(count(graph.getVertices("age", age)), 1);
+            assertEquals(graph.getVertices("age", age).iterator().next(), vertex);
+            assertEquals(count(graph.getVertices("name", (age / 10) + "")), 1);
+            assertEquals(graph.getVertices("name", (age / 10) + "").iterator().next(), vertex);
             assertEquals(vertex.getPropertyKeys().size(), 3);
             vertex.setProperty("NEW", age);
             assertEquals(vertex.getPropertyKeys().size(), 4);
@@ -242,7 +213,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
             assertTrue(edges.contains(edge));
         }
 
-        graph.shutdown();
+        graph.shutdown();*/
     }
 
     public void testElementPropertyManipulation() {
@@ -317,8 +288,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
     public void testToStringMethods() {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
-        System.out.println(batch.createManualIndex("manual", Vertex.class));
-        System.out.println(batch.createAutomaticIndex("automatic", Edge.class, new HashSet<String>(Arrays.asList("key1", "key2"))));
+        System.out.println(batch.createIndex("manual", Vertex.class));
         System.out.println(batch.addVertex(null));
         System.out.println(batch.addEdge(null, batch.addVertex(null), batch.addVertex(null), "label"));
         batch.shutdown();
@@ -374,7 +344,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
         graph.shutdown();
     }
 
-    public void testIndexParameters() throws Exception {
+    /*public void testIndexParameters() throws Exception {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
         batch.createAutomaticIndex(Index.VERTICES, Vertex.class, null, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
@@ -401,7 +371,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertEquals(counter, 1);
 
         graph.shutdown();
-    }
+    }*/
 
     private String getWorkingDirectory() {
         String directory = System.getProperty("neo4jBatchGraphDirectory");

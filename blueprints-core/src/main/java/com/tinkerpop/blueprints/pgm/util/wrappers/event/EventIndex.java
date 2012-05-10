@@ -1,14 +1,14 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexIterable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,20 +37,24 @@ public class EventIndex<T extends Element> implements Index<T> {
         this.rawIndex.put(key, value, (T) ((EventElement) element).getBaseElement());
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
+    public CloseableIterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (CloseableSequence<T>) new EventVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator(), this.graphChangedListeners);
+            return (CloseableIterable<T>) new EventVertexIterable((Iterable<Vertex>) this.rawIndex.get(key, value), this.graphChangedListeners);
         } else {
-            return (CloseableSequence<T>) new EventEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator(), this.graphChangedListeners);
+            return (CloseableIterable<T>) new EventEdgeIterable((Iterable<Edge>) this.rawIndex.get(key, value), this.graphChangedListeners);
+        }
+    }
+
+    public CloseableIterable<T> query(final String key, final Object query) {
+        if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
+            return (CloseableIterable<T>) new EventVertexIterable((Iterable<Vertex>) this.rawIndex.query(key, query), this.graphChangedListeners);
+        } else {
+            return (CloseableIterable<T>) new EventEdgeIterable((Iterable<Edge>) this.rawIndex.query(key, query), this.graphChangedListeners);
         }
     }
 
     public long count(final String key, final Object value) {
         return this.rawIndex.count(key, value);
-    }
-
-    public Index.Type getIndexType() {
-        return Index.Type.MANUAL;
     }
 
     public String getIndexName() {

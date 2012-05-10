@@ -5,8 +5,8 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexIterable;
 
 /**
  * A ReadOnlyGraph wraps a Graph and overrides the underlying graph's mutating methods.
@@ -52,7 +52,11 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Edge> getEdges() {
-        return new ReadOnlyEdgeSequence(this.baseGraph.getEdges().iterator());
+        return new ReadOnlyEdgeIterable(this.baseGraph.getEdges());
+    }
+
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        return new ReadOnlyEdgeIterable(this.baseGraph.getEdges(key, value));
     }
 
     public Edge getEdge(final Object id) {
@@ -64,7 +68,11 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new ReadOnlyVertexSequence(this.baseGraph.getVertices().iterator());
+        return new ReadOnlyVertexIterable(this.baseGraph.getVertices());
+    }
+
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        return new ReadOnlyVertexIterable(this.baseGraph.getVertices(key, value));
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
@@ -8,15 +7,17 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterAuthentication;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexIterable;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -97,7 +98,11 @@ public class RexsterGraph implements IndexableGraph, MetaGraph<JSONObject> {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new RexsterVertexSequence(this.graphURI + RexsterTokens.SLASH_VERTICES, this);
+        return new RexsterVertexIterable(this.graphURI + RexsterTokens.SLASH_VERTICES, this);
+    }
+
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        return new PropertyFilteredIterable<Vertex>(key, value, new RexsterVertexIterable(this.graphURI + RexsterTokens.SLASH_VERTICES, this));
     }
 
     public Vertex addVertex(final Object id) {
@@ -130,7 +135,11 @@ public class RexsterGraph implements IndexableGraph, MetaGraph<JSONObject> {
     }
 
     public Iterable<Edge> getEdges() {
-        return new RexsterEdgeSequence(this.graphURI + RexsterTokens.SLASH_EDGES, this);
+        return new RexsterEdgeIterable(this.graphURI + RexsterTokens.SLASH_EDGES, this);
+    }
+
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        return new PropertyFilteredIterable<Edge>(key, value, new RexsterEdgeIterable(this.graphURI + RexsterTokens.SLASH_EDGES, this));
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
@@ -167,10 +176,7 @@ public class RexsterGraph implements IndexableGraph, MetaGraph<JSONObject> {
             else
                 throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
 
-            if (index.opt(RexsterTokens.TYPE).equals(Index.Type.AUTOMATIC.toString().toLowerCase()))
-                indices.add(new RexsterAutomaticIndex(this, index.optString(RexsterTokens.NAME), c));
-            else
-                indices.add(new RexsterIndex(this, index.optString(RexsterTokens.NAME), c));
+            indices.add(new RexsterIndex(this, index.optString(RexsterTokens.NAME), c));
 
         }
 
@@ -188,36 +194,16 @@ public class RexsterGraph implements IndexableGraph, MetaGraph<JSONObject> {
         return null;
     }
 
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys, final Parameter... indexParameters) {
+
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         String c;
         if (Vertex.class.isAssignableFrom(indexClass))
             c = RexsterTokens.VERTEX;
         else
             c = RexsterTokens.EDGE;
 
-        JSONObject index;
-        if (null != indexKeys) {
-            List<String> keys = new ArrayList<String>();
-            keys.addAll(indexKeys);
-            index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.AUTOMATIC.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c + RexsterTokens.AND + RexsterTokens.KEYS_EQUALS + keys);
-        } else {
-            index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.AUTOMATIC.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
-        }
-        if (!index.opt(RexsterTokens.NAME).equals(indexName))
-            throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
-
-        return new RexsterAutomaticIndex<T>(this, indexName, indexClass);
-
-    }
-
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        String c;
-        if (Vertex.class.isAssignableFrom(indexClass))
-            c = RexsterTokens.VERTEX;
-        else
-            c = RexsterTokens.EDGE;
-
-        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + Index.Type.MANUAL.toString().toLowerCase() + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        // TODO : NO MORE INDEX TYPE -- I JUST KILLED OUT THE Index.getIndexType() call.
+        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS  + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
         if (!index.opt(RexsterTokens.NAME).equals(indexName))
             throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
 
@@ -237,6 +223,16 @@ public class RexsterGraph implements IndexableGraph, MetaGraph<JSONObject> {
             rawGraph = null;
         }
         return rawGraph;
+    }
+
+    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+    }
+
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return new HashSet<String>();
     }
 
 }

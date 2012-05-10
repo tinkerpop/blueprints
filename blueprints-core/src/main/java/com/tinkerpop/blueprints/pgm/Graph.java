@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
 /**
- * A graph is a container object for a collection of vertices and a collection edges.
+ * A Graph is a container object for a collection of vertices and a collection edges.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -11,8 +11,6 @@ public interface Graph {
      * Create a new vertex, add it to the graph, and return the newly created vertex.
      * The provided object identifier is a recommendation for the identifier to use.
      * It is not required that the implementation use this identifier.
-     * If the identifier is a vertex (perhaps from another graph),
-     * then the vertex is duplicated for this graph. Thus, a vertex can not be an identifier.
      *
      * @param id the recommended object identifier
      * @return the newly created vertex
@@ -30,19 +28,30 @@ public interface Graph {
 
     /**
      * Remove the provided vertex from the graph.
-     * Upon removing the vertex, all the edges by which the vertex is connected will be removed as well.
+     * Upon removing the vertex, all the edges by which the vertex is connected must be removed as well.
      *
      * @param vertex the vertex to remove from the graph
      */
     public void removeVertex(Vertex vertex);
 
     /**
-     * Return an iterable reference to all the vertices in the graph. Thus, what is returned can be subjected to the foreach construct.
+     * Return an iterable to all the vertices in the graph.
      * If this is not possible for the implementation, then an UnsupportedOperationException can be thrown.
      *
      * @return an iterable reference to all vertices in the graph
      */
     public Iterable<Vertex> getVertices();
+
+    /**
+     * Return an iterable to all the vertices in the graph that have a particular key/value property.
+     * If this is not possible for the implementation, then an UnsupportedOperationException can be thrown.
+     * The graph implementation should use indexing structures to make this efficient else a full vertex-filter scan is required.
+     *
+     * @param key   the key of vertex
+     * @param value the value of the vertex
+     * @return an iterable of vertices with provided key and value
+     */
+    public Iterable<Vertex> getVertices(String key, Object value);
 
     /**
      * Add an edge to the graph. The added edges requires a recommended identifier, a tail vertex, an head vertex, and a label.
@@ -73,7 +82,7 @@ public interface Graph {
     public void removeEdge(Edge edge);
 
     /**
-     * Return an iterable reference to all the edges in the graph. Thus, what is returned can be subjected to the foreach construct.
+     * Return an iterable to all the edges in the graph.
      * If this is not possible for the implementation, then an UnsupportedOperationException can be thrown.
      *
      * @return an iterable reference to all edges in the graph
@@ -81,13 +90,20 @@ public interface Graph {
     public Iterable<Edge> getEdges();
 
     /**
-     * Remove all the edges and vertices from the graph.
+     * Return an iterable to all the edges in the graph that have a particular key/value property.
+     * If this is not possible for the implementation, then an UnsupportedOperationException can be thrown.
+     * The graph implementation should use indexing structures to make this efficient else a full edge-filter scan is required.
+     *
+     * @param key   the key of the edge
+     * @param value the value of the edge
+     * @return an iterable of edges with provided key and value
      */
-    public void clear();
+    public Iterable<Edge> getEdges(String key, Object value);
 
     /**
      * A shutdown function is required to properly close the graph.
      * This is important for implementations that utilize disk-based serializations.
      */
     public void shutdown();
+
 }

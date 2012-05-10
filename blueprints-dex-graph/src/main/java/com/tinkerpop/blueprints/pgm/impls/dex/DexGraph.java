@@ -1,14 +1,10 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
-import com.sparsity.dex.gdb.Graph;
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
-import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -16,7 +12,6 @@ import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Dex is a graph database developed by Sparsity Technologies.
@@ -31,7 +26,7 @@ import java.util.Set;
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity Technologies</a>
  */
-public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
+public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
 
     /**
      * Default Vertex label. Just used when invoked addVertex with a null parameter.
@@ -72,10 +67,11 @@ public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
     }
 
     /**
-     * All collections are registered here to be automatically closed when the
+     * All iterables are registered here to be automatically closed when the
      * database is stopped (at {@link #shutdown()}).
      */
-    private List<DexIterable<? extends Element>> collections = new ArrayList<DexIterable<? extends Element>>();
+    private List<DexIterable<? extends Element>> iterables = new ArrayList<DexIterable<? extends Element>>();
+
 
     /**
      * Registers a collection.
@@ -83,7 +79,7 @@ public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
      * @param col Collection to be registered.
      */
     protected void register(final DexIterable<? extends Element> col) {
-        collections.add(col);
+        iterables.add(col);
     }
 
     /**
@@ -92,7 +88,7 @@ public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
      * @param col Collection to be unregistered
      */
     protected void unregister(final DexIterable<? extends Element> col) {
-        collections.remove(col);
+        iterables.remove(col);
     }
 
     /**
@@ -211,6 +207,10 @@ public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
         return ret;
     }
 
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
+    }
+
     /*
       * (non-Javadoc)
       *
@@ -288,45 +288,16 @@ public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
         return new DexIterable<Edge>(this, result, Edge.class);
     }
 
-    /*
-      * (non-Javadoc)
-      *
-      * @see com.tinkerpop.blueprints.pgm.Graph#clear()
-      */
-    @Override
-    public void clear() {
-        closeAllCollections();
-
-        com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
-        for (Integer etype : tlist) {
-            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(etype);
-            for (Integer attr : alist) {
-                rawGraph.removeAttribute(attr);
-            }
-            alist = null;
-            rawGraph.removeType(etype);
-        }
-        tlist = null;
-        tlist = rawGraph.findNodeTypes();
-        for (Integer ntype : tlist) {
-            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(ntype);
-            for (Integer attr : alist) {
-                rawGraph.removeAttribute(attr);
-            }
-            alist = null;
-            rawGraph.removeType(ntype);
-        }
-
-        DexAttributes.clear();
-        DexTypes.clear();
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
 
     /**
-     * Closes all non-closed collections.
+     * Closes all non-closed iterables.
      */
     protected void closeAllCollections() {
-        while (!collections.isEmpty()) {
-            collections.remove(collections.size() - 1).close();
+        while (!iterables.isEmpty()) {
+            iterables.remove(iterables.size() - 1).close();
         }
     }
 
@@ -353,85 +324,38 @@ public class DexGraph implements IndexableGraph, MetaGraph<Graph> {
         return StringFactory.graphString(this, db.getPath());
     }
 
-    /*
-    * (non-Javadoc)
-    *
-    * @see
-    * com.tinkerpop.blueprints.pgm.IndexableGraph#createManualIndex(java.lang
-    * .String, java.lang.Class, Parameter...)
-    */
-    @Override
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-      * (non-Javadoc)
-      *
-      * @see
-      * com.tinkerpop.blueprints.pgm.IndexableGraph#createAutomaticIndex(java
-      * .lang.String, java.lang.Class, java.util.Set, Parameter...)
-      */
-    @Override
-    public <T extends Element> AutomaticIndex<T> createAutomaticIndex(final String indexName, final Class<T> indexClass, final Set<String> indexKeys, final Parameter... indexParameters) {
-        throw new UnsupportedOperationException();
-    }
-
-    /*
-      * (non-Javadoc)
-      *
-      * @see
-      * com.tinkerpop.blueprints.pgm.IndexableGraph#getIndex(java.lang.String,
-      * java.lang.Class)
-      */
-    @Override
-    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        if (indexName.compareTo(Index.VERTICES) == 0 || indexName.compareTo(Index.EDGES) == 0)
-            return null;
-
-        int type = DexTypes.getTypeId(getRawGraph(), indexName);
-        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
-            throw new IllegalArgumentException();
+    /*private com.sparsity.dex.gdb.Objects rawGet(final String key, final Object value) {
+        int attr = DexAttributes.getAttributeId(this.getRawGraph(), DexTypes.getTypeId(this.getRawGraph(), value.getClass().toString()), key);
+        if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
+            throw new IllegalArgumentException(key + " is not a valid key");
         }
-        com.sparsity.dex.gdb.Type tdata = DexTypes.getTypeData(getRawGraph(), indexName);
-        Index<T> index = null;
-        if (tdata.getObjectType() == com.sparsity.dex.gdb.ObjectType.Node) {
-            index = (Index<T>) new DexAutomaticIndex<Vertex>(this, Vertex.class, type);
-        } else {
-            index = (Index<T>) new DexAutomaticIndex<Edge>(this, Edge.class, type);
-        }
-        return index;
-    }
 
-    /*
-      * (non-Javadoc)
-      *
-      * @see com.tinkerpop.blueprints.pgm.IndexableGraph#getIndices()
-      */
-    @Override
-    public Iterable<Index<? extends Element>> getIndices() {
-        List<Index<? extends Element>> ret = new ArrayList<Index<? extends Element>>();
-        com.sparsity.dex.gdb.TypeList tlist = getRawGraph().findNodeTypes();
-        for (Integer ntype : tlist) {
-            ret.add(new DexAutomaticIndex<Vertex>(this, Vertex.class, ntype));
+        com.sparsity.dex.gdb.Attribute adata = DexAttributes.getAttributeData(this.getRawGraph(), attr);
+        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+        switch (adata.getDataType()) {
+            case Boolean:
+                v.setBooleanVoid((Boolean) value);
+                break;
+            case Integer:
+                v.setIntegerVoid((Integer) value);
+                break;
+            case Long:
+                v.setLongVoid((Long) value);
+                break;
+            case String:
+                v.setStringVoid((String) value);
+                break;
+            case Double:
+                if (value instanceof Double) {
+                    v.setDoubleVoid((Double) value);
+                } else if (value instanceof Float) {
+                    v.setDoubleVoid(((Float) value).doubleValue());
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException();
         }
-        tlist = null;
-        tlist = getRawGraph().findEdgeTypes();
-        for (Integer etype : tlist) {
-            ret.add(new DexAutomaticIndex<Edge>(this, Edge.class, etype));
-        }
-        tlist = null;
-        return ret;
-    }
+        return this.getRawGraph().select(attr, com.sparsity.dex.gdb.Condition.Equal, v);
+    }*/
 
-    /*
-      * (non-Javadoc)
-      *
-      * @see
-      * com.tinkerpop.blueprints.pgm.IndexableGraph#dropIndex(java.lang.String)
-      */
-    @Override
-    public void dropIndex(final String indexName) {
-        throw new UnsupportedOperationException();
-    }
 }

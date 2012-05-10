@@ -64,15 +64,15 @@ public abstract class GraphTest extends BaseTest {
      */
     public boolean allowStringProperty;
     /**
-     * Does the graph framework ignored user provided ids in graph.addVertex(Object id)?
+     * Does the graph ignore user provided ids in graph.addVertex(Object id)?
      */
     public boolean ignoresSuppliedIds;
     /**
-     * Does the graph framework persist the graph to disk after shutdown?
+     * Does the graph persist the graph to disk after shutdown?
      */
     public boolean isPersistent;
     /**
-     * Is the graph framework an RDF framework?
+     * Is the graph an RDF framework?
      */
     public boolean isRDFModel;
     /**
@@ -81,19 +81,23 @@ public abstract class GraphTest extends BaseTest {
      */
     public boolean isWrapper;
     /**
-     * Does the graph framework support the indexing of edges by their properties?
+     * Does the graph support developer generated indices (beyond automatic key indices)?
+     */
+    public boolean supportsManualIndices;
+    /**
+     * Does the graph support the indexing of edges by their properties?
      */
     public boolean supportsEdgeIndex;
     /**
-     * Does the graph framework support graph.getEdges()?
+     * Does the graph support graph.getEdges()?
      */
     public boolean supportsEdgeIteration;
     /**
-     * Does the graph framework support the indexing of vertices by their properties?
+     * Does the graph support the indexing of vertices by their properties?
      */
     public boolean supportsVertexIndex;
     /**
-     * Does the graph framework support graph.getVertices()?
+     * Does the graph support graph.getVertices()?
      */
     public boolean supportsVertexIteration;
     /**

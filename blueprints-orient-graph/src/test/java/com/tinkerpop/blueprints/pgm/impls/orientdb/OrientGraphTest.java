@@ -1,12 +1,9 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
-import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
-import com.tinkerpop.blueprints.pgm.IndexTestSuite;
-import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
 import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
@@ -76,7 +73,7 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
+    /*public void testIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexableGraphTestSuite(this));
         printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
@@ -86,13 +83,7 @@ public class OrientGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
-    }
+    } */
 
     public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();

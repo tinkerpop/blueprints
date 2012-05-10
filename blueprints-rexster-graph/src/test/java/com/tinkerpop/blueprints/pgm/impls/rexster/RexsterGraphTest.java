@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
@@ -77,12 +76,6 @@ public class RexsterGraphTest extends GraphTest {
         printTestPerformance("IndexTestSuite", this.stopWatch());
     }
 
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
-    }
-
     /*
     TODO: Create a respective test case that doesn't require underscore prefixed properties
     public void testGraphMLReaderTestSuite() throws Exception {
@@ -116,7 +109,7 @@ public class RexsterGraphTest extends GraphTest {
 
     private void resetGraph() {
         IndexableGraph graph = new RexsterGraph(this.getWorkingUri(), this.username, this.password);
-        graph.clear();
+        //TODO: graph.clear();
     }
 
     private String getWorkingUri() {

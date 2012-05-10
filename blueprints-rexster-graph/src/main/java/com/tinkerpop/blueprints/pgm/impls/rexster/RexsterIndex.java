@@ -1,14 +1,14 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeSequence;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexSequence;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexIterable;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -49,29 +49,29 @@ public class RexsterIndex<T extends Element> implements Index<T> {
         RestHelper.put(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value) + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + clazz + RexsterTokens.AND + RexsterTokens.ID_EQUALS + RestHelper.encode(element.getId()));
     }
 
-    public String getIndexName() {
-        return this.indexName;
+    public CloseableIterable<T> query(final String key, final Object query) {
+        throw new UnsupportedOperationException();
     }
 
-    public Type getIndexType() {
-        return Type.MANUAL;
+    public String getIndexName() {
+        return this.indexName;
     }
 
     public Class<T> getIndexClass() {
         return this.indexClass;
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
+    public CloseableIterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.indexClass))
-            return (CloseableSequence<T>) new RexsterVertexSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
+            return (CloseableIterable<T>) new RexsterVertexIterable(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
         else
-            return (CloseableSequence<T>) new RexsterEdgeSequence(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
+            return (CloseableIterable<T>) new RexsterEdgeIterable(this.graph.getGraphURI() + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(this.indexName) + RexsterTokens.QUESTION + RexsterTokens.KEY_EQUALS + key + RexsterTokens.AND + RexsterTokens.VALUE_EQUALS + RestHelper.uriCast(value), this.graph);
     }
 
     public boolean equals(final Object object) {
         if (object.getClass().equals(this.getClass())) {
             Index other = (Index) object;
-            return other.getIndexClass().equals(this.getIndexClass()) && other.getIndexName().equals(this.getIndexName()) && other.getIndexType().equals(this.getIndexType());
+            return other.getIndexClass().equals(this.getIndexClass()) && other.getIndexName().equals(this.getIndexName());
         } else {
             return false;
         }

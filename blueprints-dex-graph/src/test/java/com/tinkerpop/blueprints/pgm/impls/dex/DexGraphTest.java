@@ -28,6 +28,7 @@ public class DexGraphTest extends GraphTest {
         this.supportsEdgeIndex = false;
         this.ignoresSuppliedIds = true;
         this.supportsTransactions = false;
+        this.supportsManualIndices = false;
 
         this.allowSerializableObjectProperty = false;
         this.allowBooleanProperty = true;
@@ -71,30 +72,6 @@ public class DexGraphTest extends GraphTest {
         doTestSuite(new GraphMLReaderTestSuite(this));
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
-
-    /*public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
-    }
-
-    public void testTransactionalGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new TransactionalGraphTestSuite(this));
-        printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
-    }*/
 
     public Graph getGraphInstance() {
         String db = System.getProperty("dexGraphFile");

@@ -76,9 +76,4 @@ public interface GraphChangedListener {
      * @param edge
      */
     public void edgeRemoved(final Edge edge);
-
-    /**
-     * Raised after the graph was cleared.
-     */
-    public void graphCleared();
 }

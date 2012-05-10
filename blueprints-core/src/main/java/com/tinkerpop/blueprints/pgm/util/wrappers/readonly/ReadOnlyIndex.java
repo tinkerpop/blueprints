@@ -1,15 +1,13 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexSequence;
-
-import java.util.Iterator;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -30,20 +28,24 @@ public class ReadOnlyIndex<T extends Element> implements Index<T> {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
+    public CloseableIterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (CloseableSequence<T>) new ReadOnlyVertexSequence((Iterator<Vertex>) this.rawIndex.get(key, value).iterator());
+            return (CloseableIterable<T>) new ReadOnlyVertexIterable((Iterable<Vertex>) this.rawIndex.get(key, value));
         } else {
-            return (CloseableSequence<T>) new ReadOnlyEdgeSequence((Iterator<Edge>) this.rawIndex.get(key, value).iterator());
+            return (CloseableIterable<T>) new ReadOnlyEdgeIterable((Iterable<Edge>) this.rawIndex.get(key, value));
+        }
+    }
+
+    public CloseableIterable<T> query(final String key, final Object query) {
+        if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
+            return (CloseableIterable<T>) new ReadOnlyVertexIterable((Iterable<Vertex>) this.rawIndex.query(key, query));
+        } else {
+            return (CloseableIterable<T>) new ReadOnlyEdgeIterable((Iterable<Edge>) this.rawIndex.query(key, query));
         }
     }
 
     public long count(final String key, final Object value) {
         return this.rawIndex.count(key, value);
-    }
-
-    public Index.Type getIndexType() {
-        return Index.Type.MANUAL;
     }
 
     public String getIndexName() {

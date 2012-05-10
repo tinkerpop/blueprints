@@ -1,7 +1,9 @@
 package com.tinkerpop.blueprints.pgm;
 
-import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -19,7 +21,7 @@ public class IndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             this.stopWatch();
-            Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
+            Index<Vertex> index = graph.createIndex("basic", Vertex.class);
             printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
@@ -63,7 +65,7 @@ public class IndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
 
-            Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
+            Index<Vertex> index = graph.createIndex("basic", Vertex.class);
             for (int i = 0; i < 10; i++) {
                 Vertex v = graph.addVertex(null);
                 index.put("dog", "puppy", v);
@@ -82,7 +84,7 @@ public class IndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsEdgeIndex && !graphTest.isRDFModel) {
             this.stopWatch();
-            Index<Edge> index = graph.createManualIndex("basic", Edge.class);
+            Index<Edge> index = graph.createIndex("basic", Edge.class);
             printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
@@ -127,12 +129,12 @@ public class IndexTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
 
-            Index<Vertex> index = graph.createManualIndex("basic", Vertex.class);
+            Index<Vertex> index = graph.createIndex("basic", Vertex.class);
             for (int i = 0; i < 10; i++) {
                 Vertex v = graph.addVertex(null);
                 index.put("dog", "puppy", v);
             }
-            CloseableSequence<Vertex> hits = index.get("dog", "puppy");
+            CloseableIterable<Vertex> hits = index.get("dog", "puppy");
             int counter = 0;
             for (Vertex v : hits) {
                 counter++;
@@ -148,18 +150,21 @@ public class IndexTestSuite extends TestSuite {
     public void testNoConcurrentModificationException() {
         if (graphTest.supportsEdgeIndex) {
             IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+            graph.createKeyIndex("key", Edge.class);
             for (int i = 0; i < 25; i++) {
-                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test");
+                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");
             }
-            assertEquals(BaseTest.count(graph.getVertices()), 50);
-            assertEquals(BaseTest.count(graph.getEdges()), 25);
-            for (final Edge edge : graph.getIndex(Index.EDGES, Edge.class).get("label", "test")) {
+            assertEquals(count(graph.getVertices()), 50);
+            assertEquals(count(graph.getEdges()), 25);
+            int counter = 0;
+            for (final Edge edge : graph.getEdges("key", "value")) {
                 graph.removeEdge(edge);
+                counter++;
             }
-            assertEquals(BaseTest.count(graph.getVertices()), 50);
-            assertEquals(BaseTest.count(graph.getEdges()), 0);
+            assertEquals(counter, 25);
+            assertEquals(count(graph.getVertices()), 50);
+            assertEquals(count(graph.getEdges()), 0);
             graph.shutdown();
         }
     }
-
 }

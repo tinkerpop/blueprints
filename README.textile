@@ -22,6 +22,8 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "GraphSON":https://github.com/tinkerpop/blueprints/wiki/GraphSON-Reader-and-Writer-Library Reader/Writer utility
 ** @ReadOnlyGraph@ wrapper
 ** @EventGraph@ wrapper
+** @PartitionGraph@ wrapper
+** @IdGraph@ wrapper
 ** Various helper utilities
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.pgm.AutomaticIndex;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
@@ -22,9 +21,9 @@ public class OrientEdge extends OrientElement implements Edge {
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
         this.rawElement.field(LABEL, label);
-        for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-            autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
-        }
+        //for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
+        //    autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
+        //}
     }
 
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {

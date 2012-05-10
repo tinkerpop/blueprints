@@ -6,8 +6,8 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexIterable;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -71,10 +71,6 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return (null == writePartition || this.readPartitions.contains(writePartition));
     }
 
-    public void clear() {
-        this.baseGraph.clear();
-    }
-
     public void shutdown() {
         this.baseGraph.shutdown();
     }
@@ -98,7 +94,11 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new PartitionVertexSequence(this.baseGraph.getVertices().iterator(), this);
+        return new PartitionVertexIterable(this.baseGraph.getVertices(), this);
+    }
+
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        return new PartitionVertexIterable(this.baseGraph.getVertices(key, value), this);
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
@@ -116,7 +116,11 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Edge> getEdges() {
-        return new PartitionEdgeSequence(this.baseGraph.getEdges().iterator(), this);
+        return new PartitionEdgeIterable(this.baseGraph.getEdges(), this);
+    }
+
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        return new PartitionEdgeIterable(this.baseGraph.getEdges(key, value), this);
     }
 
     public void removeEdge(final Edge edge) {

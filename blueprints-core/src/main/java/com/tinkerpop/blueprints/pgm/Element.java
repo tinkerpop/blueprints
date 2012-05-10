@@ -3,11 +3,12 @@ package com.tinkerpop.blueprints.pgm;
 import java.util.Set;
 
 /**
- * An element is the base class for both vertices and edges.
+ * An Element is the base class for both vertices and edges.
  * An element has an identifier that must be unique to its inheriting classes (vertex or edges).
  * An element can maintain a collection of key/value properties.
  * Keys are always strings and values can be any object.
  * Particular implementations can reduce the space of objects that can be used as values.
+ * Typically, objects are Java primitives (e.g. String, long, int, boolean, etc.)
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

@@ -38,11 +38,6 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
         this.graph.autoStartTransaction();
 
         try {
-            final Object oldValue = this.getProperty(key);
-            for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-                autoIndex.autoUpdate(key, value, oldValue, this);
-            }
-
             this.rawElement.field(key, value);
             this.graph.getRawGraph().save(rawElement);
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
@@ -61,11 +56,6 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
 
         try {
             final Object oldValue = this.rawElement.removeField(key);
-            if (null != oldValue) {
-                for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-                    autoIndex.autoRemove(key, oldValue, this);
-                }
-            }
             this.save();
             this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             return oldValue;

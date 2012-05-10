@@ -294,63 +294,6 @@ public class GMLReaderTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void donttestGratefulGraph() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIndex) {
-            for (int i = 200; i < 1002; i = i + 200) {
-                graph.clear();
-                ((IndexableGraph) graph).createAutomaticIndex(Index.VERTICES, Vertex.class, null);
-                this.stopWatch();
-                new GMLReader(graph).inputGraph(GMLReader.class.getResourceAsStream("graph-example-2.gml"), i);
-                if (graph instanceof TransactionalGraph) {
-                    printPerformance(graph.toString(), null, "graph-example-2 loaded with buffer size equal to " + i
-                            + " for transactional graphs", this.stopWatch());
-                } else {
-                    printPerformance(graph.toString(), null, "graph-example-2 loaded", this.stopWatch());
-                }
-
-                if (graphTest.supportsVertexIteration) {
-                    assertEquals(count(graph.getVertices()), 809);
-                }
-                if (graphTest.supportsEdgeIteration) {
-                    assertEquals(count(graph.getEdges()), 8049);
-                }
-                assertEquals(count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class)
-                        .get("name", "Garcia")), 1);
-                assertEquals(
-                        count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "Weir")), 1);
-                assertEquals(
-                        count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "Lesh")), 1);
-                assertEquals(
-                        count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "DARK STAR")),
-                        1);
-                assertEquals(
-                        count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name",
-                                "TERRAPIN STATION")), 1);
-                assertEquals(
-                        count(((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name",
-                                "TERRAPIN STATION BAD SPELLING")), 0);
-
-                Vertex garcia = ((IndexableGraph) graph).getIndex(Index.VERTICES, Vertex.class).get("name", "Garcia")
-                        .iterator().next();
-                boolean found = false;
-                for (Edge edge : garcia.getInEdges()) {
-                    if (edge.getLabel().equals("sung_by")) {
-                        if (edge.getOutVertex().getProperty("name").equals("TERRAPIN STATION")) {
-                            found = true;
-                        }
-                    }
-                }
-                assertTrue(found);
-
-                if (!(graph instanceof TransactionalGraph)) {
-                    i = 2000;
-                }
-            }
-        }
-        graph.shutdown();
-    }
-
     public void testReadingTinkerGraphExample3() throws Exception {
         Graph graph = graphTest.getGraphInstance();
         if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {

@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -16,11 +16,11 @@ public class PartitionVertex extends PartitionElement implements Vertex {
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
-        return new PartitionEdgeSequence(((Vertex) this.rawElement).getOutEdges(labels).iterator(), this.graph);
+        return new PartitionEdgeIterable(((Vertex) this.rawElement).getOutEdges(labels), this.graph);
     }
 
     public Iterable<Edge> getInEdges(final String... labels) {
-        return new PartitionEdgeSequence(((Vertex) this.rawElement).getInEdges(labels).iterator(), this.graph);
+        return new PartitionEdgeIterable(((Vertex) this.rawElement).getInEdges(labels), this.graph);
     }
 
     public Query query() {

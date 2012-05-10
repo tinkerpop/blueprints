@@ -1,14 +1,11 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
-import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -19,9 +16,8 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.ConsoleGraphChangedListener;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexSequence;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexSequence;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexIterable;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -77,12 +73,6 @@ public class EventGraphTest extends GraphTest {
         printTestPerformance("IndexTestSuite", this.stopWatch());
     }
 
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
-    }
-
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
@@ -124,8 +114,8 @@ public class EventGraphTest extends GraphTest {
 
     public void testEventedGraph() {
         graph.addListener(new ConsoleGraphChangedListener(graph));
-        assertTrue(graph.getVertices() instanceof EventVertexSequence);
-        assertTrue(graph.getEdges() instanceof EventEdgeSequence);
+        assertTrue(graph.getVertices() instanceof EventVertexIterable);
+        assertTrue(graph.getEdges() instanceof EventEdgeIterable);
         assertEquals(count(graph.getVertices()), 6);
         assertEquals(count(graph.getEdges()), 6);
 
@@ -135,7 +125,6 @@ public class EventGraphTest extends GraphTest {
         graph.removeEdge(graph.getEdge(10));
         assertNull(graph.getEdge(10));
 
-        graph.clear();
         graph.shutdown();
 
     }
@@ -148,10 +137,10 @@ public class EventGraphTest extends GraphTest {
 
             assertEquals("noname", vertex.getProperty("name"));
 
-            assertTrue(vertex.getOutEdges() instanceof EventEdgeSequence);
-            assertTrue(vertex.getInEdges() instanceof EventEdgeSequence);
-            assertTrue(vertex.getOutEdges("knows") instanceof EventEdgeSequence);
-            assertTrue(vertex.getInEdges("created") instanceof EventEdgeSequence);
+            assertTrue(vertex.getOutEdges() instanceof EventEdgeIterable);
+            assertTrue(vertex.getInEdges() instanceof EventEdgeIterable);
+            assertTrue(vertex.getOutEdges("knows") instanceof EventEdgeIterable);
+            assertTrue(vertex.getInEdges("created") instanceof EventEdgeIterable);
         }
 
         for (Edge edge : graph.getEdges()) {
@@ -205,18 +194,6 @@ public class EventGraphTest extends GraphTest {
         assertEquals(0, counter);
     }
 
-    public void testEventIndices() {
-        IndexableGraph graph = new EventIndexableGraph(TinkerGraphFactory.createTinkerGraph());
-        assertTrue(graph.getIndices() instanceof EventIndexSequence);
-        Index<Vertex> index = graph.getIndex(Index.VERTICES, Vertex.class);
-        assertTrue(index instanceof EventIndex);
-        assertTrue(index instanceof EventAutomaticIndex);
-        assertTrue(index.get("name", "marko") instanceof EventVertexSequence);
-
-        assertTrue(Vertex.class.isAssignableFrom(index.getIndexClass()));
-        assertEquals(index.getIndexType(), Index.Type.AUTOMATIC);
-        assertEquals(index.getIndexName(), Index.VERTICES);
-    }
 
     public void testFireVertexAdded() {
         graph.addListener(graphChangedListener);
@@ -317,14 +294,6 @@ public class EventGraphTest extends GraphTest {
         graph.removeEdge(edge);
 
         assertTrue(graphChangedListener.edgeRemovedEventRecorded());
-    }
-
-    public void testFireGraphCleared() {
-        graph.addListener(graphChangedListener);
-
-        graph.clear();
-
-        assertTrue(graphChangedListener.graphClearedEventRecorded());
     }
 
     private Edge createEdge() {

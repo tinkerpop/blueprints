@@ -68,8 +68,4 @@ public interface TransactionalGraph extends Graph {
      */
     public void shutdown();
 
-    /**
-     * This method is not under transaction support. A clear will clear the graph and finalize the operation.
-     */
-    public void clear();
 }

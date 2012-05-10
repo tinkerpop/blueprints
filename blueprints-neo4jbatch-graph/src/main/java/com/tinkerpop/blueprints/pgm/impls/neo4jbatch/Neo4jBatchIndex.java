@@ -1,13 +1,13 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
-import com.tinkerpop.blueprints.pgm.CloseableSequence;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.EdgeCloseableSequence;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.VertexCloseableSequence;
-import org.neo4j.graphdb.index.BatchInserterIndex;
+import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.EdgeCloseableIterable;
+import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.VertexCloseableIterable;
+import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,11 +35,18 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
         this.rawIndex.add((Long) element.getId(), map);
     }
 
-    public CloseableSequence<T> get(final String key, final Object value) {
+    public CloseableIterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.indexClass))
-            return (CloseableSequence<T>) new VertexCloseableSequence(this.graph, this.rawIndex.get(key, value));
+            return (CloseableIterable<T>) new VertexCloseableIterable(this.graph, this.rawIndex.get(key, value));
         else
-            return (CloseableSequence<T>) new EdgeCloseableSequence(this.graph, this.rawIndex.get(key, value));
+            return (CloseableIterable<T>) new EdgeCloseableIterable(this.graph, this.rawIndex.get(key, value));
+    }
+
+    public CloseableIterable<T> query(final String key, final Object query) {
+        if (Vertex.class.isAssignableFrom(this.indexClass))
+            return (CloseableIterable<T>) new VertexCloseableIterable(this.graph, this.rawIndex.query(key, query));
+        else
+            return (CloseableIterable<T>) new EdgeCloseableIterable(this.graph, this.rawIndex.query(key, query));
     }
 
     public long count(final String key, final Object value) {
@@ -63,10 +70,6 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
 
     public String getIndexName() {
         return this.name;
-    }
-
-    public Type getIndexType() {
-        return Type.MANUAL;
     }
 
     /**

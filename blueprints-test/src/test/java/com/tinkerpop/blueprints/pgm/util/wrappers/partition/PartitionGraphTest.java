@@ -1,11 +1,9 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 
-import com.tinkerpop.blueprints.pgm.AutomaticIndexTestSuite;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
-import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
@@ -66,12 +64,6 @@ public class PartitionGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
 
     public void testGraphMLReaderTestSuite() throws Exception {
@@ -178,7 +170,7 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(knows.getOutVertex(), marko);
 
         // testing indices
-        marko.setProperty("name", "marko");
+        /*marko.setProperty("name", "marko");
         peter.setProperty("name", "peter");
         assertEquals(count(graph.getIndex(Index.VERTICES, Vertex.class).get("name", "marko")), 0);
         graph.addReadPartition("a");
@@ -198,6 +190,7 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(graph.getIndex(Index.EDGES, Edge.class).get("label", "knows").next(), knows);
         graph.removeReadPartition("c");
         assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("label", "knows")), 0);
+        */
 
         graph.shutdown();
     }

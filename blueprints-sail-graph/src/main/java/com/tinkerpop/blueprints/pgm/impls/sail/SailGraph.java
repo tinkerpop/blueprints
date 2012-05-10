@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
 import info.aduna.iteration.CloseableIteration;
@@ -181,9 +182,21 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         throw new UnsupportedOperationException("RDF is an edge based graph model");
     }
 
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
+        throw new UnsupportedOperationException("RDF is an edge based graph model");
+    }
+
     public Iterable<Edge> getEdges() {
         try {
             return new SailEdgeSequence(this.sailConnection.get().getStatements(null, null, null, false), this);
+        } catch (SailException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        try {
+            return new PropertyFilteredIterable(key, value, new SailEdgeSequence(this.sailConnection.get().getStatements(null, null, null, false), this));
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
