@@ -34,13 +34,13 @@ public class OrientVertex extends OrientElement implements Vertex {
             return Collections.emptyList();
 
         if (labels.length == 0)
-            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, null).iterator());
+            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, null));
         else if (labels.length == 1) {
-            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, labels[0]).iterator());
+            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, labels[0]));
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
             for (final String label : labels) {
-                edges.add(new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, label).iterator()));
+                edges.add(new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, label)));
             }
             return new MultiIterable<Edge>(edges);
         }
@@ -51,13 +51,13 @@ public class OrientVertex extends OrientElement implements Vertex {
             return Collections.emptyList();
 
         if (labels.length == 0)
-            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, null).iterator());
+            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, null));
         else if (labels.length == 1) {
-            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, labels[0]).iterator());
+            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, labels[0]));
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
             for (final String label : labels) {
-                edges.add(new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, label).iterator()));
+                edges.add(new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, label)));
             }
             return new MultiIterable<Edge>(edges);
         }

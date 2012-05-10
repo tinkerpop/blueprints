@@ -206,6 +206,19 @@ public class VertexTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    /*public void testLegalEdgeIterables() {
+        Graph graph = graphTest.getGraphInstance();
+        Vertex v1 = graph.addVertex(null);
+        for (int i = 0; i < 10; i++) {
+            graph.addEdge(null, v1, graph.addVertex(null), convertId("knows"));
+        }
+        Iterable<Edge> edges = v1.getOutEdges(convertId("knows"));
+        assertEquals(count(edges), 10);
+        assertEquals(count(edges), 10);
+        assertEquals(count(edges), 10);
+        graph.shutdown();
+    }*/
+
     public void testAddVertexProperties() {
         Graph graph = graphTest.getGraphInstance();
         if (!graphTest.isRDFModel) {

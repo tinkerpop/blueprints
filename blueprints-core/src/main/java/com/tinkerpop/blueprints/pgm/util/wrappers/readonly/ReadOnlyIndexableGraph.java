@@ -43,16 +43,4 @@ public class ReadOnlyIndexableGraph<T extends IndexableGraph> extends ReadOnlyGr
     public Iterable<Index<? extends Element>> getIndices() {
         return new ReadOnlyIndexIterable(this.baseGraph.getIndices());
     }
-
-    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.dropKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.createKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        return this.baseGraph.getIndexedKeys(elementClass);
-    }
 }

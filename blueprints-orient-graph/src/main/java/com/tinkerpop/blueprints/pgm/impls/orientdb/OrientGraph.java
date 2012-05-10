@@ -1,25 +1,23 @@
 package com.tinkerpop.blueprints.pgm.impls.orientdb;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
-import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndex;
-import com.orientechnologies.orient.core.iterator.ORecordIteratorClass;
-import com.orientechnologies.orient.core.record.ORecordInternal;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementIterable;
+import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementScanIterable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,7 +29,7 @@ import java.util.Set;
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraph implements TransactionalGraph, MetaGraph<OGraphDatabase> {
+public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGraph<OGraphDatabase> {       // implements KeyIndexableGraph
     private final static String ADMIN = "admin";
 
     private String url;
@@ -62,7 +60,7 @@ public class OrientGraph implements TransactionalGraph, MetaGraph<OGraphDatabase
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Element> Index<T> createManualIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         final OrientGraphContext context = getContext(true);
 
         synchronized (contexts) {
@@ -245,8 +243,7 @@ public class OrientGraph implements TransactionalGraph, MetaGraph<OGraphDatabase
     }
 
     private Iterable<Vertex> getVertices(final boolean polymorphic) {
-        final OGraphDatabase db = getRawGraph();
-        return new OrientElementIterable<Vertex>(this, new ORecordIteratorClass<ORecordInternal<?>>(db, (ODatabaseRecordAbstract) db.getUnderlying(), OGraphDatabase.VERTEX_CLASS_NAME, polymorphic));
+        return new OrientElementScanIterable<Vertex>(this, Vertex.class);
     }
 
     public Iterable<Edge> getEdges() {
@@ -259,8 +256,7 @@ public class OrientGraph implements TransactionalGraph, MetaGraph<OGraphDatabase
     }
 
     private Iterable<Edge> getEdges(final boolean polymorphic) {
-        final OGraphDatabase db = getRawGraph();
-        return new OrientElementIterable<Edge>(this, new ORecordIteratorClass<ORecordInternal<?>>(db, (ODatabaseRecordAbstract) db.getUnderlying(), OGraphDatabase.EDGE_CLASS_NAME, polymorphic));
+        return new OrientElementScanIterable<Edge>(this, Edge.class);
     }
 
     public Edge getEdge(final Object id) {
@@ -442,7 +438,7 @@ public class OrientGraph implements TransactionalGraph, MetaGraph<OGraphDatabase
                 context.rawGraph.open(username, password);
 
                 // LOAD THE INDEX CONFIGURATION FROM INTO THE DICTIONARY
-               // final ODocument indexConfiguration = context.rawGraph.getMetadata().getIndexManager().getConfiguration();
+                // final ODocument indexConfiguration = context.rawGraph.getMetadata().getIndexManager().getConfiguration();
 
                 for (OIndex<?> idx : context.rawGraph.getMetadata().getIndexManager().getIndexes()) {
                     if (idx.getConfiguration().field(OrientIndex.CONFIG_TYPE) != null)

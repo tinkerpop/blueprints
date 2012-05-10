@@ -208,7 +208,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
-        return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
+        return new DexIterable<Vertex>(this, this.rawGet(key, value), Vertex.class);
     }
 
     /*
@@ -324,8 +324,8 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
         return StringFactory.graphString(this, db.getPath());
     }
 
-    /*private com.sparsity.dex.gdb.Objects rawGet(final String key, final Object value) {
-        int attr = DexAttributes.getAttributeId(this.getRawGraph(), DexTypes.getTypeId(this.getRawGraph(), value.getClass().toString()), key);
+    private com.sparsity.dex.gdb.Objects rawGet(final String key, final Object value) {
+        int attr = DexAttributes.getAttributeId(this.getRawGraph(), DexTypes.getTypeId(this.getRawGraph(), DEFAULT_DEX_VERTEX_LABEL), key);
         if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
             throw new IllegalArgumentException(key + " is not a valid key");
         }
@@ -356,6 +356,6 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
                 throw new UnsupportedOperationException();
         }
         return this.getRawGraph().select(attr, com.sparsity.dex.gdb.Condition.Equal, v);
-    }*/
+    }
 
 }

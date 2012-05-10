@@ -90,7 +90,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         if (records.isEmpty())
             return new WrappingCloseableIterable(Collections.emptySet());
 
-        return new OrientElementIterable<T>(graph, records.iterator());
+        return new OrientElementIterable<T>(graph, records);
     }
 
     public CloseableIterable<T> query(final String key, final Object query) throws UnsupportedOperationException {

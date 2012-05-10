@@ -7,7 +7,7 @@ import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeSequence;
+import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeIterable;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.nquads.NQuadsFormat;
 import org.apache.log4j.PropertyConfigurator;
@@ -187,19 +187,11 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     }
 
     public Iterable<Edge> getEdges() {
-        try {
-            return new SailEdgeSequence(this.sailConnection.get().getStatements(null, null, null, false), this);
-        } catch (SailException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return new SailEdgeIterable(null, null, null, this);
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
-        try {
-            return new PropertyFilteredIterable(key, value, new SailEdgeSequence(this.sailConnection.get().getStatements(null, null, null, false), this));
-        } catch (SailException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return new PropertyFilteredIterable<Edge>(key, value, new SailEdgeIterable(null, null, null, this));
     }
 
     public void removeVertex(final Vertex vertex) {

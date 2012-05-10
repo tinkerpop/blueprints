@@ -67,8 +67,8 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testAddManyEdges() {
         Graph graph = graphTest.getGraphInstance();
-        int edgeCount = 1000;
-        int vertexCount = 2000;
+        int edgeCount = 100;
+        int vertexCount = 200;
         long counter = 0l;
         this.stopWatch();
         for (int i = 0; i < edgeCount; i++) {
@@ -152,7 +152,7 @@ public class EdgeTestSuite extends TestSuite {
     public void testRemoveManyEdges() {
         Graph graph = graphTest.getGraphInstance();
         long counter = 200000l;
-        int edgeCount = 100;
+        int edgeCount = 10;
         Set<Edge> edges = new HashSet<Edge>();
         for (int i = 0; i < edgeCount; i++) {
             Vertex out = graph.addVertex(convertId("" + counter++));

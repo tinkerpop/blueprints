@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -26,7 +27,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterGraph implements IndexableGraph, MetaGraph<JSONObject> {
+public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGraph<JSONObject> {
 
     public static final int DEFAULT_BUFFER_SIZE = 100;
     private final String graphURI;
@@ -203,7 +204,7 @@ public class RexsterGraph implements IndexableGraph, MetaGraph<JSONObject> {
             c = RexsterTokens.EDGE;
 
         // TODO : NO MORE INDEX TYPE -- I JUST KILLED OUT THE Index.getIndexType() call.
-        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS  + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
         if (!index.opt(RexsterTokens.NAME).equals(indexName))
             throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
 

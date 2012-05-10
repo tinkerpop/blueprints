@@ -21,8 +21,6 @@ public class IndexableGraphTestSuite extends TestSuite {
         if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
             IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
             assertEquals(count(graph.getIndices()), 0);
-            graph.createKeyIndex("name", Vertex.class);
-            assertEquals(count(graph.getIndices()), 0);
             graph.createIndex("myIdx", Vertex.class);
             assertEquals(count(graph.getIndices()), 1);
 
@@ -31,20 +29,6 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(count(idx), 1);
             assertEquals(count(idx), 1);
             assertEquals(count(idx), 1);
-            graph.shutdown();
-        }
-    }
-
-    public void testAutoIndexKeyManagement() {
-        if (graphTest.supportsVertexIndex) {
-            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
-            this.stopWatch();
-            graph.createKeyIndex("name", Vertex.class);
-            graph.createKeyIndex("location", Vertex.class);
-            printPerformance(graph.toString(), 2, "automatic index keys added", this.stopWatch());
-            assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
-            assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
-            assertTrue(graph.getIndexedKeys(Vertex.class).contains("location"));
             graph.shutdown();
         }
     }
@@ -149,31 +133,6 @@ public class IndexableGraphTestSuite extends TestSuite {
             manualIndex = graph.getIndex("testIndex", Vertex.class);
             assertEquals(count(manualIndex.get("key", "value")), 0);
             printPerformance(graph.toString(), 1, "index reloaded and checked to ensure empty", this.stopWatch());
-            graph.shutdown();
-        }
-    }
-
-    public void testManualIndicesPersist() {
-        if (graphTest.isPersistent && graphTest.supportsManualIndices && graphTest.supportsVertexIndex && graphTest.supportsEdgeIndex) {
-            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
-            Vertex a = graph.addVertex(null);
-            Vertex b = graph.addVertex(null);
-            Edge e = graph.addEdge(null, a, b, "related");
-
-            Index index = graph.createIndex("vertexIdx", Vertex.class);
-            index.put("boo", "blop", a);
-            index = graph.createIndex("edgeIdx", Edge.class);
-            index.put("boo", "blop", e);
-
-            graph.shutdown();
-
-            //// check persistence
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
-            index = graph.getIndex("vertexIdx", Vertex.class);
-            assertEquals(index.get("boo", "blop").iterator().next(), a);
-
-            index = graph.getIndex("edgeIdx", Edge.class);
-            assertEquals(index.get("boo", "blop").iterator().next(), e);
             graph.shutdown();
         }
     }

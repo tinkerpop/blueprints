@@ -38,18 +38,4 @@ public class WrappedIndexableGraph<T extends IndexableGraph> extends WrappedGrap
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         return new WrappedIndex<T>(baseGraph.createIndex(indexName, indexClass, indexParameters));
     }
-
-    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.dropKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.createKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        return this.baseGraph.getIndexedKeys(elementClass);
-    }
-
-
 }

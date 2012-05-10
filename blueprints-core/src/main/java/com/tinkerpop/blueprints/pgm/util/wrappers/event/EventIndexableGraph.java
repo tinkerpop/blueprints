@@ -43,16 +43,4 @@ public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T>
     public Iterable<Index<? extends Element>> getIndices() {
         return new EventIndexIterable(this.baseGraph.getIndices(), this.graphChangedListeners);
     }
-
-    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.dropKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.createKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        return this.baseGraph.getIndexedKeys(elementClass);
-    }
 }

@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
+import com.tinkerpop.blueprints.pgm.KeyIndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
@@ -71,6 +72,12 @@ public class TinkerGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new GraphTestSuite(this));
         printTestPerformance("GraphTestSuite", this.stopWatch());
+    }
+
+    public void testKeyIndexableGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new KeyIndexableGraphTestSuite(this));
+        printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
 
     public void testIndexableGraphTestSuite() throws Exception {

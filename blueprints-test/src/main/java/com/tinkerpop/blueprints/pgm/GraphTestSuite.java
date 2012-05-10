@@ -51,7 +51,7 @@ public class GraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /*public void testSemanticallyCorrectIterables() {
+    public void testSemanticallyCorrectIterables() {
         Graph graph = graphTest.getGraphInstance();
         for (int i = 0; i < 15; i++) {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("knows"));
@@ -81,7 +81,41 @@ public class GraphTestSuite extends TestSuite {
             assertEquals(counter, 15);
         }
         graph.shutdown();
-    }*/
+    }
+
+    public void testGettingVerticesAndEdgesWithKeyValue() {
+        Graph graph = graphTest.getGraphInstance();
+        if (graphTest.supportsVertexIteration && !graphTest.isRDFModel) {
+            Vertex v1 = graph.addVertex(null);
+            v1.setProperty("name", "marko");
+            v1.setProperty("location", "everywhere");
+            Vertex v2 = graph.addVertex(null);
+            v2.setProperty("name", "stephen");
+            v2.setProperty("location", "everywhere");
+
+            assertEquals(count(graph.getVertices("location", "everywhere")), 2);
+            assertEquals(count(graph.getVertices("name", "marko")), 1);
+            assertEquals(count(graph.getVertices("name", "stephen")), 1);
+            assertEquals(graph.getVertices("name", "marko").iterator().next(), v1);
+            assertEquals(graph.getVertices("name", "stephen").iterator().next(), v2);
+        }
+
+        if (graphTest.supportsEdgeIteration && !graphTest.isRDFModel) {
+            Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("knows"));
+            e1.setProperty("name", "marko");
+            e1.setProperty("location", "everywhere");
+            Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId("knows"));
+            e2.setProperty("name", "stephen");
+            e2.setProperty("location", "everywhere");
+
+            assertEquals(count(graph.getEdges("location", "everywhere")), 2);
+            assertEquals(count(graph.getEdges("name", "marko")), 1);
+            assertEquals(count(graph.getEdges("name", "stephen")), 1);
+            assertEquals(graph.getEdges("name", "marko").iterator().next(), e1);
+            assertEquals(graph.getEdges("name", "stephen").iterator().next(), e2);
+        }
+        graph.shutdown();
+    }
 
     public void testAddingVerticesAndEdges() {
         Graph graph = graphTest.getGraphInstance();

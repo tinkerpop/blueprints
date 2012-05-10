@@ -69,7 +69,7 @@ public class DexTypes {
      *
      * @param g    Dex {@link com.sparsity.dex.gdb.Graph}.
      * @param name Dex type identifier name.
-     * @return The type identifier or {@link Type#InvalidType} if the type does not exist.
+     * @return The type identifier
      */
     public static Integer getTypeId(com.sparsity.dex.gdb.Graph g, String name) {
         assert name != null;

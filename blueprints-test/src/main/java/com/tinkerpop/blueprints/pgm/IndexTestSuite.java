@@ -146,25 +146,4 @@ public class IndexTestSuite extends TestSuite {
         }
         graph.shutdown();
     }
-
-    public void testNoConcurrentModificationException() {
-        if (graphTest.supportsEdgeIndex) {
-            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
-            graph.createKeyIndex("key", Edge.class);
-            for (int i = 0; i < 25; i++) {
-                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");
-            }
-            assertEquals(count(graph.getVertices()), 50);
-            assertEquals(count(graph.getEdges()), 25);
-            int counter = 0;
-            for (final Edge edge : graph.getEdges("key", "value")) {
-                graph.removeEdge(edge);
-                counter++;
-            }
-            assertEquals(counter, 25);
-            assertEquals(count(graph.getVertices()), 50);
-            assertEquals(count(graph.getEdges()), 0);
-            graph.shutdown();
-        }
-    }
 }

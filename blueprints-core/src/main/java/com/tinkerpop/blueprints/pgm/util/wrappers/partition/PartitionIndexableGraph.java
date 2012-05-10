@@ -43,15 +43,4 @@ public class PartitionIndexableGraph<T extends IndexableGraph> extends Partition
         return new PartitionIndex<T>(baseGraph.createIndex(indexName, indexClass, indexParameters), this);
     }
 
-    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.dropKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
-        this.baseGraph.createKeyIndex(key, elementClass);
-    }
-
-    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        return this.baseGraph.getIndexedKeys(elementClass);
-    }
 }

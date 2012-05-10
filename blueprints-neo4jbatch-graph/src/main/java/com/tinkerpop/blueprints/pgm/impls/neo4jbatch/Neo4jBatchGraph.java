@@ -277,16 +277,4 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
         }
         return map;
     }
-
-    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
-    }
-
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
-    }
-
-    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException();
-    }
 }
