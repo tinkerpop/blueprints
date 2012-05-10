@@ -31,6 +31,10 @@ public class OrientElementIterable<T extends Element> implements CloseableIterab
     @SuppressWarnings("unchecked")
     public T next() {
         OrientElement currentElement = null;
+        
+        if (!hasNext())
+            throw new NoSuchElementException();
+
         Object current = this.rawIterator.next();
 
         if (null == current)
