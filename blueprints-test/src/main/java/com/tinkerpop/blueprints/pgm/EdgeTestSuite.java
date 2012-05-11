@@ -212,7 +212,7 @@ public class EdgeTestSuite extends TestSuite {
         graph.addEdge(null, v2, v3, convertId(graph,"pets"));
         graph.addEdge(null, v2, v3, convertId(graph,"pets"));
 
-        if (graph.getFeatures().allowsDuplicateEdges) {
+        if (graph.getFeatures().allowDuplicateEdges) {
             if (graph.getFeatures().supportsVertexIteration)
                 assertEquals(3, count(graph.getVertices()));
             if (graph.getFeatures().supportsEdgeIteration)
@@ -275,7 +275,7 @@ public class EdgeTestSuite extends TestSuite {
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(2, count(graph.getVertices()));
 
-        if (graph.getFeatures().allowsDuplicateEdges)
+        if (graph.getFeatures().allowDuplicateEdges)
             assertEquals(2, count(v2.getOutEdges()));
         else
             assertEquals(1, count(v2.getOutEdges()));
@@ -283,7 +283,7 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(0, count(v3.getOutEdges()));
         assertEquals(0, count(v2.getInEdges()));
 
-        if (graph.getFeatures().allowsDuplicateEdges)
+        if (graph.getFeatures().allowDuplicateEdges)
             assertEquals(2, count(v3.getInEdges()));
         else
             assertEquals(1, count(v3.getInEdges()));
@@ -366,7 +366,7 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testAddingSelfLoops() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().allowsSelfLoops) {
+        if (graph.getFeatures().allowSelfLoops) {
             List<String> ids = generateIds(3);
             Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
             Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
@@ -393,7 +393,7 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testRemoveSelfLoops() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().allowsSelfLoops) {
+        if (graph.getFeatures().allowSelfLoops) {
             List<String> ids = generateIds(3);
             Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
             Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));

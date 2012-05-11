@@ -47,7 +47,7 @@ public class PropertyFilteredIterable<T extends Element> implements Iterable<T> 
                 try {
                     while (true) {
                         final T element = this.itty.next();
-                        if (element.getProperty(key).equals(value)) {
+                        if (element.getPropertyKeys().contains(key) &&  element.getProperty(key).equals(value)) {
                             this.nextElement = element;
                             return true;
                         }
@@ -67,7 +67,7 @@ public class PropertyFilteredIterable<T extends Element> implements Iterable<T> 
             } else {
                 while (true) {
                     final T element = this.itty.next();
-                    if (element.getProperty(key).equals(value)) {
+                    if (element.getPropertyKeys().contains(key) &&  element.getProperty(key).equals(value)) {
                         return element;
                     }
                 }

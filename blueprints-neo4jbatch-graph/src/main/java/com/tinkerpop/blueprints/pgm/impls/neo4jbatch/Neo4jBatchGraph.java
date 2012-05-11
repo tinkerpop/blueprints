@@ -69,8 +69,8 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         FEATURES.allowMapProperty = false;
         FEATURES.allowStringProperty = true;
 
-        FEATURES.allowsDuplicateEdges = true;
-        FEATURES.allowsSelfLoops = true;
+        FEATURES.allowDuplicateEdges = true;
+        FEATURES.allowSelfLoops = true;
         FEATURES.isPersistent = true;
         FEATURES.isRDFModel = false;
         FEATURES.isWrapper = false;

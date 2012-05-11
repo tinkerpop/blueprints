@@ -38,8 +38,8 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
 
     static {
         // intended to be used with TinkerGraph as the endpoint graph
-        FEATURES.allowsDuplicateEdges = true;
-        FEATURES.allowsSelfLoops = true;
+        FEATURES.allowDuplicateEdges = true;
+        FEATURES.allowSelfLoops = true;
         FEATURES.ignoresSuppliedIds = false;
         FEATURES.isPersistent = false;
         FEATURES.isRDFModel = false;

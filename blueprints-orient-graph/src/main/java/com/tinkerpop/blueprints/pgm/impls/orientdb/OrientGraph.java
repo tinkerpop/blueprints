@@ -43,8 +43,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
     private static final Features FEATURES = new Features();
 
     static {
-        FEATURES.allowsDuplicateEdges = true;
-        FEATURES.allowsSelfLoops = true;
+        FEATURES.allowDuplicateEdges = true;
+        FEATURES.allowSelfLoops = true;
         FEATURES.isPersistent = true;
         FEATURES.isRDFModel = false;
         FEATURES.supportsVertexIteration = true;
