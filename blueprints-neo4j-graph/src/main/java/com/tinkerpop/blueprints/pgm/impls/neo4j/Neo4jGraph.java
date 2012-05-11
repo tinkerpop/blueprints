@@ -126,7 +126,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 this.rawGraph.shutdown();
             throw new RuntimeException(e.getMessage(), e);
         }
-        this.autoStartTransaction();
     }
 
     private void freshLoad() {
@@ -401,6 +400,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public void shutdown() {
+        //todo inspect why certain transactions fail
         try {
             if (null != tx.get()) {
                 tx.get().success();

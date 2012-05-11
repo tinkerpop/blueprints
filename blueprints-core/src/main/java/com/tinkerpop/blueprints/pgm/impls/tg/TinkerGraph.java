@@ -19,6 +19,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -408,7 +409,10 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         }
 
         public Set<String> getIndexedKeys() {
-            return new HashSet<String>(this.indexedKeys);
+            if (null != this.indexedKeys)
+                return new HashSet<String>(this.indexedKeys);
+            else
+                return Collections.emptySet();
         }
     }
 
