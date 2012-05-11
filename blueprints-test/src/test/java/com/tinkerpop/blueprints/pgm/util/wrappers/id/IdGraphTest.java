@@ -1,50 +1,49 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.id;
 
-import junit.framework.TestCase;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
+import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
+import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.GraphTestSuite;
+import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
+import com.tinkerpop.blueprints.pgm.KeyIndexableGraphTestSuite;
+import com.tinkerpop.blueprints.pgm.TestSuite;
+import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.VertexTestSuite;
+import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdGraphTest extends TestCase { // extends GraphTest {
+public class IdGraphTest extends GraphTest {
 
     public void testTrue() {
         assertTrue(true);
     }
-    /*private IndexableGraph base;
+    private KeyIndexableGraph base;
     IdGraph graph;
 
     public IdGraphTest() {
-        // The below values should be identical to TinkerGraphTest's,
-        // apart from this one
-        isPersistent = false;
-
-        allowDuplicateEdges = true;
-        allowSelfLoops = true;
-        ignoresSuppliedIds = false;
-        isRDFModel = false;
-        supportsVertexIteration = true;
-        supportsEdgeIteration = true;
-        supportsVertexIndex = true;
-        supportsEdgeIndex = true;
-        supportsTransactions = false;
-
-        allowSerializableObjectProperty = true;
-        allowBooleanProperty = true;
-        allowDoubleProperty = true;
-        allowFloatProperty = true;
-        allowIntegerProperty = true;
-        allowPrimitiveArrayProperty = true;
-        allowUniformListProperty = true;
-        this.allowMixedListProperty = true;
-        allowLongProperty = true;
-        allowMapProperty = true;
-        allowStringProperty = true;
     }
 
     @Before
     public void setUp() throws Exception {
         base = new TinkerGraph();
         graph = new IdGraph(base);
+
+        // Note: this won't be necessary if/when TinkerGraph instances set isPersistent dynamically
+        graph.getFeatures().isPersistent = false;
     }
 
     @After
@@ -81,6 +80,7 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
         }
     }
 
+    /*
     @Test
     public void testIdIndicesExist() throws Exception {
         Index<Vertex> vertexIds = base.getIndex(IdGraph.VERTEX_IDS, Vertex.class);
@@ -91,7 +91,7 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
 
         assertNull(graph.getIndex(IdGraph.VERTEX_IDS, Vertex.class));
         assertNull(graph.getIndex(IdGraph.EDGE_IDS, Edge.class));
-    }
+    }*/
 
     @Test
     public void testDefaultIdFactory() throws Exception {
@@ -116,6 +116,7 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
         assertEquals("forty-two", v.getId());
     }
 
+    /*
     @Test
     public void testIndices() throws Exception {
         Set<String> nameKeys = new HashSet<String>();
@@ -176,6 +177,7 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
         assertEquals(1, edges.size());
         assertEquals(e.getId(), edges.iterator().next().getId());
     }
+    */
 
     @Test
     public void testProperties() throws Exception {
@@ -208,23 +210,27 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
+    public void testKeyIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
+        doTestSuite(new KeyIndexableGraphTestSuite(this));
+        printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
 
+    /*
     public void testIndexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
     }
+    */
 
+    /*
     public void testAutomaticIndexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new AutomaticIndexTestSuite(this));
         printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
     }
+    */
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
@@ -251,13 +257,14 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
     private <T> Collection<T> toCollection(final CloseableIterable<T> s) {
         Collection<T> c = new LinkedList<T>();
         try {
-            while (s.hasNext()) {
-                c.add(s.next());
+            Iterator<T> iter = s.iterator();
+            while (iter.hasNext()) {
+                c.add(iter.next());
             }
         } finally {
             s.close();
         }
 
         return c;
-    }*/
+    }
 }
