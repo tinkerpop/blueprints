@@ -224,38 +224,38 @@ public class IndexableGraphTestSuite extends TestSuite {
         IndexableGraph graph = (IndexableGraph) this.graphTest.generateGraph();
         if (graphTest.supportsTransactions && graph instanceof TransactionalGraph) {
             TransactionalGraph txGraph = (TransactionalGraph) graph;
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
-            txGraph.setMaxBufferSize(5);
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(txGraph.getMutationCounter(), 0);
+            txGraph.setBufferSize(5);
+            assertEquals(txGraph.getMutationCounter(), 0);
             Index<Vertex> index = graph.createIndex("aManualIndex", Vertex.class);
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(txGraph.getMutationCounter(), 0);
 
             Vertex v = graph.addVertex(null);
-            assertEquals(txGraph.getCurrentBufferSize(), 1);
+            assertEquals(txGraph.getMutationCounter(), 1);
             index.put("key", "value", v);
-            assertEquals(txGraph.getCurrentBufferSize(), 2);
+            assertEquals(txGraph.getMutationCounter(), 2);
             assertEquals(count(index.get("key", "value")), 1);
             assertEquals(index.get("key", "value").iterator().next(), v);
             txGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(txGraph.getMutationCounter(), 0);
             assertEquals(count(index.get("key", "value")), 0);
             assertEquals(count(graph.getVertices()), 0);
 
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
-            txGraph.setMaxBufferSize(2);
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(txGraph.getMutationCounter(), 0);
+            txGraph.setBufferSize(2);
+            assertEquals(txGraph.getMutationCounter(), 0);
             v = graph.addVertex(null);
-            assertEquals(txGraph.getCurrentBufferSize(), 1);
+            assertEquals(txGraph.getMutationCounter(), 1);
             index.put("key", "value", v);
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(txGraph.getMutationCounter(), 0);
             assertEquals(count(index.get("key", "value")), 1);
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
+            assertEquals(txGraph.getMutationCounter(), 0);
             index.remove("key", "value", v);
-            assertEquals(txGraph.getCurrentBufferSize(), 1);
+            assertEquals(txGraph.getMutationCounter(), 1);
             assertEquals(count(index.get("key", "value")), 0);
             txGraph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            assertEquals(txGraph.getCurrentBufferSize(), 0);
-            assertEquals(txGraph.getMaxBufferSize(), 2);
+            assertEquals(txGraph.getMutationCounter(), 0);
+            assertEquals(txGraph.getBufferSize(), 2);
             assertEquals(count(index.get("key", "value")), 1);
         }
 

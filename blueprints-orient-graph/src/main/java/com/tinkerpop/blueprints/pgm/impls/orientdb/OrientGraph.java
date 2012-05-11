@@ -167,13 +167,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         try {
             final OrientVertex vertex = new OrientVertex(this, db.createVertex(null));
             vertex.save();
-            autoStopTransaction(Conclusion.SUCCESS);
             return vertex;
-        } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -189,14 +184,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
             db.save(((OrientVertex) outVertex).getRawElement());
             db.save(((OrientVertex) inVertex).getRawElement());
             edge.save();
-
-            this.autoStopTransaction(Conclusion.SUCCESS);
             return edge;
-        } catch (RuntimeException e) {
-            this.autoStopTransaction(Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -258,17 +247,13 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
             }
 
             getRawGraph().removeVertex(oVertex.rawElement);
-            autoStopTransaction(Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public Iterable<Vertex> getVertices() {
+        this.stopTransaction(Conclusion.SUCCESS);
         return getVertices(true);
     }
 
@@ -334,12 +319,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
             }
 
             getRawGraph().removeEdge(oEdge.rawElement);
-            autoStopTransaction(Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            autoStopTransaction(Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -396,22 +376,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
             this.getRawGraph().rollback();
         } else
             this.getRawGraph().commit();
-        this.getContext(true).txCounter = 0;
-    }
-
-    public void setMaxBufferSize(final int bufferSize) {
-        getRawGraph().commit();
-        final OrientGraphContext context = getContext(true);
-        context.txCounter = 0;
-        context.txBuffer = bufferSize;
-    }
-
-    public int getMaxBufferSize() {
-        return getContext(true).txBuffer;
-    }
-
-    public int getCurrentBufferSize() {
-        return getContext(true).txCounter;
     }
 
     protected void saveIndexConfiguration() {
@@ -420,26 +384,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
     protected void autoStartTransaction() {
         final OrientGraphContext context = getContext(true);
-        if (context.txBuffer > 0) {
-            if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
-                context.rawGraph.begin();
-            }
-        }
-    }
-
-    protected void autoStopTransaction(final Conclusion conclusion) {
-        final OrientGraphContext context = getContext(true);
-        if (context.txBuffer > 0) {
-            context.txCounter = context.txCounter + 1;
-            if (conclusion == Conclusion.FAILURE) {
-                final OGraphDatabase db = getRawGraph();
-                db.rollback();
-                context.txCounter = 0;
-            } else if (context.txCounter % context.txBuffer == 0) {
-                final OGraphDatabase db = getRawGraph();
-                db.commit();
-                context.txCounter = 0;
-            }
+        if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
+            context.rawGraph.begin();
         }
     }
 

@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.util.wrappers.batch.BufferGraph;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
@@ -77,17 +78,14 @@ public class GraphSONReader {
      * @param bufferSize      the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
-    public static void inputGraph(final Graph graph, final InputStream jsonInputStream, int bufferSize) throws IOException {
+    public static void inputGraph(Graph graph, final InputStream jsonInputStream, int bufferSize) throws IOException {
         boolean hasEmbeddedTypes = false;
         JsonFactory jsonFactory = new MappingJsonFactory();
         JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
-        int previousMaxBufferSize = 0;
         if (graph instanceof TransactionalGraph) {
-            previousMaxBufferSize = ((TransactionalGraph) graph).getMaxBufferSize();
-            ((TransactionalGraph) graph).setMaxBufferSize(bufferSize);
+            graph = new BufferGraph((TransactionalGraph) graph, bufferSize);
         }
-
         Map<String, Object> vertexIdMap = new HashMap<String, Object>();
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
@@ -135,7 +133,7 @@ public class GraphSONReader {
         jp.close();
 
         if (graph instanceof TransactionalGraph) {
-            ((TransactionalGraph) graph).setMaxBufferSize(previousMaxBufferSize);
+            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         }
     }
 

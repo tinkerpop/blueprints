@@ -18,9 +18,12 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.util.ReadOnlyVertexIt
 public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     protected final T baseGraph;
+    private final Features features;
 
     public ReadOnlyGraph(final T baseGraph) {
         this.baseGraph = baseGraph;
+        this.features = this.baseGraph.getFeatures().copyFeatures();
+        this.features.isWrapper = true;
     }
 
     /**
@@ -100,9 +103,7 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Features getFeatures() {
-        final Features features = this.baseGraph.getFeatures().copyFeatures();
-        features.isWrapper = true;
-        return features;
+        return this.features;
     }
 
 }

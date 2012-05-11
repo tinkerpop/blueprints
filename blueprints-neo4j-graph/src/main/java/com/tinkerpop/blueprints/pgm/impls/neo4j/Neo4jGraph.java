@@ -48,16 +48,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             return null;
         }
     };
-    private final ThreadLocal<Integer> txBuffer = new ThreadLocal<Integer>() {
-        protected Integer initialValue() {
-            return 1;
-        }
-    };
-    private final ThreadLocal<Integer> txCounter = new ThreadLocal<Integer>() {
-        protected Integer initialValue() {
-            return 0;
-        }
-    };
 
     private static final Features FEATURES = new Features();
 
@@ -141,8 +131,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     private void freshLoad() {
         // remove reference node and create default indices
         try {
+            this.startTransaction();
             this.removeVertex(this.getVertex(0));
+            this.stopTransaction(Conclusion.SUCCESS);
         } catch (Exception e) {
+            this.stopTransaction(Conclusion.FAILURE);
         }
     }
 
@@ -150,7 +143,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw new RuntimeException("Index already exists: " + indexName);
         }
-
+        this.autoStartTransaction();
         return new Neo4jIndex(indexName, indexClass, this, indexParameters);
     }
 
@@ -176,8 +169,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         }
     }
 
+    /**
+     * Note that this method will force a successful closing of the current thread's transaction.
+     * As such, once the index is dropped, the operation is committed.
+     *
+     * @param indexName the name of the index to drop
+     */
     public synchronized void dropIndex(final String indexName) {
-        final Transaction tx = this.rawGraph.beginTx();
+        this.autoStartTransaction();
         try {
             if (this.rawGraph.index().existsForNodes(indexName)) {
                 org.neo4j.graphdb.index.Index<Node> nodeIndex = this.rawGraph.index().forNodes(indexName);
@@ -190,16 +189,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                     relationshipIndex.delete();
                 }
             }
-            tx.success();
-        } catch (RuntimeException e) {
-            tx.failure();
-            throw e;
         } catch (Exception e) {
-            tx.failure();
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            tx.finish();
         }
+        this.stopTransaction(Conclusion.SUCCESS);
     }
 
 
@@ -220,14 +213,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     public Vertex addVertex(final Object id) {
         try {
             this.autoStartTransaction();
-            final Vertex vertex = new Neo4jVertex(this.rawGraph.createNode(), this);
-            this.autoStopTransaction(Conclusion.SUCCESS);
-            return vertex;
+            return new Neo4jVertex(this.rawGraph.createNode(), this);
         } catch (RuntimeException e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw e;
         } catch (Exception e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -250,7 +239,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         }
     }
 
+    /**
+     * The underlying Neo4j graph does not support this method within a transaction.
+     * Calling this method will commit the current transaction successfully and then return the vertex iterable.
+     *
+     * @return all the vertices in the graph
+     */
     public Iterable<Vertex> getVertices() {
+        this.stopTransaction(Conclusion.SUCCESS);
         return new Neo4jVertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this);
     }
 
@@ -261,7 +257,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
     }
 
+    /**
+     * The underlying Neo4j graph does not support this method within a transaction.
+     * Calling this method will commit the current transaction successfully and then return the edge iterable.
+     *
+     * @return all the edges in the graph
+     */
     public Iterable<Edge> getEdges() {
+        this.stopTransaction(Conclusion.SUCCESS);
         return new Neo4jEdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this);
     }
 
@@ -273,6 +276,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+        this.autoStartTransaction();
         if (Vertex.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())
                 return;
@@ -287,6 +291,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
+        this.autoStartTransaction();
         if (Vertex.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())
                 this.rawGraph.index().getNodeAutoIndexer().setEnabled(true);
@@ -315,11 +320,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public void removeVertex(final Vertex vertex) {
+        this.autoStartTransaction();
         final Long id = (Long) vertex.getId();
         final Node node = this.rawGraph.getNodeById(id);
         if (null != node) {
             try {
-                this.autoStartTransaction();
                 for (final Edge edge : vertex.getInEdges()) {
                     ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
                 }
@@ -327,12 +332,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                     ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
                 }
                 node.delete();
-                this.autoStopTransaction(Conclusion.SUCCESS);
-            } catch (RuntimeException e) {
-                this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-                throw e;
             } catch (Exception e) {
-                this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
@@ -344,14 +344,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             final Node outNode = ((Neo4jVertex) outVertex).getRawVertex();
             final Node inNode = ((Neo4jVertex) inVertex).getRawVertex();
             final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
-            final Edge edge = new Neo4jEdge(relationship, this, true);
-            this.autoStopTransaction(Conclusion.SUCCESS);
-            return edge;
-        } catch (RuntimeException e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
+            return new Neo4jEdge(relationship, this, true);
         } catch (Exception e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -379,19 +373,13 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         try {
             this.autoStartTransaction();
             ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
-            this.autoStopTransaction(Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            this.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public void startTransaction() {
         if (tx.get() == null) {
-            txCounter.set(0);
             tx.set(this.rawGraph.beginTx());
         } else
             throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
@@ -399,7 +387,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public void stopTransaction(final Conclusion conclusion) {
         if (null == tx.get()) {
-            txCounter.set(0);
             return;
         }
 
@@ -410,62 +397,24 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
         tx.get().finish();
         tx.remove();
-        txCounter.set(0);
-    }
-
-    public int getMaxBufferSize() {
-        return txBuffer.get();
-    }
-
-    public int getCurrentBufferSize() {
-        return txCounter.get();
-    }
-
-    public void setMaxBufferSize(final int size) {
-        if (null != tx.get()) {
-            tx.get().success();
-            tx.get().finish();
-            tx.remove();
-        }
-        this.txBuffer.set(size);
-        this.txCounter.set(0);
     }
 
     public void shutdown() {
-        if (null != tx.get()) {
-            try {
+        //todo inspect why certain transactions fail
+        try {
+            if (null != tx.get()) {
                 tx.get().success();
                 tx.get().finish();
                 tx.remove();
-            } catch (TransactionFailureException e) {
             }
+        } catch (TransactionFailureException e) {
         }
         this.rawGraph.shutdown();
     }
 
     protected void autoStartTransaction() {
-        if (this.txBuffer.get() > 0) {
-            if (tx.get() == null) {
-                tx.set(this.rawGraph.beginTx());
-                txCounter.set(0);
-            }
-        }
-    }
-
-    protected void autoStopTransaction(final Conclusion conclusion) {
-        if (this.txBuffer.get() > 0) {
-            txCounter.set(txCounter.get() + 1);
-            if (conclusion == Conclusion.FAILURE) {
-                tx.get().failure();
-                tx.get().finish();
-                tx.remove();
-                txCounter.set(0);
-            } else if (this.txCounter.get() % this.txBuffer.get() == 0) {
-                tx.get().success();
-                tx.get().finish();
-                tx.remove();
-                txCounter.set(0);
-            }
+        if (tx.get() == null) {
+            tx.set(this.rawGraph.beginTx());
         }
     }
 

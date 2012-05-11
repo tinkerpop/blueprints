@@ -11,9 +11,6 @@ import java.util.Map;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphContext {
-    public int txBuffer = 1;
-    public int txCounter = 0;
-
     public Map<String, OrientIndex<? extends OrientElement>> manualIndices = new HashMap<String, OrientIndex<? extends OrientElement>>();
     public OGraphDatabase rawGraph;
 }

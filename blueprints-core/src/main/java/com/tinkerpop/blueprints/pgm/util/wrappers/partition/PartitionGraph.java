@@ -24,11 +24,15 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     private Set<String> readPartitions = new HashSet<String>();
     private String partitionKey;
 
+    private final Features features;
+
     public PartitionGraph(final T baseGraph, final String partitionKey, final String writePartition, final Set<String> readPartitions) {
         this.baseGraph = baseGraph;
         this.partitionKey = partitionKey;
         this.writePartition = writePartition;
         this.readPartitions.addAll(readPartitions);
+        this.features = this.baseGraph.getFeatures().copyFeatures();
+        this.features.isWrapper = true;
     }
 
     public PartitionGraph(final T baseGraph, final String partitionKey, final String readWritePartition) {
@@ -142,8 +146,6 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Features getFeatures() {
-        final Features features = this.baseGraph.getFeatures().copyFeatures();
-        features.isWrapper = true;
-        return features;
+        return this.features;
     }
 }

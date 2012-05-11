@@ -18,9 +18,12 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexIter
 public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     protected T baseGraph;
+    private final Features features;
 
     public WrappedGraph(final T baseGraph) {
         this.baseGraph = baseGraph;
+        this.features = this.baseGraph.getFeatures().copyFeatures();
+        this.features.isWrapper = true;
     }
 
     public void shutdown() {
@@ -85,8 +88,6 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Features getFeatures() {
-        final Features features = this.baseGraph.getFeatures().copyFeatures();
-        features.isWrapper = true;
-        return features;
+        return this.features;
     }
 }

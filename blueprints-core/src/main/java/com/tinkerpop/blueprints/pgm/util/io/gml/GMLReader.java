@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.util.wrappers.batch.BufferGraph;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class GMLReader {
 
     private Map<Object, Object> vertexIds = new HashMap<Object, Object>();
 
-    private final Graph graph;
+    private Graph graph;
 
     private final String defaultEdgeLabel;
 
@@ -115,10 +116,9 @@ public class GMLReader {
      */
     public void inputGraph(InputStream inputStream, int bufferSize) throws IOException {
 
-        int previousMaxBufferSize = 0;
+
         if (graph instanceof TransactionalGraph) {
-            previousMaxBufferSize = ((TransactionalGraph) graph).getMaxBufferSize();
-            ((TransactionalGraph) graph).setMaxBufferSize(bufferSize);
+            this.graph = new BufferGraph((TransactionalGraph) this.graph, bufferSize);
         }
 
         Reader r = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("ISO-8859-1")));
@@ -137,7 +137,7 @@ public class GMLReader {
             parse(st);
 
             if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).setMaxBufferSize(previousMaxBufferSize);
+                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             }
         } catch (IOException e) {
             throw new IOException(error(st), e);
