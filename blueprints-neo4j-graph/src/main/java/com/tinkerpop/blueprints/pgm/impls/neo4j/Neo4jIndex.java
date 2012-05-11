@@ -51,17 +51,13 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         try {
             this.graph.autoStartTransaction();
             this.rawIndex.add((S) element.getRawElement(), key, value);
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     public CloseableIterable<T> get(final String key, final Object value) {
+        this.graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph);
@@ -88,12 +84,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         try {
             this.graph.autoStartTransaction();
             this.rawIndex.remove((S) element.getRawElement(), key, value);
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

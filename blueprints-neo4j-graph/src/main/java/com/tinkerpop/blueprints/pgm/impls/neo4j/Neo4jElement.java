@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
@@ -38,21 +37,13 @@ public abstract class Neo4jElement implements Element {
     public void setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
             throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
-
         try {
             // attempts to take a collection and convert it to an array so that Neo4j can consume it
-            final Object convertedValue = tryConvertCollectionToArray(value);
             this.graph.autoStartTransaction();
-            this.rawElement.setProperty(key, convertedValue);
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
         } catch (IllegalArgumentException iae) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw iae;
-        } catch (RuntimeException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -60,17 +51,10 @@ public abstract class Neo4jElement implements Element {
     public Object removeProperty(final String key) {
         try {
             this.graph.autoStartTransaction();
-            Object oldValue = this.rawElement.removeProperty(key);
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            return oldValue;
+            return this.rawElement.removeProperty(key);
         } catch (NotFoundException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             return null;
-        } catch (RuntimeException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

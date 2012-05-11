@@ -34,8 +34,12 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     protected final List<GraphChangedListener> graphChangedListeners = new ArrayList<GraphChangedListener>();
 
+    private final Features features;
+
     public EventGraph(final T baseGraph) {
         this.baseGraph = baseGraph;
+        this.features = this.baseGraph.getFeatures().copyFeatures();
+        this.features.isWrapper = true;
     }
 
     public void removeAllListeners() {
@@ -188,8 +192,6 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Features getFeatures() {
-        final Features features = this.baseGraph.getFeatures().copyFeatures();
-        features.isWrapper = true;
-        return features;
+        return this.features;
     }
 }

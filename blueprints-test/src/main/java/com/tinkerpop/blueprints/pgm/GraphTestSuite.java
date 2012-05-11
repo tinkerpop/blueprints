@@ -256,10 +256,10 @@ public class GraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    private void trySetProperty(final Element e, final String propertyKey, final Object propertyValue, final boolean allowDataType) {
+    private void trySetProperty(final Element element, final String key, final Object value, final boolean allowDataType) {
         boolean exceptionTossed = false;
         try {
-            e.setProperty(propertyKey, propertyValue);
+            element.setProperty(key, value);
         } catch (Throwable t) {
             exceptionTossed = true;
             if (!allowDataType) {

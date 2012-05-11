@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.util.wrappers.batch.BufferGraph;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -104,17 +105,15 @@ public class GraphMLReader {
      * @param edgeLabelKey       if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
      * @throws IOException thrown when the GraphML data is not correctly formatted
      */
-    public static void inputGraph(final Graph graph, final InputStream graphMLInputStream, int bufferSize, String vertexIdKey, String edgeIdKey, String edgeLabelKey) throws IOException {
+    public static void inputGraph(Graph graph, final InputStream graphMLInputStream, int bufferSize, String vertexIdKey, String edgeIdKey, String edgeLabelKey) throws IOException {
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
         try {
             XMLStreamReader reader = inputFactory.createXMLStreamReader(graphMLInputStream);
 
-            int previousMaxBufferSize = 0;
             if (graph instanceof TransactionalGraph) {
-                previousMaxBufferSize = ((TransactionalGraph) graph).getMaxBufferSize();
-                ((TransactionalGraph) graph).setMaxBufferSize(bufferSize);
+                graph = new BufferGraph((TransactionalGraph) graph, bufferSize);
             }
 
             Map<String, String> keyIdMap = new HashMap<String, String>();
@@ -272,7 +271,7 @@ public class GraphMLReader {
             reader.close();
 
             if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).setMaxBufferSize(previousMaxBufferSize);
+                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             }
         } catch (XMLStreamException xse) {
             throw new IOException(xse);

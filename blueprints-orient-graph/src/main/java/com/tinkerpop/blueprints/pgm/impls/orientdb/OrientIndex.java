@@ -72,18 +72,14 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         graph.autoStartTransaction();
         try {
             underlying.put(keyTemp, doc);
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("rawtypes")
     public CloseableIterable<T> get(final String key, final Object value) {
+        this.graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         final String keyTemp = key + SEPARATOR + value;
         final Collection<OIdentifiable> records = (Collection<OIdentifiable>) underlying.get(keyTemp);
 
@@ -108,12 +104,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         graph.autoStartTransaction();
         try {
             underlying.remove(keyTemp, element.getRawElement());
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        } catch (RuntimeException e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            throw e;
         } catch (Exception e) {
-            graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -134,7 +125,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         graph.autoStartTransaction();
         final ORecord<?> vertexDoc = vertex.getRawElement();
         underlying.remove(vertexDoc);
-        graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     private void create(final String indexName, final Class<? extends Element> indexClass, OType iKeyType) {

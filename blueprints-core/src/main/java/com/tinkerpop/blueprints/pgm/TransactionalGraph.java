@@ -24,29 +24,6 @@ public interface TransactionalGraph extends Graph {
     }
 
     /**
-     * Transactions in a transactional graph can be handled automatically when then transaction buffer size is greater than 0.
-     * If the graph is automatically handling transactions, then every X mutations to the graph, the mutations will be committed, where X is the provided bufferSize.
-     * If the graph has a bufferSize of 0, then the user is responsible for starting and stopping transactions.
-     *
-     * @param bufferSize 0 for manual transaction handling and > 0 for automatic transaction handling
-     */
-    public void setMaxBufferSize(int bufferSize);
-
-    /**
-     * Returns the maximum size of the transaction buffer.
-     *
-     * @return the maximum transaction buffer size
-     */
-    public int getMaxBufferSize();
-
-    /**
-     * Returns the current size of the transaction buffer.
-     *
-     * @return the current size of the transaction buffer
-     */
-    public int getCurrentBufferSize();
-
-    /**
      * Start a transaction in order to manipulate the graph.
      * This is required for graph manipulations in manual transaction mode.
      *
