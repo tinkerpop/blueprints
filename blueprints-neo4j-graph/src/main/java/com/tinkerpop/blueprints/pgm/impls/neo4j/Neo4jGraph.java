@@ -206,10 +206,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     public Iterable<Index<? extends Element>> getIndices() {
         final List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
         for (final String name : this.rawGraph.index().nodeIndexNames()) {
-            indices.add(new Neo4jIndex(name, Vertex.class, this));
+            if (!name.equals(Neo4jTokens.NODE_AUTO_INDEX))
+                indices.add(new Neo4jIndex(name, Vertex.class, this));
         }
         for (final String name : this.rawGraph.index().relationshipIndexNames()) {
-            indices.add(new Neo4jIndex(name, Edge.class, this));
+            if (!name.equals(Neo4jTokens.RELATIONSHIP_AUTO_INDEX))
+                indices.add(new Neo4jIndex(name, Edge.class, this));
         }
         return indices;
     }

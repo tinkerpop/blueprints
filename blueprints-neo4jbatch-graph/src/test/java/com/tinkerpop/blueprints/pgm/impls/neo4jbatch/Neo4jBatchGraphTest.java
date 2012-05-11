@@ -3,17 +3,24 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReader;
+import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -129,12 +136,12 @@ public class Neo4jBatchGraphTest extends BaseTest {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
         assertEquals(0, count(batch.getIndices()));
-        //batch.createKeyIndex("name", Vertex.class);
-        //batch.createKeyIndex("age", Vertex.class);
-        //Index<Edge> edgeIndex = batch.createIndex("edgeIdx", Edge.class);
-        //assertEquals(1, count(batch.getIndices()));
+        batch.createKeyIndex("name", Vertex.class);
+        batch.createKeyIndex("age", Vertex.class);
+        Index<Edge> edgeIndex = batch.createIndex("edgeIdx", Edge.class);
+        assertEquals(1, count(batch.getIndices()));
 
-        /*for (final Index index : batch.getIndices()) {
+        for (final Index index : batch.getIndices()) {
             if (index.getIndexName().equals("edgeIdx")) {
                 assertEquals(index.getIndexClass(), Edge.class);
             } else {
@@ -158,12 +165,15 @@ public class Neo4jBatchGraphTest extends BaseTest {
             final Edge edge = batch.addEdge(map, batch.getVertex(idA), batch.getVertex(idB), idA + "-" + idB);
             edgeIndex.put("unique", idA + "-" + idB, edge);
             edgeIndex.put("full", "blah", edge);
-        }*/
+        }
         batch.flushIndices();
         batch.shutdown();
 
-        /*final Neo4jGraph graph = new Neo4jGraph(directory);
-        assertEquals(count(graph.getIndices()), 3);
+        final Neo4jGraph graph = new Neo4jGraph(directory);
+        graph.createKeyIndex("name", Vertex.class);
+        graph.createKeyIndex("age", Vertex.class);
+
+        assertEquals(count(graph.getIndices()), 1);
 
         assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
         assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
@@ -178,7 +188,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
             int age = (Integer) vertex.getProperty("age");
             assertEquals(vertex.getProperty("name"), (age / 10) + "");
 
-            assertFalse(graph.getVertices("nothing", 0).iterator().hasNext());
+            assertTrue(graph.getVertices("nothing", 0).iterator().hasNext());
             assertEquals(count(graph.getVertices("age", age)), 1);
             assertEquals(graph.getVertices("age", age).iterator().next(), vertex);
             assertEquals(count(graph.getVertices("name", (age / 10) + "")), 1);
@@ -221,7 +231,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
             assertTrue(edges.contains(edge));
         }
 
-        graph.shutdown();*/
+        graph.shutdown();
     }
 
     public void testElementPropertyManipulation() {
@@ -352,17 +362,18 @@ public class Neo4jBatchGraphTest extends BaseTest {
         graph.shutdown();
     }
 
-    /*public void testIndexParameters() throws Exception {
+    public void testIndexParameters() throws Exception {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
-        batch.createAutomaticIndex(Index.VERTICES, Vertex.class, null, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+        Index<Vertex> index = batch.createIndex("testIdx", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
         Vertex a = batch.addVertex(null);
         a.setProperty("name", "marko");
+        index.put("name", "marko", a);
         batch.flushIndices();
         batch.shutdown();
 
         IndexableGraph graph = new Neo4jGraph(directory);
-        Iterator<Vertex> itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        Iterator<Vertex> itty = graph.getIndex("testIdx", Vertex.class).query("name", "*rko").iterator();
         int counter = 0;
         while (itty.hasNext()) {
             counter++;
@@ -370,7 +381,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
         }
         assertEquals(counter, 1);
 
-        itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "MaRkO").iterator();
+        itty = graph.getIndex("testIdx", Vertex.class).query("name", "MaRkO").iterator();
         counter = 0;
         while (itty.hasNext()) {
             counter++;
@@ -379,7 +390,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertEquals(counter, 1);
 
         graph.shutdown();
-    }*/
+    }
 
     private String getWorkingDirectory() {
         String directory = System.getProperty("neo4jBatchGraphDirectory");

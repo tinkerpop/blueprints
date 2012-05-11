@@ -5,21 +5,30 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.factory.GraphDatabaseSetting;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.graphdb.index.AutoIndexer;
+import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-//TODO: well, you create a normal BatchIndex, but name it e.g. node_auto_index and put the properties in there, it's only a naming convention, and of course about putting the right props in there
 
 /**
  * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
@@ -28,10 +37,11 @@ import java.util.Set;
  * Neo4jBatchGraph is <b>not</b> a completely faithful Blueprints implementation.
  * Many methods throw UnsupportedOperationExceptions and take unique arguments. Be sure to review each method's JavaDoc.
  * The Neo4j "reference node" (vertex 0) is automatically created and, if so desired, must be manually deleted post data insertion.
+ * Key indices are not available until after the graph has been shutdown and loaded up using Neo4jGraph.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter> {
+public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaGraph<BatchInserter> {
 
     private final BatchInserter rawGraph;
     private final BatchInserterIndexProvider indexProvider;
@@ -39,6 +49,9 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
     private final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
 
     private Long idCounter = 0l;
+
+    protected final Set<String> vertexIndexKeys = new HashSet<String>();
+    protected final Set<String> edgeIndexKeys = new HashSet<String>();
 
     private static final Features FEATURES = new Features();
 
@@ -93,17 +106,60 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
         this.flushIndices();
         this.indexProvider.shutdown();
         this.rawGraph.shutdown();
+        finalizeKeyIndices();
     }
 
     /**
      * This is necessary prior to using indices to ensure that indexed data is available to index queries.
      * This method is not part of the Blueprints Graph or IndexableGraph API.
      * Therefore, be sure to typecast your graph to a Neo4jBatchGraph to use this necessary index-based method.
+     * Note that key indices are not usable until the Neo4jBatchGraph has been shutdown.
      */
     public void flushIndices() {
         for (final Neo4jBatchIndex index : this.indices.values()) {
             index.flush();
         }
+    }
+
+    private void finalizeKeyIndices() {
+        GraphDatabaseService db = null;
+        try {
+            GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(this.rawGraph.getStoreDir());
+            if (this.vertexIndexKeys.size() > 0)
+                builder.setConfig(GraphDatabaseSettings.node_keys_indexable, vertexIndexKeys.toString().replace("[", "").replace("]", "")).setConfig(GraphDatabaseSettings.node_auto_indexing, GraphDatabaseSetting.TRUE);
+            if (this.edgeIndexKeys.size() > 0)
+                builder.setConfig(GraphDatabaseSettings.relationship_keys_indexable, edgeIndexKeys.toString().replace("[", "").replace("]", "")).setConfig(GraphDatabaseSettings.relationship_auto_indexing, GraphDatabaseSetting.TRUE);
+
+            db = builder.newGraphDatabase();
+            GlobalGraphOperations graphOperations = GlobalGraphOperations.at(db);
+            if (this.vertexIndexKeys.size() > 0)
+                updateAutoIndex(db, db.index().getNodeAutoIndexer(), graphOperations.getAllNodes());
+            if (this.edgeIndexKeys.size() > 0)
+                updateAutoIndex(db, db.index().getRelationshipAutoIndexer(), graphOperations.getAllRelationships());
+        } finally {
+            if (db != null) db.shutdown();
+        }
+    }
+
+    private static <T extends PropertyContainer> void updateAutoIndex(final GraphDatabaseService db, final AutoIndexer<T> autoIndexer, final Iterable<T> elements) {
+        if (!autoIndexer.isEnabled()) return;
+        final Set<String> properties = autoIndexer.getAutoIndexedProperties();
+        Transaction tx = db.beginTx();
+        int count = 0;
+        for (final PropertyContainer pc : elements) {
+            for (final String property : properties) {
+                if (!pc.hasProperty(property)) continue;
+                pc.setProperty(property, pc.getProperty(property));
+                count++;
+                if (count % 10000 == 0) {
+                    tx.success();
+                    tx.finish();
+                    tx = db.beginTx();
+                }
+            }
+        }
+        tx.success();
+        tx.finish();
     }
 
     public String toString() {
@@ -287,17 +343,28 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
         return properties;
     }
 
-    private String makeAutoIndexKeys(final Set<String> autoIndexKeys) {
-        String field;
-        if (null != autoIndexKeys) {
-            field = "";
-            for (final String key : autoIndexKeys) {
-                field = field + Neo4jBatchTokens.KEY_SEPARATOR + key;
-            }
+    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            this.vertexIndexKeys.remove(key);
         } else {
-            field = "null";
+            this.edgeIndexKeys.remove(key);
         }
-        return field;
+    }
+
+    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            this.vertexIndexKeys.add(key);
+        } else {
+            this.edgeIndexKeys.add(key);
+        }
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+        if (Vertex.class.isAssignableFrom(elementClass)) {
+            return this.vertexIndexKeys;
+        } else {
+            return this.edgeIndexKeys;
+        }
     }
 
     private static Map<String, String> generateParameterMap(final Parameter<Object, Object>... indexParameters) {

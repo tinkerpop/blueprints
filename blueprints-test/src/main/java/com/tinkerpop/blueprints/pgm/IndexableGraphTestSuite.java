@@ -35,6 +35,23 @@ public class IndexableGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testKeyIndicesAreNotIndices() {
+        IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
+        assertEquals(count(graph.getIndices()), 0);
+        if (!graph.getFeatures().isWrapper && graph.getFeatures().supportsKeyIndices && graph.getFeatures().supportsVertexKeyIndex) {
+            ((KeyIndexableGraph) graph).createKeyIndex("name", Vertex.class);
+            ((KeyIndexableGraph) graph).createKeyIndex("age", Vertex.class);
+            assertEquals(((KeyIndexableGraph) graph).getIndexedKeys(Vertex.class).size(), 2);
+        }
+        if (!graph.getFeatures().isWrapper && graph.getFeatures().supportsKeyIndices && graph.getFeatures().supportsEdgeKeyIndex) {
+            ((KeyIndexableGraph) graph).createKeyIndex("weight", Edge.class);
+            ((KeyIndexableGraph) graph).createKeyIndex("since", Edge.class);
+            assertEquals(((KeyIndexableGraph) graph).getIndexedKeys(Edge.class).size(), 2);
+        }
+        assertEquals(count(graph.getIndices()), 0);
+        graph.shutdown();
+    }
+
     public void testCreateDropIndices() {
         IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexIndex && graph.getFeatures().supportsIndices) {
@@ -102,7 +119,6 @@ public class IndexableGraphTestSuite extends TestSuite {
     public void testIndexPersistence() {
         IndexableGraph graph = (IndexableGraph) this.graphTest.generateGraph();
         if (graph.getFeatures().isPersistent && graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel && graph.getFeatures().supportsIndices) {
-
 
             this.stopWatch();
             graph.createIndex("testIndex", Vertex.class);

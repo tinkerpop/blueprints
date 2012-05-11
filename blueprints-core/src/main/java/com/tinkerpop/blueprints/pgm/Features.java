@@ -4,7 +4,8 @@ import java.lang.reflect.Field;
 
 /**
  * Features provides a listing of the features/qualities/quirks associated with any Graph implementation.
- * This feature listing is used extensively through out the Blueprints TestSuite to validate behavior of the implementation.
+ * This feature listing can be used to dynamically adjust code to the features of the graph implementation.
+ * For example, this feature listing is used extensively throughout the Blueprints TestSuite to validate behavior of the implementation.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Stephen Mallette
@@ -123,7 +124,7 @@ public class Features {
             for (final Field field : this.getClass().getFields()) {
                 string.append(field.getName() + ": " + field.get(this).toString() + "\n");
             }
-            return string.toString();
+            return string.toString().substring(0, string.length() - 1);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
