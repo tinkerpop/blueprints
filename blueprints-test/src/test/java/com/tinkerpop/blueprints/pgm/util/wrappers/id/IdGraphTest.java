@@ -18,8 +18,8 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
         // apart from this one
         isPersistent = false;
 
-        allowsDuplicateEdges = true;
-        allowsSelfLoops = true;
+        allowDuplicateEdges = true;
+        allowSelfLoops = true;
         ignoresSuppliedIds = false;
         isRDFModel = false;
         supportsVertexIteration = true;

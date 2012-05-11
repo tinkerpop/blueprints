@@ -58,8 +58,8 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     private static final Features FEATURES = new Features();
 
     static {
-        FEATURES.allowsDuplicateEdges = false;
-        FEATURES.allowsSelfLoops = true;
+        FEATURES.allowDuplicateEdges = false;
+        FEATURES.allowSelfLoops = true;
         FEATURES.isPersistent = false;
         FEATURES.isRDFModel = true;
         FEATURES.supportsVertexIteration = false;

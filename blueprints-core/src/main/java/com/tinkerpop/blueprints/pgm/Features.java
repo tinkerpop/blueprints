@@ -1,6 +1,9 @@
 package com.tinkerpop.blueprints.pgm;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Features provides a listing of the features/qualities/quirks associated with any Graph implementation.
@@ -14,11 +17,11 @@ public class Features {
     /**
      * Does the graph allow for two edges with the same vertices and edge label to exist?
      */
-    public Boolean allowsDuplicateEdges = null;
+    public Boolean allowDuplicateEdges = null;
     /**
      * Does the graph allow an edge to have the same out/tail and in/head vertex?
      */
-    public Boolean allowsSelfLoops = null;
+    public Boolean allowSelfLoops = null;
     /**
      * Does the graph allow any serializable object to be used as a property value for a graph element?
      */
@@ -129,6 +132,18 @@ public class Features {
             throw new RuntimeException(e.getMessage(), e);
         }
 
+    }
+    
+    public Map toMap() {
+        try {
+            final Map<String, Object> map = new HashMap<String, Object>();
+            for (final Field field : this.getClass().getFields()) {
+                map.put(field.getName(), field.get(this));
+            }
+            return Collections.unmodifiableMap(map);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     /**

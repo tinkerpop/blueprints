@@ -46,8 +46,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     private static final Features FEATURES = new Features();
 
     static {
-        FEATURES.allowsDuplicateEdges = true;
-        FEATURES.allowsSelfLoops = true;
+        FEATURES.allowDuplicateEdges = true;
+        FEATURES.allowSelfLoops = true;
         FEATURES.allowSerializableObjectProperty = true;
         FEATURES.allowBooleanProperty = true;
         FEATURES.allowDoubleProperty = true;
