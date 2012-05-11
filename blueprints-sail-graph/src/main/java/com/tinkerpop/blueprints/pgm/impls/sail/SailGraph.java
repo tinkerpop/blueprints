@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
@@ -53,6 +54,38 @@ import java.util.UUID;
 public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
+
+    private static final Features FEATURES = new Features();
+
+    static {
+        FEATURES.allowsDuplicateEdges = false;
+        FEATURES.allowsSelfLoops = true;
+        FEATURES.isPersistent = false;
+        FEATURES.isRDFModel = true;
+        FEATURES.supportsVertexIteration = false;
+        FEATURES.supportsEdgeIteration = true;
+        FEATURES.supportsVertexIndex = false;
+        FEATURES.supportsEdgeIndex = false;
+        FEATURES.ignoresSuppliedIds = false;
+
+        FEATURES.supportsTransactions = true;
+        FEATURES.supportsEdgeKeyIndex = false;
+        FEATURES.supportsVertexKeyIndex = false;
+        FEATURES.supportsKeyIndices = false;
+        FEATURES.isWrapper = false;
+        FEATURES.supportsIndices = false;
+        FEATURES.allowSerializableObjectProperty = false;
+        FEATURES.allowBooleanProperty = false;
+        FEATURES.allowDoubleProperty = false;
+        FEATURES.allowFloatProperty = false;
+        FEATURES.allowIntegerProperty = false;
+        FEATURES.allowPrimitiveArrayProperty = false;
+        FEATURES.allowUniformListProperty = false;
+        FEATURES.allowMixedListProperty = false;
+        FEATURES.allowLongProperty = false;
+        FEATURES.allowMapProperty = false;
+        FEATURES.allowStringProperty = false;
+    }
 
     static {
         formats.put("rdf-xml", RDFFormat.RDFXML);
@@ -473,6 +506,10 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
             prefixString = prefixString + SailTokens.PREFIX_SPACE + entry.getKey() + SailTokens.COLON_LESSTHAN + entry.getValue() + SailTokens.GREATERTHAN_NEWLINE;
         }
         return prefixString;
+    }
+    
+    public Features getFeatures() {
+        return FEATURES;
     }
 
     /**

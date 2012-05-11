@@ -9,6 +9,7 @@ import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
@@ -38,6 +39,40 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
     private static final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
     private static final List<OrientGraphContext> contexts = new ArrayList<OrientGraphContext>();
+
+    private static final Features FEATURES = new Features();
+
+    static {
+        FEATURES.allowsDuplicateEdges = true;
+        FEATURES.allowsSelfLoops = true;
+        FEATURES.isPersistent = true;
+        FEATURES.isRDFModel = false;
+        FEATURES.supportsVertexIteration = true;
+        FEATURES.supportsEdgeIteration = true;
+        FEATURES.supportsVertexIndex = true;
+        FEATURES.supportsEdgeIndex = true;
+        FEATURES.ignoresSuppliedIds = true;
+        FEATURES.supportsTransactions = true;
+        FEATURES.supportsEdgeKeyIndex = false;                //todo
+        FEATURES.supportsVertexKeyIndex = false;        //todo
+        FEATURES.supportsKeyIndices = false;      //todo
+        FEATURES.isWrapper = false;
+        FEATURES.supportsIndices = false;  // todo
+
+        // For more information on supported types, please see:
+        // http://code.google.com/p/orient/wiki/Types
+        FEATURES.allowSerializableObjectProperty = true;
+        FEATURES.allowBooleanProperty = true;
+        FEATURES.allowDoubleProperty = true;
+        FEATURES.allowFloatProperty = true;
+        FEATURES.allowIntegerProperty = true;
+        FEATURES.allowPrimitiveArrayProperty = true;
+        FEATURES.allowUniformListProperty = true;
+        FEATURES.allowMixedListProperty = true;
+        FEATURES.allowLongProperty = true;
+        FEATURES.allowMapProperty = true;
+        FEATURES.allowStringProperty = true;
+    }
 
     /**
      * Constructs a new object using an existent OGraphDatabase instance.
@@ -483,6 +518,10 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
             threadContext.set(null);
         }
+    }
+
+    public Features getFeatures() {
+        return FEATURES;
     }
 
     /*public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {

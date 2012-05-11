@@ -15,8 +15,8 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testAutoIndexKeyManagement() {
-        if (graphTest.supportsVertexIndex) {
-            KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.getGraphInstance();
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIndex) {
             this.stopWatch();
             graph.createKeyIndex("name", Vertex.class);
             graph.createKeyIndex("location", Vertex.class);
@@ -24,13 +24,13 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
             assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
             assertTrue(graph.getIndexedKeys(Vertex.class).contains("location"));
-            graph.shutdown();
         }
+        graph.shutdown();
     }
 
     public void testGettingVerticesAndEdgesWithKeyValue() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration) {
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIteration) {
             graph.createKeyIndex("name", Vertex.class);
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
@@ -48,7 +48,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(graph.getVertices("name", "stephen").iterator().next(), v2);
         }
 
-        if (graphTest.supportsEdgeIteration) {
+        if (graph.getFeatures().supportsEdgeIteration) {
             graph.createKeyIndex("location", Edge.class);
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Edge.class).contains("location"));
@@ -70,8 +70,8 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testNoConcurrentModificationException() {
-        if (graphTest.supportsEdgeIndex) {
-            KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.getGraphInstance();
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeIndex) {
             graph.createKeyIndex("key", Edge.class);
             for (int i = 0; i < 25; i++) {
                 graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");
@@ -86,7 +86,8 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(counter, 25);
             assertEquals(count(graph.getVertices()), 50);
             assertEquals(count(graph.getEdges()), 0);
-            graph.shutdown();
+
         }
+        graph.shutdown();
     }
 }

@@ -17,32 +17,6 @@ import java.lang.reflect.Method;
  */
 public class DexGraphTest extends GraphTest {
 
-    public DexGraphTest() {
-        this.allowsDuplicateEdges = true;
-        this.allowsSelfLoops = true;
-        this.isPersistent = true;
-        this.isRDFModel = false;
-        this.supportsVertexIteration = true;
-        this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = false;
-        this.supportsEdgeIndex = false;
-        this.ignoresSuppliedIds = true;
-        this.supportsTransactions = false;
-        this.supportsManualIndices = false;
-
-        this.allowSerializableObjectProperty = false;
-        this.allowBooleanProperty = true;
-        this.allowDoubleProperty = true;
-        this.allowFloatProperty = true;
-        this.allowIntegerProperty = true;
-        this.allowPrimitiveArrayProperty = false;
-        this.allowUniformListProperty = false;
-        this.allowMixedListProperty = false;
-        this.allowLongProperty = false;
-        this.allowMapProperty = false;
-        this.allowStringProperty = true;
-    }
-
     /*public void testDexBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new DexBenchmarkTestSuite(this));
@@ -73,7 +47,7 @@ public class DexGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
+    public Graph generateGraph() {
         String db = System.getProperty("dexGraphFile");
         if (db == null)
             db = "/tmp/blueprints_test.dex";

@@ -24,7 +24,7 @@ public class TinkerBenchmarkTestSuite extends TestSuite {
 
     public void testTinkerGraph() throws Exception {
         double totalTime = 0.0d;
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.generateGraph();
         GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
 
         for (int i = 0; i < TOTAL_RUNS; i++) {

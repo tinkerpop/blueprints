@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
@@ -21,20 +22,6 @@ import java.util.HashSet;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class PartitionGraphTest extends GraphTest {
-
-    public PartitionGraphTest() {
-        this.allowsDuplicateEdges = true;
-        this.allowsSelfLoops = true;
-        this.ignoresSuppliedIds = false;
-        this.isPersistent = false;
-        this.isRDFModel = false;
-        this.isWrapper = true;
-        this.supportsVertexIteration = true;
-        this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = true;
-        this.supportsEdgeIndex = true;
-        this.supportsTransactions = false;
-    }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -72,8 +59,14 @@ public class PartitionGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
-        return new PartitionIndexableGraph(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph")));
+    public Graph generateGraph() {
+        return new PartitionIndexableGraph<TinkerGraph>(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph"))) {
+            public Features getFeatures() {
+                final Features features = super.getFeatures();
+                features.isPersistent = false;
+                return features;
+            }
+        };
     }
 
 

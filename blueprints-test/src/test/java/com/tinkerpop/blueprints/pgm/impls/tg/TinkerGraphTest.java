@@ -22,33 +22,6 @@ import java.lang.reflect.Method;
  */
 public class TinkerGraphTest extends GraphTest {
 
-    public TinkerGraphTest() {
-        allowsDuplicateEdges = true;
-        allowsSelfLoops = true;
-        ignoresSuppliedIds = false;
-        isPersistent = true;
-        isRDFModel = false;
-        supportsManualIndices = true;
-        supportsVertexIteration = true;
-        supportsEdgeIteration = true;
-        supportsVertexIndex = true;
-        supportsEdgeIndex = true;
-        supportsTransactions = false;
-
-        allowSerializableObjectProperty = true;
-        allowBooleanProperty = true;
-        allowDoubleProperty = true;
-        allowFloatProperty = true;
-        allowIntegerProperty = true;
-        allowPrimitiveArrayProperty = true;
-        allowUniformListProperty = true;
-        allowMixedListProperty = true;
-        allowLongProperty = true;
-        allowMapProperty = true;
-        allowStringProperty = true;
-    }
-
-
     /*public void testTinkerBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new TinkerBenchmarkTestSuite(this));
@@ -111,7 +84,7 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     @Override
-    public Graph getGraphInstance() {
+    public Graph generateGraph() {
         String directory = System.getProperty("tinkerGraphDirectory");
         if (directory == null) {
             directory = this.getWorkingDirectory();
@@ -151,7 +124,7 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     public void testClear() {
-        TinkerGraph graph = (TinkerGraph) this.getGraphInstance();
+        TinkerGraph graph = (TinkerGraph) this.generateGraph();
         this.stopWatch();
         for (int i = 0; i < 25; i++) {
             Vertex a = graph.addVertex(null);

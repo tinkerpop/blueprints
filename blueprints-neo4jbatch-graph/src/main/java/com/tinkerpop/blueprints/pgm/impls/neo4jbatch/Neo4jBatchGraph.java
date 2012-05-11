@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
@@ -17,6 +18,8 @@ import org.neo4j.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+//TODO: well, you create a normal BatchIndex, but name it e.g. node_auto_index and put the properties in there, it's only a naming convention, and of course about putting the right props in there
 
 /**
  * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
@@ -36,6 +39,40 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
     private final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
 
     private Long idCounter = 0l;
+
+    private static final Features FEATURES = new Features();
+
+    static {
+
+        FEATURES.allowSerializableObjectProperty = false;
+        FEATURES.allowBooleanProperty = true;
+        FEATURES.allowDoubleProperty = true;
+        FEATURES.allowFloatProperty = true;
+        FEATURES.allowIntegerProperty = true;
+        FEATURES.allowPrimitiveArrayProperty = true;
+        FEATURES.allowUniformListProperty = true;
+        FEATURES.allowMixedListProperty = false;
+        FEATURES.allowLongProperty = true;
+        FEATURES.allowMapProperty = false;
+        FEATURES.allowStringProperty = true;
+
+        FEATURES.allowsDuplicateEdges = true;
+        FEATURES.allowsSelfLoops = true;
+        FEATURES.isPersistent = true;
+        FEATURES.isRDFModel = false;
+        FEATURES.isWrapper = false;
+        FEATURES.supportsVertexIteration = false;
+        FEATURES.supportsEdgeIteration = false;
+        FEATURES.supportsVertexIndex = true;
+        FEATURES.supportsEdgeIndex = true;
+        FEATURES.ignoresSuppliedIds = false;
+        FEATURES.supportsTransactions = false;
+        FEATURES.supportsIndices = true;
+        FEATURES.supportsKeyIndices = true;
+        FEATURES.supportsVertexKeyIndex = true;
+        FEATURES.supportsEdgeKeyIndex = true;
+    }
+
 
     public Neo4jBatchGraph(final String directory) {
         this.rawGraph = BatchInserters.inserter(directory);
@@ -269,5 +306,9 @@ public class Neo4jBatchGraph implements IndexableGraph, MetaGraph<BatchInserter>
             map.put(parameter.getKey().toString(), parameter.getValue().toString());
         }
         return map;
+    }
+
+    public Features getFeatures() {
+        return FEATURES;
     }
 }

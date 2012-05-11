@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
@@ -28,20 +29,6 @@ public class EventGraphTest extends GraphTest {
 
     private StubGraphChangedListener graphChangedListener;
     private EventGraph<TinkerGraph> graph;
-
-    public EventGraphTest() {
-        this.allowsDuplicateEdges = true;
-        this.allowsSelfLoops = true;
-        this.ignoresSuppliedIds = false;
-        this.isPersistent = false;
-        this.isRDFModel = false;
-        this.isWrapper = true;
-        this.supportsVertexIteration = true;
-        this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = true;
-        this.supportsEdgeIndex = true;
-        this.supportsTransactions = false;
-    }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -79,10 +66,15 @@ public class EventGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
-        return new EventIndexableGraph(new TinkerGraph());
+    public Graph generateGraph() {
+        return new EventIndexableGraph<TinkerGraph>(new TinkerGraph()) {
+            public Features getFeatures() {
+                final Features features = super.getFeatures();
+                features.isPersistent = false;
+                return features;
+            }
+        };
     }
-
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         for (Method method : testSuite.getClass().getDeclaredMethods()) {

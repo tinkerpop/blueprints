@@ -232,7 +232,7 @@ public class IdGraphTest extends TestCase { // extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
+    public Graph generateGraph() {
         return new IdGraph(new TinkerGraph());
     }
 

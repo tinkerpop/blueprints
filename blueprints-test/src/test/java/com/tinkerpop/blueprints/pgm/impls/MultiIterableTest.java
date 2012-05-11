@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MultiIterableTest extends BaseTest {
 
-    public void testBasicIterable() {
+    public void testBasicFunctionality() {
         MultiIterable<Integer> itty = new MultiIterable<Integer>((List) Arrays.asList(Arrays.asList(1, 2, 3), Arrays.asList(4, 5), Arrays.asList(6, 7, 8)));
         int counter = 0;
         for (int i : itty) {

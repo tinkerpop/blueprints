@@ -8,6 +8,15 @@ package com.tinkerpop.blueprints.pgm;
 public interface Graph {
 
     /**
+     * Get the particular features of the graph implementation.
+     * Not all graph implementations are identical nor perfectly implement the Blueprints API.
+     * The Features object returned contains meta-data about numerous potential divergences between implementations.
+     *
+     * @return the features of this particular Graph implementation
+     */
+    public Features getFeatures();
+
+    /**
      * Create a new vertex, add it to the graph, and return the newly created vertex.
      * The provided object identifier is a recommendation for the identifier to use.
      * It is not required that the implementation use this identifier.

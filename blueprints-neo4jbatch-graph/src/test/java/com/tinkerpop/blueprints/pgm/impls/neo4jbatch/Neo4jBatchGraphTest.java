@@ -20,6 +20,14 @@ import java.util.Random;
  */
 public class Neo4jBatchGraphTest extends BaseTest {
 
+    public void testFeatureCompliance() {
+        final String directory = this.getWorkingDirectory();
+        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        System.out.println(batch.getFeatures());
+        batch.getFeatures().checkCompliance();
+        batch.shutdown();
+    }
+
     public void testAddingVerticesEdges() {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);

@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
@@ -57,6 +58,39 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             return 0;
         }
     };
+
+    private static final Features FEATURES = new Features();
+
+    static {
+
+        FEATURES.allowSerializableObjectProperty = false;
+        FEATURES.allowBooleanProperty = true;
+        FEATURES.allowDoubleProperty = true;
+        FEATURES.allowFloatProperty = true;
+        FEATURES.allowIntegerProperty = true;
+        FEATURES.allowPrimitiveArrayProperty = true;
+        FEATURES.allowUniformListProperty = true;
+        FEATURES.allowMixedListProperty = false;
+        FEATURES.allowLongProperty = true;
+        FEATURES.allowMapProperty = false;
+        FEATURES.allowStringProperty = true;
+
+        FEATURES.allowsDuplicateEdges = true;
+        FEATURES.allowsSelfLoops = true;
+        FEATURES.isPersistent = true;
+        FEATURES.isRDFModel = false;
+        FEATURES.isWrapper = false;
+        FEATURES.supportsVertexIteration = true;
+        FEATURES.supportsEdgeIteration = true;
+        FEATURES.supportsVertexIndex = true;
+        FEATURES.supportsEdgeIndex = true;
+        FEATURES.ignoresSuppliedIds = true;
+        FEATURES.supportsTransactions = true;
+        FEATURES.supportsIndices = true;
+        FEATURES.supportsKeyIndices = true;
+        FEATURES.supportsVertexKeyIndex = true;
+        FEATURES.supportsEdgeKeyIndex = true;
+    }
 
     public Neo4jGraph(final String directory) {
         this(directory, null);
@@ -435,6 +469,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public GraphDatabaseService getRawGraph() {
         return this.rawGraph;
+    }
+
+    public Features getFeatures() {
+        return FEATURES;
     }
 
     public String toString() {

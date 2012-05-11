@@ -19,34 +19,6 @@ import java.lang.reflect.Method;
  */
 public class Neo4jGraphTest extends GraphTest {
 
-
-    public Neo4jGraphTest() {
-        this.allowsDuplicateEdges = true;
-        this.allowsSelfLoops = true;
-        this.isPersistent = true;
-        this.isRDFModel = false;
-        this.supportsVertexIteration = true;
-        this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = true;
-        this.supportsEdgeIndex = true;
-        this.ignoresSuppliedIds = true;
-        this.supportsTransactions = true;
-        this.supportsManualIndices = true;
-
-        this.allowSerializableObjectProperty = false;
-        this.allowBooleanProperty = true;
-        this.allowDoubleProperty = true;
-        this.allowFloatProperty = true;
-        this.allowIntegerProperty = true;
-        this.allowPrimitiveArrayProperty = true;
-        this.allowUniformListProperty = true;
-        this.allowMixedListProperty = false;
-        this.allowLongProperty = true;
-        this.allowMapProperty = false;
-        this.allowStringProperty = true;
-
-    }
-
     /*public void testNeo4jBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new Neo4jBenchmarkTestSuite(this));
@@ -95,7 +67,7 @@ public class Neo4jGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
+    public Graph generateGraph() {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();

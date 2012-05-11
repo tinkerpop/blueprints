@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
@@ -184,5 +185,11 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     @Override
     public T getBaseGraph() {
         return this.baseGraph;
+    }
+
+    public Features getFeatures() {
+        final Features features = this.baseGraph.getFeatures().copyFeatures();
+        features.isWrapper = true;
+        return features;
     }
 }

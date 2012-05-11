@@ -71,7 +71,7 @@ public class ReadOnlyGraphTest extends BaseTest {
     }
 
     public void testReadOnlyElement() {
-        Graph graph = new ReadOnlyGraph(TinkerGraphFactory.createTinkerGraph());
+        Graph graph = new ReadOnlyGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
         for (Vertex vertex : graph.getVertices()) {
             assertTrue(vertex instanceof ReadOnlyVertex);
             try {
@@ -103,7 +103,7 @@ public class ReadOnlyGraphTest extends BaseTest {
     }
 
     public void testReadOnlyIndices() {
-        IndexableGraph graph = new ReadOnlyIndexableGraph(TinkerGraphFactory.createTinkerGraph());
+        IndexableGraph graph = new ReadOnlyIndexableGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
         Index<Vertex> index = ((WrapperGraph<IndexableGraph>) graph).getBaseGraph().createIndex("blah", Vertex.class);
         index.put("name", "marko", graph.getVertex(1));
         assertTrue(graph.getIndices() instanceof ReadOnlyIndexIterable);

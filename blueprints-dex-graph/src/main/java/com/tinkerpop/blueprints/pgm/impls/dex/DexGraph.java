@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
@@ -47,6 +48,39 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
     private com.sparsity.dex.gdb.Database gpool = null;
     private com.sparsity.dex.gdb.Session session = null;
     private com.sparsity.dex.gdb.Graph rawGraph = null;
+
+    private static final Features FEATURES = new Features();
+
+    static {
+        FEATURES.allowsDuplicateEdges = true;
+        FEATURES.allowsSelfLoops = true;
+        FEATURES.isPersistent = true;
+        FEATURES.isRDFModel = false;
+        FEATURES.supportsVertexIteration = true;
+        FEATURES.supportsEdgeIteration = true;
+        FEATURES.supportsVertexIndex = false;
+        FEATURES.supportsEdgeIndex = false;
+        FEATURES.ignoresSuppliedIds = true;
+        FEATURES.supportsTransactions = false;
+        FEATURES.supportsIndices = false;
+
+        FEATURES.allowSerializableObjectProperty = false;
+        FEATURES.allowBooleanProperty = true;
+        FEATURES.allowDoubleProperty = true;
+        FEATURES.allowFloatProperty = true;
+        FEATURES.allowIntegerProperty = true;
+        FEATURES.allowPrimitiveArrayProperty = false;
+        FEATURES.allowUniformListProperty = false;
+        FEATURES.allowMixedListProperty = false;
+        FEATURES.allowLongProperty = false;
+        FEATURES.allowMapProperty = false;
+        FEATURES.allowStringProperty = true;
+
+        FEATURES.isWrapper = false;
+        FEATURES.supportsKeyIndices = false;
+        FEATURES.supportsVertexKeyIndex = false;
+        FEATURES.supportsEdgeKeyIndex = false;
+    }
 
     /**
      * Gets the Dex raw graph.
@@ -322,6 +356,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
     @Override
     public String toString() {
         return StringFactory.graphString(this, db.getPath());
+    }
+
+    public Features getFeatures() {
+        return FEATURES;
     }
 
     private com.sparsity.dex.gdb.Objects rawGet(final String key, final Object value) {

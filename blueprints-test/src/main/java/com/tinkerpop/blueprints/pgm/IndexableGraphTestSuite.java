@@ -18,8 +18,9 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     public void testNoIndicesOnStartup() {
-        if (graphTest.supportsVertexIndex && !graphTest.isRDFModel) {
-            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel) {
+
             assertEquals(count(graph.getIndices()), 0);
             graph.createIndex("myIdx", Vertex.class);
             assertEquals(count(graph.getIndices()), 1);
@@ -29,13 +30,15 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(count(idx), 1);
             assertEquals(count(idx), 1);
             assertEquals(count(idx), 1);
-            graph.shutdown();
+
         }
+        graph.shutdown();
     }
 
     public void testCreateDropIndices() {
-        if (graphTest.supportsVertexIndex && graphTest.supportsManualIndices) {
-            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIndex && graph.getFeatures().supportsIndices) {
+
             this.stopWatch();
             for (int i = 0; i < 10; i++) {
                 graph.createIndex(i + "blah", Vertex.class);
@@ -77,25 +80,29 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getIndices()), 0);
 
             printPerformance(graph.toString(), 2, "indices dropped and index iterable checked for consistency", this.stopWatch());
-            graph.shutdown();
+
         }
+        graph.shutdown();
     }
 
     public void testNonExistentIndices() {
-        if (graphTest.supportsVertexIndex && graphTest.supportsEdgeIndex && graphTest.supportsManualIndices) {
-            IndexableGraph graph = (IndexableGraph) graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIndex && graph.getFeatures().supportsEdgeIndex && graph.getFeatures().supportsIndices) {
+
             this.stopWatch();
             assertNull(graph.getIndex("bloop", Vertex.class));
             assertNull(graph.getIndex("bam", Edge.class));
             assertNull(graph.getIndex("blah blah", Edge.class));
             printPerformance(graph.toString(), 3, "non-existent indices retrieved", this.stopWatch());
-            graph.shutdown();
+
         }
+        graph.shutdown();
     }
 
     public void testIndexPersistence() {
-        if (graphTest.isPersistent && graphTest.supportsVertexIndex && !graphTest.isRDFModel && graphTest.supportsManualIndices) {
-            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) this.graphTest.generateGraph();
+        if (graph.getFeatures().isPersistent && graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel && graph.getFeatures().supportsIndices) {
+
 
             this.stopWatch();
             graph.createIndex("testIndex", Vertex.class);
@@ -110,7 +117,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             printPerformance(graph.toString(), 1, "index created and 1 vertex added and checked", this.stopWatch());
             graph.shutdown();
 
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph = (IndexableGraph) this.graphTest.generateGraph();
             this.stopWatch();
             manualIndex = graph.getIndex("testIndex", Vertex.class);
             assertEquals(count(manualIndex.get("key", "value")), 1);
@@ -118,7 +125,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             printPerformance(graph.toString(), 1, "index reloaded and 1 vertex checked", this.stopWatch());
             graph.shutdown();
 
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph = (IndexableGraph) this.graphTest.generateGraph();
             this.stopWatch();
             manualIndex = graph.getIndex("testIndex", Vertex.class);
             vertex = manualIndex.get("key", "value").iterator().next();
@@ -128,25 +135,27 @@ public class IndexableGraphTestSuite extends TestSuite {
             printPerformance(graph.toString(), 1, "index reloaded and 1 vertex checked and then removed", this.stopWatch());
             graph.shutdown();
 
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph = (IndexableGraph) this.graphTest.generateGraph();
             this.stopWatch();
             manualIndex = graph.getIndex("testIndex", Vertex.class);
             assertEquals(count(manualIndex.get("key", "value")), 0);
             printPerformance(graph.toString(), 1, "index reloaded and checked to ensure empty", this.stopWatch());
-            graph.shutdown();
+
         }
+        graph.shutdown();
     }
 
     public void testExceptionOnIndexOverwrite() {
-        if (graphTest.supportsManualIndices && graphTest.supportsVertexIndex) {
+        IndexableGraph graph = (IndexableGraph) this.graphTest.generateGraph();
+        if (graph.getFeatures().supportsIndices && graph.getFeatures().supportsVertexIndex) {
             int loop = 1;
-            if (graphTest.isPersistent)
+            if (graph.getFeatures().isPersistent)
                 loop = 5;
-
+            graph.shutdown();
             this.stopWatch();
             String graphName = "";
             for (int i = 0; i < loop; i++) {
-                IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+                graph = (IndexableGraph) this.graphTest.generateGraph();
                 graph.createIndex(i + "atest", Vertex.class);
                 graphName = graph.toString();
                 int counter = 0;
@@ -168,8 +177,9 @@ public class IndexableGraphTestSuite extends TestSuite {
     }
 
     public void testIndexDropPersistence() {
-        if (graphTest.isPersistent && graphTest.supportsManualIndices && graphTest.supportsVertexIndex) {
-            IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) this.graphTest.generateGraph();
+        if (graph.getFeatures().isPersistent && graph.getFeatures().supportsIndices && graph.getFeatures().supportsVertexIndex) {
+
             graph.createIndex("blah", Vertex.class);
             graph.createIndex("bleep", Vertex.class);
             Set<String> indexNames = new HashSet<String>();
@@ -186,15 +196,16 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getIndices()), 0);
             graph.shutdown();
 
-            graph = (IndexableGraph) this.graphTest.getGraphInstance();
+            graph = (IndexableGraph) this.graphTest.generateGraph();
             assertEquals(count(graph.getIndices()), 0);
-            graph.shutdown();
+
         }
+        graph.shutdown();
     }
 
 
     /*public void testAutomaticTransactionsOnIndices() {
-        IndexableGraph graph = (IndexableGraph) this.graphTest.getGraphInstance();
+        IndexableGraph graph = (IndexableGraph) this.graphTest.generateGraph();
         if (graphTest.supportsTransactions && graph instanceof TransactionalGraph) {
             TransactionalGraph txGraph = (TransactionalGraph) graph;
             assertEquals(txGraph.getCurrentBufferSize(), 0);

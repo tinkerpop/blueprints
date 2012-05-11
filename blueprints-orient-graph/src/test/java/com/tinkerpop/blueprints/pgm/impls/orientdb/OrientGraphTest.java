@@ -24,33 +24,6 @@ public class OrientGraphTest extends GraphTest {
 
     private OrientGraph currentGraph;
 
-    public OrientGraphTest() {
-        this.allowsDuplicateEdges = true;
-        this.allowsSelfLoops = true;
-        this.isPersistent = true;
-        this.isRDFModel = false;
-        this.supportsVertexIteration = true;
-        this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = true;
-        this.supportsEdgeIndex = true;
-        this.ignoresSuppliedIds = true;
-        this.supportsTransactions = true;
-
-        // The blueprints tests don't test everything OrientDB support
-        // http://code.google.com/p/orient/wiki/Types
-        this.allowSerializableObjectProperty = true;
-        this.allowBooleanProperty = true;
-        this.allowDoubleProperty = true;
-        this.allowFloatProperty = true;
-        this.allowIntegerProperty = true;
-        this.allowPrimitiveArrayProperty = true;
-        this.allowUniformListProperty = true;
-        this.allowMixedListProperty = true;
-        this.allowLongProperty = true;
-        this.allowMapProperty = true;
-        this.allowStringProperty = true;
-    }
-
     /*public void testOrientBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new OrientBenchmarkTestSuite(this));
@@ -105,7 +78,7 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
+    public Graph generateGraph() {
         String directory = getWorkingDirectory();
         this.currentGraph = new OrientGraph("local:" + directory + "/graph");
         return this.currentGraph;

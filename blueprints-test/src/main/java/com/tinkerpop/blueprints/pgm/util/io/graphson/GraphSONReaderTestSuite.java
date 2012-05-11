@@ -22,8 +22,8 @@ public class GraphSONReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraph() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (!graphTest.ignoresSuppliedIds) {
+        Graph graph = graphTest.generateGraph();
+        if (!graph.getFeatures().ignoresSuppliedIds) {
             this.stopWatch();
             new GraphSONReader(graph).inputGraph(GraphSONReader.class.getResourceAsStream("graph-example-1.json"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -78,8 +78,8 @@ public class GraphSONReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphEdges() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
-        if (graphTest.supportsEdgeIteration) {
+        Graph graph = this.graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeIteration) {
             this.stopWatch();
             new GraphSONReader(graph).inputGraph(GraphSONReader.class.getResourceAsStream("graph-example-1.json"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -104,8 +104,8 @@ public class GraphSONReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphVertices() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration) {
+        Graph graph = this.graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             new GraphSONReader(graph).inputGraph(GraphSONReader.class.getResourceAsStream("graph-example-1.json"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -129,8 +129,8 @@ public class GraphSONReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphSoftwareVertices() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration) {
+        Graph graph = this.graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             new GraphSONReader(graph).inputGraph(GraphSONReader.class.getResourceAsStream("graph-example-1.json"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -153,8 +153,8 @@ public class GraphSONReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphVertexAndEdges() throws Exception {
-        Graph graph = this.graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration) {
+        Graph graph = this.graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             new GraphSONReader(graph).inputGraph(GraphSONReader.class.getResourceAsStream("graph-example-1.json"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -192,7 +192,7 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertTrue(null != lop);
             assertTrue(null != ripple);
 
-            if (graphTest.supportsEdgeIteration) {
+            if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 6);
             }
 

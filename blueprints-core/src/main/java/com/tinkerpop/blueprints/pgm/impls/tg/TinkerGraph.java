@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
@@ -41,6 +42,39 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
     private final String directory;
     private static final String GRAPH_FILE = "/tinkergraph.dat";
+
+    private static final Features FEATURES = new Features();
+
+    static {
+        FEATURES.allowsDuplicateEdges = true;
+        FEATURES.allowsSelfLoops = true;
+        FEATURES.allowSerializableObjectProperty = true;
+        FEATURES.allowBooleanProperty = true;
+        FEATURES.allowDoubleProperty = true;
+        FEATURES.allowFloatProperty = true;
+        FEATURES.allowIntegerProperty = true;
+        FEATURES.allowPrimitiveArrayProperty = true;
+        FEATURES.allowUniformListProperty = true;
+        FEATURES.allowMixedListProperty = true;
+        FEATURES.allowLongProperty = true;
+        FEATURES.allowMapProperty = true;
+        FEATURES.allowStringProperty = true;
+
+        FEATURES.ignoresSuppliedIds = false;
+        FEATURES.isPersistent = true;
+        FEATURES.isRDFModel = false;
+        FEATURES.isWrapper = false;
+
+        FEATURES.supportsIndices = true;
+        FEATURES.supportsKeyIndices = true;
+        FEATURES.supportsVertexKeyIndex = true;
+        FEATURES.supportsEdgeKeyIndex = true;
+        FEATURES.supportsVertexIndex = true;
+        FEATURES.supportsEdgeIndex = true;
+        FEATURES.supportsTransactions = false;
+        FEATURES.supportsVertexIteration = true;
+        FEATURES.supportsEdgeIteration = true;
+    }
 
     public TinkerGraph(final String directory) {
         this.directory = directory;
@@ -314,6 +348,10 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                 break;
         }
         return idString;
+    }
+
+    public Features getFeatures() {
+        return FEATURES;
     }
 
     protected class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements Serializable {

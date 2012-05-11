@@ -20,32 +20,6 @@ public class RexsterGraphTest extends GraphTest {
     private String username = null;
     private String password = null;
 
-    public RexsterGraphTest() {
-        // intended to be used with TinkerGraph as the endpoint graph
-        this.allowsDuplicateEdges = true;
-        this.allowsSelfLoops = true;
-        this.ignoresSuppliedIds = false;
-        this.isPersistent = false;
-        this.isRDFModel = false;
-        this.supportsVertexIteration = true;
-        this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = true;
-        this.supportsEdgeIndex = true;
-
-        // RexsterGraph will toString anything it can't convert to a standard Rexster type.
-        this.allowSerializableObjectProperty = true;
-        this.allowBooleanProperty = true;
-        this.allowDoubleProperty = true;
-        this.allowFloatProperty = true;
-        this.allowIntegerProperty = true;
-        this.allowPrimitiveArrayProperty = true;
-        this.allowUniformListProperty = true;
-        this.allowMixedListProperty = true;
-        this.allowLongProperty = true;
-        this.allowMapProperty = true;
-        this.allowStringProperty = true;
-    }
-
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new VertexTestSuite(this));
@@ -85,7 +59,7 @@ public class RexsterGraphTest extends GraphTest {
     }*/
 
 
-    public Graph getGraphInstance() {
+    public Graph generateGraph() {
         return new RexsterGraph(this.getWorkingUri(), this.username, this.password);
     }
 

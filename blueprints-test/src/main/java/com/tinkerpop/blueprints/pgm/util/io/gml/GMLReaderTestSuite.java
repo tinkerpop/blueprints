@@ -2,10 +2,7 @@ package com.tinkerpop.blueprints.pgm.util.io.gml;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TestSuite;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
@@ -24,8 +21,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraph() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (!graphTest.ignoresSuppliedIds) {
+        Graph graph = graphTest.generateGraph();
+        if (!graph.getFeatures().ignoresSuppliedIds) {
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);
             gmlReader.setVertexIdKey(GMLTokens.BLUEPRINTS_ID);
@@ -83,8 +80,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphEdges() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsEdgeIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeIteration) {
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);
             gmlReader.setVertexIdKey(GMLTokens.BLUEPRINTS_ID);
@@ -112,8 +109,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphVertices() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             new GMLReader(graph).inputGraph(GMLReader.class.getResourceAsStream("graph-example-1.gml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -137,8 +134,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphSoftwareVertices() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             new GMLReader(graph).inputGraph(GMLReader.class.getResourceAsStream("graph-example-1.gml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
@@ -161,8 +158,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testTinkerGraphVertexAndEdges() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);
             gmlReader.setVertexIdKey(GMLTokens.BLUEPRINTS_ID);
@@ -203,7 +200,7 @@ public class GMLReaderTestSuite extends TestSuite {
             assertTrue(null != lop);
             assertTrue(null != ripple);
 
-            if (graphTest.supportsEdgeIteration) {
+            if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 6);
             }
 
@@ -295,8 +292,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (!graph.getFeatures().ignoresSuppliedIds && graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
 
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);
@@ -446,8 +443,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3MappingLabels() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             GMLReader r = new GMLReader(graph);
             r.setEdgeLabelKey("label2");
@@ -510,8 +507,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3MappingIDs() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             GMLReader r = new GMLReader(graph);
             r.setVertexIdKey("id2");
@@ -574,8 +571,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testReadingTinkerGraphExample3MappingAll() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             GMLReader r = new GMLReader(graph);
             r.setVertexIdKey("id2");
@@ -639,8 +636,8 @@ public class GMLReaderTestSuite extends TestSuite {
     }
 
     public void testMigratingTinkerGraphExample3() throws Exception {
-        Graph graph = graphTest.getGraphInstance();
-        if (!graphTest.ignoresSuppliedIds && graphTest.supportsEdgeIteration && graphTest.supportsVertexIteration) {
+        Graph graph = graphTest.generateGraph();
+        if (!graph.getFeatures().ignoresSuppliedIds && graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
 
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);

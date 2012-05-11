@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.wrapped;
 
 import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
@@ -81,5 +82,11 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     public String toString() {
         return StringFactory.graphString(this, this.baseGraph.toString());
+    }
+
+    public Features getFeatures() {
+        final Features features = this.baseGraph.getFeatures().copyFeatures();
+        features.isWrapper = true;
+        return features;
     }
 }

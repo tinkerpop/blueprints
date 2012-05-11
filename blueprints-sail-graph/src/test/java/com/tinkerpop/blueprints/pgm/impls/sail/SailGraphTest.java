@@ -25,18 +25,6 @@ import java.util.regex.Matcher;
  */
 public class SailGraphTest extends GraphTest {
 
-    public SailGraphTest() {
-        this.allowsDuplicateEdges = false;
-        this.allowsSelfLoops = true;
-        this.isPersistent = false;
-        this.isRDFModel = true;
-        this.supportsVertexIteration = false;
-        this.supportsEdgeIteration = true;
-        this.supportsVertexIndex = false;
-        this.supportsEdgeIndex = false;
-        this.ignoresSuppliedIds = false;
-    }
-
     public void testSailGraphFactory() {
         assertTrue(true);
         SailGraphFactory.createTinkerGraph(new MemoryStoreSailGraph());
@@ -194,7 +182,7 @@ public class SailGraphTest extends GraphTest {
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
     }
 
-    public Graph getGraphInstance() {
+    public Graph generateGraph() {
         return new SailGraph(new MemoryStore());
     }
 
@@ -204,7 +192,7 @@ public class SailGraphTest extends GraphTest {
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
-                    Graph graph = this.getGraphInstance();
+                    Graph graph = this.generateGraph();
                     method.invoke(testSuite);
                     graph.shutdown();
                 }

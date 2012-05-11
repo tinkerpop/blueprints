@@ -26,12 +26,12 @@ public class OrientBenchmarkTestSuite extends TestSuite {
 
     public void testOrientRaw() throws Exception {
         double totalTime = 0.0d;
-        OrientGraph graph = (OrientGraph) graphTest.getGraphInstance();
+        OrientGraph graph = (OrientGraph) graphTest.generateGraph();
         GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
         graph.shutdown();
 
         for (int i = 0; i < TOTAL_RUNS; i++) {
-            graph = (OrientGraph) graphTest.getGraphInstance();
+            graph = (OrientGraph) graphTest.generateGraph();
             OGraphDatabase db = graph.getRawGraph();
             this.stopWatch();
             int counter = 0;
@@ -63,12 +63,12 @@ public class OrientBenchmarkTestSuite extends TestSuite {
 
     public void testOrientGraph() throws Exception {
         double totalTime = 0.0d;
-        Graph graph = graphTest.getGraphInstance();
+        Graph graph = graphTest.generateGraph();
         GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
         graph.shutdown();
 
         for (int i = 0; i < TOTAL_RUNS; i++) {
-            graph = graphTest.getGraphInstance();
+            graph = graphTest.generateGraph();
             this.stopWatch();
             int counter = 0;
             for (final Vertex vertex : graph.getVertices()) {

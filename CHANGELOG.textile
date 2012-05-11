@@ -26,6 +26,7 @@ h3. Version 1.3 (NOT OFFICIALLY RELEASED YET)
 * Redesign to @IndexableGraph@ where @AutomaticIndex@ no longer exists as is default
 * Introduced new interface called @KeyIndexedGraph@ for basic key/value property indexing
 * Reduce the number of vertices/edges created in various test suites to speed up testing
+* Added @Features@ so developers can learn about the various quirks of any @Graph@ implementation
 
 ==<hr/>==
 

@@ -32,8 +32,8 @@ public abstract class TestSuite extends BaseTest {
         return new ArrayList<String>(ids);
     }
 
-    protected String convertId(final String id) {
-        if (this.graphTest.isRDFModel) {
+    protected String convertId(final Graph graph, final String id) {
+        if (graph.getFeatures().isRDFModel) {
             return "blueprints:" + id;
         } else {
             return id;

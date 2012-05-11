@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
@@ -32,6 +33,39 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
     public static final int DEFAULT_BUFFER_SIZE = 100;
     private final String graphURI;
     private int bufferSize;
+
+    private static final Features FEATURES = new Features();
+
+    static {
+        // intended to be used with TinkerGraph as the endpoint graph
+        FEATURES.allowsDuplicateEdges = true;
+        FEATURES.allowsSelfLoops = true;
+        FEATURES.ignoresSuppliedIds = false;
+        FEATURES.isPersistent = false;
+        FEATURES.isRDFModel = false;
+        FEATURES.supportsVertexIteration = true;
+        FEATURES.supportsEdgeIteration = true;
+        FEATURES.supportsVertexIndex = true;
+        FEATURES.supportsEdgeIndex = true;
+        FEATURES.isWrapper = true;
+        FEATURES.supportsKeyIndices = true;
+        FEATURES.supportsVertexKeyIndex = true;
+        FEATURES.supportsEdgeKeyIndex = true;
+        FEATURES.supportsIndices = true;
+
+        // RexsterGraph will toString anything it can't convert to a standard Rexster type.
+        FEATURES.allowSerializableObjectProperty = true;
+        FEATURES.allowBooleanProperty = true;
+        FEATURES.allowDoubleProperty = true;
+        FEATURES.allowFloatProperty = true;
+        FEATURES.allowIntegerProperty = true;
+        FEATURES.allowPrimitiveArrayProperty = true;
+        FEATURES.allowUniformListProperty = true;
+        FEATURES.allowMixedListProperty = true;
+        FEATURES.allowLongProperty = true;
+        FEATURES.allowMapProperty = true;
+        FEATURES.allowStringProperty = true;
+    }
 
     /**
      * Construct a RexsterGraph with no authentication and default buffer size.
@@ -220,6 +254,10 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
             rawGraph = null;
         }
         return rawGraph;
+    }
+
+    public Features getFeatures() {
+        return FEATURES;
     }
 
     public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
