@@ -37,20 +37,44 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertTrue(graph.getIndexedKeys(Edge.class).contains("since"));
         }
         graph.shutdown();
-        /* if (graph.getFeatures().isPersistent) {
+        if (graph.getFeatures().isPersistent) {
             graph = (KeyIndexableGraph) graphTest.generateGraph();
             if (graph.getFeatures().supportsVertexKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
                 assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
                 assertTrue(graph.getIndexedKeys(Vertex.class).contains("location"));
+                graph.dropKeyIndex("name", Vertex.class);
             }
             if (graph.getFeatures().supportsEdgeKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Edge.class).size(), 2);
                 assertTrue(graph.getIndexedKeys(Edge.class).contains("weight"));
                 assertTrue(graph.getIndexedKeys(Edge.class).contains("since"));
+                graph.dropKeyIndex("weight", Edge.class);
             }
             graph.shutdown();
-        }*/
+
+            graph = (KeyIndexableGraph) graphTest.generateGraph();
+            if (graph.getFeatures().supportsVertexKeyIndex) {
+                assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
+                assertTrue(graph.getIndexedKeys(Vertex.class).contains("location"));
+                graph.dropKeyIndex("location", Vertex.class);
+            }
+            if (graph.getFeatures().supportsEdgeKeyIndex) {
+                assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
+                assertTrue(graph.getIndexedKeys(Edge.class).contains("since"));
+                graph.dropKeyIndex("since", Edge.class);
+            }
+            graph.shutdown();
+            graph = (KeyIndexableGraph) graphTest.generateGraph();
+            if (graph.getFeatures().supportsVertexKeyIndex) {
+                assertEquals(graph.getIndexedKeys(Vertex.class).size(), 0);
+            }
+            if (graph.getFeatures().supportsEdgeKeyIndex) {
+                assertEquals(graph.getIndexedKeys(Edge.class).size(), 0);
+            }
+            graph.shutdown();
+
+        }
 
     }
 
