@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.GraphTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
+import com.tinkerpop.blueprints.pgm.QueryTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
 import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
@@ -46,6 +47,12 @@ public class OrientGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new GraphTestSuite(this));
         printTestPerformance("GraphTestSuite", this.stopWatch());
+    }
+
+    public void testQueryTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new QueryTestSuite(this));
+        printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
     public void testIndexableGraphTestSuite() throws Exception {
