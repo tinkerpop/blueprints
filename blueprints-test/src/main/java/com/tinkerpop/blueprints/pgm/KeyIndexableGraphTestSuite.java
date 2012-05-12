@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
+import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -14,7 +15,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         super(graphTest);
     }
 
-    public void testAutoIndexKeyManagement() {
+    public void testAutoIndexKeyManagementWithPersistence() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexKeyIndex) {
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 0);
@@ -37,6 +38,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertTrue(graph.getIndexedKeys(Edge.class).contains("since"));
         }
         graph.shutdown();
+
         if (graph.getFeatures().isPersistent) {
             graph = (KeyIndexableGraph) graphTest.generateGraph();
             if (graph.getFeatures().supportsVertexKeyIndex) {
@@ -80,7 +82,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
 
     public void testGettingVerticesAndEdgesWithKeyValue() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIteration && graph.getFeatures().supportsVertexKeyIndex) {
+        if (graph.getFeatures().supportsVertexIteration && graph.getFeatures().supportsVertexKeyIndex && graph.getFeatures().isRDFModel) {
             graph.createKeyIndex("name", Vertex.class);
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
@@ -96,9 +98,20 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getVertices("name", "stephen")), 1);
             assertEquals(graph.getVertices("name", "marko").iterator().next(), v1);
             assertEquals(graph.getVertices("name", "stephen").iterator().next(), v2);
+
+            /*assertTrue(graph.getVertices("location", "everywhere") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getVertices("location", "united states") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getVertices("location", 10) instanceof PropertyFilteredIterable);
+            assertTrue(graph.getVertices("blah", "gnar") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getVertices("bloop", "ulapor states") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getVertices("bleep", 50) instanceof PropertyFilteredIterable);*/
+
+            assertFalse(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
+            assertFalse(graph.getVertices("name", "rodriguez") instanceof PropertyFilteredIterable);
+            assertFalse(graph.getVertices("name", 768) instanceof PropertyFilteredIterable);
         }
 
-        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeKeyIndex) {
+        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeKeyIndex && graph.getFeatures().isRDFModel) {
             graph.createKeyIndex("location", Edge.class);
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Edge.class).contains("location"));
@@ -115,13 +128,24 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getEdges("name", "stephen")), 1);
             assertEquals(graph.getEdges("name", "marko").iterator().next(), e1);
             assertEquals(graph.getEdges("name", "stephen").iterator().next(), e2);
+
+            assertFalse(graph.getEdges("location", "everywhere") instanceof PropertyFilteredIterable);
+            assertFalse(graph.getEdges("location", "united states") instanceof PropertyFilteredIterable);
+            assertFalse(graph.getEdges("location", 10) instanceof PropertyFilteredIterable);
+
+            /*assertTrue(graph.getEdges("blah", "gnar") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getEdges("bloop", "ulapor states") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getEdges("bleep", 50) instanceof PropertyFilteredIterable);
+            assertTrue(graph.getEdges("name", "marko") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getEdges("name", "rodriguez") instanceof PropertyFilteredIterable);
+            assertTrue(graph.getEdges("name", 768) instanceof PropertyFilteredIterable);*/
         }
         graph.shutdown();
     }
 
     public void testNoConcurrentModificationException() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsEdgeKeyIndex) {
+        if (graph.getFeatures().supportsEdgeKeyIndex && graph.getFeatures().isRDFModel) {
             graph.createKeyIndex("key", Edge.class);
             for (int i = 0; i < 25; i++) {
                 graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");

@@ -47,6 +47,7 @@ import java.util.Set;
 public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexableGraph, MetaGraph<GraphDatabaseService> {
 
     private GraphDatabaseService rawGraph;
+    private static final String INDEXED_KEYS_POSTFIX = ":indexed_keys";
 
     private final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {
         protected Transaction initialValue() {
@@ -97,7 +98,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public Neo4jGraph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
-        this.loadIndices();
+        this.loadKeyIndices();
     }
 
     public Neo4jGraph(final GraphDatabaseService rawGraph, boolean fresh) {
@@ -123,12 +124,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             if (fresh)
                 this.freshLoad();
 
-            this.loadIndices();
+            this.loadKeyIndices();
 
-        } catch (RuntimeException e) {
-            if (this.rawGraph != null)
-                this.rawGraph.shutdown();
-            throw e;
         } catch (Exception e) {
             if (this.rawGraph != null)
                 this.rawGraph.shutdown();
@@ -136,17 +133,17 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         }
     }
 
-    private void loadIndices() {
-        for (String key : this.getInternalIndexKeys(Vertex.class)) {
+    private void loadKeyIndices() {
+        for (final String key : this.getInternalIndexKeys(Vertex.class)) {
             this.createKeyIndex(key, Vertex.class);
         }
-        for (String key : this.getInternalIndexKeys(Edge.class)) {
+        for (final String key : this.getInternalIndexKeys(Edge.class)) {
             this.createKeyIndex(key, Edge.class);
         }
     }
 
     private void freshLoad() {
-        // remove reference node and create default indices
+        // remove reference node in a single transaction
         try {
             this.startTransaction();
             this.removeVertex(this.getVertex(0));
@@ -157,40 +154,38 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     private <T extends Element> void createInternalIndexKey(final String key, final Class<T> elementClass) {
-        final String propertyName = elementClass.getSimpleName() + ":keys";
+        final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
         final PropertyContainer pc = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
         try {
-            String[] keys = (String[]) pc.getProperty(propertyName);
-            final String[] temp = new String[keys.length + 1];
-            for (int i = 0; i < keys.length; i++) {
-                temp[i] = keys[i];
-            }
-            temp[temp.length - 1] = key;
-            pc.setProperty(propertyName, temp);
+            final String[] keys = (String[]) pc.getProperty(propertyName);
+            final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
+            temp.add(key);
+            pc.setProperty(propertyName, temp.toArray(new String[temp.size()]));
         } catch (Exception e) {
+            // no indexed_keys kernel data property
             pc.setProperty(propertyName, new String[]{key});
 
         }
     }
 
     private <T extends Element> void dropInternalIndexKey(final String key, final Class<T> elementClass) {
-        final String propertyName = elementClass.getSimpleName() + ":keys";
+        final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
         final PropertyContainer pc = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
         try {
-            String[] keys = (String[]) pc.getProperty(propertyName);
-            Set<String> temp = new HashSet<String>(Arrays.asList(keys));
+            final String[] keys = (String[]) pc.getProperty(propertyName);
+            final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
             temp.remove(key);
             pc.setProperty(propertyName, temp.toArray(new String[temp.size()]));
         } catch (Exception e) {
-
+            // no indexed_keys kernel data property
         }
     }
 
     public <T extends Element> Set<String> getInternalIndexKeys(final Class<T> elementClass) {
-        final String propertyName = elementClass.getSimpleName() + ":keys";
+        final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
         final PropertyContainer pc = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
         try {
-            String[] keys = (String[]) pc.getProperty(propertyName);
+            final String[] keys = (String[]) pc.getProperty(propertyName);
             return new HashSet<String>(Arrays.asList(keys));
         } catch (Exception e) {
             return Collections.emptySet();
@@ -228,6 +223,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     /**
+     * {@inheritDoc}
+     * <p/>
      * Note that this method will force a successful closing of the current thread's transaction.
      * As such, once the index is dropped, the operation is committed.
      *
@@ -298,6 +295,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     /**
+     * {@inheritDoc}
+     * <p/>
      * The underlying Neo4j graph does not support this method within a transaction.
      * Calling this method will commit the current transaction successfully and then return the vertex iterable.
      *
@@ -316,6 +315,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     /**
+     * {@inheritDoc}
+     * <p/>
      * The underlying Neo4j graph does not support this method within a transaction.
      * Calling this method will commit the current transaction successfully and then return the edge iterable.
      *
@@ -360,7 +361,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 this.rawGraph.index().getRelationshipAutoIndexer().setEnabled(true);
             this.rawGraph.index().getRelationshipAutoIndexer().startAutoIndexingProperty(key);
         } else {
-            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+            throw new IllegalStateException("The class " + elementClass + " is not indexable");
         }
         this.createInternalIndexKey(key, elementClass);
     }
@@ -375,7 +376,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 return Collections.emptySet();
             return this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndexedProperties();
         } else {
-            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+            throw new IllegalStateException("The class " + elementClass + " is not indexable");
         }
     }
 

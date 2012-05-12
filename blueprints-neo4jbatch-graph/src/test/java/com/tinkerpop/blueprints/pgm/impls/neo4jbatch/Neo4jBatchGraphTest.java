@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReader;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
@@ -52,8 +53,9 @@ public class Neo4jBatchGraphTest extends BaseTest {
         }
         batch.shutdown();
 
+        // native neo4j graph load
+
         final Graph graph = new Neo4jGraph(directory);
-        graph.removeVertex(graph.getVertex(0)); // remove reference node
         assertEquals(count(graph.getVertices()), 10);
 
         assertEquals(count(graph.getEdges()), 9);
@@ -88,8 +90,9 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertNull(batch.getVertex(200000L));
         batch.shutdown();
 
+        // native neo4j graph load
+
         final Graph graph = new Neo4jGraph(directory);
-        graph.removeVertex(graph.getVertex(0)); // remove reference node
         assertEquals(count(graph.getVertices()), ids.size());
         for (final Long id : ids) {
             assertNotNull(graph.getVertex(id));
@@ -119,8 +122,9 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertNull(batch.getVertex(200000L));
         batch.shutdown();
 
+        // native neo4j graph load
+
         final Graph graph = new Neo4jGraph(directory);
-        graph.removeVertex(graph.getVertex(0)); // remove reference node
         assertEquals(count(graph.getVertices()), ids.size());
         assertNotNull(graph.getVertex(100l));
         assertNotNull(graph.getVertex(5l));
@@ -169,10 +173,9 @@ public class Neo4jBatchGraphTest extends BaseTest {
         batch.flushIndices();
         batch.shutdown();
 
-        final Neo4jGraph graph = new Neo4jGraph(directory);
-        graph.createKeyIndex("name", Vertex.class);
-        graph.createKeyIndex("age", Vertex.class);
+        // native neo4j graph load
 
+        final Neo4jGraph graph = new Neo4jGraph(directory);
         assertEquals(count(graph.getIndices()), 1);
 
         assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
@@ -181,8 +184,12 @@ public class Neo4jBatchGraphTest extends BaseTest {
         edgeIndex = graph.getIndex("edgeIdx", Edge.class);
         assertEquals(edgeIndex.getIndexClass(), Edge.class);
 
-        graph.removeVertex(graph.getVertex(0)); // remove reference node
         assertEquals(count(graph.getVertices()), 10);
+
+        assertTrue(graph.getVertices("nothing", 0) instanceof PropertyFilteredIterable);
+        assertTrue(graph.getVertices("blah", "blop") instanceof PropertyFilteredIterable);
+        assertFalse(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable); // key index used
+        assertFalse(graph.getVertices("age", 32) instanceof PropertyFilteredIterable); // key indexed used
 
         for (final Vertex vertex : graph.getVertices()) {
             int age = (Integer) vertex.getProperty("age");
@@ -282,8 +289,9 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         batch.shutdown();
 
+        // native neo4j graph load
+
         Neo4jGraph graph = new Neo4jGraph(directory);
-        graph.removeVertex(graph.getVertex(0)); // remove reference vertex
         assertEquals(count(graph.getVertices()), 10);
         for (final Long id : vertexIds) {
             Vertex vertex = graph.getVertex(id);
@@ -306,7 +314,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
     public void testToStringMethods() {
         final String directory = this.getWorkingDirectory();
         final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
-        System.out.println(batch.createIndex("manual", Vertex.class));
+        System.out.println(batch.createIndex("anIdx", Vertex.class));
         System.out.println(batch.addVertex(null));
         System.out.println(batch.addEdge(null, batch.addVertex(null), batch.addVertex(null), "label"));
         batch.shutdown();
@@ -331,8 +339,9 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertEquals(batch.getVertex(6).getProperty("name"), "peter");
         batch.shutdown();
 
+        // native neo4j graph load
+
         Neo4jGraph graph = new Neo4jGraph(directory);
-        graph.removeVertex(graph.getVertex(0)); // remove reference vertex
         assertEquals(count(graph.getVertices()), 6);
         assertEquals(count(graph.getEdges()), 6);
         assertEquals(count(graph.getVertex("1").getOutEdges()), 3);
@@ -371,6 +380,8 @@ public class Neo4jBatchGraphTest extends BaseTest {
         index.put("name", "marko", a);
         batch.flushIndices();
         batch.shutdown();
+
+        // native neo4j graph load
 
         IndexableGraph graph = new Neo4jGraph(directory);
         Iterator<Vertex> itty = graph.getIndex("testIdx", Vertex.class).query("name", "*rko").iterator();

@@ -20,6 +20,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSetting;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.AutoIndexer;
+import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
@@ -32,13 +33,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
+ * A Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
  * This is a single threaded, non-transactional bulk loader and should not be used for any other reason than for massive initial data loads.
  * <p/>
  * Neo4jBatchGraph is <b>not</b> a completely faithful Blueprints implementation.
  * Many methods throw UnsupportedOperationExceptions and take unique arguments. Be sure to review each method's JavaDoc.
- * The Neo4j "reference node" (vertex 0) is automatically created and, if so desired, must be manually deleted post data insertion.
- * Key indices are not available until after the graph has been shutdown and loaded up using Neo4jGraph.
+ * The Neo4j "reference node" (vertex 0) is automatically created and is not removed until the database is shutdown() (do not add edges to the reference node).
+ * Key indices are not available until after the graph has been shutdown.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -55,6 +56,8 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     protected final Set<String> edgeIndexKeys = new HashSet<String>();
 
     private static final Features FEATURES = new Features();
+
+    private static final String INDEXED_KEYS_POSTFIX = ":indexed_keys";
 
     static {
 
@@ -107,7 +110,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         this.flushIndices();
         this.indexProvider.shutdown();
         this.rawGraph.shutdown();
-        finalizeKeyIndices();
+        removeReferenceNodeAndFinalizeKeyIndices();
     }
 
     /**
@@ -122,8 +125,8 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         }
     }
 
-    private void finalizeKeyIndices() {
-        GraphDatabaseService db = null;
+    private void removeReferenceNodeAndFinalizeKeyIndices() {
+        GraphDatabaseService rawGraphDB = null;
         try {
             GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(this.rawGraph.getStoreDir());
             if (this.vertexIndexKeys.size() > 0)
@@ -131,31 +134,52 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
             if (this.edgeIndexKeys.size() > 0)
                 builder.setConfig(GraphDatabaseSettings.relationship_keys_indexable, edgeIndexKeys.toString().replace("[", "").replace("]", "")).setConfig(GraphDatabaseSettings.relationship_auto_indexing, GraphDatabaseSetting.TRUE);
 
-            db = builder.newGraphDatabase();
-            GlobalGraphOperations graphOperations = GlobalGraphOperations.at(db);
+            rawGraphDB = builder.newGraphDatabase();
+            Transaction tx = rawGraphDB.beginTx();
+
+            try {
+                rawGraphDB.getReferenceNode().delete();
+                tx.success();
+            } catch (Exception e) {
+                tx.failure();
+            } finally {
+                tx.finish();
+            }
+
+            GlobalGraphOperations graphOperations = GlobalGraphOperations.at(rawGraphDB);
             if (this.vertexIndexKeys.size() > 0)
-                updateAutoIndex(db, db.index().getNodeAutoIndexer(), graphOperations.getAllNodes());
+                populateKeyIndices(rawGraphDB, rawGraphDB.index().getNodeAutoIndexer(), graphOperations.getAllNodes(), Vertex.class);
             if (this.edgeIndexKeys.size() > 0)
-                updateAutoIndex(db, db.index().getRelationshipAutoIndexer(), graphOperations.getAllRelationships());
+                populateKeyIndices(rawGraphDB, rawGraphDB.index().getRelationshipAutoIndexer(), graphOperations.getAllRelationships(), Edge.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
         } finally {
-            if (db != null) db.shutdown();
+            if (rawGraphDB != null) rawGraphDB.shutdown();
         }
     }
 
-    private static <T extends PropertyContainer> void updateAutoIndex(final GraphDatabaseService db, final AutoIndexer<T> autoIndexer, final Iterable<T> elements) {
-        if (!autoIndexer.isEnabled()) return;
-        final Set<String> properties = autoIndexer.getAutoIndexedProperties();
-        Transaction tx = db.beginTx();
+    private static <T extends PropertyContainer> void populateKeyIndices(final GraphDatabaseService rawGraphDB, final AutoIndexer<T> rawAutoIndexer, final Iterable<T> rawElements, final Class elementClass) {
+        if (!rawAutoIndexer.isEnabled())
+            return;
+
+
+        final Set<String> properties = rawAutoIndexer.getAutoIndexedProperties();
+        Transaction tx = rawGraphDB.beginTx();
+
+        final PropertyContainer kernel = ((AbstractGraphDatabase) rawGraphDB).getKernelData().properties();
+        kernel.setProperty(elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX, properties.toArray(new String[properties.size()]));
+
         int count = 0;
-        for (final PropertyContainer pc : elements) {
+        for (final PropertyContainer pc : rawElements) {
             for (final String property : properties) {
                 if (!pc.hasProperty(property)) continue;
                 pc.setProperty(property, pc.getProperty(property));
                 count++;
-                if (count % 10000 == 0) {
+                if (count >= 10000) {
+                    count = 0;
                     tx.success();
                     tx.finish();
-                    tx = db.beginTx();
+                    tx = rawGraphDB.beginTx();
                 }
             }
         }
@@ -172,6 +196,8 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     }
 
     /**
+     * {@inheritDoc}
+     * <p/>
      * The object id can either be null, a long id, or a Map&lt;String,Object&gt;.
      * If null, then an internal long is provided on the construction of the vertex.
      * If a long id is provided, then the vertex is constructed with that long id.
@@ -256,6 +282,8 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     }
 
     /**
+     * {@inheritDoc}
+     * <p/>
      * The object id must be a Map&lt;String,Object&gt; or null.
      * The id is the properties written when the vertex is created.
      * While it is possible to Edge.setProperty(), this method is faster.
