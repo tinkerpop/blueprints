@@ -22,16 +22,27 @@ public class EventTransactionalGraph<T extends TransactionalGraph> extends Event
 
     @Override
     public void stopTransaction(Conclusion conclusion) {
+
+        // failure in this context doesn't mean Conclusion.FAILURE.  it means that the
+        // state of closing out the transaction failed (in the setting of either one of
+        // the available conclusions.  in other words, an exception occurred by calling
+        // success/failure or a finishing of the transaction in any way.  if the transaction
+        // was not a failure in that sense then events are fired (if success) and the buffer
+        // is reset.
+        boolean transactionFailure = false;
         try {
             this.baseGraph.stopTransaction(conclusion);
-            if (conclusion == Conclusion.SUCCESS) {
-                trigger.fireEventBuffer();
-            }
-
-            this.trigger.resetEventBuffer();
-
         } catch (RuntimeException re) {
+            transactionFailure = true;
             throw re;
+        } finally {
+            if (!transactionFailure) {
+                if (conclusion == Conclusion.SUCCESS) {
+                    trigger.fireEventBuffer();
+                }
+
+                this.trigger.resetEventBuffer();
+            }
         }
     }
 }

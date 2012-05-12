@@ -184,8 +184,8 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
             // TODO: hmmmmmm??
             this.trigger.fireEventBuffer();
             this.trigger.resetEventBuffer();
-        } catch (RuntimeException re) {
-            throw re;
+        } catch (Exception re) {
+
         }
     }
 
