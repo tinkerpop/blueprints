@@ -73,34 +73,34 @@ public class GraphSONReader {
      * Input the JSON stream data into the graph.
      * More control over how data is streamed is provided by this method.
      *
-     * @param graph           the graph to populate with the JSON data
+     * @param inputGraph      the graph to populate with the JSON data
      * @param jsonInputStream an InputStream of JSON data
      * @param bufferSize      the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
-    public static void inputGraph(Graph graph, final InputStream jsonInputStream, int bufferSize) throws IOException {
+    public static void inputGraph(final Graph inputGraph, final InputStream jsonInputStream, int bufferSize) throws IOException {
         boolean hasEmbeddedTypes = false;
-        JsonFactory jsonFactory = new MappingJsonFactory();
-        JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
+        final JsonFactory jsonFactory = new MappingJsonFactory();
+        final JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
-        if (graph instanceof TransactionalGraph) {
-            graph = new BufferGraph((TransactionalGraph) graph, bufferSize);
-        }
-        Map<String, Object> vertexIdMap = new HashMap<String, Object>();
+        // if this is a transactional graph then we're buffering
+        final Graph graph = inputGraph instanceof TransactionalGraph ?
+                new BufferGraph((TransactionalGraph) inputGraph, bufferSize) : inputGraph;
+        final Map<String, Object> vertexIdMap = new HashMap<String, Object>();
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
-            String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();
+            final String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();
             if (fieldname.equals(GraphSONTokens.EMBEDDED_TYPES)) {
                 jp.nextToken();
                 hasEmbeddedTypes = jp.getBooleanValue();
             } else if (fieldname.equals(GraphSONTokens.VERTICES)) {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
-                    JsonNode node = jp.readValueAsTree();
-                    Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
+                    final JsonNode node = jp.readValueAsTree();
+                    final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
-                    String vertexId = node.get(GraphSONTokens._ID).getValueAsText();
-                    Vertex v = graph.addVertex(vertexId);
+                    final String vertexId = node.get(GraphSONTokens._ID).getValueAsText();
+                    final Vertex v = graph.addVertex(vertexId);
                     vertexIdMap.put(vertexId, v.getId());
 
                     for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -110,18 +110,18 @@ public class GraphSONReader {
             } else if (fieldname.equals(GraphSONTokens.EDGES)) {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
-                    JsonNode node = jp.readValueAsTree();
-                    Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
+                    final JsonNode node = jp.readValueAsTree();
+                    final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
-                    String edgeId = node.get(GraphSONTokens._ID).getValueAsText();
-                    Object inVertexKey = vertexIdMap.get(node.get(GraphSONTokens._IN_V).getValueAsText());
-                    Object outVertexKey = vertexIdMap.get(node.get(GraphSONTokens._OUT_V).getValueAsText());
-                    String label = node.get(GraphSONTokens._LABEL).getValueAsText();
+                    final String edgeId = node.get(GraphSONTokens._ID).getValueAsText();
+                    final Object inVertexKey = vertexIdMap.get(node.get(GraphSONTokens._IN_V).getValueAsText());
+                    final Object outVertexKey = vertexIdMap.get(node.get(GraphSONTokens._OUT_V).getValueAsText());
+                    final String label = node.get(GraphSONTokens._LABEL).getValueAsText();
 
-                    Vertex inV = graph.getVertex(inVertexKey);
-                    Vertex outV = graph.getVertex(outVertexKey);
+                    final Vertex inV = graph.getVertex(inVertexKey);
+                    final Vertex outV = graph.getVertex(outVertexKey);
 
-                    Edge e = graph.addEdge(edgeId, outV, inV, label);
+                    final Edge e = graph.addEdge(edgeId, outV, inV, label);
 
                     for (Map.Entry<String, Object> entry : props.entrySet()) {
                         e.setProperty(entry.getKey(), entry.getValue());
@@ -138,11 +138,11 @@ public class GraphSONReader {
     }
 
     private static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        final  Map<String, Object> map = new HashMap<String, Object>();
 
-        Iterator<Map.Entry<String, JsonNode>> iterator = node.getFields();
+        final Iterator<Map.Entry<String, JsonNode>> iterator = node.getFields();
         while (iterator.hasNext()) {
-            Map.Entry<String, JsonNode> entry = iterator.next();
+            final Map.Entry<String, JsonNode> entry = iterator.next();
 
             if (!ignoreReservedKeys || (ignoreReservedKeys && !isReservedKey(entry.getKey()))) {
                 map.put(entry.getKey(), readProperty(entry.getValue(), hasEmbeddedTypes));
@@ -158,7 +158,7 @@ public class GraphSONReader {
     }
 
     private static Object readProperty(final JsonNode node, final boolean hasEmbeddedTypes) {
-        Object propertyValue;
+        final Object propertyValue;
 
         if (hasEmbeddedTypes) {
             if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_UNKNOWN)) {
@@ -208,7 +208,7 @@ public class GraphSONReader {
     }
 
     private static List readProperties(final Iterator<JsonNode> listOfNodes, final boolean hasEmbeddedTypes) {
-        List array = new ArrayList();
+        final List array = new ArrayList();
 
         while (listOfNodes.hasNext()) {
             array.add(readProperty(listOfNodes.next(), hasEmbeddedTypes));

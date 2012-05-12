@@ -85,19 +85,19 @@ public class GraphMLReader {
      * Input the GraphML stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
-     * @param graph              the graph to populate with the GraphML data
+     * @param inputGraph         the graph to populate with the GraphML data
      * @param graphMLInputStream an InputStream of GraphML data
      * @throws IOException thrown when the GraphML data is not correctly formatted
      */
-    public static void inputGraph(final Graph graph, final InputStream graphMLInputStream) throws IOException {
-        GraphMLReader.inputGraph(graph, graphMLInputStream, 1000, null, null, null);
+    public static void inputGraph(final Graph inputGraph, final InputStream graphMLInputStream) throws IOException {
+        GraphMLReader.inputGraph(inputGraph, graphMLInputStream, 1000, null, null, null);
     }
 
     /**
      * Input the GraphML stream data into the graph.
      * More control over how data is streamed is provided by this method.
      *
-     * @param graph              the graph to populate with the GraphML data
+     * @param inputGraph         the graph to populate with the GraphML data
      * @param graphMLInputStream an InputStream of GraphML data
      * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @param vertexIdKey        if the id of a vertex is a &lt;data/&gt; property, fetch it from the data property.
@@ -105,16 +105,15 @@ public class GraphMLReader {
      * @param edgeLabelKey       if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
      * @throws IOException thrown when the GraphML data is not correctly formatted
      */
-    public static void inputGraph(Graph graph, final InputStream graphMLInputStream, int bufferSize, String vertexIdKey, String edgeIdKey, String edgeLabelKey) throws IOException {
+    public static void inputGraph(final Graph inputGraph, final InputStream graphMLInputStream, int bufferSize, String vertexIdKey, String edgeIdKey, String edgeLabelKey) throws IOException {
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 
         try {
             XMLStreamReader reader = inputFactory.createXMLStreamReader(graphMLInputStream);
 
-            if (graph instanceof TransactionalGraph) {
-                graph = new BufferGraph((TransactionalGraph) graph, bufferSize);
-            }
+            final Graph graph = inputGraph instanceof TransactionalGraph ?
+                    new BufferGraph((TransactionalGraph) inputGraph, bufferSize) : inputGraph;
 
             Map<String, String> keyIdMap = new HashMap<String, String>();
             Map<String, String> keyTypesMaps = new HashMap<String, String>();
