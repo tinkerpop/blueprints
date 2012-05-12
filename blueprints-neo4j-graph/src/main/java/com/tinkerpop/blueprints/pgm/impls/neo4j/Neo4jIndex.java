@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Parameter;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import org.neo4j.graphdb.Node;
@@ -55,7 +54,9 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public CloseableIterable<T> get(final String key, final Object value) {
-        this.graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        // TODO: Necessary for Neo4j index tx bug and passing IndexableGraph and Index test suites
+        // TODO: When releasing, be sure this is commented out
+        // this.graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
             return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph);
