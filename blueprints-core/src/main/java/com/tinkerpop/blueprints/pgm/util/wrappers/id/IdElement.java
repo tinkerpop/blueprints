@@ -24,14 +24,10 @@ public abstract class IdElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        Set<String> keys = baseElement.getPropertyKeys();
-
-        // TODO: creating a new set for each call is expensive...
-        // but so is maintaining a second set or doing comparisons on each read from the set
-        Set<String> s = new HashSet<String>();
+        final Set<String> keys = baseElement.getPropertyKeys();
+        final Set<String> s = new HashSet<String>();
         s.addAll(keys);
         s.remove(IdGraph.ID);
-
         return s;
     }
 
@@ -53,5 +49,9 @@ public abstract class IdElement implements Element {
 
     public Object getId() {
         return baseElement.getProperty(IdGraph.ID);
+    }
+
+    public int hashCode() {
+        return this.baseElement.hashCode();
     }
 }

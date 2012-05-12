@@ -44,9 +44,4 @@ public class IdVertex extends IdElement implements Vertex {
     public boolean equals(final Object other) {
         return other instanceof IdVertex && ((Vertex) other).getId().equals(getId());
     }
-
-    @Override
-    public int hashCode() {
-        return 274703 + getId().hashCode();
-    }
 }

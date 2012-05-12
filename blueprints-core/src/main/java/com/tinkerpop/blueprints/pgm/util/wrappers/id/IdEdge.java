@@ -42,9 +42,4 @@ public class IdEdge extends IdElement implements Edge {
     public boolean equals(final Object other) {
         return other instanceof IdEdge && ((Edge) other).getId().equals(getId());
     }
-
-    @Override
-    public int hashCode() {
-        return 808068 + getId().hashCode();
-    }
 }
