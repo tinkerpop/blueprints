@@ -1,10 +1,9 @@
-package com.tinkerpop.blueprints.pgm.util.wrappers.eventtransactional.util;
+package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventVertex;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.eventtransactional.EventTransactionalVertex;
-import com.tinkerpop.blueprints.pgm.util.wrappers.eventtransactional.event.Event;
 
 import java.util.Iterator;
 import java.util.List;
@@ -14,18 +13,18 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventTransactionalVertexIterable implements CloseableIterable<Vertex> {
+public class EventVertexIterable implements CloseableIterable<Vertex> {
 
     private final Iterable<Vertex> iterable;
     private final List<GraphChangedListener> graphChangedListeners;
-    private final ThreadLocal<List<Event>> eventBuffer;
 
-    public EventTransactionalVertexIterable(final Iterable<Vertex> iterable,
-                                            final List<GraphChangedListener> graphChangedListeners,
-                                            final ThreadLocal<List<Event>> eventBuffer) {
+    private final EventTrigger trigger;
+
+    public EventVertexIterable(final Iterable<Vertex> iterable, final List<GraphChangedListener> graphChangedListeners,
+                               final EventTrigger trigger) {
         this.iterable = iterable;
         this.graphChangedListeners = graphChangedListeners;
-        this.eventBuffer = eventBuffer;
+        this.trigger = trigger;
     }
 
     public void close() {
@@ -43,7 +42,7 @@ public class EventTransactionalVertexIterable implements CloseableIterable<Verte
             }
 
             public Vertex next() {
-                return new EventTransactionalVertex(this.itty.next(), graphChangedListeners, eventBuffer);
+                return new EventVertex(this.itty.next(), graphChangedListeners, trigger);
             }
 
             public boolean hasNext() {

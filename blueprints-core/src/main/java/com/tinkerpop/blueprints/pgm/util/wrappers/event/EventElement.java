@@ -3,7 +3,11 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.EdgePropertyChangedEvent;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.EdgePropertyRemovedEvent;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.VertexPropertyChangedEvent;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.VertexPropertyRemovedEvent;
 
 import java.util.List;
 import java.util.Set;
@@ -15,36 +19,32 @@ import java.util.Set;
  * @author Stephen Mallette
  */
 public class EventElement implements Element {
+    protected final EventTrigger trigger;
+
     protected final Element rawElement;
     protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventElement(final Element rawElement, final List<GraphChangedListener> graphChangedListeners) {
+    public EventElement(final Element rawElement, final List<GraphChangedListener> graphChangedListeners,
+                        final EventTrigger trigger) {
         this.rawElement = rawElement;
         this.graphChangedListeners = graphChangedListeners;
+        this.trigger = trigger;
     }
 
     protected void onVertexPropertyChanged(final Vertex vertex, final String key, final Object newValue) {
-        for (GraphChangedListener listener : this.graphChangedListeners) {
-            listener.vertexPropertyChanged(vertex, key, newValue);
-        }
+        this.trigger.addEvent(new VertexPropertyChangedEvent(vertex, key, newValue));
     }
 
-    protected void onEdgePropertyChanged(final Edge edge, final String key, final Object removedValue) {
-        for (GraphChangedListener listener : this.graphChangedListeners) {
-            listener.edgePropertyChanged(edge, key, removedValue);
-        }
+    protected void onEdgePropertyChanged(final Edge edge, final String key, final Object newValue) {
+        this.trigger.addEvent(new EdgePropertyChangedEvent(edge, key, newValue));
     }
 
     protected void onVertexPropertyRemoved(final Vertex vertex, final String key, final Object newValue) {
-        for (GraphChangedListener listener : this.graphChangedListeners) {
-            listener.vertexPropertyRemoved(vertex, key, newValue);
-        }
+        this.trigger.addEvent(new VertexPropertyRemovedEvent(vertex, key, newValue));
     }
 
     protected void onEdgePropertyRemoved(final Edge edge, final String key, final Object removedValue) {
-        for (GraphChangedListener listener : this.graphChangedListeners) {
-            listener.edgePropertyRemoved(edge, key, removedValue);
-        }
+        this.trigger.addEvent(new EdgePropertyRemovedEvent(edge, key, removedValue));
     }
 
     public Set<String> getPropertyKeys() {

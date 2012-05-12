@@ -14,16 +14,17 @@ import java.util.List;
  */
 public class EventEdge extends EventElement implements Edge {
 
-    public EventEdge(final Edge rawEdge, final List<GraphChangedListener> graphChangedListeners) {
-        super(rawEdge, graphChangedListeners);
+    public EventEdge(final Edge rawEdge, final List<GraphChangedListener> graphChangedListeners,
+                     final EventTrigger trigger) {
+        super(rawEdge, graphChangedListeners, trigger);
     }
 
     public Vertex getOutVertex() {
-        return new EventVertex(((Edge) this.rawElement).getOutVertex(), this.graphChangedListeners);
+        return new EventVertex(this.getBaseEdge().getOutVertex(), this.graphChangedListeners, this.trigger);
     }
 
     public Vertex getInVertex() {
-        return new EventVertex(((Edge) this.rawElement).getInVertex(), this.graphChangedListeners);
+        return new EventVertex(this.getBaseEdge().getInVertex(), this.graphChangedListeners, this.trigger);
     }
 
     public String getLabel() {

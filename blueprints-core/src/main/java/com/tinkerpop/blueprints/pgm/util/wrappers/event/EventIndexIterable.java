@@ -1,10 +1,9 @@
-package com.tinkerpop.blueprints.pgm.util.wrappers.eventtransactional.util;
+package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventIndex;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.eventtransactional.EventTransactionalIndex;
-import com.tinkerpop.blueprints.pgm.util.wrappers.eventtransactional.event.Event;
 
 import java.util.Iterator;
 import java.util.List;
@@ -14,18 +13,18 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventTransactionalIndexIterable<T extends Element> implements Iterable<Index<T>> {
+public class EventIndexIterable<T extends Element> implements Iterable<Index<T>> {
 
     private final Iterable<Index<T>> iterable;
     private final List<GraphChangedListener> graphChangedListeners;
-    private final ThreadLocal<List<Event>> eventBuffer;
+    
+    private final EventTrigger trigger;
 
-    public EventTransactionalIndexIterable(final Iterable<Index<T>> iterable,
-                                           final List<GraphChangedListener> graphChangedListeners,
-                                           final ThreadLocal<List<Event>> eventBuffer) {
+    public EventIndexIterable(final Iterable<Index<T>> iterable, List<GraphChangedListener> graphChangedListeners,
+                              final EventTrigger trigger) {
         this.iterable = iterable;
         this.graphChangedListeners = graphChangedListeners;
-        this.eventBuffer = eventBuffer;
+        this.trigger = trigger;
     }
 
     public Iterator<Index<T>> iterator() {
@@ -37,7 +36,7 @@ public class EventTransactionalIndexIterable<T extends Element> implements Itera
             }
 
             public Index<T> next() {
-                return new EventTransactionalIndex<T>(this.itty.next(), graphChangedListeners, eventBuffer);
+                return new EventIndex<T>(this.itty.next(), graphChangedListeners, trigger);
             }
 
             public boolean hasNext() {

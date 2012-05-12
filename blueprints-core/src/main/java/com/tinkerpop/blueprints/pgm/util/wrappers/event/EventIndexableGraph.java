@@ -6,9 +6,6 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexIterable;
-
-import java.util.Set;
 
 /**
  * EventIndexableGraph is merely a proxy to index methods exposing EventGraph methods in the "evented" way. Like the
@@ -29,7 +26,7 @@ public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T>
     }
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        return new EventIndex<T>(this.getBaseGraph().createIndex(indexName, indexClass, indexParameters), this.graphChangedListeners);
+        return new EventIndex<T>(this.getBaseGraph().createIndex(indexName, indexClass, indexParameters), this.graphChangedListeners, this.trigger);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
@@ -37,10 +34,10 @@ public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T>
         if (null == index)
             return null;
         else
-            return new EventIndex<T>(index, this.graphChangedListeners);
+            return new EventIndex<T>(index, this.graphChangedListeners, this.trigger);
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new EventIndexIterable(this.baseGraph.getIndices(), this.graphChangedListeners);
+        return new EventIndexIterable(this.baseGraph.getIndices(), this.graphChangedListeners, this.trigger);
     }
 }

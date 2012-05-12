@@ -1,9 +1,10 @@
-package com.tinkerpop.blueprints.pgm.util.wrappers.event.util;
+package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventEdge;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
+import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventTrigger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,9 +19,13 @@ public class EventEdgeIterable implements CloseableIterable<Edge> {
     private final Iterable<Edge> iterable;
     private final List<GraphChangedListener> graphChangedListeners;
 
-    public EventEdgeIterable(final Iterable<Edge> iterable, final List<GraphChangedListener> graphChangedListeners) {
+    private final EventTrigger trigger;
+
+    public EventEdgeIterable(final Iterable<Edge> iterable, final List<GraphChangedListener> graphChangedListeners,
+                             final EventTrigger trigger) {
         this.iterable = iterable;
         this.graphChangedListeners = graphChangedListeners;
+        this.trigger = trigger;
     }
 
     public Iterator<Edge> iterator() {
@@ -32,7 +37,7 @@ public class EventEdgeIterable implements CloseableIterable<Edge> {
             }
 
             public Edge next() {
-                return new EventEdge(this.itty.next(), graphChangedListeners);
+                return new EventEdge(this.itty.next(), graphChangedListeners, trigger);
             }
 
             public boolean hasNext() {
