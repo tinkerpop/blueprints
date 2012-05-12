@@ -138,14 +138,12 @@ public class IdGraphTest extends GraphTest {
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String doTest = System.getProperty("testIdGraph");
-        if (doTest == null || doTest.equals("true")) {
-            for (Method method : testSuite.getClass().getDeclaredMethods()) {
-                if (method.getName().startsWith("test")) {
-                    System.out.println("Testing " + method.getName() + "...");
-                    method.invoke(testSuite);
-                }
+        for (Method method : testSuite.getClass().getDeclaredMethods()) {
+            if (method.getName().startsWith("test")) {
+                System.out.println("Testing " + method.getName() + "...");
+                method.invoke(testSuite);
             }
         }
     }
+
 }
