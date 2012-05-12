@@ -6,12 +6,14 @@ import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
+import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdEdgeIterable;
+import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdVertexIterable;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 /**
  * A KeyIndexableGraph implementation which wraps another KeyIndexableGraph implementation,
@@ -19,21 +21,22 @@ import java.util.logging.Logger;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdGraph implements KeyIndexableGraph {
-    private static final Logger LOGGER = Logger.getLogger(IdGraph.class.getName());
+public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, WrapperGraph<T> {
 
     // Note: using "__id" instead of "_id" avoids collision with Rexster's "_id"
     public static final String ID = "__id";
 
-    private final KeyIndexableGraph baseGraph;
+    private final T baseGraph;
     private final IdFactory idFactory;
+
+    private final Features features;
 
     /**
      * Adds custom ID functionality to the given graph.
      *
      * @param baseGraph the base graph which does not permit custom element IDs
      */
-    public IdGraph(final KeyIndexableGraph baseGraph) {
+    public IdGraph(final T baseGraph) {
         this(baseGraph, null);
     }
 
@@ -44,9 +47,11 @@ public class IdGraph implements KeyIndexableGraph {
      * @param idFactory a factory for new element IDs.
      *                  When vertices or edges are created using null IDs, the actual IDs are chosen based on this factory.
      */
-    public IdGraph(final KeyIndexableGraph baseGraph,
-                   final IdFactory idFactory) {
+    public IdGraph(final T baseGraph, final IdFactory idFactory) {
         this.baseGraph = baseGraph;
+        this.features = this.baseGraph.getFeatures().copyFeatures();
+        features.isWrapper = true;
+        features.ignoresSuppliedIds = false;
 
         this.idFactory = null == idFactory
                 ? new IdFactory() {
@@ -69,27 +74,26 @@ public class IdGraph implements KeyIndexableGraph {
     }
 
     public Features getFeatures() {
-        return baseGraph.getFeatures();
+        return features;
     }
 
-    public Vertex addVertex(Object id) {
+    public Vertex addVertex(final Object id) {
         if (null != id && null != getVertex(id)) {
-            throw new IllegalArgumentException("vertex with given id already exists: '" + id + "'");
+            throw new IllegalArgumentException("Vertex with given id already exists: '" + id + "'");
         }
 
-        Vertex base = baseGraph.addVertex(null);
-
+        final Vertex base = baseGraph.addVertex(null);
         base.setProperty(ID, null == id ? idFactory.createId() : id);
         return new IdVertex(base);
     }
 
-    public Vertex getVertex(Object id) {
+    public Vertex getVertex(final Object id) {
         if (null == id) {
             throw new IllegalArgumentException("Element identifier cannot be null");
         }
 
-        Iterable<Vertex> i = baseGraph.getVertices(ID, id);
-        Iterator<Vertex> iter = i.iterator();
+        final Iterable<Vertex> i = baseGraph.getVertices(ID, id);
+        final Iterator<Vertex> iter = i.iterator();
         if (!iter.hasNext()) {
             return null;
         } else {
@@ -103,40 +107,39 @@ public class IdGraph implements KeyIndexableGraph {
         }
     }
 
-    public void removeVertex(Vertex vertex) {
+    public void removeVertex(final Vertex vertex) {
         verifyNativeElement(vertex);
-
-        baseGraph.removeVertex(((IdVertex) vertex).getBase());
+        baseGraph.removeVertex(((IdVertex) vertex).getBaseVertex());
     }
 
     public Iterable<Vertex> getVertices() {
         return new IdVertexIterable(baseGraph.getVertices());
     }
 
-    public Iterable<Vertex> getVertices(String key, Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         if (key.equals(ID)) {
-            throw new IllegalArgumentException("index key '" + ID + "' is reserved by IdGraph");
+            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
             return new IdVertexIterable(baseGraph.getVertices(key, value));
         }
     }
 
-    public Edge addEdge(Object id, Vertex v1, Vertex v2, String s) {
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         if (null != id && null != getEdge(id)) {
-            throw new IllegalArgumentException("edge with given id already exists: '" + id + "'");
+            throw new IllegalArgumentException("Edge with given id already exists: " + id);
         }
 
-        verifyNativeElement(v1);
-        verifyNativeElement(v2);
+        verifyNativeElement(outVertex);
+        verifyNativeElement(inVertex);
 
-        Edge e = baseGraph.addEdge(null, ((IdVertex) v1).getBase(), ((IdVertex) v2).getBase(), s);
+        Edge e = baseGraph.addEdge(null, ((IdVertex) outVertex).getBaseVertex(), ((IdVertex) inVertex).getBaseVertex(), label);
 
         e.setProperty(ID, null == id ? idFactory.createId() : id);
 
         return new IdEdge(e);
     }
 
-    public Edge getEdge(Object id) {
+    public Edge getEdge(final Object id) {
         if (null == id) {
             throw new IllegalArgumentException("Element identifier cannot be null");
         }
@@ -149,14 +152,14 @@ public class IdGraph implements KeyIndexableGraph {
             Edge e = iter.next();
 
             if (iter.hasNext()) {
-                throw new IllegalStateException("multiple edges exist with id '" + id + "'");
+                throw new IllegalStateException("Multiple edges exist with id " + id);
             }
 
             return new IdEdge(e);
         }
     }
 
-    public void removeEdge(Edge edge) {
+    public void removeEdge(final Edge edge) {
         verifyNativeElement(edge);
 
         baseGraph.removeEdge(((IdEdge) edge).getBase());
@@ -166,9 +169,9 @@ public class IdGraph implements KeyIndexableGraph {
         return new IdEdgeIterable(baseGraph.getEdges());
     }
 
-    public Iterable<Edge> getEdges(String key, Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         if (key.equals(ID)) {
-            throw new IllegalArgumentException("index key '" + ID + "' is reserved by IdGraph");
+            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
             return new IdEdgeIterable(baseGraph.getEdges(key, value));
         }
@@ -180,36 +183,40 @@ public class IdGraph implements KeyIndexableGraph {
 
     private static void verifyNativeElement(final Element e) {
         if (!(e instanceof IdElement)) {
-            throw new IllegalArgumentException("given element was not created in this graph");
+            throw new IllegalArgumentException("Given element was not created in this graph");
         }
     }
 
     @Override
     public String toString() {
-        return StringFactory.graphString(this, "base graph: " + baseGraph.toString());
+        return StringFactory.graphString(this, this.baseGraph.toString());
     }
 
-    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
         if (key.equals(ID)) {
-            throw new IllegalArgumentException("index key '" + ID + "' is reserved by IdGraph");
+            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
             baseGraph.dropKeyIndex(key, elementClass);
         }
     }
 
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
         if (key.equals(ID)) {
-            throw new IllegalArgumentException("index key '" + ID + "' is reserved by IdGraph");
+            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
             baseGraph.createKeyIndex(key, elementClass);
         }
     }
 
-    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        Set<String> keys = new HashSet<String>();
+    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+        final Set<String> keys = new HashSet<String>();
         keys.addAll(baseGraph.getIndexedKeys(elementClass));
         keys.remove(ID);
         return keys;
+    }
+
+    public T getBaseGraph() {
+        return this.baseGraph;
     }
 
     /**
@@ -217,9 +224,5 @@ public class IdGraph implements KeyIndexableGraph {
      */
     public static interface IdFactory {
         Object createId();
-    }
-
-    public static void main(final String[] args) throws Exception {
-        System.out.println(UUID.randomUUID().toString());
     }
 }

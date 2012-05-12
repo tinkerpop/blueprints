@@ -4,25 +4,27 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
+import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdEdgeIterable;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-class IdVertex extends IdElement implements Vertex {
-    public IdVertex(Vertex base) {
-        super(base);
+public class IdVertex extends IdElement implements Vertex {
+
+    public IdVertex(final Vertex baseVertex) {
+        super(baseVertex);
     }
 
-    public Vertex getBase() {
-        return (Vertex) base;
+    public Vertex getBaseVertex() {
+        return (Vertex) this.baseElement;
     }
 
-    public Iterable<Edge> getOutEdges(String... filters) {
-        return new IdEdgeIterable(((Vertex) base).getOutEdges(filters));
+    public Iterable<Edge> getOutEdges(final String... filters) {
+        return new IdEdgeIterable(((Vertex) this.baseElement).getOutEdges(filters));
     }
 
-    public Iterable<Edge> getInEdges(String... filters) {
-        return new IdEdgeIterable(((Vertex) base).getInEdges(filters));
+    public Iterable<Edge> getInEdges(final String... filters) {
+        return new IdEdgeIterable(((Vertex) this.baseElement).getInEdges(filters));
     }
 
     @Override
@@ -31,9 +33,8 @@ class IdVertex extends IdElement implements Vertex {
     }
 
     @Override
-    public boolean equals(Object other) {
-        return other instanceof IdVertex
-                && ((Vertex) other).getId().equals(getId());
+    public boolean equals(final Object other) {
+        return other instanceof IdVertex && ((Vertex) other).getId().equals(getId());
     }
 
     @Override

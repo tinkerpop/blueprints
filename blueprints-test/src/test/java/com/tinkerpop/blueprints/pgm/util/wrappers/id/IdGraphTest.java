@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.id;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Graph;
@@ -13,14 +12,10 @@ import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -28,31 +23,8 @@ import java.util.Set;
  */
 public class IdGraphTest extends GraphTest {
 
-    public void testTrue() {
-        assertTrue(true);
-    }
-    private KeyIndexableGraph base;
-    IdGraph graph;
-
-    public IdGraphTest() {
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        base = new TinkerGraph();
-        graph = new IdGraph(base);
-
-        // Note: this won't be necessary if/when TinkerGraph instances set isPersistent dynamically
-        graph.getFeatures().isPersistent = false;
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        base.shutdown();
-    }
-
-    @Test
     public void testElementClasses() throws Exception {
+        Graph graph = this.generateGraph();
         Vertex v1 = graph.addVertex(null);
         Vertex v2 = graph.addVertex(null);
         Edge e = graph.addEdge(null, v1, v2, "knows");
@@ -78,23 +50,20 @@ public class IdGraphTest extends GraphTest {
         while (edges.hasNext()) {
             assertTrue(edges.next() instanceof IdEdge);
         }
+        graph.shutdown();
     }
 
-    /*
-    @Test
+
     public void testIdIndicesExist() throws Exception {
-        Index<Vertex> vertexIds = base.getIndex(IdGraph.VERTEX_IDS, Vertex.class);
-        Index<Edge> edgeIds = base.getIndex(IdGraph.EDGE_IDS, Edge.class);
+        KeyIndexableGraph graph = (KeyIndexableGraph) generateGraph();
+        graph = (KeyIndexableGraph) ((WrapperGraph) graph).getBaseGraph();
+        assertTrue(graph.getIndexedKeys(Vertex.class).contains(IdGraph.ID));
+        assertTrue(graph.getIndexedKeys(Edge.class).contains(IdGraph.ID));
+        graph.shutdown();
+    }
 
-        assertNotNull(vertexIds);
-        assertNotNull(edgeIds);
-
-        assertNull(graph.getIndex(IdGraph.VERTEX_IDS, Vertex.class));
-        assertNull(graph.getIndex(IdGraph.EDGE_IDS, Edge.class));
-    }*/
-
-    @Test
     public void testDefaultIdFactory() throws Exception {
+        Graph graph = this.generateGraph();
         Vertex v = graph.addVertex(null);
         String id = (String) v.getId();
 
@@ -107,80 +76,19 @@ public class IdGraphTest extends GraphTest {
         id = (String) e.getId();
         assertEquals(36, id.length());
         assertEquals(5, id.split("-").length);
+        graph.shutdown();
     }
 
-    @Test
+
     public void testAddVertexWithSpecifiedId() throws Exception {
+        Graph graph = this.generateGraph();
         Vertex v = graph.addVertex("forty-two");
-
         assertEquals("forty-two", v.getId());
+        graph.shutdown();
     }
 
-    /*
-    @Test
-    public void testIndices() throws Exception {
-        Set<String> nameKeys = new HashSet<String>();
-        nameKeys.add("name");
-
-        graph.createAutomaticIndex("names", Vertex.class, nameKeys);
-        graph.createIndex("weights", Edge.class);
-
-        Iterable<Index<? extends Element>> indices = graph.getIndices();
-        int count = 0;
-        for (Index<? extends Element> i : indices) {
-            String name = i.getIndexName();
-            Class c = i.getIndexClass();
-            Index.Type t = i.getIndexType();
-
-            if (name.equals("names")) {
-                assertEquals(Index.Type.AUTOMATIC, t);
-                assertEquals(Vertex.class, c);
-                Set<String> keys = ((AutomaticIndex) i).getAutoIndexKeys();
-                assertEquals(1, keys.size());
-                assertTrue(keys.contains("name"));
-            } else if (name.equals("weights")) {
-                assertEquals(Index.Type.MANUAL, t);
-                assertEquals(Edge.class, c);
-            } else if (!name.equals("edges") && !name.equals("vertices")) {
-                fail("unexpected index: " + name);
-            }
-
-            count++;
-        }
-        assertEquals(4, count);
-
-        AutomaticIndex<Vertex> names = (AutomaticIndex<Vertex>) graph.getIndex("names", Vertex.class);
-        Index<Edge> weights = graph.getIndex("weights", Edge.class);
-
-        Vertex v1 = graph.addVertex(null);
-        v1.setProperty("name", "Arthur");
-
-        Vertex v2 = graph.addVertex(null);
-        v2.setProperty("name", "Ford");
-
-        Edge e = graph.addEdge(null, v1, v2, "knows");
-        e.setProperty("weight", 0.8);
-
-        Collection<Vertex> vertices;
-        vertices = toCollection(names.get("name", "Arthur"));
-        assertEquals(1, vertices.size());
-        assertEquals(v1.getId(), vertices.iterator().next().getId());
-                vertices = toCollection(names.get("name", "Ford"));
-        assertEquals(1, vertices.size());
-        assertEquals(v2.getId(), vertices.iterator().next().getId());
-
-        weights.put("weight", 0.4, e);
-        Collection<Edge> edges;
-        edges = toCollection(weights.get("weight", 0.8));
-        assertEquals(0, edges.size());
-        edges = toCollection(weights.get("weight", 0.4));
-        assertEquals(1, edges.size());
-        assertEquals(e.getId(), edges.iterator().next().getId());
-    }
-    */
-
-    @Test
     public void testProperties() throws Exception {
+        Graph graph = this.generateGraph();
         Vertex v = graph.addVertex(null);
         v.setProperty("name", "Zaphod");
         v.setProperty("profession", "ex-president of the Galaxy");
@@ -190,6 +98,7 @@ public class IdGraphTest extends GraphTest {
         assertTrue(keys.contains("name"));
         assertTrue(keys.contains("profession"));
         assertEquals("Zaphod", v.getProperty("name"));
+        graph.shutdown();
     }
 
     public void testVertexTestSuite() throws Exception {
@@ -216,22 +125,6 @@ public class IdGraphTest extends GraphTest {
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
 
-    /*
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-    */
-
-    /*
-    public void testAutomaticIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new AutomaticIndexTestSuite(this));
-        printTestPerformance("AutomaticIndexTestSuite", this.stopWatch());
-    }
-    */
-
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
@@ -239,7 +132,9 @@ public class IdGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        return new IdGraph(new TinkerGraph());
+        final TinkerGraph baseGraph = new TinkerGraph();
+        baseGraph.getFeatures().isPersistent = false;
+        return new IdGraph<TinkerGraph>(baseGraph);
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
@@ -252,19 +147,5 @@ public class IdGraphTest extends GraphTest {
                 }
             }
         }
-    }
-
-    private <T> Collection<T> toCollection(final CloseableIterable<T> s) {
-        Collection<T> c = new LinkedList<T>();
-        try {
-            Iterator<T> iter = s.iterator();
-            while (iter.hasNext()) {
-                c.add(iter.next());
-            }
-        } finally {
-            s.close();
-        }
-
-        return c;
     }
 }
