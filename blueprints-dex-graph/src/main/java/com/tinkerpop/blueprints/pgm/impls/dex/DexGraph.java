@@ -6,9 +6,9 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
-import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
+import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 

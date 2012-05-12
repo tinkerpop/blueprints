@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import org.neo4j.graphdb.Relationship;
 
 /**

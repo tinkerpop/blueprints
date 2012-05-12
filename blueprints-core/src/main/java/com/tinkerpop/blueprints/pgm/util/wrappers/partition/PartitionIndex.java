@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeIterable;
 import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexIterable;
 

@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm;
 
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
-import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
+import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

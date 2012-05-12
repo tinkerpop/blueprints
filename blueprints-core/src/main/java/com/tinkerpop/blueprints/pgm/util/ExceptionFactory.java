@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.impls;
+package com.tinkerpop.blueprints.pgm.util;
 
 /**
  * The ExceptionFactory provides standard exceptions that should be used by all Blueprints implementations.

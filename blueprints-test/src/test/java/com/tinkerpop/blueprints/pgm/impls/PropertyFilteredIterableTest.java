@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
 
 import java.util.Arrays;
 import java.util.List;

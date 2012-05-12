@@ -10,9 +10,9 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
-import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
+import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 
 import java.io.File;
 import java.io.FileInputStream;

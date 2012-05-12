@@ -3,8 +3,8 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableIterable;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.WrappingCloseableIterable;
 
 import java.io.Serializable;
 import java.util.ArrayList;

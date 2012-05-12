@@ -10,8 +10,8 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 
 import java.util.HashSet;
 import java.util.Set;

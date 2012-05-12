@@ -5,9 +5,9 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
-import com.tinkerpop.blueprints.pgm.impls.MultiIterable;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
+import com.tinkerpop.blueprints.pgm.util.MultiIterable;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementIterable;
 
 import java.util.ArrayList;

@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexIterable;
 import org.neo4j.graphdb.Node;

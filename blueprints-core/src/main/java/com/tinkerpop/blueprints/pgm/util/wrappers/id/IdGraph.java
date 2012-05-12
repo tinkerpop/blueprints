@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdEdgeIterable;
 import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdVertexIterable;

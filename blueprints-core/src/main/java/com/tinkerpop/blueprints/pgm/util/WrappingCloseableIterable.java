@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.impls;
+package com.tinkerpop.blueprints.pgm.util;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 

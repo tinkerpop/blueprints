@@ -14,8 +14,8 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.WrappingCloseableIterable;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.WrappingCloseableIterable;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementIterable;
 
 import java.util.Collection;

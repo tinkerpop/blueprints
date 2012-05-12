@@ -5,12 +5,11 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeIterable;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexIterable;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**

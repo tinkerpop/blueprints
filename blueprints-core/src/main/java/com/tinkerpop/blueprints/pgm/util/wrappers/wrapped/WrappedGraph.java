@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeIterable;
 import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexIterable;

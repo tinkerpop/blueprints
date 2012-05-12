@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.impls;
+package com.tinkerpop.blueprints.pgm.util;
 
 import java.util.Collections;
 import java.util.Iterator;

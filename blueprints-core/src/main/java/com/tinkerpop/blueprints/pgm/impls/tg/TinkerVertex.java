@@ -3,8 +3,8 @@ package com.tinkerpop.blueprints.pgm.impls.tg;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.DefaultQuery;
-import com.tinkerpop.blueprints.pgm.impls.StringFactory;
+import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
