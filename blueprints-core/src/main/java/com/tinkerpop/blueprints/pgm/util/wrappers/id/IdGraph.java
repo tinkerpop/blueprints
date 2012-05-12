@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.id;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -116,7 +117,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         return new IdVertexIterable(baseGraph.getVertices());
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         if (key.equals(ID)) {
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
@@ -169,7 +170,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         return new IdEdgeIterable(baseGraph.getEdges());
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         if (key.equals(ID)) {
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {

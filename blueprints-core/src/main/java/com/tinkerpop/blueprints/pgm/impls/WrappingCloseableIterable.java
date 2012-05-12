@@ -16,7 +16,21 @@ public class WrappingCloseableIterable<T> implements CloseableIterable<T> {
     }
 
     public Iterator<T> iterator() {
-        return new WrappingIterator();
+        return new Iterator<T>() {
+            private final Iterator<T> itty = iterable.iterator();
+
+            public void remove() {
+                this.itty.remove();
+            }
+
+            public T next() {
+                return this.itty.next();
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
 
     public void close() {
@@ -27,21 +41,5 @@ public class WrappingCloseableIterable<T> implements CloseableIterable<T> {
 
     public String toString() {
         return this.iterable.toString();
-    }
-
-    private class WrappingIterator implements Iterator<T> {
-        private final Iterator<T> itty = iterable.iterator();
-
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public T next() {
-            return this.itty.next();
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
     }
 }

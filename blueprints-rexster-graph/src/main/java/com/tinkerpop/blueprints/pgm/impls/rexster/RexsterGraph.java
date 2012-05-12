@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.rexster;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -132,7 +133,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         return new RexsterVertexIterable(this.graphURI + RexsterTokens.SLASH_VERTICES, this);
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         return new PropertyFilteredIterable<Vertex>(key, value, new RexsterVertexIterable(this.graphURI + RexsterTokens.SLASH_VERTICES, this));
     }
 
@@ -169,7 +170,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         return new RexsterEdgeIterable(this.graphURI + RexsterTokens.SLASH_EDGES, this);
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         return new PropertyFilteredIterable<Edge>(key, value, new RexsterEdgeIterable(this.graphURI + RexsterTokens.SLASH_EDGES, this));
     }
 

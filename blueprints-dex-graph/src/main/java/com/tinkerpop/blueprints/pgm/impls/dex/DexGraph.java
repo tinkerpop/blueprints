@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.dex;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -241,7 +242,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
         return ret;
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         return new DexIterable<Vertex>(this, this.rawGet(key, value), Vertex.class);
     }
 
@@ -322,7 +323,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
         return new DexIterable<Edge>(this, result, Edge.class);
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
 

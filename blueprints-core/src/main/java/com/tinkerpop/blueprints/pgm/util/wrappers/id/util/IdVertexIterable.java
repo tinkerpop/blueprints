@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.id.util;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.wrappers.id.IdVertex;
 
@@ -8,11 +9,17 @@ import java.util.Iterator;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdVertexIterable implements Iterable<Vertex> {
+public class IdVertexIterable implements CloseableIterable<Vertex> {
     private final Iterable<Vertex> iterable;
 
     public IdVertexIterable(Iterable<Vertex> iterable) {
         this.iterable = iterable;
+    }
+
+    public void close() {
+        if (iterable instanceof CloseableIterable) {
+            ((CloseableIterable) iterable).close();
+        }
     }
 
     public Iterator<Vertex> iterator() {

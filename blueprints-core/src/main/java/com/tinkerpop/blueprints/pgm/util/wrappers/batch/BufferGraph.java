@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.batch;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
@@ -130,7 +131,7 @@ public class BufferGraph<T extends TransactionalGraph> implements TransactionalG
         return this.baseGraph.getEdges();
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         return this.baseGraph.getEdges(key, value);
     }
 
@@ -138,7 +139,7 @@ public class BufferGraph<T extends TransactionalGraph> implements TransactionalG
         return this.baseGraph.getVertices();
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         return this.baseGraph.getVertices(key, value);
     }
 

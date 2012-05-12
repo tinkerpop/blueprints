@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
@@ -121,7 +122,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new EventVertexIterable(this.baseGraph.getVertices(), this.graphChangedListeners);
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         return new EventVertexIterable(this.baseGraph.getVertices(key, value), this.graphChangedListeners);
     }
 
@@ -174,7 +175,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new EventEdgeIterable(this.baseGraph.getEdges(), this.graphChangedListeners);
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         return new EventEdgeIterable(this.baseGraph.getEdges(key, value), this.graphChangedListeners);
     }
 

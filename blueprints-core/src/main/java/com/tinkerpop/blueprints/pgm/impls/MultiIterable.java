@@ -22,49 +22,43 @@ public class MultiIterable<S> implements Iterable<S> {
         if (this.iterables.size() == 0) {
             return (Iterator<S>) Collections.emptyList().iterator();
         } else {
-            return new MultiIterator();
-        }
-    }
+            return new Iterator<S>() {
+                private Iterator<S> currentIterator = iterables.get(0).iterator();
+                private int current = 0;
 
-    protected class MultiIterator implements Iterator<S> {
 
-        private Iterator<S> currentIterator;
-        private int current = 0;
-
-        public MultiIterator() {
-            currentIterator = iterables.get(0).iterator();
-        }
-
-        public void remove() {
-            currentIterator.remove();
-        }
-
-        public boolean hasNext() {
-            while (true) {
-                if (currentIterator.hasNext()) {
-                    return true;
-                } else {
-                    this.current++;
-                    if (this.current >= iterables.size())
-                        break;
-                    this.currentIterator = iterables.get(this.current).iterator();
+                public void remove() {
+                    currentIterator.remove();
                 }
-            }
-            return false;
-        }
 
-        public S next() {
-            while (true) {
-                if (currentIterator.hasNext()) {
-                    return currentIterator.next();
-                } else {
-                    this.current++;
-                    if (this.current >= iterables.size())
-                        break;
-                    this.currentIterator = iterables.get(current).iterator();
+                public boolean hasNext() {
+                    while (true) {
+                        if (currentIterator.hasNext()) {
+                            return true;
+                        } else {
+                            this.current++;
+                            if (this.current >= iterables.size())
+                                break;
+                            this.currentIterator = iterables.get(this.current).iterator();
+                        }
+                    }
+                    return false;
                 }
-            }
-            throw new NoSuchElementException();
+
+                public S next() {
+                    while (true) {
+                        if (currentIterator.hasNext()) {
+                            return currentIterator.next();
+                        } else {
+                            this.current++;
+                            if (this.current >= iterables.size())
+                                break;
+                            this.currentIterator = iterables.get(current).iterator();
+                        }
+                    }
+                    throw new NoSuchElementException();
+                }
+            };
         }
     }
 }

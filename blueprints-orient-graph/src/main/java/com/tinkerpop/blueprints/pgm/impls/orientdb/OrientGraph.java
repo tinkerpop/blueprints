@@ -7,6 +7,7 @@ import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -257,7 +258,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         return getVertices(true);
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         // when auto indices connected, be sure to search for respective index first
         return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
     }
@@ -270,7 +271,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         return getEdges(true);
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         // when auto indices connected, be sure to search for respective index first
         return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }

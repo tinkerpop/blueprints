@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Element;
 
 import java.util.Iterator;
@@ -11,7 +12,7 @@ import java.util.NoSuchElementException;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PropertyFilteredIterable<T extends Element> implements Iterable<T> {
+public class PropertyFilteredIterable<T extends Element> implements CloseableIterable<T> {
 
     private final String key;
     private final Object value;
@@ -23,56 +24,54 @@ public class PropertyFilteredIterable<T extends Element> implements Iterable<T> 
         this.iterable = iterable;
     }
 
-    public Iterator<T> iterator() {
-        return new PropertyFilteredIterator<T>(iterable.iterator());
+    public void close() {
+        if (this.iterable instanceof CloseableIterable) {
+            ((CloseableIterable) this.iterable).close();
+        }
     }
 
-    private class PropertyFilteredIterator<T extends Element> implements Iterator<T> {
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            private Iterator<T> itty = iterable.iterator();
+            private T nextElement = null;
 
-        private Iterator<T> itty;
-        private T nextElement = null;
+            public void remove() {
+                this.itty.remove();
+            }
 
-        public PropertyFilteredIterator(final Iterator<T> itty) {
-            this.itty = itty;
-        }
+            public boolean hasNext() {
+                if (null != nextElement)
+                    return true;
+                else {
+                    try {
+                        while (true) {
+                            final T element = this.itty.next();
+                            if (element.getPropertyKeys().contains(key) && element.getProperty(key).equals(value)) {
+                                this.nextElement = element;
+                                return true;
+                            }
+                        }
+                    } catch (NoSuchElementException e) {
+                        this.nextElement = null;
+                        return false;
+                    }
+                }
+            }
 
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public boolean hasNext() {
-            if (null != nextElement)
-                return true;
-            else {
-                try {
+            public T next() {
+                if (null != this.nextElement) {
+                    final T temp = this.nextElement;
+                    this.nextElement = null;
+                    return temp;
+                } else {
                     while (true) {
                         final T element = this.itty.next();
-                        if (element.getPropertyKeys().contains(key) &&  element.getProperty(key).equals(value)) {
-                            this.nextElement = element;
-                            return true;
+                        if (element.getPropertyKeys().contains(key) && element.getProperty(key).equals(value)) {
+                            return element;
                         }
                     }
-                } catch (NoSuchElementException e) {
-                    this.nextElement = null;
-                    return false;
                 }
             }
-        }
-
-        public T next() {
-            if (null != this.nextElement) {
-                final T temp = this.nextElement;
-                this.nextElement = null;
-                return temp;
-            } else {
-                while (true) {
-                    final T element = this.itty.next();
-                    if (element.getPropertyKeys().contains(key) &&  element.getProperty(key).equals(value)) {
-                        return element;
-                    }
-                }
-            }
-        }
+        };
     }
-
 }

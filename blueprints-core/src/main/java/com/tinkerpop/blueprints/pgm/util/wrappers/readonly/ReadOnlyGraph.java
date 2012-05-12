@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
@@ -59,7 +60,7 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new ReadOnlyEdgeIterable(this.baseGraph.getEdges());
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         return new ReadOnlyEdgeIterable(this.baseGraph.getEdges(key, value));
     }
 
@@ -75,7 +76,7 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new ReadOnlyVertexIterable(this.baseGraph.getVertices());
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         return new ReadOnlyVertexIterable(this.baseGraph.getVertices(key, value));
     }
 

@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -243,7 +244,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Vertex> getVertices(final String key, final Object value) throws UnsupportedOperationException {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
@@ -290,7 +291,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getEdges(final String key, final Object value) throws UnsupportedOperationException {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

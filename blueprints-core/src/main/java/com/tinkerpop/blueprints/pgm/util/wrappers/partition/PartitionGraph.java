@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -102,7 +103,7 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new PartitionVertexIterable(this.baseGraph.getVertices(), this);
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         return new PartitionVertexIterable(this.baseGraph.getVertices(key, value), this);
     }
 
@@ -124,7 +125,7 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new PartitionEdgeIterable(this.baseGraph.getEdges(), this);
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         return new PartitionEdgeIterable(this.baseGraph.getEdges(key, value), this);
     }
 

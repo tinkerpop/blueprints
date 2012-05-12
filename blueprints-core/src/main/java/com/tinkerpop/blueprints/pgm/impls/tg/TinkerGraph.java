@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.pgm.impls.tg;
 
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -38,8 +39,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
     protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
 
-    protected TinkerAutomaticIndex<TinkerVertex> vertexIndex = new TinkerAutomaticIndex<TinkerVertex>(TinkerVertex.class, this);
-    protected TinkerAutomaticIndex<TinkerEdge> edgeIndex = new TinkerAutomaticIndex<TinkerEdge>(TinkerEdge.class, this);
+    protected TinkerKeyIndex<TinkerVertex> vertexIndex = new TinkerKeyIndex<TinkerVertex>(TinkerVertex.class, this);
+    protected TinkerKeyIndex<TinkerEdge> edgeIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
 
     private final String directory;
     private static final String GRAPH_FILE = "/tinkergraph.dat";
@@ -105,17 +106,17 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         this.directory = null;
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         if (vertexIndex.getIndexedKeys().contains(key)) {
-            return (Iterable) vertexIndex.get(key, value);
+            return (CloseableIterable) vertexIndex.get(key, value);
         } else {
             return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
         }
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         if (edgeIndex.getIndexedKeys().contains(key)) {
-            return (Iterable) edgeIndex.get(key, value);
+            return (CloseableIterable) edgeIndex.get(key, value);
         } else {
             return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
         }
@@ -320,8 +321,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         this.edges.clear();
         this.indices.clear();
         this.currentId = 0l;
-        this.vertexIndex = new TinkerAutomaticIndex<TinkerVertex>(TinkerVertex.class, this);
-        this.edgeIndex = new TinkerAutomaticIndex<TinkerEdge>(TinkerEdge.class, this);
+        this.vertexIndex = new TinkerKeyIndex<TinkerVertex>(TinkerVertex.class, this);
+        this.edgeIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
     }
 
     public void shutdown() {
@@ -355,12 +356,12 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         return FEATURES;
     }
 
-    protected class TinkerAutomaticIndex<T extends TinkerElement> extends TinkerIndex<T> implements Serializable {
+    protected class TinkerKeyIndex<T extends TinkerElement> extends TinkerIndex<T> implements Serializable {
 
         private final Set<String> indexedKeys = new HashSet<String>();
         private TinkerGraph graph;
 
-        public TinkerAutomaticIndex(final Class<T> indexClass, final TinkerGraph graph) {
+        public TinkerKeyIndex(final Class<T> indexClass, final TinkerGraph graph) {
             super(null, indexClass);
             this.graph = graph;
         }

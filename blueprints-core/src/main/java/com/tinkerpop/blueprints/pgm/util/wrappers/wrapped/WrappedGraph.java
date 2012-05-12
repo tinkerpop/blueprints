@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.wrapped;
 
+import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.Graph;
@@ -46,7 +47,7 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new WrappedVertexIterable(this.baseGraph.getVertices());
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         return new WrappedVertexIterable(this.baseGraph.getVertices(key, value));
     }
 
@@ -66,7 +67,7 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new WrappedEdgeIterable(this.baseGraph.getEdges());
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         return new WrappedEdgeIterable(this.baseGraph.getEdges(key, value));
     }
 
