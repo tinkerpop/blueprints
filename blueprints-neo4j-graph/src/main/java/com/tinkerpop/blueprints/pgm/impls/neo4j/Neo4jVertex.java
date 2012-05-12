@@ -5,14 +5,12 @@ import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Relationship;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -26,31 +24,11 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
     }
 
     public Iterable<Edge> getInEdges(final String... labels) {
-        if (labels.length == 0)
-            return new Neo4jEdgeIterable(((Node) this.rawElement).getRelationships(Direction.INCOMING), this.graph);
-        else if (labels.length == 1) {
-            return new Neo4jEdgeIterable(((Node) this.rawElement).getRelationships(DynamicRelationshipType.withName(labels[0]), Direction.INCOMING), this.graph);
-        } else {
-            final List<RelationshipType> edgeLabels = new ArrayList<RelationshipType>();
-            for (final String label : labels) {
-                edgeLabels.add(DynamicRelationshipType.withName(label));
-            }
-            return new Neo4jEdgeIterable(((Node) this.rawElement).getRelationships(Direction.INCOMING, edgeLabels.toArray(new RelationshipType[edgeLabels.size()])), this.graph);
-        }
+        return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels);
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
-        if (labels.length == 0)
-            return new Neo4jEdgeIterable(((Node) this.rawElement).getRelationships(Direction.OUTGOING), this.graph);
-        else if (labels.length == 1) {
-            return new Neo4jEdgeIterable(((Node) this.rawElement).getRelationships(DynamicRelationshipType.withName(labels[0]), Direction.OUTGOING), this.graph);
-        } else {
-            final List<RelationshipType> edgeLabels = new ArrayList<RelationshipType>();
-            for (final String label : labels) {
-                edgeLabels.add(DynamicRelationshipType.withName(label));
-            }
-            return new Neo4jEdgeIterable(((Node) this.rawElement).getRelationships(Direction.OUTGOING, edgeLabels.toArray(new RelationshipType[edgeLabels.size()])), this.graph);
-        }
+        return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
     }
 
     public Query query() {
@@ -67,6 +45,48 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
 
     public Node getRawVertex() {
         return (Node) this.rawElement;
+    }
+
+    private class Neo4jVertexEdgesIterable<T extends Edge> implements Iterable<Neo4jEdge> {
+
+        private final Neo4jGraph graph;
+        private final Node node;
+        private final Direction direction;
+        private final DynamicRelationshipType[] labels;
+
+        public Neo4jVertexEdgesIterable(final Neo4jGraph graph, final Node node, final Direction direction, final String... labels) {
+            this.graph = graph;
+            this.node = node;
+            this.direction = direction;
+            this.labels = new DynamicRelationshipType[labels.length];
+            for (int i = 0; i < labels.length; i++) {
+                this.labels[i] = DynamicRelationshipType.withName(labels[i]);
+            }
+        }
+
+        public Iterator<Neo4jEdge> iterator() {
+            final Iterator<Relationship> itty;
+            if (labels.length > 0)
+                itty = node.getRelationships(direction, labels).iterator();
+            else
+                itty = node.getRelationships(direction).iterator();
+
+            return new Iterator<Neo4jEdge>() {
+
+
+                public Neo4jEdge next() {
+                    return new Neo4jEdge(itty.next(), graph);
+                }
+
+                public boolean hasNext() {
+                    return itty.hasNext();
+                }
+
+                public void remove() {
+                    itty.remove();
+                }
+            };
+        }
     }
 
 }

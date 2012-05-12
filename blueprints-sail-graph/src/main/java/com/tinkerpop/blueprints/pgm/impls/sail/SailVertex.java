@@ -5,11 +5,10 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeIterable;
 import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
-import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.util.MultiIterable;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeIterable;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -80,12 +79,6 @@ public class SailVertex implements Vertex {
         if (this.rawVertex instanceof Resource) {
             throw new RuntimeException(URI_BLANK_NODE_PROPERTIES);
         } else {
-
-            if (key.equals(StringFactory.ID))
-                throw ExceptionFactory.propertyKeyIdIsReserved();
-            if (key.equals(StringFactory.LABEL) && this instanceof Edge)
-                throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
-
             boolean update = false;
             final Literal oldLiteral = (Literal) this.rawVertex;
             if (key.equals(SailTokens.DATATYPE)) {

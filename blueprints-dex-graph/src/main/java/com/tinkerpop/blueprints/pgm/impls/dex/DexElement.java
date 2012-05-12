@@ -5,10 +5,10 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
-import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
+import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
+import com.tinkerpop.blueprints.pgm.util.StringFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -237,11 +237,15 @@ public class DexElement implements Element {
       */
     @Override
     public Object removeProperty(final String key) {
-        Object ret = getProperty(key);
-        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
-        v.setNull();
-        setProperty(key, v);
-        return ret;
+        try {
+            Object ret = getProperty(key);
+            com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+            v.setNull();
+            setProperty(key, v);
+            return ret;
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     /*

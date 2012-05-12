@@ -25,8 +25,8 @@ public class EdgeTestSuite extends TestSuite {
         List<String> ids = generateIds(2);
 
         Vertex v = graph.addVertex(convertId(graph, ids.get(0)));
-        Vertex u = graph.addVertex(convertId(graph,ids.get(1)));
-        Edge e = graph.addEdge(null, v, u, convertId(graph,"test_label"));
+        Vertex u = graph.addVertex(convertId(graph, ids.get(1)));
+        Edge e = graph.addEdge(null, v, u, convertId(graph, "test_label"));
         assertFalse(e.equals(null));
         assertEquals(e, v.getOutEdges().iterator().next());
         assertEquals(e, u.getInEdges().iterator().next());
@@ -44,17 +44,30 @@ public class EdgeTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testGetEdgeWithNull() {
+        Graph graph = graphTest.generateGraph();
+        if (!graph.getFeatures().isRDFModel) {
+            try {
+                graph.getEdge(null);
+                assertFalse(true);
+            } catch (IllegalArgumentException e) {
+                assertTrue(true);
+            }
+        }
+        graph.shutdown();
+    }
+
     public void testAddEdges() {
         Graph graph = graphTest.generateGraph();
         List<String> ids = generateIds(3);
 
         this.stopWatch();
-        Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
-        Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
-        Vertex v3 = graph.addVertex(convertId(graph,ids.get(2)));
-        graph.addEdge(null, v1, v2, convertId(graph,"knows"));
-        graph.addEdge(null, v2, v3, convertId(graph,"pets"));
-        graph.addEdge(null, v2, v3, convertId(graph,"cares_for"));
+        Vertex v1 = graph.addVertex(convertId(graph, ids.get(0)));
+        Vertex v2 = graph.addVertex(convertId(graph, ids.get(1)));
+        Vertex v3 = graph.addVertex(convertId(graph, ids.get(2)));
+        graph.addEdge(null, v1, v2, convertId(graph, "knows"));
+        graph.addEdge(null, v2, v3, convertId(graph, "pets"));
+        graph.addEdge(null, v2, v3, convertId(graph, "cares_for"));
         assertEquals(1, count(v1.getOutEdges()));
         assertEquals(2, count(v2.getOutEdges()));
         assertEquals(0, count(v3.getOutEdges()));
@@ -72,9 +85,9 @@ public class EdgeTestSuite extends TestSuite {
         long counter = 0l;
         this.stopWatch();
         for (int i = 0; i < edgeCount; i++) {
-            Vertex out = graph.addVertex(convertId(graph,"" + counter++));
-            Vertex in = graph.addVertex(convertId(graph,"" + counter++));
-            graph.addEdge(null, out, in, convertId(graph,UUID.randomUUID().toString()));
+            Vertex out = graph.addVertex(convertId(graph, "" + counter++));
+            Vertex in = graph.addVertex(convertId(graph, "" + counter++));
+            graph.addEdge(null, out, in, convertId(graph, UUID.randomUUID().toString()));
         }
         printPerformance(graph.toString(), vertexCount + edgeCount, "elements added", this.stopWatch());
         if (graph.getFeatures().supportsEdgeIteration) {
@@ -155,9 +168,9 @@ public class EdgeTestSuite extends TestSuite {
         int edgeCount = 10;
         Set<Edge> edges = new HashSet<Edge>();
         for (int i = 0; i < edgeCount; i++) {
-            Vertex out = graph.addVertex(convertId(graph,"" + counter++));
-            Vertex in = graph.addVertex(convertId(graph,"" + counter++));
-            edges.add(graph.addEdge(null, out, in, convertId(graph,"a" + UUID.randomUUID().toString())));
+            Vertex out = graph.addVertex(convertId(graph, "" + counter++));
+            Vertex in = graph.addVertex(convertId(graph, "" + counter++));
+            edges.add(graph.addEdge(null, out, in, convertId(graph, "a" + UUID.randomUUID().toString())));
         }
         assertEquals(edgeCount, edges.size());
 
@@ -203,14 +216,14 @@ public class EdgeTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         List<String> ids = generateIds(3);
 
-        Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
-        Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
-        Vertex v3 = graph.addVertex(convertId(graph,ids.get(2)));
-        graph.addEdge(null, v1, v2, convertId(graph,"knows"));
-        graph.addEdge(null, v2, v3, convertId(graph,"pets"));
-        graph.addEdge(null, v2, v3, convertId(graph,"pets"));
-        graph.addEdge(null, v2, v3, convertId(graph,"pets"));
-        graph.addEdge(null, v2, v3, convertId(graph,"pets"));
+        Vertex v1 = graph.addVertex(convertId(graph, ids.get(0)));
+        Vertex v2 = graph.addVertex(convertId(graph, ids.get(1)));
+        Vertex v3 = graph.addVertex(convertId(graph, ids.get(2)));
+        graph.addEdge(null, v1, v2, convertId(graph, "knows"));
+        graph.addEdge(null, v2, v3, convertId(graph, "pets"));
+        graph.addEdge(null, v2, v3, convertId(graph, "pets"));
+        graph.addEdge(null, v2, v3, convertId(graph, "pets"));
+        graph.addEdge(null, v2, v3, convertId(graph, "pets"));
 
         if (graph.getFeatures().allowDuplicateEdges) {
             if (graph.getFeatures().supportsVertexIteration)
@@ -244,12 +257,12 @@ public class EdgeTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         List<String> ids = generateIds(3);
 
-        Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
-        Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
-        Vertex v3 = graph.addVertex(convertId(graph,ids.get(2)));
-        graph.addEdge(null, v1, v2, convertId(graph,"knows"));
-        graph.addEdge(null, v2, v3, convertId(graph,"pets"));
-        graph.addEdge(null, v2, v3, convertId(graph,"pets"));
+        Vertex v1 = graph.addVertex(convertId(graph, ids.get(0)));
+        Vertex v2 = graph.addVertex(convertId(graph, ids.get(1)));
+        Vertex v3 = graph.addVertex(convertId(graph, ids.get(2)));
+        graph.addEdge(null, v1, v2, convertId(graph, "knows"));
+        graph.addEdge(null, v2, v3, convertId(graph, "pets"));
+        graph.addEdge(null, v2, v3, convertId(graph, "pets"));
 
         assertEquals(0, count(v1.getInEdges()));
         assertEquals(1, count(v1.getOutEdges()));
@@ -257,9 +270,9 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(0, count(v3.getOutEdges()));
 
         if (!graph.getFeatures().ignoresSuppliedIds) {
-            v1 = graph.getVertex(convertId(graph,ids.get(0)));
-            v2 = graph.getVertex(convertId(graph,ids.get(1)));
-            v3 = graph.getVertex(convertId(graph,ids.get(2)));
+            v1 = graph.getVertex(convertId(graph, ids.get(0)));
+            v2 = graph.getVertex(convertId(graph, ids.get(1)));
+            v3 = graph.getVertex(convertId(graph, ids.get(2)));
 
             assertEquals(0, count(v1.getInEdges()));
             assertEquals(1, count(v1.getOutEdges()));
@@ -294,12 +307,12 @@ public class EdgeTestSuite extends TestSuite {
     public void testRemoveEdges() {
         Graph graph = graphTest.generateGraph();
         List<String> ids = generateIds(3);
-        Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
-        Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
-        Vertex v3 = graph.addVertex(convertId(graph,ids.get(2)));
-        Edge e1 = graph.addEdge(null, v1, v2, convertId(graph,"knows"));
-        Edge e2 = graph.addEdge(null, v2, v3, convertId(graph,"pets"));
-        Edge e3 = graph.addEdge(null, v2, v3, convertId(graph,"cares_for"));
+        Vertex v1 = graph.addVertex(convertId(graph, ids.get(0)));
+        Vertex v2 = graph.addVertex(convertId(graph, ids.get(1)));
+        Vertex v3 = graph.addVertex(convertId(graph, ids.get(2)));
+        Edge e1 = graph.addEdge(null, v1, v2, convertId(graph, "knows"));
+        Edge e2 = graph.addEdge(null, v2, v3, convertId(graph, "pets"));
+        Edge e3 = graph.addEdge(null, v2, v3, convertId(graph, "cares_for"));
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(3, count(graph.getVertices()));
@@ -312,9 +325,9 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(0, count(v2.getInEdges()));
         assertEquals(2, count(v3.getInEdges()));
         if (!graph.getFeatures().ignoresSuppliedIds) {
-            v1 = graph.getVertex(convertId(graph,ids.get(0)));
-            v2 = graph.getVertex(convertId(graph,ids.get(1)));
-            v3 = graph.getVertex(convertId(graph,ids.get(2)));
+            v1 = graph.getVertex(convertId(graph, ids.get(0)));
+            v2 = graph.getVertex(convertId(graph, ids.get(1)));
+            v3 = graph.getVertex(convertId(graph, ids.get(2)));
         }
         assertEquals(0, count(v1.getOutEdges()));
         assertEquals(2, count(v2.getOutEdges()));
@@ -331,9 +344,9 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(0, count(v2.getInEdges()));
         assertEquals(1, count(v3.getInEdges()));
         if (!graph.getFeatures().ignoresSuppliedIds) {
-            v1 = graph.getVertex(convertId(graph,ids.get(0)));
-            v2 = graph.getVertex(convertId(graph,ids.get(1)));
-            v3 = graph.getVertex(convertId(graph,ids.get(2)));
+            v1 = graph.getVertex(convertId(graph, ids.get(0)));
+            v2 = graph.getVertex(convertId(graph, ids.get(1)));
+            v3 = graph.getVertex(convertId(graph, ids.get(2)));
         }
         assertEquals(0, count(v1.getOutEdges()));
         assertEquals(1, count(v2.getOutEdges()));
@@ -350,9 +363,9 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(0, count(v2.getInEdges()));
         assertEquals(0, count(v3.getInEdges()));
         if (!graph.getFeatures().ignoresSuppliedIds) {
-            v1 = graph.getVertex(convertId(graph,ids.get(0)));
-            v2 = graph.getVertex(convertId(graph,ids.get(1)));
-            v3 = graph.getVertex(convertId(graph,ids.get(2)));
+            v1 = graph.getVertex(convertId(graph, ids.get(0)));
+            v2 = graph.getVertex(convertId(graph, ids.get(1)));
+            v3 = graph.getVertex(convertId(graph, ids.get(2)));
         }
         assertEquals(0, count(v1.getOutEdges()));
         assertEquals(0, count(v2.getOutEdges()));
@@ -368,12 +381,12 @@ public class EdgeTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().allowSelfLoops) {
             List<String> ids = generateIds(3);
-            Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
-            Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
-            Vertex v3 = graph.addVertex(convertId(graph,ids.get(2)));
-            graph.addEdge(null, v1, v1, convertId(graph,"is_self"));
-            graph.addEdge(null, v2, v2, convertId(graph,"is_self"));
-            graph.addEdge(null, v3, v3, convertId(graph,"is_self"));
+            Vertex v1 = graph.addVertex(convertId(graph, ids.get(0)));
+            Vertex v2 = graph.addVertex(convertId(graph, ids.get(1)));
+            Vertex v3 = graph.addVertex(convertId(graph, ids.get(2)));
+            graph.addEdge(null, v1, v1, convertId(graph, "is_self"));
+            graph.addEdge(null, v2, v2, convertId(graph, "is_self"));
+            graph.addEdge(null, v3, v3, convertId(graph, "is_self"));
 
             if (graph.getFeatures().supportsVertexIteration)
                 assertEquals(3, count(graph.getVertices()));
@@ -395,12 +408,12 @@ public class EdgeTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().allowSelfLoops) {
             List<String> ids = generateIds(3);
-            Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
-            Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
-            Vertex v3 = graph.addVertex(convertId(graph,ids.get(2)));
-            Edge e1 = graph.addEdge(null, v1, v1, convertId(graph,"is_self"));
-            Edge e2 = graph.addEdge(null, v2, v2, convertId(graph,"is_self"));
-            Edge e3 = graph.addEdge(null, v3, v3, convertId(graph,"is_self"));
+            Vertex v1 = graph.addVertex(convertId(graph, ids.get(0)));
+            Vertex v2 = graph.addVertex(convertId(graph, ids.get(1)));
+            Vertex v3 = graph.addVertex(convertId(graph, ids.get(2)));
+            Edge e1 = graph.addEdge(null, v1, v1, convertId(graph, "is_self"));
+            Edge e2 = graph.addEdge(null, v2, v2, convertId(graph, "is_self"));
+            Edge e3 = graph.addEdge(null, v3, v3, convertId(graph, "is_self"));
 
             if (graph.getFeatures().supportsVertexIteration)
                 assertEquals(3, count(graph.getVertices()));
@@ -442,12 +455,12 @@ public class EdgeTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsEdgeIteration) {
             List<String> ids = generateIds(3);
-            Vertex v1 = graph.addVertex(convertId(graph,ids.get(0)));
-            Vertex v2 = graph.addVertex(convertId(graph,ids.get(1)));
-            Vertex v3 = graph.addVertex(convertId(graph,ids.get(2)));
-            Edge e1 = graph.addEdge(null, v1, v2, convertId(graph,"test"));
-            Edge e2 = graph.addEdge(null, v2, v3, convertId(graph,"test"));
-            Edge e3 = graph.addEdge(null, v3, v1, convertId(graph,"test"));
+            Vertex v1 = graph.addVertex(convertId(graph, ids.get(0)));
+            Vertex v2 = graph.addVertex(convertId(graph, ids.get(1)));
+            Vertex v3 = graph.addVertex(convertId(graph, ids.get(2)));
+            Edge e1 = graph.addEdge(null, v1, v2, convertId(graph, "test"));
+            Edge e2 = graph.addEdge(null, v2, v3, convertId(graph, "test"));
+            Edge e3 = graph.addEdge(null, v3, v1, convertId(graph, "test"));
 
             if (graph.getFeatures().supportsVertexIteration)
                 assertEquals(3, count(graph.getVertices()));
@@ -459,7 +472,7 @@ public class EdgeTestSuite extends TestSuite {
             for (Edge e : graph.getEdges()) {
                 count++;
                 edgeIds.add(e.getId().toString());
-                assertEquals(convertId(graph,"test"), e.getLabel());
+                assertEquals(convertId(graph, "test"), e.getLabel());
                 if (e.getId().toString().equals(e1.getId().toString())) {
                     assertEquals(v1, e.getOutVertex());
                     assertEquals(v2, e.getInVertex());
@@ -486,9 +499,9 @@ public class EdgeTestSuite extends TestSuite {
     public void testAddingRemovingEdgeProperties() {
         Graph graph = graphTest.generateGraph();
         if (!graph.getFeatures().isRDFModel) {
-            Vertex a = graph.addVertex(convertId(graph,"1"));
-            Vertex b = graph.addVertex(convertId(graph,"2"));
-            Edge edge = graph.addEdge(convertId(graph,"3"), a, b, "knows");
+            Vertex a = graph.addVertex(convertId(graph, "1"));
+            Vertex b = graph.addVertex(convertId(graph, "2"));
+            Edge edge = graph.addEdge(convertId(graph, "3"), a, b, "knows");
             assertEquals(edge.getPropertyKeys().size(), 0);
             assertNull(edge.getProperty("weight"));
             edge.setProperty("weight", 0.5);
@@ -533,7 +546,7 @@ public class EdgeTestSuite extends TestSuite {
     public void testNoConcurrentModificationException() {
         Graph graph = graphTest.generateGraph();
         for (int i = 0; i < 25; i++) {
-            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph,"test"));
+            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "test"));
         }
         if (!graph.getFeatures().isRDFModel)
             assertEquals(BaseTest.count(graph.getVertices()), 50);
