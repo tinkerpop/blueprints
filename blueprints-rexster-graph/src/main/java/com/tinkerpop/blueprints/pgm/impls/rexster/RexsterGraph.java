@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
@@ -146,7 +147,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.vertexIdCanNotBeNull();
 
         try {
             return new RexsterVertex(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(id)), this);
@@ -157,7 +158,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.edgeIdCanNotBeNull();
 
         try {
             return new RexsterEdge(RestHelper.getResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id)), this);
@@ -219,7 +220,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         for (Index index : getIndices()) {
             if (index.getIndexName().equals(indexName)) {
                 if (!index.getIndexClass().isAssignableFrom(indexClass))
-                    throw new RuntimeException("Stored index is " + index.getIndexClass() + " and is being loaded as a " + indexClass + " index");
+                    throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
                 return index;
             }
         }

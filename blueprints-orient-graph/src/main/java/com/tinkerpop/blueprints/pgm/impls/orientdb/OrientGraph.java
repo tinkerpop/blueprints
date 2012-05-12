@@ -17,6 +17,7 @@ import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementScanIterable;
@@ -101,7 +102,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
         synchronized (contexts) {
             if (context.manualIndices.containsKey(indexName))
-                throw new RuntimeException("Index already exists: " + indexName);
+                throw ExceptionFactory.indexAlreadyExists(indexName);
 
             final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(this, indexName, indexClass, null);
 
@@ -127,7 +128,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         if (indexClass.isAssignableFrom(index.getIndexClass()))
             return (Index<T>) index;
         else
-            throw new RuntimeException("Can not convert " + index.getIndexClass() + " to " + indexClass);
+            throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
@@ -193,7 +194,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.vertexIdCanNotBeNull();
 
         ORID rid;
         if (id instanceof ORID)
@@ -282,7 +283,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.edgeIdCanNotBeNull();
 
         final ORID rid;
         if (id instanceof ORID)

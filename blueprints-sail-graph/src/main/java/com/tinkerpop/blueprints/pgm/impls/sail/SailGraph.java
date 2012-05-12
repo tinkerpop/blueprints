@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeIterable;
@@ -199,7 +200,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.vertexIdCanNotBeNull();
 
         try {
             return createVertex(id.toString());

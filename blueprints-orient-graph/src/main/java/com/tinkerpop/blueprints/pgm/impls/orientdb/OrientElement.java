@@ -10,7 +10,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.HashSet;
@@ -21,7 +21,6 @@ import java.util.Set;
  */
 public abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
 
-    protected static final String LABEL = "label";
     protected final OrientGraph graph;
     protected final ODocument rawElement;
 
@@ -32,8 +31,11 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void setProperty(final String key, final Object value) {
-        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
-            throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
+        if (key.equals(StringFactory.ID))
+            throw ExceptionFactory.propertyKeyIdIsReserved();
+        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
+            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+
         try {
             this.graph.autoStartTransaction();
             this.rawElement.field(key, value);
@@ -75,7 +77,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
 
         final String[] fields = this.rawElement.fieldNames();
         for (String field : fields)
-            if (!field.equals(LABEL))
+            if (!field.equals(StringFactory.LABEL))
                 result.add(field);
 
         return result;

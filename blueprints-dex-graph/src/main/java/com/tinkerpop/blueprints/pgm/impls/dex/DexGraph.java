@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Features;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
@@ -138,7 +139,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
 
             if (!dbPath.exists()) {
                 if (!dbPath.mkdirs()) {
-                    throw new RuntimeException("Could not create directory.");
+                    throw new RuntimeException("Could not create directory");
                 }
             }
 
@@ -193,7 +194,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
     @Override
     public Vertex getVertex(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.vertexIdCanNotBeNull();
         try {
             final Long longId = Double.valueOf(id.toString()).longValue();
             final int type = rawGraph.getObjectType(longId);
@@ -237,9 +238,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
             objs.close();
         }
         tlist = null;
-        Iterable<Vertex> ret = new DexIterable<Vertex>(this, result,
-                Vertex.class);
-        return ret;
+        return new DexIterable<Vertex>(this, result, Vertex.class);
     }
 
     public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
@@ -275,7 +274,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
     @Override
     public Edge getEdge(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.edgeIdCanNotBeNull();
         try {
             Long longId = Double.valueOf(id.toString()).longValue();
             int type = rawGraph.getObjectType(longId);

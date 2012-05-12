@@ -11,6 +11,7 @@ import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
@@ -194,7 +195,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public synchronized <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
-            throw new RuntimeException("Index already exists: " + indexName);
+            throw ExceptionFactory.indexAlreadyExists(indexName);
         }
         this.autoStartTransaction();
         return new Neo4jIndex(indexName, indexClass, this, indexParameters);
@@ -205,7 +206,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             if (this.rawGraph.index().existsForNodes(indexName)) {
                 return new Neo4jIndex(indexName, indexClass, this);
             } else if (this.rawGraph.index().existsForRelationships(indexName)) {
-                throw new RuntimeException("Can not convert existing " + indexName + " index to a " + indexClass + " index");
+                throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
             } else {
                 return null;
             }
@@ -213,7 +214,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             if (this.rawGraph.index().existsForRelationships(indexName)) {
                 return new Neo4jIndex(indexName, indexClass, this);
             } else if (this.rawGraph.index().existsForNodes(indexName)) {
-                throw new RuntimeException("Can not convert existing " + indexName + " index to a " + indexClass + " index");
+                throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
             } else {
                 return null;
             }
@@ -278,7 +279,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Vertex identifier cannot be null");
+            throw ExceptionFactory.vertexIdCanNotBeNull();
 
         try {
             final Long longId;
@@ -345,7 +346,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 return;
             this.rawGraph.index().getRelationshipAutoIndexer().stopAutoIndexingProperty(key);
         } else {
-            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
         this.dropInternalIndexKey(key, elementClass);
     }
@@ -361,7 +362,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 this.rawGraph.index().getRelationshipAutoIndexer().setEnabled(true);
             this.rawGraph.index().getRelationshipAutoIndexer().startAutoIndexingProperty(key);
         } else {
-            throw new IllegalStateException("The class " + elementClass + " is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
         this.createInternalIndexKey(key, elementClass);
     }
@@ -376,7 +377,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 return Collections.emptySet();
             return this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndexedProperties();
         } else {
-            throw new IllegalStateException("The class " + elementClass + " is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
     }
 
@@ -413,7 +414,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Edge identifier cannot be null");
+            throw ExceptionFactory.edgeIdCanNotBeNull();
 
         try {
             final Long longId;

@@ -5,6 +5,7 @@ package com.tinkerpop.blueprints.pgm.impls.dex;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
 import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
@@ -154,8 +155,10 @@ public class DexElement implements Element {
     @Override
     public void setProperty(final String key, final Object value) {
         //System.out.println(this + "!!" + key + "!!" + value);
-        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
-            throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
+        if (key.equals(StringFactory.ID))
+            throw ExceptionFactory.propertyKeyIdIsReserved();
+        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
+            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
 
         if (key.compareTo(LABEL_PROPERTY) == 0) {
             throw new UnsupportedOperationException(LABEL_PROPERTY

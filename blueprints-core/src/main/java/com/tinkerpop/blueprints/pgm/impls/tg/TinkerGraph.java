@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
@@ -28,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A in-memory, reference implementation of the property graph interfaces provided by Blueprints.
+ * An in-memory, reference implementation of the property graph interfaces provided by Blueprints.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -39,8 +40,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
     protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
 
-    protected TinkerKeyIndex<TinkerVertex> vertexIndex = new TinkerKeyIndex<TinkerVertex>(TinkerVertex.class, this);
-    protected TinkerKeyIndex<TinkerEdge> edgeIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
+    protected TinkerKeyIndex<TinkerVertex> vertexKeyIndex = new TinkerKeyIndex<TinkerVertex>(TinkerVertex.class, this);
+    protected TinkerKeyIndex<TinkerEdge> edgeKeyIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
 
     private final String directory;
     private static final String GRAPH_FILE = "/tinkergraph.dat";
@@ -84,7 +85,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             final File file = new File(directory);
             if (!file.exists()) {
                 if (!file.mkdirs()) {
-                    throw new RuntimeException("Could not create directory.");
+                    throw new RuntimeException("Could not create directory");
                 }
             } else {
                 ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
@@ -94,8 +95,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                 this.vertices = temp.vertices;
                 this.edges = temp.edges;
                 this.indices = temp.indices;
-                this.vertexIndex = temp.vertexIndex;
-                this.edgeIndex = temp.edgeIndex;
+                this.vertexKeyIndex = temp.vertexKeyIndex;
+                this.edgeKeyIndex = temp.edgeKeyIndex;
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -107,16 +108,16 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
-        if (vertexIndex.getIndexedKeys().contains(key)) {
-            return (CloseableIterable) vertexIndex.get(key, value);
+        if (vertexKeyIndex.getIndexedKeys().contains(key)) {
+            return (CloseableIterable) vertexKeyIndex.get(key, value);
         } else {
             return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
         }
     }
 
     public CloseableIterable<Edge> getEdges(final String key, final Object value) {
-        if (edgeIndex.getIndexedKeys().contains(key)) {
-            return (CloseableIterable) edgeIndex.get(key, value);
+        if (edgeKeyIndex.getIndexedKeys().contains(key)) {
+            return (CloseableIterable) edgeKeyIndex.get(key, value);
         } else {
             return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
         }
@@ -124,37 +125,37 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
     public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
         if (Vertex.class.isAssignableFrom(elementClass)) {
-            this.vertexIndex.createKeyIndex(key);
+            this.vertexKeyIndex.createKeyIndex(key);
         } else if (Edge.class.isAssignableFrom(elementClass)) {
-            this.edgeIndex.createKeyIndex(key);
+            this.edgeKeyIndex.createKeyIndex(key);
         } else {
-            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
     }
 
     public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
         if (Vertex.class.isAssignableFrom(elementClass)) {
-            this.vertexIndex.dropKeyIndex(key);
+            this.vertexKeyIndex.dropKeyIndex(key);
         } else if (Edge.class.isAssignableFrom(elementClass)) {
-            this.edgeIndex.dropKeyIndex(key);
+            this.edgeKeyIndex.dropKeyIndex(key);
         } else {
-            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
         if (Vertex.class.isAssignableFrom(elementClass)) {
-            return this.vertexIndex.getIndexedKeys();
+            return this.vertexKeyIndex.getIndexedKeys();
         } else if (Edge.class.isAssignableFrom(elementClass)) {
-            return this.edgeIndex.getIndexedKeys();
+            return this.edgeKeyIndex.getIndexedKeys();
         } else {
-            throw new IllegalArgumentException("The class " + elementClass + " is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
     }
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         if (this.indices.containsKey(indexName))
-            throw new RuntimeException("Index already exists: " + indexName);
+            throw ExceptionFactory.indexAlreadyExists(indexName);
 
         final TinkerIndex index = new TinkerIndex(indexName, indexClass);
         this.indices.put(index.getIndexName(), index);
@@ -166,7 +167,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         if (null == index)
             return null;
         if (!indexClass.isAssignableFrom(index.getIndexClass()))
-            throw new RuntimeException(indexClass + " is not assignable from " + index.getIndexClass());
+            throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
         else
             return (Index<T>) index;
     }
@@ -191,7 +192,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             idString = id.toString();
             vertex = this.vertices.get(idString);
             if (null != vertex) {
-                throw new RuntimeException("Vertex with id " + idString + " already exists");
+                throw ExceptionFactory.vertexWithIdAlreadyExists(id);
             }
         } else {
             boolean done = false;
@@ -211,7 +212,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.vertexIdCanNotBeNull();
 
         String idString = id.toString();
         return this.vertices.get(idString);
@@ -219,7 +220,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
     public Edge getEdge(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.edgeIdCanNotBeNull();
 
         String idString = id.toString();
         return this.edges.get(idString);
@@ -227,11 +228,11 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
 
     public Iterable<Vertex> getVertices() {
-        return new ArrayList<Vertex>(vertices.values());
+        return new ArrayList<Vertex>(this.vertices.values());
     }
 
     public Iterable<Edge> getEdges() {
-        return new ArrayList<Edge>(edges.values());
+        return new ArrayList<Edge>(this.edges.values());
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -242,7 +243,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             this.removeEdge(edge);
         }
 
-        this.vertexIndex.removeElement((TinkerVertex) vertex);
+        this.vertexKeyIndex.removeElement((TinkerVertex) vertex);
         for (Index index : this.getIndices()) {
             if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>) index;
@@ -260,7 +261,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             idString = id.toString();
             edge = this.edges.get(idString);
             if (null != edge) {
-                throw new RuntimeException("Edge with id " + id + " already exists");
+                throw ExceptionFactory.edgeWithIdAlreadyExist(id);
             }
         } else {
             boolean done = false;
@@ -297,7 +298,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         }
 
 
-        this.edgeIndex.removeElement((TinkerEdge) edge);
+        this.edgeKeyIndex.removeElement((TinkerEdge) edge);
         for (Index index : this.getIndices()) {
             if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>) index;
@@ -321,8 +322,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         this.edges.clear();
         this.indices.clear();
         this.currentId = 0l;
-        this.vertexIndex = new TinkerKeyIndex<TinkerVertex>(TinkerVertex.class, this);
-        this.edgeIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
+        this.vertexKeyIndex = new TinkerKeyIndex<TinkerVertex>(TinkerVertex.class, this);
+        this.edgeKeyIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
     }
 
     public void shutdown() {

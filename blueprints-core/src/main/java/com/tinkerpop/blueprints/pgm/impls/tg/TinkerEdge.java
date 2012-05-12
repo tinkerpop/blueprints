@@ -21,7 +21,7 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
         this.label = label;
         this.outVertex = outVertex;
         this.inVertex = inVertex;
-        this.graph.edgeIndex.autoUpdate(StringFactory.LABEL, this.label, null, this);
+        this.graph.edgeKeyIndex.autoUpdate(StringFactory.LABEL, this.label, null, this);
     }
 
     public String getLabel() {

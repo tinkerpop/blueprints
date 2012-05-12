@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
 import org.codehaus.jettison.json.JSONObject;
@@ -67,8 +68,10 @@ public abstract class RexsterElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
-            throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
+        if (key.equals(StringFactory.ID))
+            throw ExceptionFactory.propertyKeyIdIsReserved();
+        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
+            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
 
         if (key.startsWith(RexsterTokens.UNDERSCORE))
             throw new RuntimeException("RexsterGraph does not support property keys that start with underscore");

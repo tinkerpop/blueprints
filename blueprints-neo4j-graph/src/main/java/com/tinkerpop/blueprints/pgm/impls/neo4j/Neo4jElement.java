@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
@@ -35,8 +36,11 @@ public abstract class Neo4jElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        if (key.equals(StringFactory.ID) || (key.equals(StringFactory.LABEL) && this instanceof Edge))
-            throw new RuntimeException(key + StringFactory.PROPERTY_EXCEPTION_MESSAGE);
+        if (key.equals(StringFactory.ID))
+            throw ExceptionFactory.propertyKeyIdIsReserved();
+        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
+            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+
         try {
             // attempts to take a collection and convert it to an array so that Neo4j can consume it
             this.graph.autoStartTransaction();

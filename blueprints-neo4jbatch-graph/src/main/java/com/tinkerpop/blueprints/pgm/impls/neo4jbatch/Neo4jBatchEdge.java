@@ -2,6 +2,8 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
+import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.Map;
 
@@ -26,6 +28,11 @@ public class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
     }
 
     public void setProperty(final String key, final Object value) {
+        if (key.equals(StringFactory.ID))
+            throw ExceptionFactory.propertyKeyIdIsReserved();
+        if (key.equals(StringFactory.LABEL))
+            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+
         final Map<String, Object> properties = this.getPropertyMapClone();
         properties.put(key, value);
         this.graph.getRawGraph().setRelationshipProperties(this.id, properties);

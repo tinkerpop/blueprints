@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.MetaGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -241,7 +242,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
 
     public Vertex getVertex(final Object id) {
         if (null == id)
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw ExceptionFactory.vertexIdCanNotBeNull();
 
         try {
             final Long longId;

@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.pgm.impls.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
 
 import java.util.Map;
@@ -25,6 +26,9 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
     }
 
     public void setProperty(final String key, final Object value) {
+        if (key.equals(StringFactory.ID))
+            throw ExceptionFactory.propertyKeyIdIsReserved();
+
         final Map<String, Object> properties = this.getPropertyMapClone();
         properties.put(key, value);
         this.graph.getRawGraph().setNodeProperties(this.id, properties);

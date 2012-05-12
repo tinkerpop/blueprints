@@ -20,10 +20,7 @@ public class OrientEdge extends OrientElement implements Edge {
 
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
-        this.rawElement.field(LABEL, label);
-        //for (final OrientAutomaticIndex autoIndex : this.graph.getAutoIndices()) {
-        //    autoIndex.autoUpdate(AutomaticIndex.LABEL, this.getLabel(), null, this);
-        //}
+        this.rawElement.field(StringFactory.LABEL, label);
     }
 
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
@@ -39,7 +36,7 @@ public class OrientEdge extends OrientElement implements Edge {
     }
 
     public String getLabel() {
-        return (String) this.rawElement.field(LABEL);
+        return (String) this.rawElement.field(StringFactory.LABEL);
     }
 
     public Set<String> getPropertyKeys() {
