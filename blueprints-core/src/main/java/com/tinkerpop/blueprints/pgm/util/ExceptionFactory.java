@@ -29,11 +29,11 @@ public class ExceptionFactory {
     // Element related exceptions
 
     public static IllegalArgumentException propertyKeyIdIsReserved() {
-        return new IllegalArgumentException("Property key id is reserved for all elements");
+        return new IllegalArgumentException("Property key is reserved for all elements: id");
     }
 
     public static IllegalArgumentException propertyKeyLabelIsReservedForEdges() {
-        return new IllegalArgumentException("Property key label is reserved for all edges");
+        return new IllegalArgumentException("Property key is reserved for all edges: label");
     }
 
     // IndexableGraph related exceptions
