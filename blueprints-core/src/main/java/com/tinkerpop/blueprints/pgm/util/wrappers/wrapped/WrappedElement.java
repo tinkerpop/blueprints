@@ -9,45 +9,45 @@ import java.util.Set;
  */
 public class WrappedElement implements Element {
 
-    protected Element rawElement;
+    protected Element baseElement;
 
-    public WrappedElement(final Element rawElement) {
-        this.rawElement = rawElement;
+    public WrappedElement(final Element baseElement) {
+        this.baseElement = baseElement;
     }
 
     public void setProperty(final String key, final Object value) {
-        this.rawElement.setProperty(key, value);
+        this.baseElement.setProperty(key, value);
     }
 
     public Object getProperty(final String key) {
-        return this.rawElement.getProperty(key);
+        return this.baseElement.getProperty(key);
     }
 
     public Object removeProperty(final String key) {
-        return this.rawElement.removeProperty(key);
+        return this.baseElement.removeProperty(key);
     }
 
     public Set<String> getPropertyKeys() {
-        return this.rawElement.getPropertyKeys();
+        return this.baseElement.getPropertyKeys();
     }
 
     public Object getId() {
-        return this.rawElement.getId();
+        return this.baseElement.getId();
     }
 
     public boolean equals(final Object object) {
-        return null != object && (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((WrappedElement) object).getId());
+        return null != object && (object.getClass().equals(this.getClass())) && this.baseElement.getId().equals(((WrappedElement) object).getId());
     }
 
     public int hashCode() {
-        return this.rawElement.hashCode();
+        return this.baseElement.hashCode();
     }
 
     public Element getBaseElement() {
-        return this.rawElement;
+        return this.baseElement;
     }
 
     public String toString() {
-        return this.rawElement.toString();
+        return this.baseElement.toString();
     }
 }

@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.MultiIterable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * For those graph engines that do not support the low-level querying of the outgoing edges of a vertex, then DefaultQuery can be used.
+ * For those graph engines that do not support the low-level querying of the edges of a vertex, then DefaultQuery can be used.
  * DefaultQuery assumes, at minimum, that Vertex.getOutEdges() and Vertex.getInEdges() is implemented by the respective Graph.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -63,11 +62,11 @@ public class DefaultQuery implements Query {
     }
 
     public Iterable<Edge> edges() {
-        return new QueryIterable<Edge>(false);
+        return new DefaultQueryIterable<Edge>(false);
     }
 
     public Iterable<Vertex> vertices() {
-        return new QueryIterable<Vertex>(true);
+        return new DefaultQueryIterable<Vertex>(true);
     }
 
     public long count() {
@@ -130,12 +129,12 @@ public class DefaultQuery implements Query {
         }
     }
 
-    private class QueryIterable<T extends Element> implements Iterable<T> {
+    private class DefaultQueryIterable<T extends Element> implements Iterable<T> {
 
         private Iterable<Edge> iterable;
         private boolean forVertex;
 
-        public QueryIterable(final boolean forVertex) {
+        public DefaultQueryIterable(final boolean forVertex) {
             this.forVertex = forVertex;
             final List<Iterable<Edge>> temp = new ArrayList<Iterable<Edge>>(2);
             if (direction == Direction.OUT || direction == Direction.BOTH) {
@@ -150,79 +149,72 @@ public class DefaultQuery implements Query {
         }
 
         public Iterator<T> iterator() {
-            return new QueryIterator<T>();
-        }
+            return new Iterator<T>() {
+                Edge nextEdge = null;
+                final Iterator<Edge> itty = iterable.iterator();
+                long count = 0;
 
-        private class QueryIterator<T extends Element> implements Iterator<T> {
-
-            Edge nextEdge = null;
-            final Iterator<Edge> itty;
-            long count = 0;
-
-            public QueryIterator() {
-                this.itty = iterable.iterator();
-            }
-
-            public boolean hasNext() {
-                if (null != this.nextEdge) {
-                    return true;
-                } else {
-                    return this.loadNext();
-                }
-            }
-
-            public T next() {
-                while (true) {
-                    if (this.nextEdge != null) {
-                        final Edge temp = this.nextEdge;
-                        this.nextEdge = null;
-                        if (forVertex) {
-                            if (direction == Direction.OUT)
-                                return (T) temp.getInVertex();
-                            else if (direction == Direction.IN)
-                                return (T) temp.getOutVertex();
-                            else {
-                                if (temp.getInVertex().equals(vertex)) {
-                                    return (T) temp.getOutVertex();
-                                } else {
-                                    return (T) temp.getInVertex();
-                                }
-                            }
-
-                        } else {
-                            return (T) temp;
-                        }
-                    }
-
-                    if (!this.loadNext())
-                        throw new NoSuchElementException();
-                }
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException();
-            }
-
-            private boolean loadNext() {
-                this.nextEdge = null;
-                if (count >= limit) return false;
-                while (this.itty.hasNext()) {
-                    final Edge edge = this.itty.next();
-                    boolean filter = false;
-                    for (final HasContainer hasContainer : hasContainers) {
-                        if (!hasContainer.isLegal(edge)) {
-                            filter = true;
-                            break;
-                        }
-                    }
-                    if (!filter) {
-                        this.nextEdge = edge;
-                        this.count++;
+                public boolean hasNext() {
+                    if (null != this.nextEdge) {
                         return true;
+                    } else {
+                        return this.loadNext();
                     }
                 }
-                return false;
-            }
+
+                public T next() {
+                    while (true) {
+                        if (this.nextEdge != null) {
+                            final Edge temp = this.nextEdge;
+                            this.nextEdge = null;
+                            if (forVertex) {
+                                if (direction == Direction.OUT)
+                                    return (T) temp.getInVertex();
+                                else if (direction == Direction.IN)
+                                    return (T) temp.getOutVertex();
+                                else {
+                                    if (temp.getInVertex().equals(vertex)) {
+                                        return (T) temp.getOutVertex();
+                                    } else {
+                                        return (T) temp.getInVertex();
+                                    }
+                                }
+
+                            } else {
+                                return (T) temp;
+                            }
+                        }
+
+                        if (!this.loadNext())
+                            throw new NoSuchElementException();
+                    }
+                }
+
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+
+                private boolean loadNext() {
+                    this.nextEdge = null;
+                    if (count >= limit) return false;
+                    while (this.itty.hasNext()) {
+                        final Edge edge = this.itty.next();
+                        boolean filter = false;
+                        for (final HasContainer hasContainer : hasContainers) {
+                            if (!hasContainer.isLegal(edge)) {
+                                filter = true;
+                                break;
+                            }
+                        }
+                        if (!filter) {
+                            this.nextEdge = edge;
+                            this.count++;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
         }
     }
 }

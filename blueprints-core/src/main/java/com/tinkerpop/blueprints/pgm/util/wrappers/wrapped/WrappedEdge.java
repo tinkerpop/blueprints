@@ -8,23 +8,23 @@ import com.tinkerpop.blueprints.pgm.Vertex;
  */
 public class WrappedEdge extends WrappedElement implements Edge {
 
-    public WrappedEdge(final Edge rawEdge) {
-        super(rawEdge);
+    public WrappedEdge(final Edge baseEdge) {
+        super(baseEdge);
     }
 
     public Vertex getInVertex() {
-        return new WrappedVertex(((Edge) rawElement).getInVertex());
+        return new WrappedVertex(((Edge) baseElement).getInVertex());
     }
 
     public Vertex getOutVertex() {
-        return new WrappedVertex(((Edge) rawElement).getOutVertex());
+        return new WrappedVertex(((Edge) baseElement).getOutVertex());
     }
 
     public String getLabel() {
-        return ((Edge) this.rawElement).getLabel();
+        return ((Edge) this.baseElement).getLabel();
     }
 
     public Edge getBaseEdge() {
-        return (Edge) this.rawElement;
+        return (Edge) this.baseElement;
     }
 }

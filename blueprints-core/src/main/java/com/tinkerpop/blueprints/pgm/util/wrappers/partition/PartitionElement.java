@@ -10,39 +10,39 @@ import java.util.Set;
  */
 public class PartitionElement implements Element {
 
-    protected Element rawElement;
+    protected Element baseElement;
     protected PartitionGraph graph;
 
-    public PartitionElement(final Element rawElement, final PartitionGraph graph) {
-        this.rawElement = rawElement;
+    public PartitionElement(final Element baseElement, final PartitionGraph graph) {
+        this.baseElement = baseElement;
         this.graph = graph;
     }
 
     public void setProperty(final String key, final Object value) {
         if (!key.equals(this.graph.getPartitionKey()))
-            this.rawElement.setProperty(key, value);
+            this.baseElement.setProperty(key, value);
     }
 
     public Object getProperty(final String key) {
         if (key.equals(this.graph.getPartitionKey()))
             return null;
-        return this.rawElement.getProperty(key);
+        return this.baseElement.getProperty(key);
     }
 
     public Object removeProperty(final String key) {
         if (key.equals(this.graph.getPartitionKey()))
             return null;
-        return this.rawElement.removeProperty(key);
+        return this.baseElement.removeProperty(key);
     }
 
     public Set<String> getPropertyKeys() {
-        final Set<String> keys = new HashSet<String>(this.rawElement.getPropertyKeys());
+        final Set<String> keys = new HashSet<String>(this.baseElement.getPropertyKeys());
         keys.remove(this.graph.getPartitionKey());
         return keys;
     }
 
     public Object getId() {
-        return this.rawElement.getId();
+        return this.baseElement.getId();
     }
 
     public boolean equals(final Object object) {
@@ -50,22 +50,22 @@ public class PartitionElement implements Element {
     }
 
     public int hashCode() {
-        return this.rawElement.hashCode();
+        return this.baseElement.hashCode();
     }
 
     public Element getBaseElement() {
-        return this.rawElement;
+        return this.baseElement;
     }
 
     public String getPartition() {
-        return (String) this.rawElement.getProperty(this.graph.getPartitionKey());
+        return (String) this.baseElement.getProperty(this.graph.getPartitionKey());
     }
 
     public void setPartition(final String partition) {
-        this.rawElement.setProperty(this.graph.getPartitionKey(), partition);
+        this.baseElement.setProperty(this.graph.getPartitionKey(), partition);
     }
 
     public String toString() {
-        return this.rawElement.toString();
+        return this.baseElement.toString();
     }
 }

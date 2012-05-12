@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.id;
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
+import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperQuery;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -26,9 +26,18 @@ public class IdVertex extends IdElement implements Vertex {
         return new IdEdgeIterable(((Vertex) this.baseElement).getInEdges(filters));
     }
 
-    @Override
     public Query query() {
-        return new DefaultQuery(this);
+        return new WrapperQuery(((Vertex) this.baseElement).query()) {
+            @Override
+            public Iterable<Vertex> vertices() {
+                return new IdVertexIterable(this.query.vertices());
+            }
+
+            @Override
+            public Iterable<Edge> edges() {
+                return new IdEdgeIterable(this.query.edges());
+            }
+        };
     }
 
     @Override

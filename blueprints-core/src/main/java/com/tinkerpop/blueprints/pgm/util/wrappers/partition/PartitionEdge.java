@@ -8,23 +8,23 @@ import com.tinkerpop.blueprints.pgm.Vertex;
  */
 public class PartitionEdge extends PartitionElement implements Edge {
 
-    public PartitionEdge(final Edge rawEdge, final PartitionGraph graph) {
-        super(rawEdge, graph);
+    public PartitionEdge(final Edge baseEdge, final PartitionGraph graph) {
+        super(baseEdge, graph);
     }
 
     public Vertex getInVertex() {
-        return new PartitionVertex(((Edge) rawElement).getInVertex(), this.graph);
+        return new PartitionVertex(((Edge) baseElement).getInVertex(), this.graph);
     }
 
     public Vertex getOutVertex() {
-        return new PartitionVertex(((Edge) rawElement).getOutVertex(), this.graph);
+        return new PartitionVertex(((Edge) baseElement).getOutVertex(), this.graph);
     }
 
     public String getLabel() {
-        return ((Edge) this.rawElement).getLabel();
+        return ((Edge) this.baseElement).getLabel();
     }
 
     public Edge getBaseEdge() {
-        return (Edge) this.rawElement;
+        return (Edge) this.baseElement;
     }
 }
