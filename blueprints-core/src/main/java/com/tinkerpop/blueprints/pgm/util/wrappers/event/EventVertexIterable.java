@@ -18,9 +18,13 @@ public class EventVertexIterable implements CloseableIterable<Vertex> {
     private final Iterable<Vertex> iterable;
     private final List<GraphChangedListener> graphChangedListeners;
 
-    public EventVertexIterable(final Iterable<Vertex> iterable, final List<GraphChangedListener> graphChangedListeners) {
+    private final EventTrigger trigger;
+
+    public EventVertexIterable(final Iterable<Vertex> iterable, final List<GraphChangedListener> graphChangedListeners,
+                               final EventTrigger trigger) {
         this.iterable = iterable;
         this.graphChangedListeners = graphChangedListeners;
+        this.trigger = trigger;
     }
 
     public void close() {
@@ -38,7 +42,7 @@ public class EventVertexIterable implements CloseableIterable<Vertex> {
             }
 
             public Vertex next() {
-                return new EventVertex(this.itty.next(), graphChangedListeners);
+                return new EventVertex(this.itty.next(), graphChangedListeners, trigger);
             }
 
             public boolean hasNext() {

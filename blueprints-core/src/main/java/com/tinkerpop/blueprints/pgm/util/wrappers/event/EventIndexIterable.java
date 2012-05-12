@@ -17,10 +17,14 @@ public class EventIndexIterable<T extends Element> implements Iterable<Index<T>>
 
     private final Iterable<Index<T>> iterable;
     private final List<GraphChangedListener> graphChangedListeners;
+    
+    private final EventTrigger trigger;
 
-    public EventIndexIterable(final Iterable<Index<T>> iterable, List<GraphChangedListener> graphChangedListeners) {
+    public EventIndexIterable(final Iterable<Index<T>> iterable, List<GraphChangedListener> graphChangedListeners,
+                              final EventTrigger trigger) {
         this.iterable = iterable;
         this.graphChangedListeners = graphChangedListeners;
+        this.trigger = trigger;
     }
 
     public Iterator<Index<T>> iterator() {
@@ -32,7 +36,7 @@ public class EventIndexIterable<T extends Element> implements Iterable<Index<T>>
             }
 
             public Index<T> next() {
-                return new EventIndex<T>(this.itty.next(), graphChangedListeners);
+                return new EventIndex<T>(this.itty.next(), graphChangedListeners, trigger);
             }
 
             public boolean hasNext() {

@@ -15,16 +15,17 @@ import java.util.List;
  * @author Stephen Mallette
  */
 public class EventVertex extends EventElement implements Vertex {
-    public EventVertex(final Vertex rawVertex, final List<GraphChangedListener> graphChangedListeners) {
-        super(rawVertex, graphChangedListeners);
+    public EventVertex(final Vertex rawVertex, final List<GraphChangedListener> graphChangedListeners,
+                       final EventTrigger trigger) {
+        super(rawVertex, graphChangedListeners, trigger);
     }
 
     public Iterable<Edge> getInEdges(final String... labels) {
-        return new EventEdgeIterable(((Vertex) this.rawElement).getInEdges(labels), this.graphChangedListeners);
+        return new EventEdgeIterable(this.getBaseVertex().getInEdges(labels), this.graphChangedListeners, trigger);
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
-        return new EventEdgeIterable(((Vertex) this.rawElement).getOutEdges(labels), this.graphChangedListeners);
+        return new EventEdgeIterable(this.getBaseVertex().getOutEdges(labels), this.graphChangedListeners, trigger);
     }
 
     public Query query() {

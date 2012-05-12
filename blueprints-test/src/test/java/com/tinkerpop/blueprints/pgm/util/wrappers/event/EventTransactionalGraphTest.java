@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
-
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.EdgeTestSuite;
 import com.tinkerpop.blueprints.pgm.Features;
@@ -9,11 +8,10 @@ import com.tinkerpop.blueprints.pgm.GraphTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
+import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.ConsoleGraphChangedListener;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
@@ -21,12 +19,13 @@ import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedLis
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 
-public class EventGraphTest extends GraphTest {
+public class EventTransactionalGraphTest extends GraphTest {
 
     private StubGraphChangedListener graphChangedListener;
-    private EventGraph<TinkerGraph> graph;
+    private EventTransactionalGraph<TinkerTransactionalGraph> graph;
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -65,7 +64,7 @@ public class EventGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        return new EventIndexableGraph<TinkerGraph>(new TinkerGraph()) {
+        return new EventTransactionalIndexableGraph<TinkerTransactionalGraph>(new TinkerTransactionalGraph()) {
             public Features getFeatures() {
                 final Features features = super.getFeatures();
                 features.isPersistent = false;
@@ -87,7 +86,7 @@ public class EventGraphTest extends GraphTest {
     public void setUp() throws Exception {
         super.setUp();
         graphChangedListener = new StubGraphChangedListener();
-        graph = new EventGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
+        graph = new EventTransactionalGraph<TinkerTransactionalGraph>(TinkerTransactionalGraph.createTinkerGraph());
     }
 
     public void testWrappedElementUniqueness() {
@@ -190,6 +189,9 @@ public class EventGraphTest extends GraphTest {
 
         Vertex vertex = createVertex();
 
+        assertEquals(0, graphChangedListener.addVertexEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
         assertEquals(1, graphChangedListener.addVertexEventRecorded());
 
         graphChangedListener.reset();
@@ -205,6 +207,8 @@ public class EventGraphTest extends GraphTest {
         Vertex vertex = createVertex();
         vertex.setProperty("name", "marko");
 
+        assertEquals(0, graphChangedListener.vertexPropertyChangedEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.vertexPropertyChangedEventRecorded());
 
         graphChangedListener.reset();
@@ -221,6 +225,8 @@ public class EventGraphTest extends GraphTest {
         vertex.setProperty("name", "marko");
         vertex.removeProperty("name");
 
+        assertEquals(0, graphChangedListener.vertexPropertyRemovedEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.vertexPropertyRemovedEventRecorded());
     }
 
@@ -230,6 +236,8 @@ public class EventGraphTest extends GraphTest {
         Vertex vertex = createVertex();
         graph.removeVertex(vertex);
 
+        assertEquals(0, graphChangedListener.vertexRemovedEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.vertexRemovedEventRecorded());
     }
 
@@ -238,6 +246,8 @@ public class EventGraphTest extends GraphTest {
 
         Edge edge = createEdge();
 
+        assertEquals(0, graphChangedListener.addEdgeEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.addEdgeEventRecorded());
 
         graphChangedListener.reset();
@@ -255,6 +265,8 @@ public class EventGraphTest extends GraphTest {
 
         edge.setProperty("weight", System.currentTimeMillis());
 
+        assertEquals(0, graphChangedListener.edgePropertyChangedEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.edgePropertyChangedEventRecorded());
 
         graphChangedListener.reset();
@@ -273,6 +285,8 @@ public class EventGraphTest extends GraphTest {
 
         edge.removeProperty("weight");
 
+        assertEquals(0, graphChangedListener.edgePropertyRemovedEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.edgePropertyRemovedEventRecorded());
     }
 
@@ -283,7 +297,100 @@ public class EventGraphTest extends GraphTest {
 
         graph.removeEdge(edge);
 
+        assertEquals(0, graphChangedListener.edgeRemovedEventRecorded());
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.edgeRemovedEventRecorded());
+    }
+    
+    public void testTransactionSeriesWithSuccess(){
+        graph.addListener(graphChangedListener);
+        
+        createEdge();
+        Edge e = createEdge();
+        e.setProperty("test", "it");
+        e.setProperty("test", "that");
+
+        Vertex v = createVertex();
+        v.setProperty("test", "it");
+
+        assertEquals(0, graphChangedListener.addEdgeEventRecorded());
+        assertEquals(0, graphChangedListener.addVertexEventRecorded());
+        assertEquals(0, graphChangedListener.edgePropertyChangedEventRecorded());
+        assertEquals(0, graphChangedListener.vertexPropertyChangedEventRecorded());
+
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
+        assertEquals(2, graphChangedListener.addEdgeEventRecorded());
+        assertEquals(5, graphChangedListener.addVertexEventRecorded());
+        assertEquals(2, graphChangedListener.edgePropertyChangedEventRecorded());
+        assertEquals(1, graphChangedListener.vertexPropertyChangedEventRecorded());
+    }
+
+    public void testTransactionSeriesWithFailure(){
+        graph.addListener(graphChangedListener);
+
+        createEdge();
+        Edge e = createEdge();
+        e.setProperty("test", "it");
+        e.setProperty("test", "that");
+
+        Vertex v = createVertex();
+        v.setProperty("test", "it");
+
+        assertEquals(0, graphChangedListener.addEdgeEventRecorded());
+        assertEquals(0, graphChangedListener.addVertexEventRecorded());
+        assertEquals(0, graphChangedListener.edgePropertyChangedEventRecorded());
+        assertEquals(0, graphChangedListener.vertexPropertyChangedEventRecorded());
+
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+
+        assertEquals(0, graphChangedListener.addEdgeEventRecorded());
+        assertEquals(0, graphChangedListener.addVertexEventRecorded());
+        assertEquals(0, graphChangedListener.edgePropertyChangedEventRecorded());
+        assertEquals(0, graphChangedListener.vertexPropertyChangedEventRecorded());
+    }
+    
+    public void testTransactionSeriesOrder(){
+        graph.addListener(graphChangedListener);
+        graph.addListener(new ConsoleGraphChangedListener(graph));
+        
+        Vertex v1 = graph.addVertex(10);
+        v1.setProperty("aaa", "bbb");
+        v1.setProperty("ccc", "ddd");
+        v1.removeProperty("aaa");
+        
+        Vertex v2 = graph.addVertex(20);
+        Vertex v3 = graph.addVertex(30);
+        
+        Edge e1 = graph.addEdge(100, v1, v2, "friend");
+        e1.setProperty("eee", "fff");
+        e1.setProperty("ggg", "hhh");
+        e1.removeProperty("eee");
+        
+        Edge e2 = graph.addEdge(101, v1, v2, "enemy");
+        
+        graph.removeEdge(e2);
+        graph.removeVertex(v3);
+        
+        assertEquals(0, graphChangedListener.getOrder().size());
+
+        ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+
+        LinkedList<String> order = graphChangedListener.getOrder();
+        assertEquals("v-added-10", order.get(0));
+        assertEquals("v-property-changed-10-aaa:bbb", order.get(1));
+        assertEquals("v-property-changed-10-ccc:ddd", order.get(2));
+        assertEquals("v-property-removed-10-aaa:bbb", order.get(3));
+        assertEquals("v-added-20", order.get(4));
+        assertEquals("v-added-30", order.get(5));
+        assertEquals("e-added-100", order.get(6));
+        assertEquals("e-property-changed-100-eee:fff", order.get(7));
+        assertEquals("e-property-changed-100-ggg:hhh", order.get(8));
+        assertEquals("e-property-removed-100-eee:fff", order.get(9));
+        assertEquals("e-added-101", order.get(10));
+        assertEquals("e-removed-101", order.get(11));
+        assertEquals("v-removed-30", order.get(12));
+
     }
 
     private Edge createEdge() {
@@ -293,5 +400,8 @@ public class EventGraphTest extends GraphTest {
     private Vertex createVertex() {
         return graph.addVertex(null);
     }
+
+
 }
+
 
