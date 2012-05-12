@@ -8,8 +8,6 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionEdgeIterable;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.util.PartitionVertexIterable;
 
 import java.util.Arrays;
 import java.util.HashSet;

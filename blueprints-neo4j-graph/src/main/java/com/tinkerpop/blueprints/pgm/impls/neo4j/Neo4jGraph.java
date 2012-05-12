@@ -14,8 +14,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jEdgeIterable;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.util.Neo4jVertexIterable;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

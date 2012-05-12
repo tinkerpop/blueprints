@@ -7,8 +7,6 @@ import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedEdgeIterable;
-import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedVertexIterable;
 
 /**
  * WrappedGraph serves as a template for writing a wrapper graph.

@@ -6,9 +6,6 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventIndexIterable;
-
-import java.util.Set;
 
 /**
  * EventIndexableGraph is merely a proxy to index methods exposing EventGraph methods in the "evented" way. Like the

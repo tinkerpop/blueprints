@@ -13,10 +13,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterAuthentication;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeIterable;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexIterable;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 

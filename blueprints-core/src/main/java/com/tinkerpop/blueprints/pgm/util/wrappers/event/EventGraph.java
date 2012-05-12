@@ -8,8 +8,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeIterable;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexIterable;
 
 import java.util.ArrayList;
 import java.util.Iterator;

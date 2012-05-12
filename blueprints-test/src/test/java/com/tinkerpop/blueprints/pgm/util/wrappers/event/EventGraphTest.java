@@ -17,8 +17,6 @@ import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.ConsoleGraphChangedListener;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventEdgeIterable;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.util.EventVertexIterable;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;

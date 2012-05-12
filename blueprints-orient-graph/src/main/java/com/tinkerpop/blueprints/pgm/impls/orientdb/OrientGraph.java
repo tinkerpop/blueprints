@@ -20,7 +20,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.util.OrientElementScanIterable;
 
 import java.util.ArrayList;
 import java.util.HashSet;

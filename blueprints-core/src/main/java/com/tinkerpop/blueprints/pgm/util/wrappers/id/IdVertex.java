@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
-import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdEdgeIterable;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)

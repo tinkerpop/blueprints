@@ -6,9 +6,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RestHelper;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterEdgeIterable;
-import com.tinkerpop.blueprints.pgm.impls.rexster.util.RexsterVertexIterable;
 import org.codehaus.jettison.json.JSONObject;
 
 /**

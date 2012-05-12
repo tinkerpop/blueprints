@@ -9,7 +9,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.util.MultiIterable;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -9,8 +9,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.dex.util.DexAttributes;
-import com.tinkerpop.blueprints.pgm.impls.dex.util.DexTypes;
 
 import java.io.File;
 import java.util.ArrayList;

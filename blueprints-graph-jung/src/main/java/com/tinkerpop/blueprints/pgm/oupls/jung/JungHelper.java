@@ -1,9 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.jung;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.oupls.jung.util.EdgeLabelTransformer;
-import com.tinkerpop.blueprints.pgm.oupls.jung.util.EdgeLabelWeightTransformer;
-import com.tinkerpop.blueprints.pgm.oupls.jung.util.EdgeWeightTransformer;
 import org.apache.commons.collections15.Transformer;
 
 import java.util.ArrayList;

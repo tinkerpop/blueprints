@@ -5,9 +5,6 @@ import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.Parameter;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.util.WrappedIndexSequence;
-
-import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -23,7 +20,7 @@ public class WrappedIndexableGraph<T extends IndexableGraph> extends WrappedGrap
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new WrappedIndexSequence(baseGraph.getIndices());
+        return new WrappedIndexIterable(baseGraph.getIndices());
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {

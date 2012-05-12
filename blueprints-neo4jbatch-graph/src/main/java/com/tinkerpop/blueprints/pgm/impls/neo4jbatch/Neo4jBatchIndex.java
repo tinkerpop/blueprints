@@ -5,8 +5,6 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.Neo4jBatchEdgeIterable;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.Neo4jBatchVertexIterable;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
 
 import java.util.HashMap;

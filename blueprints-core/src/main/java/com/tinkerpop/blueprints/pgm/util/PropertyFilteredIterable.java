@@ -46,7 +46,8 @@ public class PropertyFilteredIterable<T extends Element> implements CloseableIte
                     try {
                         while (true) {
                             final T element = this.itty.next();
-                            if (element.getPropertyKeys().contains(key) && element.getProperty(key).equals(value)) {
+                            final Object temp = element.getProperty(key);
+                            if (null != temp && temp.equals(value)) {
                                 this.nextElement = element;
                                 return true;
                             }

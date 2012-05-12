@@ -10,7 +10,6 @@ import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.ExceptionFactory;
 import com.tinkerpop.blueprints.pgm.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.sail.util.SailEdgeIterable;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.nquads.NQuadsFormat;
 import org.apache.log4j.PropertyConfigurator;

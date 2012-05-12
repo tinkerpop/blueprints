@@ -8,8 +8,6 @@ import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.StringFactory;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdEdgeIterable;
-import com.tinkerpop.blueprints.pgm.util.wrappers.id.util.IdVertexIterable;
 
 import java.util.HashSet;
 import java.util.Iterator;
