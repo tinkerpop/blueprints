@@ -21,23 +21,20 @@ public class PartitionIndexIterable<T extends Element> implements Iterable<Index
     }
 
     public Iterator<Index<T>> iterator() {
-        return new PartitionIndexIterator();
+        return new Iterator<Index<T>>() {
+            private final Iterator<Index<T>> itty = iterable.iterator();
+
+            public void remove() {
+                this.itty.remove();
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+
+            public Index<T> next() {
+                return new PartitionIndex<T>(this.itty.next(), graph);
+            }
+        };
     }
-
-    private class PartitionIndexIterator implements Iterator<Index<T>> {
-        private final Iterator<Index<T>> itty = iterable.iterator();
-
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
-        public Index<T> next() {
-            return new PartitionIndex<T>(this.itty.next(), graph);
-        }
-    }
-
 }

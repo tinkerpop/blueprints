@@ -19,25 +19,20 @@ public class ReadOnlyIndexIterable<T extends Element> implements Iterable<Index<
     }
 
     public Iterator<Index<T>> iterator() {
-        return new ReadOnlyIndexIterator();
+        return new Iterator<Index<T>>() {
+            private final Iterator<Index<T>> itty = iterable.iterator();
+
+            public void remove() {
+                throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
+            }
+
+            public Index<T> next() {
+                return new ReadOnlyIndex<T>(this.itty.next());
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
-
-    private class ReadOnlyIndexIterator implements Iterator<Index<T>> {
-
-        private final Iterator<Index<T>> itty = iterable.iterator();
-
-        public void remove() {
-            throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
-        }
-
-        public Index<T> next() {
-            return new ReadOnlyIndex<T>(this.itty.next());
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-    }
-
-
 }

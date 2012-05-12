@@ -19,7 +19,21 @@ public class ReadOnlyEdgeIterable implements CloseableIterable<Edge> {
     }
 
     public Iterator<Edge> iterator() {
-        return new ReadOnlyEdgeIterator();
+        return new Iterator<Edge>() {
+            private final Iterator<Edge> itty = iterable.iterator();
+
+            public void remove() {
+                throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
+            }
+
+            public Edge next() {
+                return new ReadOnlyEdge(this.itty.next());
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
 
     public void close() {
@@ -27,23 +41,4 @@ public class ReadOnlyEdgeIterable implements CloseableIterable<Edge> {
             ((CloseableIterable) this.iterable).close();
         }
     }
-
-
-    private class ReadOnlyEdgeIterator implements Iterator<Edge> {
-        private final Iterator<Edge> itty = iterable.iterator();
-
-        public void remove() {
-            throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
-        }
-
-        public Edge next() {
-            return new ReadOnlyEdge(this.itty.next());
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-    }
-
-
 }

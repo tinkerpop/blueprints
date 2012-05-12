@@ -18,25 +18,21 @@ public class WrappedIndexSequence<T extends Element> implements Iterable<Index<T
     }
 
     public Iterator<Index<T>> iterator() {
-        return new WrappedIndexIterator();
+        return new Iterator<Index<T>>() {
+
+            private final Iterator<Index<T>> itty = iterable.iterator();
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+
+            public Index<T> next() {
+                return new WrappedIndex<T>(this.itty.next());
+            }
+        };
     }
-
-    private class WrappedIndexIterator implements Iterator<Index<T>> {
-
-        private final Iterator<Index<T>> itty = iterable.iterator();
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
-        public Index<T> next() {
-            return new WrappedIndex<T>(this.itty.next());
-        }
-    }
-
-
 }

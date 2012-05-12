@@ -16,9 +16,9 @@ public class IdEdgeIterable implements Iterable<Edge> {
     }
 
     public Iterator<Edge> iterator() {
-        final Iterator<Edge> itty = iterable.iterator();
-
         return new Iterator<Edge>() {
+            final Iterator<Edge> itty = iterable.iterator();
+
             public boolean hasNext() {
                 return itty.hasNext();
             }

@@ -22,53 +22,50 @@ public class PartitionEdgeIterable implements CloseableIterable<Edge> {
     }
 
     public Iterator<Edge> iterator() {
-        return new PartitionEdgeIterator();
+        return new Iterator<Edge>() {
+            private Iterator<Edge> itty = iterable.iterator();
+            private PartitionEdge nextEdge;
+
+            public void remove() {
+                this.itty.remove();
+            }
+
+            public boolean hasNext() {
+                if (null != this.nextEdge) {
+                    return true;
+                }
+                while (this.itty.hasNext()) {
+                    final Edge edge = this.itty.next();
+                    if (graph.isInPartition(edge)) {
+                        nextEdge = new PartitionEdge(edge, graph);
+                        return true;
+                    }
+                }
+                return false;
+
+            }
+
+            public Edge next() {
+                if (null != this.nextEdge) {
+                    final PartitionEdge temp = this.nextEdge;
+                    this.nextEdge = null;
+                    return temp;
+                } else {
+                    while (this.itty.hasNext()) {
+                        final Edge edge = this.itty.next();
+                        if (graph.isInPartition(edge)) {
+                            return new PartitionEdge(edge, graph);
+                        }
+                    }
+                    throw new NoSuchElementException();
+                }
+            }
+        };
     }
 
     public void close() {
         if (this.iterable instanceof CloseableIterable) {
             ((CloseableIterable) iterable).close();
-        }
-    }
-
-    private class PartitionEdgeIterator implements Iterator<Edge> {
-
-        private Iterator<Edge> itty = iterable.iterator();
-        private PartitionEdge nextEdge;
-
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public boolean hasNext() {
-            if (null != this.nextEdge) {
-                return true;
-            }
-            while (this.itty.hasNext()) {
-                final Edge edge = this.itty.next();
-                if (graph.isInPartition(edge)) {
-                    nextEdge = new PartitionEdge(edge, graph);
-                    return true;
-                }
-            }
-            return false;
-
-        }
-
-        public Edge next() {
-            if (null != this.nextEdge) {
-                final PartitionEdge temp = this.nextEdge;
-                this.nextEdge = null;
-                return temp;
-            } else {
-                while (this.itty.hasNext()) {
-                    final Edge edge = this.itty.next();
-                    if (graph.isInPartition(edge)) {
-                        return new PartitionEdge(edge, graph);
-                    }
-                }
-                throw new NoSuchElementException();
-            }
         }
     }
 }

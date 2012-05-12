@@ -23,53 +23,50 @@ public class PartitionVertexIterable implements CloseableIterable<Vertex> {
     }
 
     public Iterator<Vertex> iterator() {
-        return new PartitionVertexIterator();
+        return new Iterator<Vertex>() {
+            private final Iterator<Vertex> itty = iterable.iterator();
+            private PartitionVertex nextVertex;
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public boolean hasNext() {
+                if (null != this.nextVertex) {
+                    return true;
+                }
+                while (this.itty.hasNext()) {
+                    final Vertex vertex = this.itty.next();
+                    if (graph.isInPartition(vertex)) {
+                        this.nextVertex = new PartitionVertex(vertex, graph);
+                        return true;
+                    }
+                }
+                return false;
+
+            }
+
+            public Vertex next() {
+                if (null != this.nextVertex) {
+                    final PartitionVertex temp = this.nextVertex;
+                    this.nextVertex = null;
+                    return temp;
+                } else {
+                    while (this.itty.hasNext()) {
+                        final Vertex vertex = this.itty.next();
+                        if (graph.isInPartition(vertex)) {
+                            return new PartitionVertex(vertex, graph);
+                        }
+                    }
+                    throw new NoSuchElementException();
+                }
+            }
+        };
     }
 
     public void close() {
         if (this.iterable instanceof CloseableIterable) {
             ((CloseableIterable) iterable).close();
-        }
-    }
-
-    private class PartitionVertexIterator implements Iterator<Vertex> {
-
-        private final Iterator<Vertex> itty = iterable.iterator();
-        private PartitionVertex nextVertex;
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext() {
-            if (null != this.nextVertex) {
-                return true;
-            }
-            while (this.itty.hasNext()) {
-                final Vertex vertex = this.itty.next();
-                if (graph.isInPartition(vertex)) {
-                    this.nextVertex = new PartitionVertex(vertex, graph);
-                    return true;
-                }
-            }
-            return false;
-
-        }
-
-        public Vertex next() {
-            if (null != this.nextVertex) {
-                final PartitionVertex temp = this.nextVertex;
-                this.nextVertex = null;
-                return temp;
-            } else {
-                while (this.itty.hasNext()) {
-                    final Vertex vertex = this.itty.next();
-                    if (graph.isInPartition(vertex)) {
-                        return new PartitionVertex(vertex, graph);
-                    }
-                }
-                throw new NoSuchElementException();
-            }
         }
     }
 }

@@ -5,8 +5,8 @@ import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.impls.StringFactory;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.EdgeCloseableIterable;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.VertexCloseableIterable;
+import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.Neo4jBatchEdgeIterable;
+import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.util.Neo4jBatchVertexIterable;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
 
 import java.util.HashMap;
@@ -37,16 +37,16 @@ public class Neo4jBatchIndex<T extends Element> implements Index<T> {
 
     public CloseableIterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.indexClass))
-            return (CloseableIterable<T>) new VertexCloseableIterable(this.graph, this.rawIndex.get(key, value));
+            return (CloseableIterable<T>) new Neo4jBatchVertexIterable(this.graph, this.rawIndex.get(key, value));
         else
-            return (CloseableIterable<T>) new EdgeCloseableIterable(this.graph, this.rawIndex.get(key, value));
+            return (CloseableIterable<T>) new Neo4jBatchEdgeIterable(this.graph, this.rawIndex.get(key, value));
     }
 
     public CloseableIterable<T> query(final String key, final Object query) {
         if (Vertex.class.isAssignableFrom(this.indexClass))
-            return (CloseableIterable<T>) new VertexCloseableIterable(this.graph, this.rawIndex.query(key, query));
+            return (CloseableIterable<T>) new Neo4jBatchVertexIterable(this.graph, this.rawIndex.query(key, query));
         else
-            return (CloseableIterable<T>) new EdgeCloseableIterable(this.graph, this.rawIndex.query(key, query));
+            return (CloseableIterable<T>) new Neo4jBatchEdgeIterable(this.graph, this.rawIndex.query(key, query));
     }
 
     public long count(final String key, final Object value) {

@@ -24,31 +24,26 @@ public class EventEdgeIterable implements CloseableIterable<Edge> {
     }
 
     public Iterator<Edge> iterator() {
-        return new EventEdgeIterator();
+        return new Iterator<Edge>() {
+            private final Iterator<Edge> itty = iterable.iterator();
+
+            public void remove() {
+                this.itty.remove();
+            }
+
+            public Edge next() {
+                return new EventEdge(this.itty.next(), graphChangedListeners);
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
 
     public void close() {
         if (this.iterable instanceof CloseableIterable) {
             ((CloseableIterable) this.iterable).close();
         }
-    }
-
-    private class EventEdgeIterator implements Iterator<Edge> {
-
-        private final Iterator<Edge> itty = iterable.iterator();
-
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public Edge next() {
-            return new EventEdge(this.itty.next(), graphChangedListeners);
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
-
     }
 }

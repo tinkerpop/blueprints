@@ -19,7 +19,22 @@ public class ReadOnlyVertexIterable implements CloseableIterable<Vertex> {
     }
 
     public Iterator<Vertex> iterator() {
-        return new ReadOnlyVertexIterator();
+        return new Iterator<Vertex>() {
+            private Iterator<Vertex> itty = iterable.iterator();
+
+            public void remove() {
+                throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
+            }
+
+
+            public Vertex next() {
+                return new ReadOnlyVertex(this.itty.next());
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
 
     public void close() {
@@ -27,23 +42,4 @@ public class ReadOnlyVertexIterable implements CloseableIterable<Vertex> {
             ((CloseableIterable) this.iterable).close();
         }
     }
-
-    private class ReadOnlyVertexIterator implements Iterator<Vertex> {
-        private Iterator<Vertex> itty = iterable.iterator();
-
-        public void remove() {
-            throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
-        }
-
-
-        public Vertex next() {
-            return new ReadOnlyVertex(this.itty.next());
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-    }
-
-
 }

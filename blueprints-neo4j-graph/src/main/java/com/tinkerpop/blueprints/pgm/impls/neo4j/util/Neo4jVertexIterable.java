@@ -25,7 +25,21 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
 
 
     public Iterator<Neo4jVertex> iterator() {
-        return new Neo4jVertexIterator();
+        return new Iterator<Neo4jVertex>() {
+            private final Iterator<Node> itty = nodes.iterator();
+
+            public void remove() {
+                this.itty.remove();
+            }
+
+            public Neo4jVertex next() {
+                return new Neo4jVertex(this.itty.next(), graph);
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
 
     public void close() {
@@ -34,21 +48,4 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
         }
     }
 
-    private class Neo4jVertexIterator implements Iterator<Neo4jVertex> {
-
-        private final Iterator<Node> itty = nodes.iterator();
-
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public Neo4jVertex next() {
-            return new Neo4jVertex(this.itty.next(), graph);
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
-    }
 }

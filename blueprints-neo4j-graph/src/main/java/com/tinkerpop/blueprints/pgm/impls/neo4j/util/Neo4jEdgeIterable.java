@@ -24,30 +24,26 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
     }
 
     public Iterator<Neo4jEdge> iterator() {
-        return new Neo4jEdgeIterator();
+        return new Iterator<Neo4jEdge>() {
+            private final Iterator<Relationship> itty = relationships.iterator();
+
+            public void remove() {
+                this.itty.remove();
+            }
+
+            public Neo4jEdge next() {
+                return new Neo4jEdge(this.itty.next(), graph);
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
 
     public void close() {
         if (this.relationships instanceof IndexHits) {
             ((IndexHits) this.relationships).close();
         }
-    }
-
-    private class Neo4jEdgeIterator implements Iterator<Neo4jEdge> {
-
-        private final Iterator<Relationship> itty = relationships.iterator();
-
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public Neo4jEdge next() {
-            return new Neo4jEdge(this.itty.next(), graph);
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
     }
 }

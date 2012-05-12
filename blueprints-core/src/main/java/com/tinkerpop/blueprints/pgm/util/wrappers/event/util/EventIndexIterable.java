@@ -24,24 +24,20 @@ public class EventIndexIterable<T extends Element> implements Iterable<Index<T>>
     }
 
     public Iterator<Index<T>> iterator() {
-        return new EventIndexIterator();
-    }
+        return new Iterator<Index<T>>() {
+            private final Iterator<Index<T>> itty = iterable.iterator();
 
-    private class EventIndexIterator implements Iterator<Index<T>> {
+            public void remove() {
+                this.itty.remove();
+            }
 
-        private final Iterator<Index<T>> itty = iterable.iterator();
+            public Index<T> next() {
+                return new EventIndex<T>(this.itty.next(), graphChangedListeners);
+            }
 
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public Index<T> next() {
-            return new EventIndex<T>(this.itty.next(), graphChangedListeners);
-        }
-
-        public boolean hasNext() {
-            return itty.hasNext();
-        }
-
+            public boolean hasNext() {
+                return itty.hasNext();
+            }
+        };
     }
 }

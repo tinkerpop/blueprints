@@ -16,9 +16,9 @@ public class IdVertexIterable implements Iterable<Vertex> {
     }
 
     public Iterator<Vertex> iterator() {
-        final Iterator<Vertex> itty = iterable.iterator();
-
         return new Iterator<Vertex>() {
+            final Iterator<Vertex> itty = iterable.iterator();
+
             public boolean hasNext() {
                 return itty.hasNext();
             }

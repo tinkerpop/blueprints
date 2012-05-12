@@ -18,28 +18,26 @@ public class WrappedVertexIterable implements CloseableIterable<Vertex> {
     }
 
     public Iterator<Vertex> iterator() {
-        return new WrappedVertexIterator();
+        return new Iterator<Vertex>() {
+            private final Iterator<Vertex> itty = iterable.iterator();
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+
+            public Vertex next() {
+                return new WrappedVertex(this.itty.next());
+            }
+        };
     }
 
     public void close() {
         if (this.iterable instanceof CloseableIterable) {
             ((CloseableIterable) iterable).close();
-        }
-    }
-
-    public class WrappedVertexIterator implements Iterator<Vertex> {
-        private final Iterator<Vertex> itty = iterable.iterator();
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
-        public Vertex next() {
-            return new WrappedVertex(this.itty.next());
         }
     }
 }

@@ -30,24 +30,20 @@ public class EventVertexIterable implements CloseableIterable<Vertex> {
     }
 
     public Iterator<Vertex> iterator() {
-        return new EventVertexIterator();
-    }
+        return new Iterator<Vertex>() {
+            private final Iterator<Vertex> itty = iterable.iterator();
 
-    private class EventVertexIterator implements Iterator<Vertex> {
+            public void remove() {
+                this.itty.remove();
+            }
 
-        private final Iterator<Vertex> itty = iterable.iterator();
+            public Vertex next() {
+                return new EventVertex(this.itty.next(), graphChangedListeners);
+            }
 
-        public void remove() {
-            this.itty.remove();
-        }
-
-        public Vertex next() {
-            return new EventVertex(this.itty.next(), graphChangedListeners);
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+        };
     }
 }

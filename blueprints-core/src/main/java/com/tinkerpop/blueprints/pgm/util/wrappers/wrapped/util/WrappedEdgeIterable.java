@@ -18,28 +18,26 @@ public class WrappedEdgeIterable implements CloseableIterable<Edge> {
     }
 
     public Iterator<Edge> iterator() {
-        return new WrappedEdgeIterator();
+        return new Iterator<Edge>() {
+            private final Iterator<Edge> itty = iterable.iterator();
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public boolean hasNext() {
+                return this.itty.hasNext();
+            }
+
+            public Edge next() {
+                return new WrappedEdge(this.itty.next());
+            }
+        };
     }
 
     public void close() {
         if (this.iterable instanceof CloseableIterable) {
             ((CloseableIterable) iterable).close();
-        }
-    }
-
-    public class WrappedEdgeIterator implements Iterator<Edge> {
-        private final Iterator<Edge> itty = iterable.iterator();
-
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext() {
-            return this.itty.hasNext();
-        }
-
-        public Edge next() {
-            return new WrappedEdge(this.itty.next());
         }
     }
 }
