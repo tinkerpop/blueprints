@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.impls.dex.DexGraph;
+import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.impls.dex.DexGraph;
 import org.junit.Test;
 
 import java.io.File;

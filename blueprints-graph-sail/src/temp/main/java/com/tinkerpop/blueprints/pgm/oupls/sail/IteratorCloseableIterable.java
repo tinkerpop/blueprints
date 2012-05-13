@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
+import com.tinkerpop.blueprints.CloseableIterable;
 
 import java.util.Iterator;
 

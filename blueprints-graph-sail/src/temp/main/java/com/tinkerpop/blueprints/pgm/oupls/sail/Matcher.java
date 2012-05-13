@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
-import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.CloseableIterable;
+import com.tinkerpop.blueprints.Edge;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;

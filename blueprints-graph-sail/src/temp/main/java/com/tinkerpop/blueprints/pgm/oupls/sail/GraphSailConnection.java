@@ -1,9 +1,9 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.CloseableIterable;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
 import net.fortytwo.sesametools.SailConnectionTripleSource;

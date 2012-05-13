@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import junit.framework.TestCase;
 
 import java.io.File;

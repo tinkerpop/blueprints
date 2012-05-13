@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
 import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
+import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import junit.framework.TestCase;
 
 /**
