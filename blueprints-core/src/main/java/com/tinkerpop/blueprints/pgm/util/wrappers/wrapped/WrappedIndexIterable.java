@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.wrapped;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.util.wrappers.wrapped.WrappedIndex;
 
 import java.util.Iterator;
 

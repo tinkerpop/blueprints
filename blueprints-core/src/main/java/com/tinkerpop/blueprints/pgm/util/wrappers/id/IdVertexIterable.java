@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.id;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.wrappers.id.IdVertex;
 
 import java.util.Iterator;
 

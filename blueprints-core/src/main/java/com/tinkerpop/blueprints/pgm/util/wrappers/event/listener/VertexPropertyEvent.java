@@ -21,7 +21,7 @@ public abstract class VertexPropertyEvent implements Event {
 
     @Override
     public void fireEvent(Iterator<GraphChangedListener> eventListeners) {
-        while (eventListeners.hasNext()){
+        while (eventListeners.hasNext()) {
             fire(eventListeners.next(), vertex, key, newValue);
         }
     }

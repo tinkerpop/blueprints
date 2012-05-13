@@ -101,7 +101,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     public static RDFFormat getFormat(final String format) {
         RDFFormat ret = formats.get(format);
         if (null == ret)
-            throw new RuntimeException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, n-quads, turtle, n3, trix, or trig");
+            throw new IllegalArgumentException(format + " is an unsupported RDF file format. Use rdf-xml, n-triples, n-quads, turtle, n3, trix, or trig");
         else
             return ret;
     }
@@ -125,16 +125,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     private final ThreadLocal<Boolean> inTransaction = new ThreadLocal<Boolean>() {
         protected Boolean initialValue() {
             return Boolean.FALSE;
-        }
-    };
-    private final ThreadLocal<Integer> txBuffer = new ThreadLocal<Integer>() {
-        protected Integer initialValue() {
-            return 1;
-        }
-    };
-    private final ThreadLocal<Integer> txCounter = new ThreadLocal<Integer>() {
-        protected Integer initialValue() {
-            return 0;
         }
     };
 
@@ -235,9 +225,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
                 this.sailConnection.get().removeStatements((Resource) vertexValue, null, null);
             }
             this.sailConnection.get().removeStatements(null, null, vertexValue);
-            this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (SailException e) {
-            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -247,16 +235,14 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         Value inVertexValue = ((SailVertex) inVertex).getRawVertex();
 
         if (!(outVertexValue instanceof Resource)) {
-            throw new RuntimeException(outVertex.toString() + " is not a legal URI or blank node");
+            throw new IllegalArgumentException(outVertex.toString() + " is not a legal URI or blank node");
         }
         try {
             URI labelURI = new URIImpl(this.expandPrefix(label));
             Statement statement = new StatementImpl((Resource) outVertexValue, labelURI, inVertexValue);
             SailHelper.addStatement(statement, this.sailConnection.get());
-            this.autoStopTransaction(Conclusion.SUCCESS);
             return new SailEdge(statement, this);
         } catch (Exception e) {
-            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -265,9 +251,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         Statement statement = ((SailEdge) edge).getRawEdge();
         try {
             SailHelper.removeStatement(statement, this.sailConnection.get());
-            this.autoStopTransaction(Conclusion.SUCCESS);
         } catch (Exception e) {
-            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -290,9 +274,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     public void addNamespace(final String prefix, final String namespace) {
         try {
             this.sailConnection.get().setNamespace(prefix, namespace);
-            this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
-            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -305,9 +287,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     public void removeNamespace(final String prefix) {
         try {
             this.sailConnection.get().removeNamespace(prefix);
-            this.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (SailException e) {
-            this.autoStopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -445,7 +425,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         if (inTransaction.get())
             throw ExceptionFactory.transactionAlreadyStarted();
         inTransaction.set(Boolean.TRUE);
-        this.txCounter.set(0);
     }
 
     public void stopTransaction(final Conclusion conclusion) {
@@ -456,45 +435,10 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
                 this.sailConnection.get().rollback();
             }
             this.inTransaction.set(Boolean.FALSE);
-            this.txCounter.set(0);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
-    protected void autoStopTransaction(final Conclusion conclusion) {
-        if (txBuffer.get() > 0) {
-            try {
-                txCounter.set(txCounter.get() + 1);
-                if (conclusion == Conclusion.FAILURE) {
-                    this.sailConnection.get().rollback();
-                    txCounter.set(0);
-                    inTransaction.set(Boolean.FALSE);
-                } else if (this.txCounter.get() % this.txBuffer.get() == 0) {
-                    this.sailConnection.get().commit();
-                    txCounter.set(0);
-                    inTransaction.set(Boolean.FALSE);
-                }
-            } catch (SailException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        }
-    }
-
-    public void setMaxBufferSize(final int bufferSize) {
-        this.stopTransaction(Conclusion.SUCCESS);
-        inTransaction.set(Boolean.FALSE);
-        this.txBuffer.set(bufferSize);
-    }
-
-    public int getMaxBufferSize() {
-        return this.txBuffer.get();
-    }
-
-    public int getCurrentBufferSize() {
-        return this.txCounter.get();
-    }
-
 
     public String toString() {
         return StringFactory.graphString(this, this.rawGraph.getClass().getSimpleName().toLowerCase());

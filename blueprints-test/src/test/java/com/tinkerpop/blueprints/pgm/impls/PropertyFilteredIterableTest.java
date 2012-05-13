@@ -23,7 +23,7 @@ public class PropertyFilteredIterableTest extends BaseTest {
         c.setProperty("age", 30);
         Vertex d = graph.addVertex("d");
         d.setProperty("age", 31);
-        
+
         // throw a vertex without the expected key in the mix
         Vertex e = graph.addVertex("e");
         List<Vertex> list = Arrays.asList(a, b, c, d, e);

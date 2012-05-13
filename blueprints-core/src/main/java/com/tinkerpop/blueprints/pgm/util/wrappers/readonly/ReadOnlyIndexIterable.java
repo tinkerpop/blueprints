@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyIndex;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyTokens;
 
 import java.util.Iterator;
 

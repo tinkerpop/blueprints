@@ -1,10 +1,6 @@
 package com.tinkerpop.blueprints.pgm.util;
 
 import com.tinkerpop.blueprints.BaseTest;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraphFactory;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

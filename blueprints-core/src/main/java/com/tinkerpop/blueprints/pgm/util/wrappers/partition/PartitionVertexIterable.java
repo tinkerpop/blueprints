@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.PartitionGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.PartitionVertex;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

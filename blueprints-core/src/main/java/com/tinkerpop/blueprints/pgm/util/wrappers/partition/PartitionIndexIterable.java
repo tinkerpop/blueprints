@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.partition;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.PartitionGraph;
-import com.tinkerpop.blueprints.pgm.util.wrappers.partition.PartitionIndex;
 
 import java.util.Iterator;
 

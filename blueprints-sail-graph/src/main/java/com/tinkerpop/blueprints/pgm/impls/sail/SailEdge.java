@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -22,7 +21,7 @@ public class SailEdge implements Edge {
     protected Statement rawEdge;
     protected SailGraph graph;
 
-    private static final String NAMED_GRAPH_PROPERTY = "RDF graph edges can only have partition graph (ng) properties";
+    private static final String NAMED_GRAPH_PROPERTY = "RDF graph edges can only have context/named graph (ng) properties";
 
     public SailEdge(final Statement rawEdge, final SailGraph graph) {
         this.rawEdge = rawEdge;
@@ -74,13 +73,11 @@ public class SailEdge implements Edge {
                 SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
                 this.rawEdge = new ContextStatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject(), namedGraph);
                 SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
-                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
             } catch (Exception e) {
-                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
                 throw new RuntimeException(e.getMessage(), e);
             }
         } else {
-            throw new RuntimeException(NAMED_GRAPH_PROPERTY);
+            throw new IllegalArgumentException(NAMED_GRAPH_PROPERTY);
         }
     }
 
@@ -91,14 +88,12 @@ public class SailEdge implements Edge {
                 SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
                 this.rawEdge = new StatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject());
                 SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
-                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
                 return ng;
             } catch (Exception e) {
-                this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
                 throw new RuntimeException(e.getMessage(), e);
             }
         } else {
-            throw new RuntimeException(NAMED_GRAPH_PROPERTY);
+            throw new IllegalArgumentException(NAMED_GRAPH_PROPERTY);
         }
     }
 
@@ -153,7 +148,6 @@ public class SailEdge implements Edge {
     }
 
     public Object getId() {
-        //return this.statement.hashCode();
         if (null != this.rawEdge.getContext())
             return "(" + this.rawEdge.getSubject() + ", " + this.rawEdge.getPredicate() + ", " + this.rawEdge.getObject() + ") [" + this.rawEdge.getContext() + "]";
         else

@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.sail;
 
 import com.tinkerpop.blueprints.pgm.Edge;
 import com.tinkerpop.blueprints.pgm.Query;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.DefaultQuery;
 import com.tinkerpop.blueprints.pgm.util.MultiIterable;
@@ -66,10 +65,7 @@ public class SailVertex implements Vertex {
             for (Statement statement : statements) {
                 SailHelper.addStatement(statement.getSubject(), statement.getPredicate(), newLiteral, statement.getContext(), this.graph.getSailConnection().get());
             }
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-
         } catch (SailException e) {
-            this.graph.autoStopTransaction(TransactionalGraph.Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

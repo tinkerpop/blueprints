@@ -1,10 +1,7 @@
 package com.tinkerpop.blueprints.pgm.util.io.gml;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Graph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.wrappers.batch.BufferGraph;
 
 import java.io.BufferedReader;
@@ -14,9 +11,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * A reader for the Graph Modelling Language (GML).
@@ -137,8 +131,8 @@ public class GMLReader {
      * @param edgeLabelKey     if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
      * @throws IOException thrown if the data is not valid
      */
-    public static void inputGraph(final Graph inputGraph, final InputStream inputStream, final int bufferSize, 
-                                  final String defaultEdgeLabel, final String vertexIdKey, final String edgeIdKey, 
+    public static void inputGraph(final Graph inputGraph, final InputStream inputStream, final int bufferSize,
+                                  final String defaultEdgeLabel, final String vertexIdKey, final String edgeIdKey,
                                   final String edgeLabelKey) throws IOException {
         final Graph graph = inputGraph instanceof TransactionalGraph ?
                 new BufferGraph((TransactionalGraph) inputGraph, bufferSize) : inputGraph;
@@ -163,6 +157,6 @@ public class GMLReader {
             }
         } catch (IOException e) {
             throw new IOException("GML malformed line number " + st.lineno() + ": ", e);
-        } 
+        }
     }
 }

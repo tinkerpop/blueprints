@@ -138,7 +138,7 @@ public class GraphSONReader {
     }
 
     private static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {
-        final  Map<String, Object> map = new HashMap<String, Object>();
+        final Map<String, Object> map = new HashMap<String, Object>();
 
         final Iterator<Map.Entry<String, JsonNode>> iterator = node.getFields();
         while (iterator.hasNext()) {

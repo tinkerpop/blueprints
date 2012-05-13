@@ -16,7 +16,7 @@ import java.util.Map;
  */
 class GMLParser {
     private final Map<Object, Object> vertexIds = new HashMap<Object, Object>();
-    
+
     private final String defaultEdgeLabel;
 
     private final Graph graph;

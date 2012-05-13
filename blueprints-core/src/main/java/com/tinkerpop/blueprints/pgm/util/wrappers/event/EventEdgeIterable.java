@@ -2,9 +2,7 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventEdge;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventTrigger;
 
 import java.util.Iterator;
 import java.util.List;

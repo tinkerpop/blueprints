@@ -1,8 +1,6 @@
 package com.tinkerpop.blueprints.pgm.impls.sail;
 
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.impls.sail.SailEdge;
-import com.tinkerpop.blueprints.pgm.impls.sail.SailGraph;
 import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;

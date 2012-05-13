@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.Neo4jBatchGraph;
-import com.tinkerpop.blueprints.pgm.impls.neo4jbatch.Neo4jBatchVertex;
 import org.neo4j.graphdb.index.IndexHits;
 
 import java.util.Iterator;

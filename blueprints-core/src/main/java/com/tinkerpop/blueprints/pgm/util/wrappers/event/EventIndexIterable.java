@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 
 import com.tinkerpop.blueprints.pgm.Element;
 import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.util.wrappers.event.EventIndex;
 import com.tinkerpop.blueprints.pgm.util.wrappers.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
@@ -17,7 +16,7 @@ public class EventIndexIterable<T extends Element> implements Iterable<Index<T>>
 
     private final Iterable<Index<T>> iterable;
     private final List<GraphChangedListener> graphChangedListeners;
-    
+
     private final EventTrigger trigger;
 
     public EventIndexIterable(final Iterable<Index<T>> iterable, List<GraphChangedListener> graphChangedListeners,

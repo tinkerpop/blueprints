@@ -366,7 +366,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
     public void startTransaction() {
         final OrientGraphContext context = getContext(true);
 
-        if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
+        if (context.rawGraph.getTransaction() instanceof OTransactionNoTx && context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             context.rawGraph.begin();
         } else
             throw ExceptionFactory.transactionAlreadyStarted();
@@ -385,7 +385,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
     protected void autoStartTransaction() {
         final OrientGraphContext context = getContext(true);
-        if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
+        if (context.rawGraph.getTransaction() instanceof OTransactionNoTx && context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             context.rawGraph.begin();
         }
     }

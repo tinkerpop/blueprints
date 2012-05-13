@@ -8,7 +8,6 @@ import com.tinkerpop.blueprints.pgm.IndexTestSuite;
 import com.tinkerpop.blueprints.pgm.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.QueryTestSuite;
 import com.tinkerpop.blueprints.pgm.TestSuite;
-import com.tinkerpop.blueprints.pgm.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.pgm.VertexTestSuite;
 import com.tinkerpop.blueprints.pgm.impls.GraphTest;
 import com.tinkerpop.blueprints.pgm.util.io.graphml.GraphMLReaderTestSuite;
@@ -73,11 +72,11 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }*/
 
-   /* public void testTransactionalGraphTestSuite() throws Exception {
+    /*public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionGraphTestSuite", this.stopWatch());
-    } */
+    }*/
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();

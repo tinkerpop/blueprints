@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.readonly;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyEdge;
-import com.tinkerpop.blueprints.pgm.util.wrappers.readonly.ReadOnlyTokens;
 
 import java.util.Iterator;
 

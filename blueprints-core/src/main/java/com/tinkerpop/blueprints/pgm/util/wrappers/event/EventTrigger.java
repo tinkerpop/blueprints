@@ -11,7 +11,7 @@ class EventTrigger {
      * A queue of events that are triggered by change to the graph.  The queue builds
      * up until the EventTrigger fires them in the order they were received.
      */
-    private final ThreadLocal<List<Event>> eventQueue = new ThreadLocal<List<Event>>(){
+    private final ThreadLocal<List<Event>> eventQueue = new ThreadLocal<List<Event>>() {
         protected List<Event> initialValue() {
             return new ArrayList<Event>();
         }
@@ -22,9 +22,9 @@ class EventTrigger {
      * is committed.
      */
     private final boolean enqueEvents;
-    
+
     private final EventGraph graph;
-    
+
     public EventTrigger(final EventGraph graph, final boolean enqueEvents) {
         this.enqueEvents = enqueEvents;
         this.graph = graph;
@@ -32,7 +32,7 @@ class EventTrigger {
 
     /**
      * Add an event to the event queue.
-     *
+     * <p/>
      * If the enqueEvents is false, then the queue fires and resets after each event
      * is added.
      */

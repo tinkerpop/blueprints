@@ -301,10 +301,10 @@ public class EventTransactionalGraphTest extends GraphTest {
         ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertEquals(1, graphChangedListener.edgeRemovedEventRecorded());
     }
-    
-    public void testTransactionSeriesWithSuccess(){
+
+    public void testTransactionSeriesWithSuccess() {
         graph.addListener(graphChangedListener);
-        
+
         createEdge();
         Edge e = createEdge();
         e.setProperty("test", "it");
@@ -326,7 +326,7 @@ public class EventTransactionalGraphTest extends GraphTest {
         assertEquals(1, graphChangedListener.vertexPropertyChangedEventRecorded());
     }
 
-    public void testTransactionSeriesWithFailure(){
+    public void testTransactionSeriesWithFailure() {
         graph.addListener(graphChangedListener);
 
         createEdge();
@@ -349,29 +349,29 @@ public class EventTransactionalGraphTest extends GraphTest {
         assertEquals(0, graphChangedListener.edgePropertyChangedEventRecorded());
         assertEquals(0, graphChangedListener.vertexPropertyChangedEventRecorded());
     }
-    
-    public void testTransactionSeriesOrder(){
+
+    public void testTransactionSeriesOrder() {
         graph.addListener(graphChangedListener);
         graph.addListener(new ConsoleGraphChangedListener(graph));
-        
+
         Vertex v1 = graph.addVertex(10);
         v1.setProperty("aaa", "bbb");
         v1.setProperty("ccc", "ddd");
         v1.removeProperty("aaa");
-        
+
         Vertex v2 = graph.addVertex(20);
         Vertex v3 = graph.addVertex(30);
-        
+
         Edge e1 = graph.addEdge(100, v1, v2, "friend");
         e1.setProperty("eee", "fff");
         e1.setProperty("ggg", "hhh");
         e1.removeProperty("eee");
-        
+
         Edge e2 = graph.addEdge(101, v1, v2, "enemy");
-        
+
         graph.removeEdge(e2);
         graph.removeVertex(v3);
-        
+
         assertEquals(0, graphChangedListener.getOrder().size());
 
         ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);

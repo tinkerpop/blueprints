@@ -1,7 +1,5 @@
 package com.tinkerpop.blueprints.pgm;
 
-import java.util.Set;
-
 /**
  * An IndexableGraph is a graph that supports the indexing of its elements.
  * An index is typically some sort of tree structure that allows for the fast lookup of elements by key/value pairs.

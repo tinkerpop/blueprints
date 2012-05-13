@@ -2,8 +2,6 @@ package com.tinkerpop.blueprints.pgm.impls.rexster;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterGraph;
-import com.tinkerpop.blueprints.pgm.impls.rexster.RexsterTokens;
 
 import java.util.Iterator;
 import java.util.LinkedList;

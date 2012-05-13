@@ -140,7 +140,8 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         assertEquals(graph.getVertex(v.getId()), v);
         assertEquals(graph.getVertex(u.getId()), u);
-        assertEquals(graph.getEdge(e.getId()), e);
+        if (!graph.getFeatures().isRDFModel)
+            assertEquals(graph.getEdge(e.getId()), e);
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
@@ -152,7 +153,8 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         assertEquals(graph.getVertex(v.getId()), v);
         assertEquals(graph.getVertex(u.getId()), u);
-        assertNull(graph.getEdge(e.getId()));
+        if (!graph.getFeatures().isRDFModel)
+            assertNull(graph.getEdge(e.getId()));
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
@@ -166,7 +168,8 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         assertEquals(graph.getVertex(v.getId()), v);
         assertEquals(graph.getVertex(u.getId()), u);
-        assertEquals(graph.getEdge(e.getId()), e);
+        if (!graph.getFeatures().isRDFModel)
+            assertEquals(graph.getEdge(e.getId()), e);
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
@@ -182,7 +185,8 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         assertEquals(graph.getVertex(v.getId()), v);
         assertEquals(graph.getVertex(u.getId()), u);
-        assertEquals(graph.getEdge(e.getId()), e);
+        if (!graph.getFeatures().isRDFModel)
+            assertEquals(graph.getEdge(e.getId()), e);
 
         graph.shutdown();
     }
@@ -478,15 +482,13 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.startTransaction();
         Vertex v1 = graph.addVertex(null);
         Vertex v2 = graph.addVertex(null);
-        Edge e1 = graph.addEdge(null, v1, v2, "link");
+        Edge e1 = graph.addEdge(null, v1, v2, convertId(graph, "test-edge"));
         graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
         assertEquals(1, count(graph.getEdges()));
 
         graph.startTransaction();
         graph.removeEdge(e1);
-        // We have removed an edge and not yet committed the change.
-        // However, the edge should appear to be removed until the end of the transaction.
         assertEquals(0, count(graph.getEdges()));
         graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
 

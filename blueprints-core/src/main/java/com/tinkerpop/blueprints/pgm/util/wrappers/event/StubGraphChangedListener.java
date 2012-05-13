@@ -15,7 +15,7 @@ public class StubGraphChangedListener implements GraphChangedListener {
     private int edgePropertyChangedEvent = 0;
     private int edgePropertyRemovedEvent = 0;
     private int edgeRemovedEvent = 0;
-    
+
     private final LinkedList<String> order = new LinkedList<String>();
 
     public void reset() {
@@ -27,11 +27,11 @@ public class StubGraphChangedListener implements GraphChangedListener {
         edgePropertyChangedEvent = 0;
         edgePropertyRemovedEvent = 0;
         edgeRemovedEvent = 0;
-        
+
         order.clear();
     }
-    
-    public LinkedList<String> getOrder(){
+
+    public LinkedList<String> getOrder() {
         return this.order;
     }
 

@@ -3,13 +3,14 @@ package com.tinkerpop.blueprints.pgm.util.wrappers.event;
 import com.tinkerpop.blueprints.pgm.IndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
+
 /**
  * The transactional and indexable implementation of EventGraph where events are raised in batch in the order they
  * changes occured to the graph, but only after a successful commit to the underlying graph.
  *
  * @author Stephen Mallette
  */
-public class EventTransactionalIndexableGraph <T extends IndexableGraph & TransactionalGraph> extends EventIndexableGraph<T>
+public class EventTransactionalIndexableGraph<T extends IndexableGraph & TransactionalGraph> extends EventIndexableGraph<T>
         implements TransactionalGraph, IndexableGraph, WrapperGraph<T> {
 
     public EventTransactionalIndexableGraph(final T baseIndexableGraph) {

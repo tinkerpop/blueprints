@@ -145,16 +145,25 @@ public class SailGraphTest extends GraphTest {
     public void testNamedGraphs() {
         SailGraph graph = new MemoryStoreSailGraph();
         SailGraphFactory.createTinkerGraph(graph);
+        int counter = 0;
         for (Edge edge : graph.getEdges()) {
+            counter++;
             SailEdge se = (SailEdge) edge;
             assertNull(se.getNamedGraph());
             assertNull(se.getProperty(SailTokens.NAMED_GRAPH));
             assertFalse(se.hasNamedGraph());
+
+        }
+        assertEquals(counter, 6);
+
+        for (Edge edge : graph.getEdges()) {
+            SailEdge se = (SailEdge) edge;
             se.setNamedGraph("http://agraph");
             assertEquals(se.getNamedGraph(), "http://agraph");
             assertEquals(se.getNamedGraph(), se.getProperty(SailTokens.NAMED_GRAPH));
             assertTrue(se.hasNamedGraph());
         }
+        assertEquals(count(graph.getEdges()), 6);
     }
 
     //// TEST SUITES
@@ -183,11 +192,11 @@ public class SailGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
-    /*public void testTransactionalGraphTestSuite() throws Exception {
+    public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
-    }*/
+    }
 
     public Graph generateGraph() {
         return new SailGraph(new MemoryStore());
