@@ -16,7 +16,7 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
     private final Iterable<Node> nodes;
     private final Neo4jGraph graph;
     private final boolean checkTransaction;
-    private final String DUMMY = "a";
+    private final String DUMMY_PROPERTY = "a";
 
     public Neo4jVertexIterable(final Iterable<Node> nodes, final Neo4jGraph graph, final boolean checkTransaction) {
         this.graph = graph;
@@ -46,10 +46,10 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
                     while (true) {
                         final Node node = this.itty.next();
                         try {
-                            node.hasProperty(DUMMY);
+                            node.hasProperty(DUMMY_PROPERTY);
                             return new Neo4jVertex(node, graph);
                         } catch (final IllegalStateException e) {
-                            // tried to access a relationship not available to the transaction
+                            // tried to access a node not available to the transaction
                         }
                     }
                 }
@@ -62,7 +62,7 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
                     while (this.itty.hasNext()) {
                         final Node node = this.itty.next();
                         try {
-                            node.hasProperty(DUMMY);
+                            node.hasProperty(DUMMY_PROPERTY);
                             this.nextNode = node;
                             return true;
                         } catch (final IllegalStateException e) {

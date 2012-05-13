@@ -16,6 +16,7 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
     private final Iterable<Relationship> relationships;
     private final Neo4jGraph graph;
     private final boolean checkTransaction;
+    private final String DUMMY_PROPERTY = "a";
 
     public Neo4jEdgeIterable(final Iterable<Relationship> relationships, final Neo4jGraph graph, final boolean checkTransaction) {
         this.relationships = relationships;
@@ -45,7 +46,7 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
                     while (true) {
                         final Relationship relationship = this.itty.next();
                         try {
-                            relationship.hasProperty("a");
+                            relationship.hasProperty(DUMMY_PROPERTY);
                             return new Neo4jEdge(relationship, graph);
                         } catch (final IllegalStateException e) {
                             // tried to access a relationship not available to the transaction
@@ -61,7 +62,7 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
                     while (this.itty.hasNext()) {
                         final Relationship relationship = this.itty.next();
                         try {
-                            relationship.hasProperty("a");
+                            relationship.hasProperty(DUMMY_PROPERTY);
                             this.nextRelationship = relationship;
                             return true;
                         } catch (final IllegalStateException e) {
