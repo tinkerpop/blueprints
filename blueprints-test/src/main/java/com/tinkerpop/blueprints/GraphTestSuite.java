@@ -273,6 +273,33 @@ public class GraphTestSuite extends TestSuite {
         }
     }
 
+    public void testSimpleRemovingVerticesEdges() {
+        Graph graph = graphTest.generateGraph();
+
+        Vertex v = graph.addVertex(null);
+        Vertex u = graph.addVertex(null);
+        Edge e = graph.addEdge(null, v, u, convertId(graph, "knows"));
+
+        if (graph.getFeatures().supportsVertexIteration)
+            assertEquals(count(graph.getVertices()), 2);
+        if (graph.getFeatures().supportsEdgeIteration)
+            assertEquals(count(graph.getEdges()), 1);
+
+        assertEquals(v.getOutEdges().iterator().next().getInVertex(), u);
+        assertEquals(u.getInEdges().iterator().next().getOutVertex(), v);
+        assertEquals(v.getOutEdges().iterator().next(), e);
+        assertEquals(u.getInEdges().iterator().next(), e);
+        graph.removeVertex(v);
+        assertFalse(v.getOutEdges().iterator().hasNext());
+
+        if (graph.getFeatures().supportsVertexIteration)
+            assertEquals(count(graph.getVertices()), 1);
+        if (graph.getFeatures().supportsEdgeIteration)
+            assertEquals(count(graph.getEdges()), 0);
+
+        graph.shutdown();
+    }
+
     public void testRemovingEdges() {
         Graph graph = graphTest.generateGraph();
         int vertexCount = 100;
