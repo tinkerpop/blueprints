@@ -12,11 +12,6 @@ package com.tinkerpop.blueprints.pgm;
 public interface TransactionalGraph extends Graph {
 
     /**
-     * Error message to use when code is trying to start another transaction before stopping the previous.
-     */
-    public static final String NESTED_MESSAGE = "Stop current transaction before starting another";
-
-    /**
      * Whether the transaction being stopped was successful (commit) or a failure (rollback).
      */
     public enum Conclusion {

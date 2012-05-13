@@ -51,4 +51,10 @@ public class ExceptionFactory {
     public static IllegalArgumentException classIsNotIndexable(final Class clazz) {
         return new IllegalArgumentException("Class is not indexable: " + clazz);
     }
+
+    // TransactionalGraph related exceptions
+
+    public static IllegalStateException transactionAlreadyStarted() {
+        return new IllegalStateException("Stop the current transaction before starting another");
+    }
 }

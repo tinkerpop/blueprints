@@ -183,11 +183,11 @@ public class SailGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
-    public void testTransactionalGraphTestSuite() throws Exception {
+    /*public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
-    }
+    }*/
 
     public Graph generateGraph() {
         return new SailGraph(new MemoryStore());

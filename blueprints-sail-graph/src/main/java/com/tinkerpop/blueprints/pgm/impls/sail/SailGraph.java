@@ -443,7 +443,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public void startTransaction() {
         if (inTransaction.get())
-            throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
+            throw ExceptionFactory.transactionAlreadyStarted();
         inTransaction.set(Boolean.TRUE);
         this.txCounter.set(0);
     }

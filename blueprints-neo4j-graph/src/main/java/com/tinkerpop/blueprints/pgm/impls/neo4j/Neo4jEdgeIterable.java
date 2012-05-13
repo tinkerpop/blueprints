@@ -3,8 +3,6 @@ package com.tinkerpop.blueprints.pgm.impls.neo4j;
 
 import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jEdge;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
 
@@ -17,26 +15,60 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
 
     private final Iterable<Relationship> relationships;
     private final Neo4jGraph graph;
+    private final boolean checkTransaction;
 
-    public Neo4jEdgeIterable(final Iterable<Relationship> relationships, final Neo4jGraph graph) {
+    public Neo4jEdgeIterable(final Iterable<Relationship> relationships, final Neo4jGraph graph, final boolean checkTransaction) {
         this.relationships = relationships;
         this.graph = graph;
+        this.checkTransaction = checkTransaction;
+    }
+
+    public Neo4jEdgeIterable(final Iterable<Relationship> relationships, final Neo4jGraph graph) {
+        this(relationships, graph, false);
     }
 
     public Iterator<Neo4jEdge> iterator() {
         return new Iterator<Neo4jEdge>() {
             private final Iterator<Relationship> itty = relationships.iterator();
+            private Relationship nextRelationship = null;
 
             public void remove() {
                 this.itty.remove();
             }
 
             public Neo4jEdge next() {
-                return new Neo4jEdge(this.itty.next(), graph);
+                if (!checkTransaction) {
+                    return new Neo4jEdge(this.itty.next(), graph);
+                } else {
+                    if (null != this.nextRelationship)
+                        return new Neo4jEdge(this.nextRelationship, graph);
+                    while (true) {
+                        final Relationship relationship = this.itty.next();
+                        try {
+                            relationship.hasProperty("a");
+                            return new Neo4jEdge(relationship, graph);
+                        } catch (final IllegalStateException e) {
+                            // tried to access a relationship not available to the transaction
+                        }
+                    }
+                }
             }
 
             public boolean hasNext() {
-                return this.itty.hasNext();
+                if (!checkTransaction)
+                    return this.itty.hasNext();
+                else {
+                    while (this.itty.hasNext()) {
+                        final Relationship relationship = this.itty.next();
+                        try {
+                            relationship.hasProperty("a");
+                            this.nextRelationship = relationship;
+                            return true;
+                        } catch (final IllegalStateException e) {
+                        }
+                    }
+                    return false;
+                }
             }
         };
     }

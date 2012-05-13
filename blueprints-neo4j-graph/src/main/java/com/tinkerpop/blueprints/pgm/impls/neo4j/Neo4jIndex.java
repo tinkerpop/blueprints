@@ -54,28 +54,31 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     }
 
     public CloseableIterable<T> get(final String key, final Object value) {
-        // TODO: Necessary for Neo4j index tx bug and passing IndexableGraph and Index test suites
-        // TODO: When releasing, be sure this is commented out
-        // this.graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph);
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, true);
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph);
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, true);
     }
 
     public CloseableIterable<T> query(final String key, final Object query) {
         final IndexHits<S> itty = this.rawIndex.query(key, query);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph);
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, true);
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph);
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, true);
     }
 
     public long count(final String key, final Object value) {
-        final IndexHits hits = this.rawIndex.get(key, value);
+        /*final IndexHits hits = this.rawIndex.get(key, value);
         final long count = hits.size();
         hits.close();
+        return count;*/
+
+        long count = 0;
+        for (T t : this.get(key, value)) {
+            count++;
+        }
         return count;
     }
 

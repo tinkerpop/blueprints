@@ -73,11 +73,11 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }*/
 
-    public void testTransactionalGraphTestSuite() throws Exception {
+   /* public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionGraphTestSuite", this.stopWatch());
-    }
+    } */
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();

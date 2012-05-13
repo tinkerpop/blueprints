@@ -369,7 +369,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         if (context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
             context.rawGraph.begin();
         } else
-            throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
+            throw ExceptionFactory.transactionAlreadyStarted();
     }
 
     public void stopTransaction(final Conclusion conclusion) {

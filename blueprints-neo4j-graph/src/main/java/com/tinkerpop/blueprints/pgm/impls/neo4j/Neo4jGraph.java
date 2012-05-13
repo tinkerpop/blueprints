@@ -302,8 +302,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
      * @return all the vertices in the graph
      */
     public Iterable<Vertex> getVertices() {
-        this.stopTransaction(Conclusion.SUCCESS);
-        return new Neo4jVertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this);
+        //this.stopTransaction(Conclusion.SUCCESS);
+        return new Neo4jVertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, true);
     }
 
     public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
@@ -322,8 +322,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
      * @return all the edges in the graph
      */
     public Iterable<Edge> getEdges() {
-        this.stopTransaction(Conclusion.SUCCESS);
-        return new Neo4jEdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this);
+        //this.stopTransaction(Conclusion.SUCCESS);
+        return new Neo4jEdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, true);
     }
 
     public CloseableIterable<Edge> getEdges(final String key, final Object value) {
@@ -442,7 +442,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         if (tx.get() == null) {
             tx.set(this.rawGraph.beginTx());
         } else
-            throw new RuntimeException(TransactionalGraph.NESTED_MESSAGE);
+            throw ExceptionFactory.transactionAlreadyStarted();
     }
 
     public void stopTransaction(final Conclusion conclusion) {
@@ -450,13 +450,15 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             return;
         }
 
-        if (conclusion == Conclusion.SUCCESS)
-            tx.get().success();
-        else
-            tx.get().failure();
-
-        tx.get().finish();
-        tx.remove();
+        try {
+            if (conclusion.equals(Conclusion.SUCCESS))
+                tx.get().success();
+            else
+                tx.get().failure();
+        } finally {
+            tx.get().finish();
+            tx.remove();
+        }
     }
 
     public void shutdown() {
