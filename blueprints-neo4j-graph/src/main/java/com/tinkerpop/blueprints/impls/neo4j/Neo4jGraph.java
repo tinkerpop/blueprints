@@ -38,8 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A Blueprints implementation of the graph database Neo4j (http://neo4j.o
- * rg)
+ * A Blueprints implementation of the graph database Neo4j (http://neo4j.org)
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -438,7 +437,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         }
     }
 
-    public void startTransaction() {
+    public void startTransaction() throws IllegalStateException {
         if (tx.get() == null) {
             tx.set(this.rawGraph.beginTx());
         } else

@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints;
 /**
  * A transactional graph supports the notion of transactions.
  * Once a transaction is started, all write operations can either be committed or rolled back.
- * Read operations are not required to be in a transaction.
+ * If an operation is transactional and there currently exists no transaction, then a transaction must be automatically started.
  * A transactional graph supports automatic transaction handling with user-defined transaction buffer size.
  * All constructed transactional graphs begin in with a transaction buffer size of 1 (thus, every mutation is a commit).
  *
@@ -20,14 +20,13 @@ public interface TransactionalGraph extends Graph {
 
     /**
      * Start a transaction in order to manipulate the graph.
-     * This is required for graph manipulations in manual transaction mode.
      *
-     * @throws RuntimeException If a transaction is already in progress, then a RuntimeException of "nested transaction" is thrown.
+     * @throws IllegalStateException If a transaction is already in progress, then a "nested transaction exception" is thrown.
      */
-    public void startTransaction();
+    public void startTransaction() throws IllegalStateException;
 
     /**
-     * Stop the current transaction. If the current buffer still has active mutations, then they are committed.
+     * Stop the current transaction.
      * Specify whether the transaction was successful or not.
      * A failing transaction will rollback all updates to before the transaction was started.
      *
@@ -36,7 +35,7 @@ public interface TransactionalGraph extends Graph {
     public void stopTransaction(Conclusion conclusion);
 
     /**
-     * When the graph is shutdown, any open transaction is committed successfully.
+     * When the graph is shutdown, any open transactions should be successfully committed.
      */
     public void shutdown();
 

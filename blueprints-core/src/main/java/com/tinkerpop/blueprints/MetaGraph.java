@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints;
 
 /**
- * Useful for those Graph implementations that are not native Blueprints implementations.
  * MetaGraph can be implemented as a way to access the underlying native graph engine.
+ * This is useful for those Graph implementations that are not native Blueprints implementations.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

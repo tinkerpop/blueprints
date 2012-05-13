@@ -28,7 +28,7 @@ public interface Vertex extends Element {
 
     /**
      * Use to query the incoming and/or outgoing edges of the vertex.
-     * The returned query object can be configured to support intelligent filtering and modifying of results.
+     * The returned query object can be configured to support low-level filtering of result set.
      *
      * @return a configurable query object
      */

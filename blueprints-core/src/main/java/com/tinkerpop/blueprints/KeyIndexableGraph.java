@@ -3,12 +3,16 @@ package com.tinkerpop.blueprints;
 import java.util.Set;
 
 /**
+ * A KeyIndexableGraph is a graph that supports basic index functionality around the key/value pairs of the elements of the graph.
+ * By creating key indices for a particular property key, that key is indexed on all the elements of the graph.
+ * This has ramifications for quick lookups on methods like getVertices(String, Object) and getEdges(String, Object).
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface KeyIndexableGraph extends Graph {
 
     /**
-     * Remove any automatic indexing structure associated with indexing provided key for element class.
+     * Remove an automatic indexing structure associated with indexing provided key for element class.
      *
      * @param key          the key to drop the index for
      * @param elementClass the element class that the index is for

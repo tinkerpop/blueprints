@@ -1,9 +1,10 @@
 package com.tinkerpop.blueprints;
 
 /**
- * An index maintains a mapping between some key/value pair and an element.
+ * An Index maintains a mapping between some key/value pair and an element.
  * An index requires that the developer explicitly put elements of the graph into the index.
- * A the key/value pair need not be specific to the element properties.
+ * The key/value pair need not be specific to the element properties.
+ * There is a query method to support index lookups beyond exact matches.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
