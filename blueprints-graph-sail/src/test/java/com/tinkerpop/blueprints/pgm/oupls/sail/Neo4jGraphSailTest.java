@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
 import org.junit.Test;
 
@@ -61,13 +61,13 @@ public class Neo4jGraphSailTest {//extends GraphSailTest {
 
     }
 
-    protected IndexableGraph createGraph() throws Exception {
+    protected KeyIndexableGraph createGraph() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
         Neo4jGraph g = new Neo4jGraph(directory);
-        g.clear();
-        g.setMaxBufferSize(0);
+        //g.clear();
+        //g.setMaxBufferSize(0);
         return g;
     }
 }

@@ -155,10 +155,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private int countIterator(final CloseableIterable i) {
         try {
+            Iterator<Edge> iter = i.iterator();
             int count = 0;
-            while (i.hasNext()) {
+            while (iter.hasNext()) {
                 count++;
-                i.next();
+                iter.next();
             }
             return count;
         } finally {
@@ -289,8 +290,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         if (0 == contexts.length) {
             CloseableIterable<Edge> i = store.matchers[index].match(subject, predicate, object, null);
             try {
-                while (i.hasNext()) {
-                    edgesToRemove.add(i.next());
+                Iterator<Edge> iter = i.iterator();
+                while (iter.hasNext()) {
+                    edgesToRemove.add(iter.next());
                 }
             } finally {
                 i.close();
@@ -303,8 +305,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 //System.out.println("matcher: " + indexes.matchers[index]);
                 CloseableIterable<Edge> i = store.matchers[index].match(subject, predicate, object, context);
                 try {
-                    while (i.hasNext()) {
-                        Edge e = i.next();
+                    Iterator<Edge> iter = i.iterator();
+                    while (iter.hasNext()) {
+                        Edge e = iter.next();
                         Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
                         if ((!inferred && null == b)
                                 || (inferred && null != b && b)) {
@@ -371,8 +374,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     private void deleteEdgesInIterator(final boolean inferred,
                                        final CloseableIterable<Edge> i) {
         try {
-            while (i.hasNext()) {
-                Edge e = i.next();
+            Iterator<Edge> iter = i.iterator();
+            while (iter.hasNext()) {
+                Edge e = iter.next();
 
                 Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
                 if ((!inferred && null == b)
@@ -386,7 +390,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                     }
 
                     try {
-                        i.remove();
+                        iter.remove();
                     } catch (UnsupportedOperationException x) {
                         // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
                         // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
@@ -607,11 +611,13 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private class StableStatementIteration implements CloseableIteration<Statement, SailException> {
         private final CloseableIterable<Edge> iterator;
+        private final Iterator<Edge> iter;
         private boolean closed = false;
 
         public StableStatementIteration(final CloseableIterable<Edge> iterator) {
             writeSemaphoreUp();
             this.iterator = iterator;
+            iter = iterator.iterator();
         }
 
         public void close() throws SailException {
@@ -628,7 +634,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             // elements if the iteration has already been closed.
             // The CloseableIteration API says nothing about what to expect from a closed iteration,
             // so the behavior of LookAheadIteration will be taken as normative.
-            return !closed && iterator.hasNext();
+            return !closed && iter.hasNext();
         }
 
         public Statement next() throws SailException {
@@ -636,7 +642,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 throw new IllegalStateException("already closed");
             }
 
-            Edge e = iterator.next();
+            Edge e = iter.next();
 
             SimpleStatement s = new SimpleStatement();
             fillStatement(s, e);
@@ -660,9 +666,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
         private final SimpleStatement s = new SimpleStatement();
         private final CloseableIterable<Edge> iterator;
+        private final Iterator<Edge> iter;
 
         public VolatileStatementIteration(final CloseableIterable<Edge> iterator) {
             this.iterator = iterator;
+            iter = iterator.iterator();
         }
 
         public void close() throws SailException {
@@ -670,11 +678,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
 
         public boolean hasNext() throws SailException {
-            return iterator.hasNext();
+            return iter.hasNext();
         }
 
         public Statement next() throws SailException {
-            Edge e = iterator.next();
+            Edge e = iter.next();
 
             fillStatement(s, e);
 

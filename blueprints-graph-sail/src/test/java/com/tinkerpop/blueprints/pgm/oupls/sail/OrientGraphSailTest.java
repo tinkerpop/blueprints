@@ -1,8 +1,5 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
-import com.tinkerpop.blueprints.pgm.impls.orientdb.OrientGraph;
 import junit.framework.TestCase;
 
 /**
@@ -14,14 +11,8 @@ public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
         assertTrue(true);
     }
 
-    protected IndexableGraph createGraph() {
-        /*try {
-            synchronized (this) {
-                wait(2000);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }*/
+    /*
+    protected KeyIndexableGraph createGraph() {
 
         String directory = getWorkingDirectory();
 
@@ -37,7 +28,6 @@ public class OrientGraphSailTest extends TestCase {//extends GraphSailTest {
         return System.getProperty("os.name").toUpperCase().contains("WINDOWS") ? "C:/temp/blueprints_test/graphsail/orientgraph" : "/tmp/blueprints_test/graphsail/orientgraph";
     }
 
-    /*
     public static void main(final String[] args) throws Exception {
         new OrientGraphSailTest().doTest();
     }

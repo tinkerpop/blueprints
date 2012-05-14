@@ -1,10 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
 import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Element;
-import com.tinkerpop.blueprints.pgm.Index;
-import com.tinkerpop.blueprints.pgm.IndexableGraph;
+import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
 import com.tinkerpop.blueprints.pgm.TransactionalGraph;
 import com.tinkerpop.blueprints.pgm.Vertex;
 import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
@@ -55,7 +52,7 @@ import java.util.regex.Pattern;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase implements WrapperGraph<T> {
+public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase implements WrapperGraph<T> {
     public static final String SEPARATOR = " ";
 
     public static final String
@@ -88,9 +85,6 @@ public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase imple
 
     private static final String NAMESPACES_VERTEX_ID = "urn:com.tinkerpop.blueprints.pgm.oupls.sail:namespaces";
 
-    // Index name
-    private static final String VALUES = "values";
-
     private final DataStore store = new DataStore();
 
     /**
@@ -110,6 +104,7 @@ public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase imple
      *
      * @param graph           the storage layer.  If the provided graph implements TransactionalGraph and is in manual transaction
      *                        mode, then this Sail will also be transactional.
+     *                        Any vertices and edges in the graph should have been previously created with GraphSail.
      * @param indexedPatterns a comma-delimited list of triple patterns for index-based statement matching.  Only p,c are required,
      *                        while the default patterns are p,c,pc.
      */
@@ -121,16 +116,10 @@ public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase imple
         store.sail = this;
         store.graph = graph;
 
-        // For now, use the default EDGES and VERTICES indices, which *must exist* in Blueprints and are automatically indexed.
-        // Think harder about collision issues (if someone hands a non-empty, non-Sail graph to this constructor) later on.
-        store.edges = graph.getIndex(Index.EDGES, Edge.class);
-        store.values = getOrCreateValuesIndex(graph);
+        createIndices(graph);
 
-        if (null == store.edges) {
-            throw new IllegalStateException("the provided graph has no '" + Index.EDGES + "' index");
-        }
-
-        store.manualTransactions = store.graph instanceof TransactionalGraph && 0 == ((TransactionalGraph) store.graph).getMaxBufferSize();
+        store.manualTransactions = store.graph instanceof TransactionalGraph;
+                //&& 0 == ((TransactionalGraph) store.graph).getMaxBufferSize();
 
         store.namespaces = store.getReferenceVertex();
         if (null == store.namespaces) {
@@ -154,16 +143,21 @@ public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase imple
         assignUnassignedTriplePatterns();
     }
 
-    private Index<Vertex> getOrCreateValuesIndex(final IndexableGraph graph) {
-        for (Index<? extends Element> index : graph.getIndices()) {
-            if (index.getIndexName().equals(VALUES)) {
-                return (Index<Vertex>) index;
+    private void createIndices(final KeyIndexableGraph graph) {
+        String[] keys = {"s", "p", "o", "c",
+                "sp", "so", "sc", "po", "pc", "oc",
+                "spo", "spc", "soc", "poc",
+                "spoc"};
+
+        for (String key : keys) {
+            if (!store.graph.getIndexedKeys(Edge.class).contains(key)) {
+                store.graph.createKeyIndex(key, Edge.class);
             }
         }
 
-        Set<String> keys = new HashSet<String>();
-        keys.add(VALUE);
-        return graph.createAutomaticIndex(VALUES, Vertex.class, keys);
+        if (!store.graph.getIndexedKeys(Vertex.class).contains(VALUE)) {
+            store.graph.createKeyIndex(VALUE, Vertex.class);
+        }
     }
 
     public T getBaseGraph() {
@@ -252,19 +246,18 @@ public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase imple
         public boolean volatileStatements = false;
         public boolean uniqueStatements = true;
 
-        public Index<Vertex> values;
-        public Index<Edge> edges;
-
         public Vertex namespaces;
 
         public Vertex getReferenceVertex() {
             //System.out.println("value = " + value);
-            CloseableIterable<Vertex> i = values.get(VALUE, NAMESPACES_VERTEX_ID);
-            try {
-                return i.hasNext() ? i.next() : null;
-            } finally {
-                i.close();
-            }
+            Iterable<Vertex> i = store.graph.getVertices(VALUE, NAMESPACES_VERTEX_ID);
+            // TODO: restore the close()
+            //try {
+            Iterator<Vertex> iter = i.iterator();
+            return iter.hasNext() ? iter.next() : null;
+            //} finally {
+            //    i.close();
+            //}
         }
 
         public Vertex addVertex(final Value value) {
@@ -295,20 +288,21 @@ public class GraphSail<T extends IndexableGraph> extends NotifyingSailBase imple
         }
 
         public Vertex findVertex(final Value value) {
-            CloseableIterable<Vertex> i = values.get(VALUE, value.stringValue());
-            try {
-                while (i.hasNext()) {
-                    Vertex v = i.next();
+            Iterator<Vertex> i = store.graph.getVertices(VALUE, value.stringValue()).iterator();
+            // TODO: restore the close()
+            //try {
+            while (i.hasNext()) {
+                Vertex v = i.next();
 
-                    if (matches(v, value)) {
-                        return v;
-                    }
+                if (matches(v, value)) {
+                    return v;
                 }
-
-                return null;
-            } finally {
-                i.close();
             }
+
+            return null;
+            //} finally {
+            //    i.close();
+            //}
         }
 
         public boolean matches(final Vertex vertex,

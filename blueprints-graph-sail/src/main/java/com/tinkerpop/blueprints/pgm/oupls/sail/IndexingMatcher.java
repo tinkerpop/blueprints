@@ -87,7 +87,7 @@ public class IndexingMatcher extends Matcher {
 
         //System.out.println("store = " + store);
         //System.out.println("\tstore.edges = " + store.edges);
-        CloseableIterable<Edge> results = store.edges.get(propertyName, sb.toString().substring(1));
+        CloseableIterable<Edge> results = store.graph.getEdges(propertyName, sb.toString().substring(1));
 
         for (PartOfSpeechCriterion m : criteria) {
             results = new FilteredIterator<Edge>(results, m);
