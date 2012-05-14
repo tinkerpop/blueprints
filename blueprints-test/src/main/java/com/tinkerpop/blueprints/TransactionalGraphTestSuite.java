@@ -500,6 +500,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.stopTransaction(Conclusion.SUCCESS);
 
         assertEquals(0, count(graph.getEdges()));
+        graph.shutdown();
     }
 
 }

@@ -77,6 +77,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             graph.shutdown();
 
         }
+        graph.shutdown();
 
     }
 

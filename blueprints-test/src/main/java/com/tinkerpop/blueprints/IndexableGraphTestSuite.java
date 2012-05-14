@@ -190,6 +190,8 @@ public class IndexableGraphTestSuite extends TestSuite {
             }
             printPerformance(graphName, loop, "attempt(s) to overwrite existing indices", this.stopWatch());
         }
+        
+        graph.shutdown();
     }
 
     public void testIndexDropPersistence() {
