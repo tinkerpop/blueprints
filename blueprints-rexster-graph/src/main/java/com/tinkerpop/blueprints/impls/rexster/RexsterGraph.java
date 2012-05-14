@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
-import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -36,8 +35,8 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
 
     static {
         // intended to be used with TinkerGraph as the endpoint graph
-        FEATURES.allowDuplicateEdges = true;
-        FEATURES.allowSelfLoops = true;
+        FEATURES.supportsDuplicateEdges = true;
+        FEATURES.supportsSelfLoops = true;
         FEATURES.ignoresSuppliedIds = false;
         FEATURES.isPersistent = false;
         FEATURES.isRDFModel = false;
@@ -52,17 +51,18 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         FEATURES.supportsIndices = true;
 
         // RexsterGraph will toString anything it can't convert to a standard Rexster type.
-        FEATURES.allowSerializableObjectProperty = true;
-        FEATURES.allowBooleanProperty = true;
-        FEATURES.allowDoubleProperty = true;
-        FEATURES.allowFloatProperty = true;
-        FEATURES.allowIntegerProperty = true;
-        FEATURES.allowPrimitiveArrayProperty = true;
-        FEATURES.allowUniformListProperty = true;
-        FEATURES.allowMixedListProperty = true;
-        FEATURES.allowLongProperty = true;
-        FEATURES.allowMapProperty = true;
-        FEATURES.allowStringProperty = true;
+        FEATURES.supportsSerializableObjectProperty = true;
+        FEATURES.supportsBooleanProperty = true;
+        FEATURES.supportsDoubleProperty = true;
+        FEATURES.supportsFloatProperty = true;
+        FEATURES.supportsIntegerProperty = true;
+        FEATURES.supportsPrimitiveArrayProperty = true;
+        FEATURES.supportsUniformListProperty = true;
+        FEATURES.supportsMixedListProperty = true;
+        FEATURES.supportsLongProperty = true;
+        FEATURES.supportsMapProperty = true;
+        FEATURES.supportsStringProperty = true;
+        FEATURES.supportsThreadedTransactions= false;
     }
 
     /**

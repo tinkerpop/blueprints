@@ -7,7 +7,6 @@ import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
-import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -44,8 +43,8 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
     private static final Features FEATURES = new Features();
 
     static {
-        FEATURES.allowDuplicateEdges = true;
-        FEATURES.allowSelfLoops = true;
+        FEATURES.supportsDuplicateEdges = true;
+        FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = true;
         FEATURES.isRDFModel = false;
         FEATURES.supportsVertexIteration = true;
@@ -62,17 +61,18 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
 
         // For more information on supported types, please see:
         // http://code.google.com/p/orient/wiki/Types
-        FEATURES.allowSerializableObjectProperty = true;
-        FEATURES.allowBooleanProperty = true;
-        FEATURES.allowDoubleProperty = true;
-        FEATURES.allowFloatProperty = true;
-        FEATURES.allowIntegerProperty = true;
-        FEATURES.allowPrimitiveArrayProperty = true;
-        FEATURES.allowUniformListProperty = true;
-        FEATURES.allowMixedListProperty = true;
-        FEATURES.allowLongProperty = true;
-        FEATURES.allowMapProperty = true;
-        FEATURES.allowStringProperty = true;
+        FEATURES.supportsSerializableObjectProperty = true;
+        FEATURES.supportsBooleanProperty = true;
+        FEATURES.supportsDoubleProperty = true;
+        FEATURES.supportsFloatProperty = true;
+        FEATURES.supportsIntegerProperty = true;
+        FEATURES.supportsPrimitiveArrayProperty = true;
+        FEATURES.supportsUniformListProperty = true;
+        FEATURES.supportsMixedListProperty = true;
+        FEATURES.supportsLongProperty = true;
+        FEATURES.supportsMapProperty = true;
+        FEATURES.supportsStringProperty = true;
+        FEATURES.supportsThreadedTransactions= false;
     }
 
     /**

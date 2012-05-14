@@ -177,74 +177,74 @@ public class GraphTestSuite extends TestSuite {
             Vertex vertexB = graph.addVertex(null);
             Edge edge = graph.addEdge(null, vertexA, vertexB, convertId(graph, "knows"));
 
-            trySetProperty(vertexA, "keyString", "value", graph.getFeatures().allowStringProperty);
-            trySetProperty(edge, "keyString", "value", graph.getFeatures().allowStringProperty);
+            trySetProperty(vertexA, "keyString", "value", graph.getFeatures().supportsStringProperty);
+            trySetProperty(edge, "keyString", "value", graph.getFeatures().supportsStringProperty);
 
-            trySetProperty(vertexA, "keyInteger", 100, graph.getFeatures().allowIntegerProperty);
-            trySetProperty(edge, "keyInteger", 100, graph.getFeatures().allowIntegerProperty);
+            trySetProperty(vertexA, "keyInteger", 100, graph.getFeatures().supportsIntegerProperty);
+            trySetProperty(edge, "keyInteger", 100, graph.getFeatures().supportsIntegerProperty);
 
-            trySetProperty(vertexA, "keyLong", 10000L, graph.getFeatures().allowLongProperty);
-            trySetProperty(edge, "keyLong", 10000L, graph.getFeatures().allowLongProperty);
+            trySetProperty(vertexA, "keyLong", 10000L, graph.getFeatures().supportsLongProperty);
+            trySetProperty(edge, "keyLong", 10000L, graph.getFeatures().supportsLongProperty);
 
-            trySetProperty(vertexA, "keyDouble", 100.321d, graph.getFeatures().allowDoubleProperty);
-            trySetProperty(edge, "keyDouble", 100.321d, graph.getFeatures().allowDoubleProperty);
+            trySetProperty(vertexA, "keyDouble", 100.321d, graph.getFeatures().supportsDoubleProperty);
+            trySetProperty(edge, "keyDouble", 100.321d, graph.getFeatures().supportsDoubleProperty);
 
-            trySetProperty(vertexA, "keyFloat", 100.321f, graph.getFeatures().allowFloatProperty);
-            trySetProperty(edge, "keyFloat", 100.321f, graph.getFeatures().allowFloatProperty);
+            trySetProperty(vertexA, "keyFloat", 100.321f, graph.getFeatures().supportsFloatProperty);
+            trySetProperty(edge, "keyFloat", 100.321f, graph.getFeatures().supportsFloatProperty);
 
-            trySetProperty(vertexA, "keyBoolean", true, graph.getFeatures().allowBooleanProperty);
-            trySetProperty(edge, "keyBoolean", true, graph.getFeatures().allowBooleanProperty);
+            trySetProperty(vertexA, "keyBoolean", true, graph.getFeatures().supportsBooleanProperty);
+            trySetProperty(edge, "keyBoolean", true, graph.getFeatures().supportsBooleanProperty);
 
-            trySetProperty(vertexA, "keyDate", new Date(), graph.getFeatures().allowSerializableObjectProperty);
-            trySetProperty(edge, "keyDate", new Date(), graph.getFeatures().allowSerializableObjectProperty);
+            trySetProperty(vertexA, "keyDate", new Date(), graph.getFeatures().supportsSerializableObjectProperty);
+            trySetProperty(edge, "keyDate", new Date(), graph.getFeatures().supportsSerializableObjectProperty);
 
             trySetProperty(vertexA, "keyListString", new ArrayList() {{
                 add("try1");
                 add("try2");
-            }}, graph.getFeatures().allowUniformListProperty);
+            }}, graph.getFeatures().supportsUniformListProperty);
             trySetProperty(edge, "keyListString", new ArrayList() {{
                 add("try1");
                 add("try2");
-            }}, graph.getFeatures().allowUniformListProperty);
+            }}, graph.getFeatures().supportsUniformListProperty);
 
             trySetProperty(vertexA, "keyListMixed", new ArrayList() {{
                 add("try1");
                 add(2);
-            }}, graph.getFeatures().allowMixedListProperty);
+            }}, graph.getFeatures().supportsMixedListProperty);
             trySetProperty(edge, "keyListMixed", new ArrayList() {{
                 add("try1");
                 add(2);
-            }}, graph.getFeatures().allowMixedListProperty);
+            }}, graph.getFeatures().supportsMixedListProperty);
 
-            trySetProperty(vertexA, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayInteger", new int[]{1, 2}, graph.getFeatures().allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayInteger", new int[]{1, 2}, graph.getFeatures().allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayInteger", new int[]{1, 2}, graph.getFeatures().supportsPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayInteger", new int[]{1, 2}, graph.getFeatures().supportsPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayLong", new long[]{1000l, 2000l}, graph.getFeatures().allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayLong", new long[]{1000l, 2000l}, graph.getFeatures().allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayLong", new long[]{1000l, 2000l}, graph.getFeatures().supportsPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayLong", new long[]{1000l, 2000l}, graph.getFeatures().supportsPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayFloat", new float[]{1000.321f, 2000.321f}, graph.getFeatures().allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayFloat", new float[]{1000.321f, 2000.321f}, graph.getFeatures().allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayFloat", new float[]{1000.321f, 2000.321f}, graph.getFeatures().supportsPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayFloat", new float[]{1000.321f, 2000.321f}, graph.getFeatures().supportsPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayDouble", new double[]{1000.321d, 2000.321d}, graph.getFeatures().allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayDouble", new double[]{1000.321d, 2000.321d}, graph.getFeatures().allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayDouble", new double[]{1000.321d, 2000.321d}, graph.getFeatures().supportsPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayDouble", new double[]{1000.321d, 2000.321d}, graph.getFeatures().supportsPrimitiveArrayProperty);
 
-            trySetProperty(vertexA, "keyArrayBoolean", new boolean[]{false, true}, graph.getFeatures().allowPrimitiveArrayProperty);
-            trySetProperty(edge, "keyArrayBoolean", new boolean[]{false, true}, graph.getFeatures().allowPrimitiveArrayProperty);
+            trySetProperty(vertexA, "keyArrayBoolean", new boolean[]{false, true}, graph.getFeatures().supportsPrimitiveArrayProperty);
+            trySetProperty(edge, "keyArrayBoolean", new boolean[]{false, true}, graph.getFeatures().supportsPrimitiveArrayProperty);
 
             final Map map = new HashMap() {{
                 put("testString", "try");
                 put("testInteger", "string");
             }};
-            trySetProperty(vertexA, "keyMap", map, graph.getFeatures().allowMapProperty);
-            trySetProperty(edge, "keyMap", map, graph.getFeatures().allowMapProperty);
+            trySetProperty(vertexA, "keyMap", map, graph.getFeatures().supportsMapProperty);
+            trySetProperty(edge, "keyMap", map, graph.getFeatures().supportsMapProperty);
 
             MockSerializable mockSerializable = new MockSerializable();
             mockSerializable.setTestField("test");
-            trySetProperty(vertexA, "keySerializable", mockSerializable, graph.getFeatures().allowSerializableObjectProperty);
-            trySetProperty(edge, "keySerializable", mockSerializable, graph.getFeatures().allowSerializableObjectProperty);
+            trySetProperty(vertexA, "keySerializable", mockSerializable, graph.getFeatures().supportsSerializableObjectProperty);
+            trySetProperty(edge, "keySerializable", mockSerializable, graph.getFeatures().supportsSerializableObjectProperty);
 
         }
 

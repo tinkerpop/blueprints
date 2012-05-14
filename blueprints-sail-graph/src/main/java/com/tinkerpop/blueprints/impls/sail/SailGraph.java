@@ -58,8 +58,8 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     private static final Features FEATURES = new Features();
 
     static {
-        FEATURES.allowDuplicateEdges = false;
-        FEATURES.allowSelfLoops = true;
+        FEATURES.supportsDuplicateEdges = false;
+        FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = false;
         FEATURES.isRDFModel = true;
         FEATURES.supportsVertexIteration = false;
@@ -74,17 +74,18 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         FEATURES.supportsKeyIndices = false;
         FEATURES.isWrapper = false;
         FEATURES.supportsIndices = false;
-        FEATURES.allowSerializableObjectProperty = false;
-        FEATURES.allowBooleanProperty = false;
-        FEATURES.allowDoubleProperty = false;
-        FEATURES.allowFloatProperty = false;
-        FEATURES.allowIntegerProperty = false;
-        FEATURES.allowPrimitiveArrayProperty = false;
-        FEATURES.allowUniformListProperty = false;
-        FEATURES.allowMixedListProperty = false;
-        FEATURES.allowLongProperty = false;
-        FEATURES.allowMapProperty = false;
-        FEATURES.allowStringProperty = false;
+        FEATURES.supportsSerializableObjectProperty = false;
+        FEATURES.supportsBooleanProperty = false;
+        FEATURES.supportsDoubleProperty = false;
+        FEATURES.supportsFloatProperty = false;
+        FEATURES.supportsIntegerProperty = false;
+        FEATURES.supportsPrimitiveArrayProperty = false;
+        FEATURES.supportsUniformListProperty = false;
+        FEATURES.supportsMixedListProperty = false;
+        FEATURES.supportsLongProperty = false;
+        FEATURES.supportsMapProperty = false;
+        FEATURES.supportsStringProperty = false;
+        FEATURES.supportsThreadedTransactions= false;
     }
 
     static {

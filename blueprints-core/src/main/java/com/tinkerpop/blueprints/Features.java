@@ -17,57 +17,57 @@ public class Features {
     /**
      * Does the graph allow for two edges with the same vertices and edge label to exist?
      */
-    public Boolean allowDuplicateEdges = null;
+    public Boolean supportsDuplicateEdges = null;
     /**
      * Does the graph allow an edge to have the same out/tail and in/head vertex?
      */
-    public Boolean allowSelfLoops = null;
+    public Boolean supportsSelfLoops = null;
     /**
      * Does the graph allow any serializable object to be used as a property value for a graph element?
      */
-    public Boolean allowSerializableObjectProperty = null;
+    public Boolean supportsSerializableObjectProperty = null;
     /**
      * Does the graph allows boolean to be used as a property value for a graph element?
      */
-    public Boolean allowBooleanProperty = null;
+    public Boolean supportsBooleanProperty = null;
     /**
      * Does the graph allows double to be used as a property value for a graph element?
      */
-    public Boolean allowDoubleProperty = null;
+    public Boolean supportsDoubleProperty = null;
     /**
      * Does the graph allows float to be used as a property value for a graph element?
      */
-    public Boolean allowFloatProperty = null;
+    public Boolean supportsFloatProperty = null;
     /**
      * Does the graph allows integer to be used as a property value for a graph element?
      */
-    public Boolean allowIntegerProperty = null;
+    public Boolean supportsIntegerProperty = null;
     /**
      * Does the graph allows a primitive array to be used as a property value for a graph element?
      */
-    public Boolean allowPrimitiveArrayProperty = null;
+    public Boolean supportsPrimitiveArrayProperty = null;
     /**
      * Does the graph allows list (all objects with the list have the same data types) to be used as a property
      * value for a graph element?
      */
-    public Boolean allowUniformListProperty = null;
+    public Boolean supportsUniformListProperty = null;
     /**
      * Does the graph allows a mixed list (different data types within the same list) to be used as a
      * property value for a graph element?
      */
-    public Boolean allowMixedListProperty = null;
+    public Boolean supportsMixedListProperty = null;
     /**
      * Does the graph allows long to be used as a property value for a graph element?
      */
-    public Boolean allowLongProperty = null;
+    public Boolean supportsLongProperty = null;
     /**
      * Does the graph allows map to be used as a property value for a graph element?
      */
-    public Boolean allowMapProperty = null;
+    public Boolean supportsMapProperty = null;
     /**
      * Graph allows string to be used as a property value for a graph element.
      */
-    public Boolean allowStringProperty = null;
+    public Boolean supportsStringProperty = null;
     /**
      * Does the graph ignore user provided ids in graph.addVertex(Object id)?
      */
@@ -120,6 +120,10 @@ public class Features {
      * Does the graph implement TransactionalGraph?
      */
     public Boolean supportsTransactions = null;
+    /**
+     * Does the graph implement ThreadedTransactionalGraph?
+     */
+    public Boolean supportsThreadedTransactions = null;
 
     public String toString() {
         try {

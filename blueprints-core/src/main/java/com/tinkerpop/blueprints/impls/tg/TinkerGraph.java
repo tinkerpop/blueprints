@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.impls.tg;
 
 
-import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -49,19 +48,19 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     private static final Features FEATURES = new Features();
 
     static {
-        FEATURES.allowDuplicateEdges = true;
-        FEATURES.allowSelfLoops = true;
-        FEATURES.allowSerializableObjectProperty = true;
-        FEATURES.allowBooleanProperty = true;
-        FEATURES.allowDoubleProperty = true;
-        FEATURES.allowFloatProperty = true;
-        FEATURES.allowIntegerProperty = true;
-        FEATURES.allowPrimitiveArrayProperty = true;
-        FEATURES.allowUniformListProperty = true;
-        FEATURES.allowMixedListProperty = true;
-        FEATURES.allowLongProperty = true;
-        FEATURES.allowMapProperty = true;
-        FEATURES.allowStringProperty = true;
+        FEATURES.supportsDuplicateEdges = true;
+        FEATURES.supportsSelfLoops = true;
+        FEATURES.supportsSerializableObjectProperty = true;
+        FEATURES.supportsBooleanProperty = true;
+        FEATURES.supportsDoubleProperty = true;
+        FEATURES.supportsFloatProperty = true;
+        FEATURES.supportsIntegerProperty = true;
+        FEATURES.supportsPrimitiveArrayProperty = true;
+        FEATURES.supportsUniformListProperty = true;
+        FEATURES.supportsMixedListProperty = true;
+        FEATURES.supportsLongProperty = true;
+        FEATURES.supportsMapProperty = true;
+        FEATURES.supportsStringProperty = true;
 
         FEATURES.ignoresSuppliedIds = false;
         FEATURES.isPersistent = true;
@@ -77,6 +76,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         FEATURES.supportsTransactions = false;
         FEATURES.supportsVertexIteration = true;
         FEATURES.supportsEdgeIteration = true;
+        FEATURES.supportsThreadedTransactions= false;
     }
 
     public TinkerGraph(final String directory) {
@@ -169,7 +169,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         if (!indexClass.isAssignableFrom(index.getIndexClass()))
             throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
         else
-            return (Index<T>) index;
+            return index;
     }
 
     public Iterable<Index<? extends Element>> getIndices() {

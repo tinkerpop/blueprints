@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.impls.dex;
 
-import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -52,8 +51,8 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
     private static final Features FEATURES = new Features();
 
     static {
-        FEATURES.allowDuplicateEdges = true;
-        FEATURES.allowSelfLoops = true;
+        FEATURES.supportsDuplicateEdges = true;
+        FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = true;
         FEATURES.isRDFModel = false;
         FEATURES.supportsVertexIteration = true;
@@ -64,22 +63,23 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
         FEATURES.supportsTransactions = false;
         FEATURES.supportsIndices = false;
 
-        FEATURES.allowSerializableObjectProperty = false;
-        FEATURES.allowBooleanProperty = true;
-        FEATURES.allowDoubleProperty = true;
-        FEATURES.allowFloatProperty = true;
-        FEATURES.allowIntegerProperty = true;
-        FEATURES.allowPrimitiveArrayProperty = false;
-        FEATURES.allowUniformListProperty = false;
-        FEATURES.allowMixedListProperty = false;
-        FEATURES.allowLongProperty = false;
-        FEATURES.allowMapProperty = false;
-        FEATURES.allowStringProperty = true;
+        FEATURES.supportsSerializableObjectProperty = false;
+        FEATURES.supportsBooleanProperty = true;
+        FEATURES.supportsDoubleProperty = true;
+        FEATURES.supportsFloatProperty = true;
+        FEATURES.supportsIntegerProperty = true;
+        FEATURES.supportsPrimitiveArrayProperty = false;
+        FEATURES.supportsUniformListProperty = false;
+        FEATURES.supportsMixedListProperty = false;
+        FEATURES.supportsLongProperty = false;
+        FEATURES.supportsMapProperty = false;
+        FEATURES.supportsStringProperty = true;
 
         FEATURES.isWrapper = false;
         FEATURES.supportsKeyIndices = false;
         FEATURES.supportsVertexKeyIndex = false;
         FEATURES.supportsEdgeKeyIndex = false;
+        FEATURES.supportsThreadedTransactions= false;
     }
 
     /**

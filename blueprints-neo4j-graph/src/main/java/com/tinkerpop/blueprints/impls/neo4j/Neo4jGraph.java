@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.impls.neo4j;
 
-import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -57,20 +56,20 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     static {
 
-        FEATURES.allowSerializableObjectProperty = false;
-        FEATURES.allowBooleanProperty = true;
-        FEATURES.allowDoubleProperty = true;
-        FEATURES.allowFloatProperty = true;
-        FEATURES.allowIntegerProperty = true;
-        FEATURES.allowPrimitiveArrayProperty = true;
-        FEATURES.allowUniformListProperty = true;
-        FEATURES.allowMixedListProperty = false;
-        FEATURES.allowLongProperty = true;
-        FEATURES.allowMapProperty = false;
-        FEATURES.allowStringProperty = true;
+        FEATURES.supportsSerializableObjectProperty = false;
+        FEATURES.supportsBooleanProperty = true;
+        FEATURES.supportsDoubleProperty = true;
+        FEATURES.supportsFloatProperty = true;
+        FEATURES.supportsIntegerProperty = true;
+        FEATURES.supportsPrimitiveArrayProperty = true;
+        FEATURES.supportsUniformListProperty = true;
+        FEATURES.supportsMixedListProperty = false;
+        FEATURES.supportsLongProperty = true;
+        FEATURES.supportsMapProperty = false;
+        FEATURES.supportsStringProperty = true;
 
-        FEATURES.allowDuplicateEdges = true;
-        FEATURES.allowSelfLoops = true;
+        FEATURES.supportsDuplicateEdges = true;
+        FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = true;
         FEATURES.isRDFModel = false;
         FEATURES.isWrapper = false;
@@ -84,6 +83,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         FEATURES.supportsKeyIndices = true;
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
+        FEATURES.supportsThreadedTransactions= false;
     }
 
     public Neo4jGraph(final String directory) {
