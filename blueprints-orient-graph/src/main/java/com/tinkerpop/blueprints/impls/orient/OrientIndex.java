@@ -12,7 +12,6 @@ import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
@@ -27,7 +26,6 @@ import java.util.Collections;
 public class OrientIndex<T extends OrientElement> implements Index<T> {
     private static final String VERTEX = "Vertex";
     private static final String EDGE = "Edge";
-    protected static final String CONFIG_TYPE = "blueprintsIndexType";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
 
     protected static final String SEPARATOR = "!=!";
@@ -45,7 +43,8 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
         this.graph = orientGraph;
-        this.underlying = new OIndexTxAwareMultiValue(orientGraph.getRawGraph(), rawIndex);
+        this.underlying = rawIndex instanceof OIndexTxAwareMultiValue ? rawIndex : new OIndexTxAwareMultiValue(
+                orientGraph.getRawGraph(), rawIndex);
         load(rawIndex.getConfiguration());
     }
 
@@ -78,7 +77,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     @SuppressWarnings("rawtypes")
     public CloseableIterable<T> get(final String key, final Object value) {
-        this.graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         final String keyTemp = key + SEPARATOR + value;
         final Collection<OIdentifiable> records = (Collection<OIdentifiable>) underlying.get(keyTemp);
 
@@ -133,7 +131,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             iKeyType = OType.STRING;
 
         // CREATE THE MAP
-        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph().getMetadata().getIndexManager().createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(), new OSimpleKeyIndexDefinition(iKeyType), null, null));
+        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph()
+                .getMetadata().getIndexManager()
+                .createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(), new OSimpleKeyIndexDefinition(iKeyType), null, null));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))
@@ -165,7 +165,10 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     }
 
     public void close() {
-        underlying = null;
+        if (underlying != null) {
+            underlying.lazySave();
+            underlying = null;
+        }
         graph = null;
     }
 

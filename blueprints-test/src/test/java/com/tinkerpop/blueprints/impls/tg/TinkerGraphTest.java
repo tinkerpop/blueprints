@@ -28,6 +28,11 @@ public class TinkerGraphTest extends GraphTest {
         printTestPerformance("TinkerBenchmarkTestSuite", this.stopWatch());
     }*/
 
+    public void testGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphTestSuite(this));
+        printTestPerformance("GraphTestSuite", this.stopWatch());
+    }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -39,12 +44,6 @@ public class TinkerGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new EdgeTestSuite(this));
         printTestPerformance("EdgeTestSuite", this.stopWatch());
-    }
-
-    public void testGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new GraphTestSuite(this));
-        printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
     public void testKeyIndexableGraphTestSuite() throws Exception {

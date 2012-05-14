@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
@@ -11,6 +12,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,9 +34,13 @@ public class OrientVertex extends OrientElement implements Vertex {
         if (this.rawElement == null)
             return Collections.emptyList();
 
-        if (labels.length == 0)
-            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, null));
-        else if (labels.length == 1) {
+        if (labels.length == 0) {
+            Set<OIdentifiable> edges = graph.getRawGraph().getOutEdges(this.rawElement, null);
+            if (!edges.isEmpty())
+                // WRAP IT TO VOID CONCURRENT MODIFICATION EXCEPTIONS
+                edges = new HashSet<OIdentifiable>(edges);
+            return new OrientElementIterable<Edge>(graph, edges);
+        } else if (labels.length == 1) {
             return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getOutEdges(this.rawElement, labels[0]));
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
@@ -49,9 +55,13 @@ public class OrientVertex extends OrientElement implements Vertex {
         if (this.rawElement == null)
             return Collections.emptyList();
 
-        if (labels.length == 0)
-            return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, null));
-        else if (labels.length == 1) {
+        if (labels.length == 0) {
+            Set<OIdentifiable> edges = graph.getRawGraph().getInEdges(this.rawElement, null);
+            if (!edges.isEmpty())
+                // WRAP IT TO VOID CONCURRENT MODIFICATION EXCEPTIONS
+                edges = new HashSet<OIdentifiable>(edges);
+            return new OrientElementIterable<Edge>(graph, edges);
+        } else if (labels.length == 1) {
             return new OrientElementIterable<Edge>(graph, graph.getRawGraph().getInEdges(this.rawElement, labels[0]));
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();

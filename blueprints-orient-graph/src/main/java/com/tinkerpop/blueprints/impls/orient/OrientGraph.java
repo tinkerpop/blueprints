@@ -1,9 +1,17 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndex;
+import com.orientechnologies.orient.core.index.OPropertyIndexDefinition;
+import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
@@ -12,6 +20,7 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph;
@@ -20,17 +29,12 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGraph<OGraphDatabase> {       // implements KeyIndexableGraph
+public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGraph<OGraphDatabase>, KeyIndexableGraph {
     private final static String ADMIN = "admin";
 
     private String url;
@@ -53,11 +57,11 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         FEATURES.supportsEdgeIndex = true;
         FEATURES.ignoresSuppliedIds = true;
         FEATURES.supportsTransactions = true;
-        FEATURES.supportsEdgeKeyIndex = false;                //todo
-        FEATURES.supportsVertexKeyIndex = false;        //todo
-        FEATURES.supportsKeyIndices = false;      //todo
+        FEATURES.supportsEdgeKeyIndex = true;
+        FEATURES.supportsVertexKeyIndex = true;
+        FEATURES.supportsKeyIndices = true;
         FEATURES.isWrapper = false;
-        FEATURES.supportsIndices = false;  // todo
+        FEATURES.supportsIndices = true;
 
         // For more information on supported types, please see:
         // http://code.google.com/p/orient/wiki/Types
@@ -254,7 +258,6 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
     }
 
     public Iterable<Vertex> getVertices() {
-        this.stopTransaction(Conclusion.SUCCESS);
         return getVertices(true);
     }
 
@@ -264,7 +267,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
     }
 
     private Iterable<Vertex> getVertices(final boolean polymorphic) {
-        return new OrientElementScanIterable<Vertex>(this, Vertex.class);
+        return new OrientElementScanIterable<Vertex>(this, Vertex.class, polymorphic);
     }
 
     public Iterable<Edge> getEdges() {
@@ -277,7 +280,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
     }
 
     private Iterable<Edge> getEdges(final boolean polymorphic) {
-        return new OrientElementScanIterable<Edge>(this, Edge.class);
+        return new OrientElementScanIterable<Edge>(this, Edge.class, polymorphic);
     }
 
     public Edge getEdge(final Object id) {
@@ -423,7 +426,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
                 // final ODocument indexConfiguration = context.rawGraph.getMetadata().getIndexManager().getConfiguration();
 
                 for (OIndex<?> idx : context.rawGraph.getMetadata().getIndexManager().getIndexes()) {
-                    if (idx.getConfiguration().field(OrientIndex.CONFIG_TYPE) != null)
+                    if (idx.getConfiguration().field(OrientIndex.CONFIG_CLASSNAME) != null)
                         // LOAD THE INDEXES
                         loadIndex(idx);
                 }
@@ -450,14 +453,12 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         final OrientGraphContext context = getContext(false);
 
         if (context != null) {
+            for (Index<? extends Element> idx : context.manualIndices.values())
+                ((OrientIndex<?>) idx).close();
+            context.manualIndices.clear();
+
             context.rawGraph.commit();
             context.rawGraph.close();
-
-            for (Index<? extends Element> idx : getIndices()) {
-                ((OrientIndex<?>) idx).close();
-            }
-
-            context.manualIndices.clear();
 
             synchronized (contexts) {
                 contexts.remove(context);
@@ -471,14 +472,37 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         return FEATURES;
     }
 
-    /*public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
-
+    public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
+        final String className = getClassName(elementClass);
+        getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
     }
+
     public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass) {
+        final String className = getClassName(elementClass);
 
+        getRawGraph().getMetadata().getIndexManager()
+                .createIndex(className + "." + key, "NOTUNIQUE", new OPropertyIndexDefinition(className, key, OType.STRING), null, null);
     }
-    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
-        
-    }*/
 
+    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+        final String classPrefix = getClassName(elementClass) + ".";
+
+        Set<String> result = new HashSet<String>();
+        final Collection<? extends OIndex<?>> indexes = getRawGraph().getMetadata().getIndexManager().getIndexes();
+        for (OIndex<?> index : indexes) {
+            if (index.getName().startsWith(classPrefix))
+                result.add(index.getDefinition().getFields().get(0));
+        }
+        return result;
+    }
+
+    protected <T> String getClassName(Class<T> elementClass) {
+        String className = null;
+
+        if (elementClass.isAssignableFrom(Vertex.class))
+            className = OGraphDatabase.VERTEX_CLASS_NAME;
+        else if (elementClass.isAssignableFrom(Edge.class))
+            className = OGraphDatabase.EDGE_CLASS_NAME;
+        return className;
+    }
 }

@@ -29,7 +29,6 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
         this.rawElement = rawElement;
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public void setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
@@ -45,7 +44,6 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
         }
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Object removeProperty(final String key) {
         try {
             this.graph.autoStartTransaction();
@@ -136,7 +134,8 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
     @Override
     public ORID getIdentity() {
         ORID rid = this.rawElement.getIdentity();
-        this.save();
+        if( !rid.isValid() )
+            this.save();
         return rid;
     }
 
