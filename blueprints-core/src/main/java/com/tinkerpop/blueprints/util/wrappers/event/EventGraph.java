@@ -120,7 +120,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new EventVertexIterable(this.baseGraph.getVertices(), this.graphChangedListeners, this.trigger);
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return new EventVertexIterable(this.baseGraph.getVertices(key, value), this.graphChangedListeners, this.trigger);
     }
 
@@ -173,7 +173,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new EventEdgeIterable(this.baseGraph.getEdges(), this.graphChangedListeners, this.trigger);
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return new EventEdgeIterable(this.baseGraph.getEdges(key, value), this.graphChangedListeners, this.trigger);
     }
 

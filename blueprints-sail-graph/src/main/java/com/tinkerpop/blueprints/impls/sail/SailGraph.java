@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.impls.sail;
 
 
-import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.MetaGraph;
@@ -206,7 +205,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         throw new UnsupportedOperationException("RDF is an edge based graph model");
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         throw new UnsupportedOperationException("RDF is an edge based graph model");
     }
 
@@ -214,7 +213,8 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         return new SailEdgeIterable(null, null, null, this);
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
+        // TODO: Make this efficient using a SPARQL query
         return new PropertyFilteredIterable<Edge>(key, value, new SailEdgeIterable(null, null, null, this));
     }
 

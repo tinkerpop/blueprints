@@ -239,7 +239,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
         return new DexIterable<Vertex>(this, result, Vertex.class);
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return new DexIterable<Vertex>(this, this.rawGet(key, value), Vertex.class);
     }
 
@@ -320,7 +320,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
         return new DexIterable<Edge>(this, result, Edge.class);
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
 

@@ -58,7 +58,7 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new ReadOnlyEdgeIterable(this.baseGraph.getEdges());
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return new ReadOnlyEdgeIterable(this.baseGraph.getEdges(key, value));
     }
 
@@ -74,7 +74,7 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new ReadOnlyVertexIterable(this.baseGraph.getVertices());
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return new ReadOnlyVertexIterable(this.baseGraph.getVertices(key, value));
     }
 

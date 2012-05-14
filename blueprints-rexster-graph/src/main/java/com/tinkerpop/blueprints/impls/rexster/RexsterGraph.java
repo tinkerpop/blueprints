@@ -130,7 +130,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         return new RexsterVertexIterable(this.graphURI + RexsterTokens.SLASH_VERTICES, this);
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return new PropertyFilteredIterable<Vertex>(key, value, new RexsterVertexIterable(this.graphURI + RexsterTokens.SLASH_VERTICES, this));
     }
 
@@ -167,7 +167,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         return new RexsterEdgeIterable(this.graphURI + RexsterTokens.SLASH_EDGES, this);
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return new PropertyFilteredIterable<Edge>(key, value, new RexsterEdgeIterable(this.graphURI + RexsterTokens.SLASH_EDGES, this));
     }
 

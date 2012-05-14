@@ -107,17 +107,17 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         this.directory = null;
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         if (vertexKeyIndex.getIndexedKeys().contains(key)) {
-            return (CloseableIterable) vertexKeyIndex.get(key, value);
+            return (Iterable) vertexKeyIndex.get(key, value);
         } else {
             return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
         }
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         if (edgeKeyIndex.getIndexedKeys().contains(key)) {
-            return (CloseableIterable) edgeKeyIndex.get(key, value);
+            return (Iterable) edgeKeyIndex.get(key, value);
         } else {
             return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
         }

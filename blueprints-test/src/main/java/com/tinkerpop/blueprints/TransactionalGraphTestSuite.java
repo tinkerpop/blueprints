@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints;
 
+import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.impls.GraphTest;
 
 import java.util.Random;
@@ -39,7 +40,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsVertexIteration) {
             assertEquals(count(graph.getVertices()), 1);
         }
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.stopTransaction(Conclusion.SUCCESS);
         assertEquals(graph.getVertex(v1.getId()), v1);
         if (graph.getFeatures().supportsVertexIteration) {
             assertEquals(count(graph.getVertices()), 1);
@@ -54,14 +55,14 @@ public class TransactionalGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsVertexIteration) {
             graph.startTransaction();
             graph.addVertex(null);
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
             assertEquals(count(graph.getVertices()), 1);
 
             graph.startTransaction();
             this.stopWatch();
             graph.addVertex(null);
             assertEquals(count(graph.getVertices()), 2);
-            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.stopTransaction(Conclusion.FAILURE);
             assertEquals(count(graph.getVertices()), 1);
             printPerformance(graph.toString(), 1, "vertex not added in failed transaction", this.stopWatch());
 
@@ -69,7 +70,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph.startTransaction();
             graph.addVertex(null);
             assertEquals(count(graph.getVertices()), 2);
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
             printPerformance(graph.toString(), 1, "vertex added in successful transaction", this.stopWatch());
             assertEquals(count(graph.getVertices()), 2);
         }
@@ -84,7 +85,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             for (int i = 0; i < 100; i++) {
                 graph.startTransaction();
                 graph.addVertex(null);
-                graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                graph.stopTransaction(Conclusion.SUCCESS);
             }
             printPerformance(graph.toString(), 100, "vertices added in 100 successful transactions", this.stopWatch());
             assertEquals(count(graph.getVertices()), 100);
@@ -93,14 +94,14 @@ public class TransactionalGraphTestSuite extends TestSuite {
             for (int i = 0; i < 100; i++) {
                 graph.startTransaction();
                 graph.addVertex(null);
-                graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                graph.stopTransaction(Conclusion.FAILURE);
             }
             printPerformance(graph.toString(), 100, "vertices not added in 100 failed transactions", this.stopWatch());
 
             assertEquals(count(graph.getVertices()), 100);
             graph.startTransaction();
             assertEquals(count(graph.getVertices()), 100);
-            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.stopTransaction(Conclusion.FAILURE);
             assertEquals(count(graph.getVertices()), 100);
 
             this.stopWatch();
@@ -109,7 +110,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
                 graph.addVertex(null);
             }
             assertEquals(count(graph.getVertices()), 200);
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
             printPerformance(graph.toString(), 100, "vertices added in 1 successful transactions", this.stopWatch());
             assertEquals(count(graph.getVertices()), 200);
 
@@ -119,7 +120,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
                 graph.addVertex(null);
             }
             assertEquals(count(graph.getVertices()), 300);
-            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.stopTransaction(Conclusion.FAILURE);
             printPerformance(graph.toString(), 100, "vertices not added in 1 failed transactions", this.stopWatch());
             assertEquals(count(graph.getVertices()), 200);
         }
@@ -131,7 +132,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         Vertex v = graph.addVertex(null);
         Vertex u = graph.addVertex(null);
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.stopTransaction(Conclusion.SUCCESS);
 
         this.stopWatch();
         graph.startTransaction();
@@ -148,7 +149,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 1);
 
-        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        graph.stopTransaction(Conclusion.FAILURE);
         printPerformance(graph.toString(), 1, "edge not added in failed transaction (w/ iteration)", this.stopWatch());
 
         assertEquals(graph.getVertex(v.getId()), v);
@@ -175,7 +176,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getVertices()), 2);
         if (graph.getFeatures().supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 1);
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.stopTransaction(Conclusion.SUCCESS);
         printPerformance(graph.toString(), 1, "edge added in successful transaction (w/ iteration)", this.stopWatch());
 
         if (graph.getFeatures().supportsVertexIteration)
@@ -199,7 +200,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             Vertex v = graph.addVertex(null);
             Vertex u = graph.addVertex(null);
             graph.addEdge(null, v, u, convertId(graph, "test"));
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
         }
         printPerformance(graph.toString(), 100, "edges added in 100 successful transactions (2 vertices added for each edge)", this.stopWatch());
         if (graph.getFeatures().supportsVertexIteration)
@@ -213,7 +214,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             Vertex v = graph.addVertex(null);
             Vertex u = graph.addVertex(null);
             graph.addEdge(null, v, u, convertId(graph, "test"));
-            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.stopTransaction(Conclusion.FAILURE);
         }
         printPerformance(graph.toString(), 100, "edges not added in 100 failed transactions (2 vertices added for each edge)", this.stopWatch());
         if (graph.getFeatures().supportsVertexIteration)
@@ -232,7 +233,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getVertices()), 400);
         if (graph.getFeatures().supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 200);
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.stopTransaction(Conclusion.SUCCESS);
         printPerformance(graph.toString(), 100, "edges added in 1 successful transactions (2 vertices added for each edge)", this.stopWatch());
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 400);
@@ -250,7 +251,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getVertices()), 600);
         if (graph.getFeatures().supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 300);
-        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        graph.stopTransaction(Conclusion.FAILURE);
         printPerformance(graph.toString(), 100, "edges not added in 1 failed transactions (2 vertices added for each edge)", this.stopWatch());
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 400);
@@ -268,7 +269,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             Vertex v = graph.addVertex(null);
             Object id = v.getId();
             v.setProperty("name", "marko");
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
             printPerformance(graph.toString(), 1, "vertex added with string property in a successful transaction", this.stopWatch());
 
 
@@ -279,7 +280,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals(v.getProperty("name"), "marko");
             v.setProperty("age", 30);
             assertEquals(v.getProperty("age"), 30);
-            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.stopTransaction(Conclusion.FAILURE);
             printPerformance(graph.toString(), 1, "integer property not added in a failed transaction", this.stopWatch());
 
             this.stopWatch();
@@ -293,7 +294,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test");
             if (graph.getFeatures().supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 1);
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
             if (graph.getFeatures().supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 1);
 
@@ -301,7 +302,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph.startTransaction();
             edge.setProperty("transaction-1", "success");
             assertEquals(edge.getProperty("transaction-1"), "success");
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
             printPerformance(graph.toString(), 1, "edge property added and checked in a successful transaction", this.stopWatch());
             assertEquals(edge.getProperty("transaction-1"), "success");
 
@@ -310,7 +311,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             edge.setProperty("transaction-2", "failure");
             assertEquals(edge.getProperty("transaction-1"), "success");
             assertEquals(edge.getProperty("transaction-2"), "failure");
-            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.stopTransaction(Conclusion.FAILURE);
             printPerformance(graph.toString(), 1, "edge property added and checked in a failed transaction", this.stopWatch());
             assertEquals(edge.getProperty("transaction-1"), "success");
             assertNull(edge.getProperty("transaction-2"));
@@ -333,7 +334,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             v = ((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "marko").iterator().next();
             assertEquals(v.getId(), id);
             assertEquals(v.getProperty("name"), "marko");
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.stopTransaction(Conclusion.SUCCESS);
             printPerformance(graph.toString(), 1, "vertex added and retrieved from index in a successful transaction", this.stopWatch());
 
 
@@ -357,7 +358,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals(v.getProperty("name"), "marko");
             v = ((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "pavel").iterator().next();
             assertEquals(v.getProperty("name"), "pavel");
-            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            graph.stopTransaction(Conclusion.FAILURE);
             printPerformance(graph.toString(), 1, "vertex not added in a failed transaction", this.stopWatch());
 
             this.stopWatch();
@@ -397,14 +398,14 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "test"));
         }
         assertEquals(count(graph.getEdges()), 5);
-        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        graph.stopTransaction(Conclusion.FAILURE);
         assertEquals(count(graph.getEdges()), 0);
 
         for (int i = 0; i < 4; i++) {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "test"));
         }
         assertEquals(count(graph.getEdges()), 4);
-        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        graph.stopTransaction(Conclusion.FAILURE);
         assertEquals(count(graph.getEdges()), 0);
 
 
@@ -412,7 +413,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "test"));
         }
         assertEquals(count(graph.getEdges()), 3);
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.stopTransaction(Conclusion.SUCCESS);
         assertEquals(count(graph.getEdges()), 3);
 
         graph.shutdown();
@@ -441,7 +442,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
                         }
                         vertices.getAndAdd(2);
                         edges.getAndAdd(1);
-                        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                        graph.stopTransaction(Conclusion.SUCCESS);
                     } else {
                         graph.startTransaction();
                         Vertex a = graph.addVertex(null);
@@ -453,11 +454,11 @@ public class TransactionalGraphTestSuite extends TestSuite {
                             e.setProperty("bloop", random.nextInt());
                         }
                         if (random.nextBoolean()) {
-                            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                            graph.stopTransaction(Conclusion.SUCCESS);
                             vertices.getAndAdd(2);
                             edges.getAndAdd(1);
                         } else {
-                            graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+                            graph.stopTransaction(Conclusion.FAILURE);
                         }
                     }
                     completedThreads.getAndAdd(1);
@@ -483,20 +484,20 @@ public class TransactionalGraphTestSuite extends TestSuite {
         Vertex v1 = graph.addVertex(null);
         Vertex v2 = graph.addVertex(null);
         Edge e1 = graph.addEdge(null, v1, v2, convertId(graph, "test-edge"));
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.stopTransaction(Conclusion.SUCCESS);
 
         assertEquals(1, count(graph.getEdges()));
 
         graph.startTransaction();
         graph.removeEdge(e1);
         assertEquals(0, count(graph.getEdges()));
-        graph.stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        graph.stopTransaction(Conclusion.FAILURE);
 
         assertEquals(1, count(graph.getEdges()));
 
         graph.startTransaction();
         graph.removeEdge(e1);
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.stopTransaction(Conclusion.SUCCESS);
 
         assertEquals(0, count(graph.getEdges()));
     }

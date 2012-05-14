@@ -131,7 +131,7 @@ public class BufferGraph<T extends TransactionalGraph> implements TransactionalG
         return this.baseGraph.getEdges();
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return this.baseGraph.getEdges(key, value);
     }
 
@@ -139,7 +139,7 @@ public class BufferGraph<T extends TransactionalGraph> implements TransactionalG
         return this.baseGraph.getVertices();
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return this.baseGraph.getVertices(key, value);
     }
 

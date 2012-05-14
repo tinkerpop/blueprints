@@ -45,7 +45,7 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new WrappedVertexIterable(this.baseGraph.getVertices());
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return new WrappedVertexIterable(this.baseGraph.getVertices(key, value));
     }
 
@@ -65,7 +65,7 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new WrappedEdgeIterable(this.baseGraph.getEdges());
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return new WrappedEdgeIterable(this.baseGraph.getEdges(key, value));
     }
 

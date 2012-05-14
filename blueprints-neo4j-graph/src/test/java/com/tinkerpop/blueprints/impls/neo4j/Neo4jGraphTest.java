@@ -1,20 +1,27 @@
 package com.tinkerpop.blueprints.impls.neo4j;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
+import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexTestSuite;
+import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.TransactionalGraphTestSuite;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
+import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -148,16 +155,21 @@ public class Neo4jGraphTest extends GraphTest {
         }
     }
 
-    /*public void testQueryIndex() throws Exception {
+    public void testQueryIndex() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
         deleteDirectory(new File(directory));
 
-        IndexableGraph graph = new Neo4jGraph(directory);
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        Index<Vertex> vertexIndex = graph.createIndex("vertices", Vertex.class);
+        Index<Edge> edgeIndex = graph.createIndex("edges", Edge.class);
+
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
-        Iterator itty = graph.getIndex(Index.VERTICES, Vertex.class).get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        vertexIndex.put("name", "marko", a);
+
+        Iterator itty = graph.getIndex("vertices", Vertex.class).query("name", "*rko").iterator();
         int counter = 0;
         while (itty.hasNext()) {
             counter++;
@@ -168,39 +180,42 @@ public class Neo4jGraphTest extends GraphTest {
         Vertex b = graph.addVertex(null);
         Edge edge = graph.addEdge(null, a, b, "knows");
         edge.setProperty("weight", 0.75);
-        itty = graph.getIndex(Index.EDGES, Edge.class).get("label", Neo4jTokens.QUERY_HEADER + "k?ows").iterator();
+        edgeIndex.put("weight", 0.75, edge);
+
+        itty = graph.getIndex("edges", Edge.class).query("label", "k?ows").iterator();
+        counter = 0;
+        while (itty.hasNext()) {
+            counter++;
+            assertEquals(itty.next(), edge);
+        }
+        assertEquals(counter, 0);
+
+        itty = graph.getIndex("edges", Edge.class).query("weight", "[0.5 TO 1.0]").iterator();
         counter = 0;
         while (itty.hasNext()) {
             counter++;
             assertEquals(itty.next(), edge);
         }
         assertEquals(counter, 1);
-        itty = graph.getIndex(Index.EDGES, Edge.class).get("weight", Neo4jTokens.QUERY_HEADER + "[0.5 TO 1.0]").iterator();
-        counter = 0;
-        while (itty.hasNext()) {
-            counter++;
-            assertEquals(itty.next(), edge);
-        }
-        assertEquals(counter, 1);
-        assertEquals(count(graph.getIndex(Index.EDGES, Edge.class).get("weight", Neo4jTokens.QUERY_HEADER + "[0.1 TO 0.5]")), 0);
+        assertEquals(count(graph.getIndex("edges", Edge.class).query("weight", "[0.1 TO 0.5]")), 0);
 
 
         graph.shutdown();
         deleteDirectory(new File(directory));
-    }*/
+    }
 
-    /*public void testIndexParameters() throws Exception {
+    public void testIndexParameters() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
         deleteDirectory(new File(directory));
 
         IndexableGraph graph = new Neo4jGraph(directory);
-        Index<Vertex> index = graph.createIndex("luceneIdx", Vertex.class, null, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+        Index<Vertex> index = graph.createIndex("luceneIdx", Vertex.class, new Parameter<String, String>("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
         index.put("name", "marko", a);
-        Iterator itty = index.get("name", Neo4jTokens.QUERY_HEADER + "*rko").iterator();
+        Iterator itty = index.query("name", "*rko").iterator();
         int counter = 0;
         while (itty.hasNext()) {
             counter++;
@@ -208,7 +223,7 @@ public class Neo4jGraphTest extends GraphTest {
         }
         assertEquals(counter, 1);
 
-        itty = index.get("name", Neo4jTokens.QUERY_HEADER + "MaRkO").iterator();
+        itty = index.query("name", "MaRkO").iterator();
         counter = 0;
         while (itty.hasNext()) {
             counter++;
@@ -218,7 +233,7 @@ public class Neo4jGraphTest extends GraphTest {
 
         graph.shutdown();
         deleteDirectory(new File(directory));
-    }*/
+    }
 
 
 }

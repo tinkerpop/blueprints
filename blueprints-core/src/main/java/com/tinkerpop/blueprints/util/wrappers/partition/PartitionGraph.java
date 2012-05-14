@@ -101,7 +101,7 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new PartitionVertexIterable(this.baseGraph.getVertices(), this);
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return new PartitionVertexIterable(this.baseGraph.getVertices(key, value), this);
     }
 
@@ -123,7 +123,7 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new PartitionEdgeIterable(this.baseGraph.getEdges(), this);
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return new PartitionEdgeIterable(this.baseGraph.getEdges(key, value), this);
     }
 

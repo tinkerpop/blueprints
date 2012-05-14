@@ -115,7 +115,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         return new IdVertexIterable(baseGraph.getVertices());
     }
 
-    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         if (key.equals(ID)) {
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
@@ -168,7 +168,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         return new IdEdgeIterable(baseGraph.getEdges());
     }
 
-    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         if (key.equals(ID)) {
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {

@@ -60,7 +60,7 @@ public interface Graph {
      * @param value the value of the vertex
      * @return an iterable of vertices with provided key and value
      */
-    public CloseableIterable<Vertex> getVertices(String key, Object value);
+    public Iterable<Vertex> getVertices(String key, Object value);
 
     /**
      * Add an edge to the graph. The added edges requires a recommended identifier, a tail vertex, an head vertex, and a label.
@@ -107,7 +107,7 @@ public interface Graph {
      * @param value the value of the edge
      * @return an iterable of edges with provided key and value
      */
-    public CloseableIterable<Edge> getEdges(String key, Object value);
+    public Iterable<Edge> getEdges(String key, Object value);
 
     /**
      * A shutdown function is required to properly close the graph.
