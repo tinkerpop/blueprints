@@ -28,10 +28,10 @@ public class EventEdge extends EventElement implements Edge {
     }
 
     public String getLabel() {
-        return ((Edge) this.rawElement).getLabel();
+        return ((Edge) this.baseElement).getLabel();
     }
 
     public Edge getBaseEdge() {
-        return (Edge) this.rawElement;
+        return (Edge) this.baseElement;
     }
 }

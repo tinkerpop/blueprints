@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.util.wrappers.event;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 
 import java.util.List;
@@ -29,10 +29,20 @@ public class EventVertex extends EventElement implements Vertex {
     }
 
     public Query query() {
-        return new DefaultQuery(this);
+        return new WrapperQuery(((Vertex) this.baseElement).query()) {
+            @Override
+            public Iterable<Vertex> vertices() {
+                return new EventVertexIterable(this.query.vertices(), graphChangedListeners, trigger);
+            }
+
+            @Override
+            public Iterable<Edge> edges() {
+                return new EventEdgeIterable(this.query.edges(), graphChangedListeners, trigger);
+            }
+        };
     }
 
     public Vertex getBaseVertex() {
-        return (Vertex) this.rawElement;
+        return (Vertex) this.baseElement;
     }
 }

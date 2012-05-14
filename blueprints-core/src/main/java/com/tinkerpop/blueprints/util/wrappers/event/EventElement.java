@@ -21,12 +21,12 @@ import java.util.Set;
 public class EventElement implements Element {
     protected final EventTrigger trigger;
 
-    protected final Element rawElement;
+    protected final Element baseElement;
     protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventElement(final Element rawElement, final List<GraphChangedListener> graphChangedListeners,
+    public EventElement(final Element baseElement, final List<GraphChangedListener> graphChangedListeners,
                         final EventTrigger trigger) {
-        this.rawElement = rawElement;
+        this.baseElement = baseElement;
         this.graphChangedListeners = graphChangedListeners;
         this.trigger = trigger;
     }
@@ -48,18 +48,18 @@ public class EventElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        return this.rawElement.getPropertyKeys();
+        return this.baseElement.getPropertyKeys();
     }
 
     public Object getId() {
-        return this.rawElement.getId();
+        return this.baseElement.getId();
     }
 
     /**
      * Raises a vertexPropertyRemoved or edgePropertyRemoved event.
      */
     public Object removeProperty(final String key) {
-        Object propertyRemoved = rawElement.removeProperty(key);
+        Object propertyRemoved = baseElement.removeProperty(key);
 
         if (this instanceof Vertex) {
             this.onVertexPropertyRemoved((Vertex) this, key, propertyRemoved);
@@ -71,14 +71,14 @@ public class EventElement implements Element {
     }
 
     public Object getProperty(final String key) {
-        return this.rawElement.getProperty(key);
+        return this.baseElement.getProperty(key);
     }
 
     /**
      * Raises a vertexPropertyRemoved or edgePropertyChanged event.
      */
     public void setProperty(final String key, final Object value) {
-        this.rawElement.setProperty(key, value);
+        this.baseElement.setProperty(key, value);
 
         if (this instanceof Vertex) {
             this.onVertexPropertyChanged((Vertex) this, key, value);
@@ -88,18 +88,18 @@ public class EventElement implements Element {
     }
 
     public String toString() {
-        return this.rawElement.toString();
+        return this.baseElement.toString();
     }
 
     public int hashCode() {
-        return this.rawElement.hashCode();
+        return this.baseElement.hashCode();
     }
 
     public boolean equals(final Object object) {
-        return null != object && (object.getClass().equals(this.getClass())) && this.rawElement.getId().equals(((EventElement) object).getId());
+        return null != object && (object.getClass().equals(this.getClass())) && this.baseElement.getId().equals(((EventElement) object).getId());
     }
 
     public Element getBaseElement() {
-        return this.rawElement;
+        return this.baseElement;
     }
 }
