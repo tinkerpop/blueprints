@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Features;
@@ -126,10 +127,10 @@ public class EventTransactionalGraphTest extends GraphTest {
 
             assertEquals("noname", vertex.getProperty("name"));
 
-            assertTrue(vertex.getOutEdges() instanceof EventEdgeIterable);
-            assertTrue(vertex.getInEdges() instanceof EventEdgeIterable);
-            assertTrue(vertex.getOutEdges("knows") instanceof EventEdgeIterable);
-            assertTrue(vertex.getInEdges("created") instanceof EventEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.OUT) instanceof EventEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.IN) instanceof EventEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.OUT, "knows") instanceof EventEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.IN, "created") instanceof EventEdgeIterable);
         }
 
         for (Edge edge : graph.getEdges()) {

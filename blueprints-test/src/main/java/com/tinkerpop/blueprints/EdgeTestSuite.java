@@ -27,16 +27,16 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(e.getLabel(), convertId(graph, "knows"));
         assertEquals(e.getInVertex(), u);
         assertEquals(e.getOutVertex(), v);
-        assertEquals(e, v.getOutEdges().iterator().next());
-        assertEquals(e, u.getInEdges().iterator().next());
-        assertEquals(v.getOutEdges().iterator().next(), u.getInEdges().iterator().next());
+        assertEquals(e, v.getEdges(Direction.OUT).iterator().next());
+        assertEquals(e, u.getEdges(Direction.IN).iterator().next());
+        assertEquals(v.getEdges(Direction.OUT).iterator().next(), u.getEdges(Direction.IN).iterator().next());
         Set<Edge> set = new HashSet<Edge>();
         set.add(e);
         set.add(e);
-        set.add(v.getOutEdges().iterator().next());
-        set.add(v.getOutEdges().iterator().next());
-        set.add(u.getInEdges().iterator().next());
-        set.add(u.getInEdges().iterator().next());
+        set.add(v.getEdges(Direction.OUT).iterator().next());
+        set.add(v.getEdges(Direction.OUT).iterator().next());
+        set.add(u.getEdges(Direction.IN).iterator().next());
+        set.add(u.getEdges(Direction.IN).iterator().next());
         if (graph.getFeatures().supportsEdgeIteration)
             set.add(graph.getEdges().iterator().next());
         assertEquals(set.size(), 1);
@@ -66,12 +66,12 @@ public class EdgeTestSuite extends TestSuite {
         graph.addEdge(null, v1, v2, convertId(graph, "knows"));
         graph.addEdge(null, v2, v3, convertId(graph, "pets"));
         graph.addEdge(null, v2, v3, convertId(graph, "caresFor"));
-        assertEquals(1, count(v1.getOutEdges()));
-        assertEquals(2, count(v2.getOutEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(1, count(v2.getInEdges()));
-        assertEquals(2, count(v3.getInEdges()));
+        assertEquals(1, count(v1.getEdges(Direction.OUT)));
+        assertEquals(2, count(v2.getEdges(Direction.OUT)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(1, count(v2.getEdges(Direction.IN)));
+        assertEquals(2, count(v3.getEdges(Direction.IN)));
         printPerformance(graph.toString(), 6, "elements added and checked", this.stopWatch());
         graph.shutdown();
     }
@@ -99,13 +99,13 @@ public class EdgeTestSuite extends TestSuite {
             printPerformance(graph.toString(), vertexCount, "vertices counted", this.stopWatch());
             this.stopWatch();
             for (Vertex vertex : graph.getVertices()) {
-                if (count(vertex.getOutEdges()) > 0) {
-                    assertEquals(1, count(vertex.getOutEdges()));
-                    assertFalse(count(vertex.getInEdges()) > 0);
+                if (count(vertex.getEdges(Direction.OUT)) > 0) {
+                    assertEquals(1, count(vertex.getEdges(Direction.OUT)));
+                    assertFalse(count(vertex.getEdges(Direction.IN)) > 0);
 
                 } else {
-                    assertEquals(1, count(vertex.getInEdges()));
-                    assertFalse(count(vertex.getOutEdges()) > 0);
+                    assertEquals(1, count(vertex.getEdges(Direction.IN)));
+                    assertFalse(count(vertex.getEdges(Direction.OUT)) > 0);
                 }
             }
             printPerformance(graph.toString(), vertexCount, "vertices checked", this.stopWatch());
@@ -192,12 +192,12 @@ public class EdgeTestSuite extends TestSuite {
                 if (graph.getFeatures().supportsVertexIteration) {
                     int x = 0;
                     for (Vertex vertex : graph.getVertices()) {
-                        if (count(vertex.getOutEdges()) > 0) {
-                            assertEquals(1, count(vertex.getOutEdges()));
-                            assertFalse(count(vertex.getInEdges()) > 0);
-                        } else if (count(vertex.getInEdges()) > 0) {
-                            assertEquals(1, count(vertex.getInEdges()));
-                            assertFalse(count(vertex.getOutEdges()) > 0);
+                        if (count(vertex.getEdges(Direction.OUT)) > 0) {
+                            assertEquals(1, count(vertex.getEdges(Direction.OUT)));
+                            assertFalse(count(vertex.getEdges(Direction.IN)) > 0);
+                        } else if (count(vertex.getEdges(Direction.IN)) > 0) {
+                            assertEquals(1, count(vertex.getEdges(Direction.IN)));
+                            assertFalse(count(vertex.getEdges(Direction.OUT)) > 0);
                         } else {
                             x++;
                         }
@@ -228,24 +228,24 @@ public class EdgeTestSuite extends TestSuite {
             if (graph.getFeatures().supportsEdgeIteration)
                 assertEquals(5, count(graph.getEdges()));
 
-            assertEquals(0, count(v1.getInEdges()));
-            assertEquals(1, count(v1.getOutEdges()));
-            assertEquals(1, count(v2.getInEdges()));
-            assertEquals(4, count(v2.getOutEdges()));
-            assertEquals(4, count(v3.getInEdges()));
-            assertEquals(0, count(v3.getOutEdges()));
+            assertEquals(0, count(v1.getEdges(Direction.IN)));
+            assertEquals(1, count(v1.getEdges(Direction.OUT)));
+            assertEquals(1, count(v2.getEdges(Direction.IN)));
+            assertEquals(4, count(v2.getEdges(Direction.OUT)));
+            assertEquals(4, count(v3.getEdges(Direction.IN)));
+            assertEquals(0, count(v3.getEdges(Direction.OUT)));
         } else {
             if (graph.getFeatures().supportsVertexIteration)
                 assertEquals(count(graph.getVertices()), 3);
             if (graph.getFeatures().supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 2);
 
-            assertEquals(0, count(v1.getInEdges()));
-            assertEquals(1, count(v1.getOutEdges()));
-            assertEquals(1, count(v2.getInEdges()));
-            assertEquals(1, count(v2.getOutEdges()));
-            assertEquals(1, count(v3.getInEdges()));
-            assertEquals(0, count(v3.getOutEdges()));
+            assertEquals(0, count(v1.getEdges(Direction.IN)));
+            assertEquals(1, count(v1.getEdges(Direction.OUT)));
+            assertEquals(1, count(v2.getEdges(Direction.IN)));
+            assertEquals(1, count(v2.getEdges(Direction.OUT)));
+            assertEquals(1, count(v3.getEdges(Direction.IN)));
+            assertEquals(0, count(v3.getEdges(Direction.OUT)));
         }
         graph.shutdown();
     }
@@ -260,20 +260,20 @@ public class EdgeTestSuite extends TestSuite {
         graph.addEdge(null, v2, v3, convertId(graph, "pets"));
         graph.addEdge(null, v2, v3, convertId(graph, "pets"));
 
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(1, count(v1.getOutEdges()));
-        assertEquals(1, count(v2.getInEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(1, count(v1.getEdges(Direction.OUT)));
+        assertEquals(1, count(v2.getEdges(Direction.IN)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
 
         if (!graph.getFeatures().ignoresSuppliedIds) {
             v1 = graph.getVertex(convertId(graph, "1"));
             v2 = graph.getVertex(convertId(graph, "2"));
             v3 = graph.getVertex(convertId(graph, "3"));
 
-            assertEquals(0, count(v1.getInEdges()));
-            assertEquals(1, count(v1.getOutEdges()));
-            assertEquals(1, count(v2.getInEdges()));
-            assertEquals(0, count(v3.getOutEdges()));
+            assertEquals(0, count(v1.getEdges(Direction.IN)));
+            assertEquals(1, count(v1.getEdges(Direction.OUT)));
+            assertEquals(1, count(v2.getEdges(Direction.IN)));
+            assertEquals(0, count(v3.getEdges(Direction.OUT)));
         }
 
         if (graph.getFeatures().supportsVertexIteration)
@@ -285,17 +285,17 @@ public class EdgeTestSuite extends TestSuite {
             assertEquals(2, count(graph.getVertices()));
 
         if (graph.getFeatures().supportsDuplicateEdges)
-            assertEquals(2, count(v2.getOutEdges()));
+            assertEquals(2, count(v2.getEdges(Direction.OUT)));
         else
-            assertEquals(1, count(v2.getOutEdges()));
+            assertEquals(1, count(v2.getEdges(Direction.OUT)));
 
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v2.getInEdges()));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v2.getEdges(Direction.IN)));
 
         if (graph.getFeatures().supportsDuplicateEdges)
-            assertEquals(2, count(v3.getInEdges()));
+            assertEquals(2, count(v3.getEdges(Direction.IN)));
         else
-            assertEquals(1, count(v3.getInEdges()));
+            assertEquals(1, count(v3.getEdges(Direction.IN)));
 
         graph.shutdown();
     }
@@ -313,61 +313,61 @@ public class EdgeTestSuite extends TestSuite {
             assertEquals(3, count(graph.getVertices()));
 
         graph.removeEdge(e1);
-        assertEquals(0, count(v1.getOutEdges()));
-        assertEquals(2, count(v2.getOutEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(0, count(v2.getInEdges()));
-        assertEquals(2, count(v3.getInEdges()));
+        assertEquals(0, count(v1.getEdges(Direction.OUT)));
+        assertEquals(2, count(v2.getEdges(Direction.OUT)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(0, count(v2.getEdges(Direction.IN)));
+        assertEquals(2, count(v3.getEdges(Direction.IN)));
         if (!graph.getFeatures().ignoresSuppliedIds) {
             v1 = graph.getVertex(convertId(graph, "1"));
             v2 = graph.getVertex(convertId(graph, "2"));
             v3 = graph.getVertex(convertId(graph, "3"));
         }
-        assertEquals(0, count(v1.getOutEdges()));
-        assertEquals(2, count(v2.getOutEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(0, count(v2.getInEdges()));
-        assertEquals(2, count(v3.getInEdges()));
+        assertEquals(0, count(v1.getEdges(Direction.OUT)));
+        assertEquals(2, count(v2.getEdges(Direction.OUT)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(0, count(v2.getEdges(Direction.IN)));
+        assertEquals(2, count(v3.getEdges(Direction.IN)));
 
         graph.removeEdge(e2);
-        assertEquals(0, count(v1.getOutEdges()));
-        assertEquals(1, count(v2.getOutEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(0, count(v2.getInEdges()));
-        assertEquals(1, count(v3.getInEdges()));
+        assertEquals(0, count(v1.getEdges(Direction.OUT)));
+        assertEquals(1, count(v2.getEdges(Direction.OUT)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(0, count(v2.getEdges(Direction.IN)));
+        assertEquals(1, count(v3.getEdges(Direction.IN)));
         if (!graph.getFeatures().ignoresSuppliedIds) {
             v1 = graph.getVertex(convertId(graph, "1"));
             v2 = graph.getVertex(convertId(graph, "2"));
             v3 = graph.getVertex(convertId(graph, "3"));
         }
-        assertEquals(0, count(v1.getOutEdges()));
-        assertEquals(1, count(v2.getOutEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(0, count(v2.getInEdges()));
-        assertEquals(1, count(v3.getInEdges()));
+        assertEquals(0, count(v1.getEdges(Direction.OUT)));
+        assertEquals(1, count(v2.getEdges(Direction.OUT)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(0, count(v2.getEdges(Direction.IN)));
+        assertEquals(1, count(v3.getEdges(Direction.IN)));
 
         graph.removeEdge(e3);
-        assertEquals(0, count(v1.getOutEdges()));
-        assertEquals(0, count(v2.getOutEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(0, count(v2.getInEdges()));
-        assertEquals(0, count(v3.getInEdges()));
+        assertEquals(0, count(v1.getEdges(Direction.OUT)));
+        assertEquals(0, count(v2.getEdges(Direction.OUT)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(0, count(v2.getEdges(Direction.IN)));
+        assertEquals(0, count(v3.getEdges(Direction.IN)));
         if (!graph.getFeatures().ignoresSuppliedIds) {
             v1 = graph.getVertex(convertId(graph, "1"));
             v2 = graph.getVertex(convertId(graph, "2"));
             v3 = graph.getVertex(convertId(graph, "3"));
         }
-        assertEquals(0, count(v1.getOutEdges()));
-        assertEquals(0, count(v2.getOutEdges()));
-        assertEquals(0, count(v3.getOutEdges()));
-        assertEquals(0, count(v1.getInEdges()));
-        assertEquals(0, count(v2.getInEdges()));
-        assertEquals(0, count(v3.getInEdges()));
+        assertEquals(0, count(v1.getEdges(Direction.OUT)));
+        assertEquals(0, count(v2.getEdges(Direction.OUT)));
+        assertEquals(0, count(v3.getEdges(Direction.OUT)));
+        assertEquals(0, count(v1.getEdges(Direction.IN)));
+        assertEquals(0, count(v2.getEdges(Direction.IN)));
+        assertEquals(0, count(v3.getEdges(Direction.IN)));
         graph.shutdown();
 
     }
@@ -427,11 +427,11 @@ public class EdgeTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(1, count(v2.getOutEdges()));
-            assertEquals(1, count(v2.getInEdges()));
+            assertEquals(1, count(v2.getEdges(Direction.OUT)));
+            assertEquals(1, count(v2.getEdges(Direction.IN)));
             graph.removeEdge(e2);
-            assertEquals(0, count(v2.getOutEdges()));
-            assertEquals(0, count(v2.getInEdges()));
+            assertEquals(0, count(v2.getEdges(Direction.OUT)));
+            assertEquals(0, count(v2.getEdges(Direction.IN)));
 
             if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 1);

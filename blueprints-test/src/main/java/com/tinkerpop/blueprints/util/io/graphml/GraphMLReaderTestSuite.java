@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.io.graphml;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TestSuite;
@@ -29,13 +30,13 @@ public class GraphMLReaderTestSuite extends TestSuite {
             new GraphMLReader(graph).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
 
-            assertEquals(count(graph.getVertex("1").getOutEdges()), 3);
-            assertEquals(count(graph.getVertex("1").getInEdges()), 0);
+            assertEquals(count(graph.getVertex("1").getEdges(Direction.OUT)), 3);
+            assertEquals(count(graph.getVertex("1").getEdges(Direction.IN)), 0);
             Vertex marko = graph.getVertex("1");
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(marko.getProperty("age"), 29);
             int counter = 0;
-            for (Edge e : graph.getVertex("1").getOutEdges()) {
+            for (Edge e : graph.getVertex("1").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getLabel(), "knows");
@@ -54,12 +55,12 @@ public class GraphMLReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(graph.getVertex("4").getOutEdges()), 2);
-            assertEquals(count(graph.getVertex("4").getInEdges()), 1);
+            assertEquals(count(graph.getVertex("4").getEdges(Direction.OUT)), 2);
+            assertEquals(count(graph.getVertex("4").getEdges(Direction.IN)), 1);
             Vertex josh = graph.getVertex("4");
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), 32);
-            for (Edge e : graph.getVertex("4").getOutEdges()) {
+            for (Edge e : graph.getVertex("4").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("3")) {
                     assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                     assertEquals(e.getLabel(), "created");
@@ -202,9 +203,9 @@ public class GraphMLReaderTestSuite extends TestSuite {
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(((Number) marko.getProperty("age")).intValue(), 29);
             assertEquals(marko.getPropertyKeys().size(), 2);
-            assertEquals(count(marko.getOutEdges()), 3);
-            assertEquals(count(marko.getInEdges()), 0);
-            for (Edge e : marko.getOutEdges()) {
+            assertEquals(count(marko.getEdges(Direction.OUT)), 3);
+            assertEquals(count(marko.getEdges(Direction.IN)), 0);
+            for (Edge e : marko.getEdges(Direction.OUT)) {
                 vertices.add(e.getInVertex());
             }
             assertEquals(vertices.size(), 3);
@@ -216,9 +217,9 @@ public class GraphMLReaderTestSuite extends TestSuite {
             assertEquals(peter.getProperty("name"), "peter");
             assertEquals(((Number) peter.getProperty("age")).intValue(), 35);
             assertEquals(peter.getPropertyKeys().size(), 2);
-            assertEquals(count(peter.getOutEdges()), 1);
-            assertEquals(count(peter.getInEdges()), 0);
-            for (Edge e : peter.getOutEdges()) {
+            assertEquals(count(peter.getEdges(Direction.OUT)), 1);
+            assertEquals(count(peter.getEdges(Direction.IN)), 0);
+            for (Edge e : peter.getEdges(Direction.OUT)) {
                 vertices.add(e.getInVertex());
             }
             assertEquals(vertices.size(), 1);
@@ -228,16 +229,16 @@ public class GraphMLReaderTestSuite extends TestSuite {
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(((Number) josh.getProperty("age")).intValue(), 32);
             assertEquals(josh.getPropertyKeys().size(), 2);
-            assertEquals(count(josh.getOutEdges()), 2);
-            assertEquals(count(josh.getInEdges()), 1);
-            for (Edge e : josh.getOutEdges()) {
+            assertEquals(count(josh.getEdges(Direction.OUT)), 2);
+            assertEquals(count(josh.getEdges(Direction.IN)), 1);
+            for (Edge e : josh.getEdges(Direction.OUT)) {
                 vertices.add(e.getInVertex());
             }
             assertEquals(vertices.size(), 2);
             assertTrue(vertices.contains(lop));
             assertTrue(vertices.contains(ripple));
             vertices = new HashSet<Vertex>();
-            for (Edge e : josh.getInEdges()) {
+            for (Edge e : josh.getEdges(Direction.IN)) {
                 vertices.add(e.getOutVertex());
             }
             assertEquals(vertices.size(), 1);
@@ -247,9 +248,9 @@ public class GraphMLReaderTestSuite extends TestSuite {
             assertEquals(vadas.getProperty("name"), "vadas");
             assertEquals(((Number) vadas.getProperty("age")).intValue(), 27);
             assertEquals(vadas.getPropertyKeys().size(), 2);
-            assertEquals(count(vadas.getOutEdges()), 0);
-            assertEquals(count(vadas.getInEdges()), 1);
-            for (Edge e : vadas.getInEdges()) {
+            assertEquals(count(vadas.getEdges(Direction.OUT)), 0);
+            assertEquals(count(vadas.getEdges(Direction.IN)), 1);
+            for (Edge e : vadas.getEdges(Direction.IN)) {
                 vertices.add(e.getOutVertex());
             }
             assertEquals(vertices.size(), 1);
@@ -259,9 +260,9 @@ public class GraphMLReaderTestSuite extends TestSuite {
             assertEquals(lop.getProperty("name"), "lop");
             assertEquals(lop.getProperty("lang"), "java");
             assertEquals(lop.getPropertyKeys().size(), 2);
-            assertEquals(count(lop.getOutEdges()), 0);
-            assertEquals(count(lop.getInEdges()), 3);
-            for (Edge e : lop.getInEdges()) {
+            assertEquals(count(lop.getEdges(Direction.OUT)), 0);
+            assertEquals(count(lop.getEdges(Direction.IN)), 3);
+            for (Edge e : lop.getEdges(Direction.IN)) {
                 vertices.add(e.getOutVertex());
             }
             assertEquals(vertices.size(), 3);
@@ -273,9 +274,9 @@ public class GraphMLReaderTestSuite extends TestSuite {
             assertEquals(ripple.getProperty("name"), "ripple");
             assertEquals(ripple.getProperty("lang"), "java");
             assertEquals(ripple.getPropertyKeys().size(), 2);
-            assertEquals(count(ripple.getOutEdges()), 0);
-            assertEquals(count(ripple.getInEdges()), 1);
-            for (Edge e : ripple.getInEdges()) {
+            assertEquals(count(ripple.getEdges(Direction.OUT)), 0);
+            assertEquals(count(ripple.getEdges(Direction.IN)), 1);
+            for (Edge e : ripple.getEdges(Direction.IN)) {
                 vertices.add(e.getOutVertex());
             }
             assertEquals(vertices.size(), 1);
@@ -294,14 +295,14 @@ public class GraphMLReaderTestSuite extends TestSuite {
 
             // Specific Graph Characteristics
 
-            assertEquals(count(graph.getVertex("1").getOutEdges()), 3);
-            assertEquals(count(graph.getVertex("1").getInEdges()), 0);
+            assertEquals(count(graph.getVertex("1").getEdges(Direction.OUT)), 3);
+            assertEquals(count(graph.getVertex("1").getEdges(Direction.IN)), 0);
             Vertex marko = graph.getVertex("1");
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(marko.getProperty("age"), 29);
             assertEquals(marko.getProperty("_id"), 2);
             int counter = 0;
-            for (Edge e : graph.getVertex("1").getOutEdges()) {
+            for (Edge e : graph.getVertex("1").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getProperty("_id"), 8);
@@ -326,26 +327,26 @@ public class GraphMLReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(graph.getVertex("2").getOutEdges()), 0);
-            assertEquals(count(graph.getVertex("2").getInEdges()), 1);
+            assertEquals(count(graph.getVertex("2").getEdges(Direction.OUT)), 0);
+            assertEquals(count(graph.getVertex("2").getEdges(Direction.IN)), 1);
             Vertex vadas = graph.getVertex("2");
             assertEquals(vadas.getProperty("name"), "vadas");
             assertEquals(vadas.getProperty("age"), 27);
             assertEquals(vadas.getProperty("_id"), 3);
 
-            assertEquals(count(graph.getVertex("3").getOutEdges()), 0);
-            assertEquals(count(graph.getVertex("3").getInEdges()), 3);
+            assertEquals(count(graph.getVertex("3").getEdges(Direction.OUT)), 0);
+            assertEquals(count(graph.getVertex("3").getEdges(Direction.IN)), 3);
             Vertex lop = graph.getVertex("3");
             assertEquals(lop.getProperty("name"), "lop");
             assertEquals(lop.getProperty("lang"), "java");
             assertEquals(lop.getProperty("_id"), 4);
 
-            assertEquals(count(graph.getVertex("4").getOutEdges()), 2);
-            assertEquals(count(graph.getVertex("4").getInEdges()), 1);
+            assertEquals(count(graph.getVertex("4").getEdges(Direction.OUT)), 2);
+            assertEquals(count(graph.getVertex("4").getEdges(Direction.IN)), 1);
             Vertex josh = graph.getVertex("4");
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), 32);
-            for (Edge e : graph.getVertex("4").getOutEdges()) {
+            for (Edge e : graph.getVertex("4").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("3")) {
                     assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                     assertEquals(e.getProperty("_id"), 13);
@@ -363,20 +364,20 @@ public class GraphMLReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(graph.getVertex("5").getOutEdges()), 0);
-            assertEquals(count(graph.getVertex("5").getInEdges()), 1);
+            assertEquals(count(graph.getVertex("5").getEdges(Direction.OUT)), 0);
+            assertEquals(count(graph.getVertex("5").getEdges(Direction.IN)), 1);
             Vertex ripple = graph.getVertex("5");
             assertEquals(ripple.getProperty("name"), "ripple");
             assertEquals(ripple.getProperty("lang"), "java");
             assertEquals(ripple.getProperty("_id"), 7);
 
-            assertEquals(count(graph.getVertex("6").getOutEdges()), 1);
-            assertEquals(count(graph.getVertex("6").getInEdges()), 0);
+            assertEquals(count(graph.getVertex("6").getEdges(Direction.OUT)), 1);
+            assertEquals(count(graph.getVertex("6").getEdges(Direction.IN)), 0);
             Vertex peter = graph.getVertex("6");
             assertEquals(peter.getProperty("name"), "peter");
             assertEquals(peter.getProperty("age"), 35);
 
-            for (Edge e : graph.getVertex("6").getOutEdges()) {
+            for (Edge e : graph.getVertex("6").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("3")) {
                     assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                     assertEquals(e.getProperty("_id"), null);
@@ -634,14 +635,14 @@ public class GraphMLReaderTestSuite extends TestSuite {
 
             // Specific Graph Characteristics
 
-            assertEquals(count(toGraph.getVertex("1").getOutEdges()), 3);
-            assertEquals(count(toGraph.getVertex("1").getInEdges()), 0);
+            assertEquals(count(toGraph.getVertex("1").getEdges(Direction.OUT)), 3);
+            assertEquals(count(toGraph.getVertex("1").getEdges(Direction.IN)), 0);
             Vertex marko = toGraph.getVertex("1");
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(marko.getProperty("age"), 29);
             assertEquals(marko.getProperty("_id"), 2);
             int counter = 0;
-            for (Edge e : toGraph.getVertex("1").getOutEdges()) {
+            for (Edge e : toGraph.getVertex("1").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getProperty("_id"), 8);
@@ -666,26 +667,26 @@ public class GraphMLReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(toGraph.getVertex("2").getOutEdges()), 0);
-            assertEquals(count(toGraph.getVertex("2").getInEdges()), 1);
+            assertEquals(count(toGraph.getVertex("2").getEdges(Direction.OUT)), 0);
+            assertEquals(count(toGraph.getVertex("2").getEdges(Direction.IN)), 1);
             Vertex vadas = toGraph.getVertex("2");
             assertEquals(vadas.getProperty("name"), "vadas");
             assertEquals(vadas.getProperty("age"), 27);
             assertEquals(vadas.getProperty("_id"), 3);
 
-            assertEquals(count(toGraph.getVertex("3").getOutEdges()), 0);
-            assertEquals(count(toGraph.getVertex("3").getInEdges()), 3);
+            assertEquals(count(toGraph.getVertex("3").getEdges(Direction.OUT)), 0);
+            assertEquals(count(toGraph.getVertex("3").getEdges(Direction.IN)), 3);
             Vertex lop = toGraph.getVertex("3");
             assertEquals(lop.getProperty("name"), "lop");
             assertEquals(lop.getProperty("lang"), "java");
             assertEquals(lop.getProperty("_id"), 4);
 
-            assertEquals(count(toGraph.getVertex("4").getOutEdges()), 2);
-            assertEquals(count(toGraph.getVertex("4").getInEdges()), 1);
+            assertEquals(count(toGraph.getVertex("4").getEdges(Direction.OUT)), 2);
+            assertEquals(count(toGraph.getVertex("4").getEdges(Direction.IN)), 1);
             Vertex josh = toGraph.getVertex("4");
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), 32);
-            for (Edge e : toGraph.getVertex("4").getOutEdges()) {
+            for (Edge e : toGraph.getVertex("4").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("3")) {
                     assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                     assertEquals(e.getProperty("_id"), 13);
@@ -703,20 +704,20 @@ public class GraphMLReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(toGraph.getVertex("5").getOutEdges()), 0);
-            assertEquals(count(toGraph.getVertex("5").getInEdges()), 1);
+            assertEquals(count(toGraph.getVertex("5").getEdges(Direction.OUT)), 0);
+            assertEquals(count(toGraph.getVertex("5").getEdges(Direction.IN)), 1);
             Vertex ripple = toGraph.getVertex("5");
             assertEquals(ripple.getProperty("name"), "ripple");
             assertEquals(ripple.getProperty("lang"), "java");
             assertEquals(ripple.getProperty("_id"), 7);
 
-            assertEquals(count(toGraph.getVertex("6").getOutEdges()), 1);
-            assertEquals(count(toGraph.getVertex("6").getInEdges()), 0);
+            assertEquals(count(toGraph.getVertex("6").getEdges(Direction.OUT)), 1);
+            assertEquals(count(toGraph.getVertex("6").getEdges(Direction.IN)), 0);
             Vertex peter = toGraph.getVertex("6");
             assertEquals(peter.getProperty("name"), "peter");
             assertEquals(peter.getProperty("age"), 35);
 
-            for (Edge e : toGraph.getVertex("6").getOutEdges()) {
+            for (Edge e : toGraph.getVertex("6").getEdges(Direction.OUT)) {
                 if (e.getInVertex().getId().equals("3")) {
                     assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                     assertEquals(e.getProperty("_id"), null);

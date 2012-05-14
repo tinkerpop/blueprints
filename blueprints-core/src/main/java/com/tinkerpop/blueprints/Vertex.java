@@ -7,30 +7,32 @@ package com.tinkerpop.blueprints;
  * Diagrammatically, ---inEdges---> vertex ---outEdges--->.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Matthias Brocheler (http://matthiasb.com)
  */
 public interface Vertex extends Element {
 
     /**
-     * The edges emanating from, or leaving, the vertex.
+     * Return the edges incident to the vertex according to the provided direction and edge labels.
      *
-     * @param labels the labels of the edges to return
-     * @return the edges for which the vertex is the tail
+     * @param direction the direction of the edges to retrieve
+     * @param labels    the labels of the edges to retrieve
+     * @return an iterable of incident edges
      */
-    public Iterable<Edge> getOutEdges(String... labels);
+    public Iterable<Edge> getEdges(Direction direction, String... labels);
 
     /**
-     * The edges incoming to, or arriving at, the vertex.
+     * Return the vertices adjacent to the vertex according to the provided direction and edge labels.
      *
-     * @param labels the labels of the edges to return
-     * @return the edges for which the vertex is the head
+     * @param direction the direction of the edges of the adjacent vertices
+     * @param labels    the labels of the edges of the adjacent vertices
+     * @return an iterable of adjacent vertices
      */
-    public Iterable<Edge> getInEdges(String... labels);
+    public Iterable<Vertex> getVertices(Direction direction, String... labels);
 
     /**
-     * Use to query the incoming and/or outgoing edges of the vertex.
-     * The returned query object can be configured to support low-level filtering of result set.
+     * Generate a query object that can be used to fine tune which edges/vertices are retrieved that are incident/adjacent to this vertex.
      *
-     * @return a configurable query object
+     * @return a vertex query object with methods for constraining which data is pulled from the underlying graph
      */
     public Query query();
 }

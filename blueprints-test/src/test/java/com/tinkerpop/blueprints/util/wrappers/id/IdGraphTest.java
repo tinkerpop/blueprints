@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.id;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -32,7 +33,7 @@ public class IdGraphTest extends GraphTest {
         assertTrue(v1 instanceof IdVertex);
         assertTrue(e instanceof IdEdge);
 
-        Iterator<Edge> outE = v1.getOutEdges().iterator();
+        Iterator<Edge> outE = v1.getEdges(Direction.OUT).iterator();
         assertTrue(outE.hasNext());
         e = outE.next();
         assertTrue(e instanceof IdEdge);

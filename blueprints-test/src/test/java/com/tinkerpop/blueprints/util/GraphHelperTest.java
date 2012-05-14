@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -55,13 +56,13 @@ public class GraphHelperTest extends BaseTest {
         GraphHelper.copyGraph(g, h);
         assertEquals(count(h.getVertices()), 6);
         assertEquals(count(h.getEdges()), 6);
-        assertEquals(count(h.getVertex("1").getOutEdges()), 3);
-        assertEquals(count(h.getVertex("1").getInEdges()), 0);
+        assertEquals(count(h.getVertex("1").getEdges(Direction.OUT)), 3);
+        assertEquals(count(h.getVertex("1").getEdges(Direction.IN)), 0);
         Vertex marko = h.getVertex("1");
         assertEquals(marko.getProperty("name"), "marko");
         assertEquals(marko.getProperty("age"), 29);
         int counter = 0;
-        for (Edge e : h.getVertex("1").getOutEdges()) {
+        for (Edge e : h.getVertex("1").getEdges(Direction.OUT)) {
             if (e.getInVertex().getId().equals("2")) {
                 assertEquals(e.getProperty("weight"), 0.5f);
                 assertEquals(e.getLabel(), "knows");
@@ -80,12 +81,12 @@ public class GraphHelperTest extends BaseTest {
             }
         }
 
-        assertEquals(count(h.getVertex("4").getOutEdges()), 2);
-        assertEquals(count(h.getVertex("4").getInEdges()), 1);
+        assertEquals(count(h.getVertex("4").getEdges(Direction.OUT)), 2);
+        assertEquals(count(h.getVertex("4").getEdges(Direction.IN)), 1);
         Vertex josh = h.getVertex("4");
         assertEquals(josh.getProperty("name"), "josh");
         assertEquals(josh.getProperty("age"), 32);
-        for (Edge e : h.getVertex("4").getOutEdges()) {
+        for (Edge e : h.getVertex("4").getEdges(Direction.OUT)) {
             if (e.getInVertex().getId().equals("3")) {
                 assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                 assertEquals(e.getLabel(), "created");

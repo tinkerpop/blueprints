@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.id;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
@@ -18,12 +19,12 @@ public class IdVertex extends IdElement implements Vertex {
         return (Vertex) this.baseElement;
     }
 
-    public Iterable<Edge> getOutEdges(final String... filters) {
-        return new IdEdgeIterable(((Vertex) this.baseElement).getOutEdges(filters));
+    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+        return new IdEdgeIterable(((Vertex) this.baseElement).getEdges(direction, labels));
     }
 
-    public Iterable<Edge> getInEdges(final String... filters) {
-        return new IdEdgeIterable(((Vertex) this.baseElement).getInEdges(filters));
+    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+        return new IdVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels));
     }
 
     public Query query() {

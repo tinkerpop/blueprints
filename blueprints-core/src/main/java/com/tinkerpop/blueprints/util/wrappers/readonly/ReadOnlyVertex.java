@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
@@ -14,12 +15,12 @@ public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
         super(baseVertex);
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        return new ReadOnlyEdgeIterable(((Vertex) this.baseElement).getInEdges(labels));
+    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+        return new ReadOnlyEdgeIterable(((Vertex) this.baseElement).getEdges(direction, labels));
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        return new ReadOnlyEdgeIterable(((Vertex) this.baseElement).getOutEdges(labels));
+    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+        return new ReadOnlyVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels));
     }
 
     public Query query() {

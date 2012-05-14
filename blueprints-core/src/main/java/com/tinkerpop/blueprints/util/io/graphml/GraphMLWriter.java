@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.io.graphml;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -78,7 +79,7 @@ public class GraphMLWriter {
                         vertexKeyTypes.put(key, GraphMLWriter.getStringType(vertex.getProperty(key)));
                     }
                 }
-                for (Edge edge : vertex.getOutEdges()) {
+                for (Edge edge : vertex.getEdges(Direction.OUT)) {
                     for (String key : edge.getPropertyKeys()) {
                         if (!edgeKeyTypes.containsKey(key)) {
                             edgeKeyTypes.put(key, GraphMLWriter.getStringType(edge.getProperty(key)));
@@ -183,7 +184,7 @@ public class GraphMLWriter {
             if (normalize) {
                 List<Edge> edges = new ArrayList<Edge>();
                 for (Vertex vertex : graph.getVertices()) {
-                    for (Edge edge : vertex.getOutEdges()) {
+                    for (Edge edge : vertex.getEdges(Direction.OUT)) {
                         edges.add(edge);
                     }
                 }
@@ -213,7 +214,7 @@ public class GraphMLWriter {
                 }
             } else {
                 for (Vertex vertex : graph.getVertices()) {
-                    for (Edge edge : vertex.getOutEdges()) {
+                    for (Edge edge : vertex.getEdges(Direction.OUT)) {
                         writer.writeStartElement(GraphMLTokens.EDGE);
                         writer.writeAttribute(GraphMLTokens.ID, edge.getId().toString());
                         writer.writeAttribute(GraphMLTokens.SOURCE, edge.getOutVertex().getId().toString());

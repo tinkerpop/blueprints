@@ -38,136 +38,136 @@ public class QueryTestSuite extends TestSuite {
 
             // out edges
 
-            List results = asList(a.query().direction(Query.Direction.OUT).edges());
+            List results = asList(a.query().direction(Direction.OUT).edges());
             assertEquals(results.size(), 3);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
             assertTrue(results.contains(aHateC));
-            results = asList(a.query().direction(Query.Direction.OUT).vertices());
+            results = asList(a.query().direction(Direction.OUT).vertices());
             assertEquals(results.size(), 3);
             assertTrue(results.contains(b));
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.OUT).count(), 3);
+            assertEquals(a.query().direction(Direction.OUT).count(), 3);
 
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("hate", "friend").edges());
+            results = asList(a.query().direction(Direction.OUT).labels("hate", "friend").edges());
             assertEquals(results.size(), 3);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
             assertTrue(results.contains(aHateC));
-            results = asList(a.query().direction(Query.Direction.OUT).labels("hate", "friend").vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("hate", "friend").vertices());
             assertEquals(results.size(), 3);
             assertTrue(results.contains(b));
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.OUT).labels("hate", "friend").count(), 3);
+            assertEquals(a.query().direction(Direction.OUT).labels("hate", "friend").count(), 3);
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").edges());
             assertEquals(results.size(), 2);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").vertices());
             assertEquals(results.size(), 2);
             assertTrue(results.contains(b));
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.OUT).labels("friend").count(), 2);
+            assertEquals(a.query().direction(Direction.OUT).labels("friend").count(), 2);
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0).edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendB));
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0).vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(b));
-            assertEquals(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0).count(), 1);
+            assertEquals(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0).count(), 1);
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.NOT_EQUAL).edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.NOT_EQUAL).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.NOT_EQUAL).vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.NOT_EQUAL).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.NOT_EQUAL).count(), 1);
+            assertEquals(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.NOT_EQUAL).count(), 1);
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.LESS_THAN_EQUAL).edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.LESS_THAN_EQUAL).edges());
             assertEquals(results.size(), 2);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.LESS_THAN_EQUAL).vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.LESS_THAN_EQUAL).vertices());
             assertEquals(results.size(), 2);
             assertTrue(results.contains(b));
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.LESS_THAN_EQUAL).count(), 2);
+            assertEquals(a.query().direction(Direction.OUT).labels("friend").has("amount", 1.0, Query.Compare.LESS_THAN_EQUAL).count(), 2);
 
-            results = asList(a.query().direction(Query.Direction.OUT).has("amount", 1.0, Query.Compare.LESS_THAN).edges());
+            results = asList(a.query().direction(Direction.OUT).has("amount", 1.0, Query.Compare.LESS_THAN).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(Query.Direction.OUT).has("amount", 1.0, Query.Compare.LESS_THAN).vertices());
+            results = asList(a.query().direction(Direction.OUT).has("amount", 1.0, Query.Compare.LESS_THAN).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.OUT).has("amount", 1.0, Query.Compare.LESS_THAN).count(), 1);
+            assertEquals(a.query().direction(Direction.OUT).has("amount", 1.0, Query.Compare.LESS_THAN).count(), 1);
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 0.5).edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 0.5).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").has("amount", 0.5).vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").has("amount", 0.5).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
 
-            results = asList(a.query().direction(Query.Direction.IN).labels("hate", "friend").has("amount", 0.5, Query.Compare.GREATER_THAN).edges());
+            results = asList(a.query().direction(Direction.IN).labels("hate", "friend").has("amount", 0.5, Query.Compare.GREATER_THAN).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(cHateA));
-            results = asList(a.query().direction(Query.Direction.IN).labels("hate", "friend").has("amount", 0.5, Query.Compare.GREATER_THAN).vertices());
+            results = asList(a.query().direction(Direction.IN).labels("hate", "friend").has("amount", 0.5, Query.Compare.GREATER_THAN).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.IN).labels("hate", "friend").has("amount", 0.5, Query.Compare.GREATER_THAN).count(), 1);
+            assertEquals(a.query().direction(Direction.IN).labels("hate", "friend").has("amount", 0.5, Query.Compare.GREATER_THAN).count(), 1);
 
-            results = asList(a.query().direction(Query.Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN).edges());
+            results = asList(a.query().direction(Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN).edges());
             assertEquals(results.size(), 0);
-            results = asList(a.query().direction(Query.Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN).vertices());
+            results = asList(a.query().direction(Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN).vertices());
             assertEquals(results.size(), 0);
-            assertEquals(a.query().direction(Query.Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN).count(), 0);
+            assertEquals(a.query().direction(Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN).count(), 0);
 
-            results = asList(a.query().direction(Query.Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN_EQUAL).edges());
+            results = asList(a.query().direction(Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN_EQUAL).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(cHateA));
-            results = asList(a.query().direction(Query.Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN_EQUAL).vertices());
+            results = asList(a.query().direction(Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN_EQUAL).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(Query.Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN_EQUAL).count(), 1);
+            assertEquals(a.query().direction(Direction.IN).labels("hate").has("amount", 1.0, Query.Compare.GREATER_THAN_EQUAL).count(), 1);
 
-            results = asList(a.query().direction(Query.Direction.OUT).interval("date", 5, 10).edges());
+            results = asList(a.query().direction(Direction.OUT).interval("date", 5, 10).edges());
             assertEquals(results.size(), 0);
-            results = asList(a.query().direction(Query.Direction.OUT).interval("date", 5, 10).vertices());
+            results = asList(a.query().direction(Direction.OUT).interval("date", 5, 10).vertices());
             assertEquals(results.size(), 0);
-            assertEquals(a.query().direction(Query.Direction.OUT).interval("date", 5, 10).count(), 0);
+            assertEquals(a.query().direction(Direction.OUT).interval("date", 5, 10).count(), 0);
 
-            results = asList(a.query().direction(Query.Direction.OUT).interval("date", 5, 11).edges());
+            results = asList(a.query().direction(Direction.OUT).interval("date", 5, 11).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendB));
-            results = asList(a.query().direction(Query.Direction.OUT).interval("date", 5, 11).vertices());
+            results = asList(a.query().direction(Direction.OUT).interval("date", 5, 11).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(b));
-            assertEquals(a.query().direction(Query.Direction.OUT).interval("date", 5, 11).count(), 1);
+            assertEquals(a.query().direction(Direction.OUT).interval("date", 5, 11).count(), 1);
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").interval("date", 5, 11).edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").interval("date", 5, 11).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendB));
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").interval("date", 5, 11).vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").interval("date", 5, 11).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(b));
-            assertEquals(a.query().direction(Query.Direction.OUT).labels("friend").interval("date", 5, 11).count(), 1);
+            assertEquals(a.query().direction(Direction.OUT).labels("friend").interval("date", 5, 11).count(), 1);
 
-            results = asList(a.query().direction(Query.Direction.BOTH).labels("friend", "hate").edges());
+            results = asList(a.query().direction(Direction.BOTH).labels("friend", "hate").edges());
             assertEquals(results.size(), 4);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
             assertTrue(results.contains(aHateC));
             assertTrue(results.contains(cHateA));
-            results = asList(a.query().direction(Query.Direction.BOTH).labels("friend", "hate").vertices());
+            results = asList(a.query().direction(Direction.BOTH).labels("friend", "hate").vertices());
             assertEquals(results.size(), 4);
             assertTrue(results.contains(b));
             assertTrue(results.contains(c));
             assertFalse(results.contains(a));
-            assertEquals(a.query().direction(Query.Direction.BOTH).labels("friend", "hate").count(), 4);
+            assertEquals(a.query().direction(Direction.BOTH).labels("friend", "hate").count(), 4);
 
             results = asList(a.query().labels("friend", "hate").limit(2).edges());
             assertEquals(results.size(), 2);
@@ -178,11 +178,11 @@ public class QueryTestSuite extends TestSuite {
             assertFalse(results.contains(a));
             assertEquals(a.query().labels("friend", "hate").limit(2).count(), 2);
 
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").limit(0).edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").limit(0).edges());
             assertEquals(results.size(), 0);
-            results = asList(a.query().direction(Query.Direction.OUT).labels("friend").limit(0).vertices());
+            results = asList(a.query().direction(Direction.OUT).labels("friend").limit(0).vertices());
             assertEquals(results.size(), 0);
-            assertEquals(a.query().direction(Query.Direction.OUT).labels("friend").limit(0).count(), 0);
+            assertEquals(a.query().direction(Direction.OUT).labels("friend").limit(0).count(), 0);
 
 
         }

@@ -10,8 +10,6 @@ public interface Query {
 
     public enum Compare {EQUAL, NOT_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL}
 
-    public enum Direction {OUT, IN, BOTH}
-
     /**
      * Filter out the edge if it does not have a property with the specified value.
      *
@@ -29,7 +27,7 @@ public interface Query {
      * @param compare the comparator to use for comparison
      * @return the modified query object
      */
-    public Query has(final String key, final Object value, final Compare compare);
+    public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare);
 
     /**
      * Filter out the edge of its property value is not within the provided interval.
@@ -39,7 +37,7 @@ public interface Query {
      * @param endValue   the exclusive end value of the interval
      * @return the modified query object
      */
-    public Query interval(final String key, final Object startValue, final Object endValue);
+    public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue);
 
     /**
      * The direction of the edges to retrieve.

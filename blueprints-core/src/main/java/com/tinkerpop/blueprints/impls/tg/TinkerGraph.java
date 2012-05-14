@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.tg;
 
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -76,7 +77,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         FEATURES.supportsTransactions = false;
         FEATURES.supportsVertexIteration = true;
         FEATURES.supportsEdgeIteration = true;
-        FEATURES.supportsThreadedTransactions= false;
+        FEATURES.supportsThreadedTransactions = false;
     }
 
     public TinkerGraph(final String directory) {
@@ -236,10 +237,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public void removeVertex(final Vertex vertex) {
-        for (Edge edge : vertex.getInEdges()) {
-            this.removeEdge(edge);
-        }
-        for (Edge edge : vertex.getOutEdges()) {
+        for (Edge edge : vertex.getEdges(Direction.BOTH)) {
             this.removeEdge(edge);
         }
 

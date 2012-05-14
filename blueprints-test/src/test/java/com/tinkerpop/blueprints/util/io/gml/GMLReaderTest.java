@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.io.gml;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
@@ -34,15 +35,15 @@ public class GMLReaderTest {
         Vertex v2 = graph.getVertex(2);
         Vertex v3 = graph.getVertex(3);
 
-        Iterable<Edge> out1 = v1.getOutEdges();
+        Iterable<Edge> out1 = v1.getEdges(Direction.OUT);
         Edge e1 = out1.iterator().next();
         Assert.assertEquals(v2, e1.getInVertex());
 
-        Iterable<Edge> out2 = v2.getOutEdges();
+        Iterable<Edge> out2 = v2.getEdges(Direction.OUT);
         Edge e2 = out2.iterator().next();
         Assert.assertEquals(v3, e2.getInVertex());
 
-        Iterable<Edge> out3 = v3.getOutEdges();
+        Iterable<Edge> out3 = v3.getEdges(Direction.OUT);
         Edge e3 = out3.iterator().next();
         Assert.assertEquals(v1, e3.getInVertex());
 
@@ -63,15 +64,15 @@ public class GMLReaderTest {
         Vertex v3 = graph.getVertex(3);
         Assert.assertEquals("Node 3", v3.getProperty(LABEL));
 
-        Iterable<Edge> out1 = v1.getOutEdges();
+        Iterable<Edge> out1 = v1.getEdges(Direction.OUT);
         Edge e1 = out1.iterator().next();
         Assert.assertEquals("Edge from node 1 to node 2", e1.getLabel());
 
-        Iterable<Edge> out2 = v2.getOutEdges();
+        Iterable<Edge> out2 = v2.getEdges(Direction.OUT);
         Edge e2 = out2.iterator().next();
         Assert.assertEquals("Edge from node 2 to node 3", e2.getLabel());
 
-        Iterable<Edge> out3 = v3.getOutEdges();
+        Iterable<Edge> out3 = v3.getEdges(Direction.OUT);
         Edge e3 = out3.iterator().next();
         Assert.assertEquals("Edge from node 3 to node 1", e3.getLabel());
 

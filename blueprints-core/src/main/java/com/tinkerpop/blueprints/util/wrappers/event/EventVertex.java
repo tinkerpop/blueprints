@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
@@ -20,12 +21,12 @@ public class EventVertex extends EventElement implements Vertex {
         super(rawVertex, graphChangedListeners, trigger);
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        return new EventEdgeIterable(this.getBaseVertex().getInEdges(labels), this.graphChangedListeners, trigger);
+    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+        return new EventEdgeIterable(((Vertex) this.baseElement).getEdges(direction, labels), this.graphChangedListeners, trigger);
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        return new EventEdgeIterable(this.getBaseVertex().getOutEdges(labels), this.graphChangedListeners, trigger);
+    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+        return new EventVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels), this.graphChangedListeners, trigger);
     }
 
     public Query query() {

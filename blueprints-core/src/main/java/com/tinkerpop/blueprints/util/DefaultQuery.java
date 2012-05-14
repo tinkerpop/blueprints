@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Query;
@@ -35,12 +36,12 @@ public class DefaultQuery implements Query {
         return this;
     }
 
-    public Query has(final String key, final Object value, final Compare compare) {
+    public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare) {
         this.hasContainers.add(new HasContainer(key, value, compare));
         return this;
     }
 
-    public Query interval(final String key, final Object startValue, final Object endValue) {
+    public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
         this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
         this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
         return this;
@@ -136,16 +137,7 @@ public class DefaultQuery implements Query {
 
         public DefaultQueryIterable(final boolean forVertex) {
             this.forVertex = forVertex;
-            final List<Iterable<Edge>> temp = new ArrayList<Iterable<Edge>>(2);
-            if (direction == Direction.OUT || direction == Direction.BOTH) {
-                temp.add(vertex.getOutEdges(labels));
-            }
-
-            if (direction == Direction.IN || direction == Direction.BOTH) {
-                temp.add(vertex.getInEdges(labels));
-            }
-            this.iterable = new MultiIterable<Edge>(temp);
-
+            this.iterable = vertex.getEdges(direction, labels);
         }
 
         public Iterator<T> iterator() {

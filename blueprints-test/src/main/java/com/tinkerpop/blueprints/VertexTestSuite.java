@@ -225,7 +225,7 @@ public class VertexTestSuite extends TestSuite {
         for (int i = 0; i < 10; i++) {
             graph.addEdge(null, v1, graph.addVertex(null), convertId(graph, "knows"));
         }
-        Iterable<Edge> edges = v1.getOutEdges(convertId(graph, "knows"));
+        Iterable<Edge> edges = v1.getEdges(Direction.OUT, convertId(graph, "knows"));
         assertEquals(count(edges), 10);
         assertEquals(count(edges), 10);
         assertEquals(count(edges), 10);

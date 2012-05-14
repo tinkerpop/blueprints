@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Index;
@@ -79,10 +80,10 @@ public class ReadOnlyGraphTest extends BaseTest {
             }
             vertex.getProperty("name");
             vertex.getPropertyKeys();
-            assertTrue(vertex.getOutEdges() instanceof ReadOnlyEdgeIterable);
-            assertTrue(vertex.getInEdges() instanceof ReadOnlyEdgeIterable);
-            assertTrue(vertex.getOutEdges("knows") instanceof ReadOnlyEdgeIterable);
-            assertTrue(vertex.getInEdges("created") instanceof ReadOnlyEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.OUT) instanceof ReadOnlyEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.IN) instanceof ReadOnlyEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.OUT, "knows") instanceof ReadOnlyEdgeIterable);
+            assertTrue(vertex.getEdges(Direction.IN, "created") instanceof ReadOnlyEdgeIterable);
         }
         for (Edge edge : graph.getEdges()) {
             assertTrue(edge instanceof ReadOnlyEdge);

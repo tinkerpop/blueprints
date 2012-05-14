@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
@@ -23,12 +24,12 @@ public abstract class WrapperQuery implements Query {
         return this;
     }
 
-    public Query has(final String key, final Object value, final Compare compare) {
+    public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare) {
         this.query.has(key, value, compare);
         return this;
     }
 
-    public Query interval(final String key, final Object startValue, final Object endValue) {
+    public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
         this.query.interval(key, startValue, endValue);
         return this;
     }

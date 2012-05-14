@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.partition;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
@@ -14,12 +15,12 @@ public class PartitionVertex extends PartitionElement implements Vertex {
         super(baseVertex, graph);
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        return new PartitionEdgeIterable(((Vertex) this.baseElement).getOutEdges(labels), this.graph);
+    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+        return new PartitionEdgeIterable(((Vertex) this.baseElement).getEdges(direction, labels), this.graph);
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        return new PartitionEdgeIterable(((Vertex) this.baseElement).getInEdges(labels), this.graph);
+    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+        return new PartitionVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels), this.graph);
     }
 
     public Query query() {

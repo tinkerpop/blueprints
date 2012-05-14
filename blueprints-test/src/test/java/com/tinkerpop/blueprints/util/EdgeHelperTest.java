@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
@@ -20,7 +21,7 @@ public class EdgeHelperTest extends BaseTest {
         int counter = 0;
         int counter2 = 0;
         Edge temp = null;
-        for (Edge edge : graph.getVertex(1).getOutEdges()) {
+        for (Edge edge : graph.getVertex(1).getEdges(Direction.OUT)) {
             if (edge.getLabel().equals("use_to_know")) {
                 counter++;
                 assertEquals(edge.getId(), "1234");
@@ -35,7 +36,7 @@ public class EdgeHelperTest extends BaseTest {
 
         counter = 0;
         counter2 = 0;
-        for (Edge edge : graph.getVertex(2).getInEdges()) {
+        for (Edge edge : graph.getVertex(2).getEdges(Direction.IN)) {
             if (edge.getLabel().equals("use_to_know")) {
                 counter++;
                 assertEquals(edge.getId(), "1234");
@@ -56,7 +57,7 @@ public class EdgeHelperTest extends BaseTest {
         int counter = 0;
         int counter2 = 0;
         Edge temp = null;
-        for (Edge edge : graph.getVertex(1).getOutEdges()) {
+        for (Edge edge : graph.getVertex(1).getEdges(Direction.OUT)) {
             if (edge.getLabel().equals("use_to_know")) {
                 counter++;
                 assertEquals(edge.getProperty("weight"), 0.5f);
@@ -70,7 +71,7 @@ public class EdgeHelperTest extends BaseTest {
 
         counter = 0;
         counter2 = 0;
-        for (Edge edge : graph.getVertex(2).getInEdges()) {
+        for (Edge edge : graph.getVertex(2).getEdges(Direction.IN)) {
             if (edge.getLabel().equals("use_to_know")) {
                 counter++;
                 assertEquals(edge.getProperty("weight"), 0.5f);
