@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.impls.neo4j;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -83,7 +84,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         FEATURES.supportsKeyIndices = true;
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
-        FEATURES.supportsThreadedTransactions= false;
+        FEATURES.supportsThreadedTransactions = false;
     }
 
     public Neo4jGraph(final String directory) {
@@ -384,10 +385,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         final Node node = this.rawGraph.getNodeById(id);
         if (null != node) {
             try {
-                for (final Edge edge : vertex.getInEdges()) {
-                    ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
-                }
-                for (final Edge edge : vertex.getOutEdges()) {
+                for (final Edge edge : vertex.getEdges(Direction.BOTH)) {
                     ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
                 }
                 node.delete();

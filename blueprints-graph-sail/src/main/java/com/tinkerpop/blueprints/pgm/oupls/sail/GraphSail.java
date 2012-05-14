@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.TransactionalGraph;
@@ -548,12 +549,12 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
             System.out.println("\t" + key + ":\t'" + v.getProperty(key) + "'");
         }
         Iterator<Edge> i;
-        i = v.getInEdges().iterator();
+        i = v.getEdges(Direction.IN).iterator();
         System.out.println("\t[in edges]:");
         while (i.hasNext()) {
             System.out.println("\t\t" + i.next());
         }
-        i = v.getOutEdges().iterator();
+        i = v.getEdges(Direction.OUT).iterator();
         System.out.println("\t[out edges]:");
         while (i.hasNext()) {
             System.out.println("\t\t" + i.next());

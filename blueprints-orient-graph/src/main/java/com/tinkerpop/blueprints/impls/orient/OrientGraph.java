@@ -9,6 +9,7 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -231,9 +232,7 @@ public class OrientGraph implements TransactionalGraph, IndexableGraph, MetaGrap
         this.autoStartTransaction();
         try {
             final Set<Edge> allEdges = new HashSet<Edge>();
-            for (Edge e : oVertex.getInEdges())
-                allEdges.add(e);
-            for (Edge e : oVertex.getOutEdges())
+            for (Edge e : oVertex.getEdges(Direction.BOTH))
                 allEdges.add(e);
 
             for (final Index<? extends Element> index : this.getManualIndices()) {

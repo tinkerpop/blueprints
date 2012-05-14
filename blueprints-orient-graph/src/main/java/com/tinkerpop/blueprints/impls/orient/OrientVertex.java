@@ -3,14 +3,17 @@ package com.tinkerpop.blueprints.impls.orient;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.record.impl.ODocument;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +33,21 @@ public class OrientVertex extends OrientElement implements Vertex {
         super(rawGraph, rawVertex);
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
+    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+        if (direction.equals(Direction.OUT)) {
+            return this.getOutEdges(labels);
+        } else if (direction.equals(Direction.IN))
+            return this.getInEdges(labels);
+        else {
+            return new MultiIterable<Edge>(Arrays.asList(this.getInEdges(labels), this.getOutEdges(labels)));
+        }
+    }
+
+    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+        return new VerticesFromEdgesIterable(this, direction, labels);
+    }
+
+    private Iterable<Edge> getOutEdges(final String... labels) {
         if (this.rawElement == null)
             return Collections.emptyList();
 
@@ -51,7 +68,7 @@ public class OrientVertex extends OrientElement implements Vertex {
         }
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
+    private Iterable<Edge> getInEdges(final String... labels) {
         if (this.rawElement == null)
             return Collections.emptyList();
 

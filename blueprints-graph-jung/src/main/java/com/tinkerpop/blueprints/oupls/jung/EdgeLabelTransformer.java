@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.oupls.jung;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import org.apache.commons.collections15.Transformer;
 
@@ -32,7 +33,7 @@ public class EdgeLabelTransformer implements Transformer<Edge, Number> {
                 return this.filterValue;
             } else {
                 if (this.probability) {
-                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getOutVertex().getOutEdges(), this.labels, filter);
+                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getOutVertex().getEdges(Direction.OUT), this.labels, filter);
                     return 1.0d / allowedEdges.size();
                 } else {
                     return 1.0d;
@@ -41,7 +42,7 @@ public class EdgeLabelTransformer implements Transformer<Edge, Number> {
         } else {
             if (filter) {
                 if (this.probability) {
-                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getOutVertex().getOutEdges(), this.labels, filter);
+                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getOutVertex().getEdges(Direction.OUT), this.labels, filter);
                     return 1.0d / allowedEdges.size();
                 } else {
                     return 1.0d;

@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
@@ -396,7 +397,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         Vertex h = edge.getInVertex();
         Vertex t = edge.getOutVertex();
         store.graph.removeEdge(edge);
-        if (!h.getInEdges().iterator().hasNext() && !h.getOutEdges().iterator().hasNext()) {
+        if (!h.getEdges(Direction.IN).iterator().hasNext() && !h.getEdges(Direction.OUT).iterator().hasNext()) {
             try {
                 store.graph.removeVertex(h);
             } catch (IllegalStateException ex) {
@@ -404,7 +405,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 // one to-be-deleted edge.
             }
         }
-        if (!t.getOutEdges().iterator().hasNext() && !t.getInEdges().iterator().hasNext()) {
+        if (!t.getEdges(Direction.OUT).iterator().hasNext() && !t.getEdges(Direction.IN).iterator().hasNext()) {
             try {
                 store.graph.removeVertex(t);
             } catch (IllegalStateException ex) {

@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import org.openrdf.model.Resource;
@@ -46,7 +47,7 @@ public class GraphBasedMatcher extends Matcher {
             } else {
                 // TODO: use a simple heuristic (e.g. based on the value type of the vertices) to choose either subject or object.
                 // Right now, we arbitrarily choose the subject as the starting point.
-                return new FilteredIterator<Edge>(vs.getOutEdges(), new FilteredIterator.Criterion<Edge>() {
+                return new FilteredIterator<Edge>(vs.getEdges(Direction.OUT), new FilteredIterator.Criterion<Edge>() {
                     public boolean fulfilledBy(final Edge edge) {
                         return store.matches(edge.getInVertex(), object)
                                 && (!p || edge.getLabel().equals(predicate.stringValue()))
@@ -57,7 +58,7 @@ public class GraphBasedMatcher extends Matcher {
         } else if (s) {
             Vertex vs = store.findVertex(subject);
             return null == vs ? new IteratorCloseableIterable<Edge>(new EmptyIterator<Edge>())
-                    : new FilteredIterator<Edge>(vs.getOutEdges(), new FilteredIterator.Criterion<Edge>() {
+                    : new FilteredIterator<Edge>(vs.getEdges(Direction.OUT), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
                             && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
@@ -66,7 +67,7 @@ public class GraphBasedMatcher extends Matcher {
         } else {
             Vertex vo = store.findVertex(object);
             return null == vo ? new IteratorCloseableIterable<Edge>(new EmptyIterator<Edge>())
-                    : new FilteredIterator<Edge>(vo.getInEdges(), new FilteredIterator.Criterion<Edge>() {
+                    : new FilteredIterator<Edge>(vo.getEdges(Direction.IN), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
                             && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));

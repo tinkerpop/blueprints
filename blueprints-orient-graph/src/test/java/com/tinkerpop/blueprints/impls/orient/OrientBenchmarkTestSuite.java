@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.orient;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TestSuite;
@@ -73,15 +74,15 @@ public class OrientBenchmarkTestSuite extends TestSuite {
             int counter = 0;
             for (final Vertex vertex : graph.getVertices()) {
                 counter++;
-                for (final Edge edge : vertex.getOutEdges()) {
+                for (final Edge edge :  vertex.getEdges(Direction.OUT)) {
                     counter++;
                     final Vertex vertex2 = edge.getInVertex();
                     counter++;
-                    for (final Edge edge2 : vertex2.getOutEdges()) {
+                    for (final Edge edge2 :  vertex2.getEdges(Direction.OUT)) {
                         counter++;
                         final Vertex vertex3 = edge2.getInVertex();
                         counter++;
-                        for (final Edge edge3 : vertex3.getOutEdges()) {
+                        for (final Edge edge3 :  vertex3.getEdges(Direction.OUT)) {
                             counter++;
                             edge3.getOutVertex();
                             counter++;

@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.oupls.jung;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import org.apache.commons.collections15.Transformer;
 
@@ -27,7 +28,7 @@ public class EdgeWeightTransformer implements Transformer<Edge, Number> {
             if (this.invert)
                 weight = 1.0d / weight;
             if (this.normalize) {
-                return weight / JungHelper.totalWeight(edge.getOutVertex().getOutEdges(), this.weightKey);
+                return weight / JungHelper.totalWeight(edge.getOutVertex().getEdges(Direction.OUT), this.weightKey);
             } else {
                 return weight;
             }

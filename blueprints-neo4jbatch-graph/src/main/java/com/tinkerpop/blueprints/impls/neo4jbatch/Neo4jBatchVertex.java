@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.impls.neo4jbatch;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
@@ -37,14 +38,14 @@ public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getOutEdges(final String... labels) throws UnsupportedOperationException {
+    public Iterable<Edge> getEdges(final Direction direction, final String... labels) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
     /**
      * @throws UnsupportedOperationException
      */
-    public Iterable<Edge> getInEdges(final String... labels) throws UnsupportedOperationException {
+    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

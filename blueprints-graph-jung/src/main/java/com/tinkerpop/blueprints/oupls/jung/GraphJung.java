@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.oupls.jung;
 
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -92,7 +93,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public Edge findEdge(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getOutEdges()) {
+        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getInVertex().equals(inVertex)) {
                 return edge;
             }
@@ -102,7 +103,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Collection<Edge> findEdgeSet(final Vertex outVertex, final Vertex inVertex) {
         Set<Edge> edges = new HashSet<Edge>();
-        for (Edge edge : outVertex.getOutEdges()) {
+        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getInVertex().equals(inVertex)) {
                 edges.add(edge);
             }
@@ -116,10 +117,10 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Collection<Edge> getIncidentEdges(final Vertex vertex) {
         Set<Edge> edges = new HashSet<Edge>();
-        for (Edge edge : vertex.getInEdges()) {
+        for (Edge edge : vertex.getEdges(Direction.IN)) {
             edges.add(edge);
         }
-        for (Edge edge : vertex.getOutEdges()) {
+        for (Edge edge : vertex.getEdges(Direction.OUT)) {
             edges.add(edge);
         }
         return edges;
@@ -207,11 +208,11 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public boolean isNeighbor(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getOutEdges()) {
+        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getInVertex().equals(inVertex))
                 return true;
         }
-        for (Edge edge : outVertex.getInEdges()) {
+        for (Edge edge : outVertex.getEdges(Direction.IN)) {
             if (edge.getOutVertex().equals(inVertex))
                 return true;
         }
@@ -224,10 +225,10 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Collection<Vertex> getNeighbors(final Vertex vertex) {
         Set<Vertex> vertices = new HashSet<Vertex>();
-        for (Edge e : vertex.getOutEdges()) {
+        for (Edge e : vertex.getEdges(Direction.OUT)) {
             vertices.add(e.getInVertex());
         }
-        for (Edge e : vertex.getInEdges()) {
+        for (Edge e : vertex.getEdges(Direction.IN)) {
             vertices.add(e.getOutVertex());
         }
         return vertices;
@@ -242,7 +243,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Collection<Edge> getOutEdges(final Vertex vertex) {
 
-        Iterable<Edge> itty = vertex.getOutEdges();
+        Iterable<Edge> itty = vertex.getEdges(Direction.OUT);
         if (itty instanceof Collection) {
             return (Collection<Edge>) itty;
         } else {
@@ -255,7 +256,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public Collection<Edge> getInEdges(final Vertex vertex) {
-        Iterable<Edge> itty = vertex.getInEdges();
+        Iterable<Edge> itty = vertex.getEdges(Direction.IN);
         if (itty instanceof Collection) {
             return (Collection<Edge>) itty;
         } else {
@@ -273,7 +274,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Collection<Vertex> getPredecessors(final Vertex vertex) {
         Set<Vertex> vertices = new HashSet<Vertex>();
-        for (Edge edge : vertex.getInEdges()) {
+        for (Edge edge : vertex.getEdges(Direction.IN)) {
             vertices.add(edge.getOutVertex());
         }
         return vertices;
@@ -285,14 +286,14 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Collection<Vertex> getSuccessors(final Vertex vertex) {
         Set<Vertex> vertices = new HashSet<Vertex>();
-        for (Edge edge : vertex.getOutEdges()) {
+        for (Edge edge : vertex.getEdges(Direction.OUT)) {
             vertices.add(edge.getInVertex());
         }
         return vertices;
     }
 
     public int inDegree(final Vertex vertex) {
-        Iterable<Edge> itty = vertex.getInEdges();
+        Iterable<Edge> itty = vertex.getEdges(Direction.IN);
         if (itty instanceof Collection) {
             return ((Collection) itty).size();
         } else {
@@ -305,7 +306,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public int outDegree(final Vertex vertex) {
-        Iterable<Edge> itty = vertex.getOutEdges();
+        Iterable<Edge> itty = vertex.getEdges(Direction.OUT);
         if (itty instanceof Collection) {
             return ((Collection) itty).size();
         } else {
@@ -331,7 +332,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public boolean isPredecessor(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getInEdges()) {
+        for (Edge edge : outVertex.getEdges(Direction.IN)) {
             if (edge.getOutVertex().equals(inVertex))
                 return true;
         }
@@ -339,7 +340,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public boolean isSuccessor(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getOutEdges()) {
+        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getInVertex().equals(inVertex))
                 return true;
         }

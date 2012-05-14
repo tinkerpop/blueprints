@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultQuery;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
@@ -23,12 +24,17 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
 
     }
 
-    public Iterable<Edge> getInEdges(final String... labels) {
-        return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels);
+    public Iterable<Edge> getEdges(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
+        if (direction.equals(com.tinkerpop.blueprints.Direction.OUT))
+            return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
+        else if (direction.equals(com.tinkerpop.blueprints.Direction.IN))
+            return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels);
+        else
+            return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.BOTH, labels);
     }
 
-    public Iterable<Edge> getOutEdges(final String... labels) {
-        return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
+    public Iterable<Vertex> getVertices(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
+        return new VerticesFromEdgesIterable(this, direction, labels);
     }
 
     public Query query() {
