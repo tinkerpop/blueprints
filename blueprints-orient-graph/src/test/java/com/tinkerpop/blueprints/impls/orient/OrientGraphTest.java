@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import com.orientechnologies.orient.core.db.graph.ODatabaseGraphTx;
+import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
@@ -12,7 +12,9 @@ import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -86,6 +88,18 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
 
+    public void testGraphSONReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphSONReaderTestSuite(this));
+        printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
+    }
+
+    /*public void testGMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GMLReaderTestSuite(this));
+        printTestPerformance("GMLReaderTestSuite", this.stopWatch());
+    }*/
+
     public Graph generateGraph() {
         String directory = getWorkingDirectory();
         this.currentGraph = new OrientGraph("local:" + directory + "/graph");
@@ -106,7 +120,7 @@ public class OrientGraphTest extends GraphTest {
                             this.currentGraph.shutdown();
                     } catch (Exception e) {
                     }
-                    ODatabaseGraphTx g = new ODatabaseGraphTx("local:" + directory + "/graph");
+                    OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
                     if (g.exists())
                         g.open("admin", "admin").drop();
                 }

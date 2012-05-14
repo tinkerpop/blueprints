@@ -62,7 +62,8 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         FEATURES.supportsLongProperty = true;
         FEATURES.supportsMapProperty = true;
         FEATURES.supportsStringProperty = true;
-        FEATURES.supportsThreadedTransactions= false;
+        FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsTransactions = false;
     }
 
     /**

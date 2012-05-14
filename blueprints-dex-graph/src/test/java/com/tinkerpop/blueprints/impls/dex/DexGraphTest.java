@@ -7,7 +7,9 @@ import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -53,6 +55,19 @@ public class DexGraphTest extends GraphTest {
         doTestSuite(new GraphMLReaderTestSuite(this));
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
     }
+
+    public void testGraphSONReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphSONReaderTestSuite(this));
+        printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
+    }
+
+    /*public void testGMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GMLReaderTestSuite(this));
+        printTestPerformance("GMLReaderTestSuite", this.stopWatch());
+    }*/
+
 
     public Graph generateGraph() {
         String db = System.getProperty("dexGraphFile");
