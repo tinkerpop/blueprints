@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.util.wrappers.event;
+package com.tinkerpop.blueprints.util.wrappers.event.listener;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;

@@ -16,6 +16,7 @@ import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.ConsoleGraphChangedListener;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.StubGraphChangedListener;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
