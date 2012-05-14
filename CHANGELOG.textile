@@ -29,6 +29,10 @@ h3. Version 1.3 (NOT OFFICIALLY RELEASED YET)
 * Added @Features@ so developers can learn about the various quirks of any @Graph@ implementation
 * Support for Neo4j's native automatic indices in @Neo4jGraph@
 * Support for Neo4j's native automatic indices in @Neo4jBatchGraph@
+* Added @ExceptionFactory@ so all exceptions have the same message and type amongst graph implementations
+* Removed superfluous @util@ packages on all @Graph@ implementations
+* @EventGraph@ wrapper set now includes @EventTransactionalGraph@ which will fire queued sets of events in conjunction with successful commits to the graph.
+* Added @IdGraph@ to support the user defined ids for those @Graphs@ that ignore user supplied ids
 
 ==<hr/>==
 

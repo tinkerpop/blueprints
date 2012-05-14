@@ -1,8 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Vertex;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -33,7 +32,7 @@ public class GraphBasedMatcher extends Matcher {
         this.store = store;
     }
 
-    public CloseableIterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
+    public Iterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         //System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
         final String contextStr = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);

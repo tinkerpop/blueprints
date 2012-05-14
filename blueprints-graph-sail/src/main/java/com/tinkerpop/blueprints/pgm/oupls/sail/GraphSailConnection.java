@@ -1,9 +1,8 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
 import net.fortytwo.sesametools.SailConnectionTripleSource;
@@ -153,18 +152,14 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
     }
 
-    private int countIterator(final CloseableIterable i) {
-        try {
-            Iterator<Edge> iter = i.iterator();
-            int count = 0;
-            while (iter.hasNext()) {
-                count++;
-                iter.next();
-            }
-            return count;
-        } finally {
-            i.close();
+    private int countIterator(final Iterable i) {
+        Iterator iter = i.iterator();
+        int count = 0;
+        while (iter.hasNext()) {
+            count++;
+            iter.next();
         }
+        return count;
     }
 
     public void addStatementInternal(final Resource subject,
@@ -288,14 +283,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
 
         if (0 == contexts.length) {
-            CloseableIterable<Edge> i = store.matchers[index].match(subject, predicate, object, null);
-            try {
-                Iterator<Edge> iter = i.iterator();
-                while (iter.hasNext()) {
-                    edgesToRemove.add(iter.next());
-                }
-            } finally {
-                i.close();
+            Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, null);
+            for (Edge anI : i) {
+                edgesToRemove.add(anI);
             }
         } else {
             // TODO: as an optimization, filter on multiple contexts simultaneously (when context is not used in the matcher), rather than trying each context consecutively.
@@ -303,19 +293,13 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 index |= 0x8;
 
                 //System.out.println("matcher: " + indexes.matchers[index]);
-                CloseableIterable<Edge> i = store.matchers[index].match(subject, predicate, object, context);
-                try {
-                    Iterator<Edge> iter = i.iterator();
-                    while (iter.hasNext()) {
-                        Edge e = iter.next();
-                        Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
-                        if ((!inferred && null == b)
-                                || (inferred && null != b && b)) {
-                            edgesToRemove.add(e);
-                        }
+                Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, context);
+                for (Edge e : i) {
+                    Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
+                    if ((!inferred && null == b)
+                            || (inferred && null != b && b)) {
+                        edgesToRemove.add(e);
                     }
-                } finally {
-                    i.close();
                 }
             }
         }
@@ -372,43 +356,39 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     private void deleteEdgesInIterator(final boolean inferred,
-                                       final CloseableIterable<Edge> i) {
-        try {
-            Iterator<Edge> iter = i.iterator();
-            while (iter.hasNext()) {
-                Edge e = iter.next();
+                                       final Iterable<Edge> i) {
+        Iterator<Edge> iter = i.iterator();
+        while (iter.hasNext()) {
+            Edge e = iter.next();
 
-                Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
-                if ((!inferred && null == b)
-                        || (inferred && null != b && b)) {
-                    SimpleStatement s;
-                    if (hasConnectionListeners()) {
-                        s = new SimpleStatement();
-                        fillStatement(s, e);
-                    } else {
-                        s = null;
-                    }
-
-                    try {
-                        iter.remove();
-                    } catch (UnsupportedOperationException x) {
-                        // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
-                        // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
-                        // delete an edge in an iterator currently being traversed.  So for now, just ignore the
-                        // UnsupportedOperationException and proceed to delete the edge from the graph.
-                    }
-
-                    removeEdge(e);
-
-                    if (null != s) {
-                        notifyStatementRemoved(s);
-                    }
-
-                    statementsRemoved = true;
+            Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
+            if ((!inferred && null == b)
+                    || (inferred && null != b && b)) {
+                SimpleStatement s;
+                if (hasConnectionListeners()) {
+                    s = new SimpleStatement();
+                    fillStatement(s, e);
+                } else {
+                    s = null;
                 }
+
+                try {
+                    iter.remove();
+                } catch (UnsupportedOperationException x) {
+                    // TODO: it so happens that Neo4jGraph, the only IndexableGraph implementation so far tested whose
+                    // iterators don't support remove(), does *not* throw ConcurrentModificationExceptions when you
+                    // delete an edge in an iterator currently being traversed.  So for now, just ignore the
+                    // UnsupportedOperationException and proceed to delete the edge from the graph.
+                }
+
+                removeEdge(e);
+
+                if (null != s) {
+                    notifyStatementRemoved(s);
+                }
+
+                statementsRemoved = true;
             }
-        } finally {
-            i.close();
         }
     }
 
@@ -603,18 +583,18 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     // statement iteration /////////////////////////////////////////////////////
 
-    private CloseableIteration<Statement, SailException> createIteration(final CloseableIterable<Edge> iterator) {
+    private CloseableIteration<Statement, SailException> createIteration(final Iterable<Edge> iterator) {
         return store.volatileStatements
                 ? new VolatileStatementIteration(iterator)
                 : new StableStatementIteration(iterator);
     }
 
     private class StableStatementIteration implements CloseableIteration<Statement, SailException> {
-        private final CloseableIterable<Edge> iterator;
+        private final Iterable<Edge> iterator;
         private final Iterator<Edge> iter;
         private boolean closed = false;
 
-        public StableStatementIteration(final CloseableIterable<Edge> iterator) {
+        public StableStatementIteration(final Iterable<Edge> iterator) {
             writeSemaphoreUp();
             this.iterator = iterator;
             iter = iterator.iterator();
@@ -623,7 +603,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         public void close() throws SailException {
             if (!closed) {
                 closed = true;
-                iterator.close();
                 writeSemaphoreDown();
             }
         }
@@ -665,16 +644,15 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
         private final SimpleStatement s = new SimpleStatement();
-        private final CloseableIterable<Edge> iterator;
+        private final Iterable<Edge> iterator;
         private final Iterator<Edge> iter;
 
-        public VolatileStatementIteration(final CloseableIterable<Edge> iterator) {
+        public VolatileStatementIteration(final Iterable<Edge> iterator) {
             this.iterator = iterator;
             iter = iterator.iterator();
         }
 
         public void close() throws SailException {
-            iterator.close();
         }
 
         public boolean hasNext() throws SailException {

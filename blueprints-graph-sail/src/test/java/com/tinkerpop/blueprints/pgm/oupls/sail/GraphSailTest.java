@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
-import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import info.aduna.iteration.CloseableIteration;
 import org.junit.Test;
 import org.openrdf.model.Statement;

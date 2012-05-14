@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
-import com.tinkerpop.blueprints.pgm.Edge;
+import com.tinkerpop.blueprints.Edge;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -53,7 +52,7 @@ public class IndexingMatcher extends Matcher {
         propertyName = sb.toString();
     }
 
-    public CloseableIterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
+    public Iterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         // FIXME: the temporary linked list is a little wasty
         List<PartOfSpeechCriterion> criteria = new LinkedList<PartOfSpeechCriterion>();
 
@@ -87,7 +86,7 @@ public class IndexingMatcher extends Matcher {
 
         //System.out.println("store = " + store);
         //System.out.println("\tstore.edges = " + store.edges);
-        CloseableIterable<Edge> results = store.graph.getEdges(propertyName, sb.toString().substring(1));
+        Iterable<Edge> results = store.graph.getEdges(propertyName, sb.toString().substring(1));
 
         for (PartOfSpeechCriterion m : criteria) {
             results = new FilteredIterator<Edge>(results, m);

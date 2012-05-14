@@ -1,8 +1,7 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.CloseableIterable;
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.Graph;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Graph;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
@@ -22,7 +21,7 @@ public class TrivialMatcher extends Matcher {
     }
 
     @Override
-    public CloseableIterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
+    public Iterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
         return new IteratorCloseableIterable<Edge>(graph.getEdges().iterator());
     }
 }

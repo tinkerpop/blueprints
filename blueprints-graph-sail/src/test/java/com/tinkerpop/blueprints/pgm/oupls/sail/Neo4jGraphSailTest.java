@@ -1,7 +1,8 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
-import com.tinkerpop.blueprints.pgm.impls.neo4j.Neo4jGraph;
+
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import org.junit.Test;
 
 import java.io.File;

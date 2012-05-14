@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.Edge;
-import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
-import com.tinkerpop.blueprints.pgm.TransactionalGraph;
-import com.tinkerpop.blueprints.pgm.Vertex;
-import com.tinkerpop.blueprints.pgm.util.wrappers.WrapperGraph;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;

@@ -1,7 +1,8 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
-import com.tinkerpop.blueprints.pgm.KeyIndexableGraph;
-import com.tinkerpop.blueprints.pgm.impls.tg.TinkerGraph;
+
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
