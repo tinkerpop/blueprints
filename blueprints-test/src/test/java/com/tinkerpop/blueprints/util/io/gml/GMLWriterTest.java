@@ -58,6 +58,7 @@ public class GMLWriterTest extends TestCase {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GMLWriter w = new GMLWriter(g1);
+        w.setUseId(true);
         w.outputGraph(bos);
 
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());

@@ -89,37 +89,37 @@ public class GMLWriter {
         // ISO 8859-1 as specified in the GML documentation
         Writer writer = new BufferedWriter(new OutputStreamWriter(gMLOutputStream, Charset.forName("ISO-8859-1")));
 
-        List<Vertex> verticies = new ArrayList<Vertex>();
+        List<Vertex> vertices = new ArrayList<Vertex>();
         List<Edge> edges = new ArrayList<Edge>();
 
-        populateLists(verticies, edges);
+        populateLists(vertices, edges);
 
         if (normalize) {
             LexicographicalElementComparator comparator = new LexicographicalElementComparator();
-            Collections.sort(verticies, comparator);
+            Collections.sort(vertices, comparator);
             Collections.sort(edges, comparator);
         }
 
-        writeGraph(writer, verticies, edges);
+        writeGraph(writer, vertices, edges);
 
         writer.flush();
         writer.close();
     }
 
-    private void writeGraph(Writer writer, List<Vertex> verticies, List<Edge> edges) throws IOException {
+    private void writeGraph(Writer writer, List<Vertex> vertices, List<Edge> edges) throws IOException {
         Map<Vertex, Integer> ids = new HashMap<Vertex, Integer>();
 
         writer.write(GMLTokens.GRAPH);
         writer.write(OPEN_LIST);
-        writeVerticies(writer, verticies, ids);
+        writeVertices(writer, vertices, ids);
         writeEdges(writer, edges, ids);
         writer.write(CLOSE_LIST);
 
     }
 
-    private void writeVerticies(Writer writer, List<Vertex> verticies, Map<Vertex, Integer> ids) throws IOException {
+    private void writeVertices(Writer writer, List<Vertex> vertices, Map<Vertex, Integer> ids) throws IOException {
         int count = 1;
-        for (Vertex v : verticies) {
+        for (Vertex v : vertices) {
             if (useId) {
                 Integer id = Integer.valueOf(v.getId().toString());
                 writeVertex(writer, v, id);
@@ -246,9 +246,9 @@ public class GMLWriter {
         writer.write(DELIMITER);
     }
 
-    private void populateLists(List<Vertex> verticies, List<Edge> edges) {
+    private void populateLists(List<Vertex> vertices, List<Edge> edges) {
         for (Vertex v : graph.getVertices()) {
-            verticies.add(v);
+            vertices.add(v);
         }
         for (Edge e : graph.getEdges()) {
             edges.add(e);

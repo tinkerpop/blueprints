@@ -62,12 +62,17 @@ public class DexGraphTest extends GraphTest {
         printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
     }
 
-    /*public void testGMLReaderTestSuite() throws Exception {
+    /*
+    the GML Reader won't work with Dex because of our test approach.  the test uses the toy
+    tinkergraph which has a mix of data types for the "weight" property on the edge...dex does
+    not allow an attribute with the same name to have values with different data types so it
+    blows up the test.
+    public void testGMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GMLReaderTestSuite(this));
         printTestPerformance("GMLReaderTestSuite", this.stopWatch());
-    }*/
-
+    }
+    */
 
     public Graph generateGraph() {
         String db = System.getProperty("dexGraphFile");

@@ -1,80 +1,68 @@
 graph [
 	node [
-		id 1
-		blueprintsId "3"
+		id 3
 		name "lop"
 		lang "java"
 	]
 	node [
 		id 2
-		blueprintsId "2"
-		name "vadas"
 		age 27
+		name "vadas"
 	]
 	node [
-		id 3
-		blueprintsId "1"
-		name "marko"
+		id 1
 		age 29
+		name "marko"
 	]
 	node [
-		id 4
-		blueprintsId "6"
-		name "peter"
+		id 6
 		age 35
+		name "peter"
 	]
 	node [
 		id 5
-		blueprintsId "5"
 		name "ripple"
 		lang "java"
 	]
 	node [
-		id 6
-		blueprintsId "4"
-		name "josh"
+		id 4
 		age 32
-	]
-	edge [
-		source 6
-		target 5
-		label "created"
-		blueprintsId "10"
-		weight 1.0
-	]
-	edge [
-		source 3
-		target 2
-		label "knows"
-		blueprintsId "7"
-		weight 0.5
-	]
-	edge [
-		source 3
-		target 1
-		label "created"
-		blueprintsId "9"
-		weight 0.4
-	]
-	edge [
-		source 3
-		target 6
-		label "knows"
-		blueprintsId "8"
-		weight 1.0
-	]
-	edge [
-		source 6
-		target 1
-		label "created"
-		blueprintsId "11"
-		weight 0.4
+		name "josh"
 	]
 	edge [
 		source 4
-		target 1
+		target 5
 		label "created"
-		blueprintsId "12"
+		weight 1.0
+	]
+	edge [
+		source 1
+		target 2
+		label "knows"
+		weight 0.5
+	]
+	edge [
+		source 1
+		target 3
+		label "created"
+		weight 0.4
+	]
+	edge [
+		source 1
+		target 4
+		label "knows"
+		weight 1.0
+	]
+	edge [
+		source 4
+		target 3
+		label "created"
+		weight 0.4
+	]
+	edge [
+		source 6
+		target 3
+		label "created"
 		weight 0.2
 	]
 ]

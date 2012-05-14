@@ -22,11 +22,13 @@ public class GMLReaderTestSuite extends TestSuite {
 
     public void testReadingTinkerGraph() throws Exception {
         Graph graph = graphTest.generateGraph();
+
+        // note that GML does not have the notion of Edge Identifiers built into the specification
+        // so that values are not tested here even for graphs that allow edge identifier assignment
+        // like tinkergraph.
         if (!graph.getFeatures().ignoresSuppliedIds) {
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);
-            gmlReader.setVertexIdKey(GMLTokens.BLUEPRINTS_ID);
-            gmlReader.setEdgeIdKey(GMLTokens.BLUEPRINTS_ID);
             gmlReader.inputGraph(GMLReader.class.getResourceAsStream("graph-example-1.gml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
 
@@ -40,17 +42,14 @@ public class GMLReaderTestSuite extends TestSuite {
                 if (e.getInVertex().getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getLabel(), "knows");
-                    assertEquals(e.getId(), "7");
                     counter++;
                 } else if (e.getInVertex().getId().equals("3")) {
                     assertEquals(0, Math.round(((Number) e.getProperty("weight")).floatValue()));
                     assertEquals(e.getLabel(), "created");
-                    assertEquals(e.getId(), "9");
                     counter++;
                 } else if (e.getInVertex().getId().equals("4")) {
                     assertEquals(1, Math.round(((Number) e.getProperty("weight")).floatValue()));
                     assertEquals(e.getLabel(), "knows");
-                    assertEquals(e.getId(), "8");
                     counter++;
                 }
             }
@@ -64,12 +63,10 @@ public class GMLReaderTestSuite extends TestSuite {
                 if (e.getInVertex().getId().equals("3")) {
                     assertEquals(0, Math.round(((Number) e.getProperty("weight")).floatValue()));
                     assertEquals(e.getLabel(), "created");
-                    assertEquals(e.getId(), "11");
                     counter++;
                 } else if (e.getInVertex().getId().equals("5")) {
                     assertEquals(1, Math.round(((Number) e.getProperty("weight")).floatValue()));
                     assertEquals(e.getLabel(), "created");
-                    assertEquals(e.getId(), "10");
                     counter++;
                 }
             }
@@ -84,8 +81,6 @@ public class GMLReaderTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeIteration) {
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);
-            gmlReader.setVertexIdKey(GMLTokens.BLUEPRINTS_ID);
-            gmlReader.setEdgeIdKey(GMLTokens.BLUEPRINTS_ID);
             gmlReader.inputGraph(GMLReader.class.getResourceAsStream("graph-example-1.gml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> edgeIds = new HashSet<String>();
@@ -162,8 +157,6 @@ public class GMLReaderTestSuite extends TestSuite {
         if (graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
             GMLReader gmlReader = new GMLReader(graph);
-            gmlReader.setVertexIdKey(GMLTokens.BLUEPRINTS_ID);
-            gmlReader.setEdgeIdKey(GMLTokens.BLUEPRINTS_ID);
             gmlReader.inputGraph(GMLReader.class.getResourceAsStream("graph-example-1.gml"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Vertex marko = null;

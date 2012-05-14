@@ -94,11 +94,11 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
     }
 
-    /*public void testGMLReaderTestSuite() throws Exception {
+    public void testGMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GMLReaderTestSuite(this));
         printTestPerformance("GMLReaderTestSuite", this.stopWatch());
-    }*/
+    }
 
     public Graph generateGraph() {
         String directory = getWorkingDirectory();
