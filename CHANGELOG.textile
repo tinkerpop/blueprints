@@ -15,7 +15,7 @@ h3. Version 1.3 (NOT OFFICIALLY RELEASED YET)
 
 * Added a var args based @ElementHelper.setProperties()@ method
 * Added GML Reader/Writer utility
-* Bumped to support Neo4j 1.8.M01
+* Bumped to support Neo4j 1.8.M02
 * @RexsterGraph@ supports Rexster Authentication
 * @Neo4jElement@ will accept a @Collection@ as a property (as long as all items within it are of the same data type), internally converting it to an array for storage in Neo4j
 * Fixed a couple of API naming convention errors in @PartitionGraph@
@@ -33,6 +33,8 @@ h3. Version 1.3 (NOT OFFICIALLY RELEASED YET)
 * Removed superfluous @util@ packages on all @Graph@ implementations
 * @EventGraph@ wrapper set now includes @EventTransactionalGraph@ which will fire queued sets of events in conjunction with successful commits to the graph.
 * Added @IdGraph@ to support the user defined ids for those @Graphs@ that ignore user supplied ids
+* Added @ThreadTransactionalGraph@ to support multiple threads within a single transaction
+* Changed the @Vertex@ API to only have three methods: @getEdges()@, @getVertices()@, and @query()@
 
 ==<hr/>==
 
