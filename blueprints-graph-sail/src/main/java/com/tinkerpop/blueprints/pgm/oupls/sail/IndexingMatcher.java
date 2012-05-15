@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.pgm.oupls.sail;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
@@ -148,11 +149,11 @@ public class IndexingMatcher extends Matcher {
                 case CONTEXT:
                     return value.equals(edge.getProperty(GraphSail.CONTEXT_PROP));
                 case OBJECT:
-                    return value.equals(store.getValueOf(edge.getInVertex()));
+                    return value.equals(store.getValueOf(edge.getVertex(Direction.IN)));
                 case PREDICATE:
                     return value.equals(edge.getProperty(GraphSail.PREDICATE_PROP));
                 case SUBJECT:
-                    return value.equals(store.getValueOf(edge.getOutVertex()));
+                    return value.equals(store.getValueOf(edge.getVertex(Direction.OUT)));
                 default:
                     throw new IllegalStateException();
             }

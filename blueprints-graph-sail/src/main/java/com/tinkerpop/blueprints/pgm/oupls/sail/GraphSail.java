@@ -539,8 +539,8 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         for (String key : e.getPropertyKeys()) {
             System.out.println("\t" + key + ":\t'" + e.getProperty(key) + "'");
         }
-        System.out.println("\t[in vertex]: " + e.getInVertex());
-        System.out.println("\t[out vertex]: " + e.getOutVertex());
+        System.out.println("\t[in vertex]: " + e.getVertex(Direction.IN));
+        System.out.println("\t[out vertex]: " + e.getVertex(Direction.OUT));
     }
 
     private static void debugVertex(final Vertex v) {

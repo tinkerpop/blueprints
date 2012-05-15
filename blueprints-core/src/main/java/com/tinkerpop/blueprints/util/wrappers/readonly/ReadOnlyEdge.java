@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
@@ -12,12 +13,8 @@ public class ReadOnlyEdge extends ReadOnlyElement implements Edge {
         super(baseEdge);
     }
 
-    public Vertex getOutVertex() {
-        return new ReadOnlyVertex(((Edge) this.baseElement).getOutVertex());
-    }
-
-    public Vertex getInVertex() {
-        return new ReadOnlyVertex(((Edge) this.baseElement).getInVertex());
+    public Vertex getVertex(final Direction direction) throws IllegalArgumentException {
+        return new ReadOnlyVertex(((Edge) baseElement).getVertex(direction));
     }
 
     public String getLabel() {

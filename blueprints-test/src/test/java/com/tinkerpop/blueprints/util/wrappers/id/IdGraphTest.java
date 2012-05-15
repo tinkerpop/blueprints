@@ -37,8 +37,8 @@ public class IdGraphTest extends GraphTest {
         assertTrue(outE.hasNext());
         e = outE.next();
         assertTrue(e instanceof IdEdge);
-        assertTrue(e.getInVertex() instanceof IdVertex);
-        assertTrue(e.getOutVertex() instanceof IdVertex);
+        assertTrue(e.getVertex(Direction.IN) instanceof IdVertex);
+        assertTrue(e.getVertex(Direction.OUT) instanceof IdVertex);
 
         Iterator<Vertex> vertices = graph.getVertices().iterator();
         assertTrue(vertices.hasNext());

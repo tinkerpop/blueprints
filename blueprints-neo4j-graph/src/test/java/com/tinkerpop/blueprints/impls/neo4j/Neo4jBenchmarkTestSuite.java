@@ -77,15 +77,15 @@ public class Neo4jBenchmarkTestSuite extends TestSuite {
                 counter++;
                 for (final Edge edge : vertex.getEdges(com.tinkerpop.blueprints.Direction.OUT)) {
                     counter++;
-                    final Vertex vertex2 = edge.getInVertex();
+                    final Vertex vertex2 = edge.getVertex(com.tinkerpop.blueprints.Direction.IN);
                     counter++;
                     for (final Edge edge2 : vertex2.getEdges(com.tinkerpop.blueprints.Direction.OUT)) {
                         counter++;
-                        final Vertex vertex3 = edge2.getInVertex();
+                        final Vertex vertex3 = edge2.getVertex(com.tinkerpop.blueprints.Direction.IN);
                         counter++;
                         for (final Edge edge3 : vertex3.getEdges(com.tinkerpop.blueprints.Direction.OUT)) {
                             counter++;
-                            edge3.getOutVertex();
+                            edge3.getVertex(com.tinkerpop.blueprints.Direction.OUT);
                             counter++;
                         }
                     }

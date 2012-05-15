@@ -61,8 +61,8 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         assertEquals(count(graph.getEdges()), 9);
         for (final Edge edge : graph.getEdges()) {
-            long idA = (Long) edge.getOutVertex().getId();
-            long idB = (Long) edge.getInVertex().getId();
+            long idA = (Long) edge.getVertex(Direction.OUT).getId();
+            long idB = (Long) edge.getVertex(Direction.IN).getId();
             assertEquals(idA + 1, idB);
             assertEquals(edge.getLabel(), idA + "-" + idB);
         }
@@ -226,8 +226,8 @@ public class Neo4jBatchGraphTest extends BaseTest {
         }
         assertEquals(edges.size(), 9);
         for (final Edge edge : graph.getEdges()) {
-            long idA = (Long) edge.getOutVertex().getId();
-            long idB = (Long) edge.getInVertex().getId();
+            long idA = (Long) edge.getVertex(Direction.OUT).getId();
+            long idB = (Long) edge.getVertex(Direction.IN).getId();
             assertEquals(idA + 1, idB);
             assertEquals(edge.getLabel(), idA + "-" + idB);
             assertEquals(edge.getPropertyKeys().size(), 1);
@@ -358,11 +358,11 @@ public class Neo4jBatchGraphTest extends BaseTest {
         assertEquals(josh.getProperty("name"), "josh");
         assertEquals(josh.getProperty("age"), 32);
         for (Edge e : graph.getVertex("4").getEdges(Direction.OUT)) {
-            if (e.getInVertex().getId().equals(3l)) {
+            if (e.getVertex(Direction.IN).getId().equals(3l)) {
                 assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                 assertEquals(e.getLabel(), "created");
                 counter++;
-            } else if (e.getInVertex().getId().equals(5l)) {
+            } else if (e.getVertex(Direction.IN).getId().equals(5l)) {
                 assertEquals(Math.round((Float) e.getProperty("weight")), 1);
                 assertEquals(e.getLabel(), "created");
                 counter++;

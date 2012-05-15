@@ -16,7 +16,7 @@ Vertex b = graph.addVertex(null);
 a.setProperty("name", "marko");
 b.setProperty("name", "peter");
 Edge e = graph.addEdge(null, a, b, "knows");
-System.out.println(e.getOutVertex().getProperty("name") + "--" + e.getLabel() + "-->" + e.getInVertex().getProperty("name"));
+System.out.println(e.getVertex(Direction.OUT).getProperty("name") + "--" + e.getLabel() + "-->" + e.getVertex(Direction.IN).getProperty("name"));
 ```
 
 The @System.out@ after the code executes is:

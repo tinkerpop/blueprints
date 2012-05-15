@@ -95,8 +95,8 @@ public class ReadOnlyGraphTest extends BaseTest {
             }
             edge.getProperty("weight");
             edge.getPropertyKeys();
-            assertTrue(edge.getOutVertex() instanceof ReadOnlyVertex);
-            assertTrue(edge.getInVertex() instanceof ReadOnlyVertex);
+            assertTrue(edge.getVertex(Direction.OUT) instanceof ReadOnlyVertex);
+            assertTrue(edge.getVertex(Direction.IN) instanceof ReadOnlyVertex);
         }
     }
 

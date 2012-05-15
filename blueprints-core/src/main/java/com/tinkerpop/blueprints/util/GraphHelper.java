@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -62,8 +63,8 @@ public class GraphHelper {
             ElementHelper.copyProperties(fromVertex, toVertex);
         }
         for (final Edge fromEdge : from.getEdges()) {
-            final Vertex outVertex = to.getVertex(fromEdge.getOutVertex().getId());
-            final Vertex inVertex = to.getVertex(fromEdge.getInVertex().getId());
+            final Vertex outVertex = to.getVertex(fromEdge.getVertex(Direction.OUT).getId());
+            final Vertex inVertex = to.getVertex(fromEdge.getVertex(Direction.IN).getId());
             final Edge toEdge = to.addEdge(fromEdge.getId(), outVertex, inVertex, fromEdge.getLabel());
             ElementHelper.copyProperties(fromEdge, toEdge);
         }

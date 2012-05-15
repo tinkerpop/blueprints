@@ -94,7 +94,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Edge findEdge(final Vertex outVertex, final Vertex inVertex) {
         for (Edge edge : outVertex.getEdges(Direction.OUT)) {
-            if (edge.getInVertex().equals(inVertex)) {
+            if (edge.getVertex(Direction.IN).equals(inVertex)) {
                 return edge;
             }
         }
@@ -104,7 +104,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     public Collection<Edge> findEdgeSet(final Vertex outVertex, final Vertex inVertex) {
         Set<Edge> edges = new HashSet<Edge>();
         for (Edge edge : outVertex.getEdges(Direction.OUT)) {
-            if (edge.getInVertex().equals(inVertex)) {
+            if (edge.getVertex(Direction.IN).equals(inVertex)) {
                 edges.add(edge);
             }
         }
@@ -112,7 +112,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public boolean isIncident(final Vertex vertex, final Edge edge) {
-        return edge.getInVertex().equals(vertex) || edge.getOutVertex().equals(vertex);
+        return edge.getVertex(Direction.IN).equals(vertex) || edge.getVertex(Direction.OUT).equals(vertex);
     }
 
     public Collection<Edge> getIncidentEdges(final Vertex vertex) {
@@ -135,7 +135,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public int getIncidentCount(final Edge edge) {
-        if (edge.getInVertex().equals(edge.getOutVertex()))
+        if (edge.getVertex(Direction.IN).equals(edge.getVertex(Direction.OUT)))
             return 1;
         else
             return 2;
@@ -190,30 +190,30 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public Collection<Vertex> getIncidentVertices(final Edge edge) {
         List<Vertex> vertices = new ArrayList<Vertex>();
-        vertices.add(edge.getInVertex());
-        vertices.add(edge.getOutVertex());
+        vertices.add(edge.getVertex(Direction.IN));
+        vertices.add(edge.getVertex(Direction.OUT));
         return vertices;
     }
 
     public Vertex getDest(final Edge edge) {
-        return edge.getInVertex();
+        return edge.getVertex(Direction.IN);
     }
 
     public Vertex getSource(final Edge edge) {
-        return edge.getOutVertex();
+        return edge.getVertex(Direction.OUT);
     }
 
     public Pair<Vertex> getEndpoints(final Edge edge) {
-        return new Pair<Vertex>(edge.getOutVertex(), edge.getInVertex());
+        return new Pair<Vertex>(edge.getVertex(Direction.OUT), edge.getVertex(Direction.IN));
     }
 
     public boolean isNeighbor(final Vertex outVertex, final Vertex inVertex) {
         for (Edge edge : outVertex.getEdges(Direction.OUT)) {
-            if (edge.getInVertex().equals(inVertex))
+            if (edge.getVertex(Direction.IN).equals(inVertex))
                 return true;
         }
         for (Edge edge : outVertex.getEdges(Direction.IN)) {
-            if (edge.getOutVertex().equals(inVertex))
+            if (edge.getVertex(Direction.OUT).equals(inVertex))
                 return true;
         }
         return false;
@@ -226,19 +226,19 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     public Collection<Vertex> getNeighbors(final Vertex vertex) {
         Set<Vertex> vertices = new HashSet<Vertex>();
         for (Edge e : vertex.getEdges(Direction.OUT)) {
-            vertices.add(e.getInVertex());
+            vertices.add(e.getVertex(Direction.IN));
         }
         for (Edge e : vertex.getEdges(Direction.IN)) {
-            vertices.add(e.getOutVertex());
+            vertices.add(e.getVertex(Direction.OUT));
         }
         return vertices;
     }
 
     public Vertex getOpposite(final Vertex vertex, final Edge edge) {
-        if (edge.getOutVertex().equals(vertex))
-            return edge.getInVertex();
+        if (edge.getVertex(Direction.OUT).equals(vertex))
+            return edge.getVertex(Direction.IN);
         else
-            return edge.getOutVertex();
+            return edge.getVertex(Direction.OUT);
     }
 
     public Collection<Edge> getOutEdges(final Vertex vertex) {
@@ -275,7 +275,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     public Collection<Vertex> getPredecessors(final Vertex vertex) {
         Set<Vertex> vertices = new HashSet<Vertex>();
         for (Edge edge : vertex.getEdges(Direction.IN)) {
-            vertices.add(edge.getOutVertex());
+            vertices.add(edge.getVertex(Direction.OUT));
         }
         return vertices;
     }
@@ -287,7 +287,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     public Collection<Vertex> getSuccessors(final Vertex vertex) {
         Set<Vertex> vertices = new HashSet<Vertex>();
         for (Edge edge : vertex.getEdges(Direction.OUT)) {
-            vertices.add(edge.getInVertex());
+            vertices.add(edge.getVertex(Direction.IN));
         }
         return vertices;
     }
@@ -324,16 +324,16 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
     }
 
     public boolean isDest(final Vertex vertex, final Edge edge) {
-        return edge.getInVertex().equals(vertex);
+        return edge.getVertex(Direction.IN).equals(vertex);
     }
 
     public boolean isSource(final Vertex vertex, final Edge edge) {
-        return edge.getOutVertex().equals(vertex);
+        return edge.getVertex(Direction.OUT).equals(vertex);
     }
 
     public boolean isPredecessor(final Vertex outVertex, final Vertex inVertex) {
         for (Edge edge : outVertex.getEdges(Direction.IN)) {
-            if (edge.getOutVertex().equals(inVertex))
+            if (edge.getVertex(Direction.OUT).equals(inVertex))
                 return true;
         }
         return false;
@@ -341,7 +341,7 @@ public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<
 
     public boolean isSuccessor(final Vertex outVertex, final Vertex inVertex) {
         for (Edge edge : outVertex.getEdges(Direction.OUT)) {
-            if (edge.getInVertex().equals(inVertex))
+            if (edge.getVertex(Direction.IN).equals(inVertex))
                 return true;
         }
         return false;

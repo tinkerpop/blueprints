@@ -63,17 +63,17 @@ public class GraphHelperTest extends BaseTest {
         assertEquals(marko.getProperty("age"), 29);
         int counter = 0;
         for (Edge e : h.getVertex("1").getEdges(Direction.OUT)) {
-            if (e.getInVertex().getId().equals("2")) {
+            if (e.getVertex(Direction.IN).getId().equals("2")) {
                 assertEquals(e.getProperty("weight"), 0.5f);
                 assertEquals(e.getLabel(), "knows");
                 assertEquals(e.getId(), "7");
                 counter++;
-            } else if (e.getInVertex().getId().equals("3")) {
+            } else if (e.getVertex(Direction.IN).getId().equals("3")) {
                 assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                 assertEquals(e.getLabel(), "created");
                 assertEquals(e.getId(), "9");
                 counter++;
-            } else if (e.getInVertex().getId().equals("4")) {
+            } else if (e.getVertex(Direction.IN).getId().equals("4")) {
                 assertEquals(Math.round((Float) e.getProperty("weight")), 1);
                 assertEquals(e.getLabel(), "knows");
                 assertEquals(e.getId(), "8");
@@ -87,12 +87,12 @@ public class GraphHelperTest extends BaseTest {
         assertEquals(josh.getProperty("name"), "josh");
         assertEquals(josh.getProperty("age"), 32);
         for (Edge e : h.getVertex("4").getEdges(Direction.OUT)) {
-            if (e.getInVertex().getId().equals("3")) {
+            if (e.getVertex(Direction.IN).getId().equals("3")) {
                 assertEquals(Math.round((Float) e.getProperty("weight")), 0);
                 assertEquals(e.getLabel(), "created");
                 assertEquals(e.getId(), "11");
                 counter++;
-            } else if (e.getInVertex().getId().equals("5")) {
+            } else if (e.getVertex(Direction.IN).getId().equals("5")) {
                 assertEquals(Math.round((Float) e.getProperty("weight")), 1);
                 assertEquals(e.getLabel(), "created");
                 assertEquals(e.getId(), "10");

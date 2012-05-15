@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.io.gml;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
@@ -145,7 +146,7 @@ public class GMLWriter {
 
     private void writeEdges(Writer writer, List<Edge> edges, Map<Vertex, Integer> ids) throws IOException {
         for (Edge e : edges) {
-            writeEdgeProperties(writer, e, ids.get(e.getOutVertex()), ids.get(e.getInVertex()));
+            writeEdgeProperties(writer, e, ids.get(e.getVertex(Direction.OUT)), ids.get(e.getVertex(Direction.IN)));
         }
     }
 

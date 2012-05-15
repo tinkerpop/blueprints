@@ -282,8 +282,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public void removeEdge(final Edge edge) {
-        TinkerVertex outVertex = (TinkerVertex) edge.getOutVertex();
-        TinkerVertex inVertex = (TinkerVertex) edge.getInVertex();
+        TinkerVertex outVertex = (TinkerVertex) edge.getVertex(Direction.OUT);
+        TinkerVertex inVertex = (TinkerVertex) edge.getVertex(Direction.IN);
         if (null != outVertex && null != outVertex.outEdges) {
             final Set<Edge> edges = outVertex.outEdges.get(edge.getLabel());
             if (null != edges)

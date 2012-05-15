@@ -42,7 +42,7 @@ public class EdgeLabelWeightTransformer implements Transformer<Edge, Number> {
                     if (this.invertWeights)
                         weight = 1 / weight;
                     if (this.normalizeWeights) {
-                        return weight / JungHelper.totalWeight(JungHelper.filterEdgeLabels(edge.getOutVertex().getEdges(Direction.OUT), this.labels, filterLabels), this.weightKey);
+                        return weight / JungHelper.totalWeight(JungHelper.filterEdgeLabels(edge.getVertex(Direction.OUT).getEdges(Direction.OUT), this.labels, filterLabels), this.weightKey);
                     } else {
                         return weight;
                     }
@@ -58,7 +58,7 @@ public class EdgeLabelWeightTransformer implements Transformer<Edge, Number> {
                     if (this.invertWeights)
                         weight = 1 / weight;
                     if (this.normalizeWeights) {
-                        return weight / JungHelper.totalWeight(JungHelper.filterEdgeLabels(edge.getOutVertex().getEdges(Direction.OUT), this.labels, filterLabels), this.weightKey);
+                        return weight / JungHelper.totalWeight(JungHelper.filterEdgeLabels(edge.getVertex(Direction.OUT).getEdges(Direction.OUT), this.labels, filterLabels), this.weightKey);
                     } else {
                         return weight;
                     }

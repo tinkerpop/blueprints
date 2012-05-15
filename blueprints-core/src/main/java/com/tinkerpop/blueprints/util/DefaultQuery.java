@@ -161,14 +161,14 @@ public class DefaultQuery implements Query {
                             this.nextEdge = null;
                             if (forVertex) {
                                 if (direction == Direction.OUT)
-                                    return (T) temp.getInVertex();
+                                    return (T) temp.getVertex(Direction.IN);
                                 else if (direction == Direction.IN)
-                                    return (T) temp.getOutVertex();
+                                    return (T) temp.getVertex(Direction.OUT);
                                 else {
-                                    if (temp.getInVertex().equals(vertex)) {
-                                        return (T) temp.getOutVertex();
+                                    if (temp.getVertex(Direction.OUT).equals(vertex)) {
+                                        return (T) temp.getVertex(Direction.IN);
                                     } else {
-                                        return (T) temp.getInVertex();
+                                        return (T) temp.getVertex(Direction.OUT);
                                     }
                                 }
 

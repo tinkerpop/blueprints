@@ -3,8 +3,10 @@
  */
 package com.tinkerpop.blueprints.impls.dex;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 /**
@@ -62,23 +64,17 @@ public class DexEdge extends DexElement implements Edge {
     /*
       * (non-Javadoc)
       *
-      * @see com.tinkerpop.blueprints.Edge#getOutVertex()
+      * @see com.tinkerpop.blueprints.Edge#getVertex(Direction.OUT)
       */
     @Override
-    public Vertex getOutVertex() {
+    public Vertex getVertex(final Direction direction) {
         setEdges();
-        return new DexVertex(graph, out);
-    }
-
-    /*
-      * (non-Javadoc)
-      *
-      * @see com.tinkerpop.blueprints.Edge#getInVertex()
-      */
-    @Override
-    public Vertex getInVertex() {
-        setEdges();
-        return new DexVertex(graph, in);
+        if (direction.equals(Direction.OUT))
+            return new DexVertex(graph, out);
+        else if (direction.equals(Direction.IN))
+            return new DexVertex(graph, in);
+        else
+            throw ExceptionFactory.bothIsNotSupported();
     }
 
     /*

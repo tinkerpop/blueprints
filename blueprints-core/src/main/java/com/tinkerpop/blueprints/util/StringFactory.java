@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Index;
@@ -29,7 +30,7 @@ public class StringFactory {
     }
 
     public static String edgeString(final Edge edge) {
-        return E + L_BRACKET + edge.getId() + R_BRACKET + L_BRACKET + edge.getOutVertex().getId() + DASH + edge.getLabel() + ARROW + edge.getInVertex().getId() + R_BRACKET;
+        return E + L_BRACKET + edge.getId() + R_BRACKET + L_BRACKET + edge.getVertex(Direction.OUT).getId() + DASH + edge.getLabel() + ARROW + edge.getVertex(Direction.IN).getId() + R_BRACKET;
     }
 
     public static String graphString(final Graph graph, final String internalString) {
