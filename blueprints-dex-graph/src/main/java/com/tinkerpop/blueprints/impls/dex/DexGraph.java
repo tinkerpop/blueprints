@@ -79,7 +79,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
         FEATURES.supportsKeyIndices = false;
         FEATURES.supportsVertexKeyIndex = false;
         FEATURES.supportsEdgeKeyIndex = false;
-        FEATURES.supportsThreadedTransactions= false;
+        FEATURES.supportsThreadedTransactions = false;
     }
 
     /**

@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.util.wrappers.event.listener;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 
 import java.util.LinkedList;
 

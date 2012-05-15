@@ -120,7 +120,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         createIndices(graph);
 
         store.manualTransactions = store.graph instanceof TransactionalGraph;
-                //&& 0 == ((TransactionalGraph) store.graph).getMaxBufferSize();
+        //&& 0 == ((TransactionalGraph) store.graph).getMaxBufferSize();
 
         store.namespaces = store.getReferenceVertex();
         if (null == store.namespaces) {

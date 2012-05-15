@@ -85,7 +85,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         FEATURES.supportsLongProperty = false;
         FEATURES.supportsMapProperty = false;
         FEATURES.supportsStringProperty = false;
-        FEATURES.supportsThreadedTransactions= false;
+        FEATURES.supportsThreadedTransactions = false;
     }
 
     static {

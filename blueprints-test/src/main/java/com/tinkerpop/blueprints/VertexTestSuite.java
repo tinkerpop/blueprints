@@ -475,6 +475,13 @@ public class VertexTestSuite extends TestSuite {
         assertEquals(count(c.getEdges(IN, convertId(graph, "hates"))), 2);
         assertEquals(count(c.getEdges(OUT, convertId(graph, "hates"))), 1);
 
+        try {
+            x.getVertex(BOTH);
+            assertTrue(false);
+        } catch (IllegalArgumentException e) {
+            assertTrue(true);
+        }
+
         graph.shutdown();
     }
 }

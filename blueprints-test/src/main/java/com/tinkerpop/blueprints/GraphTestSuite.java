@@ -477,27 +477,27 @@ public class GraphTestSuite extends TestSuite {
         assertTrue(results.contains(aFriendC));
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.OUT,convertId(graph, "friend")));
+        results = asList(a.getEdges(Direction.OUT, convertId(graph, "friend")));
         assertEquals(results.size(), 2);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(aFriendC));
 
-        results = asList(a.getEdges(Direction.OUT,convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.OUT, convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.IN,convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.IN, convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateA));
 
-        results = asList(a.getEdges(Direction.IN,convertId(graph, "friend")));
+        results = asList(a.getEdges(Direction.IN, convertId(graph, "friend")));
         assertEquals(results.size(), 0);
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "hate")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateB));
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "friend")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "friend")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(aFriendB));
 
@@ -517,22 +517,22 @@ public class GraphTestSuite extends TestSuite {
         Edge cHateB = graph.addEdge(null, c, b, convertId(graph, "hate"));
 
 
-        List<Edge> results = asList(a.getEdges(Direction.OUT,convertId(graph, "friend"), convertId(graph, "hate")));
+        List<Edge> results = asList(a.getEdges(Direction.OUT, convertId(graph, "friend"), convertId(graph, "hate")));
         assertEquals(results.size(), 3);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(aFriendC));
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.IN,convertId(graph, "friend"), convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.IN, convertId(graph, "friend"), convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateA));
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "friend"), convertId(graph, "hate")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "friend"), convertId(graph, "hate")));
         assertEquals(results.size(), 2);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(cHateB));
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "blah"), convertId(graph, "blah2"), convertId(graph, "blah3")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "blah"), convertId(graph, "blah2"), convertId(graph, "blah3")));
         assertEquals(results.size(), 0);
 
         graph.shutdown();

@@ -39,11 +39,11 @@ public class DexBenchmarkTestSuite extends TestSuite {
                     counter++;
                     final Vertex vertex2 = edge.getVertex(Direction.IN);
                     counter++;
-                    for (final Edge edge2 :  vertex2.getEdges(Direction.OUT)) {
+                    for (final Edge edge2 : vertex2.getEdges(Direction.OUT)) {
                         counter++;
                         final Vertex vertex3 = edge2.getVertex(Direction.IN);
                         counter++;
-                        for (final Edge edge3 :  vertex3.getEdges(Direction.OUT)) {
+                        for (final Edge edge3 : vertex3.getEdges(Direction.OUT)) {
                             counter++;
                             edge3.getVertex(Direction.OUT);
                             counter++;

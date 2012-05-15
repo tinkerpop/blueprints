@@ -17,8 +17,8 @@ class FilteredIterator<T> implements CloseableIterable<T>, Iterator<T> {
     /**
      * Create a new iterator which is constrained by the given criterion.
      *
-     * @param base a lower-level iterator of untested values
-     * @param criterion    only values which pass this criterion will be accessible through the iterator
+     * @param base      a lower-level iterator of untested values
+     * @param criterion only values which pass this criterion will be accessible through the iterator
      */
     public FilteredIterator(final Iterable<T> base, final Criterion<T> criterion) {
         this.baseIterator = base.iterator();

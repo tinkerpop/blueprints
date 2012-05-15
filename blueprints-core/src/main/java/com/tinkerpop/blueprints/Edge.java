@@ -7,7 +7,7 @@ package com.tinkerpop.blueprints;
  * Diagrammatically, outVertex ---label---> inVertex.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
-*/
+ */
 public interface Edge extends Element {
 
     /**

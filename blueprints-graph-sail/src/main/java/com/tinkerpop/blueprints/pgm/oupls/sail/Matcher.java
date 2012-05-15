@@ -36,7 +36,6 @@ public abstract class Matcher {
      * If a component such as subject or object is specified in the pattern, a non-null value must be provided to this method.
      * Non-null values for unspecified components may be provided, but they will not be used.
      *
-     *
      * @param subject   the subject value of matching statements
      * @param predicate the predicate value of matching statements
      * @param object    the object of matching statements
