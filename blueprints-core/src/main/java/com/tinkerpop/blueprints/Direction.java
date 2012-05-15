@@ -7,6 +7,8 @@ public enum Direction {
 
     OUT, IN, BOTH;
 
+    public static final Direction[] proper = new Direction[]{OUT, IN};
+
     public Direction opposite() {
         if (this.equals(OUT))
             return IN;
