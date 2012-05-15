@@ -7,10 +7,10 @@ public enum Direction {
 
     OUT, IN, BOTH;
 
-    public Direction opposite(final Direction direction) {
-        if (direction.equals(OUT))
+    public Direction opposite() {
+        if (this.equals(OUT))
             return IN;
-        else if (direction.equals(IN))
+        else if (this.equals(IN))
             return OUT;
         else
             return BOTH;
