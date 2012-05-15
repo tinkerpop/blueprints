@@ -465,7 +465,8 @@ public class VertexTestSuite extends TestSuite {
         assertTrue(asList(b.getVertices(BOTH, convertId(graph, "knows"))).contains(a));
         assertTrue(asList(b.getVertices(BOTH, convertId(graph, "knows"))).contains(c));
 
-        // TODO: What is the semantics? assertEquals(count(c.getEdges(BOTH, "hates")), 2);
+        assertEquals(count(c.getEdges(BOTH, convertId(graph, "hates"))), 3);
+        assertEquals(count(c.getVertices(BOTH, convertId(graph, "hates"))), 3);
         assertEquals(count(c.getEdges(BOTH, convertId(graph, "knows"))), 1);
         assertTrue(asList(c.getEdges(BOTH, convertId(graph, "hates"))).contains(y));
         assertTrue(asList(c.getEdges(BOTH, convertId(graph, "hates"))).contains(zz));
