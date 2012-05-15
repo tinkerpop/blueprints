@@ -20,7 +20,7 @@ public class MultiIterable<S> implements Iterable<S> {
 
     public Iterator<S> iterator() {
         if (this.iterables.size() == 0) {
-            return (Iterator<S>) Collections.emptyList().iterator();
+            return (Iterator) Collections.emptyList().iterator();
         } else {
             return new Iterator<S>() {
                 private Iterator<S> currentIterator = iterables.get(0).iterator();
