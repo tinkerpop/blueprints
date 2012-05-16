@@ -1,8 +1,11 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Vertex;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
+
+import java.util.Queue;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -13,20 +16,12 @@ public class RexsterEdgeIterable extends RexsterElementIterable<Edge> {
         super(uri, graph);
     }
 
-    protected void fillBuffer() {
-        final int bufferSize = this.graph.getBufferSize();
-        final JSONObject object = RestHelper.get(this.uri + this.createSeparator() + RexsterTokens.REXSTER_OFFSET_START + RexsterTokens.EQUALS + this.start + RexsterTokens.AND + RexsterTokens.REXSTER_OFFSET_END + RexsterTokens.EQUALS + this.end);
+    protected void fillBuffer(final Queue<Edge> queue, final int start, final int end) {
+        final JSONObject object = RestHelper.get(this.uri + this.createSeparator() + RexsterTokens.REXSTER_OFFSET_START + RexsterTokens.EQUALS + start + RexsterTokens.AND + RexsterTokens.REXSTER_OFFSET_END + RexsterTokens.EQUALS + end);
 
         JSONArray array = object.optJSONArray(RexsterTokens.RESULTS);
         for (int ix = 0; ix < array.length(); ix++) {
-            this.queue.add(new RexsterEdge(array.optJSONObject(ix), this.graph));
-        }
-
-        if (this.queue.size() == bufferSize) { // next buffer if full
-            this.start = this.start + bufferSize;
-            this.end = this.end + bufferSize;
-        } else { // last buffer
-            this.start = this.end;
+            queue.add(new RexsterEdge(array.optJSONObject(ix), this.graph));
         }
     }
 }
