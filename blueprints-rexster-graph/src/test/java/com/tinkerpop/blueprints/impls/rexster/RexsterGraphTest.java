@@ -16,6 +16,9 @@ import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -86,6 +89,7 @@ public class RexsterGraphTest extends GraphTest {
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
                     System.out.println("Testing " + method.getName() + "...");
+                    this.resetGraph();
                     method.invoke(testSuite);
                     this.resetGraph();
                 }
@@ -98,8 +102,14 @@ public class RexsterGraphTest extends GraphTest {
         final IndexableGraph idxGraph = (IndexableGraph) graph;
         
         // since we don't have graph.clear() anymore we manually reset the graph.
-        for (Vertex v : graph.getVertices()) {
-            graph.removeVertex(v);
+        Iterator<Vertex> vertexItty = graph.getVertices().iterator();
+        List<Vertex> verticesToRemove = new ArrayList<Vertex>();
+        while (vertexItty.hasNext()) {
+            verticesToRemove.add(vertexItty.next());
+        }
+        
+        for (Vertex vertexToRemove : verticesToRemove) {
+            graph.removeVertex(vertexToRemove);
         }
         
         for (String key : graph.getIndexedKeys(Vertex.class)) {
