@@ -23,12 +23,14 @@ public class RexsterTokens {
     public static final String EDGE = "edge";
     public static final String EDGES = "edges";
 
+    public static final String SLASH = "/";
     public static final String SLASH_VERTICES = "/vertices";
     public static final String SLASH_VERTICES_SLASH = "/vertices/";
     public static final String SLASH_EDGES = "/edges";
     public static final String SLASH_EDGES_SLASH = "/edges/";
     public static final String SLASH_INDICES = "/indices";
     public static final String SLASH_INDICES_SLASH = "/indices/";
+    public static final String SLASH_KEY_INDICES_SLASH = "/keyindices/";
     public static final String SLASH_COUNT = "/count";
     public static final String SLASH_KEYS = "/keys";
     public static final String SLASH_KEYS_SLASH = "/keys/";

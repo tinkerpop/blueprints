@@ -226,14 +226,9 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
 
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        String c;
-        if (Vertex.class.isAssignableFrom(indexClass))
-            c = RexsterTokens.VERTEX;
-        else
-            c = RexsterTokens.EDGE;
+        final String c = getKeyIndexClass(indexClass);
 
-        // TODO : NO MORE INDEX TYPE -- I JUST KILLED OUT THE Index.getIndexType() call.
-        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.TYPE_EQUALS + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
         if (!index.opt(RexsterTokens.NAME).equals(indexName))
             throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
 
@@ -260,13 +255,34 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
     }
 
     public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+        final String c = getKeyIndexClass(elementClass);
+        RestHelper.delete(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c + RexsterTokens.SLASH + key);
     }
 
     public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+        final String c = getKeyIndexClass(elementClass);
+        RestHelper.post(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c + RexsterTokens.SLASH + key);
     }
 
     public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        return new HashSet<String>();
+        final String c = getKeyIndexClass(elementClass);
+        final JSONArray jsonArray = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c);
+
+        final HashSet<String> keys = new  HashSet<String>();
+        for (int ix = 0; ix < jsonArray.length(); ix++) {
+            keys.add(jsonArray.optString(ix));
+        }
+        
+        return keys;
+    }
+
+    private static <T extends Element> String getKeyIndexClass(Class<T> elementClass) {
+        String c;
+        if (Vertex.class.isAssignableFrom(elementClass))
+            c = RexsterTokens.VERTEX;
+        else
+            c = RexsterTokens.EDGE;
+        return c;
     }
 
 }
