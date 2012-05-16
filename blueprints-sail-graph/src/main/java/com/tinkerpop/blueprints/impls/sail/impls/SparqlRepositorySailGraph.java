@@ -25,7 +25,7 @@ public class SparqlRepositorySailGraph extends SailGraph {
     private static Sail createSail(final String queryEndpointUrl,
                                    final String updateEndpointUrl) {
         if (null == queryEndpointUrl) {
-            throw new IllegalArgumentException("query endpoint URL may not be null");
+            throw new IllegalArgumentException("Query endpoint URL may not be null");
         }
 
         Repository r = null == updateEndpointUrl
