@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util.wrappers.wrapped;
 
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.ElementHelper;
 
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class WrappedElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return null != object && (object.getClass().equals(this.getClass())) && this.baseElement.getId().equals(((WrappedElement) object).getId());
+        return ElementHelper.areEqual(this, object);
     }
 
     public int hashCode() {

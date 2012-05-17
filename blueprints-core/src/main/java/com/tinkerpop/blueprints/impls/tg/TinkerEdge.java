@@ -42,9 +42,4 @@ public class TinkerEdge extends TinkerElement implements Edge, Serializable {
     public String toString() {
         return StringFactory.edgeString(this);
     }
-
-    public boolean equals(final Object object) {
-        return object instanceof TinkerEdge && ((TinkerEdge) object).getId().equals(this.getId());
-    }
-
 }

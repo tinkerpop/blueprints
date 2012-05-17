@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.rexster;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.codehaus.jettison.json.JSONObject;
@@ -99,7 +100,7 @@ public abstract class RexsterElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return (null != object) && (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+        return ElementHelper.areEqual(this, object);
     }
 
 }

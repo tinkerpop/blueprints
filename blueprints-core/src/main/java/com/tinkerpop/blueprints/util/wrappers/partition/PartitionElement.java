@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util.wrappers.partition;
 
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.ElementHelper;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class PartitionElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return null != object && this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId());
+        return ElementHelper.areEqual(this, object);
     }
 
     public int hashCode() {

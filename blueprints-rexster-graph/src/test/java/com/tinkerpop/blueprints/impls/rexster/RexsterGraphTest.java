@@ -9,6 +9,7 @@ import com.tinkerpop.blueprints.IndexTestSuite;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
 import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
@@ -50,6 +51,12 @@ public class RexsterGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new QueryTestSuite(this));
         printTestPerformance("QueryTestSuite", this.stopWatch());
+    }
+
+    public void testKeyIndexableGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new KeyIndexableGraphTestSuite(this));
+        printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
 
     public void testIndexableGraphTestSuite() throws Exception {
@@ -100,18 +107,18 @@ public class RexsterGraphTest extends GraphTest {
     private void resetGraph() {
         final KeyIndexableGraph graph = new RexsterGraph(this.getWorkingUri(), this.username, this.password);
         final IndexableGraph idxGraph = (IndexableGraph) graph;
-        
+
         // since we don't have graph.clear() anymore we manually reset the graph.
         Iterator<Vertex> vertexItty = graph.getVertices().iterator();
         List<Vertex> verticesToRemove = new ArrayList<Vertex>();
         while (vertexItty.hasNext()) {
             verticesToRemove.add(vertexItty.next());
         }
-        
+
         for (Vertex vertexToRemove : verticesToRemove) {
             graph.removeVertex(vertexToRemove);
         }
-        
+
         for (String key : graph.getIndexedKeys(Vertex.class)) {
             graph.dropKeyIndex(key, Vertex.class);
         }
@@ -119,7 +126,7 @@ public class RexsterGraphTest extends GraphTest {
         for (String key : graph.getIndexedKeys(Edge.class)) {
             graph.dropKeyIndex(key, Edge.class);
         }
-        
+
         for (Index idx : idxGraph.getIndices()) {
             idxGraph.dropIndex(idx.getIndexName());
         }
