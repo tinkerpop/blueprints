@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
@@ -19,12 +20,8 @@ public class EventEdge extends EventElement implements Edge {
         super(rawEdge, graphChangedListeners, trigger);
     }
 
-    public Vertex getOutVertex() {
-        return new EventVertex(this.getBaseEdge().getOutVertex(), this.graphChangedListeners, this.trigger);
-    }
-
-    public Vertex getInVertex() {
-        return new EventVertex(this.getBaseEdge().getInVertex(), this.graphChangedListeners, this.trigger);
+    public Vertex getVertex(final Direction direction) throws IllegalArgumentException {
+        return new EventVertex(this.getBaseEdge().getVertex(direction), this.graphChangedListeners, this.trigger);
     }
 
     public String getLabel() {

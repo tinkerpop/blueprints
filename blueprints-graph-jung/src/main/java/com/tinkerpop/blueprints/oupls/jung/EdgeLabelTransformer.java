@@ -33,7 +33,7 @@ public class EdgeLabelTransformer implements Transformer<Edge, Number> {
                 return this.filterValue;
             } else {
                 if (this.probability) {
-                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getOutVertex().getEdges(Direction.OUT), this.labels, filter);
+                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getVertex(Direction.OUT).getEdges(Direction.OUT), this.labels, filter);
                     return 1.0d / allowedEdges.size();
                 } else {
                     return 1.0d;
@@ -42,7 +42,7 @@ public class EdgeLabelTransformer implements Transformer<Edge, Number> {
         } else {
             if (filter) {
                 if (this.probability) {
-                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getOutVertex().getEdges(Direction.OUT), this.labels, filter);
+                    List<Edge> allowedEdges = JungHelper.filterEdgeLabels(edge.getVertex(Direction.OUT).getEdges(Direction.OUT), this.labels, filter);
                     return 1.0d / allowedEdges.size();
                 } else {
                     return 1.0d;

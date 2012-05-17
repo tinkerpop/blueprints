@@ -1,7 +1,9 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -22,13 +24,15 @@ public class RexsterEdge extends RexsterElement implements Edge {
         this.inVertex = rawEdge.opt(RexsterTokens._INV);
     }
 
-    public Vertex getOutVertex() {
-        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.outVertex)), this.graph);
+    public Vertex getVertex(final Direction direction) {
+        if (direction.equals(Direction.OUT))
+            return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.outVertex)), this.graph);
+        else if (direction.equals(Direction.IN))
+            return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.inVertex)), this.graph);
+        else
+            throw ExceptionFactory.bothIsNotSupported();
     }
 
-    public Vertex getInVertex() {
-        return new RexsterVertex(RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.inVertex)), this.graph);
-    }
 
     public String getLabel() {
         return this.label;

@@ -70,8 +70,8 @@ public Iterable<Edge> getInEdges(String... labels);
 h3. Edge (extends Element)
 
 ```java
-public Vertex getOutVertex();
-public Vertex getInVertex();
+public Vertex getVertex(Direction.OUT);
+public Vertex getVertex(Direction.IN);
 public String getLabel();
 ```
 

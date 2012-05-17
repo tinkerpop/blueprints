@@ -193,8 +193,8 @@ public class GraphMLWriter {
                 for (Edge edge : edges) {
                     writer.writeStartElement(GraphMLTokens.EDGE);
                     writer.writeAttribute(GraphMLTokens.ID, edge.getId().toString());
-                    writer.writeAttribute(GraphMLTokens.SOURCE, edge.getOutVertex().getId().toString());
-                    writer.writeAttribute(GraphMLTokens.TARGET, edge.getInVertex().getId().toString());
+                    writer.writeAttribute(GraphMLTokens.SOURCE, edge.getVertex(Direction.OUT).getId().toString());
+                    writer.writeAttribute(GraphMLTokens.TARGET, edge.getVertex(Direction.IN).getId().toString());
                     writer.writeAttribute(GraphMLTokens.LABEL, edge.getLabel());
 
                     List<String> keys = new ArrayList<String>();
@@ -217,8 +217,8 @@ public class GraphMLWriter {
                     for (Edge edge : vertex.getEdges(Direction.OUT)) {
                         writer.writeStartElement(GraphMLTokens.EDGE);
                         writer.writeAttribute(GraphMLTokens.ID, edge.getId().toString());
-                        writer.writeAttribute(GraphMLTokens.SOURCE, edge.getOutVertex().getId().toString());
-                        writer.writeAttribute(GraphMLTokens.TARGET, edge.getInVertex().getId().toString());
+                        writer.writeAttribute(GraphMLTokens.SOURCE, edge.getVertex(Direction.OUT).getId().toString());
+                        writer.writeAttribute(GraphMLTokens.TARGET, edge.getVertex(Direction.IN).getId().toString());
                         writer.writeAttribute(GraphMLTokens.LABEL, edge.getLabel());
 
                         for (String key : edge.getPropertyKeys()) {

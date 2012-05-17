@@ -157,5 +157,23 @@ public class ElementHelper {
         }
     }
 
+    /**
+     * A standard method for determining if two elements are equal.
+     * This method should be used by any Element.equals() implementation to ensure consistent behavior.
+     *
+     * @param a The first element
+     * @param b The second element (as an object)
+     * @return Whether the two elements are equal
+     */
+    public static boolean areEqual(final Element a, final Object b) {
+        if (a == b)
+            return true;
+        if (null == b)
+            return false;
+        if (!a.getClass().equals(b.getClass()))
+            return false;
+        return a.getId().equals(((Element) b).getId());
+    }
+
 
 }

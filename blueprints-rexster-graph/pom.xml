@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-rexster-graph</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Blueprints-RexsterGraph</name>
     <description>Blueprints property graph implementation for Rexster</description>
@@ -60,11 +60,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.5</version>
 
-                <!--<configuration>
-                    <argLine>-DtestRexsterGraph=false -Dusername=rexster -Dpassword=rexster
-                        -DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph
-                    </argLine>
-                </configuration>-->
+                <configuration>
+                    <argLine>-DtestRexsterGraph=false -Dusername=rexster -Dpassword=rexster -DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

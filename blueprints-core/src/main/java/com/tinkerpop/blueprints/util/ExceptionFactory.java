@@ -26,6 +26,10 @@ public class ExceptionFactory {
         return new IllegalArgumentException("Edge with id already exists: " + id);
     }
 
+    public static IllegalArgumentException bothIsNotSupported() {
+        return new IllegalArgumentException("A direction of BOTH is not supported");
+    }
+
     // Element related exceptions
 
     public static IllegalArgumentException propertyKeyIdIsReserved() {

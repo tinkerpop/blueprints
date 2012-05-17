@@ -4,13 +4,14 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -26,15 +27,20 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
 
     public Iterable<Edge> getEdges(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
         if (direction.equals(com.tinkerpop.blueprints.Direction.OUT))
-            return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
+            return new Neo4jVertexEdgeIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
         else if (direction.equals(com.tinkerpop.blueprints.Direction.IN))
-            return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels);
+            return new Neo4jVertexEdgeIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels);
         else
-            return new Neo4jVertexEdgesIterable(this.graph, (Node) this.rawElement, Direction.BOTH, labels);
+            return new MultiIterable(Arrays.asList(new Neo4jVertexEdgeIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels), new Neo4jVertexEdgeIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels)));
     }
 
     public Iterable<Vertex> getVertices(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
-        return new VerticesFromEdgesIterable(this, direction, labels);
+        if (direction.equals(com.tinkerpop.blueprints.Direction.OUT))
+            return new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
+        else if (direction.equals(com.tinkerpop.blueprints.Direction.IN))
+            return new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels);
+        else
+            return new MultiIterable(Arrays.asList(new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels), new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels)));
     }
 
     public Query query() {
@@ -53,14 +59,55 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
         return (Node) this.rawElement;
     }
 
-    private class Neo4jVertexEdgesIterable<T extends Edge> implements Iterable<Neo4jEdge> {
+    private class Neo4jVertexVertexIterable<T extends Vertex> implements Iterable<Neo4jVertex> {
+        private final Neo4jGraph graph;
+        private final Node node;
+        private final Direction direction;
+        private final DynamicRelationshipType[] labels;
+
+        public Neo4jVertexVertexIterable(final Neo4jGraph graph, final Node node, final Direction direction, final String... labels) {
+            this.graph = graph;
+            this.node = node;
+            this.direction = direction;
+            this.labels = new DynamicRelationshipType[labels.length];
+            for (int i = 0; i < labels.length; i++) {
+                this.labels[i] = DynamicRelationshipType.withName(labels[i]);
+            }
+        }
+
+        public Iterator<Neo4jVertex> iterator() {
+            final Iterator<Relationship> itty;
+            if (labels.length > 0)
+                itty = node.getRelationships(direction, labels).iterator();
+            else
+                itty = node.getRelationships(direction).iterator();
+
+            return new Iterator<Neo4jVertex>() {
+
+
+                public Neo4jVertex next() {
+                    return new Neo4jVertex(itty.next().getOtherNode(node), graph);
+                }
+
+                public boolean hasNext() {
+                    return itty.hasNext();
+                }
+
+                public void remove() {
+                    itty.remove();
+                }
+            };
+        }
+    }
+
+    private class Neo4jVertexEdgeIterable<T extends Edge> implements Iterable<Neo4jEdge> {
 
         private final Neo4jGraph graph;
         private final Node node;
         private final Direction direction;
         private final DynamicRelationshipType[] labels;
 
-        public Neo4jVertexEdgesIterable(final Neo4jGraph graph, final Node node, final Direction direction, final String... labels) {
+        public Neo4jVertexEdgeIterable(final Neo4jGraph graph, final Node node, final Direction direction, final String... labels) {
             this.graph = graph;
             this.node = node;
             this.direction = direction;

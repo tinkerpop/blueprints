@@ -169,12 +169,12 @@ public class QueryTestSuite extends TestSuite {
             assertFalse(results.contains(a));
             assertEquals(a.query().direction(Direction.BOTH).labels("friend", "hate").count(), 4);
 
-            results = asList(a.query().labels("friend", "hate").limit(2).edges());
+            results = asList(a.query().direction(Direction.OUT).labels("friend", "hate").limit(2).edges());
             assertEquals(results.size(), 2);
-            results = asList(a.query().labels("friend", "hate").limit(2).vertices());
+            assertTrue(results.contains(aFriendB) || results.contains(aHateC) || results.contains(aFriendC));
+            results = asList(a.query().direction(Direction.OUT).labels("friend", "hate").limit(2).vertices());
             assertEquals(results.size(), 2);
-            assertTrue(results.contains(b));
-            assertTrue(results.contains(c));
+            assertTrue(results.contains(b) || results.contains(c));
             assertFalse(results.contains(a));
             assertEquals(a.query().labels("friend", "hate").limit(2).count(), 2);
 

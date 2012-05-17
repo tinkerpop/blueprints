@@ -21,7 +21,7 @@ import com.tinkerpop.blueprints.util.wrappers.event.listener.StubGraphChangedLis
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class EventTransactionalGraphTest extends GraphTest {
@@ -139,8 +139,8 @@ public class EventTransactionalGraphTest extends GraphTest {
             edge.removeProperty("weight");
             assertNull(edge.getProperty("weight"));
 
-            assertTrue(edge.getOutVertex() instanceof EventVertex);
-            assertTrue(edge.getInVertex() instanceof EventVertex);
+            assertTrue(edge.getVertex(Direction.OUT) instanceof EventVertex);
+            assertTrue(edge.getVertex(Direction.IN) instanceof EventVertex);
         }
     }
 
@@ -378,7 +378,7 @@ public class EventTransactionalGraphTest extends GraphTest {
 
         ((EventTransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
 
-        LinkedList<String> order = graphChangedListener.getOrder();
+        List<String> order = graphChangedListener.getOrder();
         assertEquals("v-added-10", order.get(0));
         assertEquals("v-property-changed-10-aaa:bbb", order.get(1));
         assertEquals("v-property-changed-10-ccc:ddd", order.get(2));

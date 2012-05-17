@@ -11,18 +11,13 @@ package com.tinkerpop.blueprints;
 public interface Edge extends Element {
 
     /**
-     * Return the vertex on the tail of the edge.
+     * Return the tail/out or head/in vertex.
      *
-     * @return the tail vertex
+     * @param direction whether to return the tail/out or head/in vertex
+     * @return the tail/out or head/in vertex
+     * @throws IllegalArgumentException is thrown if a direction of both is provided
      */
-    public Vertex getOutVertex();
-
-    /**
-     * Return the vertex on the head of the edge.
-     *
-     * @return the head vertex
-     */
-    public Vertex getInVertex();
+    public Vertex getVertex(Direction direction) throws IllegalArgumentException;
 
     /**
      * Return the label associated with the edge.

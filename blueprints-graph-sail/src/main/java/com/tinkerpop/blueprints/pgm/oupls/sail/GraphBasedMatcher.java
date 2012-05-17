@@ -49,7 +49,7 @@ public class GraphBasedMatcher extends Matcher {
                 // Right now, we arbitrarily choose the subject as the starting point.
                 return new FilteredIterator<Edge>(vs.getEdges(Direction.OUT), new FilteredIterator.Criterion<Edge>() {
                     public boolean fulfilledBy(final Edge edge) {
-                        return store.matches(edge.getInVertex(), object)
+                        return store.matches(edge.getVertex(Direction.IN), object)
                                 && (!p || edge.getLabel().equals(predicate.stringValue()))
                                 && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
                     }

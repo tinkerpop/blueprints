@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
@@ -90,8 +91,8 @@ public final class GraphSONFactory {
         } else if (element instanceof Edge) {
             final Edge edge = (Edge) element;
             jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
-            putObject(jsonElement, GraphSONTokens._OUT_V, edge.getOutVertex().getId());
-            putObject(jsonElement, GraphSONTokens._IN_V, edge.getInVertex().getId());
+            putObject(jsonElement, GraphSONTokens._OUT_V, edge.getVertex(Direction.OUT).getId());
+            putObject(jsonElement, GraphSONTokens._IN_V, edge.getVertex(Direction.IN).getId());
             jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
         }
 

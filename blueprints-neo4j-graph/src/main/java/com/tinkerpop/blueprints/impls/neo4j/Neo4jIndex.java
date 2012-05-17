@@ -53,33 +53,58 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * The underlying Neo4j graph does not natively support this method within a transaction.
+     * If the graph is not currently in a transaction, then the operation runs efficiently.
+     * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
+     */
     public CloseableIterable<T> get(final String key, final Object value) {
         final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, true);
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.tx.get() != null);
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, true);
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.tx.get() != null);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * The underlying Neo4j graph does not natively support this method within a transaction.
+     * If the graph is not currently in a transaction, then the operation runs efficiently.
+     * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
+     */
     public CloseableIterable<T> query(final String key, final Object query) {
         final IndexHits<S> itty = this.rawIndex.query(key, query);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, true);
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.tx.get() != null);
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, true);
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.tx.get() != null);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * The underlying Neo4j graph does not natively support this method within a transaction.
+     * If the graph is not currently in a transaction, then the operation runs efficiently.
+     * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
+     */
     public long count(final String key, final Object value) {
-        /*final IndexHits hits = this.rawIndex.get(key, value);
-        final long count = hits.size();
-        hits.close();
-        return count;*/
-
-        long count = 0;
-        for (T t : this.get(key, value)) {
-            count++;
+        if (this.graph.tx.get() == null) {
+            final IndexHits hits = this.rawIndex.get(key, value);
+            final long count = hits.size();
+            hits.close();
+            return count;
+        } else {
+            final CloseableIterable<T> hits = this.get(key, value);
+            long count = 0;
+            for (final T t : hits) {
+                count++;
+            }
+            hits.close();
+            return count;
         }
-        return count;
     }
 
     public void remove(final String key, final Object value, final T element) {

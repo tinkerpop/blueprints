@@ -25,8 +25,8 @@ public class EdgeTestSuite extends TestSuite {
         Vertex u = graph.addVertex(convertId(graph, "2"));
         Edge e = graph.addEdge(null, v, u, convertId(graph, "knows"));
         assertEquals(e.getLabel(), convertId(graph, "knows"));
-        assertEquals(e.getInVertex(), u);
-        assertEquals(e.getOutVertex(), v);
+        assertEquals(e.getVertex(Direction.IN), u);
+        assertEquals(e.getVertex(Direction.OUT), v);
         assertEquals(e, v.getEdges(Direction.OUT).iterator().next());
         assertEquals(e, u.getEdges(Direction.IN).iterator().next());
         assertEquals(v.getEdges(Direction.OUT).iterator().next(), u.getEdges(Direction.IN).iterator().next());
@@ -126,16 +126,16 @@ public class EdgeTestSuite extends TestSuite {
 
             this.stopWatch();
             assertEquals(graph.getEdge(e1.getId()), e1);
-            assertEquals(graph.getEdge(e1.getId()).getInVertex(), v2);
-            assertEquals(graph.getEdge(e1.getId()).getOutVertex(), v1);
+            assertEquals(graph.getEdge(e1.getId()).getVertex(Direction.IN), v2);
+            assertEquals(graph.getEdge(e1.getId()).getVertex(Direction.OUT), v1);
 
             assertEquals(graph.getEdge(e2.getId()), e2);
-            assertEquals(graph.getEdge(e2.getId()).getInVertex(), v3);
-            assertEquals(graph.getEdge(e2.getId()).getOutVertex(), v2);
+            assertEquals(graph.getEdge(e2.getId()).getVertex(Direction.IN), v3);
+            assertEquals(graph.getEdge(e2.getId()).getVertex(Direction.OUT), v2);
 
             assertEquals(graph.getEdge(e3.getId()), e3);
-            assertEquals(graph.getEdge(e3.getId()).getInVertex(), v1);
-            assertEquals(graph.getEdge(e3.getId()).getOutVertex(), v3);
+            assertEquals(graph.getEdge(e3.getId()).getVertex(Direction.IN), v1);
+            assertEquals(graph.getEdge(e3.getId()).getVertex(Direction.OUT), v3);
 
             printPerformance(graph.toString(), 3, "edges retrieved", this.stopWatch());
         }
@@ -389,8 +389,8 @@ public class EdgeTestSuite extends TestSuite {
                 int counter = 0;
                 for (Edge edge : graph.getEdges()) {
                     counter++;
-                    assertEquals(edge.getInVertex(), edge.getOutVertex());
-                    assertEquals(edge.getInVertex().getId(), edge.getOutVertex().getId());
+                    assertEquals(edge.getVertex(Direction.IN), edge.getVertex(Direction.OUT));
+                    assertEquals(edge.getVertex(Direction.IN).getId(), edge.getVertex(Direction.OUT).getId());
                 }
                 assertEquals(counter, 3);
             }
@@ -413,8 +413,8 @@ public class EdgeTestSuite extends TestSuite {
             if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(3, count(graph.getEdges()));
                 for (Edge edge : graph.getEdges()) {
-                    assertEquals(edge.getInVertex(), edge.getOutVertex());
-                    assertEquals(edge.getInVertex().getId(), edge.getOutVertex().getId());
+                    assertEquals(edge.getVertex(Direction.IN), edge.getVertex(Direction.OUT));
+                    assertEquals(edge.getVertex(Direction.IN).getId(), edge.getVertex(Direction.OUT).getId());
                 }
             }
 
@@ -422,8 +422,8 @@ public class EdgeTestSuite extends TestSuite {
             if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(2, count(graph.getEdges()));
                 for (Edge edge : graph.getEdges()) {
-                    assertEquals(edge.getInVertex(), edge.getOutVertex());
-                    assertEquals(edge.getInVertex().getId(), edge.getOutVertex().getId());
+                    assertEquals(edge.getVertex(Direction.IN), edge.getVertex(Direction.OUT));
+                    assertEquals(edge.getVertex(Direction.IN).getId(), edge.getVertex(Direction.OUT).getId());
                 }
             }
 
@@ -436,8 +436,8 @@ public class EdgeTestSuite extends TestSuite {
             if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 1);
                 for (Edge edge : graph.getEdges()) {
-                    assertEquals(edge.getInVertex(), edge.getOutVertex());
-                    assertEquals(edge.getInVertex().getId(), edge.getOutVertex().getId());
+                    assertEquals(edge.getVertex(Direction.IN), edge.getVertex(Direction.OUT));
+                    assertEquals(edge.getVertex(Direction.IN).getId(), edge.getVertex(Direction.OUT).getId());
                 }
             }
         }
@@ -466,14 +466,14 @@ public class EdgeTestSuite extends TestSuite {
                 edgeIds.add(e.getId().toString());
                 assertEquals(convertId(graph, "test"), e.getLabel());
                 if (e.getId().toString().equals(e1.getId().toString())) {
-                    assertEquals(v1, e.getOutVertex());
-                    assertEquals(v2, e.getInVertex());
+                    assertEquals(v1, e.getVertex(Direction.OUT));
+                    assertEquals(v2, e.getVertex(Direction.IN));
                 } else if (e.getId().toString().equals(e2.getId().toString())) {
-                    assertEquals(v2, e.getOutVertex());
-                    assertEquals(v3, e.getInVertex());
+                    assertEquals(v2, e.getVertex(Direction.OUT));
+                    assertEquals(v3, e.getVertex(Direction.IN));
                 } else if (e.getId().toString().equals(e3.getId().toString())) {
-                    assertEquals(v3, e.getOutVertex());
-                    assertEquals(v1, e.getInVertex());
+                    assertEquals(v3, e.getVertex(Direction.OUT));
+                    assertEquals(v1, e.getVertex(Direction.IN));
                 } else {
                     assertTrue(false);
                 }

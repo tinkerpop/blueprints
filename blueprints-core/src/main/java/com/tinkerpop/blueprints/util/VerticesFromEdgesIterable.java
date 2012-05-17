@@ -35,15 +35,15 @@ public class VerticesFromEdgesIterable implements Iterable<Vertex> {
 
             public Vertex next() {
                 if (direction.equals(Direction.OUT)) {
-                    return this.itty.next().getInVertex();
+                    return this.itty.next().getVertex(Direction.IN);
                 } else if (direction.equals(Direction.IN)) {
-                    return this.itty.next().getOutVertex();
+                    return this.itty.next().getVertex(Direction.OUT);
                 } else {
                     final Edge edge = this.itty.next();
-                    if (edge.getInVertex().equals(vertex))
-                        return edge.getOutVertex();
+                    if (edge.getVertex(Direction.IN).equals(vertex))
+                        return edge.getVertex(Direction.OUT);
                     else
-                        return edge.getInVertex();
+                        return edge.getVertex(Direction.IN);
                 }
             }
         };

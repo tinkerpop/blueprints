@@ -106,10 +106,6 @@ public class TinkerVertex extends TinkerElement implements Vertex, Serializable 
         return StringFactory.vertexString(this);
     }
 
-    public boolean equals(final Object object) {
-        return object instanceof TinkerVertex && ((TinkerVertex) object).getId().equals(this.getId());
-    }
-
     protected void addOutEdge(final String label, final Edge edge) {
         Set<Edge> edges = this.outEdges.get(label);
         if (null == edges) {

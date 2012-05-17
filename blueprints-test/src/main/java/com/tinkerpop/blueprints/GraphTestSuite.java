@@ -285,8 +285,8 @@ public class GraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 1);
 
-        assertEquals(v.getEdges(Direction.OUT).iterator().next().getInVertex(), u);
-        assertEquals(u.getEdges(Direction.IN).iterator().next().getOutVertex(), v);
+        assertEquals(v.getEdges(Direction.OUT).iterator().next().getVertex(Direction.IN), u);
+        assertEquals(u.getEdges(Direction.IN).iterator().next().getVertex(Direction.OUT), v);
         assertEquals(v.getEdges(Direction.OUT).iterator().next(), e);
         assertEquals(u.getEdges(Direction.IN).iterator().next(), e);
         graph.removeVertex(v);
@@ -442,8 +442,8 @@ public class GraphTestSuite extends TestSuite {
                 assertTrue(x.getLabel().equals(convertId(graph, "knows")) || x.getLabel().equals(convertId(graph, "hates")));
             }
             assertEquals(convertId(graph, "hates"), i.getLabel());
-            assertEquals(i.getInVertex().getId().toString(), convertId(graph, "2"));
-            assertEquals(i.getOutVertex().getId().toString(), convertId(graph, "1"));
+            assertEquals(i.getVertex(Direction.IN).getId().toString(), convertId(graph, "2"));
+            assertEquals(i.getVertex(Direction.OUT).getId().toString(), convertId(graph, "1"));
         }
 
         Set<Object> vertexIds = new HashSet<Object>();
@@ -477,27 +477,27 @@ public class GraphTestSuite extends TestSuite {
         assertTrue(results.contains(aFriendC));
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.OUT,convertId(graph, "friend")));
+        results = asList(a.getEdges(Direction.OUT, convertId(graph, "friend")));
         assertEquals(results.size(), 2);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(aFriendC));
 
-        results = asList(a.getEdges(Direction.OUT,convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.OUT, convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.IN,convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.IN, convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateA));
 
-        results = asList(a.getEdges(Direction.IN,convertId(graph, "friend")));
+        results = asList(a.getEdges(Direction.IN, convertId(graph, "friend")));
         assertEquals(results.size(), 0);
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "hate")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateB));
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "friend")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "friend")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(aFriendB));
 
@@ -517,22 +517,22 @@ public class GraphTestSuite extends TestSuite {
         Edge cHateB = graph.addEdge(null, c, b, convertId(graph, "hate"));
 
 
-        List<Edge> results = asList(a.getEdges(Direction.OUT,convertId(graph, "friend"), convertId(graph, "hate")));
+        List<Edge> results = asList(a.getEdges(Direction.OUT, convertId(graph, "friend"), convertId(graph, "hate")));
         assertEquals(results.size(), 3);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(aFriendC));
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.IN,convertId(graph, "friend"), convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.IN, convertId(graph, "friend"), convertId(graph, "hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateA));
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "friend"), convertId(graph, "hate")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "friend"), convertId(graph, "hate")));
         assertEquals(results.size(), 2);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(cHateB));
 
-        results = asList(b.getEdges(Direction.IN,convertId(graph, "blah"), convertId(graph, "blah2"), convertId(graph, "blah3")));
+        results = asList(b.getEdges(Direction.IN, convertId(graph, "blah"), convertId(graph, "blah2"), convertId(graph, "blah3")));
         assertEquals(results.size(), 0);
 
         graph.shutdown();
@@ -561,16 +561,16 @@ public class GraphTestSuite extends TestSuite {
         assertEquals(branchSize, count(start.getEdges(Direction.OUT)));
         for (Edge e : start.getEdges(Direction.OUT)) {
             assertEquals(convertId(graph, "test1"), e.getLabel());
-            assertEquals(branchSize, count(e.getInVertex().getEdges(Direction.OUT)));
-            assertEquals(1, count(e.getInVertex().getEdges(Direction.IN)));
-            for (Edge f : e.getInVertex().getEdges(Direction.OUT)) {
+            assertEquals(branchSize, count(e.getVertex(Direction.IN).getEdges(Direction.OUT)));
+            assertEquals(1, count(e.getVertex(Direction.IN).getEdges(Direction.IN)));
+            for (Edge f : e.getVertex(Direction.IN).getEdges(Direction.OUT)) {
                 assertEquals(convertId(graph, "test2"), f.getLabel());
-                assertEquals(branchSize, count(f.getInVertex().getEdges(Direction.OUT)));
-                assertEquals(1, count(f.getInVertex().getEdges(Direction.IN)));
-                for (Edge g : f.getInVertex().getEdges(Direction.OUT)) {
+                assertEquals(branchSize, count(f.getVertex(Direction.IN).getEdges(Direction.OUT)));
+                assertEquals(1, count(f.getVertex(Direction.IN).getEdges(Direction.IN)));
+                for (Edge g : f.getVertex(Direction.IN).getEdges(Direction.OUT)) {
                     assertEquals(convertId(graph, "test3"), g.getLabel());
-                    assertEquals(0, count(g.getInVertex().getEdges(Direction.OUT)));
-                    assertEquals(1, count(g.getInVertex().getEdges(Direction.IN)));
+                    assertEquals(0, count(g.getVertex(Direction.IN).getEdges(Direction.OUT)));
+                    assertEquals(1, count(g.getVertex(Direction.IN).getEdges(Direction.IN)));
                 }
             }
         }

@@ -85,7 +85,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         FEATURES.supportsLongProperty = false;
         FEATURES.supportsMapProperty = false;
         FEATURES.supportsStringProperty = false;
-        FEATURES.supportsThreadedTransactions= false;
+        FEATURES.supportsThreadedTransactions = false;
     }
 
     static {
@@ -138,7 +138,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     public SailGraph(final Sail sail) {
         try {
             PropertyConfigurator.configure(SailGraph.class.getResource(LOG4J_PROPERTIES));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // TODO: uncomment this?
             //e.printStackTrace(System.err);
         }
@@ -315,6 +315,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     /**
      * Load RDF data into the SailGraph. Supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig.
+     * Before loading data, the current transaction is successfully committed.
      *
      * @param input     the InputStream of RDF data
      * @param baseURI   the baseURI for RDF data
@@ -323,6 +324,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      */
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
         try {
+            this.stopTransaction(Conclusion.SUCCESS);
             final SailConnection c = this.rawGraph.getConnection();
             try {
                 RDFParser p = Rio.createParser(getFormat(format));

@@ -1,7 +1,10 @@
 package com.tinkerpop.blueprints.impls.sail;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ElementHelper;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -97,12 +100,13 @@ public class SailEdge implements Edge {
         }
     }
 
-    public Vertex getInVertex() {
-        return new SailVertex(this.rawEdge.getObject(), this.graph);
-    }
-
-    public Vertex getOutVertex() {
-        return new SailVertex(this.rawEdge.getSubject(), this.graph);
+    public Vertex getVertex(final Direction direction) {
+        if (direction.equals(Direction.OUT))
+            return new SailVertex(this.rawEdge.getSubject(), this.graph);
+        else if (direction.equals(Direction.IN))
+            return new SailVertex(this.rawEdge.getObject(), this.graph);
+        else
+            throw ExceptionFactory.bothIsNotSupported();
     }
 
     public String toString() {
@@ -140,7 +144,7 @@ public class SailEdge implements Edge {
     }
 
     public boolean equals(final Object object) {
-        return object instanceof SailEdge && ((SailEdge) object).getId().equals(this.getId());
+        return ElementHelper.areEqual(this, object);
     }
 
     public int hashCode() {

@@ -37,15 +37,15 @@ public class GMLReaderTest {
 
         Iterable<Edge> out1 = v1.getEdges(Direction.OUT);
         Edge e1 = out1.iterator().next();
-        Assert.assertEquals(v2, e1.getInVertex());
+        Assert.assertEquals(v2, e1.getVertex(Direction.IN));
 
         Iterable<Edge> out2 = v2.getEdges(Direction.OUT);
         Edge e2 = out2.iterator().next();
-        Assert.assertEquals(v3, e2.getInVertex());
+        Assert.assertEquals(v3, e2.getVertex(Direction.IN));
 
         Iterable<Edge> out3 = v3.getEdges(Direction.OUT);
         Edge e3 = out3.iterator().next();
-        Assert.assertEquals(v1, e3.getInVertex());
+        Assert.assertEquals(v1, e3.getVertex(Direction.IN));
 
     }
 

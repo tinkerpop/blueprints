@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
@@ -240,7 +241,7 @@ public class SailVertex implements Vertex {
     }
 
     public boolean equals(final Object object) {
-        return object instanceof SailVertex && ((SailVertex) object).getId().equals(this.getId());
+        return ElementHelper.areEqual(this, object);
     }
 
     public Object getId() {

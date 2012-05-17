@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -20,8 +21,8 @@ public class EdgeHelper {
      * @return the newly created edge
      */
     public static Edge relabelEdge(final Graph graph, final Edge oldEdge, final Object newId, final String newLabel) {
-        final Vertex outVertex = oldEdge.getOutVertex();
-        final Vertex inVertex = oldEdge.getInVertex();
+        final Vertex outVertex = oldEdge.getVertex(Direction.OUT);
+        final Vertex inVertex = oldEdge.getVertex(Direction.IN);
         final Edge newEdge = graph.addEdge(newId, outVertex, inVertex, newLabel);
         ElementHelper.copyProperties(oldEdge, newEdge);
         graph.removeEdge(oldEdge);
@@ -38,8 +39,8 @@ public class EdgeHelper {
      */
     public static void relabelEdges(final Graph graph, final Iterable<Edge> oldEdges, final String newLabel) {
         for (final Edge oldEdge : oldEdges) {
-            final Vertex outVertex = oldEdge.getOutVertex();
-            final Vertex inVertex = oldEdge.getInVertex();
+            final Vertex outVertex = oldEdge.getVertex(Direction.OUT);
+            final Vertex inVertex = oldEdge.getVertex(Direction.IN);
             final Edge newEdge = graph.addEdge(null, outVertex, inVertex, newLabel);
             ElementHelper.copyProperties(oldEdge, newEdge);
             graph.removeEdge(oldEdge);

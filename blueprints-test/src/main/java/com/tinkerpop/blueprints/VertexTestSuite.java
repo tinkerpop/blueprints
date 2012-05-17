@@ -7,6 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.tinkerpop.blueprints.Direction.BOTH;
+import static com.tinkerpop.blueprints.Direction.IN;
+import static com.tinkerpop.blueprints.Direction.OUT;
+
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -405,6 +409,79 @@ public class VertexTestSuite extends TestSuite {
             }
             assertEquals(count(graph.getVertices()), 0);
         }
+        graph.shutdown();
+    }
+
+    public void testGettingEdgesAndVertices() {
+        Graph graph = graphTest.generateGraph();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        Vertex c = graph.addVertex(null);
+        Edge w = graph.addEdge(null, a, b, convertId(graph, "knows"));
+        Edge x = graph.addEdge(null, b, c, convertId(graph, "knows"));
+        Edge y = graph.addEdge(null, a, c, convertId(graph, "hates"));
+        Edge z = graph.addEdge(null, a, b, convertId(graph, "hates"));
+        Edge zz = graph.addEdge(null, c, c, convertId(graph, "hates"));
+
+        assertEquals(count(a.getEdges(OUT)), 3);
+        assertEquals(count(a.getEdges(OUT, convertId(graph, "hates"))), 2);
+        assertEquals(count(a.getEdges(OUT, convertId(graph, "knows"))), 1);
+        assertEquals(count(a.getVertices(OUT)), 3);
+        assertEquals(count(a.getVertices(OUT, convertId(graph, "hates"))), 2);
+        assertEquals(count(a.getVertices(OUT, convertId(graph, "knows"))), 1);
+        assertEquals(count(a.getVertices(BOTH)), 3);
+        assertEquals(count(a.getVertices(BOTH, convertId(graph, "hates"))), 2);
+        assertEquals(count(a.getVertices(BOTH, convertId(graph, "knows"))), 1);
+
+        assertTrue(asList(a.getEdges(OUT)).contains(w));
+        assertTrue(asList(a.getEdges(OUT)).contains(y));
+        assertTrue(asList(a.getEdges(OUT)).contains(z));
+        assertTrue(asList(a.getVertices(OUT)).contains(b));
+        assertTrue(asList(a.getVertices(OUT)).contains(c));
+
+        assertTrue(asList(a.getEdges(OUT, convertId(graph, "knows"))).contains(w));
+        assertFalse(asList(a.getEdges(OUT, convertId(graph, "knows"))).contains(y));
+        assertFalse(asList(a.getEdges(OUT, convertId(graph, "knows"))).contains(z));
+        assertTrue(asList(a.getVertices(OUT, convertId(graph, "knows"))).contains(b));
+        assertFalse(asList(a.getVertices(OUT, convertId(graph, "knows"))).contains(c));
+
+        assertFalse(asList(a.getEdges(OUT, convertId(graph, "hates"))).contains(w));
+        assertTrue(asList(a.getEdges(OUT, convertId(graph, "hates"))).contains(y));
+        assertTrue(asList(a.getEdges(OUT, convertId(graph, "hates"))).contains(z));
+        assertTrue(asList(a.getVertices(OUT, convertId(graph, "hates"))).contains(b));
+        assertTrue(asList(a.getVertices(OUT, convertId(graph, "hates"))).contains(c));
+
+        assertEquals(count(a.getVertices(IN)), 0);
+        assertEquals(count(a.getVertices(IN, convertId(graph, "knows"))), 0);
+        assertEquals(count(a.getVertices(IN, convertId(graph, "hates"))), 0);
+        assertTrue(asList(a.getEdges(OUT)).contains(w));
+        assertTrue(asList(a.getEdges(OUT)).contains(y));
+        assertTrue(asList(a.getEdges(OUT)).contains(z));
+
+        assertEquals(count(b.getEdges(BOTH)), 3);
+        assertEquals(count(b.getEdges(BOTH, convertId(graph, "knows"))), 2);
+        assertTrue(asList(b.getEdges(BOTH, convertId(graph, "knows"))).contains(x));
+        assertTrue(asList(b.getEdges(BOTH, convertId(graph, "knows"))).contains(w));
+        assertTrue(asList(b.getVertices(BOTH, convertId(graph, "knows"))).contains(a));
+        assertTrue(asList(b.getVertices(BOTH, convertId(graph, "knows"))).contains(c));
+
+        assertEquals(count(c.getEdges(BOTH, convertId(graph, "hates"))), 3);
+        assertEquals(count(c.getVertices(BOTH, convertId(graph, "hates"))), 3);
+        assertEquals(count(c.getEdges(BOTH, convertId(graph, "knows"))), 1);
+        assertTrue(asList(c.getEdges(BOTH, convertId(graph, "hates"))).contains(y));
+        assertTrue(asList(c.getEdges(BOTH, convertId(graph, "hates"))).contains(zz));
+        assertTrue(asList(c.getVertices(BOTH, convertId(graph, "hates"))).contains(a));
+        assertTrue(asList(c.getVertices(BOTH, convertId(graph, "hates"))).contains(c));
+        assertEquals(count(c.getEdges(IN, convertId(graph, "hates"))), 2);
+        assertEquals(count(c.getEdges(OUT, convertId(graph, "hates"))), 1);
+
+        try {
+            x.getVertex(BOTH);
+            assertTrue(false);
+        } catch (IllegalArgumentException e) {
+            assertTrue(true);
+        }
+
         graph.shutdown();
     }
 }

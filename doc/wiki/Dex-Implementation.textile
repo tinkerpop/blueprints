@@ -39,7 +39,7 @@ For example, if we execute a long traversal like this:
 ```java
 for (final Vertex vertex : graph.getVertices()) {
     for (final Edge edge : vertex.getOutEdges()) {
-        final Vertex vertex2 = edge.getInVertex();
+        final Vertex vertex2 = edge.getVertex(Direction.IN);
         for (final Edge edge2 : vertex2.getOutEdges()) {
             ...
         }
@@ -54,7 +54,7 @@ DexIterable<Vertex> vv = (DexIterable<Vertex>)graph.getVertices();
 for (final Vertex vertex : vv) {
     DexIterable<Edge> ee = (DexIterable<Edge>)vertex.getOutEdges();
     for (final Edge edge : ee) {
-        final Vertex vertex2 = edge.getInVertex();
+        final Vertex vertex2 = edge.getVertex(Direction.IN);
         DexIterable<Edge> ee2 = (DexIterable<Edge>)vertex2.getOutEdges();
         for (final Edge edge2 : ee2) {
             ...

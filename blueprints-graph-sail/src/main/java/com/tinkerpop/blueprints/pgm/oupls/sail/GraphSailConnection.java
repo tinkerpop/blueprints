@@ -394,8 +394,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     private void removeEdge(final Edge edge) {
-        Vertex h = edge.getInVertex();
-        Vertex t = edge.getOutVertex();
+        Vertex h = edge.getVertex(Direction.IN);
+        Vertex t = edge.getVertex(Direction.OUT);
         store.graph.removeEdge(edge);
         if (!h.getEdges(Direction.IN).iterator().hasNext() && !h.getEdges(Direction.OUT).iterator().hasNext()) {
             try {
@@ -637,9 +637,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private void fillStatement(final SimpleStatement s,
                                final Edge e) {
-        s.subject = (Resource) toSesame(e.getOutVertex());
+        s.subject = (Resource) toSesame(e.getVertex(Direction.OUT));
         s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
-        s.object = toSesame(e.getInVertex());
+        s.object = toSesame(e.getVertex(Direction.IN));
         s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
     }
 

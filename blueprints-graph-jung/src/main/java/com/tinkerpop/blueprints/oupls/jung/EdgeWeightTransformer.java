@@ -28,7 +28,7 @@ public class EdgeWeightTransformer implements Transformer<Edge, Number> {
             if (this.invert)
                 weight = 1.0d / weight;
             if (this.normalize) {
-                return weight / JungHelper.totalWeight(edge.getOutVertex().getEdges(Direction.OUT), this.weightKey);
+                return weight / JungHelper.totalWeight(edge.getVertex(Direction.OUT).getEdges(Direction.OUT), this.weightKey);
             } else {
                 return weight;
             }

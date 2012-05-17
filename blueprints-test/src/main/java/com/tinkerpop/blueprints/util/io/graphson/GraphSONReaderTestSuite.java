@@ -36,17 +36,17 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(marko.getProperty("age"), 29);
             int counter = 0;
             for (Edge e : graph.getVertex("1").getEdges(Direction.OUT)) {
-                if (e.getInVertex().getId().equals("2")) {
+                if (e.getVertex(Direction.IN).getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getLabel(), "knows");
                     assertEquals(e.getId(), "7");
                     counter++;
-                } else if (e.getInVertex().getId().equals("3")) {
+                } else if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 0);
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "9");
                     counter++;
-                } else if (e.getInVertex().getId().equals("4")) {
+                } else if (e.getVertex(Direction.IN).getId().equals("4")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 1);
                     assertEquals(e.getLabel(), "knows");
                     assertEquals(e.getId(), "8");
@@ -60,12 +60,12 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), 32);
             for (Edge e : graph.getVertex("4").getEdges(Direction.OUT)) {
-                if (e.getInVertex().getId().equals("3")) {
+                if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 0);
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "11");
                     counter++;
-                } else if (e.getInVertex().getId().equals("5")) {
+                } else if (e.getVertex(Direction.IN).getId().equals("5")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 1);
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "10");
@@ -205,7 +205,7 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(count(marko.getEdges(Direction.OUT)), 3);
             assertEquals(count(marko.getEdges(Direction.IN)), 0);
             for (Edge e : marko.getEdges(Direction.OUT)) {
-                vertices.add(e.getInVertex());
+                vertices.add(e.getVertex(Direction.IN));
             }
             assertEquals(vertices.size(), 3);
             assertTrue(vertices.contains(lop));
@@ -219,7 +219,7 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(count(peter.getEdges(Direction.OUT)), 1);
             assertEquals(count(peter.getEdges(Direction.IN)), 0);
             for (Edge e : peter.getEdges(Direction.OUT)) {
-                vertices.add(e.getInVertex());
+                vertices.add(e.getVertex(Direction.IN));
             }
             assertEquals(vertices.size(), 1);
             assertTrue(vertices.contains(lop));
@@ -231,14 +231,14 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(count(josh.getEdges(Direction.OUT)), 2);
             assertEquals(count(josh.getEdges(Direction.IN)), 1);
             for (Edge e : josh.getEdges(Direction.OUT)) {
-                vertices.add(e.getInVertex());
+                vertices.add(e.getVertex(Direction.IN));
             }
             assertEquals(vertices.size(), 2);
             assertTrue(vertices.contains(lop));
             assertTrue(vertices.contains(ripple));
             vertices = new HashSet<Vertex>();
             for (Edge e : josh.getEdges(Direction.IN)) {
-                vertices.add(e.getOutVertex());
+                vertices.add(e.getVertex(Direction.OUT));
             }
             assertEquals(vertices.size(), 1);
             assertTrue(vertices.contains(marko));
@@ -250,7 +250,7 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(count(vadas.getEdges(Direction.OUT)), 0);
             assertEquals(count(vadas.getEdges(Direction.IN)), 1);
             for (Edge e : vadas.getEdges(Direction.IN)) {
-                vertices.add(e.getOutVertex());
+                vertices.add(e.getVertex(Direction.OUT));
             }
             assertEquals(vertices.size(), 1);
             assertTrue(vertices.contains(marko));
@@ -262,7 +262,7 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(count(lop.getEdges(Direction.OUT)), 0);
             assertEquals(count(lop.getEdges(Direction.IN)), 3);
             for (Edge e : lop.getEdges(Direction.IN)) {
-                vertices.add(e.getOutVertex());
+                vertices.add(e.getVertex(Direction.OUT));
             }
             assertEquals(vertices.size(), 3);
             assertTrue(vertices.contains(marko));
@@ -276,7 +276,7 @@ public class GraphSONReaderTestSuite extends TestSuite {
             assertEquals(count(ripple.getEdges(Direction.OUT)), 0);
             assertEquals(count(ripple.getEdges(Direction.IN)), 1);
             for (Edge e : ripple.getEdges(Direction.IN)) {
-                vertices.add(e.getOutVertex());
+                vertices.add(e.getVertex(Direction.OUT));
             }
             assertEquals(vertices.size(), 1);
             assertTrue(vertices.contains(josh));

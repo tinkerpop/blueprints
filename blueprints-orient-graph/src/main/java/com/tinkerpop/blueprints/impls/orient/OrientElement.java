@@ -10,6 +10,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
@@ -103,20 +104,8 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
         return result;
     }
 
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final OrientElement other = (OrientElement) obj;
-        if (this.rawElement == null) {
-            if (other.rawElement != null)
-                return false;
-        } else if (!this.rawElement.equals(other.rawElement))
-            return false;
-        return true;
+    public boolean equals(final Object object) {
+        return ElementHelper.areEqual(this, object);
     }
 
     @Override
@@ -134,7 +123,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
     @Override
     public ORID getIdentity() {
         ORID rid = this.rawElement.getIdentity();
-        if( !rid.isValid() )
+        if (!rid.isValid())
             this.save();
         return rid;
     }

@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
@@ -62,8 +63,8 @@ public class GraphSONReaderTest {
         Edge e = graph.getEdge(100);
         Assert.assertNotNull(e);
         Assert.assertEquals("works", e.getLabel());
-        Assert.assertEquals(v1, e.getOutVertex());
-        Assert.assertEquals(v2, e.getInVertex());
+        Assert.assertEquals(v1, e.getVertex(Direction.OUT));
+        Assert.assertEquals(v2, e.getVertex(Direction.IN));
         Assert.assertEquals("please worke", e.getProperty("teste"));
         Assert.assertNull(e.getProperty("keyNull"));
 
@@ -113,8 +114,8 @@ public class GraphSONReaderTest {
         Edge e = graph.getEdge(100);
         Assert.assertNotNull(e);
         Assert.assertEquals("works", e.getLabel());
-        Assert.assertEquals(v1, e.getOutVertex());
-        Assert.assertEquals(v2, e.getInVertex());
+        Assert.assertEquals(v1, e.getVertex(Direction.OUT));
+        Assert.assertEquals(v2, e.getVertex(Direction.IN));
         Assert.assertEquals("please worke", e.getProperty("teste"));
         Assert.assertNull(e.getProperty("keyNull"));
 

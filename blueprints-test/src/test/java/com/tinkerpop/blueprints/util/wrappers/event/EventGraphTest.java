@@ -140,8 +140,8 @@ public class EventGraphTest extends GraphTest {
             edge.removeProperty("weight");
             assertNull(edge.getProperty("weight"));
 
-            assertTrue(edge.getOutVertex() instanceof EventVertex);
-            assertTrue(edge.getInVertex() instanceof EventVertex);
+            assertTrue(edge.getVertex(Direction.OUT) instanceof EventVertex);
+            assertTrue(edge.getVertex(Direction.IN) instanceof EventVertex);
         }
     }
 

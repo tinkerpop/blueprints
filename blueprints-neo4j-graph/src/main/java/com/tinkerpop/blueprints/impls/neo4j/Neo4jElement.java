@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.neo4j;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.neo4j.graphdb.Node;
@@ -88,7 +89,7 @@ public abstract class Neo4jElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return (null != object) && (this.getClass().equals(object.getClass()) && this.getId().equals(((Element) object).getId()));
+        return ElementHelper.areEqual(this, object);
     }
 
     private Object tryConvertCollectionToArray(final Object value) {

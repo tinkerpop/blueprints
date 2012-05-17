@@ -47,7 +47,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     private GraphDatabaseService rawGraph;
     private static final String INDEXED_KEYS_POSTFIX = ":indexed_keys";
 
-    private final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {
+    protected final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {
         protected Transaction initialValue() {
             return null;
         }
@@ -296,14 +296,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     /**
      * {@inheritDoc}
      * <p/>
-     * The underlying Neo4j graph does not support this method within a transaction.
-     * Calling this method will commit the current transaction successfully and then return the vertex iterable.
+     * The underlying Neo4j graph does not natively support this method within a transaction.
+     * If the graph is not currently in a transaction, then the operation runs efficiently.
+     * If the graph is in a transaction, then, for every vertex, a try/catch is used to determine if its in the current transaction.
      *
      * @return all the vertices in the graph
      */
     public Iterable<Vertex> getVertices() {
-        //this.stopTransaction(Conclusion.SUCCESS);
-        return new Neo4jVertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, true);
+        return new Neo4jVertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, this.tx.get() != null);
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
@@ -316,14 +316,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     /**
      * {@inheritDoc}
      * <p/>
-     * The underlying Neo4j graph does not support this method within a transaction.
-     * Calling this method will commit the current transaction successfully and then return the edge iterable.
+     * The underlying Neo4j graph does not natively support this method within a transaction.
+     * If the graph is not currently in a transaction, then the operation runs efficiently.
+     * If the graph is in a transaction, then, for every edge, a try/catch is used to determine if its in the current transaction.
      *
      * @return all the edges in the graph
      */
     public Iterable<Edge> getEdges() {
-        //this.stopTransaction(Conclusion.SUCCESS);
-        return new Neo4jEdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, true);
+        return new Neo4jEdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, this.tx.get() != null);
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {

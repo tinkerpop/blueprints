@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.partition;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Features;
@@ -159,8 +160,8 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(graph.getWritePartition(), "c");
         assertEquals(count(graph.getVertices()), 0);
         assertEquals(count(graph.getEdges()), 1);
-        assertEquals(knows.getInVertex(), peter);
-        assertEquals(knows.getOutVertex(), marko);
+        assertEquals(knows.getVertex(Direction.IN), peter);
+        assertEquals(knows.getVertex(Direction.OUT), marko);
 
         // testing indices
         /*marko.setProperty("name", "marko");

@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
-import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;

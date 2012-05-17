@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.partition;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
@@ -12,12 +13,8 @@ public class PartitionEdge extends PartitionElement implements Edge {
         super(baseEdge, graph);
     }
 
-    public Vertex getInVertex() {
-        return new PartitionVertex(((Edge) baseElement).getInVertex(), this.graph);
-    }
-
-    public Vertex getOutVertex() {
-        return new PartitionVertex(((Edge) baseElement).getOutVertex(), this.graph);
+    public Vertex getVertex(final Direction direction) throws IllegalArgumentException {
+        return new PartitionVertex(((Edge) baseElement).getVertex(direction), graph);
     }
 
     public String getLabel() {
