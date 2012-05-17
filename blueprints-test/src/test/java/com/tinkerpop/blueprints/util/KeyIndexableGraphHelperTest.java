@@ -19,7 +19,7 @@ public class KeyIndexableGraphHelperTest extends BaseTest {
         assertEquals(count(graph.getVertices("name", "marko")), 1);
         assertEquals(graph.getVertices("name", "marko").iterator().next(), graph.getVertex(1));
         graph.createKeyIndex("name", Vertex.class);
-        KeyIndexableGraphHelper.reIndexElements(graph, graph.getVertices(), new HashSet<String>(Arrays.asList("name")));
+        //KeyIndexableGraphHelper.reIndexElements(graph, graph.getVertices(), new HashSet<String>(Arrays.asList("name")));
         assertFalse(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
         assertEquals(count(graph.getVertices("name", "marko")), 1);
         assertEquals(graph.getVertices("name", "marko").iterator().next(), graph.getVertex(1));
