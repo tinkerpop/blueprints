@@ -52,6 +52,12 @@ public class DexGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
+    /*public void testKeyIndexableGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new KeyIndexableGraphTestSuite(this));
+        printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
+    }*/
+
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
@@ -98,7 +104,7 @@ public class DexGraphTest extends GraphTest {
         BaseTest.printPerformance(graph.toString(), 1, "validate label is protected", this.stopWatch());
         graph.shutdown();
     }
-    
+
     public Graph generateGraph() {
         String db = System.getProperty("dexGraphFile");
         if (db == null)

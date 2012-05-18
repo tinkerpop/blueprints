@@ -10,13 +10,10 @@ import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.MultiIterable;
-import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -158,13 +155,12 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     /**
      * Adds a Vertex or retrieves an existing one.
-     * 
-     * @param id
-     *            In case this is <code>null</code> it adds a new vertex with
-     *            the default label ({@link #DEFAULT_DEX_VERTEX_LABEL}). In case
-     *            this is a string, it will be the label for the new vertex.
-     *            Otherwise, it will try to retrieve an already existing vertex
-     *            using the given id somehow.
+     *
+     * @param id In case this is <code>null</code> it adds a new vertex with
+     *           the default label ({@link #DEFAULT_DEX_VERTEX_LABEL}). In case
+     *           this is a string, it will be the label for the new vertex.
+     *           Otherwise, it will try to retrieve an already existing vertex
+     *           using the given id somehow.
      * @return Added or retrieved Vertex.
      * @see com.tinkerpop.blueprints.Graph#addVertex(java.lang.Object)
      */
@@ -252,7 +248,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             }
             return null;
         }
-        
+
         com.sparsity.dex.gdb.TypeList tlist = this.getRawGraph().findNodeTypes();
         List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer type : tlist) {
@@ -267,7 +263,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             }
         }
         tlist = null;
-        
+
         if (vertices.size() > 0) return new MultiIterable<Vertex>(vertices);
         else throw new IllegalArgumentException("The given attribute '" + key + "' does not exist");
     }
@@ -360,7 +356,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             }
             return null;
         }
-        
+
         com.sparsity.dex.gdb.TypeList tlist = this.getRawGraph().findEdgeTypes();
         List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer type : tlist) {
@@ -375,7 +371,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             }
         }
         tlist = null;
-        
+
         if (edges.size() > 0) return new MultiIterable<Edge>(edges);
         else throw new IllegalArgumentException("The given attribute '" + key + "' does not exist");
     }
@@ -441,19 +437,19 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         return this.getRawGraph().select(adata.getId(), com.sparsity.dex.gdb.Condition.Equal, v);
     }
 
-	@Override
-	public <T extends Element> void dropKeyIndex(String key,
-			Class<T> elementClass) {
-	    throw new UnsupportedOperationException();
-	}
+    @Override
+    public <T extends Element> void dropKeyIndex(String key,
+                                                 Class<T> elementClass) {
+        throw new UnsupportedOperationException();
+    }
 
-	@Override
-	public <T extends Element> void createKeyIndex(String key,
-			Class<T> elementClass) {
+    @Override
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+
         com.sparsity.dex.gdb.TypeList tlist = null;
         if (Vertex.class.isAssignableFrom(elementClass)) {
             tlist = this.getRawGraph().findNodeTypes();
-        } else if(Edge.class.isAssignableFrom(elementClass)) {
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
             tlist = this.getRawGraph().findEdgeTypes();
         } else {
             throw ExceptionFactory.classIsNotIndexable(elementClass);
@@ -470,14 +466,14 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         if (!found) {
             throw new IllegalArgumentException("There is no '" + key + "' attribute");
         }
-	}
+    }
 
-	@Override
-	public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+    @Override
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
         com.sparsity.dex.gdb.TypeList tlist = null;
         if (Vertex.class.isAssignableFrom(elementClass)) {
             tlist = this.getRawGraph().findNodeTypes();
-        } else if(Edge.class.isAssignableFrom(elementClass)) {
+        } else if (Edge.class.isAssignableFrom(elementClass)) {
             tlist = this.getRawGraph().findEdgeTypes();
         } else {
             throw ExceptionFactory.classIsNotIndexable(elementClass);
@@ -495,6 +491,6 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         }
         tlist = null;
         return ret;
-	}
+    }
 
 }
