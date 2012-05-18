@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.util.wrappers.event;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgePropertyChangedEvent;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgePropertyRemovedEvent;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
@@ -96,7 +97,7 @@ public class EventElement implements Element {
     }
 
     public boolean equals(final Object object) {
-        return null != object && (object.getClass().equals(this.getClass())) && this.baseElement.getId().equals(((EventElement) object).getId());
+        return ElementHelper.areEqual(this, object);
     }
 
     public Element getBaseElement() {

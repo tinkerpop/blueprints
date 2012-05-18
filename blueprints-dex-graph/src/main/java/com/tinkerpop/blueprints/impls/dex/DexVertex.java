@@ -56,7 +56,7 @@ public class DexVertex extends DexElement implements Vertex {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer etype : tlist) {
-        	edges.add(getOutEdgesSingleType(etype));
+            edges.add(getOutEdgesSingleType(etype));
         }
         tlist = null;
         return new MultiIterable<Edge>(edges);
@@ -66,7 +66,7 @@ public class DexVertex extends DexElement implements Vertex {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer etype : tlist) {
-        	vertices.add(getOutVerticesSingleType(etype));
+            vertices.add(getOutVerticesSingleType(etype));
         }
         tlist = null;
         return new MultiIterable<Vertex>(vertices);
@@ -76,7 +76,7 @@ public class DexVertex extends DexElement implements Vertex {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer etype : tlist) {
-        	edges.add(getInEdgesSingleType(etype));
+            edges.add(getInEdgesSingleType(etype));
         }
         tlist = null;
         return new MultiIterable<Edge>(edges);
@@ -86,7 +86,7 @@ public class DexVertex extends DexElement implements Vertex {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer etype : tlist) {
-        	vertices.add(getInVerticesSingleType(etype));
+            vertices.add(getInVerticesSingleType(etype));
         }
         tlist = null;
         return new MultiIterable<Vertex>(vertices);
@@ -174,7 +174,7 @@ public class DexVertex extends DexElement implements Vertex {
         } else {
             final List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
             for (final String label : labels) {
-            	vertices.add(this.getInVerticesSingleLabel(label));
+                vertices.add(this.getInVerticesSingleLabel(label));
             }
             return new MultiIterable<Vertex>(vertices);
         }
@@ -202,7 +202,7 @@ public class DexVertex extends DexElement implements Vertex {
         } else {
             final List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
             for (final String label : labels) {
-            	vertices.add(this.getOutVerticesSingleLabel(label));
+                vertices.add(this.getOutVerticesSingleLabel(label));
             }
             return new MultiIterable<Vertex>(vertices);
         }

@@ -3,7 +3,9 @@ package com.tinkerpop.blueprints.util.wrappers.event.listener;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class StubGraphChangedListener implements GraphChangedListener {
     private int addEdgeEvent = 0;
@@ -15,7 +17,7 @@ public class StubGraphChangedListener implements GraphChangedListener {
     private int edgePropertyRemovedEvent = 0;
     private int edgeRemovedEvent = 0;
 
-    private final LinkedList<String> order = new LinkedList<String>();
+    private final List<String> order = new ArrayList<String>();
 
     public void reset() {
         addEdgeEvent = 0;
@@ -30,7 +32,7 @@ public class StubGraphChangedListener implements GraphChangedListener {
         order.clear();
     }
 
-    public LinkedList<String> getOrder() {
+    public List<String> getOrder() {
         return this.order;
     }
 

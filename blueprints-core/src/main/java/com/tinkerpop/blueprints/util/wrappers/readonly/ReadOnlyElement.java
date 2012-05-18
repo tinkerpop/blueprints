@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.ElementHelper;
 
 import java.util.Set;
 
@@ -49,7 +50,7 @@ public class ReadOnlyElement implements Element {
         return this.baseElement.hashCode();
     }
 
-    public boolean equals(Object object) {
-        return null != object && (object.getClass().equals(this.getClass())) && this.baseElement.getId().equals(((ReadOnlyElement) object).getId());
+    public boolean equals(final Object object) {
+        return ElementHelper.areEqual(this, object);
     }
 }

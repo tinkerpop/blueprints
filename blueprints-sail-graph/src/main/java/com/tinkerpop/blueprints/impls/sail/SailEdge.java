@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.sail;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
@@ -143,7 +144,7 @@ public class SailEdge implements Edge {
     }
 
     public boolean equals(final Object object) {
-        return object instanceof SailEdge && ((SailEdge) object).getId().equals(this.getId());
+        return ElementHelper.areEqual(this, object);
     }
 
     public int hashCode() {

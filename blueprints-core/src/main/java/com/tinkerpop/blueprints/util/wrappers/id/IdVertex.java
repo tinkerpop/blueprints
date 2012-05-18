@@ -40,9 +40,4 @@ public class IdVertex extends IdElement implements Vertex {
             }
         };
     }
-
-    @Override
-    public boolean equals(final Object other) {
-        return other instanceof IdVertex && ((Vertex) other).getId().equals(getId());
-    }
 }

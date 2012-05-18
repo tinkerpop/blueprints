@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.tg;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
@@ -62,5 +63,9 @@ public abstract class TinkerElement implements Element, Serializable {
 
     public String getId() {
         return this.id;
+    }
+
+    public boolean equals(final Object object) {
+        return ElementHelper.areEqual(this, object);
     }
 }

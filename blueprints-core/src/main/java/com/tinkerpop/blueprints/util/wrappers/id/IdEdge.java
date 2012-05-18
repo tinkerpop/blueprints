@@ -24,9 +24,4 @@ public class IdEdge extends IdElement implements Edge {
     public String getLabel() {
         return ((Edge) this.baseElement).getLabel();
     }
-
-    @Override
-    public boolean equals(final Object other) {
-        return other instanceof IdEdge && ((Edge) other).getId().equals(getId());
-    }
 }

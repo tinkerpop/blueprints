@@ -11,6 +11,7 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
+import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
@@ -21,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -384,18 +386,11 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                 return;
 
             this.indexedKeys.add(key);
+
             if (TinkerVertex.class.equals(this.indexClass)) {
-                for (final Vertex vertex : graph.getVertices()) {
-                    if (vertex.getPropertyKeys().contains(key)) {
-                        this.put(key, vertex.getProperty(key), (T) vertex);
-                    }
-                }
+                KeyIndexableGraphHelper.reIndexElements(graph, graph.getVertices(), new HashSet<String>(Arrays.asList(key)));
             } else {
-                for (final Edge edge : graph.getEdges()) {
-                    if (edge.getPropertyKeys().contains(key)) {
-                        this.put(key, edge.getProperty(key), (T) edge);
-                    }
-                }
+                KeyIndexableGraphHelper.reIndexElements(graph, graph.getEdges(), new HashSet<String>(Arrays.asList(key)));
             }
         }
 
