@@ -20,7 +20,6 @@ public class QueryTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (!graph.getFeatures().isRDFModel) {
 
-
             Vertex a = graph.addVertex(null);
             Vertex b = graph.addVertex(null);
             Vertex c = graph.addVertex(null);
@@ -183,8 +182,6 @@ public class QueryTestSuite extends TestSuite {
             results = asList(a.query().direction(Direction.OUT).labels("friend").limit(0).vertices());
             assertEquals(results.size(), 0);
             assertEquals(a.query().direction(Direction.OUT).labels("friend").limit(0).count(), 0);
-
-
         }
         graph.shutdown();
 
