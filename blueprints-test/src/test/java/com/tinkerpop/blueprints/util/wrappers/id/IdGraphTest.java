@@ -13,6 +13,7 @@ import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 
 import java.lang.reflect.Method;
@@ -130,6 +131,18 @@ public class IdGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
         printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
+    }
+
+    /*public void testGMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GMLReaderTestSuite(this));
+        printTestPerformance("GMLReaderTestSuite", this.stopWatch());
+    }*/
+
+    public void testGraphSONReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphSONReaderTestSuite(this));
+        printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
     }
 
     public Graph generateGraph() {

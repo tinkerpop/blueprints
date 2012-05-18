@@ -4,13 +4,6 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 
-/**
- * Created by IntelliJ IDEA.
- * User: stephen m
- * Date: 5/12/12
- * Time: 11:35 AM
- * To change this template use File | Settings | File Templates.
- */
 public class TinkerTransactionalGraph extends TinkerGraph implements TransactionalGraph {
     public void startTransaction() {
     }
