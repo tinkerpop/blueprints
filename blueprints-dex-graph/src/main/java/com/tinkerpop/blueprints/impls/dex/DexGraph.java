@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.dex;
 
 import com.sparsity.dex.gdb.AttributeKind;
+import com.sparsity.dex.gdb.ObjectType;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -38,12 +39,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     /**
      * Default Vertex label. Just used when invoked addVertex with a null parameter.
      */
-    public static final String DEFAULT_DEX_VERTEX_LABEL = "?DEFAULT_DEX_VERTEX_LABEL?";
-
-    /**
-     * Vertex label used at {@link #addVertex(Object)} method.
-     */
-    public static String LABEL = DEFAULT_DEX_VERTEX_LABEL;
+    public static final String DEFAULT_DEX_VERTEX_LABEL = "NO_LABEL";
 
     /**
      * Database persistent file.
@@ -162,33 +158,32 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     /**
      * Adds a Vertex or retrieves an existing one.
-     * <p/>
-     * Since all {@link DexVertex} instances are labeled, the static field
-     * {@link #LABEL} sets the label of the vertex to be created. If this is
-     * null the {@link #DEFAULT_DEX_VERTEX_LABEL} is used.
-     *
-     * @param id In case this is an instance of Long, then it corresponds to
-     *           the identifier of the instance to be retrieved. Otherwise, it
-     *           is ignored.
+     * 
+     * @param id
+     *            In case this is <code>null</code> it adds a new vertex with
+     *            the default label ({@link #DEFAULT_DEX_VERTEX_LABEL}). In case
+     *            this is a string, it will be the label for the new vertex.
+     *            Otherwise, it will try to retrieve an already existing vertex
+     *            using the given id somehow.
      * @return Added or retrieved Vertex.
      * @see com.tinkerpop.blueprints.Graph#addVertex(java.lang.Object)
      */
     @Override
     public Vertex addVertex(final Object id) {
-        String label = LABEL;
-        if (label == null) {
-            label = DEFAULT_DEX_VERTEX_LABEL;
+        if (id == null || id instanceof String) {
+            String label = (id == null ? DEFAULT_DEX_VERTEX_LABEL : (String) id);
+            int type = this.getRawGraph().findType(label);
+            if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+                // First instance of this type, let's create it
+                type = rawGraph.newNodeType(label);
+            }
+            assert type != com.sparsity.dex.gdb.Type.InvalidType;
+            // create object instance
+            long oid = rawGraph.newNode(type);
+            return new DexVertex(this, oid);
+        } else {
+            return getVertex(id);
         }
-
-        int type = DexTypes.getTypeId(rawGraph, label);
-        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
-            // First instance of this type, let's create it
-            type = rawGraph.newNodeType(label);
-        }
-        assert type != com.sparsity.dex.gdb.Type.InvalidType;
-        // create object instance
-        long oid = rawGraph.newNode(type);
-        return new DexVertex(this, oid);
     }
 
     /*
@@ -246,6 +241,18 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
+        if (key.compareTo(StringFactory.LABEL) == 0) {
+            int type = this.getRawGraph().findType(value.toString());
+            if (type != com.sparsity.dex.gdb.Type.InvalidType) {
+                com.sparsity.dex.gdb.Type tdata = this.getRawGraph().getType(type);
+                if (tdata.getObjectType() == ObjectType.Edge) {
+                    com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                    return new DexIterable<Vertex>(this, objs, Vertex.class);
+                }
+            }
+            return null;
+        }
+        
         com.sparsity.dex.gdb.TypeList tlist = this.getRawGraph().findNodeTypes();
         List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer type : tlist) {
@@ -274,7 +281,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        int type = DexTypes.getTypeId(rawGraph, label);
+        int type = this.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newEdgeType(label, true, true);
@@ -342,6 +349,18 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
+        if (key.compareTo(StringFactory.LABEL) == 0) {
+            int type = this.getRawGraph().findType(value.toString());
+            if (type != com.sparsity.dex.gdb.Type.InvalidType) {
+                com.sparsity.dex.gdb.Type tdata = this.getRawGraph().getType(type);
+                if (tdata.getObjectType() == ObjectType.Edge) {
+                    com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                    return new DexIterable<Edge>(this, objs, Edge.class);
+                }
+            }
+            return null;
+        }
+        
         com.sparsity.dex.gdb.TypeList tlist = this.getRawGraph().findEdgeTypes();
         List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer type : tlist) {
@@ -383,9 +402,6 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         session.close();
         gpool.close();
         dex.close();
-
-        DexAttributes.clear();
-        DexTypes.clear();
     }
 
     @Override
@@ -440,7 +456,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         } else if(Edge.class.isAssignableFrom(elementClass)) {
             tlist = this.getRawGraph().findEdgeTypes();
         } else {
-            new IllegalArgumentException("'" + elementClass + "' class is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
         boolean found = false;
         for (Integer type : tlist) {
@@ -464,7 +480,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         } else if(Edge.class.isAssignableFrom(elementClass)) {
             tlist = this.getRawGraph().findEdgeTypes();
         } else {
-            new IllegalArgumentException("'" + elementClass + "' class is not indexable");
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
         boolean found = false;
         Set<String> ret = new HashSet<String>();

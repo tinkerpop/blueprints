@@ -28,10 +28,6 @@ import java.util.Set;
  */
 public class DexElement implements Element {
     /**
-     * "Ghost" property to retrieve the element type or label.
-     */
-    public static final String LABEL_PROPERTY = "?DEX_LABEL_PROPERTY?";
-    /**
      * DexGraph instance.
      */
     protected DexGraph graph = null;
@@ -70,8 +66,7 @@ public class DexElement implements Element {
      * @return Type or label of the element.
      */
     protected String getTypeLabel() {
-        return DexTypes.getTypeData(graph.getRawGraph(), getObjectType())
-                .getName();
+        return graph.getRawGraph().getType(getObjectType()).getName();
     }
 
     /**
@@ -95,15 +90,18 @@ public class DexElement implements Element {
       */
     @Override
     public Object getProperty(final String key) {
-        com.sparsity.dex.gdb.Attribute adata = DexAttributes.getAttributeData(graph.getRawGraph(), getObjectType(), key);
-        if (adata == null) {
+        int type = getObjectType();
+        if (key.compareTo(StringFactory.LABEL) == 0) {
+            com.sparsity.dex.gdb.Type tdata = graph.getRawGraph().getType(type);
+            return tdata.getName();
+        }
+        int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
+        if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
             return null;
         }
-
-        Integer attr = DexAttributes.getAttributeId(graph.getRawGraph(),
-                getObjectType(), key);
-        assert attr != null && attr.longValue() != com.sparsity.dex.gdb.Attribute.InvalidAttribute;
-
+        com.sparsity.dex.gdb.Attribute adata = graph.getRawGraph().getAttribute(attr);
+        assert adata != null;
+        
         com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
         graph.getRawGraph().getAttribute(oid, attr, v);
         Object result = null;
@@ -156,15 +154,10 @@ public class DexElement implements Element {
         //System.out.println(this + "!!" + key + "!!" + value);
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
-        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
-            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+        if (key.equals(StringFactory.LABEL))
+            throw new IllegalArgumentException("Property key is reserved for all nodes and edges: " + StringFactory.LABEL);
 
-        if (key.compareTo(LABEL_PROPERTY) == 0) {
-            throw new UnsupportedOperationException(LABEL_PROPERTY
-                    + " property cannot be set.");
-        }
-
-        Integer attr = DexAttributes.getAttributeId(graph.getRawGraph(), getObjectType(), key);
+        int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
         com.sparsity.dex.gdb.DataType datatype = null;
         if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
             //
@@ -187,7 +180,7 @@ public class DexElement implements Element {
             attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.dex.gdb.AttributeKind.Basic);
             assert attr != com.sparsity.dex.gdb.Attribute.InvalidAttribute;
         } else {
-            datatype = DexAttributes.getAttributeData(graph.getRawGraph(), attr).getDataType();
+            datatype = graph.getRawGraph().getAttribute(attr).getDataType();
         }
         //
         // Set the Value
