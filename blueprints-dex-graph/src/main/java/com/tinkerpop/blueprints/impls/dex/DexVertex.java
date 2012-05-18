@@ -93,7 +93,7 @@ public class DexVertex extends DexElement implements Vertex {
     }
 
     private Iterable<Edge> getOutEdgesSingleLabel(final String label) {
-        int type = DexTypes.getTypeId(graph.getRawGraph(), label);
+        int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             return new ArrayList<Edge>();
         }
@@ -102,7 +102,7 @@ public class DexVertex extends DexElement implements Vertex {
     }
 
     private Iterable<Vertex> getOutVerticesSingleLabel(final String label) {
-        int type = DexTypes.getTypeId(graph.getRawGraph(), label);
+        int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             return new ArrayList<Vertex>();
         }
@@ -121,7 +121,7 @@ public class DexVertex extends DexElement implements Vertex {
     }
 
     private Iterable<Edge> getInEdgesSingleLabel(final String label) {
-        int type = DexTypes.getTypeId(graph.getRawGraph(), label);
+        int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             return new ArrayList<Edge>();
         }
@@ -130,7 +130,7 @@ public class DexVertex extends DexElement implements Vertex {
     }
 
     private Iterable<Vertex> getInVerticesSingleLabel(final String label) {
-        int type = DexTypes.getTypeId(graph.getRawGraph(), label);
+        int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             return new ArrayList<Vertex>();
         }

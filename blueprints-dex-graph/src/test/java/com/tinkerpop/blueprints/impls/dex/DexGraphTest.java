@@ -1,12 +1,15 @@
 package com.tinkerpop.blueprints.impls.dex;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 
@@ -73,6 +76,29 @@ public class DexGraphTest extends GraphTest {
     }
     */
 
+    public void testDexVertexLabel() throws Exception {
+        Graph graph = generateGraph();
+
+        this.stopWatch();
+        assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(DexGraph.DEFAULT_DEX_VERTEX_LABEL));
+        assertTrue(graph.addVertex("people").getProperty(StringFactory.LABEL).equals("people"));
+        assertTrue(graph.addVertex("thing").getProperty(StringFactory.LABEL).equals("thing"));
+        BaseTest.printPerformance(graph.toString(), 3, "vertices with user labels added", this.stopWatch());
+
+        this.stopWatch();
+        Vertex v1 = graph.addVertex("mylabel");
+        boolean excep = false;
+        try {
+            v1.setProperty(StringFactory.LABEL, "otherlabel");
+        } catch (IllegalArgumentException e) {
+            excep = true;
+        } finally {
+            assertTrue(excep);
+        }
+        BaseTest.printPerformance(graph.toString(), 1, "validate label is protected", this.stopWatch());
+        graph.shutdown();
+    }
+    
     public Graph generateGraph() {
         String db = System.getProperty("dexGraphFile");
         if (db == null)
