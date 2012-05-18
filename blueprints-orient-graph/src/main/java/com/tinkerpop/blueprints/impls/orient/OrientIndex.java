@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexTxAwareMultiValue;
@@ -16,9 +19,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 
-import java.util.Collection;
-import java.util.Collections;
-
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
@@ -31,7 +31,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected static final String SEPARATOR = "!=!";
 
     protected OrientGraph graph;
-    protected OIndex underlying;
+    protected OIndex<?>   underlying;
 
     protected Class<? extends Element> indexClass;
 
@@ -41,14 +41,14 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         create(indexName, this.indexClass, iType);
     }
 
-    public OrientIndex(OrientGraph orientGraph, OIndex rawIndex) {
+    public OrientIndex(OrientGraph orientGraph, OIndex<?> rawIndex) {
         this.graph = orientGraph;
         this.underlying = rawIndex instanceof OIndexTxAwareMultiValue ? rawIndex : new OIndexTxAwareMultiValue(
-                orientGraph.getRawGraph(), rawIndex);
+                orientGraph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) rawIndex);
         load(rawIndex.getConfiguration());
     }
 
-    public OIndex getRawIndex() {
+    public OIndex<?> getRawIndex() {
         return this.underlying;
     }
 
@@ -104,10 +104,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    protected void removeBasic(final String key, final T element) {
-        underlying.remove(key, element.getRawElement());
     }
 
     protected void putBasic(final String key, final T element) {
