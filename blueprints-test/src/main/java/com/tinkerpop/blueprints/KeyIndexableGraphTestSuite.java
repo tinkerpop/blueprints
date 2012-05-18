@@ -149,7 +149,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel) {
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
-            assertTrue(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
+//            assertTrue(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
             assertEquals(count(graph.getVertices("name", "marko")), 1);
             assertEquals(graph.getVertices("name", "marko").iterator().next(), vertex);
             graph.createKeyIndex("name", Vertex.class);
@@ -161,7 +161,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeIndex && !graph.getFeatures().isRDFModel) {
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             edge.setProperty("date", 2012);
-            assertTrue(graph.getEdges("date", 2012) instanceof PropertyFilteredIterable);
+            //          assertTrue(graph.getEdges("date", 2012) instanceof PropertyFilteredIterable);
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
             graph.createKeyIndex("date", Edge.class);
