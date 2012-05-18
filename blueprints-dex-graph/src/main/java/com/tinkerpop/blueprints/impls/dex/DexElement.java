@@ -184,7 +184,7 @@ public class DexElement implements Element {
                 throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
             }
             assert datatype != null;
-            attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.dex.gdb.AttributeKind.Indexed);
+            attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.dex.gdb.AttributeKind.Basic);
             assert attr != com.sparsity.dex.gdb.Attribute.InvalidAttribute;
         } else {
             datatype = DexAttributes.getAttributeData(graph.getRawGraph(), attr).getDataType();
