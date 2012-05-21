@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.util.wrappers.bulk;
+package com.tinkerpop.blueprints.util.wrappers.batch;
 
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Features;
@@ -13,7 +13,6 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
-import com.tinkerpop.blueprints.util.wrappers.batch.BufferGraph;
 
 import java.lang.reflect.Method;
 

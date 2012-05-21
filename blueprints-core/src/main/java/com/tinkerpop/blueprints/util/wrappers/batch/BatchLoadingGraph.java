@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.util.wrappers.batch;
 
 import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.util.wrappers.batch.vertexcache.VertexCache;
+import com.tinkerpop.blueprints.util.wrappers.batch.vertexcache.*;
 
 import java.util.Set;
 
@@ -25,8 +25,9 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
 
     public static final double MAX_PERCENTAGE_MEMORY = 0.5;
     public static final int DEFAULT_BYTES_PER_ELEMENT = 1000;
-    
+
     private static final long MIN_BUFFERSIZE = 1000;
+    private static final long MAX_BUFFERSIZE = 10000000;
     private static final double CONSERVATIVE_BPE_FACTOR = 1.3;
     private static final int GC_RUN_SLEEPTIME = 100;
     
@@ -51,6 +52,7 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
     
     public BatchLoadingGraph(T graph, IDType type, String vertexIDKey, String edgeIDKey) {
         if (graph==null) throw new IllegalArgumentException("Graph may not be null");
+        if (type==null) throw new IllegalArgumentException("Type may not be null");
         this.graph = graph;
         this.ignoreSuppliedIDs = graph.getFeatures().ignoresSuppliedIds;
         if (!ignoreSuppliedIDs && (vertexIDKey!=null || edgeIDKey!=null)) {
@@ -74,7 +76,13 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
     }
 
     public void setBytesPerElement(int bytesPerElement) {
+        if (bytesPerElement<=0) throw new IllegalArgumentException("Expected positive number.");
         this.bytesPerElement=bytesPerElement;
+    }
+
+    public void setMaxPercentageMemory(double percentage) {
+        if (percentage<=0.0 || percentage>1.0) throw new IllegalArgumentException("Expected positive percentage in (0,1]");
+        this.maxPercentageMemory=percentage;
     }
 
     private long calculateRemainingBufferSize() {
@@ -87,11 +95,13 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
                     lastBufferSize * CONSERVATIVE_BPE_FACTOR);
             assert bytesPerElement>0;
         }
-        long bufferSize = availableMemory/bytesPerElement;
+        long bufferSize = (long)(availableMemory-(1.0-maxPercentageMemory)*runtime.maxMemory())/bytesPerElement;
+        if (bufferSize<MIN_BUFFERSIZE) bufferSize=0;
+        if (bufferSize>MAX_BUFFERSIZE) bufferSize=MAX_BUFFERSIZE;
         lastAvailableMemory = availableMemory;
         lastBufferSize = bufferSize;
-        if (bufferSize>=MIN_BUFFERSIZE) return bufferSize;
-        else return 0;
+
+        return bufferSize;
     }
 
     private static void runGC() {
@@ -115,6 +125,8 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
         if (remainingBufferSize<=0 || stopTransactionFlag) {
             graph.stopTransaction(Conclusion.SUCCESS);
             cache.newTransaction();
+            lastAvailableMemory=-1;
+            lastBufferSize=-1;
             graph.startTransaction();
             remainingBufferSize = calculateRemainingBufferSize();
         }
@@ -192,7 +204,7 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
 
     @Override
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
-        if (!(outVertex instanceof BatchLoadingVertex) || !(inVertex instanceof BatchLoadingVertex))
+        if (outVertex.getClass() != BatchLoadingVertex.class || inVertex.getClass() != BatchLoadingVertex.class)
             throw new IllegalArgumentException("Unexpected vertex type.");
         nextElement();
         Vertex ov = getCachedVertex(outVertex.getId());
@@ -246,7 +258,7 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
         throw retrievalNotSupported();
     }
     
-    class BatchLoadingVertex implements Vertex {
+    private class BatchLoadingVertex implements Vertex {
 
         private final Object externalID;
 
@@ -296,7 +308,7 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
         }
     }
     
-    class BatchLoadingEdge implements Edge {
+    private class BatchLoadingEdge implements Edge {
 
         @Override
         public Vertex getVertex(Direction direction) throws IllegalArgumentException {
@@ -350,4 +362,19 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
         return new UnsupportedOperationException("Removal operations are not supported during batch loading.");
     }
 
+    public static enum IDType {
+
+        OBJECT, NUMBER, STRING, URL;
+
+        private VertexCache getVertexCache(Graph g) {
+            switch(this) {
+                case OBJECT: return new ObjectIDVertexCache(g);
+                case NUMBER: return new LongIDVertexCache(g);
+                case STRING: return new StringIDVertexCache(g);
+                case URL: return new StringIDVertexCache(g,new URLCompression());
+                default: throw new IllegalArgumentException("Unrecognized ID type: " + this);
+            }
+        }
+
+    }
 }
