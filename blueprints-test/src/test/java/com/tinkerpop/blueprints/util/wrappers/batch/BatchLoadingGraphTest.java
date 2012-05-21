@@ -18,14 +18,12 @@ public class BatchLoadingGraphTest extends TestCase {
         final VertexEdgeCounter counter = new VertexEdgeCounter();
         BLGraph graph = new BLGraph(counter);
         BatchLoadingGraph<BLGraph> loader = new BatchLoadingGraph<BLGraph>(graph,
-                                                BatchLoadingGraph.IDType.NUMBER);
-        loader.setMaxPercentageMemory(0.7);
-        loader.setBytesPerElement(500);
-        
+                                                BatchLoadingGraph.IDType.NUMBER,3000);
+
         Graph loadg = loader;
         
         //Create a chain
-        int chainLength = 200000;
+        int chainLength = 50000;
         Vertex previous = null;
         for (int i=0;i<=chainLength;i++) {
             Vertex next = loadg.addVertex(Long.valueOf(i));
@@ -68,7 +66,7 @@ public class BatchLoadingGraphTest extends TestCase {
         @Override
         public void stopTransaction(Conclusion conclusion) {
             super.stopTransaction(conclusion);
-            System.out.println("Committed (vertices/edges): " + counter.numVertices + " / " + counter.numEdges);
+            //System.out.println("Committed (vertices/edges): " + counter.numVertices + " / " + counter.numEdges);
             assertEquals(counter.numVertices, BaseTest.count(super.getVertices()) - (first ? 0 : keepLast));
             assertEquals(counter.numEdges,BaseTest.count(super.getEdges()));
             for (Vertex v : getVertices()) {
@@ -81,7 +79,7 @@ public class BatchLoadingGraphTest extends TestCase {
             counter.numVertices=0;
             counter.numEdges=0;
             first = false;
-            System.out.println("------");
+            //System.out.println("------");
         }
         
     }

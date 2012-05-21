@@ -23,13 +23,7 @@ import java.util.Set;
 
 public class BatchLoadingGraph<T extends TransactionalGraph> implements TransactionalGraph, WrapperGraph<T> {
 
-    public static final double MAX_PERCENTAGE_MEMORY = 0.5;
-    public static final int DEFAULT_BYTES_PER_ELEMENT = 1000;
-
-    private static final long MIN_BUFFERSIZE = 1000;
-    private static final long MAX_BUFFERSIZE = 10000000;
-    private static final double CONSERVATIVE_BPE_FACTOR = 1.3;
-    private static final int GC_RUN_SLEEPTIME = 100;
+    public static final long DEFAULT_BUFFER_SIZE = 100000;
     
 
     private final T graph;
@@ -39,21 +33,20 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
     
     private final VertexCache cache;
     
-    private double maxPercentageMemory = MAX_PERCENTAGE_MEMORY;
     private boolean stopTransactionFlag = false;
 
-    private int bytesPerElement = DEFAULT_BYTES_PER_ELEMENT;
+    private long bufferSize = DEFAULT_BUFFER_SIZE;
     private long remainingBufferSize;
-    private long lastAvailableMemory = -1;
-    private long lastBufferSize = -1;
-    
+
     private BatchLoadingEdge currentEdge =null;
     private Edge currentEdgeCached =null;
     
-    public BatchLoadingGraph(T graph, IDType type, String vertexIDKey, String edgeIDKey) {
+    public BatchLoadingGraph(T graph, IDType type, long bufferSize, String vertexIDKey, String edgeIDKey) {
         if (graph==null) throw new IllegalArgumentException("Graph may not be null");
         if (type==null) throw new IllegalArgumentException("Type may not be null");
+        if (bufferSize<=0) throw new IllegalArgumentException("BufferSize must be positive");
         this.graph = graph;
+        this.bufferSize=bufferSize;
         this.ignoreSuppliedIDs = graph.getFeatures().ignoresSuppliedIds;
         if (!ignoreSuppliedIDs && (vertexIDKey!=null || edgeIDKey!=null)) {
             throw new IllegalArgumentException("Wrapped graph supports supplied IDs");
@@ -64,76 +57,25 @@ public class BatchLoadingGraph<T extends TransactionalGraph> implements Transact
         cache = type.getVertexCache(this.graph);
 
         graph.startTransaction();
-        remainingBufferSize = calculateRemainingBufferSize();
+        remainingBufferSize = this.bufferSize;
     }
 
-    public BatchLoadingGraph(T graph, IDType type) {
-        this(graph,type,null,null);
+    public BatchLoadingGraph(T graph, IDType type, long bufferSize) {
+        this(graph,type,bufferSize,null,null);
     }
     
     public BatchLoadingGraph(T graph) {
-        this(graph,IDType.OBJECT);
-    }
-
-    public void setBytesPerElement(int bytesPerElement) {
-        if (bytesPerElement<=0) throw new IllegalArgumentException("Expected positive number.");
-        this.bytesPerElement=bytesPerElement;
-    }
-
-    public void setMaxPercentageMemory(double percentage) {
-        if (percentage<=0.0 || percentage>1.0) throw new IllegalArgumentException("Expected positive percentage in (0,1]");
-        this.maxPercentageMemory=percentage;
-    }
-
-    private long calculateRemainingBufferSize() {
-        runGC();
-        Runtime runtime = Runtime.getRuntime();
-        long availableMemory = runtime.maxMemory()-runtime.totalMemory()+runtime.freeMemory();
-        //Update
-        if (lastAvailableMemory>0) {
-            bytesPerElement = (int)Math.ceil((lastAvailableMemory - availableMemory) /
-                    lastBufferSize * CONSERVATIVE_BPE_FACTOR);
-            assert bytesPerElement>0;
-        }
-        long bufferSize = (long)(availableMemory-(1.0-maxPercentageMemory)*runtime.maxMemory())/bytesPerElement;
-        if (bufferSize<MIN_BUFFERSIZE) bufferSize=0;
-        if (bufferSize>MAX_BUFFERSIZE) bufferSize=MAX_BUFFERSIZE;
-        lastAvailableMemory = availableMemory;
-        lastBufferSize = bufferSize;
-
-        return bufferSize;
-    }
-
-    private static void runGC() {
-        for (int i=0;i<2;i++) {
-            try {
-                System.gc();
-                Thread.sleep(GC_RUN_SLEEPTIME);
-                System.runFinalization();
-                Thread.sleep(GC_RUN_SLEEPTIME);
-            }
-            catch (InterruptedException ex){
-                ex.printStackTrace();
-            }
-        }
+        this(graph,IDType.OBJECT,DEFAULT_BUFFER_SIZE);
     }
 
     private void nextElement() {
         currentEdge =null;
         currentEdgeCached =null;
-        if (remainingBufferSize<=0) remainingBufferSize = calculateRemainingBufferSize();
         if (remainingBufferSize<=0 || stopTransactionFlag) {
             graph.stopTransaction(Conclusion.SUCCESS);
             cache.newTransaction();
-            lastAvailableMemory=-1;
-            lastBufferSize=-1;
             graph.startTransaction();
-            remainingBufferSize = calculateRemainingBufferSize();
-        }
-        if (remainingBufferSize<=0) {
-            throw new OutOfMemoryError("Could not allocate non-empty write buffer since max memory " +
-                    "fraction has been reached ["+maxPercentageMemory+"]. Try increasing heap space (using -Xmx) " +
-                    "or allow a larger fraction of memory to be allocated.");
+            remainingBufferSize = bufferSize;
         }
         remainingBufferSize--;
     }
