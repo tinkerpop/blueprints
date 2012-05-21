@@ -5,20 +5,19 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.MockTransactionalTinkerGraph;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import junit.framework.TestCase;
 
 /**
  * (c) Matthias Broecheler (me@matthiasb.com)
  */
 
-public class BatchLoadingGraphTest extends TestCase {
+public class BatchGraphTest extends TestCase {
 
     public void testLongIDLoading() {
         final VertexEdgeCounter counter = new VertexEdgeCounter();
         BLGraph graph = new BLGraph(counter);
-        BatchLoadingGraph<BLGraph> loader = new BatchLoadingGraph<BLGraph>(graph,
-                                                BatchLoadingGraph.IDType.NUMBER,3000);
+        BatchGraph<BLGraph> loader = new BatchGraph<BLGraph>(graph,
+                                                BatchGraph.IDType.NUMBER,3000);
 
         Graph loadg = loader;
         

@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.util.wrappers.batch.vertexcache;
+package com.tinkerpop.blueprints.util.wrappers.batch.cache;
 
 import com.tinkerpop.blueprints.Vertex;
 
@@ -7,11 +7,11 @@ import com.tinkerpop.blueprints.Vertex;
  */
 
 public interface VertexCache {
-    
+
     public Vertex getVertex(Object externalID);
-    
+
     public void add(Vertex vertex, Object externalID);
 
     public void newTransaction();
-    
+
 }
