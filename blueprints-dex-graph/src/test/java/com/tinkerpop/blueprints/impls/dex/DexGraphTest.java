@@ -92,8 +92,8 @@ public class DexGraphTest extends GraphTest {
     
     public void testDexVertexLabel() throws Exception {
         Graph graph = generateGraph(true);
-
         this.stopWatch();
+        
         assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(DexGraph.DEFAULT_DEX_VERTEX_LABEL));
         ((DexGraph)graph).label.set("people");
         assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals("people"));
@@ -102,9 +102,7 @@ public class DexGraphTest extends GraphTest {
         assertTrue(graph.addVertex("whatever").getProperty(StringFactory.LABEL).equals("thing"));
         ((DexGraph)graph).label.set(null);
         assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(DexGraph.DEFAULT_DEX_VERTEX_LABEL));
-        BaseTest.printPerformance(graph.toString(), 5, "vertices with user labels added", this.stopWatch());
 
-        this.stopWatch();
         ((DexGraph)graph).label.set("mylabel");
         Vertex v1 = graph.addVertex("mylabel");
         boolean excep = false;
@@ -115,7 +113,8 @@ public class DexGraphTest extends GraphTest {
         } finally {
             assertTrue(excep);
         }
-        BaseTest.printPerformance(graph.toString(), 1, "validate label is protected", this.stopWatch());
+        
+        printTestPerformance("Dex specific #testDexVertexLabel", this.stopWatch());
         graph.shutdown();
     }
     
@@ -165,14 +164,12 @@ public class DexGraphTest extends GraphTest {
         }
         assertTrue(result.size() == 0);
 
-        BaseTest.printPerformance(graph.toString(), 2, "vertex indices created and validated", this.stopWatch());
-        
         // table scan
         v1.setProperty("age", 99);
         ((DexGraph)graph).label.set("people");
         assertTrue(graph.getVertices("age", 99).iterator().next().equals(v1));
-        BaseTest.printPerformance(graph.toString(), 1, "table scan", this.stopWatch());
         
+        printTestPerformance("Dex specific #testKeyIndex", this.stopWatch());
         graph.shutdown();
     }
 

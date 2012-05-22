@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.dex;
 
 import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
@@ -33,27 +34,35 @@ public class DexBenchmarkTestSuite extends TestSuite {
             graph = graphTest.generateGraph();
             this.stopWatch();
             int counter = 0;
-            for (final Vertex vertex : graph.getVertices()) {
+            CloseableIterable<Vertex> vv = (CloseableIterable<Vertex>)graph.getVertices();
+            for (final Vertex vertex : vv) {
                 counter++;
-                for (final Edge edge : vertex.getEdges(Direction.OUT)) {
+                CloseableIterable<Edge> ee = (CloseableIterable<Edge>) vertex.getEdges(Direction.OUT); 
+                for (final Edge edge : ee) {
                     counter++;
                     final Vertex vertex2 = edge.getVertex(Direction.IN);
                     counter++;
-                    for (final Edge edge2 : vertex2.getEdges(Direction.OUT)) {
+                    CloseableIterable<Edge> ee2 = (CloseableIterable<Edge>) vertex2.getEdges(Direction.OUT); 
+                    for (final Edge edge2 : ee2) {
                         counter++;
                         final Vertex vertex3 = edge2.getVertex(Direction.IN);
                         counter++;
-                        for (final Edge edge3 : vertex3.getEdges(Direction.OUT)) {
+                        CloseableIterable<Edge> ee3 = (CloseableIterable<Edge>) vertex3.getEdges(Direction.OUT); 
+                        for (final Edge edge3 : ee3) {
                             counter++;
                             edge3.getVertex(Direction.OUT);
                             counter++;
                         }
+                        ee3.close();
                     }
+                    ee2.close();
                 }
+                ee.close();
             }
+            vv.close();
             double currentTime = this.stopWatch();
             totalTime = totalTime + currentTime;
-            BaseTest.printPerformance(graph.toString(), counter, "DexGraph elements touched", currentTime);
+            BaseTest.printPerformance(graph.toString(), counter, "DexGraph elements touched (run=" + i + ")", currentTime);
             graph.shutdown();
         }
         BaseTest.printPerformance("DexGraph", 1, "DexGraph experiment average", totalTime / (double) TOTAL_RUNS);

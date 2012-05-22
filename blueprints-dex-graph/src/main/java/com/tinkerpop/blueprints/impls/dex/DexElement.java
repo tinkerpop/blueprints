@@ -3,14 +3,13 @@
  */
 package com.tinkerpop.blueprints.impls.dex;
 
-import com.tinkerpop.blueprints.Edge;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * {@link Element} implementation for Dex.
@@ -139,6 +138,7 @@ public class DexElement implements Element {
             String key = graph.getRawGraph().getAttribute(attr).getName();
             attrKeys.add(key);
         }
+        alist.delete();
         alist = null;
         return attrKeys;
     }

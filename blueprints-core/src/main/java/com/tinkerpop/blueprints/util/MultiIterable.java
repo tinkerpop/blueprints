@@ -5,12 +5,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.tinkerpop.blueprints.CloseableIterable;
+
 /**
- * A helper class that is used to combine multiple iterables into a single iterable.
+ * A helper class that is used to combine multiple iterables into a single closeable iterable.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class MultiIterable<S> implements Iterable<S> {
+public class MultiIterable<S> implements CloseableIterable<S> {
 
     private final List<Iterable<S>> iterables;
 
@@ -59,6 +61,15 @@ public class MultiIterable<S> implements Iterable<S> {
                     throw new NoSuchElementException();
                 }
             };
+        }
+    }
+
+    @Override
+    public void close() {
+        for (Iterable<S> itty : iterables) {
+            if (itty instanceof CloseableIterable) {
+                ((CloseableIterable<S>)itty).close();
+            }
         }
     }
 }

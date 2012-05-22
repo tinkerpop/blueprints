@@ -1,7 +1,14 @@
 package com.tinkerpop.blueprints.impls.dex;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.sparsity.dex.gdb.AttributeKind;
 import com.sparsity.dex.gdb.ObjectType;
+import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -12,12 +19,6 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Dex is a graph database developed by Sparsity Technologies.
@@ -247,13 +248,14 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       * @see com.tinkerpop.blueprints.Graph#getVertices()
       */
     @Override
-    public Iterable<Vertex> getVertices() {
+    public CloseableIterable<Vertex> getVertices() {
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
         List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer type : tlist) {
             com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
             vertices.add(new DexIterable<Vertex>(this, objs, Vertex.class));
         }
+        tlist.delete();
         tlist = null;
         return new MultiIterable<Vertex>(vertices);
     }
@@ -273,7 +275,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * @see #label
      */
     @Override
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
             
@@ -305,6 +307,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
                     }
                 }
             }
+            tlist.delete();
             tlist = null;
 
             if (vertices.size() > 0) return new MultiIterable<Vertex>(vertices);
@@ -402,13 +405,14 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       * @see com.tinkerpop.blueprints.Graph#getEdges()
       */
     @Override
-    public Iterable<Edge> getEdges() {
+    public CloseableIterable<Edge> getEdges() {
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
         List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer type : tlist) {
             com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
             edges.add(new DexIterable<Edge>(this, objs, Edge.class));
         }
+        tlist.delete();
         tlist = null;
         return new MultiIterable<Edge>(edges);
     }
@@ -428,7 +432,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * @see #label
      */
     @Override
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
             
@@ -460,6 +464,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
                     }
                 }
             }
+            tlist.delete();
             tlist = null;
 
             if (edges.size() > 0) return new MultiIterable<Edge>(edges);
@@ -651,7 +656,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
                     ret.add(adata.getName());
                 }
             }
+            alist.delete();
+            alist = null;
         }
+        tlist.delete();
         tlist = null;
         return ret;
     }
