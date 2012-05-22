@@ -37,6 +37,7 @@ h3. Version 2.0.0 (NOT OFFICIALLY RELEASED YET)
 * Added @IdGraph@ to support the user defined ids for those @Graphs@ that ignore user supplied ids
 * Added @ThreadTransactionalGraph@ to support multiple threads within a single transaction
 * Changed the @Vertex@ API to only have three methods: @getEdges()@, @getVertices()@, and @query()@
+* Bumped to support Orient 1.0.1
 
 h2. Blueprints 1.x
 
