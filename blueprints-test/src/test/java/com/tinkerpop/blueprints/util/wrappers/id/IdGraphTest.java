@@ -103,6 +103,29 @@ public class IdGraphTest extends GraphTest {
         graph.shutdown();
     }
 
+    //@Test(expected = IllegalArgumentException.class)
+    public void testEnforcedUniqueIds() throws Exception {
+        IdGraph graph = (IdGraph) this.generateGraph();
+
+        graph.addVertex("whop");
+
+        boolean ex = false;
+        try {
+            graph.addVertex("whop");
+        } catch (IllegalArgumentException e) {
+            ex = true;
+        }
+        assertTrue("should have failed on duplicate id", ex);
+    }
+
+    public void testUnenforcedUniqueIds() throws Exception {
+        IdGraph graph = (IdGraph) this.generateGraph();
+        graph.enforceUniqueIds(false);
+
+        graph.addVertex("whop");
+        graph.addVertex("whop");
+    }
+
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new VertexTestSuite(this));

@@ -29,6 +29,8 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     private final Features features;
 
+    private boolean uniqueIds = true;
+
     /**
      * Adds custom ID functionality to the given graph.
      *
@@ -76,7 +78,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     public Vertex addVertex(final Object id) {
-        if (null != id && null != getVertex(id)) {
+        if (uniqueIds && null != id && null != getVertex(id)) {
             throw new IllegalArgumentException("Vertex with given id already exists: '" + id + "'");
         }
 
@@ -123,7 +125,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        if (null != id && null != getEdge(id)) {
+        if (uniqueIds && null != id && null != getEdge(id)) {
             throw new IllegalArgumentException("Edge with given id already exists: " + id);
         }
 
@@ -215,6 +217,10 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     public T getBaseGraph() {
         return this.baseGraph;
+    }
+
+    public void enforceUniqueIds(boolean enforceUniqueIds) {
+        this.uniqueIds = enforceUniqueIds;
     }
 
     /**
