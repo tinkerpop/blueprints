@@ -4,8 +4,6 @@ package com.tinkerpop.blueprints;
  * A transactional graph supports the notion of transactions.
  * Once a transaction is started, all write operations can either be committed or rolled back.
  * If an operation is transactional and there currently exists no transaction, then a transaction must be automatically started.
- * A transactional graph supports automatic transaction handling with user-defined transaction buffer size.
- * All constructed transactional graphs begin in with a transaction buffer size of 1 (thus, every mutation is a commit).
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
