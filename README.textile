@@ -20,7 +20,7 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "GML":http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html Reader/Writer utility
 ** "GraphML":http://graphml.graphdrawing.org/ Reader/Writer utility
 ** "GraphSON":https://github.com/tinkerpop/blueprints/wiki/GraphSON-Reader-and-Writer-Library Reader/Writer utility
-** @BufferGraph@ wrapper
+** @BatchGraph@ wrapper
 ** @ReadOnlyGraph@ wrapper
 ** @EventGraph@ wrapper
 ** @PartitionGraph@ wrapper
