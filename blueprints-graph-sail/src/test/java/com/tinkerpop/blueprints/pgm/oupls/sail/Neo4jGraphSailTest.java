@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Neo4jGraphSailTest extends GraphSailTest {
+public class Neo4jGraphSailTest {//extends GraphSailTest {
 
     private String getWorkingDirectory() throws Exception {
         File dir = File.createTempFile("blueprints", "-neo4j-test");
