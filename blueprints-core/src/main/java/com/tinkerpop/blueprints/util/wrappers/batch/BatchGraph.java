@@ -15,27 +15,47 @@ import com.tinkerpop.blueprints.util.wrappers.batch.cache.StringIDVertexCache;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.URLCompression;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.VertexCache;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
+import com.tinkerpop.blueprints.util.wrappers.transaction.WritethroughGraph;
 
 import java.util.Set;
 
 /**
- * BachLoadingGraph is a wrapper that enables batch loading of a large number of edges and vertices.
- * <p/>
+ * BachLoadingGraph is a wrapper that enables batch loading of a large number of edges and vertices by chunking the entire
+ * load into smaller batches and maintaining a memory-efficient vertex cache so that the entire transactional state can
+ * be flushed after each chunk is loaded.
+ * 
  * BatchGraph is ONLY meant for loading data and does not support any retrieval or removal operations.
  * That is, BatchGraph only supports the following methods:
  * - {@link #addVertex(Object)} for adding vertices
  * - {@link #addEdge(Object, com.tinkerpop.blueprints.Vertex, com.tinkerpop.blueprints.Vertex, String)} for adding edges
  * - {@link #getVertex(Object)} to be used when adding edges
- * <p/>
- * BatchGraph tries to determine the optimal transaction length based on the available heap memory.
+ * - Property getter, setter and removal methods for vertices and edges.
+ * 
+ * An important limitation of BatchGraph is that edge properties can only be set immediately after the edge has been added.
+ * If other vertices or edges have been created in the meantime, setting, getting or removing properties will throw 
+ * exceptions. This is done to avoid caching of edges which would require a great amount of memory.
+ * 
+ * BatchGraph wraps {@link TransactionalGraph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
+ * which will additionally wrap non-transactional graphs using {@link WritethroughGraph}.
+ * 
+ * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use 
+ * {@link #setVertexIDKey(String)} and {@link #setEdgeIDKey(String)} to set the keys for the vertex and edge properties
+ * respectively. For wrapped graphs which ignore supplied ids, these default to IdGraph.ID.
  *
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 
 public class BatchGraph<T extends TransactionalGraph> implements TransactionalGraph, WrapperGraph<T> {
 
+    /**
+     * Default buffer size
+     */
     public static final long DEFAULT_BUFFER_SIZE = 100000;
 
+    /**
+     * Type of vertex ids expected by BatchGraph. The default is IDType.OBJECT.
+     * Use the IDType that best matches the used vertex id types in order to save memory.
+     */
     public static enum IDType {
 
         OBJECT, NUMBER, STRING, URL;
@@ -71,6 +91,14 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     private BatchEdge currentEdge = null;
     private Edge currentEdgeCached = null;
 
+    /**
+     * Constructs a BatchGraph wrapping the provided graph, using the specified buffer size and expecting vertex ids of
+     * the specified IDType. Supplying vertex ids which do not match this type will throw exceptions.
+     *
+     * @param graph Graph to be wrapped
+     * @param type Type of vertex id expected. This information is used to optimize the vertex cache memory footprint.
+     * @param bufferSize Defines the number of vertices and edges loaded before starting a new transaction. The larger this value, the more memory is required but the faster the loading process.
+     */
     public BatchGraph(T graph, IDType type, long bufferSize) {
         if (graph == null) throw new IllegalArgumentException("Graph may not be null");
         if (type == null) throw new IllegalArgumentException("Type may not be null");
@@ -93,10 +121,47 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         remainingBufferSize = this.bufferSize;
     }
 
+    /**
+     * Constructs a BatchGraph wrapping the provided graph.
+     *
+     * @param graph Graph to be wrapped
+     */
     public BatchGraph(final T graph) {
         this(graph, IDType.OBJECT, DEFAULT_BUFFER_SIZE);
     }
 
+    /**
+     * Constructs a BatchGraph wrapping the provided graph. Immediately returns the graph if its a BatchGraph
+     * and wraps non-transactional graphs in an additional {@link WritethroughGraph}.
+     *
+     * @param graph Graph to be wrapped
+     */
+    public static final BatchGraph wrap(Graph graph) {
+        if (graph instanceof BatchGraph) return (BatchGraph)graph;
+        else if (graph instanceof TransactionalGraph) return new BatchGraph((TransactionalGraph)graph);
+        else return new BatchGraph(new WritethroughGraph(graph));
+    }
+
+    /**
+     * Sets the key to be used when setting the vertex id as a property on the respective vertex.
+     * If the key is null, then no property will be set.
+     *
+     * @param key Key to be used.
+     */
+    public void setVertexIDKey(String key) {
+        this.vertexIDKey = key;
+    }
+
+    /**
+     * Sets the key to be used when setting the edge id as a property on the respective edge.
+     * If the key is null, then no property will be set.
+     *
+     * @param key Key to be used.
+     */
+    public void setEdgeIDKey(String key) {
+        this.edgeIDKey = key;
+    }
+    
     private void nextElement() {
         currentEdge = null;
         currentEdgeCached = null;
@@ -109,11 +174,20 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         remainingBufferSize--;
     }
 
+    /**
+     * Has no effect since a transaction is started automatically.
+     * @throws IllegalStateException
+     */
     @Override
     public void startTransaction() throws IllegalStateException {
         //Do nothing, transaction is already started
     }
 
+    /**
+     * Should only be invoked after loading is complete. Stopping the transaction before will cause the loading to fail.
+     * Only Conclusion.SUCCESS is accepted.
+     * @param conclusion whether or not the current transaction was successful
+     */
     @Override
     public void stopTransaction(final Conclusion conclusion) {
         if (conclusion != Conclusion.SUCCESS) throw new IllegalArgumentException("Cannot abort batch loading");
