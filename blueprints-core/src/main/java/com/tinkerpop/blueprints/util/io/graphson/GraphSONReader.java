@@ -85,6 +85,7 @@ public class GraphSONReader {
 
         // if this is a transactional graph then we're buffering
         final BatchGraph graph = BatchGraph.wrap(inputGraph);
+        graph.setBufferSize(bufferSize);
         //final Map<String, Object> vertexIdMap = new HashMap<String, Object>();
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {

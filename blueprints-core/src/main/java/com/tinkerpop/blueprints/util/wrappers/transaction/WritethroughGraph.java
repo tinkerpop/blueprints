@@ -25,7 +25,7 @@ public class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Tran
 
     private final T graph;
 
-    public WritethroughGraph(T graph) {
+    public WritethroughGraph(final T graph) {
         if (graph == null) throw new IllegalArgumentException("Graph expected");
         if (graph instanceof TransactionalGraph)
             throw new IllegalArgumentException("Can only wrap non-transactional graphs");
@@ -48,7 +48,7 @@ public class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Tran
      * @param conclusion whether or not the current transaction was successful or not
      */
     @Override
-    public void stopTransaction(Conclusion conclusion) {
+    public void stopTransaction(final Conclusion conclusion) {
         if (conclusion == Conclusion.FAILURE) throw new IllegalArgumentException("Failure not accepted");
     }
 
@@ -64,17 +64,17 @@ public class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Tran
     }
 
     @Override
-    public Vertex addVertex(Object id) {
+    public Vertex addVertex(final Object id) {
         return graph.addVertex(id);
     }
 
     @Override
-    public Vertex getVertex(Object id) {
+    public Vertex getVertex(final Object id) {
         return graph.getVertex(id);
     }
 
     @Override
-    public void removeVertex(Vertex vertex) {
+    public void removeVertex(final Vertex vertex) {
         graph.removeVertex(vertex);
     }
 
@@ -84,22 +84,22 @@ public class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Tran
     }
 
     @Override
-    public Iterable<Vertex> getVertices(String key, Object value) {
+    public Iterable<Vertex> getVertices(final String key, final Object value) {
         return graph.getVertices(key, value);
     }
 
     @Override
-    public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         return graph.addEdge(id, outVertex, inVertex, label);
     }
 
     @Override
-    public Edge getEdge(Object id) {
+    public Edge getEdge(final Object id) {
         return graph.getEdge(id);
     }
 
     @Override
-    public void removeEdge(Edge edge) {
+    public void removeEdge(final Edge edge) {
         graph.removeEdge(edge);
     }
 
@@ -109,7 +109,7 @@ public class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Tran
     }
 
     @Override
-    public Iterable<Edge> getEdges(String key, Object value) {
+    public Iterable<Edge> getEdges(final String key, final Object value) {
         return graph.getEdges(key, value);
     }
 

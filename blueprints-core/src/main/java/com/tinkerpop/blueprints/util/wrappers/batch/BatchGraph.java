@@ -23,23 +23,23 @@ import java.util.Set;
  * BachLoadingGraph is a wrapper that enables batch loading of a large number of edges and vertices by chunking the entire
  * load into smaller batches and maintaining a memory-efficient vertex cache so that the entire transactional state can
  * be flushed after each chunk is loaded.
- * 
+ * <p/>
  * BatchGraph is ONLY meant for loading data and does not support any retrieval or removal operations.
  * That is, BatchGraph only supports the following methods:
  * - {@link #addVertex(Object)} for adding vertices
  * - {@link #addEdge(Object, com.tinkerpop.blueprints.Vertex, com.tinkerpop.blueprints.Vertex, String)} for adding edges
  * - {@link #getVertex(Object)} to be used when adding edges
  * - Property getter, setter and removal methods for vertices and edges.
- * 
+ * <p/>
  * An important limitation of BatchGraph is that edge properties can only be set immediately after the edge has been added.
- * If other vertices or edges have been created in the meantime, setting, getting or removing properties will throw 
+ * If other vertices or edges have been created in the meantime, setting, getting or removing properties will throw
  * exceptions. This is done to avoid caching of edges which would require a great amount of memory.
- * 
+ * <p/>
  * BatchGraph wraps {@link TransactionalGraph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
  * which will additionally wrap non-transactional graphs using {@link WritethroughGraph}.
- * 
- * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use 
- * {@link #setVertexIDKey(String)} and {@link #setEdgeIDKey(String)} to set the keys for the vertex and edge properties
+ * <p/>
+ * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use
+ * {@link #setVertexIdKey} and {@link #setEdgeIdKey} to set the keys for the vertex and edge properties
  * respectively. For wrapped graphs which ignore supplied ids, these default to IdGraph.ID.
  *
  * @author Matthias Broecheler (http://www.matthiasb.com)
@@ -78,10 +78,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     }
 
     private final T graph;
-    private final boolean ignoreSuppliedIDs;
+    private final boolean ignoreSuppliedIds;
 
-    private String vertexIDKey;
-    private String edgeIDKey;
+    private String vertexIdKey;
+    private String edgeIdKey;
 
     private final VertexCache cache;
 
@@ -95,8 +95,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * Constructs a BatchGraph wrapping the provided graph, using the specified buffer size and expecting vertex ids of
      * the specified IDType. Supplying vertex ids which do not match this type will throw exceptions.
      *
-     * @param graph Graph to be wrapped
-     * @param type Type of vertex id expected. This information is used to optimize the vertex cache memory footprint.
+     * @param graph      Graph to be wrapped
+     * @param type       Type of vertex id expected. This information is used to optimize the vertex cache memory footprint.
      * @param bufferSize Defines the number of vertices and edges loaded before starting a new transaction. The larger this value, the more memory is required but the faster the loading process.
      */
     public BatchGraph(T graph, IDType type, long bufferSize) {
@@ -106,13 +106,13 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         this.graph = graph;
         this.bufferSize = bufferSize;
 
-        this.ignoreSuppliedIDs = graph.getFeatures().ignoresSuppliedIds;
-        if (!ignoreSuppliedIDs) {
-            vertexIDKey = null;
-            edgeIDKey = null;
+        this.ignoreSuppliedIds = graph.getFeatures().ignoresSuppliedIds;
+        if (!ignoreSuppliedIds) {
+            vertexIdKey = null;
+            edgeIdKey = null;
         } else {
-            vertexIDKey = IdGraph.ID;
-            edgeIDKey = IdGraph.ID;
+            vertexIdKey = IdGraph.ID;
+            edgeIdKey = IdGraph.ID;
         }
 
         cache = type.getVertexCache(this.graph);
@@ -136,9 +136,9 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      *
      * @param graph Graph to be wrapped
      */
-    public static final BatchGraph wrap(Graph graph) {
-        if (graph instanceof BatchGraph) return (BatchGraph)graph;
-        else if (graph instanceof TransactionalGraph) return new BatchGraph((TransactionalGraph)graph);
+    public static BatchGraph wrap(final Graph graph) {
+        if (graph instanceof BatchGraph) return (BatchGraph) graph;
+        else if (graph instanceof TransactionalGraph) return new BatchGraph((TransactionalGraph) graph);
         else return new BatchGraph(new WritethroughGraph(graph));
     }
 
@@ -148,8 +148,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      *
      * @param key Key to be used.
      */
-    public void setVertexIDKey(String key) {
-        this.vertexIDKey = key;
+    public void setVertexIdKey(final String key) {
+        this.vertexIdKey = key;
     }
 
     /**
@@ -158,10 +158,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      *
      * @param key Key to be used.
      */
-    public void setEdgeIDKey(String key) {
-        this.edgeIDKey = key;
+    public void setEdgeIdKey(final String key) {
+        this.edgeIdKey = key;
     }
-    
+
     private void nextElement() {
         currentEdge = null;
         currentEdgeCached = null;
@@ -176,6 +176,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     /**
      * Has no effect since a transaction is started automatically.
+     *
      * @throws IllegalStateException
      */
     @Override
@@ -186,6 +187,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     /**
      * Should only be invoked after loading is complete. Stopping the transaction before will cause the loading to fail.
      * Only Conclusion.SUCCESS is accepted.
+     *
      * @param conclusion whether or not the current transaction was successful
      */
     @Override
@@ -230,7 +232,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     @Override
     public Vertex getVertex(final Object id) {
         Vertex v = cache.getVertex(id);
-        if (v==null) return null;
+        if (v == null) return null;
         else return new BatchVertex(id);
     }
 
@@ -240,8 +242,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         nextElement();
 
         Vertex v = graph.addVertex(id);
-        if (vertexIDKey != null) {
-            v.setProperty(vertexIDKey, id);
+        if (vertexIdKey != null) {
+            v.setProperty(vertexIdKey, id);
         }
         cache.add(v, id);
         return new BatchVertex(id);
@@ -255,12 +257,20 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         final Vertex ov = getCachedVertex(outVertex.getId());
         final Vertex iv = getCachedVertex(inVertex.getId());
         currentEdgeCached = graph.addEdge(id, ov, iv, label);
-        if (edgeIDKey != null && id != null) {
-            currentEdgeCached.setProperty(edgeIDKey, id);
+        if (edgeIdKey != null && id != null) {
+            currentEdgeCached.setProperty(edgeIdKey, id);
         }
 
         currentEdge = new BatchEdge();
         return currentEdge;
+    }
+
+    public void setBufferSize(final long bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    public long getBufferSize() {
+        return this.bufferSize;
     }
 
     // ################### Unsupported Graph Methods ####################
@@ -396,11 +406,11 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     }
 
 
-    private static final UnsupportedOperationException retrievalNotSupported() {
+    private static UnsupportedOperationException retrievalNotSupported() {
         return new UnsupportedOperationException("Retrieval operations are not supported during batch loading");
     }
 
-    private static final UnsupportedOperationException removalNotSupported() {
+    private static UnsupportedOperationException removalNotSupported() {
         return new UnsupportedOperationException("Removal operations are not supported during batch loading");
     }
 
