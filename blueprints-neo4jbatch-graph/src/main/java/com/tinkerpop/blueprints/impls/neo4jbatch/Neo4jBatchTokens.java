@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.impls.neo4jbatch;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchTokens {
+class Neo4jBatchTokens {
 
     public static final String TYPE = "type";
     public static final String EXACT = "exact";

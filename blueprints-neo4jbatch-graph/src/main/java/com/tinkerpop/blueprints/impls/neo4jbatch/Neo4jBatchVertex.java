@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
+class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
 
     public Neo4jBatchVertex(final Neo4jBatchGraph graph, final Long id) {
         super(graph, id);

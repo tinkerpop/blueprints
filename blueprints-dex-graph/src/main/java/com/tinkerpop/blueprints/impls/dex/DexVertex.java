@@ -24,7 +24,7 @@ import java.util.List;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexVertex extends DexElement implements Vertex {
+class DexVertex extends DexElement implements Vertex {
     /**
      * Creates a new instance.
      *

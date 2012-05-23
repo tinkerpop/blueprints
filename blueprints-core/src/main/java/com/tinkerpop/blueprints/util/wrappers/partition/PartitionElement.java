@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionElement implements Element {
+class PartitionElement implements Element {
 
     protected Element baseElement;
     protected PartitionGraph graph;

@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class SailEdgeIterable implements Iterable<Edge> {
+class SailEdgeIterable implements Iterable<Edge> {
 
 
     private final SailGraph graph;

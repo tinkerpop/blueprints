@@ -7,7 +7,7 @@ import com.tinkerpop.blueprints.Vertex;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedEdge extends WrappedElement implements Edge {
+class WrappedEdge extends WrappedElement implements Edge {
 
     public WrappedEdge(final Edge baseEdge) {
         super(baseEdge);

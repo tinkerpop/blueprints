@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedVertexIterable implements CloseableIterable<Vertex> {
+class WrappedVertexIterable implements CloseableIterable<Vertex> {
 
     private final Iterable<Vertex> iterable;
 

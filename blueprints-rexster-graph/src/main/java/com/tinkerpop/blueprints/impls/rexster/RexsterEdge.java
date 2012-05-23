@@ -10,7 +10,7 @@ import org.codehaus.jettison.json.JSONObject;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterEdge extends RexsterElement implements Edge {
+class RexsterEdge extends RexsterElement implements Edge {
 
     private final String label;
     private final Object outVertex;

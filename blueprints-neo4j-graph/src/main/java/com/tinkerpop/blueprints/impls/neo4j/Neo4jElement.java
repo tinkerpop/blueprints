@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class Neo4jElement implements Element {
+abstract class Neo4jElement implements Element {
 
     protected final Neo4jGraph graph;
     protected PropertyContainer rawElement;

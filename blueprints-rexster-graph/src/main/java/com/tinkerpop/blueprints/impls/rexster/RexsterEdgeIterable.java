@@ -9,7 +9,7 @@ import java.util.Queue;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterEdgeIterable extends RexsterElementIterable<Edge> {
+class RexsterEdgeIterable extends RexsterElementIterable<Edge> {
 
     public RexsterEdgeIterable(final String uri, final RexsterGraph graph) {
         super(uri, graph);

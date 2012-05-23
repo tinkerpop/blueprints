@@ -7,7 +7,7 @@ import com.tinkerpop.blueprints.Vertex;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionEdge extends PartitionElement implements Edge {
+class PartitionEdge extends PartitionElement implements Edge {
 
     public PartitionEdge(final Edge baseEdge, final PartitionGraph graph) {
         super(baseEdge, graph);

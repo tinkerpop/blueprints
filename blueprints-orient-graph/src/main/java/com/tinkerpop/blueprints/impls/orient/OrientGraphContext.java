@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraphContext {
+class OrientGraphContext {
     public Map<String, OrientIndex<? extends OrientElement>> manualIndices = new HashMap<String, OrientIndex<? extends OrientElement>>();
     public OGraphDatabase rawGraph;
 }

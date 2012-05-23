@@ -9,7 +9,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchVertexIterable implements CloseableIterable<Vertex> {
+class Neo4jBatchVertexIterable implements CloseableIterable<Vertex> {
 
     private final IndexHits<Long> hits;
     private final Neo4jBatchGraph graph;

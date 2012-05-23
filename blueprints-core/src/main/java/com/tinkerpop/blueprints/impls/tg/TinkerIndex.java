@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerIndex<T extends Element> implements Index<T>, Serializable {
+class TinkerIndex<T extends Element> implements Index<T>, Serializable {
 
     protected Map<String, Map<Object, Set<T>>> index = new HashMap<String, Map<Object, Set<T>>>();
     protected final String indexName;

@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class RexsterElement implements Element {
+abstract class RexsterElement implements Element {
 
     protected final Object id;
     protected final RexsterGraph graph;

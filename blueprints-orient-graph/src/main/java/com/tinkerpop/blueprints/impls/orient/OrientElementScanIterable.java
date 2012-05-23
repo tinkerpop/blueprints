@@ -13,7 +13,7 @@ import java.util.Iterator;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientElementScanIterable<T extends Element> implements CloseableIterable<T> {
+class OrientElementScanIterable<T extends Element> implements CloseableIterable<T> {
     private final Class<T> elementClass;
     private final OrientGraph graph;
     private final boolean polymorphic;

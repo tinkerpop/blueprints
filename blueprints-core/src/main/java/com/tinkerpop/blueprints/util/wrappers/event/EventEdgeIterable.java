@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventEdgeIterable implements CloseableIterable<Edge> {
+class EventEdgeIterable implements CloseableIterable<Edge> {
 
     private final Iterable<Edge> iterable;
     private final List<GraphChangedListener> graphChangedListeners;

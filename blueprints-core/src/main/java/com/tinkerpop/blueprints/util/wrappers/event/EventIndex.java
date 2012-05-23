@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventIndex<T extends Element> implements Index<T> {
+class EventIndex<T extends Element> implements Index<T> {
     protected final Index<T> rawIndex;
     protected final List<GraphChangedListener> graphChangedListeners;
 

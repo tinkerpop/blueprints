@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedIndexIterable<T extends Element> implements Iterable<Index<T>> {
+class WrappedIndexIterable<T extends Element> implements Iterable<Index<T>> {
 
     private Iterable<Index<T>> iterable;
 

@@ -23,7 +23,7 @@ import java.util.Collections;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 @SuppressWarnings("unchecked")
-public class OrientIndex<T extends OrientElement> implements Index<T> {
+class OrientIndex<T extends OrientElement> implements Index<T> {
     private static final String VERTEX = "Vertex";
     private static final String EDGE = "Edge";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";

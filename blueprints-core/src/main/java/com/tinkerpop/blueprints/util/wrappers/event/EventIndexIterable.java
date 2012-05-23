@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventIndexIterable<T extends Element> implements Iterable<Index<T>> {
+class EventIndexIterable<T extends Element> implements Iterable<Index<T>> {
 
     private final Iterable<Index<T>> iterable;
     private final List<GraphChangedListener> graphChangedListeners;

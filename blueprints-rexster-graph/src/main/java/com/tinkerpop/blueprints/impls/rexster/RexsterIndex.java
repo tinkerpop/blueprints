@@ -11,7 +11,7 @@ import org.codehaus.jettison.json.JSONObject;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterIndex<T extends Element> implements Index<T> {
+class RexsterIndex<T extends Element> implements Index<T> {
 
     protected final String indexName;
     protected final Class<T> indexClass;

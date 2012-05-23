@@ -9,7 +9,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchEdgeIterable implements CloseableIterable<Edge> {
+class Neo4jBatchEdgeIterable implements CloseableIterable<Edge> {
 
     private final IndexHits<Long> hits;
     private final Neo4jBatchGraph graph;

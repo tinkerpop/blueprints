@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyIndexIterable<T extends Element> implements Iterable<Index<T>> {
+class ReadOnlyIndexIterable<T extends Element> implements Iterable<Index<T>> {
 
     private final Iterable<Index<T>> iterable;
 

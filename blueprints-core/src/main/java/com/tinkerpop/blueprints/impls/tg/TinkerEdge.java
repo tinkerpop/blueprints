@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerEdge extends TinkerElement implements Edge, Serializable {
+class TinkerEdge extends TinkerElement implements Edge, Serializable {
 
     private final String label;
     private final Vertex inVertex;

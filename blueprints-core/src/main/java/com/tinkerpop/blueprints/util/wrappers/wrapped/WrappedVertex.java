@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedVertex extends WrappedElement implements Vertex {
+class WrappedVertex extends WrappedElement implements Vertex {
 
     public WrappedVertex(final Vertex baseVertex) {
         super(baseVertex);

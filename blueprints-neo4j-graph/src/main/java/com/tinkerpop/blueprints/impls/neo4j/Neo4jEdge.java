@@ -11,7 +11,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jEdge extends Neo4jElement implements Edge {
+class Neo4jEdge extends Neo4jElement implements Edge {
 
     public Neo4jEdge(final Relationship relationship, final Neo4jGraph graph) {
         this(relationship, graph, false);

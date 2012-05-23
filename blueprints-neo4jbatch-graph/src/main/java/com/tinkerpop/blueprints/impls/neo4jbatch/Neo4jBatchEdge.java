@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
+class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
 
     private final String label;
 

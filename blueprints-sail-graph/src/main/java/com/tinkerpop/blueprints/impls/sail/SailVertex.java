@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class SailVertex implements Vertex {
+class SailVertex implements Vertex {
 
     protected Value rawVertex;
     protected SailGraph graph;

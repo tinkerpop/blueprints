@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements Index<T> {
+class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements Index<T> {
 
     private final Class<T> indexClass;
     protected final Neo4jGraph graph;

@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.impls.rexster;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterTokens {
+class RexsterTokens {
 
     public static final String RESULTS = "results";
     public static final String MESSAGE = "message";

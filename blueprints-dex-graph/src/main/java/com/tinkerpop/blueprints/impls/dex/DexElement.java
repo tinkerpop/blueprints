@@ -25,7 +25,7 @@ import java.util.Set;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexElement implements Element {
+class DexElement implements Element {
     /**
      * DexGraph instance.
      */

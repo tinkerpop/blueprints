@@ -21,7 +21,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexEdge extends DexElement implements Edge {
+class DexEdge extends DexElement implements Edge {
 
     /**
      * In vertex.

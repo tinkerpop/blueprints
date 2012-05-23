@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchIndex<T extends Element> implements Index<T> {
+class Neo4jBatchIndex<T extends Element> implements Index<T> {
 
     private final Neo4jBatchGraph graph;
     protected final BatchInserterIndex rawIndex;

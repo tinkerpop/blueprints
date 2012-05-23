@@ -10,7 +10,7 @@ import java.util.NoSuchElementException;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class OrientElementIterator<T extends Element> implements Iterator<T> {
+class OrientElementIterator<T extends Element> implements Iterator<T> {
 
     private final Iterator itty;
     private final OrientGraph graph;

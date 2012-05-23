@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerVertex extends TinkerElement implements Vertex, Serializable {
+class TinkerVertex extends TinkerElement implements Vertex, Serializable {
 
     protected Map<String, Set<Edge>> outEdges = new HashMap<String, Set<Edge>>();
     protected Map<String, Set<Edge>> inEdges = new HashMap<String, Set<Edge>>();

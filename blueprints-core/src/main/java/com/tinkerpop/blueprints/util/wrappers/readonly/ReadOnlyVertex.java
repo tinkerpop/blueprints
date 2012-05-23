@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
+class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
 
     public ReadOnlyVertex(final Vertex baseVertex) {
         super(baseVertex);

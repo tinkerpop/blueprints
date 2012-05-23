@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class Neo4jBatchElement implements Element {
+abstract class Neo4jBatchElement implements Element {
 
     protected final Neo4jBatchGraph graph;
     protected final Long id;

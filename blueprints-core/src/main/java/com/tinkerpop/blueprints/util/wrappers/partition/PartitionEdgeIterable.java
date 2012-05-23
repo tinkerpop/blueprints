@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionEdgeIterable implements CloseableIterable<Edge> {
+class PartitionEdgeIterable implements CloseableIterable<Edge> {
 
     private final Iterable<Edge> iterable;
     private final PartitionGraph graph;

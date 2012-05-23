@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class TinkerElement implements Element, Serializable {
+abstract class TinkerElement implements Element, Serializable {
 
     protected Map<String, Object> properties = new HashMap<String, Object>();
     protected final String id;

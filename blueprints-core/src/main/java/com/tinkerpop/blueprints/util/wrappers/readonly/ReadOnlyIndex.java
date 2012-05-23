@@ -10,7 +10,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyIndex<T extends Element> implements Index<T> {
+class ReadOnlyIndex<T extends Element> implements Index<T> {
 
     protected final Index<T> rawIndex;
 

@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class SailHelper {
+class SailHelper {
     public static final Pattern literalPattern = Pattern.compile("^\"(.*?)\"((\\^\\^<(.+?)>)$|(@(.{2}))$)");
 
     protected static void removeStatement(final Statement statement, final SailConnection sailConnection) {

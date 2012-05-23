@@ -19,7 +19,7 @@ import java.util.Set;
  *
  * @author Stephen Mallette
  */
-public class EventElement implements Element {
+class EventElement implements Element {
     protected final EventTrigger trigger;
 
     protected final Element baseElement;

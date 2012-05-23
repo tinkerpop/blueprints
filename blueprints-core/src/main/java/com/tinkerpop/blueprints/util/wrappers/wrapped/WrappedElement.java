@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedElement implements Element {
+class WrappedElement implements Element {
 
     protected Element baseElement;
 

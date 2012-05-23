@@ -10,7 +10,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class WrappedIndex<T extends Element> implements Index<T> {
+class WrappedIndex<T extends Element> implements Index<T> {
 
     protected Index<T> rawIndex;
 

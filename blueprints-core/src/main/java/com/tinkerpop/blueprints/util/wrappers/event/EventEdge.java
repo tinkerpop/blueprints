@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-public class EventEdge extends EventElement implements Edge {
+class EventEdge extends EventElement implements Edge {
 
     public EventEdge(final Edge rawEdge, final List<GraphChangedListener> graphChangedListeners,
                      final EventTrigger trigger) {

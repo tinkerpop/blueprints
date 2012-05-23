@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexIterable<T extends Element> implements CloseableIterable<T> {
+class DexIterable<T extends Element> implements CloseableIterable<T> {
 
     private DexGraph graph;
     private com.sparsity.dex.gdb.Objects iterable;

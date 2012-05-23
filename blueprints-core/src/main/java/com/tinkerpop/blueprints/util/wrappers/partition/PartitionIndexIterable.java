@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class PartitionIndexIterable<T extends Element> implements Iterable<Index<T>> {
+class PartitionIndexIterable<T extends Element> implements Iterable<Index<T>> {
 
     protected Iterable<Index<T>> iterable;
     private final PartitionGraph graph;

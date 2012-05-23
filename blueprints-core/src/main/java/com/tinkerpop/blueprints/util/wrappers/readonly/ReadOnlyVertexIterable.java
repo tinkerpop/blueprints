@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class ReadOnlyVertexIterable implements CloseableIterable<Vertex> {
+class ReadOnlyVertexIterable implements CloseableIterable<Vertex> {
 
     private final Iterable<Vertex> iterable;
 

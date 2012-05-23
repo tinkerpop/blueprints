@@ -12,7 +12,7 @@ import java.util.Queue;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class RexsterElementIterable<T extends Element> implements CloseableIterable<T> {
+abstract class RexsterElementIterable<T extends Element> implements CloseableIterable<T> {
 
     protected final RexsterGraph graph;
     protected final String uri;

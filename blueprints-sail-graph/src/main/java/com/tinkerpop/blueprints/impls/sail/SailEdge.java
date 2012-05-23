@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class SailEdge implements Edge {
+class SailEdge implements Edge {
 
     protected Statement rawEdge;
     protected SailGraph graph;

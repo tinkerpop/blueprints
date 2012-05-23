@@ -9,7 +9,7 @@ import java.util.Queue;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterVertexIterable extends RexsterElementIterable<Vertex> {
+class RexsterVertexIterable extends RexsterElementIterable<Vertex> {
 
     public RexsterVertexIterable(final String uri, final RexsterGraph graph) {
         super(uri, graph);

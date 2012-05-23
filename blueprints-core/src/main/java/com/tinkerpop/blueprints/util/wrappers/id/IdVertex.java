@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdVertex extends IdElement implements Vertex {
+class IdVertex extends IdElement implements Vertex {
 
     public IdVertex(final Vertex baseVertex) {
         super(baseVertex);
