@@ -5,4 +5,5 @@ target/
 *.iws
 *.DS_Store
 *.ipr
-
+buildAll.sh
+build_output.txt

@@ -61,8 +61,7 @@
                 <version>2.5</version>
 
                 <configuration>
-                    <argLine>-DtestRexsterGraph=false -Dusername=rexster -Dpassword=rexster
-                        -DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph
+                    <argLine>-DtestRexsterGraph=false -Dusername=rexster -Dpassword=rexster -DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph
                     </argLine>
                 </configuration>
             </plugin>
