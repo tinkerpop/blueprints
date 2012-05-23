@@ -7,8 +7,8 @@ import com.tinkerpop.blueprints.*;
  * implement transactional behavior but only counts transaction starts, successes and failures so that
  * these can be compared to expected behavior.
  * This class is only meant for testing.
- *
- *
+ * <br />
+ * <br />
  * (c) Matthias Broecheler (http://www.matthiasb.com)
  */
 

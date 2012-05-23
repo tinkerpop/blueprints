@@ -1,17 +1,17 @@
 Blueprints: A Property Graph Model Interface
 "http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
 
-==<hr/>==
-
 h2. Blueprints 2.y.z
 
-h3. Version 2.0.0 (NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
+
+h3. Version 2.0.0 (May 23, 2012)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.0.0</version>
 </dependency>
 ```
 
@@ -38,6 +38,10 @@ h3. Version 2.0.0 (NOT OFFICIALLY RELEASED YET)
 * Added @ThreadTransactionalGraph@ to support multiple threads within a single transaction
 * Changed the @Vertex@ API to only have three methods: @getEdges()@, @getVertices()@, and @query()@
 * Bumped to support Orient 1.0.1
+* Added @BatchGraph@ to support bulk loading of data
+* Added @WritethroughGraph@ to support mock @TransactionalGraph@-wrapping
+
+==<hr/>==
 
 h2. Blueprints 1.x
 

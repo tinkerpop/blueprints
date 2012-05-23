@@ -112,7 +112,7 @@ public class GraphMLReader {
         try {
             XMLStreamReader reader = inputFactory.createXMLStreamReader(graphMLInputStream);
 
-            final BatchGraph graph = BatchGraph.wrap(inputGraph);
+            final BatchGraph graph = BatchGraph.wrap(inputGraph, bufferSize);
 
             Map<String, String> keyIdMap = new HashMap<String, String>();
             Map<String, String> keyTypesMaps = new HashMap<String, String>();
@@ -162,12 +162,12 @@ public class GraphMLReader {
                         vertexIds[0] = reader.getAttributeValue(null, GraphMLTokens.SOURCE);
                         vertexIds[1] = reader.getAttributeValue(null, GraphMLTokens.TARGET);
                         edgeEndVertices = new Vertex[2];
-                        
-                        for (int i=0;i<2;i++) { //i=0 => outVertex, i=1 => inVertex
+
+                        for (int i = 0; i < 2; i++) { //i=0 => outVertex, i=1 => inVertex
                             if (vertexIdKey == null) {
-                                edgeEndVertices[i]=graph.getVertex(vertexIds[i]);
+                                edgeEndVertices[i] = graph.getVertex(vertexIds[i]);
                             } else {
-                                edgeEndVertices[i]=graph.getVertex(vertexMappedIdMap.get(vertexIds[i]));
+                                edgeEndVertices[i] = graph.getVertex(vertexMappedIdMap.get(vertexIds[i]));
                             }
 
                             if (null == edgeEndVertices[i]) {
@@ -213,7 +213,7 @@ public class GraphMLReader {
 
                     if (elementName.equals(GraphMLTokens.NODE)) {
                         Vertex currentVertex = graph.getVertex(vertexId);
-                        if (currentVertex==null) {
+                        if (currentVertex == null) {
                             currentVertex = graph.addVertex(vertexId);
                         }
 
@@ -233,7 +233,7 @@ public class GraphMLReader {
 
                         edgeId = null;
                         edgeLabel = null;
-                        edgeEndVertices=null;
+                        edgeEndVertices = null;
                         edgeProps = null;
                         inEdge = false;
                     }

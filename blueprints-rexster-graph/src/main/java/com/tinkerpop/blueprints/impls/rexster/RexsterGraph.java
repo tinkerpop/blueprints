@@ -10,7 +10,6 @@ import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -268,11 +267,11 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         final String c = getKeyIndexClass(elementClass);
         final JSONArray jsonArray = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c);
 
-        final HashSet<String> keys = new  HashSet<String>();
+        final HashSet<String> keys = new HashSet<String>();
         for (int ix = 0; ix < jsonArray.length(); ix++) {
             keys.add(jsonArray.optString(ix));
         }
-        
+
         return keys;
     }
 

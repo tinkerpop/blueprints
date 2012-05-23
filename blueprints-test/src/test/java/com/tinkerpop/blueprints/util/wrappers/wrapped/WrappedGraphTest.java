@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.wrapped;
 
 import com.tinkerpop.blueprints.EdgeTestSuite;
-import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.IndexTestSuite;
@@ -70,13 +69,7 @@ public class WrappedGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        return new WrappedIndexableGraph<TinkerGraph>(new TinkerGraph()) {
-            public Features getFeatures() {
-                final Features features = super.getFeatures();
-                features.isPersistent = false;
-                return features;
-            }
-        };
+        return new WrappedIndexableGraph<TinkerGraph>(new TinkerGraph());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {

@@ -7,6 +7,8 @@ import com.tinkerpop.blueprints.Vertex;
 import java.util.Iterator;
 
 /**
+ * VerticesFromEdgesIterable is a helper class that returns vertices that meet the direction/label criteria of the incident edges.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class VerticesFromEdgesIterable implements Iterable<Vertex> {

@@ -3,19 +3,19 @@
  */
 package com.tinkerpop.blueprints.impls.dex;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * {@link Element} implementation for Dex.
  * <p/>
  * All elements are typed or labeled. The way to get the type or label for an
- * element is retrieving the property. This
+ * element is retrieving the property {@link DexElement#LABEL_PROPERTY}. This
  * property cannot be set or removed.
  * <p/>
  * TODO: When a Float value is set for an attribute, it is stored as a Double
@@ -100,7 +100,7 @@ public class DexElement implements Element {
         }
         com.sparsity.dex.gdb.Attribute adata = graph.getRawGraph().getAttribute(attr);
         assert adata != null;
-        
+
         com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
         graph.getRawGraph().getAttribute(oid, attr, v);
         Object result = null;

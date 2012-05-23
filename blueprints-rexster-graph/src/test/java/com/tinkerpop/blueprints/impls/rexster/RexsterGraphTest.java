@@ -53,11 +53,13 @@ public class RexsterGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
+    /*
+    https://github.com/tinkerpop/rexster/issues/188
     public void testKeyIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new KeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
-    }
+    }*/
 
     public void testIndexableGraphTestSuite() throws Exception {
         this.stopWatch();

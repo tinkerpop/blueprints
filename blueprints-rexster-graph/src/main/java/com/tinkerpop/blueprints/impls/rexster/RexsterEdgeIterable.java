@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Vertex;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
