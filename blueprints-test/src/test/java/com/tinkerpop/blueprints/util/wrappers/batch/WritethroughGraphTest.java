@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.util.wrappers.transaction;
+package com.tinkerpop.blueprints.util.wrappers.batch;
 
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -14,7 +14,7 @@ import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 import java.lang.reflect.Method;
 
 /**
- * Standard test suite for {@link WritethroughGraph} without testing transactions.
+ * Standard test suite for {@link com.tinkerpop.blueprints.util.wrappers.batch.WritethroughGraph} without testing transactions.
  *
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */

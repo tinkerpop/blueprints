@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.util.wrappers.transaction;
+package com.tinkerpop.blueprints.util.wrappers.batch;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
@@ -21,11 +21,11 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 
-public class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, TransactionalGraph {
+class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, TransactionalGraph {
 
     private final T graph;
 
-    public WritethroughGraph(final T graph) {
+    WritethroughGraph(final T graph) {
         if (graph == null) throw new IllegalArgumentException("Graph expected");
         if (graph instanceof TransactionalGraph)
             throw new IllegalArgumentException("Can only wrap non-transactional graphs");

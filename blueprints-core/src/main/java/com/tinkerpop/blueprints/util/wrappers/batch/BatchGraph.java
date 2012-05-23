@@ -15,12 +15,11 @@ import com.tinkerpop.blueprints.util.wrappers.batch.cache.StringIDVertexCache;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.URLCompression;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.VertexCache;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
-import com.tinkerpop.blueprints.util.wrappers.transaction.WritethroughGraph;
 
 import java.util.Set;
 
 /**
- * BachLoadingGraph is a wrapper that enables batch loading of a large number of edges and vertices by chunking the entire
+ * BatchGraph is a wrapper that enables batch loading of a large number of edges and vertices by chunking the entire
  * load into smaller batches and maintaining a memory-efficient vertex cache so that the entire transactional state can
  * be flushed after each chunk is loaded.
  * <br />
@@ -36,7 +35,7 @@ import java.util.Set;
  * exceptions. This is done to avoid caching of edges which would require a great amount of memory.
  * <br />
  * BatchGraph wraps {@link TransactionalGraph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
- * which will additionally wrap non-transactional graphs using {@link WritethroughGraph}.
+ * which will additionally wrap non-transactional.
  * <br />
  * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use 
  * {@link #setVertexIdKey(String)} and {@link #setEdgeIdKey(String)} to set the keys for the vertex and edge properties
@@ -138,6 +137,13 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         else return new BatchGraph(new WritethroughGraph(graph));
     }
 
+    /**
+     * Constructs a BatchGraph wrapping the provided graph. Immediately returns the graph if its a BatchGraph
+     * and wraps non-transactional graphs in an additional {@link WritethroughGraph}.
+     *
+     * @param graph Graph to be wrapped
+     * @param buffer Size of the buffer
+     */
     public static BatchGraph wrap(final Graph graph, final long buffer) {
         if (graph instanceof BatchGraph) return (BatchGraph) graph;
         else if (graph instanceof TransactionalGraph)
