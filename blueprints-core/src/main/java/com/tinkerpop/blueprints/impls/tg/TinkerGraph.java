@@ -49,6 +49,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     private static final String GRAPH_FILE = "/tinkergraph.dat";
 
     private static final Features FEATURES = new Features();
+    private static final Features PERSISTENT_FEATURES;
 
     static {
         FEATURES.supportsDuplicateEdges = true;
@@ -66,7 +67,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         FEATURES.supportsStringProperty = true;
 
         FEATURES.ignoresSuppliedIds = false;
-        FEATURES.isPersistent = true;
+        FEATURES.isPersistent = false;
         FEATURES.isRDFModel = false;
         FEATURES.isWrapper = false;
 
@@ -80,6 +81,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         FEATURES.supportsVertexIteration = true;
         FEATURES.supportsEdgeIteration = true;
         FEATURES.supportsThreadedTransactions = false;
+
+        PERSISTENT_FEATURES = FEATURES.copyFeatures();
+        PERSISTENT_FEATURES.isPersistent = true;
     }
 
     public TinkerGraph(final String directory) {
@@ -354,7 +358,10 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public Features getFeatures() {
-        return FEATURES;
+        if (null == directory)
+            return FEATURES;
+        else
+            return PERSISTENT_FEATURES;
     }
 
     protected class TinkerKeyIndex<T extends TinkerElement> extends TinkerIndex<T> implements Serializable {

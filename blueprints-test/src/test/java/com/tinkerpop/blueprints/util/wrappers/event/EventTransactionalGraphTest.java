@@ -80,13 +80,7 @@ public class EventTransactionalGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        return new EventTransactionalIndexableGraph<TinkerTransactionalGraph>(new TinkerTransactionalGraph()) {
-            public Features getFeatures() {
-                final Features features = super.getFeatures();
-                features.isPersistent = false;
-                return features;
-            }
-        };
+        return new EventTransactionalIndexableGraph<TinkerTransactionalGraph>(new TinkerTransactionalGraph());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {

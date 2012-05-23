@@ -82,13 +82,7 @@ public class EventGraphTest extends GraphTest {
 
 
     public Graph generateGraph() {
-        return new EventIndexableGraph<TinkerGraph>(new TinkerGraph()) {
-            public Features getFeatures() {
-                final Features features = super.getFeatures();
-                features.isPersistent = false;
-                return features;
-            }
-        };
+        return new EventIndexableGraph<TinkerGraph>(new TinkerGraph());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {

@@ -1,7 +1,14 @@
 package com.tinkerpop.blueprints.impls.dex;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.sparsity.dex.gdb.AttributeKind;
 import com.sparsity.dex.gdb.ObjectType;
+import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -13,17 +20,16 @@ import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Dex is a graph database developed by Sparsity Technologies.
  * Dex natively supports the property graph data model defined by Blueprints. However, there are a few peculiarities.
- * Vertices are labeled: When adding vertices, the user can set DexGraph.label to be used as the label of the vertex to be created.
- * Also, the label of a vertex (or even an element) can be retrieved through the DEXElement.getTypeLabel().
+ * No user defined element identifiers: Dex is the gatekeeper and creator of vertex and edge identifiers.
+ * Thus, when creating a new vertex or edge instance, the provided object identifier is ignored.
+ * Vertices are labeled too: When adding vertices, the user can set DexGraph#LABEL to be used as the label of the vertex to be created.
+ * Also, the label of a vertex (or even an element) can be retrieved through the DEXElement#LABEL_PROPERTY property.
+ * DexGraph implements IndexableGraph. However, the use of indices is limited when working with Dex and is explained as follows:
+ * There is no support to create indices. By default, there is an AutomaticIndex for each existing label which corresponds to the name of the index.
+ * Also, each index contains a key for each existing property.
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity Technologies</a>
  */
@@ -36,12 +42,12 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     /**
      * This is a "bypass" to set the Dex vertex label (node type).
-     * <p/>
+     * <p>
      * Dex vertices belong to a vertex/node type (thus all of them have a label).
      * By default, all vertices will have the {@link #DEFAULT_DEX_VERTEX_LABEL} label.
      * The user may set a different vertex label by setting this property when calling
      * {@link #addVertex(Object)}.
-     * <p/>
+     * <p>
      * Moreover, this value will also be used for the KeyIndex-related methods.
      *
      * @see #addVertex(Object)
@@ -173,14 +179,15 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     /**
      * Creates a new Vertex.
-     * <p/>
+     * <p>
      * Given identifier is ignored.
-     * <p/>
+     * <p>
      * Use {@link #label} to specify the label for the new Vertex.
      * If no label is given, {@value #DEFAULT_DEX_VERTEX_LABEL} will be used.
      *
      * @param id It is ignored.
      * @return Added Vertex.
+     *
      * @see com.tinkerpop.blueprints.Graph#addVertex(java.lang.Object)
      * @see #label
      */
@@ -241,7 +248,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       * @see com.tinkerpop.blueprints.Graph#getVertices()
       */
     @Override
-    public Iterable<Vertex> getVertices() {
+    public CloseableIterable<Vertex> getVertices() {
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
         List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer type : tlist) {
@@ -255,10 +262,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     /**
      * Returns an iterable to all the vertices in the graph that have a particular key/value property.
-     * <p/>
+     * <p>
      * In case key is {@link StringFactory#LABEL}, it returns an iterable of all the vertices having
      * the given value as the label (therefore, belonging to the given type).
-     * <p/>
+     * <p>
      * In case {@link #label} is null, it will return all vertices having a particular
      * key/value no matters the type.
      * In case {@link #label} is not null, it will return all vertices having a particular
@@ -268,7 +275,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * @see #label
      */
     @Override
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
+    public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
 
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
 
@@ -398,7 +405,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       * @see com.tinkerpop.blueprints.Graph#getEdges()
       */
     @Override
-    public Iterable<Edge> getEdges() {
+    public CloseableIterable<Edge> getEdges() {
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
         List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer type : tlist) {
@@ -412,10 +419,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     /**
      * Returns an iterable to all the edges in the graph that have a particular key/value property.
-     * <p/>
+     * <p>
      * In case key is {@link StringFactory#LABEL}, it returns an iterable of all the edges having
      * the given value as the label (therefore, belonging to the given type).
-     * <p/>
+     * <p>
      * In case {@link #label} is null, it will return all edges having a particular
      * key/value no matters the type.
      * In case {@link #label} is not null, it will return all edges having a particular
@@ -425,7 +432,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * @see #label
      */
     @Override
-    public Iterable<Edge> getEdges(final String key, final Object value) {
+    public CloseableIterable<Edge> getEdges(final String key, final Object value) {
 
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
 
@@ -559,15 +566,15 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     /**
      * Create an automatic indexing structure for indexing provided key for element class.
-     * <p/>
+     * <p>
      * Dex attributes are restricted to an specific vertex/edge type. The property
      * {@link #label} must be used to specify the vertex/edge label.
-     * <p/>
+     * <p>
      * The index could be created even before the vertex/edge label
      * had been created (that is, there are no instances for the given vertex/edge label).
      * If so, this will create the vertex/edge type automatically.
      * The same way, if necessary the attribute will be created automatically.
-     * <p/>
+     * <p>
      * FIXME: In case the attribute is created, this always creates an String
      * attribute, could this be set somehow?
      *
@@ -579,7 +586,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
                                                    Class<T> elementClass) {
         String label = this.label.get();
         if (label == null) {
-            throw new IllegalArgumentException("Label can not be null");
+            throw new IllegalArgumentException("Label must be given");
         }
 
         int type = this.getRawGraph().findType(label);

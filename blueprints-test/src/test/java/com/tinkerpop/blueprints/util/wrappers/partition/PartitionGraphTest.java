@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.util.wrappers.partition;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
-import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.IndexTestSuite;
@@ -75,13 +74,7 @@ public class PartitionGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        return new PartitionIndexableGraph<TinkerGraph>(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph"))) {
-            public Features getFeatures() {
-                final Features features = super.getFeatures();
-                features.isPersistent = false;
-                return features;
-            }
-        };
+        return new PartitionIndexableGraph<TinkerGraph>(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph")));
     }
 
 

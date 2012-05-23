@@ -3,6 +3,7 @@
  */
 package com.tinkerpop.blueprints.impls.dex;
 
+import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
@@ -10,6 +11,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +35,7 @@ public class DexVertex extends DexElement implements Vertex {
         super(g, oid);
     }
 
-    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+    public CloseableIterable<Edge> getEdges(final Direction direction, final String... labels) {
         if (direction.equals(Direction.OUT)) {
             return this.getOutEdges(labels);
         } else if (direction.equals(Direction.IN))
@@ -43,7 +45,7 @@ public class DexVertex extends DexElement implements Vertex {
         }
     }
 
-    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+    public CloseableIterable<Vertex> getVertices(final Direction direction, final String... labels) {
         if (direction.equals(Direction.OUT)) {
             return this.getOutVertices(labels);
         } else if (direction.equals(Direction.IN))
@@ -53,7 +55,7 @@ public class DexVertex extends DexElement implements Vertex {
         }
     }
 
-    private Iterable<Edge> getOutEdgesNoLabels() {
+    private CloseableIterable<Edge> getOutEdgesNoLabels() {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer etype : tlist) {
@@ -64,7 +66,7 @@ public class DexVertex extends DexElement implements Vertex {
         return new MultiIterable<Edge>(edges);
     }
 
-    private Iterable<Vertex> getOutVerticesNoLabels() {
+    private CloseableIterable<Vertex> getOutVerticesNoLabels() {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer etype : tlist) {
@@ -75,7 +77,7 @@ public class DexVertex extends DexElement implements Vertex {
         return new MultiIterable<Vertex>(vertices);
     }
 
-    private Iterable<Edge> getInEdgesNoLabels() {
+    private CloseableIterable<Edge> getInEdgesNoLabels() {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer etype : tlist) {
@@ -86,7 +88,7 @@ public class DexVertex extends DexElement implements Vertex {
         return new MultiIterable<Edge>(edges);
     }
 
-    private Iterable<Vertex> getInVerticesNoLabels() {
+    private CloseableIterable<Vertex> getInVerticesNoLabels() {
         com.sparsity.dex.gdb.TypeList tlist = graph.getRawGraph().findEdgeTypes();
         final List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer etype : tlist) {
@@ -97,58 +99,58 @@ public class DexVertex extends DexElement implements Vertex {
         return new MultiIterable<Vertex>(vertices);
     }
 
-    private Iterable<Edge> getOutEdgesSingleLabel(final String label) {
+    private CloseableIterable<Edge> getOutEdgesSingleLabel(final String label) {
         int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
-            return Collections.emptyList();
+            return new WrappingCloseableIterable<Edge>((Iterable) Collections.emptyList());
         }
 
         return getOutEdgesSingleType(type);
     }
 
-    private Iterable<Vertex> getOutVerticesSingleLabel(final String label) {
+    private CloseableIterable<Vertex> getOutVerticesSingleLabel(final String label) {
         int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
-            return Collections.emptyList();
+            return new WrappingCloseableIterable<Vertex>((Iterable) Collections.emptyList());
         }
 
         return getOutVerticesSingleType(type);
     }
 
-    private Iterable<Edge> getOutEdgesSingleType(final int type) {
+    private CloseableIterable<Edge> getOutEdgesSingleType(final int type) {
         com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, type, com.sparsity.dex.gdb.EdgesDirection.Outgoing);
         return new DexIterable<Edge>(graph, objs, Edge.class);
     }
 
-    private Iterable<Vertex> getOutVerticesSingleType(final int type) {
+    private CloseableIterable<Vertex> getOutVerticesSingleType(final int type) {
         com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().neighbors(oid, type, com.sparsity.dex.gdb.EdgesDirection.Outgoing);
         return new DexIterable<Vertex>(graph, objs, Vertex.class);
     }
 
-    private Iterable<Edge> getInEdgesSingleLabel(final String label) {
+    private CloseableIterable<Edge> getInEdgesSingleLabel(final String label) {
         int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
-            return Collections.emptyList();
+            return new WrappingCloseableIterable<Edge>((Iterable) Collections.emptyList());
         }
 
         return getInEdgesSingleType(type);
     }
 
-    private Iterable<Vertex> getInVerticesSingleLabel(final String label) {
+    private CloseableIterable<Vertex> getInVerticesSingleLabel(final String label) {
         int type = graph.getRawGraph().findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
-            return Collections.emptyList();
+            return new WrappingCloseableIterable<Vertex>((Iterable) Collections.emptyList());
         }
 
         return getInVerticesSingleType(type);
     }
 
-    private Iterable<Edge> getInEdgesSingleType(final int type) {
+    private CloseableIterable<Edge> getInEdgesSingleType(final int type) {
         com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().explode(oid, type, com.sparsity.dex.gdb.EdgesDirection.Ingoing);
         return new DexIterable<Edge>(graph, objs, Edge.class);
     }
 
-    private Iterable<Vertex> getInVerticesSingleType(final int type) {
+    private CloseableIterable<Vertex> getInVerticesSingleType(final int type) {
         com.sparsity.dex.gdb.Objects objs = graph.getRawGraph().neighbors(oid, type, com.sparsity.dex.gdb.EdgesDirection.Ingoing);
         return new DexIterable<Vertex>(graph, objs, Vertex.class);
     }
@@ -157,7 +159,7 @@ public class DexVertex extends DexElement implements Vertex {
         return StringFactory.vertexString(this);
     }
 
-    private Iterable<Edge> getInEdges(final String... labels) {
+    private CloseableIterable<Edge> getInEdges(final String... labels) {
         if (labels.length == 0)
             return this.getInEdgesNoLabels();
         else if (labels.length == 1) {
@@ -171,7 +173,7 @@ public class DexVertex extends DexElement implements Vertex {
         }
     }
 
-    private Iterable<Vertex> getInVertices(final String... labels) {
+    private CloseableIterable<Vertex> getInVertices(final String... labels) {
         if (labels.length == 0)
             return this.getInVerticesNoLabels();
         else if (labels.length == 1) {
@@ -185,7 +187,7 @@ public class DexVertex extends DexElement implements Vertex {
         }
     }
 
-    private Iterable<Edge> getOutEdges(final String... labels) {
+    private CloseableIterable<Edge> getOutEdges(final String... labels) {
         if (labels.length == 0)
             return this.getOutEdgesNoLabels();
         else if (labels.length == 1) {
@@ -199,7 +201,7 @@ public class DexVertex extends DexElement implements Vertex {
         }
     }
 
-    private Iterable<Vertex> getOutVertices(final String... labels) {
+    private CloseableIterable<Vertex> getOutVertices(final String... labels) {
         if (labels.length == 0)
             return this.getOutVerticesNoLabels();
         else if (labels.length == 1) {

@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.util.wrappers.transaction;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.EdgeTestSuite;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphTestSuite;
+import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
@@ -11,7 +15,7 @@ import java.lang.reflect.Method;
 
 /**
  * Standard test suite for {@link WritethroughGraph} without testing transactions.
- * 
+ *
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 public class WritethroughGraphTest extends GraphTest {

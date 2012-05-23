@@ -169,9 +169,7 @@ public class IdGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        final TinkerGraph baseGraph = new TinkerGraph();
-        baseGraph.getFeatures().isPersistent = false;
-        return new IdGraph<TinkerGraph>(baseGraph);
+        return new IdGraph<TinkerGraph>(new TinkerGraph());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
