@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdEdgeIterable implements CloseableIterable<Edge> {
+class IdEdgeIterable implements CloseableIterable<Edge> {
     private final Iterable<Edge> iterable;
 
     public IdEdgeIterable(Iterable<Edge> iterable) {

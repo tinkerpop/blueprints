@@ -9,12 +9,12 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class PartitionElement implements Element {
+public abstract class PartitionElement implements Element {
 
     protected Element baseElement;
     protected PartitionGraph graph;
 
-    public PartitionElement(final Element baseElement, final PartitionGraph graph) {
+    protected PartitionElement(final Element baseElement, final PartitionGraph graph) {
         this.baseElement = baseElement;
         this.graph = graph;
     }

@@ -162,7 +162,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     public void removeEdge(final Edge edge) {
         verifyNativeElement(edge);
 
-        baseGraph.removeEdge(((IdEdge) edge).getBase());
+        baseGraph.removeEdge(((IdEdge) edge).getBaseEdge());
     }
 
     public Iterable<Edge> getEdges() {

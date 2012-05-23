@@ -23,7 +23,7 @@ import java.util.Collections;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 @SuppressWarnings("unchecked")
-class OrientIndex<T extends OrientElement> implements Index<T> {
+public class OrientIndex<T extends OrientElement> implements Index<T> {
     private static final String VERTEX = "Vertex";
     private static final String EDGE = "Edge";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
@@ -35,13 +35,13 @@ class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected Class<? extends Element> indexClass;
 
-    OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass, final OType iType) {
+    protected OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass, final OType iType) {
         this.graph = graph;
         this.indexClass = indexClass;
         create(indexName, this.indexClass, iType);
     }
 
-    public OrientIndex(OrientGraph orientGraph, OIndex<?> rawIndex) {
+    protected OrientIndex(OrientGraph orientGraph, OIndex<?> rawIndex) {
         this.graph = orientGraph;
         this.underlying = rawIndex instanceof OIndexTxAwareMultiValue ? rawIndex : new OIndexTxAwareMultiValue(
                 orientGraph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) rawIndex);

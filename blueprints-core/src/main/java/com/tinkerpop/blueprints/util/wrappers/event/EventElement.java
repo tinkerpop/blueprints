@@ -19,13 +19,13 @@ import java.util.Set;
  *
  * @author Stephen Mallette
  */
-class EventElement implements Element {
+public abstract class EventElement implements Element {
     protected final EventTrigger trigger;
 
     protected final Element baseElement;
     protected final List<GraphChangedListener> graphChangedListeners;
 
-    public EventElement(final Element baseElement, final List<GraphChangedListener> graphChangedListeners,
+    protected EventElement(final Element baseElement, final List<GraphChangedListener> graphChangedListeners,
                         final EventTrigger trigger) {
         this.baseElement = baseElement;
         this.graphChangedListeners = graphChangedListeners;

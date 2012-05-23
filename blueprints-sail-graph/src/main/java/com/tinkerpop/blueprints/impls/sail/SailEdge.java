@@ -19,14 +19,14 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class SailEdge implements Edge {
+public class SailEdge implements Edge {
 
     protected Statement rawEdge;
     protected SailGraph graph;
 
     private static final String NAMED_GRAPH_PROPERTY = "RDF graph edges can only have context/named graph (ng) properties";
 
-    public SailEdge(final Statement rawEdge, final SailGraph graph) {
+    protected SailEdge(final Statement rawEdge, final SailGraph graph) {
         this.rawEdge = rawEdge;
         this.graph = graph;
     }

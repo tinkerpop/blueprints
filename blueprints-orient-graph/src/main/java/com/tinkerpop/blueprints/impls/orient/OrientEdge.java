@@ -13,14 +13,14 @@ import java.util.Set;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-class OrientEdge extends OrientElement implements Edge {
+public class OrientEdge extends OrientElement implements Edge {
 
-    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
+    protected OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
         this.rawElement.field(StringFactory.LABEL, label);
     }
 
-    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
+    protected OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
         super(rawGraph, rawEdge);
     }
 

@@ -8,11 +8,11 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class WrappedElement implements Element {
+public abstract class WrappedElement implements Element {
 
     protected Element baseElement;
 
-    public WrappedElement(final Element baseElement) {
+    protected WrappedElement(final Element baseElement) {
         this.baseElement = baseElement;
     }
 

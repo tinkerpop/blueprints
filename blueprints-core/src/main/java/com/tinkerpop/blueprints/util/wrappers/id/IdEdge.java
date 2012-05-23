@@ -7,13 +7,13 @@ import com.tinkerpop.blueprints.Vertex;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-class IdEdge extends IdElement implements Edge {
+public class IdEdge extends IdElement implements Edge {
 
-    public IdEdge(final Edge base) {
+    protected IdEdge(final Edge base) {
         super(base);
     }
 
-    public Edge getBase() {
+    public Edge getBaseEdge() {
         return (Edge) this.baseElement;
     }
 

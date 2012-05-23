@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class RexsterVertex extends RexsterElement implements Vertex {
+public class RexsterVertex extends RexsterElement implements Vertex {
 
-    public RexsterVertex(final JSONObject rawVertex, final RexsterGraph graph) {
+    protected RexsterVertex(final JSONObject rawVertex, final RexsterGraph graph) {
         super(rawVertex, graph);
     }
 

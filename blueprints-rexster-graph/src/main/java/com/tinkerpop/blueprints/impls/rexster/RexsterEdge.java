@@ -10,14 +10,14 @@ import org.codehaus.jettison.json.JSONObject;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class RexsterEdge extends RexsterElement implements Edge {
+public class RexsterEdge extends RexsterElement implements Edge {
 
     private final String label;
     private final Object outVertex;
     private final Object inVertex;
 
 
-    public RexsterEdge(final JSONObject rawEdge, final RexsterGraph graph) {
+    protected RexsterEdge(final JSONObject rawEdge, final RexsterGraph graph) {
         super(rawEdge, graph);
         this.label = rawEdge.optString(RexsterTokens._LABEL);
         this.outVertex = rawEdge.opt(RexsterTokens._OUTV);

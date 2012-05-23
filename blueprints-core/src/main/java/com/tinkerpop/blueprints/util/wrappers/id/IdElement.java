@@ -9,10 +9,10 @@ import java.util.Set;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-abstract class IdElement implements Element {
+public abstract class IdElement implements Element {
     protected final Element baseElement;
 
-    public IdElement(final Element baseElement) {
+    protected IdElement(final Element baseElement) {
         this.baseElement = baseElement;
     }
 

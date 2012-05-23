@@ -19,14 +19,14 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements Index<T> {
+public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements Index<T> {
 
     private final Class<T> indexClass;
     protected final Neo4jGraph graph;
     private final String indexName;
     protected org.neo4j.graphdb.index.Index<S> rawIndex;
 
-    public Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph, final Parameter... indexParameters) {
+    protected Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph, final Parameter... indexParameters) {
         this.indexClass = indexClass;
         this.graph = graph;
         this.indexName = indexName;
@@ -141,5 +141,9 @@ class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements
             map.put(parameter.getKey().toString(), parameter.getValue().toString());
         }
         return map;
+    }
+
+    public org.neo4j.graphdb.index.Index<S> getRawIndex() {
+        return this.rawIndex;
     }
 }

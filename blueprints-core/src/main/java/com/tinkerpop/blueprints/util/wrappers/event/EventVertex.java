@@ -15,8 +15,8 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-class EventVertex extends EventElement implements Vertex {
-    public EventVertex(final Vertex rawVertex, final List<GraphChangedListener> graphChangedListeners,
+public class EventVertex extends EventElement implements Vertex {
+    protected EventVertex(final Vertex rawVertex, final List<GraphChangedListener> graphChangedListeners,
                        final EventTrigger trigger) {
         super(rawVertex, graphChangedListeners, trigger);
     }

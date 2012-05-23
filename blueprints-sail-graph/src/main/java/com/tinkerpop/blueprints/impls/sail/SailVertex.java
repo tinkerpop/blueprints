@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class SailVertex implements Vertex {
+public class SailVertex implements Vertex {
 
     protected Value rawVertex;
     protected SailGraph graph;
@@ -48,7 +48,7 @@ class SailVertex implements Vertex {
         dataTypeToClass.put(SailTokens.XSD_NS + "double", "java.lang.Double");
     }
 
-    public SailVertex(final Value rawVertex, final SailGraph graph) {
+    protected SailVertex(final Value rawVertex, final SailGraph graph) {
         this.rawVertex = rawVertex;
         this.graph = graph;
     }

@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
+public abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
 
     protected final OrientGraph graph;
     protected final ODocument rawElement;

@@ -8,7 +8,7 @@ import java.util.Iterator;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdVertexIterable implements CloseableIterable<Vertex> {
+class IdVertexIterable implements CloseableIterable<Vertex> {
     private final Iterable<Vertex> iterable;
 
     public IdVertexIterable(Iterable<Vertex> iterable) {
