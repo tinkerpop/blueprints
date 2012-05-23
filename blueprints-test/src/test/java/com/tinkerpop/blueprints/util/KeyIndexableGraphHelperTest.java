@@ -5,9 +5,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

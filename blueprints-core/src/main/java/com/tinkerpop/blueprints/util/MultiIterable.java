@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints.util;
 
+import com.tinkerpop.blueprints.CloseableIterable;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import com.tinkerpop.blueprints.CloseableIterable;
 
 /**
  * A helper class that is used to combine multiple iterables into a single closeable iterable.
@@ -68,7 +68,7 @@ public class MultiIterable<S> implements CloseableIterable<S> {
     public void close() {
         for (Iterable<S> itty : iterables) {
             if (itty instanceof CloseableIterable) {
-                ((CloseableIterable<S>)itty).close();
+                ((CloseableIterable<S>) itty).close();
             }
         }
     }

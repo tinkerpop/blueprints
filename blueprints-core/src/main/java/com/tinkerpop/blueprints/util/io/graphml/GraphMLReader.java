@@ -112,8 +112,7 @@ public class GraphMLReader {
         try {
             XMLStreamReader reader = inputFactory.createXMLStreamReader(graphMLInputStream);
 
-            final BatchGraph graph = BatchGraph.wrap(inputGraph);
-            graph.setBufferSize(bufferSize);
+            final BatchGraph graph = BatchGraph.wrap(inputGraph, bufferSize);
 
             Map<String, String> keyIdMap = new HashMap<String, String>();
             Map<String, String> keyTypesMaps = new HashMap<String, String>();

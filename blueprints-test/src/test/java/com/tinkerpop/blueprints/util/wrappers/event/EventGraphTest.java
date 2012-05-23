@@ -4,7 +4,6 @@ package com.tinkerpop.blueprints.util.wrappers.event;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
-import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.IndexTestSuite;

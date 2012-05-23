@@ -142,6 +142,13 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         else return new BatchGraph(new WritethroughGraph(graph));
     }
 
+    public static BatchGraph wrap(final Graph graph, final long buffer) {
+        if (graph instanceof BatchGraph) return (BatchGraph) graph;
+        else if (graph instanceof TransactionalGraph)
+            return new BatchGraph((TransactionalGraph) graph, IDType.OBJECT, buffer);
+        else return new BatchGraph(new WritethroughGraph(graph), IDType.OBJECT, buffer);
+    }
+
     /**
      * Sets the key to be used when setting the vertex id as a property on the respective vertex.
      * If the key is null, then no property will be set.
@@ -263,14 +270,6 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
         currentEdge = new BatchEdge();
         return currentEdge;
-    }
-
-    public void setBufferSize(final long bufferSize) {
-        this.bufferSize = bufferSize;
-    }
-
-    public long getBufferSize() {
-        return this.bufferSize;
     }
 
     // ################### Unsupported Graph Methods ####################

@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class StubGraphChangedListener implements GraphChangedListener {

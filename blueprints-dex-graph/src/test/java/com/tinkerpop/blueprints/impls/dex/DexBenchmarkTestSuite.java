@@ -34,20 +34,20 @@ public class DexBenchmarkTestSuite extends TestSuite {
             graph = graphTest.generateGraph();
             this.stopWatch();
             int counter = 0;
-            CloseableIterable<Vertex> vv = (CloseableIterable<Vertex>)graph.getVertices();
+            CloseableIterable<Vertex> vv = (CloseableIterable<Vertex>) graph.getVertices();
             for (final Vertex vertex : vv) {
                 counter++;
-                CloseableIterable<Edge> ee = (CloseableIterable<Edge>) vertex.getEdges(Direction.OUT); 
+                CloseableIterable<Edge> ee = (CloseableIterable<Edge>) vertex.getEdges(Direction.OUT);
                 for (final Edge edge : ee) {
                     counter++;
                     final Vertex vertex2 = edge.getVertex(Direction.IN);
                     counter++;
-                    CloseableIterable<Edge> ee2 = (CloseableIterable<Edge>) vertex2.getEdges(Direction.OUT); 
+                    CloseableIterable<Edge> ee2 = (CloseableIterable<Edge>) vertex2.getEdges(Direction.OUT);
                     for (final Edge edge2 : ee2) {
                         counter++;
                         final Vertex vertex3 = edge2.getVertex(Direction.IN);
                         counter++;
-                        CloseableIterable<Edge> ee3 = (CloseableIterable<Edge>) vertex3.getEdges(Direction.OUT); 
+                        CloseableIterable<Edge> ee3 = (CloseableIterable<Edge>) vertex3.getEdges(Direction.OUT);
                         for (final Edge edge3 : ee3) {
                             counter++;
                             edge3.getVertex(Direction.OUT);

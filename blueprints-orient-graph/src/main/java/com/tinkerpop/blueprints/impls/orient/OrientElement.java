@@ -1,8 +1,5 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
 import com.orientechnologies.orient.core.exception.OSerializationException;
@@ -16,6 +13,9 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)

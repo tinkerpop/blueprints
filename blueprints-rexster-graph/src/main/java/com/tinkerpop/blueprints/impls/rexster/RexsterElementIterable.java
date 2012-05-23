@@ -28,7 +28,7 @@ public abstract class RexsterElementIterable<T extends Element> implements Close
             private final Queue<T> queue = new LinkedList<T>();
             private int start = 0;
             private int end = graph.getBufferSize();
-            
+
             public boolean hasNext() {
                 if (!queue.isEmpty())
                     return true;
@@ -41,12 +41,12 @@ public abstract class RexsterElementIterable<T extends Element> implements Close
                     return !queue.isEmpty();
                 }
             }
-    
-    
+
+
             public void remove() {
                 throw new NotImplementedException();
             }
-        
+
             public T next() {
                 if (!queue.isEmpty()) {
                     return queue.remove();

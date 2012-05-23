@@ -134,8 +134,7 @@ public class GMLReader {
     public static void inputGraph(final Graph inputGraph, final InputStream inputStream, final int bufferSize,
                                   final String defaultEdgeLabel, final String vertexIdKey, final String edgeIdKey,
                                   final String edgeLabelKey) throws IOException {
-        final BatchGraph graph = BatchGraph.wrap(inputGraph);
-        graph.setBufferSize(bufferSize);
+        final BatchGraph graph = BatchGraph.wrap(inputGraph, bufferSize);
 
         final Reader r = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("ISO-8859-1")));
         final StreamTokenizer st = new StreamTokenizer(r);

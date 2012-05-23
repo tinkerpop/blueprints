@@ -100,10 +100,10 @@ class GMLParser {
     private Vertex createVertex(final Map<String, Object> map, final Object id) {
         //final Object vertexId = vertexIdKey == null ? (graph.getFeatures().ignoresSuppliedIds ? null : id) : map.remove(vertexIdKey);
         Object vertexId = id;
-        if (vertexIdKey!=null) {
+        if (vertexIdKey != null) {
             vertexId = map.remove(vertexIdKey);
-            if (vertexId==null) vertexId=id;
-            vertexMappedIdMap.put(id,vertexId);
+            if (vertexId == null) vertexId = id;
+            vertexMappedIdMap.put(id, vertexId);
         }
         final Vertex createdVertex = graph.addVertex(vertexId);
 
@@ -121,7 +121,7 @@ class GMLParser {
         if (target == null) {
             throw new IOException("Edge has no target");
         }
-        if (vertexIdKey!=null) {
+        if (vertexIdKey != null) {
             source = vertexMappedIdMap.get(source);
             target = vertexMappedIdMap.get(target);
         }
