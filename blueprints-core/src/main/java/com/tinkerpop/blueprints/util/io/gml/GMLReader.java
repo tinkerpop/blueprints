@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.util.io.gml;
 
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.wrappers.batch.BufferGraph;
+import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -134,8 +134,7 @@ public class GMLReader {
     public static void inputGraph(final Graph inputGraph, final InputStream inputStream, final int bufferSize,
                                   final String defaultEdgeLabel, final String vertexIdKey, final String edgeIdKey,
                                   final String edgeLabelKey) throws IOException {
-        final Graph graph = inputGraph instanceof TransactionalGraph ?
-                new BufferGraph((TransactionalGraph) inputGraph, bufferSize) : inputGraph;
+        final BatchGraph graph = BatchGraph.wrap(inputGraph);
 
         final Reader r = new BufferedReader(new InputStreamReader(inputStream, Charset.forName("ISO-8859-1")));
         final StreamTokenizer st = new StreamTokenizer(r);
@@ -152,9 +151,7 @@ public class GMLReader {
 
             new GMLParser(graph, defaultEdgeLabel, vertexIdKey, edgeIdKey, edgeLabelKey).parse(st);
 
-            if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            }
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (IOException e) {
             throw new IOException("GML malformed line number " + st.lineno() + ": ", e);
         }

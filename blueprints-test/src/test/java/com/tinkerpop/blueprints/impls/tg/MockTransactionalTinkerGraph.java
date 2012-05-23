@@ -3,7 +3,13 @@ package com.tinkerpop.blueprints.impls.tg;
 import com.tinkerpop.blueprints.TransactionalGraph;
 
 /**
- * (c) Matthias Broecheler (me@matthiasb.com)
+ * Mocking TinkerGraph as a transactional graph for testing purposes. This implementation does not actually
+ * implement transactional behavior but only counts transaction starts, successes and failures so that
+ * these can be compared to expected behavior.
+ * This class is only meant for testing.
+ *
+ *
+ * (c) Matthias Broecheler (http://www.matthiasb.com)
  */
 
 public class MockTransactionalTinkerGraph extends TinkerGraph implements TransactionalGraph {

@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.batch.BufferGraph;
+import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
@@ -84,9 +84,8 @@ public class GraphSONReader {
         final JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
         // if this is a transactional graph then we're buffering
-        final Graph graph = inputGraph instanceof TransactionalGraph ?
-                new BufferGraph((TransactionalGraph) inputGraph, bufferSize) : inputGraph;
-        final Map<String, Object> vertexIdMap = new HashMap<String, Object>();
+        final BatchGraph graph = BatchGraph.wrap(inputGraph);
+        //final Map<String, Object> vertexIdMap = new HashMap<String, Object>();
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
             final String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();
@@ -101,7 +100,6 @@ public class GraphSONReader {
 
                     final String vertexId = node.get(GraphSONTokens._ID).getValueAsText();
                     final Vertex v = graph.addVertex(vertexId);
-                    vertexIdMap.put(vertexId, v.getId());
 
                     for (Map.Entry<String, Object> entry : props.entrySet()) {
                         v.setProperty(entry.getKey(), entry.getValue());
@@ -114,12 +112,10 @@ public class GraphSONReader {
                     final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
                     final String edgeId = node.get(GraphSONTokens._ID).getValueAsText();
-                    final Object inVertexKey = vertexIdMap.get(node.get(GraphSONTokens._IN_V).getValueAsText());
-                    final Object outVertexKey = vertexIdMap.get(node.get(GraphSONTokens._OUT_V).getValueAsText());
                     final String label = node.get(GraphSONTokens._LABEL).getValueAsText();
 
-                    final Vertex inV = graph.getVertex(inVertexKey);
-                    final Vertex outV = graph.getVertex(outVertexKey);
+                    final Vertex inV = graph.getVertex(node.get(GraphSONTokens._IN_V).getValueAsText());
+                    final Vertex outV = graph.getVertex(node.get(GraphSONTokens._OUT_V).getValueAsText());
 
                     final Edge e = graph.addEdge(edgeId, outV, inV, label);
 
@@ -132,9 +128,7 @@ public class GraphSONReader {
 
         jp.close();
 
-        if (graph instanceof TransactionalGraph) {
-            ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        }
+        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
     }
 
     private static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {

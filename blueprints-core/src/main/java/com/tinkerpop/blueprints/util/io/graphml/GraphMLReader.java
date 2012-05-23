@@ -4,7 +4,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.batch.BufferGraph;
+import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -112,14 +112,12 @@ public class GraphMLReader {
         try {
             XMLStreamReader reader = inputFactory.createXMLStreamReader(graphMLInputStream);
 
-            final Graph graph = inputGraph instanceof TransactionalGraph ?
-                    new BufferGraph((TransactionalGraph) inputGraph, bufferSize) : inputGraph;
+            final BatchGraph graph = BatchGraph.wrap(inputGraph);
 
             Map<String, String> keyIdMap = new HashMap<String, String>();
             Map<String, String> keyTypesMaps = new HashMap<String, String>();
             // <Mapped ID String, ID Object>
-            Map<String, Object> vertexIdMap = new HashMap<String, Object>();
-            // Mapping between Source/Target IDs and "Property IDs"
+
             // <Default ID String, Mapped ID String>
             Map<String, String> vertexMappedIdMap = new HashMap<String, String>();
 
@@ -131,8 +129,7 @@ public class GraphMLReader {
             // Buffered Edge Data
             String edgeId = null;
             String edgeLabel = null;
-            Vertex edgeInVertex = null;
-            Vertex edgeOutVertex = null;
+            Vertex[] edgeEndVertices = null; //[0] = outVertex , [1] = inVertex
             Map<String, Object> edgeProps = null;
             boolean inEdge = false;
 
@@ -161,41 +158,25 @@ public class GraphMLReader {
                         edgeLabel = reader.getAttributeValue(null, GraphMLTokens.LABEL);
                         edgeLabel = edgeLabel == null ? GraphMLTokens._DEFAULT : edgeLabel;
 
-                        String outVertexId = reader.getAttributeValue(null, GraphMLTokens.SOURCE);
-                        String inVertexId = reader.getAttributeValue(null, GraphMLTokens.TARGET);
+                        String[] vertexIds = new String[2];
+                        vertexIds[0] = reader.getAttributeValue(null, GraphMLTokens.SOURCE);
+                        vertexIds[1] = reader.getAttributeValue(null, GraphMLTokens.TARGET);
+                        edgeEndVertices = new Vertex[2];
+                        
+                        for (int i=0;i<2;i++) { //i=0 => outVertex, i=1 => inVertex
+                            if (vertexIdKey == null) {
+                                edgeEndVertices[i]=graph.getVertex(vertexIds[i]);
+                            } else {
+                                edgeEndVertices[i]=graph.getVertex(vertexMappedIdMap.get(vertexIds[i]));
+                            }
 
-                        Object outObjectId = null;
-                        Object inObjectId = null;
-                        if (vertexIdKey == null) {
-                            outObjectId = vertexIdMap.get(outVertexId);
-                            inObjectId = vertexIdMap.get(inVertexId);
-                        } else {
-                            outObjectId = vertexIdMap.get(vertexMappedIdMap.get(outVertexId));
-                            inObjectId = vertexIdMap.get(vertexMappedIdMap.get(inVertexId));
-                        }
-
-                        edgeOutVertex = null;
-                        if (null != outObjectId)
-                            edgeOutVertex = graph.getVertex(outObjectId);
-                        edgeInVertex = null;
-                        if (null != inObjectId)
-                            edgeInVertex = graph.getVertex(inObjectId);
-
-                        if (null == edgeOutVertex) {
-                            edgeOutVertex = graph.addVertex(outVertexId);
-                            vertexIdMap.put(outVertexId, edgeOutVertex.getId());
-                            if (vertexIdKey != null)
-                                // Default to standard ID system (in case no mapped
-                                // ID is found later)
-                                vertexMappedIdMap.put(outVertexId, outVertexId);
-                        }
-                        if (null == edgeInVertex) {
-                            edgeInVertex = graph.addVertex(inVertexId);
-                            vertexIdMap.put(inVertexId, edgeInVertex.getId());
-                            if (vertexIdKey != null)
-                                // Default to standard ID system (in case no mapped
-                                // ID is found later)
-                                vertexMappedIdMap.put(inVertexId, inVertexId);
+                            if (null == edgeEndVertices[i]) {
+                                edgeEndVertices[i] = graph.addVertex(vertexIds[i]);
+                                if (vertexIdKey != null)
+                                    // Default to standard ID system (in case no mapped
+                                    // ID is found later)
+                                    vertexMappedIdMap.put(vertexIds[i], vertexIds[i]);
+                            }
                         }
 
                         inEdge = true;
@@ -231,15 +212,9 @@ public class GraphMLReader {
                     String elementName = reader.getName().getLocalPart();
 
                     if (elementName.equals(GraphMLTokens.NODE)) {
-                        Object vertexObjectId = vertexIdMap.get(vertexId);
-                        Vertex currentVertex;
-                        if (vertexObjectId != null)
-                            // Duplicate vertices with same ID?
-                            // TODO Alex: Shouldn't this throw an Exception?
-                            currentVertex = graph.getVertex(vertexObjectId);
-                        else {
+                        Vertex currentVertex = graph.getVertex(vertexId);
+                        if (currentVertex==null) {
                             currentVertex = graph.addVertex(vertexId);
-                            vertexIdMap.put(vertexId, currentVertex.getId());
                         }
 
                         for (Entry<String, Object> prop : vertexProps.entrySet()) {
@@ -250,7 +225,7 @@ public class GraphMLReader {
                         vertexProps = null;
                         inVertex = false;
                     } else if (elementName.equals(GraphMLTokens.EDGE)) {
-                        Edge currentEdge = graph.addEdge(edgeId, edgeOutVertex, edgeInVertex, edgeLabel);
+                        Edge currentEdge = graph.addEdge(edgeId, edgeEndVertices[0], edgeEndVertices[1], edgeLabel);
 
                         for (Entry<String, Object> prop : edgeProps.entrySet()) {
                             currentEdge.setProperty(prop.getKey(), prop.getValue());
@@ -258,8 +233,7 @@ public class GraphMLReader {
 
                         edgeId = null;
                         edgeLabel = null;
-                        edgeInVertex = null;
-                        edgeOutVertex = null;
+                        edgeEndVertices=null;
                         edgeProps = null;
                         inEdge = false;
                     }
@@ -269,9 +243,7 @@ public class GraphMLReader {
 
             reader.close();
 
-            if (graph instanceof TransactionalGraph) {
-                ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            }
+            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         } catch (XMLStreamException xse) {
             throw new IOException(xse);
         }

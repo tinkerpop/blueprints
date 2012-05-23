@@ -18,7 +18,9 @@ class GMLParser {
     /**
      * <Mapped ID String, ID Object>
      */
-    private final Map<Object, Object> vertexIdMap = new HashMap<Object, Object>();
+    //private final Map<Object, Object> vertexIdMap = new HashMap<Object, Object>();
+
+    private final Map<Object, Object> vertexMappedIdMap = new HashMap<Object, Object>();
 
     private final String defaultEdgeLabel;
 
@@ -96,10 +98,14 @@ class GMLParser {
     }
 
     private Vertex createVertex(final Map<String, Object> map, final Object id) {
-        final Object vertexId = vertexIdKey == null ? (graph.getFeatures().ignoresSuppliedIds ? null : id) : map.remove(vertexIdKey);
-        final Vertex createdVertex = vertexId == null ? graph.addVertex(null) : graph.addVertex(vertexId);
-
-        vertexIdMap.put(id, createdVertex.getId());
+        //final Object vertexId = vertexIdKey == null ? (graph.getFeatures().ignoresSuppliedIds ? null : id) : map.remove(vertexIdKey);
+        Object vertexId = id;
+        if (vertexIdKey!=null) {
+            vertexId = map.remove(vertexIdKey);
+            if (vertexId==null) vertexId=id;
+            vertexMappedIdMap.put(id,vertexId);
+        }
+        final Vertex createdVertex = graph.addVertex(vertexId);
 
         return createdVertex;
     }
@@ -115,9 +121,10 @@ class GMLParser {
         if (target == null) {
             throw new IOException("Edge has no target");
         }
-
-        source = vertexIdMap.get(source);
-        target = vertexIdMap.get(target);
+        if (vertexIdKey!=null) {
+            source = vertexMappedIdMap.get(source);
+            target = vertexMappedIdMap.get(target);
+        }
 
         final Vertex outVertex = graph.getVertex(source);
         final Vertex inVertex = graph.getVertex(target);
