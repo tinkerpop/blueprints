@@ -8,10 +8,10 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@link BatchGraph} by creating a variable length chain and verifying that the chain is correctly inserted into the wrapped TinkerGraph.
- * <p/>
+ * <br />
  * Tests the various different Vertex caches and different length of chains.
- * <p/>
- * (c) Matthias Broecheler (http://www.matthiasb.com)
+ * <br />
+ * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 
 public class BatchGraphTest extends TestCase {

@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.Vertex;
  * and instead uses its own internal id scheme.
  * This is meant to be used for testing only.
  *
- * (c) Matthias Broecheler (http://www.matthiasb.com)
+ * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 
 public class IgnoreIdTinkerGraph extends TinkerGraph {

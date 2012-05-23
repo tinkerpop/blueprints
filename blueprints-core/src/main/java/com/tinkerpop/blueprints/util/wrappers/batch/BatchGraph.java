@@ -23,21 +23,21 @@ import java.util.Set;
  * BachLoadingGraph is a wrapper that enables batch loading of a large number of edges and vertices by chunking the entire
  * load into smaller batches and maintaining a memory-efficient vertex cache so that the entire transactional state can
  * be flushed after each chunk is loaded.
- * <p/>
+ * <br />
  * BatchGraph is ONLY meant for loading data and does not support any retrieval or removal operations.
  * That is, BatchGraph only supports the following methods:
  * - {@link #addVertex(Object)} for adding vertices
  * - {@link #addEdge(Object, com.tinkerpop.blueprints.Vertex, com.tinkerpop.blueprints.Vertex, String)} for adding edges
  * - {@link #getVertex(Object)} to be used when adding edges
  * - Property getter, setter and removal methods for vertices and edges.
- * <p/>
+ * <br />
  * An important limitation of BatchGraph is that edge properties can only be set immediately after the edge has been added.
  * If other vertices or edges have been created in the meantime, setting, getting or removing properties will throw
  * exceptions. This is done to avoid caching of edges which would require a great amount of memory.
- * <p/>
+ * <br />
  * BatchGraph wraps {@link TransactionalGraph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
  * which will additionally wrap non-transactional graphs using {@link WritethroughGraph}.
- * <p/>
+ * <br />
  * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use 
  * {@link #setVertexIdKey(String)} and {@link #setEdgeIdKey(String)} to set the keys for the vertex and edge properties
  * respectively. This allows to make the loaded graph compatible for later wrapping with {@link IdGraph}.

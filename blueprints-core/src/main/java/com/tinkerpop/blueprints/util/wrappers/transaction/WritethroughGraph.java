@@ -11,11 +11,11 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 /**
  * This is a naive wrapper to make a non-transactional graph transactional by simply writing all mutations
  * directly through to the wrapped graph and not supporting transactional failures.
- * <p/>
+ * <br />
  * Hence, this is not meant as a functional implementation of a {@link TransactionalGraph} but rather as a means
  * to using non-transactional graphs where transactional graphs are expected and transactional failure can be
  * excluded. {@link com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph} is one such case.
- * <p/>
+ * <br />
  * Note, the constructor will throw an exception if the given graph already supports transactions.
  *
  * @author Matthias Broecheler (http://www.matthiasb.com)

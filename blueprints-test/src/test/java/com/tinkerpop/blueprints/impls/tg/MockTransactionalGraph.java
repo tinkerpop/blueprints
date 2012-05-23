@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.*;
  * This class is only meant for testing.
  * <br />
  * <br />
- * (c) Matthias Broecheler (http://www.matthiasb.com)
+ * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 
 public class MockTransactionalGraph implements TransactionalGraph {
