@@ -1,8 +1,6 @@
 Blueprints: A Property Graph Model Interface
 "http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
 
-==<hr/>==
-
 h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
@@ -42,6 +40,8 @@ h3. Version 2.0.0 (May 23, 2012)
 * Bumped to support Orient 1.0.1
 * Added @BatchGraph@ to support bulk loading of data
 * Added @WritethroughGraph@ to support mock @TransactionalGraph@-wrapping
+
+==<hr/>==
 
 h2. Blueprints 1.x
 
