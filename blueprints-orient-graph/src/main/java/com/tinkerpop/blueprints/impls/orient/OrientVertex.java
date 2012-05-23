@@ -102,4 +102,8 @@ public class OrientVertex extends OrientElement implements Vertex {
     public String toString() {
         return StringFactory.vertexString(this);
     }
+
+    public ODocument getRawVertex() {
+        return this.getRawElement();
+    }
 }

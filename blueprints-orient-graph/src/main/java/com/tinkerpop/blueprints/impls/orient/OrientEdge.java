@@ -47,4 +47,8 @@ public class OrientEdge extends OrientElement implements Edge {
     public String toString() {
         return StringFactory.edgeString(this);
     }
+
+    public ODocument getRawEdge() {
+        return this.getRawElement();
+    }
 }
