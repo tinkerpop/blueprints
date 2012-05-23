@@ -84,11 +84,15 @@ public class TinkerGraphTest extends GraphTest {
 
     @Override
     public Graph generateGraph() {
+        return new TinkerGraph(getDirectory());
+    }
+    
+    protected String getDirectory() {
         String directory = System.getProperty("tinkerGraphDirectory");
         if (directory == null) {
             directory = this.getWorkingDirectory();
         }
-        return new TinkerGraph(directory);
+        return directory;
     }
 
     private String getWorkingDirectory() {
@@ -107,10 +111,7 @@ public class TinkerGraphTest extends GraphTest {
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         String doTest = System.getProperty("testTinkerGraph");
         if (doTest == null || doTest.equals("true")) {
-            String directory = System.getProperty("tinkerGraphDirectory");
-            if (directory == null) {
-                directory = this.getWorkingDirectory();
-            }
+            String directory = getDirectory();
             deleteDirectory(new File(directory));
             for (Method method : testSuite.getClass().getDeclaredMethods()) {
                 if (method.getName().startsWith("test")) {
@@ -123,6 +124,7 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     public void testClear() {
+        deleteDirectory(new File(getDirectory()));
         TinkerGraph graph = (TinkerGraph) this.generateGraph();
         this.stopWatch();
         for (int i = 0; i < 25; i++) {

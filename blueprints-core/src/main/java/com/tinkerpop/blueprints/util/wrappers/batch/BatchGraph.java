@@ -40,7 +40,7 @@ import java.util.Set;
  * 
  * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use 
  * {@link #setVertexIDKey(String)} and {@link #setEdgeIDKey(String)} to set the keys for the vertex and edge properties
- * respectively. For wrapped graphs which ignore supplied ids, these default to IdGraph.ID.
+ * respectively. This allows to make the loaded graph compatible for later wrapping with {@link IdGraph}.
  *
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */
@@ -107,13 +107,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         this.bufferSize = bufferSize;
 
         this.ignoreSuppliedIDs = graph.getFeatures().ignoresSuppliedIds;
-        if (!ignoreSuppliedIDs) {
-            vertexIDKey = null;
-            edgeIDKey = null;
-        } else {
-            vertexIDKey = IdGraph.ID;
-            edgeIDKey = IdGraph.ID;
-        }
+
+        vertexIDKey = null;
+        edgeIDKey = null;
+
 
         cache = type.getVertexCache(this.graph);
 
@@ -145,6 +142,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     /**
      * Sets the key to be used when setting the vertex id as a property on the respective vertex.
      * If the key is null, then no property will be set.
+     * If the loaded graph should later be wrapped with {@link IdGraph} use IdGraph.ID.
      *
      * @param key Key to be used.
      */
@@ -155,6 +153,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     /**
      * Sets the key to be used when setting the edge id as a property on the respective edge.
      * If the key is null, then no property will be set.
+     * If the loaded graph should later be wrapped with {@link IdGraph} use IdGraph.ID.
      *
      * @param key Key to be used.
      */

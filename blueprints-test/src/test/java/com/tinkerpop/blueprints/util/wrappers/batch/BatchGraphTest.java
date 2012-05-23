@@ -1,10 +1,9 @@
 package com.tinkerpop.blueprints.util.wrappers.batch;
 
-import com.tinkerpop.blueprints.BaseTest;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.tg.MockTransactionalTinkerGraph;
+import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.impls.tg.IgnoreIdTinkerGraph;
+import com.tinkerpop.blueprints.impls.tg.MockTransactionalGraph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import junit.framework.TestCase;
 
 /**
@@ -22,6 +21,7 @@ public class BatchGraphTest extends TestCase {
     private static final String vertexIDKey = "vid";
     private static final String edgeIDKey = "eid";
     private static boolean assignKeys = false;
+    private static boolean ignoreIDs = false;
 
     public void testNumberIDLoading() {
         loadingTest(5000,100, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
@@ -31,6 +31,11 @@ public class BatchGraphTest extends TestCase {
         loadingTest(5000,100, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
         loadingTest(50000,10000, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
         assignKeys=false;
+
+        ignoreIDs=true;
+        loadingTest(5000,100, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
+        loadingTest(50000,10000, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
+        ignoreIDs=false;
     }
 
     public void testObjectIDLoading() {
@@ -51,7 +56,14 @@ public class BatchGraphTest extends TestCase {
 
     public void loadingTest(int total, int bufferSize, BatchGraph.IDType type, LoadingFactory ids) {
         final VertexEdgeCounter counter = new VertexEdgeCounter();
-        BLGraph graph = new BLGraph(counter,ids);
+        MockTransactionalGraph tgraph = null;
+        if (ignoreIDs) {
+            tgraph = new MockTransactionalGraph(new IgnoreIdTinkerGraph());
+        } else {
+            tgraph = new MockTransactionalGraph(new TinkerGraph());
+        }
+
+        BLGraph graph = new BLGraph(tgraph,counter,ids);
         BatchGraph<BLGraph> loader = new BatchGraph<BLGraph>(graph,type,bufferSize);
         if (assignKeys) {
             loader.setVertexIDKey(vertexIDKey);
@@ -75,8 +87,8 @@ public class BatchGraphTest extends TestCase {
         }
 
         loader.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-        assertEquals(0, graph.getNumTransactionsAborted());
-        assertEquals(graph.getNumTransactionStarted(),graph.getNumTransactionsCommitted());
+        assertTrue(tgraph.allSuccessful());
+        assertTrue(tgraph.allFinished());
         loader.shutdown();
     }
     
@@ -88,15 +100,18 @@ public class BatchGraphTest extends TestCase {
         
     }
     
-    static class BLGraph extends MockTransactionalTinkerGraph {
+    static class BLGraph implements TransactionalGraph {
         
         private static final int keepLast = 10;
         
         private final VertexEdgeCounter counter;
         private boolean first=true;
         private final LoadingFactory ids;
+
+        private final TransactionalGraph graph;
                 
-        BLGraph(final VertexEdgeCounter counter, LoadingFactory ids) {
+        BLGraph(TransactionalGraph graph, final VertexEdgeCounter counter, LoadingFactory ids) {
+            this.graph=graph;
             this.counter=counter;
             this.ids=ids;
         }
@@ -110,38 +125,116 @@ public class BatchGraphTest extends TestCase {
                 }
             } else return id;
         }
-        
+
+        @Override
+        public void startTransaction() throws IllegalStateException {
+            graph.startTransaction();
+        }
+
         @Override
         public void stopTransaction(Conclusion conclusion) {
-            super.stopTransaction(conclusion);
+            graph.stopTransaction(conclusion);
             //System.out.println("Committed (vertices/edges): " + counter.numVertices + " / " + counter.numEdges);
-            assertEquals(counter.numVertices, BaseTest.count(super.getVertices()) - (first ? 0 : keepLast));
-            assertEquals(counter.numEdges,BaseTest.count(super.getEdges()));
+            assertEquals(counter.numVertices, BaseTest.count(graph.getVertices()) - (first ? 0 : keepLast));
+            assertEquals(counter.numEdges,BaseTest.count(graph.getEdges()));
             for (Edge e : getEdges()) {
                 int id = ((Number)e.getProperty(UID)).intValue();
-                assertEquals(ids.getEdgeID(id),parseID(e.getId()));
+                if (!ignoreIDs) {
+                    assertEquals(ids.getEdgeID(id),parseID(e.getId()));
+                }
+                assertEquals(1,(Integer)e.getVertex(Direction.IN).getProperty(UID)-(Integer)e.getVertex(Direction.OUT).getProperty(UID));
                 if (assignKeys) {
                     assertEquals(ids.getEdgeID(id),e.getProperty(edgeIDKey));
                 }
             }
             for (Vertex v : getVertices()) {
                 int id = ((Number)v.getProperty(UID)).intValue();
-                assertEquals(ids.getVertexID(id),parseID(v.getId()));
+                if (!ignoreIDs) {
+                    assertEquals(ids.getVertexID(id),parseID(v.getId()));
+                }
+                assertTrue(2>=BaseTest.count(v.getEdges(Direction.BOTH)));
+                assertTrue(1>=BaseTest.count(v.getEdges(Direction.IN)));
+                assertTrue(1>=BaseTest.count(v.getEdges(Direction.OUT)));
+
                 if (assignKeys) {
                     assertEquals(ids.getVertexID(id), v.getProperty(vertexIDKey));
                 }
+
+            }
+            for (Vertex v : getVertices()) {
+                int id = ((Number)v.getProperty(UID)).intValue();
                 if (id<counter.totalVertices-keepLast) {
                     removeVertex(v);
                 }
             }
             for (Edge e : getEdges()) removeEdge(e);
-            assertEquals(keepLast,BaseTest.count(super.getVertices()));
+            assertEquals(keepLast,BaseTest.count(graph.getVertices()));
             counter.numVertices=0;
             counter.numEdges=0;
             first = false;
             //System.out.println("------");
         }
-        
+
+        @Override
+        public Features getFeatures() {
+            return graph.getFeatures();
+        }
+
+        @Override
+        public Vertex addVertex(Object id) {
+            return graph.addVertex(id);
+        }
+
+        @Override
+        public Vertex getVertex(Object id) {
+            return graph.getVertex(id);
+        }
+
+        @Override
+        public void removeVertex(Vertex vertex) {
+            graph.removeVertex(vertex);
+        }
+
+        @Override
+        public Iterable<Vertex> getVertices() {
+            return graph.getVertices();
+        }
+
+        @Override
+        public Iterable<Vertex> getVertices(String key, Object value) {
+            return graph.getVertices(key,value);
+        }
+
+        @Override
+        public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
+            return graph.addEdge(id,outVertex,inVertex,label);
+        }
+
+        @Override
+        public Edge getEdge(Object id) {
+            return graph.getEdge(id);
+        }
+
+        @Override
+        public void removeEdge(Edge edge) {
+            graph.removeEdge(edge);
+        }
+
+        @Override
+        public Iterable<Edge> getEdges() {
+            return graph.getEdges();
+        }
+
+        @Override
+        public Iterable<Edge> getEdges(String key, Object value) {
+            return graph.getEdges(key,value);
+        }
+
+        @Override
+        public void shutdown() {
+            graph.shutdown();
+        }
+
     }
     
     interface LoadingFactory {
