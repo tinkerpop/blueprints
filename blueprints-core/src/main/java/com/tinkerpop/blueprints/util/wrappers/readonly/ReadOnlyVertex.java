@@ -11,7 +11,7 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
  */
 class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
 
-    public ReadOnlyVertex(final Vertex baseVertex) {
+    protected ReadOnlyVertex(final Vertex baseVertex) {
         super(baseVertex);
     }
 

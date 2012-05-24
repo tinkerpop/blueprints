@@ -12,7 +12,7 @@ class ReadOnlyVertexIterable implements CloseableIterable<Vertex> {
 
     private final Iterable<Vertex> iterable;
 
-    public ReadOnlyVertexIterable(final Iterable<Vertex> iterable) {
+    protected ReadOnlyVertexIterable(final Iterable<Vertex> iterable) {
         this.iterable = iterable;
     }
 

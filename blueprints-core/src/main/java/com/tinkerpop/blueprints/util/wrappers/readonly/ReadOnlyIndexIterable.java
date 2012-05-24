@@ -12,7 +12,7 @@ class ReadOnlyIndexIterable<T extends Element> implements Iterable<Index<T>> {
 
     private final Iterable<Index<T>> iterable;
 
-    public ReadOnlyIndexIterable(final Iterable<Index<T>> iterable) {
+    protected ReadOnlyIndexIterable(final Iterable<Index<T>> iterable) {
         this.iterable = iterable;
     }
 

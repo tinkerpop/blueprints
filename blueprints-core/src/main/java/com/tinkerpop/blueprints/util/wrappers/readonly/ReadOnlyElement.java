@@ -8,11 +8,11 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class ReadOnlyElement implements Element {
+abstract class ReadOnlyElement implements Element {
 
     protected final Element baseElement;
 
-    public ReadOnlyElement(final Element baseElement) {
+    protected ReadOnlyElement(final Element baseElement) {
         this.baseElement = baseElement;
     }
 

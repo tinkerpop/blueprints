@@ -12,7 +12,7 @@ class ReadOnlyEdgeIterable implements CloseableIterable<Edge> {
 
     private final Iterable<Edge> iterable;
 
-    public ReadOnlyEdgeIterable(final Iterable<Edge> iterable) {
+    protected ReadOnlyEdgeIterable(final Iterable<Edge> iterable) {
         this.iterable = iterable;
     }
 

@@ -24,37 +24,37 @@ public class BatchGraphTest extends TestCase {
     private static boolean ignoreIDs = false;
 
     public void testNumberIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IDType.NUMBER, new NumberLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IDType.NUMBER, new NumberLoadingFactory());
+        loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        loadingTest(200000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
 
         assignKeys=true;
-        loadingTest(5000,100, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
-        loadingTest(50000,10000, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
+        loadingTest(5000,100, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
+        loadingTest(50000,10000, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
         assignKeys=false;
 
         ignoreIDs=true;
-        loadingTest(5000,100, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
-        loadingTest(50000,10000, BatchGraph.IDType.NUMBER,new NumberLoadingFactory());
+        loadingTest(5000,100, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
+        loadingTest(50000,10000, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
         ignoreIDs=false;
     }
 
     public void testObjectIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IDType.OBJECT, new StringLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IDType.OBJECT, new StringLoadingFactory());
+        loadingTest(5000, 100, BatchGraph.IdType.OBJECT, new StringLoadingFactory());
+        loadingTest(200000, 10000, BatchGraph.IdType.OBJECT, new StringLoadingFactory());
     }
 
     public void testStringIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IDType.STRING, new StringLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IDType.STRING, new StringLoadingFactory());
+        loadingTest(5000, 100, BatchGraph.IdType.STRING, new StringLoadingFactory());
+        loadingTest(200000, 10000, BatchGraph.IdType.STRING, new StringLoadingFactory());
     }
 
     public void testURLIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IDType.URL, new URLLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IDType.URL, new URLLoadingFactory());
+        loadingTest(5000, 100, BatchGraph.IdType.URL, new URLLoadingFactory());
+        loadingTest(200000, 10000, BatchGraph.IdType.URL, new URLLoadingFactory());
     }
 
 
-    public void loadingTest(int total, int bufferSize, BatchGraph.IDType type, LoadingFactory ids) {
+    public void loadingTest(int total, int bufferSize, BatchGraph.IdType type, LoadingFactory ids) {
         final VertexEdgeCounter counter = new VertexEdgeCounter();
 
         MockTransactionalGraph tgraph = null;

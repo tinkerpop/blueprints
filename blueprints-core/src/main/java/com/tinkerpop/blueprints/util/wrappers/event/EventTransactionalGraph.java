@@ -18,12 +18,8 @@ public class EventTransactionalGraph<T extends TransactionalGraph> extends Event
 
     @Override
     public void startTransaction() {
-        try {
-            this.baseGraph.startTransaction();
-            this.trigger.resetEventQueue();
-        } catch (RuntimeException re) {
-            throw re;
-        }
+        this.baseGraph.startTransaction();
+        this.trigger.resetEventQueue();
     }
 
     @Override

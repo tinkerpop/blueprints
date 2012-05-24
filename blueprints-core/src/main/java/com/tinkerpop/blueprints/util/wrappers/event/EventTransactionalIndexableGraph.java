@@ -20,12 +20,8 @@ public class EventTransactionalIndexableGraph<T extends IndexableGraph & Transac
 
     @Override
     public void startTransaction() {
-        try {
-            this.baseGraph.startTransaction();
-            this.trigger.resetEventQueue();
-        } catch (RuntimeException re) {
-            throw re;
-        }
+        this.baseGraph.startTransaction();
+        this.trigger.resetEventQueue();
     }
 
     @Override

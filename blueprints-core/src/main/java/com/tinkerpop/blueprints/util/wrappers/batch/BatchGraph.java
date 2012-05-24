@@ -37,7 +37,7 @@ import java.util.Set;
  * BatchGraph wraps {@link TransactionalGraph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
  * which will additionally wrap non-transactional.
  * <br />
- * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use 
+ * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use
  * {@link #setVertexIdKey(String)} and {@link #setEdgeIdKey(String)} to set the keys for the vertex and edge properties
  * respectively. This allows to make the loaded graph compatible for later wrapping with {@link IdGraph}.
  *
@@ -52,10 +52,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     public static final long DEFAULT_BUFFER_SIZE = 100000;
 
     /**
-     * Type of vertex ids expected by BatchGraph. The default is IDType.OBJECT.
-     * Use the IDType that best matches the used vertex id types in order to save memory.
+     * Type of vertex ids expected by BatchGraph. The default is IdType.OBJECT.
+     * Use the IdType that best matches the used vertex id types in order to save memory.
      */
-    public static enum IDType {
+    public static enum IdType {
 
         OBJECT, NUMBER, STRING, URL;
 
@@ -77,7 +77,6 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     }
 
     private final T graph;
-    private final boolean ignoreSuppliedIds;
 
     private String vertexIdKey;
     private String edgeIdKey;
@@ -92,20 +91,18 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     /**
      * Constructs a BatchGraph wrapping the provided graph, using the specified buffer size and expecting vertex ids of
-     * the specified IDType. Supplying vertex ids which do not match this type will throw exceptions.
+     * the specified IdType. Supplying vertex ids which do not match this type will throw exceptions.
      *
      * @param graph      Graph to be wrapped
      * @param type       Type of vertex id expected. This information is used to optimize the vertex cache memory footprint.
      * @param bufferSize Defines the number of vertices and edges loaded before starting a new transaction. The larger this value, the more memory is required but the faster the loading process.
      */
-    public BatchGraph(T graph, IDType type, long bufferSize) {
+    public BatchGraph(final T graph, final IdType type, final long bufferSize) {
         if (graph == null) throw new IllegalArgumentException("Graph may not be null");
         if (type == null) throw new IllegalArgumentException("Type may not be null");
         if (bufferSize <= 0) throw new IllegalArgumentException("BufferSize must be positive");
         this.graph = graph;
         this.bufferSize = bufferSize;
-
-        this.ignoreSuppliedIds = graph.getFeatures().ignoresSuppliedIds;
 
         vertexIdKey = null;
         edgeIdKey = null;
@@ -122,7 +119,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * @param graph Graph to be wrapped
      */
     public BatchGraph(final T graph) {
-        this(graph, IDType.OBJECT, DEFAULT_BUFFER_SIZE);
+        this(graph, IdType.OBJECT, DEFAULT_BUFFER_SIZE);
     }
 
     /**
@@ -141,14 +138,14 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * Constructs a BatchGraph wrapping the provided graph. Immediately returns the graph if its a BatchGraph
      * and wraps non-transactional graphs in an additional {@link WritethroughGraph}.
      *
-     * @param graph Graph to be wrapped
+     * @param graph  Graph to be wrapped
      * @param buffer Size of the buffer
      */
     public static BatchGraph wrap(final Graph graph, final long buffer) {
         if (graph instanceof BatchGraph) return (BatchGraph) graph;
         else if (graph instanceof TransactionalGraph)
-            return new BatchGraph((TransactionalGraph) graph, IDType.OBJECT, buffer);
-        else return new BatchGraph(new WritethroughGraph(graph), IDType.OBJECT, buffer);
+            return new BatchGraph((TransactionalGraph) graph, IdType.OBJECT, buffer);
+        else return new BatchGraph(new WritethroughGraph(graph), IdType.OBJECT, buffer);
     }
 
     /**

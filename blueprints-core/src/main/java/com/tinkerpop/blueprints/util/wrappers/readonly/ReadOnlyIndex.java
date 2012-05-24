@@ -14,7 +14,7 @@ class ReadOnlyIndex<T extends Element> implements Index<T> {
 
     protected final Index<T> rawIndex;
 
-    public ReadOnlyIndex(Index<T> rawIndex) {
+    protected ReadOnlyIndex(Index<T> rawIndex) {
         this.rawIndex = rawIndex;
     }
 
