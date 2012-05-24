@@ -39,7 +39,6 @@ h3. Version 2.0.0 (May 23, 2012)
 * Changed the @Vertex@ API to only have three methods: @getEdges()@, @getVertices()@, and @query()@
 * Bumped to support Orient 1.0.1
 * Added @BatchGraph@ to support bulk loading of data
-* Added @WritethroughGraph@ to support mock @TransactionalGraph@-wrapping
 
 ==<hr/>==
 
