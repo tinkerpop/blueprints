@@ -16,7 +16,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
  * <p/>
  * Since edges are labeled, {@link #getLabel()} gets the same result as
  * {@link #getProperty(String)} if and only if the key is
- * {@link DexElement#LABEL_PROPERTY}.
+ * {@link StringFactory#LABEL}.
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>

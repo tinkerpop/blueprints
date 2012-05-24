@@ -22,16 +22,33 @@ import java.util.Set;
 
 /**
  * Dex is a graph database developed by Sparsity Technologies.
- * Dex natively supports the property graph data model defined by Blueprints. However, there are a few peculiarities.
- * No user defined element identifiers: Dex is the gatekeeper and creator of vertex and edge identifiers.
- * Thus, when creating a new vertex or edge instance, the provided object identifier is ignored.
- * Vertices are labeled too: When adding vertices, the user can set DexGraph#LABEL to be used as the label of the vertex to be created.
- * Also, the label of a vertex (or even an element) can be retrieved through the DEXElement#LABEL_PROPERTY property.
- * DexGraph implements IndexableGraph. However, the use of indices is limited when working with Dex and is explained as follows:
- * There is no support to create indices. By default, there is an AutomaticIndex for each existing label which corresponds to the name of the index.
- * Also, each index contains a key for each existing property.
- *
- * @author <a href="http://www.sparsity-technologies.com">Sparsity Technologies</a>
+ * <p/>
+ * Dex natively supports the property graph data model defined by Blueprints.
+ * However, there are a few peculiarities. No user defined element identifiers:
+ * Dex is the gatekeeper and creator of vertex and edge identifiers. Thus, when
+ * creating a new vertex or edge instance, the provided object identifier is
+ * ignored.
+ * <p/>
+ * Vertices are labeled too: When adding vertices, the user can set
+ * {@link DexGraph#label} to be used as the label of the vertex to be created.
+ * Also, the label of a vertex (or even an element) can be retrieved through the
+ * {@link StringFactory#LABEL} property.
+ * <p/>
+ * DexGraph implements {@link KeyIndexableGraph} with some particularities on
+ * the way it can be used. As both vertices and edges are labeled when working
+ * with Dex, the use of some APIs may require previously setting the label (by
+ * means of {@link DexGraph#label}). Those APIs are:
+ * {@link #getVertices(String, Object)}, {@link #getEdges(String, Object)}, and
+ * {@link #createKeyIndex(String, Class)}.
+ * <p/>
+ * When working with DexGraph, all methods having as a result a collection
+ * actually return a {@link CloseableIterable} collection. Thus users can
+ * {@link CloseableIterable#close()} the collection to free resources.
+ * Otherwise, all those collections will automatically be closed when the
+ * database is stopped ( {@link #shutdown()}).
+ * 
+ * @author <a href="http://www.sparsity-technologies.com">Sparsity
+ *         Technologies</a>
  */
 public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndexableGraph {
 
