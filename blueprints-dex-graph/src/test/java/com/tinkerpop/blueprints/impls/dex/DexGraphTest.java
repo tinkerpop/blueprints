@@ -55,11 +55,18 @@ public class DexGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
-    /*public void testKeyIndexableGraphTestSuite() throws Exception {
+    /*
+    This test does not work because Dex properties are restricted to
+    the scope of a node/edge type. Thus, when using the KeyIndexableGraph
+    APIs it is required to previously set the label where the key property
+    is defined, as it is shown in the testKeyIndex below.
+    
+    public void testKeyIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new KeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
-    }*/
+    }
+    */
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
@@ -86,7 +93,7 @@ public class DexGraphTest extends GraphTest {
     */
 
     //
-    // specific dex types
+    // specific dex tests
     //
 
     public void testDexVertexLabel() throws Exception {

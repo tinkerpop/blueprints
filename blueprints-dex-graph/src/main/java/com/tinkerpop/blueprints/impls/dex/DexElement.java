@@ -15,7 +15,7 @@ import java.util.Set;
  * {@link Element} implementation for Dex.
  * <p/>
  * All elements are typed or labeled. The way to get the type or label for an
- * element is retrieving the property {@link DexElement#LABEL_PROPERTY}. This
+ * element is retrieving the property {@link StringFactory#LABEL}. This
  * property cannot be set or removed.
  * <p/>
  * TODO: When a Float value is set for an attribute, it is stored as a Double
