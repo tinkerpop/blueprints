@@ -37,7 +37,7 @@ h3. Version 2.0.0 (May 23, 2012)
 * Added @IdGraph@ to support the user defined ids for those @Graphs@ that ignore user supplied ids
 * Added @ThreadTransactionalGraph@ to support multiple threads within a single transaction
 * Changed the @Vertex@ API to only have three methods: @getEdges()@, @getVertices()@, and @query()@
-* Bumped to support Orient 1.0.1
+* Bumped to support OrientDB 1.0.1
 * Added @BatchGraph@ to support bulk loading of data
 
 ==<hr/>==
