@@ -5,7 +5,7 @@ h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
-h3. Version 2.1.0 (May 23, 2012)
+h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
