@@ -20,7 +20,7 @@ public class OrientEdge extends OrientElement implements Edge {
         this.rawElement.field(StringFactory.LABEL, label);
     }
 
-    protected OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
+    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
         super(rawGraph, rawEdge);
     }
 
