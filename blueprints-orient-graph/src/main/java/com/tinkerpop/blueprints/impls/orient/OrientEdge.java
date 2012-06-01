@@ -15,12 +15,12 @@ import java.util.Set;
  */
 public class OrientEdge extends OrientElement implements Edge {
 
-    protected OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
+    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
         this.rawElement.field(StringFactory.LABEL, label);
     }
 
-    protected OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
+    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
         super(rawGraph, rawEdge);
     }
 

@@ -55,6 +55,11 @@
             <email>darrick@innatesoftware.com</email>
             <url>http://github.com/pangloss</url>
         </contributor>
+        <contributor>
+            <name>Matthias Broecheler</name>
+            <email>me@matthiasb.com</email>
+            <url>http://matthiasb.com</url>
+        </contributor>
     </contributors>
 
     <modules>

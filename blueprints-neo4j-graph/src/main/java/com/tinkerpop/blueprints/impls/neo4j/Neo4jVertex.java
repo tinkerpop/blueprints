@@ -19,7 +19,7 @@ import java.util.Iterator;
  */
 public class Neo4jVertex extends Neo4jElement implements Vertex {
 
-    protected Neo4jVertex(final Node node, final Neo4jGraph graph) {
+    public Neo4jVertex(final Node node, final Neo4jGraph graph) {
         super(graph);
         this.rawElement = node;
 
