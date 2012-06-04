@@ -63,9 +63,9 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     public CloseableIterable<T> get(final String key, final Object value) {
         final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.tx.get() != null);
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.tx.get() != null);
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
     }
 
     /**
@@ -78,9 +78,9 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
     public CloseableIterable<T> query(final String key, final Object query) {
         final IndexHits<S> itty = this.rawIndex.query(key, query);
         if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.tx.get() != null);
+            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.tx.get() != null);
+            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
     }
 
     /**
@@ -91,7 +91,7 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
      * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
      */
     public long count(final String key, final Object value) {
-        if (this.graph.tx.get() == null) {
+        if (!this.graph.checkElementsInTransaction()) {
             final IndexHits hits = this.rawIndex.get(key, value);
             final long count = hits.size();
             hits.close();
