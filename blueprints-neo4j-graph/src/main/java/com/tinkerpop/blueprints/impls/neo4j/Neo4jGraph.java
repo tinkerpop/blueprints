@@ -54,6 +54,12 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         }
     };
 
+    public final ThreadLocal<Boolean> checkElementsInTransaction = new ThreadLocal<Boolean>() {
+        protected Boolean initialValue() {
+            return true;
+        }
+    };
+
     private static final Features FEATURES = new Features();
 
     static {
@@ -86,6 +92,14 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
         FEATURES.supportsThreadedTransactions = false;
+    }
+
+    protected boolean checkElementsInTransaction() {
+        if (this.tx.get() == null) {
+            return false;
+        } else {
+            return this.checkElementsInTransaction.get();
+        }
     }
 
     public Neo4jGraph(final String directory) {
@@ -304,7 +318,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
      * @return all the vertices in the graph
      */
     public Iterable<Vertex> getVertices() {
-        return new Neo4jVertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, this.tx.get() != null);
+        return new Neo4jVertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, this.checkElementsInTransaction());
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
@@ -324,7 +338,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
      * @return all the edges in the graph
      */
     public Iterable<Edge> getEdges() {
-        return new Neo4jEdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, this.tx.get() != null);
+        return new Neo4jEdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, this.checkElementsInTransaction());
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
