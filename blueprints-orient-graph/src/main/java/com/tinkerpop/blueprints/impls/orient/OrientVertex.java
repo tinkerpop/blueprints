@@ -24,10 +24,7 @@ import java.util.Set;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientVertex extends OrientElement implements Vertex {
-    public OrientVertex() {
-        super(null, new ODocument());
-    }
-    
+
     public OrientVertex(final OrientGraph rawGraph, final ODocument rawVertex) {
         super(rawGraph, rawVertex);
     }

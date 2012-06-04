@@ -14,9 +14,6 @@ import java.util.Set;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientEdge extends OrientElement implements Edge {
-    public OrientEdge() {
-        super(null, new ODocument());
-    }
 
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
