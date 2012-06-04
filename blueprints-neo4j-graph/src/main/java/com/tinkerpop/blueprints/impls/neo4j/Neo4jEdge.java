@@ -13,11 +13,7 @@ import org.neo4j.graphdb.Relationship;
  */
 public class Neo4jEdge extends Neo4jElement implements Edge {
 
-    protected Neo4jEdge(final Relationship relationship, final Neo4jGraph graph) {
-        this(relationship, graph, false);
-    }
-
-    protected Neo4jEdge(final Relationship relationship, final Neo4jGraph graph, boolean isNew) {
+    public Neo4jEdge(final Relationship relationship, final Neo4jGraph graph) {
         super(graph);
         this.rawElement = relationship;
     }

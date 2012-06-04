@@ -408,7 +408,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             final Node outNode = ((Neo4jVertex) outVertex).getRawVertex();
             final Node inNode = ((Neo4jVertex) inVertex).getRawVertex();
             final Relationship relationship = outNode.createRelationshipTo(inNode, DynamicRelationshipType.withName(label));
-            return new Neo4jEdge(relationship, this, true);
+            return new Neo4jEdge(relationship, this);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
