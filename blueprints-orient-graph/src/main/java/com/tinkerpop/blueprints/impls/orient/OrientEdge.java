@@ -15,6 +15,10 @@ import java.util.Set;
  */
 public class OrientEdge extends OrientElement implements Edge {
 
+    public OrientEdge() {
+        super(null, new ODocument());
+    }
+
     public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
         this.rawElement.field(StringFactory.LABEL, label);
