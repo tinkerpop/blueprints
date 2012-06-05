@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexTxAwareMultiValue;
@@ -16,9 +19,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 
-import java.util.Collection;
-import java.util.Collections;
-
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
@@ -30,18 +30,18 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected static final String SEPARATOR = "!=!";
 
-    protected OrientGraph graph;
+    protected OrientBaseGraph graph;
     protected OIndex<?> underlying;
 
     protected Class<? extends Element> indexClass;
 
-    protected OrientIndex(final OrientGraph graph, final String indexName, final Class<? extends Element> indexClass, final OType iType) {
+    protected OrientIndex(final OrientBaseGraph graph, final String indexName, final Class<? extends Element> indexClass, final OType iType) {
         this.graph = graph;
         this.indexClass = indexClass;
         create(indexName, this.indexClass, iType);
     }
 
-    protected OrientIndex(OrientGraph orientGraph, OIndex<?> rawIndex) {
+    protected OrientIndex(OrientBaseGraph orientGraph, OIndex<?> rawIndex) {
         this.graph = orientGraph;
         this.underlying = rawIndex instanceof OIndexTxAwareMultiValue ? rawIndex : new OIndexTxAwareMultiValue(
                 orientGraph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) rawIndex);

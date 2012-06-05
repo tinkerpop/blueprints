@@ -1,9 +1,9 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Iterator;
+
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
-
-import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -11,9 +11,9 @@ import java.util.Iterator;
 public class OrientElementIterable<T extends Element> implements CloseableIterable<T> {
 
     private final Iterable<?> iterable;
-    private final OrientGraph graph;
+    private final OrientBaseGraph graph;
 
-    public OrientElementIterable(final OrientGraph graph, final Iterable<?> iterable) {
+    public OrientElementIterable(final OrientBaseGraph graph, final Iterable<?> iterable) {
         this.graph = graph;
         this.iterable = iterable;
     }
