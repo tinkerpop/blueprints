@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Element;
-
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -13,9 +13,9 @@ import java.util.NoSuchElementException;
 class OrientElementIterator<T extends Element> implements Iterator<T> {
 
     private final Iterator itty;
-    private final OrientGraph graph;
+    private final OrientBaseGraph graph;
 
-    public OrientElementIterator(final OrientGraph graph, final Iterator itty) {
+    public OrientElementIterator(final OrientBaseGraph graph, final Iterator itty) {
         this.itty = itty;
         this.graph = graph;
     }

@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Set;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Direction;
@@ -7,8 +9,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
-
-import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -19,12 +19,12 @@ public class OrientEdge extends OrientElement implements Edge {
         super(null, new ODocument());
     }
 
-    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge, final String label) {
+    public OrientEdge(final OrientBaseGraph rawGraph, final ODocument rawEdge, final String label) {
         super(rawGraph, rawEdge);
         this.rawElement.field(StringFactory.LABEL, label);
     }
 
-    public OrientEdge(final OrientGraph rawGraph, final ODocument rawEdge) {
+    public OrientEdge(final OrientBaseGraph rawGraph, final ODocument rawEdge) {
         super(rawGraph, rawEdge);
     }
 
