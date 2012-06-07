@@ -203,15 +203,12 @@ public class SailGraphTest extends GraphTest {
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String doTest = System.getProperty("testSail");
-        if (doTest == null || doTest.equals("true")) {
-            for (Method method : testSuite.getClass().getDeclaredMethods()) {
-                if (method.getName().startsWith("test")) {
-                    System.out.println("Testing " + method.getName() + "...");
-                    Graph graph = this.generateGraph();
-                    method.invoke(testSuite);
-                    graph.shutdown();
-                }
+        for (Method method : testSuite.getClass().getDeclaredMethods()) {
+            if (method.getName().startsWith("test")) {
+                System.out.println("Testing " + method.getName() + "...");
+                Graph graph = this.generateGraph();
+                method.invoke(testSuite);
+                graph.shutdown();
             }
         }
     }

@@ -184,9 +184,7 @@ public class DexGraphTest extends GraphTest {
     }
 
     public Graph generateGraph(boolean create) {
-        String db = System.getProperty("dexGraphFile");
-        if (db == null)
-            db = "/tmp/blueprints_test.dex";
+        String db = this.computeTestDataRoot() + "/blueprints_test.dex";
 
         if (create) {
             File f = new File(db);
@@ -196,19 +194,13 @@ public class DexGraphTest extends GraphTest {
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String doTest = System.getProperty("testDexGraph");
-        if (doTest == null || doTest.equals("true")) {
-            String db = System.getProperty("dexGraphFile");
-            if (db == null)
-                db = "/tmp/blueprints_test.dex";
-            File fDB = new File(db);
-            fDB.delete();
-            for (Method method : testSuite.getClass().getDeclaredMethods()) {
-                if (method.getName().startsWith("test")) {
-                    System.out.println("Testing " + method.getName() + "...");
-                    method.invoke(testSuite);
-                    fDB.delete();
-                }
+        File fDB = new File(this.computeTestDataRoot() + "/blueprints_test.dex");
+        fDB.delete();
+        for (Method method : testSuite.getClass().getDeclaredMethods()) {
+            if (method.getName().startsWith("test")) {
+                System.out.println("Testing " + method.getName() + "...");
+                method.invoke(testSuite);
+                fDB.delete();
             }
         }
     }

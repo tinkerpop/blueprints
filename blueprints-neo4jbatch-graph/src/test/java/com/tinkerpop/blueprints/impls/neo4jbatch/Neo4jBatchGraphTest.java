@@ -405,13 +405,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
     }
 
     private String getWorkingDirectory() {
-        String directory = System.getProperty("neo4jBatchGraphDirectory");
-        if (directory == null) {
-            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-                directory = "C:/temp/blueprints_test";
-            else
-                directory = "/tmp/blueprints_test";
-        }
+        String directory = this.computeTestDataRoot().getAbsolutePath();
         deleteDirectory(new File(directory));
         return directory;
     }

@@ -107,35 +107,25 @@ public class OrientGraphTest extends GraphTest {
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String doTest = System.getProperty("testOrientGraph");
-        if (doTest == null || doTest.equals("true")) {
-            String directory = getWorkingDirectory();
-            deleteDirectory(new File(directory));
-            for (Method method : testSuite.getClass().getDeclaredMethods()) {
-                if (method.getName().startsWith("test")) {
-                    System.out.println("Testing " + method.getName() + "...");
-                    method.invoke(testSuite);
-                    try {
-                        if (this.currentGraph != null)
-                            this.currentGraph.shutdown();
-                    } catch (Exception e) {
-                    }
-                    OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
-                    if (g.exists())
-                        g.open("admin", "admin").drop();
+        String directory = getWorkingDirectory();
+        deleteDirectory(new File(directory));
+        for (Method method : testSuite.getClass().getDeclaredMethods()) {
+            if (method.getName().startsWith("test")) {
+                System.out.println("Testing " + method.getName() + "...");
+                method.invoke(testSuite);
+                try {
+                    if (this.currentGraph != null)
+                        this.currentGraph.shutdown();
+                } catch (Exception e) {
                 }
+                OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
+                if (g.exists())
+                    g.open("admin", "admin").drop();
             }
         }
     }
 
     private String getWorkingDirectory() {
-        String directory = System.getProperty("orientGraphDirectory");
-        if (directory == null) {
-            if (System.getProperty("os.name").toUpperCase().contains("WINDOWS"))
-                directory = "C:/temp/blueprints_test";
-            else
-                directory = "/tmp/blueprints_test";
-        }
-        return directory;
+        return this.computeTestDataRoot().getAbsolutePath();
     }
 }
