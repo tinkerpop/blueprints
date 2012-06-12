@@ -9,8 +9,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-neo4j-graph</artifactId>
-    <version>2.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
     <name>Blueprints-Neo4jGraph</name>
     <description>Blueprints property graph implementation for the Neo4j graph database</description>
     <dependencies>
@@ -59,20 +57,5 @@
                 </directory>
             </testResource>
         </testResources>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.4.2</version>
-            </plugin>
-        </plugins>
     </build>
 </project>
