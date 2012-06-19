@@ -60,18 +60,18 @@ public class TransactionalGraphTestSuite extends TestSuite {
         containsVertices(graph,vin); containsVertices(graph,vout);
         graph.stopTransaction(Conclusion.FAILURE);
 
-        vertexExistence(graph, vin, vout);
+        containsVertices(graph,vin);
         vertexCount(graph,1);
         printPerformance(graph.toString(), 1, "vertex not added in failed transaction", this.stopWatch());
 
         this.stopWatch();
         vin.add(graph.addVertex(null));
         vertexCount(graph,2);
-        vertexExistence(graph, vin, vout);
+        containsVertices(graph,vin);
         graph.stopTransaction(Conclusion.SUCCESS);
         printPerformance(graph.toString(), 1, "vertex added in successful transaction", this.stopWatch());
         vertexCount(graph,2);
-        vertexExistence(graph, vin, vout);
+        containsVertices(graph,vin);
 
         graph.shutdown();
     }
@@ -96,32 +96,33 @@ public class TransactionalGraphTestSuite extends TestSuite {
         printPerformance(graph.toString(), 100, "vertices not added in 100 failed transactions", this.stopWatch());
 
         vertexCount(graph,100);
-        vertexExistence(graph,vin,vout);
+        containsVertices(graph,vin);
         graph.stopTransaction(Conclusion.FAILURE);
         vertexCount(graph,100);
-        vertexExistence(graph,vin,vout);
+        containsVertices(graph,vin);
+
 
         this.stopWatch();
         for (int i = 0; i < 100; i++) {
             vin.add(graph.addVertex(null));
         }
         vertexCount(graph,200);
-        vertexExistence(graph,vin,vout);
+        containsVertices(graph,vin);
         graph.stopTransaction(Conclusion.SUCCESS);
         printPerformance(graph.toString(), 100, "vertices added in 1 successful transactions", this.stopWatch());
         vertexCount(graph,200);
-        vertexExistence(graph,vin,vout);
+        containsVertices(graph,vin);
 
         this.stopWatch();
         for (int i = 0; i < 100; i++) {
             vout.add(graph.addVertex(null));
         }
         vertexCount(graph,300);
-        vertexExistence(graph,vin,vout.subList(0,100)); containsVertices(graph,vout.subList(100,200));
+        containsVertices(graph,vin); containsVertices(graph,vout.subList(100,200));
         graph.stopTransaction(Conclusion.FAILURE);
         printPerformance(graph.toString(), 100, "vertices not added in 1 failed transactions", this.stopWatch());
         vertexCount(graph,200);
-        vertexExistence(graph,vin,vout);
+        containsVertices(graph,vin);
         graph.shutdown();
     }
 

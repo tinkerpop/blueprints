@@ -36,13 +36,6 @@ public abstract class TestSuite extends BaseTest {
             if (vp==null || !vp.getId().equals(v.getId())) fail();
         }
     }
-    
-    protected void vertexExistence(final Graph graph, final Collection<Vertex> included, final Collection<Vertex> excluded) {
-        containsVertices(graph,included);
-        for (Vertex v : excluded) {
-            if (graph.getVertex(v.getId())!=null) fail();
-        }
-    }
 
     protected void edgeCount(final Graph graph, int expectedCount) {
         if (graph.getFeatures().supportsEdgeIteration) assertEquals(count(graph.getEdges()),expectedCount);
