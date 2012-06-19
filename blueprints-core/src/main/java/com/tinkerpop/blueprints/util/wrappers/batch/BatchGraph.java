@@ -109,7 +109,6 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
         cache = type.getVertexCache(this.graph);
 
-        graph.startTransaction();
         remainingBufferSize = this.bufferSize;
     }
 
@@ -176,20 +175,9 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         if (remainingBufferSize <= 0) {
             graph.stopTransaction(Conclusion.SUCCESS);
             cache.newTransaction();
-            graph.startTransaction();
             remainingBufferSize = bufferSize;
         }
         remainingBufferSize--;
-    }
-
-    /**
-     * Has no effect since a transaction is started automatically.
-     *
-     * @throws IllegalStateException
-     */
-    @Override
-    public void startTransaction() throws IllegalStateException {
-        //Do nothing, transaction is already started
     }
 
     /**

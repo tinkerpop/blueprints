@@ -5,9 +5,8 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 
 public class TinkerTransactionalGraph extends TinkerGraph implements TransactionalGraph {
-    public void startTransaction() {
-    }
 
+    @Override
     public void stopTransaction(Conclusion conclusion) {
     }
 

@@ -18,11 +18,6 @@ public class EventTransactionalIndexableGraph<T extends IndexableGraph & Transac
         this.trigger = new EventTrigger(this, true);
     }
 
-    @Override
-    public void startTransaction() {
-        this.baseGraph.startTransaction();
-        this.trigger.resetEventQueue();
-    }
 
     @Override
     public void stopTransaction(Conclusion conclusion) {

@@ -14,6 +14,17 @@ import java.util.List;
 public abstract class BaseTest extends TestCase {
 
     double timer = -1.0d;
+    
+    public static<T> T getOnlyElement(final Iterator<T> iterator) {
+        if (!iterator.hasNext()) return null;
+        T element = iterator.next();
+        if (iterator.hasNext()) throw new IllegalArgumentException("Iterator has multiple elmenets");
+        return element;
+    }
+
+    public static<T> T getOnlyElement(final Iterable<T> iterable) {
+        return getOnlyElement(iterable.iterator());
+    }
 
     public static int count(final Iterator iterator) {
         int counter = 0;

@@ -46,10 +46,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     public GraphSailConnection(final GraphSail.DataStore store) {
         super(store.sail);
         this.store = store;
-
-        if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).startTransaction();
-        }
     }
 
     protected void startTransactionInternal() throws SailException {
@@ -60,7 +56,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     public void commitInternal() throws SailException {
         if (store.manualTransactions) {
             ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-            ((TransactionalGraph) store.graph).startTransaction();
         }
 
         if (statementsAdded || statementsRemoved) {
@@ -74,7 +69,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     public void rollbackInternal() throws SailException {
         if (store.manualTransactions) {
             ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
-            ((TransactionalGraph) store.graph).startTransaction();
         }
     }
 

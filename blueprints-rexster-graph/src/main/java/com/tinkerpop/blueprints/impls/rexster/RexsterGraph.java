@@ -48,6 +48,10 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
         FEATURES.supportsIndices = true;
+        FEATURES.supportsEdgeRetrieval = true;
+        FEATURES.supportsVertexProperties = true;
+        FEATURES.supportsEdgeProperties = true;
+
 
         // RexsterGraph will toString anything it can't convert to a standard Rexster type.
         FEATURES.supportsSerializableObjectProperty = true;

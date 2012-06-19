@@ -91,6 +91,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         FEATURES.supportsKeyIndices = true;
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
+        FEATURES.supportsEdgeRetrieval = true;
+        FEATURES.supportsVertexProperties = true;
+        FEATURES.supportsEdgeProperties = true;
         FEATURES.supportsThreadedTransactions = false;
     }
 
@@ -159,7 +162,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     private void freshLoad() {
         // remove reference node in a single transaction
         try {
-            this.startTransaction();
+            this.autoStartTransaction();
             this.removeVertex(this.getVertex(0));
             this.stopTransaction(Conclusion.SUCCESS);
         } catch (Exception e) {
@@ -454,13 +457,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    public void startTransaction() throws IllegalStateException {
-        if (tx.get() == null) {
-            tx.set(this.rawGraph.beginTx());
-        } else
-            throw ExceptionFactory.transactionAlreadyStarted();
     }
 
     public void stopTransaction(final Conclusion conclusion) {

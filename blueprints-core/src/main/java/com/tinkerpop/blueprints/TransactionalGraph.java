@@ -24,16 +24,12 @@ public interface TransactionalGraph extends Graph {
     }
 
     /**
-     * Start a transaction in order to manipulate the graph.
-     *
-     * @throws IllegalStateException If a transaction is already in progress, then a "nested transaction exception" is thrown.
-     */
-    public void startTransaction() throws IllegalStateException;
-
-    /**
      * Stop the current transaction.
      * Specify whether the transaction was successful or not.
      * A failing transaction will rollback all updates to before the transaction was started.
+     *
+     * If there is currently no open transaction (i.e. no operations on the graph), then calling this method
+     * has no effect other than potentially re-initializing data structures.
      *
      * @param conclusion whether or not the current transaction was successful
      */

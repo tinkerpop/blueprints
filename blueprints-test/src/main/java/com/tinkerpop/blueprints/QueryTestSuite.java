@@ -18,7 +18,7 @@ public class QueryTestSuite extends TestSuite {
 
     public void testVertexQuery() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeProperties) {
 
             Vertex a = graph.addVertex(null);
             Vertex b = graph.addVertex(null);

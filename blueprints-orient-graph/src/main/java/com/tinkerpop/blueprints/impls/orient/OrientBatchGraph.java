@@ -28,6 +28,9 @@ public class OrientBatchGraph extends OrientBaseGraph {
         FEATURES.supportsKeyIndices = true;
         FEATURES.isWrapper = false;
         FEATURES.supportsIndices = true;
+        FEATURES.supportsEdgeRetrieval = true;
+        FEATURES.supportsVertexProperties = true;
+        FEATURES.supportsEdgeProperties = true;
 
         // For more information on supported types, please see:
         // http://code.google.com/p/orient/wiki/Types

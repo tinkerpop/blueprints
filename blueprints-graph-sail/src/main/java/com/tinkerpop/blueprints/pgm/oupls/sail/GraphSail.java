@@ -124,9 +124,6 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
         store.namespaces = store.getReferenceVertex();
         if (null == store.namespaces) {
-            if (store.manualTransactions) {
-                ((TransactionalGraph) graph).startTransaction();
-            }
             try {
                 // FIXME: with FAKE_VERTEX_IDS, an extra "namespace" called "value" is present.  Perhaps namespaces
                 // should be given individual nodes, rather than being encapsulated in properties of the namespaces node.

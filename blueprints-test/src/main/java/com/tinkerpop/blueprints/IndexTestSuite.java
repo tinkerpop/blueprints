@@ -16,7 +16,7 @@ public class IndexTestSuite extends TestSuite {
 
     public void testPutGetRemoveVertex() {
         IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexIndex) {
             this.stopWatch();
             Index<Vertex> index = graph.createIndex("basic", Vertex.class);
             printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
@@ -60,7 +60,7 @@ public class IndexTestSuite extends TestSuite {
 
     public void testIndexCount() {
         IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexIndex) {
 
             Index<Vertex> index = graph.createIndex("basic", Vertex.class);
             for (int i = 0; i < 10; i++) {
@@ -79,7 +79,7 @@ public class IndexTestSuite extends TestSuite {
 
     public void testPutGetRemoveEdge() {
         IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsEdgeIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeIndex) {
             this.stopWatch();
             Index<Edge> index = graph.createIndex("basic", Edge.class);
             printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
@@ -124,7 +124,7 @@ public class IndexTestSuite extends TestSuite {
 
     public void testCloseableSequence() {
         IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexIndex) {
 
             Index<Vertex> index = graph.createIndex("basic", Vertex.class);
             for (int i = 0; i < 10; i++) {

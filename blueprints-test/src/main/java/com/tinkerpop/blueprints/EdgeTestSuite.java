@@ -43,18 +43,6 @@ public class EdgeTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void testGetEdgeWithNull() {
-        Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
-            try {
-                graph.getEdge(null);
-                assertFalse(true);
-            } catch (IllegalArgumentException e) {
-                assertTrue(true);
-            }
-        }
-        graph.shutdown();
-    }
 
     public void testAddEdges() {
         Graph graph = graphTest.generateGraph();
@@ -115,15 +103,15 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testGetEdges() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
-            Vertex v1 = graph.addVertex(null);
-            Vertex v2 = graph.addVertex(null);
-            Vertex v3 = graph.addVertex(null);
+        Vertex v1 = graph.addVertex(null);
+        Vertex v2 = graph.addVertex(null);
+        Vertex v3 = graph.addVertex(null);
 
-            Edge e1 = graph.addEdge(null, v1, v2, "test1");
-            Edge e2 = graph.addEdge(null, v2, v3, "test2");
-            Edge e3 = graph.addEdge(null, v3, v1, "test3");
+        Edge e1 = graph.addEdge(null, v1, v2, convertId(graph,"test1"));
+        Edge e2 = graph.addEdge(null, v2, v3, convertId(graph,"test2"));
+        Edge e3 = graph.addEdge(null, v3, v1, convertId(graph,"test3"));
 
+        if (graph.getFeatures().supportsEdgeRetrieval) {
             this.stopWatch();
             assertEquals(graph.getEdge(e1.getId()), e1);
             assertEquals(graph.getEdge(e1.getId()).getVertex(Direction.IN), v2);
@@ -139,13 +127,26 @@ public class EdgeTestSuite extends TestSuite {
 
             printPerformance(graph.toString(), 3, "edges retrieved", this.stopWatch());
         }
+
+        assertEquals(getOnlyElement(v1.getEdges(Direction.OUT)), e1);
+        assertEquals(getOnlyElement(v1.getEdges(Direction.OUT)).getVertex(Direction.IN), v2);
+        assertEquals(getOnlyElement(v1.getEdges(Direction.OUT)).getVertex(Direction.OUT), v1);
+
+        assertEquals(getOnlyElement(v2.getEdges(Direction.OUT)), e2);
+        assertEquals(getOnlyElement(v2.getEdges(Direction.OUT)).getVertex(Direction.IN), v3);
+        assertEquals(getOnlyElement(v2.getEdges(Direction.OUT)).getVertex(Direction.OUT), v2);
+
+        assertEquals(getOnlyElement(v3.getEdges(Direction.OUT)), e3);
+        assertEquals(getOnlyElement(v3.getEdges(Direction.OUT)).getVertex(Direction.IN), v1);
+        assertEquals(getOnlyElement(v3.getEdges(Direction.OUT)).getVertex(Direction.OUT), v3);
+
         graph.shutdown();
     }
 
     public void testGetNonExistantEdges() {
         Graph graph = graphTest.generateGraph();
 
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeRetrieval) {
             try {
                 graph.getEdge(null);
                 fail("Getting an element with a null identifier must throw IllegalArgumentException");
@@ -490,7 +491,7 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testAddingRemovingEdgeProperties() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeProperties) {
             Vertex a = graph.addVertex(convertId(graph, "1"));
             Vertex b = graph.addVertex(convertId(graph, "2"));
             Edge edge = graph.addEdge(convertId(graph, "3"), a, b, "knows");
@@ -515,21 +516,17 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testAddingLabelAndIdProperty() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeProperties) {
 
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             try {
                 edge.setProperty("id", "123");
-                assertTrue(false);
-            } catch (RuntimeException e) {
-                assertTrue(true);
-            }
+                fail();
+            } catch (RuntimeException e) { }
             try {
                 edge.setProperty("label", "hates");
-                assertTrue(false);
-            } catch (RuntimeException e) {
-                assertTrue(true);
-            }
+                fail();
+            } catch (RuntimeException e) { }
 
         }
         graph.shutdown();
@@ -540,15 +537,17 @@ public class EdgeTestSuite extends TestSuite {
         for (int i = 0; i < 25; i++) {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "test"));
         }
-        if (!graph.getFeatures().isRDFModel)
+        if (graph.getFeatures().supportsVertexIteration)
             assertEquals(BaseTest.count(graph.getVertices()), 50);
-        assertEquals(BaseTest.count(graph.getEdges()), 25);
-        for (final Edge edge : graph.getEdges()) {
-            graph.removeEdge(edge);
+        if (graph.getFeatures().supportsEdgeIteration) {
+            assertEquals(BaseTest.count(graph.getEdges()), 25);
+            for (final Edge edge : graph.getEdges()) {
+                graph.removeEdge(edge);
+            }
+            assertEquals(BaseTest.count(graph.getEdges()), 0);
         }
-        if (!graph.getFeatures().isRDFModel)
+        if (graph.getFeatures().supportsVertexIteration)
             assertEquals(BaseTest.count(graph.getVertices()), 50);
-        assertEquals(BaseTest.count(graph.getEdges()), 0);
         graph.shutdown();
     }
 }

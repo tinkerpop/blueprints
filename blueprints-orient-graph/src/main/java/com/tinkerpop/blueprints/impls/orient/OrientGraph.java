@@ -31,6 +31,10 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
         FEATURES.supportsKeyIndices = true;
         FEATURES.isWrapper = false;
         FEATURES.supportsIndices = true;
+        FEATURES.supportsEdgeRetrieval = true;
+        FEATURES.supportsVertexProperties = true;
+        FEATURES.supportsEdgeProperties = true;
+
 
         // For more information on supported types, please see:
         // http://code.google.com/p/orient/wiki/Types
@@ -63,16 +67,6 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
 
     public OrientGraph(final String url, final String username, final String password) {
        super(url, username, password);
-    }
-
-    @Override
-    public void startTransaction() {
-        final OrientGraphContext context = getContext(true);
-
-        if (context.rawGraph.getTransaction() instanceof OTransactionNoTx && context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN) {
-            context.rawGraph.begin();
-        } else
-            throw ExceptionFactory.transactionAlreadyStarted();
     }
 
     @Override

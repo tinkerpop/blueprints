@@ -19,7 +19,7 @@ public class IndexableGraphTestSuite extends TestSuite {
 
     public void testNoIndicesOnStartup() {
         IndexableGraph graph = (IndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexIndex) {
 
             assertEquals(count(graph.getIndices()), 0);
             graph.createIndex("myIdx", Vertex.class);
@@ -118,7 +118,7 @@ public class IndexableGraphTestSuite extends TestSuite {
 
     public void testIndexPersistence() {
         IndexableGraph graph = (IndexableGraph) this.graphTest.generateGraph();
-        if (graph.getFeatures().isPersistent && graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel && graph.getFeatures().supportsIndices) {
+        if (graph.getFeatures().isPersistent && graph.getFeatures().supportsVertexIndex && graph.getFeatures().supportsElementProperties() && graph.getFeatures().supportsIndices) {
 
             this.stopWatch();
             graph.createIndex("testIndex", Vertex.class);

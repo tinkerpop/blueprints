@@ -32,15 +32,6 @@ class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Transaction
         this.graph = graph;
     }
 
-    /**
-     * Calling this method has no effect.
-     *
-     * @throws IllegalStateException
-     */
-    @Override
-    public void startTransaction() throws IllegalStateException {
-        //Do nothing
-    }
 
     /**
      * Only supports successful termination of a transaction.

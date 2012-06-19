@@ -67,6 +67,10 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         FEATURES.supportsVertexIndex = false;
         FEATURES.supportsEdgeIndex = false;
         FEATURES.ignoresSuppliedIds = false;
+        FEATURES.supportsEdgeRetrieval = false;
+        FEATURES.supportsVertexProperties = false;
+        FEATURES.supportsEdgeProperties = false;
+
 
         FEATURES.supportsTransactions = true;
         FEATURES.supportsEdgeKeyIndex = false;
@@ -122,11 +126,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         }
     };
 
-    private final ThreadLocal<Boolean> inTransaction = new ThreadLocal<Boolean>() {
-        protected Boolean initialValue() {
-            return Boolean.FALSE;
-        }
-    };
 
     private static final String LOG4J_PROPERTIES = "log4j.properties";
 
@@ -424,12 +423,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         return uri;
     }
 
-    public void startTransaction() {
-        if (inTransaction.get())
-            throw ExceptionFactory.transactionAlreadyStarted();
-        inTransaction.set(Boolean.TRUE);
-    }
-
     public void stopTransaction(final Conclusion conclusion) {
         try {
             if (Conclusion.SUCCESS == conclusion) {
@@ -437,7 +430,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
             } else {
                 this.sailConnection.get().rollback();
             }
-            this.inTransaction.set(Boolean.FALSE);
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

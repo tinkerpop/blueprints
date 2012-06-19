@@ -238,7 +238,7 @@ public class VertexTestSuite extends TestSuite {
 
     public void testAddVertexProperties() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexProperties) {
             Vertex v1 = graph.addVertex(convertId(graph, "1"));
             Vertex v2 = graph.addVertex(convertId(graph, "2"));
 
@@ -249,7 +249,7 @@ public class VertexTestSuite extends TestSuite {
             assertEquals("value1", v1.getProperty("key1"));
             assertEquals(10, v1.getProperty("key2"));
             assertEquals(20, v2.getProperty("key2"));
-        } else {
+        } else if (graph.getFeatures().isRDFModel) {
             Vertex v1 = graph.addVertex("\"1\"^^<http://www.w3.org/2001/XMLSchema#int>");
             assertEquals("http://www.w3.org/2001/XMLSchema#int", v1.getProperty(SailTokens.DATATYPE));
             assertEquals(1, v1.getProperty(SailTokens.VALUE));
@@ -267,7 +267,7 @@ public class VertexTestSuite extends TestSuite {
 
     public void testAddManyVertexProperties() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexProperties) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             this.stopWatch();
             for (int i = 0; i < 50; i++) {
@@ -285,7 +285,7 @@ public class VertexTestSuite extends TestSuite {
             for (Vertex vertex : vertices) {
                 assertEquals(15, vertex.getPropertyKeys().size());
             }
-        } else {
+        } else if (graph.getFeatures().isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             this.stopWatch();
             for (int i = 0; i < 50; i++) {
@@ -313,7 +313,7 @@ public class VertexTestSuite extends TestSuite {
 
     public void testRemoveVertexProperties() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexProperties) {
 
             Vertex v1 = graph.addVertex("1");
             Vertex v2 = graph.addVertex("2");
@@ -365,7 +365,7 @@ public class VertexTestSuite extends TestSuite {
                 assertNull(v1.removeProperty("key2"));
                 assertNull(v2.removeProperty("key2"));
             }
-        } else {
+        } else if (graph.getFeatures().isRDFModel) {
             Vertex v1 = graph.addVertex("\"1\"^^<http://www.w3.org/2001/XMLSchema#int>");
             assertEquals("http://www.w3.org/2001/XMLSchema#int", v1.removeProperty("type"));
             assertEquals("1", v1.getProperty("value"));
@@ -383,7 +383,7 @@ public class VertexTestSuite extends TestSuite {
 
     public void testAddingIdProperty() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexProperties) {
             Vertex vertex = graph.addVertex(null);
             try {
                 vertex.setProperty("id", "123");
@@ -398,7 +398,7 @@ public class VertexTestSuite extends TestSuite {
 
     public void testNoConcurrentModificationException() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexIteration) {
 
             for (int i = 0; i < 25; i++) {
                 graph.addVertex(null);

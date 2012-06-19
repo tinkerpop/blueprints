@@ -101,6 +101,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         FEATURES.supportsVertexIndex = false;
         FEATURES.supportsEdgeIndex = false;
         FEATURES.ignoresSuppliedIds = true;
+        FEATURES.supportsEdgeRetrieval = true;
+        FEATURES.supportsVertexProperties = true;
+        FEATURES.supportsEdgeProperties = true;
         FEATURES.supportsTransactions = false;
         FEATURES.supportsIndices = false;
 

@@ -64,15 +64,15 @@
 
     <modules>
         <module>blueprints-core</module>
-        <module>blueprints-dex-graph</module>
+        <module>blueprints-test</module>
         <module>blueprints-graph-jung</module>
-        <module>blueprints-graph-sail</module>
+        <module>blueprints-rexster-graph</module>
+        <module>blueprints-dex-graph</module>
         <module>blueprints-neo4j-graph</module>
         <module>blueprints-neo4jbatch-graph</module>
         <module>blueprints-orient-graph</module>
-        <module>blueprints-rexster-graph</module>
+        <module>blueprints-graph-sail</module>
         <module>blueprints-sail-graph</module>
-        <module>blueprints-test</module>
     </modules>
 
     <properties>

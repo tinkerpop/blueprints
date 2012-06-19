@@ -340,9 +340,6 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         return getContext(true).rawGraph;
     }
 
-    public void startTransaction() {
-    }
-
     public void stopTransaction(final Conclusion conclusion) {
     }
 

@@ -2,6 +2,8 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
 
+import java.util.Collection;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -23,4 +25,28 @@ public abstract class TestSuite extends BaseTest {
             return id;
         }
     }
+
+    protected void vertexCount(final Graph graph, int expectedCount) {
+        if (graph.getFeatures().supportsVertexIteration) assertEquals(count(graph.getVertices()), expectedCount);
+    }
+    
+    protected void containsVertices(final Graph graph, final Collection<Vertex> vertices) {
+        for (Vertex v : vertices) {
+            Vertex vp = graph.getVertex(v.getId());
+            if (vp==null || !vp.getId().equals(v.getId())) fail();
+        }
+    }
+    
+    protected void vertexExistence(final Graph graph, final Collection<Vertex> included, final Collection<Vertex> excluded) {
+        containsVertices(graph,included);
+        for (Vertex v : excluded) {
+            if (graph.getVertex(v.getId())!=null) fail();
+        }
+    }
+
+    protected void edgeCount(final Graph graph, int expectedCount) {
+        if (graph.getFeatures().supportsEdgeIteration) assertEquals(count(graph.getEdges()),expectedCount);
+    }
+    
+    
 }

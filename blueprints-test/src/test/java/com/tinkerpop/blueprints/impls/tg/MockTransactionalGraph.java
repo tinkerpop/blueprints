@@ -14,7 +14,6 @@ import com.tinkerpop.blueprints.*;
 
 public class MockTransactionalGraph implements TransactionalGraph {
     
-    private int numTransactionStarted = 0;
     private int numTransactionsCommitted = 0;
     private int numTransactionsAborted = 0;
     
@@ -22,11 +21,6 @@ public class MockTransactionalGraph implements TransactionalGraph {
     
     public MockTransactionalGraph(final Graph graph) {
         this.graph=graph;
-    }
-    
-    @Override
-    public void startTransaction() throws IllegalStateException {
-        numTransactionStarted++;
     }
 
     @Override
@@ -36,10 +30,6 @@ public class MockTransactionalGraph implements TransactionalGraph {
             case FAILURE: numTransactionsAborted++; break;
             default: throw new IllegalArgumentException("Unrecognized conclusion: " + conclusion);
         }
-    }
-
-    public int getNumTransactionStarted() {
-        return numTransactionStarted;
     }
 
     public int getNumTransactionsCommitted() {
@@ -52,10 +42,6 @@ public class MockTransactionalGraph implements TransactionalGraph {
 
     public boolean allSuccessful() {
         return numTransactionsAborted==0;
-    }
-
-    public boolean allFinished() {
-        return numTransactionStarted == (numTransactionsAborted + numTransactionsCommitted);
     }
 
     @Override

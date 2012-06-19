@@ -90,7 +90,6 @@ public class BatchGraphTest extends TestCase {
 
         loader.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertTrue(tgraph.allSuccessful());
-        assertTrue(tgraph.allFinished());
 
         loader.shutdown();
     }
@@ -128,11 +127,6 @@ public class BatchGraphTest extends TestCase {
                     return id;
                 }
             } else return id;
-        }
-
-        @Override
-        public void startTransaction() throws IllegalStateException {
-            graph.startTransaction();
         }
 
         @Override

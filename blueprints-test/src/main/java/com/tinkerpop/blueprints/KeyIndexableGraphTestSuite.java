@@ -45,12 +45,24 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
                 assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
                 assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
                 assertTrue(graph.getIndexedKeys(Vertex.class).contains("location"));
-                graph.dropKeyIndex("name", Vertex.class);
             }
             if (graph.getFeatures().supportsEdgeKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Edge.class).size(), 2);
                 assertTrue(graph.getIndexedKeys(Edge.class).contains("weight"));
                 assertTrue(graph.getIndexedKeys(Edge.class).contains("since"));
+            }
+            graph.shutdown();
+        }
+    }
+
+    public void testAutoIndexKeyDroppingWithPersistence() {
+        testAutoIndexKeyManagementWithPersistence();
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        if (graph.getFeatures().isPersistent) {
+            if (graph.getFeatures().supportsVertexKeyIndex) {
+                graph.dropKeyIndex("name", Vertex.class);
+            }
+            if (graph.getFeatures().supportsEdgeKeyIndex) {
                 graph.dropKeyIndex("weight", Edge.class);
             }
             graph.shutdown();
@@ -74,16 +86,13 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             if (graph.getFeatures().supportsEdgeKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Edge.class).size(), 0);
             }
-            graph.shutdown();
-
         }
         graph.shutdown();
-
     }
 
     public void testGettingVerticesAndEdgesWithKeyValue() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIteration && graph.getFeatures().supportsVertexKeyIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexIteration && graph.getFeatures().supportsVertexKeyIndex) {
             graph.createKeyIndex("name", Vertex.class);
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
@@ -114,7 +123,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertFalse(graph.getVertices("name", 768) instanceof PropertyFilteredIterable);
         }
 
-        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeKeyIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeKeyIndex) {
             graph.createKeyIndex("location", Edge.class);
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Edge.class).contains("location"));
@@ -150,7 +159,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
 
     public void testReIndexingOfElements() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexKeyIndex) {
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
             if (!graph.getFeatures().isWrapper)
@@ -163,7 +172,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(graph.getVertices("name", "marko").iterator().next(), vertex);
         }
 
-        if (graph.getFeatures().supportsEdgeIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeKeyIndex) {
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             edge.setProperty("date", 2012);
             if (!graph.getFeatures().isWrapper)
@@ -175,11 +184,12 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
         }
+        graph.shutdown();
     }
 
     public void testNoConcurrentModificationException() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsEdgeKeyIndex && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeKeyIndex) {
             graph.createKeyIndex("key", Edge.class);
             for (int i = 0; i < 25; i++) {
                 graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");

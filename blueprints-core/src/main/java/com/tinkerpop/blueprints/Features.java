@@ -78,6 +78,7 @@ public class Features {
     public Boolean isPersistent = null;
     /**
      * Is the graph an RDF framework?
+     * @deprecated thus far, isRDFModel describes a collection of features. Use actual features to describe your data model.
      */
     public Boolean isRDFModel = null;
     /**
@@ -117,6 +118,18 @@ public class Features {
      */
     public Boolean supportsVertexIteration = null;
     /**
+     * Does the graph support retrieving edges by id, i.e. graph.getEdge(Object id)?
+     */
+    public Boolean supportsEdgeRetrieval = null;
+    /**
+     * Does the graph support setting and retrieving properties on vertices?
+     */
+    public Boolean supportsVertexProperties = null;
+    /**
+     * Does the graph support setting and retrieving properties on edges?
+     */
+    public Boolean supportsEdgeProperties = null;
+    /**
      * Does the graph implement TransactionalGraph?
      */
     public Boolean supportsTransactions = null;
@@ -124,6 +137,14 @@ public class Features {
      * Does the graph implement ThreadedTransactionalGraph?
      */
     public Boolean supportsThreadedTransactions = null;
+
+    /**
+     * Checks whether the graph supports both vertex and edge properties
+     * @return whether the graph supports both vertex and edge properties
+     */
+    public boolean supportsElementProperties() {
+        return supportsVertexProperties && supportsEdgeProperties;
+    }
 
     public String toString() {
         try {

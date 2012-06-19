@@ -88,6 +88,9 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         FEATURES.supportsKeyIndices = true;
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
+        FEATURES.supportsEdgeRetrieval = true;
+        FEATURES.supportsVertexProperties = true;
+        FEATURES.supportsEdgeProperties = true;
         FEATURES.supportsThreadedTransactions = false;
     }
 

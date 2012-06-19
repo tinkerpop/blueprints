@@ -17,12 +17,6 @@ public class EventTransactionalGraph<T extends TransactionalGraph> extends Event
     }
 
     @Override
-    public void startTransaction() {
-        this.baseGraph.startTransaction();
-        this.trigger.resetEventQueue();
-    }
-
-    @Override
     public void stopTransaction(Conclusion conclusion) {
 
         // failure in this context doesn't mean Conclusion.FAILURE.  it means that the

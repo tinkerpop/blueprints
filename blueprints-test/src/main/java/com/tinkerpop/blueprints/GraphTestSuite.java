@@ -91,7 +91,7 @@ public class GraphTestSuite extends TestSuite {
 
     public void testGettingVerticesAndEdgesWithKeyValue() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIteration && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexProperties) {
             Vertex v1 = graph.addVertex(null);
             v1.setProperty("name", "marko");
             v1.setProperty("location", "everywhere");
@@ -99,14 +99,16 @@ public class GraphTestSuite extends TestSuite {
             v2.setProperty("name", "stephen");
             v2.setProperty("location", "everywhere");
 
-            assertEquals(count(graph.getVertices("location", "everywhere")), 2);
-            assertEquals(count(graph.getVertices("name", "marko")), 1);
-            assertEquals(count(graph.getVertices("name", "stephen")), 1);
-            assertEquals(graph.getVertices("name", "marko").iterator().next(), v1);
-            assertEquals(graph.getVertices("name", "stephen").iterator().next(), v2);
+            if (graph.getFeatures().supportsVertexIteration) {
+                assertEquals(count(graph.getVertices("location", "everywhere")), 2);
+                assertEquals(count(graph.getVertices("name", "marko")), 1);
+                assertEquals(count(graph.getVertices("name", "stephen")), 1);
+                assertEquals(getOnlyElement(graph.getVertices("name", "marko")), v1);
+                assertEquals(getOnlyElement(graph.getVertices("name", "stephen")), v2);
+            }
         }
 
-        if (graph.getFeatures().supportsEdgeIteration && !graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeProperties) {
             Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
             e1.setProperty("name", "marko");
             e1.setProperty("location", "everywhere");
@@ -114,11 +116,13 @@ public class GraphTestSuite extends TestSuite {
             e2.setProperty("name", "stephen");
             e2.setProperty("location", "everywhere");
 
-            assertEquals(count(graph.getEdges("location", "everywhere")), 2);
-            assertEquals(count(graph.getEdges("name", "marko")), 1);
-            assertEquals(count(graph.getEdges("name", "stephen")), 1);
-            assertEquals(graph.getEdges("name", "marko").iterator().next(), e1);
-            assertEquals(graph.getEdges("name", "stephen").iterator().next(), e2);
+            if (graph.getFeatures().supportsEdgeIteration) {
+                assertEquals(count(graph.getEdges("location", "everywhere")), 2);
+                assertEquals(count(graph.getEdges("name", "marko")), 1);
+                assertEquals(count(graph.getEdges("name", "stephen")), 1);
+                assertEquals(graph.getEdges("name", "marko").iterator().next(), e1);
+                assertEquals(graph.getEdges("name", "stephen").iterator().next(), e2);
+            }
         }
         graph.shutdown();
     }
@@ -158,7 +162,7 @@ public class GraphTestSuite extends TestSuite {
 
     public void testSettingProperties() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsEdgeProperties) {
             Vertex a = graph.addVertex(null);
             Vertex b = graph.addVertex(null);
             graph.addEdge(null, a, b, convertId(graph, "knows"));
@@ -172,7 +176,7 @@ public class GraphTestSuite extends TestSuite {
 
     public void testDataTypeValidationOnProperties() {
         Graph graph = graphTest.generateGraph();
-        if (!graph.getFeatures().isRDFModel && !graph.getFeatures().isWrapper) {
+        if (graph.getFeatures().supportsElementProperties() && !graph.getFeatures().isWrapper) {
             Vertex vertexA = graph.addVertex(null);
             Vertex vertexB = graph.addVertex(null);
             Edge edge = graph.addEdge(null, vertexA, vertexB, convertId(graph, "knows"));
@@ -609,7 +613,7 @@ public class GraphTestSuite extends TestSuite {
         Vertex a = graph.addVertex(null);
         graph.addVertex(null);
         graph.addVertex(null);
-        if (!graph.getFeatures().isRDFModel) {
+        if (graph.getFeatures().supportsVertexIteration) {
             for (Vertex vertex : graph.getVertices()) {
                 graph.addEdge(null, vertex, a, convertId(graph, "x"));
                 graph.addEdge(null, vertex, a, convertId(graph, "y"));
@@ -623,7 +627,7 @@ public class GraphTestSuite extends TestSuite {
             for (Vertex vertex : graph.getVertices()) {
                 graph.removeVertex(vertex);
             }
-        } else {
+        } else if (graph.getFeatures().supportsEdgeIteration) {
             for (int i = 0; i < 10; i++) {
                 graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "test"));
             }
@@ -641,12 +645,12 @@ public class GraphTestSuite extends TestSuite {
 
             Vertex v = graph.addVertex(null);
             Vertex u = graph.addVertex(null);
-            if (!graph.getFeatures().isRDFModel) {
+            if (graph.getFeatures().supportsVertexProperties) {
                 v.setProperty("name", "marko");
                 u.setProperty("name", "pavel");
             }
             Edge e = graph.addEdge(null, v, u, convertId(graph, "collaborator"));
-            if (!graph.getFeatures().isRDFModel)
+            if (graph.getFeatures().supportsEdgeProperties)
                 e.setProperty("location", "internet");
 
             if (graph.getFeatures().supportsVertexIteration) {
@@ -663,7 +667,7 @@ public class GraphTestSuite extends TestSuite {
             printPerformance(graph.toString(), 1, "graph loaded", this.stopWatch());
             if (graph.getFeatures().supportsVertexIteration) {
                 assertEquals(count(graph.getVertices()), 2);
-                if (!graph.getFeatures().isRDFModel) {
+                if (graph.getFeatures().supportsVertexProperties) {
                     for (Vertex vertex : graph.getVertices()) {
                         assertTrue(vertex.getProperty("name").equals("marko") || vertex.getProperty("name").equals("pavel"));
                     }
@@ -673,7 +677,7 @@ public class GraphTestSuite extends TestSuite {
                 assertEquals(count(graph.getEdges()), 1);
                 for (Edge edge : graph.getEdges()) {
                     assertEquals(edge.getLabel(), convertId(graph, "collaborator"));
-                    if (!graph.getFeatures().isRDFModel)
+                    if (graph.getFeatures().supportsEdgeProperties)
                         assertEquals(edge.getProperty("location"), "internet");
                 }
             }
