@@ -5,3 +5,5 @@ notifications:
     - spmallette@gmail.com
     - parcour@gmail.com
     - me@matthiasb.com
+jdk:
+  - oraclejdk7
