@@ -175,6 +175,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
         }
+        graph.shutdown();
     }
 
     public void testNoConcurrentModificationException() {
