@@ -15,10 +15,11 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Enable tests for KeyIndexableGraph under RexsterGraph.  Issue with casting index values resolved.
+* Enable tests for @KeyIndexableGraph@ under @RexsterGraph@.  Issue with casting index values resolved.
 * Optimized the pom.xml for both the parent and child projects
 * Added Travis continuous integration support
-* Made OrientGraph and Neo4jGraph Element constructors public
+* Made @OrientGraph@ and @Neo4jGraph@ Element constructors public
+* Made @Neo4jGraph.getVertex()@ slightly more efficient
 
 ==<hr/>==
 
