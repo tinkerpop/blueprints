@@ -7,3 +7,5 @@ notifications:
     - me@matthiasb.com
 jdk:
   - oraclejdk7
+  - openjdk7
+  - openjdk6
