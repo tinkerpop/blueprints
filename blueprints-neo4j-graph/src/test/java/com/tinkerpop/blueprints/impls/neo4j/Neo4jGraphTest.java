@@ -106,7 +106,9 @@ public class Neo4jGraphTest extends GraphTest {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
-        return new Neo4jGraph(directory);
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        graph.setCheckElementsInTransaction(true);
+        return graph;
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
