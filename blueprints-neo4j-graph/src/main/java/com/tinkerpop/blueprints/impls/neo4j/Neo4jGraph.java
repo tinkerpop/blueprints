@@ -298,6 +298,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             final Long longId;
             if (id instanceof Long)
                 longId = (Long) id;
+            else if (id instanceof Number)
+                longId = ((Number) id).longValue();
             else
                 longId = Double.valueOf(id.toString()).longValue();
             return new Neo4jVertex(this.rawGraph.getNodeById(longId), this);
