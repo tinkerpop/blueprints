@@ -19,7 +19,7 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 * Optimized the pom.xml for both the parent and child projects
 * Added Travis continuous integration support
 * Made @OrientGraph@ and @Neo4jGraph@ Element constructors public
-* Made @Neo4jGraph.getVertex()@ slightly more efficient
+* Provided a method to turn on/off @Neo4jGraph@ transaction consistency checking. Default behavior being native Neo4j.
 
 ==<hr/>==
 
