@@ -25,6 +25,7 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 * Bumped to support Neo4j 1.8.M05
 * An @Element@ can not have a property key that is the empty string
 
+
 ==<hr/>==
 
 h3. Version 2.0.0 (May 23, 2012)
