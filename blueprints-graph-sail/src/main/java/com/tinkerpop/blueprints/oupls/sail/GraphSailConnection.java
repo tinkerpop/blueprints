@@ -36,6 +36,8 @@ import java.util.LinkedList;
 public class GraphSailConnection extends NotifyingSailConnectionBase implements InferencerConnection {
     private static final Resource[] NULL_CONTEXT_ARRAY = {null};
 
+    private static final String DEFAULT_NAMESPACE_PREFIX_KEY = "default.namespace";
+
     private final GraphSail.DataStore store;
 
     private final Collection<WriteAction> writeBuffer = new LinkedList<WriteAction>();
@@ -424,7 +426,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             public Namespace next() throws SailException {
                 String prefix = prefixes.next();
                 String uri = (String) store.namespaces.getProperty(prefix);
-                return new NamespaceImpl(prefix, uri);
+                return new NamespaceImpl(fromNativePrefixKey(prefix), uri);
             }
 
             public void remove() throws SailException {
@@ -434,19 +436,19 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     public String getNamespaceInternal(final String prefix) throws SailException {
-        return (String) store.namespaces.getProperty(prefix);
+        return (String) store.namespaces.getProperty(toNativePrefixKey(prefix));
     }
 
     public void setNamespaceInternal(final String prefix, final String uri) throws SailException {
-        store.namespaces.setProperty(prefix, uri);
+        store.namespaces.setProperty(toNativePrefixKey(prefix), uri);
     }
 
     public void removeNamespaceInternal(final String prefix) throws SailException {
-        store.namespaces.removeProperty(prefix);
+        store.namespaces.removeProperty(toNativePrefixKey(prefix));
     }
 
     public void clearNamespacesInternal() throws SailException {
-        throw new UnsupportedOperationException("The clearNamespaces operation is not yet supported");
+        throw new UnsupportedOperationException("the clearNamespaces operation is not yet supported");
     }
 
     // write lock //////////////////////////////////////////////////////////////
@@ -714,6 +716,14 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     // value conversion ////////////////////////////////////////////////////////
+
+    private String toNativePrefixKey(final String prefix) {
+        return 0 == prefix.length() ? DEFAULT_NAMESPACE_PREFIX_KEY : prefix;
+    }
+
+    private String fromNativePrefixKey(final String prefix) {
+        return prefix.equals(DEFAULT_NAMESPACE_PREFIX_KEY) ? "" : prefix;
+    }
 
     private Value toSesame(final Vertex v) {
         String value = (String) v.getProperty(GraphSail.VALUE);

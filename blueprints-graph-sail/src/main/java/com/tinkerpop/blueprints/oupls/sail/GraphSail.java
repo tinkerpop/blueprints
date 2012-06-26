@@ -117,7 +117,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         store.sail = this;
         store.graph = graph;
 
-        createIndices(graph);
+        createIndices();
 
         store.manualTransactions = store.graph instanceof TransactionalGraph;
         //&& 0 == ((TransactionalGraph) store.graph).getMaxBufferSize();
@@ -141,13 +141,14 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         assignUnassignedTriplePatterns();
     }
 
-    private void createIndices(final KeyIndexableGraph graph) {
-        String[] keys = {"s", "p", "o", "c",
+    private void createIndices() {
+        String[] allKeys = {"s", "p", "o", "c",
                 "sp", "so", "sc", "po", "pc", "oc",
                 "spo", "spc", "soc", "poc",
                 "spoc"};
 
-        for (String key : keys) {
+        // TODO: indices for all keys are not required
+        for (String key : allKeys) {
             if (!store.graph.getIndexedKeys(Edge.class).contains(key)) {
                 store.graph.createKeyIndex(key, Edge.class);
             }

@@ -23,6 +23,7 @@ import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.File;
+import java.net.URL;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -276,5 +277,13 @@ public abstract class GraphSailTest extends SailTest {
             }
             directory.delete();
         }
+    }
+
+    protected File computeTestDataRoot() {
+        final String clsUri = this.getClass().getName().replace('.','/') + ".class";
+        final URL url = this.getClass().getClassLoader().getResource(clsUri);
+        final String clsPath = url.getPath();
+        final File root = new File(clsPath.substring(0, clsPath.length() - clsUri.length()));
+        return new File(root.getParentFile(), "test-data");
     }
 }
