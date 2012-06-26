@@ -107,9 +107,9 @@ public class EdgeTestSuite extends TestSuite {
         Vertex v2 = graph.addVertex(null);
         Vertex v3 = graph.addVertex(null);
 
-        Edge e1 = graph.addEdge(null, v1, v2, convertId(graph,"test1"));
-        Edge e2 = graph.addEdge(null, v2, v3, convertId(graph,"test2"));
-        Edge e3 = graph.addEdge(null, v3, v1, convertId(graph,"test3"));
+        Edge e1 = graph.addEdge(null, v1, v2, convertId(graph, "test1"));
+        Edge e2 = graph.addEdge(null, v2, v3, convertId(graph, "test2"));
+        Edge e3 = graph.addEdge(null, v3, v1, convertId(graph, "test3"));
 
         if (graph.getFeatures().supportsEdgeRetrieval) {
             this.stopWatch();
@@ -522,11 +522,13 @@ public class EdgeTestSuite extends TestSuite {
             try {
                 edge.setProperty("id", "123");
                 fail();
-            } catch (RuntimeException e) { }
+            } catch (RuntimeException e) {
+            }
             try {
                 edge.setProperty("label", "hates");
                 fail();
-            } catch (RuntimeException e) { }
+            } catch (RuntimeException e) {
+            }
 
         }
         graph.shutdown();
@@ -548,6 +550,20 @@ public class EdgeTestSuite extends TestSuite {
         }
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(BaseTest.count(graph.getVertices()), 50);
+        graph.shutdown();
+    }
+
+    public void testEmptyKeyProperty() {
+        final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeProperties) {
+            final Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "friend");
+            try {
+                e.setProperty("", "value");
+                fail();
+            } catch (IllegalArgumentException e1) {
+                assertTrue(true);
+            }
+        }
         graph.shutdown();
     }
 }

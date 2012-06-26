@@ -484,4 +484,18 @@ public class VertexTestSuite extends TestSuite {
 
         graph.shutdown();
     }
+
+    public void testEmptyKeyProperty() {
+        final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties) {
+            final Vertex v = graph.addVertex(null);
+            try {
+                v.setProperty("", "value");
+                fail();
+            } catch (IllegalArgumentException e) {
+                assertTrue(true);
+            }
+        }
+        graph.shutdown();
+    }
 }

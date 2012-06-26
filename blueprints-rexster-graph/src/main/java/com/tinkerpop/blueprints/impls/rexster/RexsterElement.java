@@ -72,6 +72,8 @@ abstract class RexsterElement implements Element {
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
             throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+        if (key.equals(StringFactory.EMPTY_STRING))
+            throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
         if (key.startsWith(RexsterTokens.UNDERSCORE))
             throw new RuntimeException("RexsterGraph does not support property keys that start with underscore");

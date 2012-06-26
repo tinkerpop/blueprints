@@ -33,6 +33,8 @@ class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL))
             throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+        if (key.equals(StringFactory.EMPTY_STRING))
+            throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
         final Map<String, Object> properties = this.getPropertyMapClone();
         properties.put(key, value);

@@ -41,6 +41,8 @@ abstract class Neo4jElement implements Element {
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
             throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+        if (key.equals(StringFactory.EMPTY_STRING))
+            throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
         try {
             // attempts to take a collection and convert it to an array so that Neo4j can consume it

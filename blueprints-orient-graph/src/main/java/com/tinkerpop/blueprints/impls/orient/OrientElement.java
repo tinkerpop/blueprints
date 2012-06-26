@@ -35,6 +35,8 @@ abstract class OrientElement implements Element, OSerializableStream, OIdentifia
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
             throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+        if (key.equals(StringFactory.EMPTY_STRING))
+            throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
         try {
             this.graph.autoStartTransaction();

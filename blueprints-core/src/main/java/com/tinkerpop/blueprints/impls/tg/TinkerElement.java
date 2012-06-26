@@ -39,6 +39,8 @@ abstract class TinkerElement implements Element, Serializable {
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
             throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+        if (key.equals(StringFactory.EMPTY_STRING))
+            throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
         Object oldValue = this.properties.put(key, value);
         if (this instanceof TinkerVertex)

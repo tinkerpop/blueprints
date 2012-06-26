@@ -156,6 +156,8 @@ class DexElement implements Element {
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL))
             throw new IllegalArgumentException("Property key is reserved for all nodes and edges: " + StringFactory.LABEL);
+        if (key.equals(StringFactory.EMPTY_STRING))
+            throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
         int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
         com.sparsity.dex.gdb.DataType datatype = null;
