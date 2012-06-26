@@ -15,6 +15,12 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Enable tests for @KeyIndexableGraph@ under @RexsterGraph@.  Issue with casting index values resolved.
+* Optimized the pom.xml for both the parent and child projects
+* Added Travis continuous integration support
+* Made @OrientGraph@ and @Neo4jGraph@ Element constructors public
+* Provided a method to turn on/off @Neo4jGraph@ transaction consistency checking. Default behavior being native Neo4j.
+
 ==<hr/>==
 
 h3. Version 2.0.0 (May 23, 2012)

@@ -20,6 +20,7 @@ import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
+import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -106,7 +107,9 @@ public class Neo4jGraphTest extends GraphTest {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null)
             directory = this.getWorkingDirectory();
-        return new Neo4jGraph(directory);
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        graph.setCheckElementsInTransaction(true);
+        return graph;
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
@@ -158,9 +161,7 @@ public class Neo4jGraphTest extends GraphTest {
     }
 
     public void testQueryIndex() throws Exception {
-        String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null)
-            directory = this.getWorkingDirectory();
+        String directory = this.getWorkingDirectory();
         deleteDirectory(new File(directory));
 
         Neo4jGraph graph = new Neo4jGraph(directory);
@@ -207,9 +208,7 @@ public class Neo4jGraphTest extends GraphTest {
     }
 
     public void testIndexParameters() throws Exception {
-        String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null)
-            directory = this.getWorkingDirectory();
+        String directory = this.getWorkingDirectory();
         deleteDirectory(new File(directory));
 
         IndexableGraph graph = new Neo4jGraph(directory);
@@ -233,6 +232,30 @@ public class Neo4jGraphTest extends GraphTest {
         }
         assertEquals(counter, 1);
 
+        graph.shutdown();
+        deleteDirectory(new File(this.getWorkingDirectory()));
+    }
+
+    public void testReadOnlyGraph() throws Exception {
+        String directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        assertEquals(graph.getIndexedKeys(Vertex.class).size(), 0);
+        assertFalse(graph.getIndexedKeys(Vertex.class).contains("name"));
+        graph.createKeyIndex("name", Vertex.class);
+        graph.addVertex(null).setProperty("name", "marko");
+        graph.addVertex(null).setProperty("name", "matthias");
+        assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
+        assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
+        graph.shutdown();
+
+        graph = new Neo4jGraph(new EmbeddedReadOnlyGraphDatabase(directory));
+        assertEquals(count(graph.getVertices()), 2);
+        assertEquals(count(graph.getVertices("name", "marko")), 1);
+        assertEquals(count(graph.getVertices("name", "matthias")), 1);
+        assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
+        assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
         graph.shutdown();
         deleteDirectory(new File(directory));
     }

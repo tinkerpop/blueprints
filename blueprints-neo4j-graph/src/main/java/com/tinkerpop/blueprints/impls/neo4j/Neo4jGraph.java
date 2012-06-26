@@ -54,9 +54,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         }
     };
 
-    public final ThreadLocal<Boolean> checkElementsInTransaction = new ThreadLocal<Boolean>() {
+    protected final ThreadLocal<Boolean> checkElementsInTransaction = new ThreadLocal<Boolean>() {
         protected Boolean initialValue() {
-            return true;
+            return false;
         }
     };
 
@@ -103,6 +103,20 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         } else {
             return this.checkElementsInTransaction.get();
         }
+    }
+
+    /**
+     * Neo4j's transactions are not consistent between the graph and the graph indices.
+     * Moreover, global graph operations are not consistent.
+     * For example, if a vertex is removed and then an index is queried in the same transaction, the removed vertex can be returned.
+     * This method allows the developer to turn on/off a Neo4jGraph 'hack' that ensures transactional consistency.
+     * The default behavior for Neo4jGraph is to use Neo4j's native behavior which ensures speed at the expensive of consistency.
+     * Note that this boolean switch is local to the current thread (i.e. a ThreadLocal variable).
+     *
+     * @param checkElementsInTransaction check whether an element is in the transaction between returning it
+     */
+    public void setCheckElementsInTransaction(final boolean checkElementsInTransaction) {
+        this.checkElementsInTransaction.set(checkElementsInTransaction);
     }
 
     public Neo4jGraph(final String directory) {
@@ -301,6 +315,8 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             final Long longId;
             if (id instanceof Long)
                 longId = (Long) id;
+            else if (id instanceof Number)
+                longId = ((Number) id).longValue();
             else
                 longId = Double.valueOf(id.toString()).longValue();
             return new Neo4jVertex(this.rawGraph.getNodeById(longId), this);
@@ -374,19 +390,22 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 this.rawGraph.index().getNodeAutoIndexer().setEnabled(true);
 
             this.rawGraph.index().getNodeAutoIndexer().startAutoIndexingProperty(key);
-            if (!this.getInternalIndexKeys(Vertex.class).contains(key))
+            if (!this.getInternalIndexKeys(Vertex.class).contains(key)) {
                 KeyIndexableGraphHelper.reIndexElements(this, this.getVertices(), new HashSet<String>(Arrays.asList(key)));
+                this.createInternalIndexKey(key, elementClass);
+            }
         } else if (Edge.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getRelationshipAutoIndexer().isEnabled())
                 this.rawGraph.index().getRelationshipAutoIndexer().setEnabled(true);
 
             this.rawGraph.index().getRelationshipAutoIndexer().startAutoIndexingProperty(key);
-            if (!this.getInternalIndexKeys(Edge.class).contains(key))
+            if (!this.getInternalIndexKeys(Edge.class).contains(key)) {
                 KeyIndexableGraphHelper.reIndexElements(this, this.getEdges(), new HashSet<String>(Arrays.asList(key)));
+                this.createInternalIndexKey(key, elementClass);
+            }
         } else {
             throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
-        this.createInternalIndexKey(key, elementClass);
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {

@@ -57,6 +57,18 @@ public class GraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testStringRepresentationOfVertexId() {
+        final Graph graph = graphTest.generateGraph();
+        final Vertex a = graph.addVertex(null);
+        final Object id = a.getId();
+        final Vertex b = graph.getVertex(id);
+        final Vertex c = graph.getVertex(id.toString());
+        assertEquals(a, b);
+        assertEquals(b, c);
+        assertEquals(c, a);
+        graph.shutdown();
+    }
+
     public void testSemanticallyCorrectIterables() {
         Graph graph = graphTest.generateGraph();
         for (int i = 0; i < 15; i++) {
