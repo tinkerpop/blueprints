@@ -20,6 +20,9 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 * Added Travis continuous integration support
 * Made @OrientGraph@ and @Neo4jGraph@ Element constructors public
 * Provided a method to turn on/off @Neo4jGraph@ transaction consistency checking. Default behavior being native Neo4j.
+* Removed @startTransaction()@ from @TransactionalGraph@. Transactions are auto-started.
+* Bumped to support Dex 4.6.0
+* Bumped to support Neo4j 1.8.M05
 
 ==<hr/>==
 

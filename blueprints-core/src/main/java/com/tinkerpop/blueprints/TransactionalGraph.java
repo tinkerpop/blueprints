@@ -12,6 +12,7 @@ package com.tinkerpop.blueprints;
  * <p/>
  * By default, the first operation on a TransactionalGraph will start a transaction automatically.
  *
+ * @author Matthias Broecheler (http://matthiasb.com)
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface TransactionalGraph extends Graph {
