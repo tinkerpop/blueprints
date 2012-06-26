@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.oupls.sail;
+package com.tinkerpop.blueprints.oupls.sail;
 
 import info.aduna.iteration.CloseableIteration;
 import org.junit.After;

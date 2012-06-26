@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.pgm.oupls.sail;
+package com.tinkerpop.blueprints.oupls.sail;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 
