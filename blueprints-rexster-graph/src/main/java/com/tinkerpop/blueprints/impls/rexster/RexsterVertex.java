@@ -69,7 +69,7 @@ public class RexsterVertex extends RexsterElement implements Vertex {
     }
 
     public Query query() {
-        return new DefaultQuery(this);
+        return new RexsterQuery(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()), graph);
     }
 
     public String toString() {

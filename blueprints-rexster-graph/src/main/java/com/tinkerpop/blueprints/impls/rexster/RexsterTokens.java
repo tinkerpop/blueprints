@@ -14,6 +14,8 @@ class RexsterTokens {
     public static final String _INE = "_inE";
     public static final String _OUTV = "_outV";
     public static final String _INV = "_inV";
+    public static final String _LIMIT = "_limit";
+    public static final String _PROPERTIES = "_properties";
     public static final String UNDERSCORE = "_";
     public static final String NULL = "null";
 
@@ -37,10 +39,26 @@ class RexsterTokens {
 
     public static final String SLASH_OUTE = "/outE";
     public static final String SLASH_INE = "/inE";
+    public static final String SLASH_BOTHE = "/bothE";
+
+    public static final String SLASH_OUT = "/out";
+    public static final String SLASH_IN = "/in";
+    public static final String SLASH_BOTH = "/both";
+
+    public static final String SLASH_OUTCOUNT = "/outCount";
+    public static final String SLASH_INCOUNT = "/inCount";
+    public static final String SLASH_BOTHCOUNT = "/bothCount";
+
+    public static final String SLASH_OUTIDS = "/outIds";
+    public static final String SLASH_INIDS = "/inIds";
+    public static final String SLASH_BOTHIDS = "/bothv";
 
     public static final String AND = "&";
+    public static final String COMMA = ",";
     public static final String EQUALS = "=";
     public static final String QUESTION = "?";
+    public static final String LEFT_SQUARE_BRACKET = "[";
+    public static final String RIGHT_SQUARE_BRACKET = "]";
 
     public static final String KEY = "key";
     public static final String KEY_EQUALS = "key=";
@@ -53,6 +71,7 @@ class RexsterTokens {
     public static final String CLASS = "class";
     public static final String CLASS_EQUALS = "class=";
     public static final String NAME = "name";
+    public static final String TOTAL_SIZE = "totalSize";
     public static final String _LABEL_EQUALS = "_label=";
 
     public static final String REXSTER_OFFSET_END = "rexster.offset.end";

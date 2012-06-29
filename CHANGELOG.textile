@@ -24,6 +24,7 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 * Bumped to support Dex 4.6.0
 * Bumped to support Neo4j 1.8.M05
 * An @Element@ can not have a property key that is the empty string
+* Update @RexsterGraph@ to utilize Vertex Query API of Rexster.
 
 
 ==<hr/>==
