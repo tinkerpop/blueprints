@@ -171,10 +171,10 @@ public class RestHelper {
             return "(" + RexsterTokens.INTEGER + "," + value + ")";
         else if (value instanceof Long)
             return "(" + RexsterTokens.LONG + "," + value + ")";
-        else if (value instanceof Double)
-            return "(" + RexsterTokens.DOUBLE + "," + value + ")";
         else if (value instanceof Float)
             return "(" + RexsterTokens.FLOAT + "," + value + ")";
+        else if (value instanceof Double)
+            return "(" + RexsterTokens.DOUBLE + "," + value + ")";
         else
             return value.toString();
 
