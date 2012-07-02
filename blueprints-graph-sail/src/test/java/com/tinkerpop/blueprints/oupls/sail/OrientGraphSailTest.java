@@ -22,5 +22,5 @@ public class OrientGraphSailTest {//extends GraphSailTest {
     private String getWorkingDirectory() {
         return this.computeTestDataRoot().getAbsolutePath();
     }
-    */
+    //*/
 }

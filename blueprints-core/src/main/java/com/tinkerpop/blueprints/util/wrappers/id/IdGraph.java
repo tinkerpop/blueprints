@@ -25,7 +25,8 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     public static final String ID = "__id";
 
     private final T baseGraph;
-    private final IdFactory idFactory;
+    private final IdFactory vertexIdFactory;
+    private final IdFactory edgeIdFactory;
 
     private final Features features;
 
@@ -44,21 +45,32 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
      * Adds custom ID functionality to the given graph, also specifying a factory for new element IDs.
      *
      * @param baseGraph the base graph which may or may not permit custom element IDs
-     * @param idFactory a factory for new element IDs.
+     * @param idFactory a factory for new vertex and edge IDs.
      *                  When vertices or edges are created using null IDs, the actual IDs are chosen based on this factory.
      */
     public IdGraph(final T baseGraph, final IdFactory idFactory) {
+        this(baseGraph, idFactory, idFactory);
+    }
+
+    /**
+     * Adds custom ID functionality to the given graph, also specifying (separate) factories for new vertex and edge IDs.
+     *
+     * @param baseGraph the base graph which may or may not permit custom element IDs
+     * @param vertexIdFactory a factory for new vertex IDs.
+     *                  When vertices are created using null IDs, the actual IDs are chosen based on this factory.
+     * @param edgeIdFactory a factory for new edge IDs.
+     *                  When edges are created using null IDs, the actual IDs are chosen based on this factory.
+     */
+    public IdGraph(final T baseGraph,
+                   final IdFactory vertexIdFactory,
+                   final IdFactory edgeIdFactory) {
         this.baseGraph = baseGraph;
         this.features = this.baseGraph.getFeatures().copyFeatures();
         features.isWrapper = true;
         features.ignoresSuppliedIds = false;
 
-        this.idFactory = null == idFactory
-                ? new IdFactory() {
-            public Object createId() {
-                return UUID.randomUUID().toString();
-            }
-        } : idFactory;
+        this.vertexIdFactory = null == vertexIdFactory ? new DefaultIdFactory() : vertexIdFactory;
+        this.edgeIdFactory = null == edgeIdFactory ? new DefaultIdFactory() : edgeIdFactory;
 
         createIndices();
     }
@@ -83,7 +95,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         }
 
         final Vertex base = baseGraph.addVertex(null);
-        base.setProperty(ID, null == id ? idFactory.createId() : id);
+        base.setProperty(ID, null == id ? vertexIdFactory.createId() : id);
         return new IdVertex(base);
     }
 
@@ -134,7 +146,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
         Edge e = baseGraph.addEdge(null, ((IdVertex) outVertex).getBaseVertex(), ((IdVertex) inVertex).getBaseVertex(), label);
 
-        e.setProperty(ID, null == id ? idFactory.createId() : id);
+        e.setProperty(ID, null == id ? edgeIdFactory.createId() : id);
 
         return new IdEdge(e);
     }
@@ -228,5 +240,11 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
      */
     public static interface IdFactory {
         Object createId();
+    }
+
+    private static class DefaultIdFactory implements IdFactory {
+        public Object createId() {
+            return UUID.randomUUID().toString();
+        }
     }
 }
