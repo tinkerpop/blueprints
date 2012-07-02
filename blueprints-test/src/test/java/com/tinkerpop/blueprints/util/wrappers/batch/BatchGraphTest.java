@@ -6,6 +6,8 @@ import com.tinkerpop.blueprints.impls.tg.MockTransactionalGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import junit.framework.TestCase;
 
+import java.util.Random;
+
 /**
  * Tests {@link BatchGraph} by creating a variable length chain and verifying that the chain is correctly inserted into the wrapped TinkerGraph.
  * <br />
@@ -51,6 +53,37 @@ public class BatchGraphTest extends TestCase {
     public void testURLIdLoading() {
         loadingTest(5000, 100, BatchGraph.IdType.URL, new URLLoadingFactory());
         loadingTest(200000, 10000, BatchGraph.IdType.URL, new URLLoadingFactory());
+    }
+    
+    
+    public void testQuadLoading() {
+        int numEdges = 10000;
+        String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
+        TinkerGraph graph = new TinkerGraph();
+        BatchGraph bgraph = new BatchGraph(new WritethroughGraph(graph), BatchGraph.IdType.STRING, 1000);
+        for (String[] quad : quads) {
+            Vertex[] vertices = new Vertex[2];
+            for (int i=0;i<2;i++) {
+                vertices[i] = bgraph.getVertex(quad[i]);
+                if (vertices[i]==null) vertices[i]=bgraph.addVertex(quad[i]);
+            }
+            Edge edge = bgraph.addEdge(null,vertices[0],vertices[1],quad[2]);
+            edge.setProperty("annotation",quad[3]);
+        }
+        assertEquals(numEdges,BaseTest.count(graph.getEdges()));
+    }
+    
+    
+    public static String[][] generateQuads(int numVertices, int numEdges, String[] labels) {
+        Random random = new Random();
+        String[][] edges = new String[numEdges][4];
+        for (int i=0;i<numEdges;i++) {
+            edges[i][0] = "v"+random.nextInt(numVertices)+1;
+            edges[i][1] = "v"+random.nextInt(numVertices)+1;
+            edges[i][2] = labels[random.nextInt(labels.length)];
+            edges[i][3] = ""+random.nextInt();
+        }
+        return edges;
     }
 
 
