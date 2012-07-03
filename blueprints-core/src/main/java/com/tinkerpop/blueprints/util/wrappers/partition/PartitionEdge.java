@@ -24,4 +24,8 @@ public class PartitionEdge extends PartitionElement implements Edge {
     public Edge getBaseEdge() {
         return (Edge) this.baseElement;
     }
+
+    public Edge setProperty(final String key, final Object value) {
+        return (Edge) super.setProperty(key, value);
+    }
 }

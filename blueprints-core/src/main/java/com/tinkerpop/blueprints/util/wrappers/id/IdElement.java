@@ -32,12 +32,13 @@ public abstract class IdElement implements Element {
         return s;
     }
 
-    public void setProperty(final String key, final Object value) {
+    public Element setProperty(final String key, final Object value) {
         if (key.equals(IdGraph.ID)) {
             throw new IllegalArgumentException("Unable to set value for reserved property " + IdGraph.ID);
         }
 
         baseElement.setProperty(key, value);
+        return this;
     }
 
     public Object removeProperty(final String key) {

@@ -36,4 +36,8 @@ class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
             }
         };
     }
+
+    public Vertex setProperty(final String key, final Object value) {
+        throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
+    }
 }

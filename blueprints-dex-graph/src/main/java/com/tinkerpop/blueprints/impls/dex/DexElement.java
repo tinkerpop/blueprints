@@ -150,7 +150,7 @@ class DexElement implements Element {
       * java.lang.Object)
       */
     @Override
-    public void setProperty(final String key, final Object value) {
+    public Element setProperty(final String key, final Object value) {
         //System.out.println(this + "!!" + key + "!!" + value);
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
@@ -220,7 +220,7 @@ class DexElement implements Element {
         //System.out.println("\t" + this + "!!" + attr + "!!" + v);
         //    throw e;
         //}
-
+        return this;
     }
 
     /*

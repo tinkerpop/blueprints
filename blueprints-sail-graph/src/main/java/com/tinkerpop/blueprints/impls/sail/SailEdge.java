@@ -69,7 +69,7 @@ public class SailEdge implements Edge {
             return null;
     }
 
-    public void setProperty(final String key, final Object value) {
+    public Edge setProperty(final String key, final Object value) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
             try {
                 URI namedGraph = new URIImpl(this.graph.expandPrefix(value.toString()));
@@ -82,6 +82,7 @@ public class SailEdge implements Edge {
         } else {
             throw new IllegalArgumentException(NAMED_GRAPH_PROPERTY);
         }
+        return this;
     }
 
     public Object removeProperty(final String key) {

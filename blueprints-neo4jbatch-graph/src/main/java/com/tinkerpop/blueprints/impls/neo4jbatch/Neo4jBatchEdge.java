@@ -28,7 +28,7 @@ class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
 
     }
 
-    public void setProperty(final String key, final Object value) {
+    public Edge setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL))
@@ -39,6 +39,7 @@ class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
         final Map<String, Object> properties = this.getPropertyMapClone();
         properties.put(key, value);
         this.graph.getRawGraph().setRelationshipProperties(this.id, properties);
+        return this;
     }
 
     public Map<String, Object> getPropertyMap() {

@@ -16,8 +16,9 @@ public abstract class WrappedElement implements Element {
         this.baseElement = baseElement;
     }
 
-    public void setProperty(final String key, final Object value) {
+    public Element setProperty(final String key, final Object value) {
         this.baseElement.setProperty(key, value);
+        return this;
     }
 
     public Object getProperty(final String key) {
