@@ -55,11 +55,11 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     /**
      * Adds custom ID functionality to the given graph, also specifying (separate) factories for new vertex and edge IDs.
      *
-     * @param baseGraph the base graph which may or may not permit custom element IDs
+     * @param baseGraph       the base graph which may or may not permit custom element IDs
      * @param vertexIdFactory a factory for new vertex IDs.
-     *                  When vertices are created using null IDs, the actual IDs are chosen based on this factory.
-     * @param edgeIdFactory a factory for new edge IDs.
-     *                  When edges are created using null IDs, the actual IDs are chosen based on this factory.
+     *                        When vertices are created using null IDs, the actual IDs are chosen based on this factory.
+     * @param edgeIdFactory   a factory for new edge IDs.
+     *                        When edges are created using null IDs, the actual IDs are chosen based on this factory.
      */
     public IdGraph(final T baseGraph,
                    final IdFactory vertexIdFactory,
@@ -95,7 +95,15 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         }
 
         final Vertex base = baseGraph.addVertex(null);
-        base.setProperty(ID, null == id ? vertexIdFactory.createId() : id);
+
+        Object v = null == id ? vertexIdFactory.createId() : id;
+
+        if (null == v) {
+            base.removeProperty(ID);
+        } else {
+            base.setProperty(ID, v);
+        }
+
         return new IdVertex(base);
     }
 
@@ -144,11 +152,17 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         verifyNativeElement(outVertex);
         verifyNativeElement(inVertex);
 
-        Edge e = baseGraph.addEdge(null, ((IdVertex) outVertex).getBaseVertex(), ((IdVertex) inVertex).getBaseVertex(), label);
+        Edge base = baseGraph.addEdge(null, ((IdVertex) outVertex).getBaseVertex(), ((IdVertex) inVertex).getBaseVertex(), label);
 
-        e.setProperty(ID, null == id ? edgeIdFactory.createId() : id);
+        Object v = null == id ? edgeIdFactory.createId() : id;
 
-        return new IdEdge(e);
+        if (null == v) {
+            base.removeProperty(ID);
+        } else {
+            base.setProperty(ID, v);
+        }
+
+        return new IdEdge(base);
     }
 
     public Edge getEdge(final Object id) {
