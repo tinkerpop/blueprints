@@ -38,7 +38,7 @@ abstract class ReadOnlyElement implements Element {
     /**
      * @throws UnsupportedOperationException
      */
-    public void setProperty(final String key, final Object value) throws UnsupportedOperationException {
+    public Element setProperty(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 

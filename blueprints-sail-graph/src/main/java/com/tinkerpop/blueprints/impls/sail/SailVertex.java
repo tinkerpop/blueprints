@@ -74,7 +74,7 @@ public class SailVertex implements Vertex {
         }
     }
 
-    public void setProperty(final String key, final Object value) {
+    public Vertex setProperty(final String key, final Object value) {
         if (this.rawVertex instanceof Resource) {
             throw new RuntimeException(URI_BLANK_NODE_PROPERTIES);
         } else {
@@ -91,6 +91,7 @@ public class SailVertex implements Vertex {
                 this.updateLiteral(oldLiteral, (Literal) this.rawVertex);
             }
         }
+        return this;
     }
 
     public Object removeProperty(final String key) {

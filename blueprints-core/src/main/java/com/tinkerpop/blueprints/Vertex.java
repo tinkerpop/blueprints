@@ -35,4 +35,14 @@ public interface Vertex extends Element {
      * @return a vertex query object with methods for constraining which data is pulled from the underlying graph
      */
     public Query query();
+
+    /**
+     * Assign a key/value property to the vertex.
+     * If a value already exists for this key, then the previous key/value is overwritten.
+     *
+     * @param key   the string key of the property
+     * @param value the object value o the property
+     * @return return the vertex with the newly added property
+     */
+    public Vertex setProperty(String key, Object value);
 }

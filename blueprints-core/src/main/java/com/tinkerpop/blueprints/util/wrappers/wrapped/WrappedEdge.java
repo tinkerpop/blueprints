@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.util.wrappers.wrapped;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
@@ -23,5 +24,9 @@ public class WrappedEdge extends WrappedElement implements Edge {
 
     public Edge getBaseEdge() {
         return (Edge) this.baseElement;
+    }
+
+    public Edge setProperty(final String key, final Object value) {
+        return (Edge) super.setProperty(key, value);
     }
 }

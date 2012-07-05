@@ -19,9 +19,10 @@ public abstract class PartitionElement implements Element {
         this.graph = graph;
     }
 
-    public void setProperty(final String key, final Object value) {
+    public Element setProperty(final String key, final Object value) {
         if (!key.equals(this.graph.getPartitionKey()))
             this.baseElement.setProperty(key, value);
+        return this;
     }
 
     public Object getProperty(final String key) {

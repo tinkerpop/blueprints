@@ -507,8 +507,7 @@ public class EdgeTestSuite extends TestSuite {
             assertEquals(edge.removeProperty("weight"), 0.6);
             assertNull(edge.getProperty("weight"));
             assertEquals(edge.getPropertyKeys().size(), 0);
-            edge.setProperty("blah", "marko");
-            edge.setProperty("blah2", "josh");
+            edge.setProperty("blah", "marko").setProperty("blah2", "josh");
             assertEquals(edge.getPropertyKeys().size(), 2);
         }
         graph.shutdown();
