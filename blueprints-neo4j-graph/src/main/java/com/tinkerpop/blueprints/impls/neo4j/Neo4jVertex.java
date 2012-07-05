@@ -59,10 +59,6 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
         return (Node) this.rawElement;
     }
 
-    public Vertex setProperty(final String key, final Object value) {
-        return (Vertex) super.setProperty(key, value);
-    }
-
     private class Neo4jVertexVertexIterable<T extends Vertex> implements Iterable<Neo4jVertex> {
         private final Neo4jGraph graph;
         private final Node node;

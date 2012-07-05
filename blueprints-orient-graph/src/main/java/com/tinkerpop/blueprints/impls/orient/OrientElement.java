@@ -30,7 +30,7 @@ abstract class OrientElement implements Element, OSerializableStream, OIdentifia
         this.rawElement = rawElement;
     }
 
-    public Element setProperty(final String key, final Object value) {
+    public void setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
@@ -45,8 +45,6 @@ abstract class OrientElement implements Element, OSerializableStream, OIdentifia
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        return this;
     }
 
     public Object removeProperty(final String key) {

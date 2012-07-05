@@ -46,8 +46,4 @@ public class RexsterEdge extends RexsterElement implements Edge {
         return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + this.getId());
     }
 
-    public Edge setProperty(final String key, final Object value) {
-        return (Edge) super.setProperty(key, value);
-    }
-
 }

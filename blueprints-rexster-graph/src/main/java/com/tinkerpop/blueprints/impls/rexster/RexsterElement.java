@@ -67,7 +67,7 @@ abstract class RexsterElement implements Element {
             return null;
     }
 
-    public Element setProperty(final String key, final Object value) {
+    public void setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
@@ -83,8 +83,6 @@ abstract class RexsterElement implements Element {
         } else {
             RestHelper.postResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RestHelper.encode(key) + RexsterTokens.EQUALS + RestHelper.uriCast(value));
         }
-
-        return this;
     }
 
     public int hashCode() {

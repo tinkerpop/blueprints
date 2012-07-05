@@ -80,8 +80,4 @@ public class RexsterVertex extends RexsterElement implements Vertex {
         return RestHelper.getResultObject(graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + this.getId());
     }
 
-    public Vertex setProperty(final String key, final Object value) {
-        return (Vertex) super.setProperty(key, value);
-    }
-
 }

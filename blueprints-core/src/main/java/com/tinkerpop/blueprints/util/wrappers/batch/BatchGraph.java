@@ -323,9 +323,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         }
 
         @Override
-        public Vertex setProperty(String key, Object value) {
+        public void setProperty(String key, Object value) {
             getCachedVertex(externalID).setProperty(key, value);
-            return this;
         }
 
         @Override
@@ -362,9 +361,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         }
 
         @Override
-        public Edge setProperty(String key, Object value) {
+        public void setProperty(String key, Object value) {
             getWrappedEdge().setProperty(key, value);
-            return this;
         }
 
         @Override
