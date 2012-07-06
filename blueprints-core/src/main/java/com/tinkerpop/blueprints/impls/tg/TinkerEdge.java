@@ -42,8 +42,4 @@ class TinkerEdge extends TinkerElement implements Edge, Serializable {
     public String toString() {
         return StringFactory.edgeString(this);
     }
-
-    public Edge setProperty(final String key, final Object value) {
-        return (Edge) super.setProperty(key, value);
-    }
 }

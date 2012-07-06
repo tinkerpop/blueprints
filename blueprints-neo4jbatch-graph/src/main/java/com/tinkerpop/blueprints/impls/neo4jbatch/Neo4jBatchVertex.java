@@ -26,14 +26,13 @@ class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
 
     }
 
-    public Vertex setProperty(final String key, final Object value) {
+    public void setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
 
         final Map<String, Object> properties = this.getPropertyMapClone();
         properties.put(key, value);
         this.graph.getRawGraph().setNodeProperties(this.id, properties);
-        return this;
     }
 
     /**

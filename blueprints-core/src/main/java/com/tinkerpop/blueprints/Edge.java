@@ -25,14 +25,4 @@ public interface Edge extends Element {
      * @return the edge label
      */
     public String getLabel();
-
-    /**
-     * Assign a key/value property to the edge.
-     * If a value already exists for this key, then the previous key/value is overwritten.
-     *
-     * @param key   the string key of the property
-     * @param value the object value o the property
-     * @return return the edge with the newly added property
-     */
-    public Edge setProperty(String key, Object value);
 }

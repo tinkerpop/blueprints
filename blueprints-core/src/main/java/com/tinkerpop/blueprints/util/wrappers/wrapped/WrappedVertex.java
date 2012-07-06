@@ -40,8 +40,4 @@ public class WrappedVertex extends WrappedElement implements Vertex {
     public Vertex getBaseVertex() {
         return (Vertex) this.baseElement;
     }
-
-    public Vertex setProperty(final String key, final Object value) {
-        return (Vertex) super.setProperty(key, value);
-    }
 }

@@ -218,8 +218,4 @@ class DexVertex extends DexElement implements Vertex {
     public Query query() {
         return new DefaultQuery(this);
     }
-
-    public Vertex setProperty(final String key, final Object value) {
-        return (Vertex) super.setProperty(key, value);
-    }
 }

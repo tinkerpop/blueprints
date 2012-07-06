@@ -36,7 +36,7 @@ abstract class Neo4jElement implements Element {
             return null;
     }
 
-    public Element setProperty(final String key, final Object value) {
+    public void setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
@@ -53,8 +53,6 @@ abstract class Neo4jElement implements Element {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
-        return this;
     }
 
     public Object removeProperty(final String key) {

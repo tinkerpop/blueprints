@@ -239,8 +239,12 @@ public class VertexTestSuite extends TestSuite {
     public void testAddVertexProperties() {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexProperties) {
-            Vertex v1 = graph.addVertex(convertId(graph, "1")).setProperty("key1", "value1").setProperty("key2", 10);
-            Vertex v2 = graph.addVertex(convertId(graph, "2")).setProperty("key2", 20);
+            Vertex v1 = graph.addVertex(convertId(graph, "1"));
+            Vertex v2 = graph.addVertex(convertId(graph, "2"));
+
+            v1.setProperty("key1", "value1");
+            v1.setProperty("key2", 10);
+            v2.setProperty("key2", 20);
 
             assertEquals("value1", v1.getProperty("key1"));
             assertEquals(10, v1.getProperty("key2"));

@@ -41,8 +41,8 @@ public class IdVertex extends IdElement implements Vertex {
         };
     }
 
-    public Vertex setProperty(final String key, final Object value) {
-        return (Vertex) super.setProperty(key, value);
+    public void setProperty(final String key, final Object value) {
+        super.setProperty(key, value);
     }
 
     public String toString() {

@@ -90,8 +90,4 @@ class DexEdge extends DexElement implements Edge {
     public String toString() {
         return StringFactory.edgeString(this);
     }
-
-    public Edge setProperty(final String key, final Object value) {
-        return (Edge) super.setProperty(key, value);
-    }
 }

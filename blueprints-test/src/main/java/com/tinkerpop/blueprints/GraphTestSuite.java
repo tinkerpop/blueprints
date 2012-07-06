@@ -104,8 +104,12 @@ public class GraphTestSuite extends TestSuite {
     public void testGettingVerticesAndEdgesWithKeyValue() {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexProperties) {
-            Vertex v1 = graph.addVertex(null).setProperty("name", "marko").setProperty("location", "everywhere");
-            Vertex v2 = graph.addVertex(null).setProperty("name", "stephen").setProperty("location", "everywhere");
+            Vertex v1 = graph.addVertex(null);
+            v1.setProperty("name", "marko");
+            v1.setProperty("location", "everywhere");
+            Vertex v2 = graph.addVertex(null);
+            v2.setProperty("name", "stephen");
+            v2.setProperty("location", "everywhere");
 
             if (graph.getFeatures().supportsVertexIteration) {
                 assertEquals(count(graph.getVertices("location", "everywhere")), 2);
@@ -117,8 +121,12 @@ public class GraphTestSuite extends TestSuite {
         }
 
         if (graph.getFeatures().supportsEdgeProperties) {
-            Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows")).setProperty("name", "marko").setProperty("location", "everywhere");
-            Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows")).setProperty("name", "stephen").setProperty("location", "everywhere");
+            Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+            e1.setProperty("name", "marko");
+            e1.setProperty("location", "everywhere");
+            Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+            e2.setProperty("name", "stephen");
+            e2.setProperty("location", "everywhere");
 
             if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges("location", "everywhere")), 2);

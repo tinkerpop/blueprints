@@ -25,8 +25,8 @@ public class IdEdge extends IdElement implements Edge {
         return ((Edge) this.baseElement).getLabel();
     }
 
-    public Edge setProperty(final String key, final Object value) {
-        return (Edge) super.setProperty(key, value);
+    public void setProperty(final String key, final Object value) {
+        super.setProperty(key, value);
     }
 
     public String toString() {
