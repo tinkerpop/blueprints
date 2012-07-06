@@ -28,4 +28,8 @@ public class IdEdge extends IdElement implements Edge {
     public Edge setProperty(final String key, final Object value) {
         return (Edge) super.setProperty(key, value);
     }
+
+    public String toString() {
+        return "IdEdge(" + getId() + "," + baseElement + ")";
+    }
 }
