@@ -435,7 +435,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         final OClass cls = getRawGraph().getMetadata().getSchema().getClass(className);
 
         getRawGraph().getMetadata().getIndexManager()
-                .createIndex(className + "." + key, "NOTUNIQUE", new OPropertyIndexDefinition(className, key, OType.STRING), cls.getClusterIds(), null);
+                .createIndex(className + "." + key, "NOTUNIQUE", new OPropertyIndexDefinition(className, key, OType.STRING), cls.getPolymorphicClusterIds(), null);
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
