@@ -24,8 +24,8 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.index.RelationshipIndex;
-import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.HighlyAvailableGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -186,7 +186,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     private <T extends Element> void createInternalIndexKey(final String key, final Class<T> elementClass) {
         final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        final PropertyContainer pc = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
+        final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getKernelData().properties();
         try {
             final String[] keys = (String[]) pc.getProperty(propertyName);
             final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
@@ -201,7 +201,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     private <T extends Element> void dropInternalIndexKey(final String key, final Class<T> elementClass) {
         final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        final PropertyContainer pc = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
+        final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getKernelData().properties();
         try {
             final String[] keys = (String[]) pc.getProperty(propertyName);
             final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
@@ -214,7 +214,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public <T extends Element> Set<String> getInternalIndexKeys(final Class<T> elementClass) {
         final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        final PropertyContainer pc = ((AbstractGraphDatabase) this.rawGraph).getKernelData().properties();
+        final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getKernelData().properties();
         try {
             final String[] keys = (String[]) pc.getProperty(propertyName);
             return new HashSet<String>(Arrays.asList(keys));
