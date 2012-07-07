@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.io.LexicographicalElementComparator;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -23,6 +24,7 @@ import java.util.Map;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Joshua Shinavier (http://fortytwo.net)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class GraphMLWriter {
 
@@ -31,11 +33,21 @@ public class GraphMLWriter {
     private Map<String, String> vertexKeyTypes = null;
     private Map<String, String> edgeKeyTypes = null;
 
+    private String xmlSchemaLocation = null;
+
     /**
      * @param graph the Graph to pull the data from
      */
     public GraphMLWriter(final Graph graph) {
         this.graph = graph;
+    }
+
+    /**
+     *
+     * @param xmlSchemaLocation the location of the GraphML XML Schema instance
+     */
+    public void setXmlSchemaLocation(String xmlSchemaLocation) {
+        this.xmlSchemaLocation = xmlSchemaLocation;
     }
 
     /**
@@ -97,7 +109,7 @@ public class GraphMLWriter {
             }
         }
 
-        XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
+        final XMLOutputFactory inputFactory = XMLOutputFactory.newInstance();
         try {
             XMLStreamWriter writer = inputFactory.createXMLStreamWriter(graphMLOutputStream, "UTF8");
             if (normalize) {
@@ -108,6 +120,14 @@ public class GraphMLWriter {
             writer.writeStartDocument();
             writer.writeStartElement(GraphMLTokens.GRAPHML);
             writer.writeAttribute(GraphMLTokens.XMLNS, GraphMLTokens.GRAPHML_XMLNS);
+
+            //XML Schema instance namespace definition (xsi)
+            writer.writeAttribute(XMLConstants.XMLNS_ATTRIBUTE + ":" + GraphMLTokens.XML_SCHEMA_NAMESPACE_TAG,
+                    XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+            //XML Schema location
+            writer.writeAttribute(GraphMLTokens.XML_SCHEMA_NAMESPACE_TAG + ":" + GraphMLTokens.XML_SCHEMA_LOCATION_ATTRIBUTE,
+                    GraphMLTokens.GRAPHML_XMLNS + " " + (this.xmlSchemaLocation == null ?
+                            GraphMLTokens.DEFAULT_GRAPHML_SCHEMA_LOCATION : this.xmlSchemaLocation));
 
             // <key id="weight" for="edge" attr.name="weight" attr.type="float"/>
             Collection<String> keyset;
