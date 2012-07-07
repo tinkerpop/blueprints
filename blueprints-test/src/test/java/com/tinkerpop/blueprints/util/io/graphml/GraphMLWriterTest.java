@@ -36,6 +36,21 @@ public class GraphMLWriterTest extends TestCase {
         assertEquals(expected.replace("\n", "").replace("\r", ""), bos.toString().replace("\n", "").replace("\r", ""));
     }
 
+    public void testWithEdgeLabel() throws Exception {
+        TinkerGraph g = new TinkerGraph();
+        GraphMLReader.inputGraph(g, GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        GraphMLWriter w = new GraphMLWriter(g);
+        w.setEdgeLabelKey("label");
+        w.setNormalize(true);
+        w.outputGraph(bos);
+
+        String expected = streamToString(GraphMLWriterTest.class.getResourceAsStream("graph-example-1-schema-valid.xml"));
+        //System.out.println(expected);
+        assertEquals(expected.replace("\n", "").replace("\r", ""), bos.toString().replace("\n", "").replace("\r", ""));
+    }
+
     private String streamToString(final InputStream in) throws IOException {
         Writer writer = new StringWriter();
 
