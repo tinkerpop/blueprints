@@ -422,7 +422,7 @@ public final class GraphSONFactory {
         return returnValue;
     }
 
-    private static Object getTypedValueFromJsonNode(JsonNode node) {
+    static Object getTypedValueFromJsonNode(JsonNode node) {
         Object theValue = null;
 
         if (node != null && !node.isNull()) {

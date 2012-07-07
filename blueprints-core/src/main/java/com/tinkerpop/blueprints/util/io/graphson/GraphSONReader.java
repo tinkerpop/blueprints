@@ -97,8 +97,8 @@ public class GraphSONReader {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
                     final JsonNode node = jp.readValueAsTree();
-                    final Vertex inV = graph.getVertex(node.get(GraphSONTokens._IN_V).getValueAsText());
-                    final Vertex outV = graph.getVertex(node.get(GraphSONTokens._OUT_V).getValueAsText());
+                    final Vertex inV = graph.getVertex(GraphSONFactory.getTypedValueFromJsonNode(node.get(GraphSONTokens._IN_V)));
+                    final Vertex outV = graph.getVertex(GraphSONFactory.getTypedValueFromJsonNode(node.get(GraphSONTokens._OUT_V)));
                     GraphSONFactory.edgeFromJSON(node, outV, inV, elementFactory, hasEmbeddedTypes);
                 }
             }
