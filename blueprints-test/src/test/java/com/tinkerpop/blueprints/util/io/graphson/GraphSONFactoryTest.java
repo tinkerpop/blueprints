@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -803,6 +804,11 @@ public class GraphSONFactoryTest {
         Vertex v = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false);
 
         Assert.assertSame(v, g.getVertex(1));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("1", v.getId());
+        Assert.assertEquals("marko", v.getProperty("name"));
+        Assert.assertEquals(29, v.getProperty("age"));
     }
 
     @Test
@@ -822,6 +828,32 @@ public class GraphSONFactoryTest {
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));
         Assert.assertSame(e, g.getEdge(7));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("7", e.getId());
+        Assert.assertEquals(0.5d, e.getProperty("weight"));
+        Assert.assertEquals("knows", e.getLabel());
+        Assert.assertEquals(v1, e.getVertex(Direction.OUT));
+        Assert.assertEquals(v2, e.getVertex(Direction.IN));
+    }
+
+    @Test
+    public void edgeFromJsonNoTypeOrIdOnEdge()  throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+        final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
+
+        final String edgeJson = "{\"weight\":0.5,\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
+
+        Vertex v1 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false);
+        Vertex v2 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false);
+        Edge e = GraphSONFactory.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false);
+
+        Assert.assertSame(v1, g.getVertex(1));
+        Assert.assertSame(v2, g.getVertex(2));
+        Assert.assertSame(e, g.getEdge(0));
     }
 
     private class Cat {

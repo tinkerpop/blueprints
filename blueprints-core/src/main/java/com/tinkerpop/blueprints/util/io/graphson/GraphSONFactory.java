@@ -61,7 +61,7 @@ public final class GraphSONFactory {
 
         final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
-        final String vertexId = node.get(GraphSONTokens._ID).getValueAsText();
+        final Object vertexId = getTypedValueFromJsonNode(node.get(GraphSONTokens._ID));
         final Vertex v = factory.createVertex(vertexId);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
@@ -97,7 +97,7 @@ public final class GraphSONFactory {
 
         final Map<String, Object> props = GraphSONFactory.readProperties(node, true, hasEmbeddedTypes);
 
-        final String edgeId = node.get(GraphSONTokens._ID).getValueAsText();
+        final Object edgeId = getTypedValueFromJsonNode(node.get(GraphSONTokens._ID));
         final String label = node.get(GraphSONTokens._LABEL).getValueAsText();
 
         final Edge e = factory.createEdge(edgeId, out, in, label);
