@@ -4,7 +4,10 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
+import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.MappingJsonFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
@@ -25,13 +28,86 @@ import java.util.Map;
  * Helps write graph elements to TinkerPop JSON format. Contains methods to support both Jackson and Jettison
  * for JSON processing.
  *
- * @author Stephen Mallette
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public final class GraphSONFactory {
 
-    private static JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+    private static final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
+    private static final JsonFactory jsonFactory = new MappingJsonFactory();
 
-    private static ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param json a single vertex in GraphSON format
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     */
+    public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final boolean hasEmbeddedTypes) throws IOException{
+        final JsonParser jp = jsonFactory.createJsonParser(json.toString());
+        final JsonNode node = jp.readValueAsTree();
+        return vertexFromJson(node, factory, hasEmbeddedTypes);
+    }
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param node a single vertex in GraphSON format
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     */
+    public static Vertex vertexFromJson(final JsonNode node, final ElementFactory factory, final boolean hasEmbeddedTypes) throws IOException{
+
+        final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
+
+        final String vertexId = node.get(GraphSONTokens._ID).getValueAsText();
+        final Vertex v = factory.createVertex(vertexId);
+
+        for (Map.Entry<String, Object> entry : props.entrySet()) {
+            v.setProperty(entry.getKey(), entry.getValue());
+        }
+
+        return v;
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param json a single edge in GraphSON format
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     */
+    public static Edge edgeFromJSON(final JSONObject json, final Vertex out, final Vertex in,
+                                final ElementFactory factory, final boolean hasEmbeddedTypes)  throws IOException {
+        final JsonParser jp = jsonFactory.createJsonParser(json.toString());
+        final JsonNode node = jp.readValueAsTree();
+        return edgeFromJSON(node, out, in, factory, hasEmbeddedTypes);
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param node a single edge in GraphSON format
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     */
+    public static Edge edgeFromJSON(final JsonNode node, final Vertex out, final Vertex in,
+                                final ElementFactory factory, final boolean hasEmbeddedTypes)  throws IOException {
+
+        final Map<String, Object> props = GraphSONFactory.readProperties(node, true, hasEmbeddedTypes);
+
+        final String edgeId = node.get(GraphSONTokens._ID).getValueAsText();
+        final String label = node.get(GraphSONTokens._LABEL).getValueAsText();
+
+        final Edge e = factory.createEdge(edgeId, out, in, label);
+
+        for (Map.Entry<String, Object> entry : props.entrySet()) {
+            e.setProperty(entry.getKey(), entry.getValue());
+        }
+
+        return e;
+    }
 
     /**
      * Creates a Jettison JSONObject from a graph element. All property keys are serialized and types are not shown.
@@ -97,6 +173,86 @@ public final class GraphSONFactory {
         }
 
         return jsonElement;
+    }
+
+    static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {
+        final Map<String, Object> map = new HashMap<String, Object>();
+
+        final Iterator<Map.Entry<String, JsonNode>> iterator = node.getFields();
+        while (iterator.hasNext()) {
+            final Map.Entry<String, JsonNode> entry = iterator.next();
+
+            if (!ignoreReservedKeys || (ignoreReservedKeys && !isReservedKey(entry.getKey()))) {
+                map.put(entry.getKey(), readProperty(entry.getValue(), hasEmbeddedTypes));
+            }
+        }
+
+        return map;
+    }
+
+    private static boolean isReservedKey(final String key) {
+        return key.equals(GraphSONTokens._ID) || key.equals(GraphSONTokens._TYPE) || key.equals(GraphSONTokens._LABEL)
+                || key.equals(GraphSONTokens._OUT_V) || key.equals(GraphSONTokens._IN_V);
+    }
+
+    private static Object readProperty(final JsonNode node, final boolean hasEmbeddedTypes) {
+        final Object propertyValue;
+
+        if (hasEmbeddedTypes) {
+            if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_UNKNOWN)) {
+                propertyValue = null;
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_BOOLEAN)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getBooleanValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_FLOAT)) {
+                propertyValue = Float.parseFloat(node.get(GraphSONTokens.VALUE).getValueAsText());
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_DOUBLE)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getDoubleValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_INTEGER)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getIntValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_LONG)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getLongValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_STRING)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).getTextValue();
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_LIST)) {
+                propertyValue = readProperties(node.get(GraphSONTokens.VALUE).getElements(), hasEmbeddedTypes);
+            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_MAP)) {
+                propertyValue = readProperties(node.get(GraphSONTokens.VALUE), false, hasEmbeddedTypes);
+            } else {
+                propertyValue = node.getValueAsText();
+            }
+        } else {
+            if (node.isNull()) {
+                propertyValue = null;
+            } else if (node.isBoolean()) {
+                propertyValue = node.getBooleanValue();
+            } else if (node.isDouble()) {
+                propertyValue = node.getDoubleValue();
+            } else if (node.isInt()) {
+                propertyValue = node.getIntValue();
+            } else if (node.isLong()) {
+                propertyValue = node.getLongValue();
+            } else if (node.isTextual()) {
+                propertyValue = node.getTextValue();
+            } else if (node.isArray()) {
+                propertyValue = readProperties(node.getElements(), hasEmbeddedTypes);
+            } else if (node.isObject()) {
+                propertyValue = readProperties(node, false, hasEmbeddedTypes);
+            } else {
+                propertyValue = node.getValueAsText();
+            }
+        }
+
+        return propertyValue;
+    }
+
+    private static List readProperties(final Iterator<JsonNode> listOfNodes, final boolean hasEmbeddedTypes) {
+        final List array = new ArrayList();
+
+        while (listOfNodes.hasNext()) {
+            array.add(readProperty(listOfNodes.next(), hasEmbeddedTypes));
+        }
+
+        return array;
     }
 
     private static ArrayNode createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes) {

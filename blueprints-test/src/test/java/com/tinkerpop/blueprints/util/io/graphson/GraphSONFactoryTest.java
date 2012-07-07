@@ -7,10 +7,12 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -789,6 +791,37 @@ public class GraphSONFactoryTest {
         JSONObject jsonObjectListFirst = jsonArray.getJSONObject(0);
         Assert.assertTrue(jsonObjectListFirst.isNull(GraphSONTokens.VALUE));
         Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectListFirst.optString(GraphSONTokens.TYPE));
+    }
+
+    @Test
+    public void vertexFromJsonValid() throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+
+        Vertex v = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false);
+
+        Assert.assertSame(v, g.getVertex(1));
+    }
+
+    @Test
+    public void edgeFromJsonValid()  throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+        final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
+
+        final String edgeJson = "{\"weight\":0.5,\"_id\":7,\"_type\":\"edge\",\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
+
+        Vertex v1 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false);
+        Vertex v2 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false);
+        Edge e = GraphSONFactory.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false);
+
+        Assert.assertSame(v1, g.getVertex(1));
+        Assert.assertSame(v2, g.getVertex(2));
+        Assert.assertSame(e, g.getEdge(7));
     }
 
     private class Cat {
