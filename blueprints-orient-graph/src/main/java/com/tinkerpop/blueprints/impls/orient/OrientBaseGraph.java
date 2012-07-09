@@ -224,7 +224,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public Iterable<Vertex> getVertices(final String key, Object value) {
-        final OIndex<?> idx = getContext(false).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.VERTEX_CLASS_NAME + "." + key);
+        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.VERTEX_CLASS_NAME + "." + key);
         if (idx != null) {
             if (value != null && !(value instanceof String))
                 value = value.toString();
@@ -235,6 +235,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     private Iterable<Vertex> getVertices(final boolean polymorphic) {
+        getContext(true);
         return new OrientElementScanIterable<Vertex>(this, Vertex.class, polymorphic);
     }
 
@@ -243,7 +244,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public Iterable<Edge> getEdges(final String key, Object value) {
-        final OIndex<?> idx = getContext(false).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.EDGE_CLASS_NAME + "." + key);
+        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.EDGE_CLASS_NAME + "." + key);
         if (idx != null) {
             if (value != null && !(value instanceof String))
                 value = value.toString();
@@ -254,6 +255,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     private Iterable<Edge> getEdges(final boolean polymorphic) {
+        getContext(true);
         return new OrientElementScanIterable<Edge>(this, Edge.class, polymorphic);
     }
 
