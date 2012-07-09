@@ -5,7 +5,6 @@ import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
