@@ -10,14 +10,14 @@ import com.tinkerpop.blueprints.Vertex;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public interface ElementFactory {
+public interface ElementFactory<V extends Vertex, E extends Edge> {
     /**
      * Creates a new Edge instance.
      */
-    Edge createEdge(final Object id, final Vertex out, final Vertex in, final String label);
+    E createEdge(final Object id, final V out, final V in, final String label);
 
     /**
      * Creates a new Vertex instance.
      */
-    Vertex createVertex(final Object id);
+    V createVertex(final Object id);
 }

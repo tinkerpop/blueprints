@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.Vertex;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class GraphElementFactory implements ElementFactory {
+public class GraphElementFactory implements ElementFactory<Vertex, Edge> {
 
     private final Graph graph;
 
