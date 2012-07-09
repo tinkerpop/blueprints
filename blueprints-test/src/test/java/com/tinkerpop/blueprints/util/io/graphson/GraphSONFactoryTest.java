@@ -16,8 +16,10 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class GraphSONFactoryTest {
@@ -801,7 +803,7 @@ public class GraphSONFactoryTest {
 
         final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
 
-        Vertex v = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false);
+        Vertex v = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
 
         Assert.assertSame(v, g.getVertex(1));
 
@@ -809,6 +811,25 @@ public class GraphSONFactoryTest {
         Assert.assertEquals("1", v.getId());
         Assert.assertEquals("marko", v.getProperty("name"));
         Assert.assertEquals(29, v.getProperty("age"));
+    }
+
+    @Test
+    public void vertexFromJsonIgnoreKeyValid() throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+
+        Set<String> ignoreAge = new HashSet<String>();
+        ignoreAge.add("age");
+        Vertex v = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, ignoreAge);
+
+        Assert.assertSame(v, g.getVertex(1));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("1", v.getId());
+        Assert.assertEquals("marko", v.getProperty("name"));
+        Assert.assertNull(v.getProperty("age"));
     }
 
     @Test
@@ -821,9 +842,9 @@ public class GraphSONFactoryTest {
 
         final String edgeJson = "{\"weight\":0.5,\"_id\":7,\"_type\":\"edge\",\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
 
-        Vertex v1 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false);
-        Vertex v2 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false);
-        Edge e = GraphSONFactory.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false);
+        Vertex v1 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
+        Vertex v2 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false, null);
+        Edge e = GraphSONFactory.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false, null);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));
@@ -838,18 +859,47 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void edgeFromJsonNoTypeOrIdOnEdge()  throws IOException, JSONException {
+    public void edgeFromJsonIgnoreKeyValid()  throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 
         final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
         final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
 
-        final String edgeJson = "{\"weight\":0.5,\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
+        final String edgeJson = "{\"weight\":0.5,\"_id\":7,\"_type\":\"edge\",\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
 
-        Vertex v1 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false);
-        Vertex v2 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false);
-        Edge e = GraphSONFactory.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false);
+        Vertex v1 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
+        Vertex v2 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false, null);
+
+        Set<String> ignoreWeight = new HashSet<String>();
+        ignoreWeight.add("weight");
+        Edge e = GraphSONFactory.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false, ignoreWeight);
+
+        Assert.assertSame(v1, g.getVertex(1));
+        Assert.assertSame(v2, g.getVertex(2));
+        Assert.assertSame(e, g.getEdge(7));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("7", e.getId());
+        Assert.assertNull(e.getProperty("weight"));
+        Assert.assertEquals("knows", e.getLabel());
+        Assert.assertEquals(v1, e.getVertex(Direction.OUT));
+        Assert.assertEquals(v2, e.getVertex(Direction.IN));
+    }
+
+    @Test
+    public void edgeFromJsonNoTypeLabelOrIdOnEdge()  throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+        final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
+
+        final String edgeJson = "{\"weight\":0.5,\"_outV\":1,\"_inV\":2}";
+
+        Vertex v1 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
+        Vertex v2 = GraphSONFactory.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false, null);
+        Edge e = GraphSONFactory.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false, null);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));

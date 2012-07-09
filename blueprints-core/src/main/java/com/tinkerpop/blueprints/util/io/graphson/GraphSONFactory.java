@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Helps write graph elements to TinkerPop JSON format. Contains methods to support both Jackson and Jettison
@@ -43,11 +44,13 @@ public final class GraphSONFactory {
      * @param json a single vertex in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
-    public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final boolean hasEmbeddedTypes) throws IOException{
+    public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                        final Set<String> ignoreKeys) throws IOException{
         final JsonParser jp = jsonFactory.createJsonParser(json.toString());
         final JsonNode node = jp.readValueAsTree();
-        return vertexFromJson(node, factory, hasEmbeddedTypes);
+        return vertexFromJson(node, factory, hasEmbeddedTypes, ignoreKeys);
     }
 
     /**
@@ -56,8 +59,10 @@ public final class GraphSONFactory {
      * @param node a single vertex in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
-    public static Vertex vertexFromJson(final JsonNode node, final ElementFactory factory, final boolean hasEmbeddedTypes) throws IOException{
+    public static Vertex vertexFromJson(final JsonNode node, final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                        final Set<String> ignoreKeys) throws IOException{
 
         final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
@@ -65,7 +70,9 @@ public final class GraphSONFactory {
         final Vertex v = factory.createVertex(vertexId);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            v.setProperty(entry.getKey(), entry.getValue());
+            if (ignoreKeys == null || !ignoreKeys.contains(entry.getKey())) {
+                v.setProperty(entry.getKey(), entry.getValue());
+            }
         }
 
         return v;
@@ -77,12 +84,14 @@ public final class GraphSONFactory {
      * @param json a single edge in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
     public static Edge edgeFromJSON(final JSONObject json, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final boolean hasEmbeddedTypes)  throws IOException {
+                                final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                final Set<String> ignoreKeys)  throws IOException {
         final JsonParser jp = jsonFactory.createJsonParser(json.toString());
         final JsonNode node = jp.readValueAsTree();
-        return edgeFromJSON(node, out, in, factory, hasEmbeddedTypes);
+        return edgeFromJSON(node, out, in, factory, hasEmbeddedTypes, ignoreKeys);
     }
 
     /**
@@ -91,19 +100,24 @@ public final class GraphSONFactory {
      * @param node a single edge in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
     public static Edge edgeFromJSON(final JsonNode node, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final boolean hasEmbeddedTypes)  throws IOException {
+                                final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                final Set<String> ignoreKeys)  throws IOException {
 
         final Map<String, Object> props = GraphSONFactory.readProperties(node, true, hasEmbeddedTypes);
 
         final Object edgeId = getTypedValueFromJsonNode(node.get(GraphSONTokens._ID));
-        final String label = node.get(GraphSONTokens._LABEL).getValueAsText();
+        final JsonNode nodeLabel = node.get(GraphSONTokens._LABEL);
+        final String label = nodeLabel == null ? null : nodeLabel.getValueAsText();
 
         final Edge e = factory.createEdge(edgeId, out, in, label);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            e.setProperty(entry.getKey(), entry.getValue());
+            if (ignoreKeys == null || !ignoreKeys.contains(entry.getKey())) {
+                e.setProperty(entry.getKey(), entry.getValue());
+            }
         }
 
         return e;
