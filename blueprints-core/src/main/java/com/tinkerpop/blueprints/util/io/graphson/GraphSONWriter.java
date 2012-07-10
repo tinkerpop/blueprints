@@ -49,14 +49,14 @@ public class GraphSONWriter {
 
         jg.writeArrayFieldStart(GraphSONTokens.VERTICES);
         for (Vertex v : this.graph.getVertices()) {
-            jg.writeTree(GraphSONFactory.createJSONElementAsObjectNode(v, vertexPropertyKeys, showTypes));
+            jg.writeTree(GraphSONUtility.objectNodeFromElement(v, vertexPropertyKeys, showTypes));
         }
 
         jg.writeEndArray();
 
         jg.writeArrayFieldStart(GraphSONTokens.EDGES);
         for (Edge e : this.graph.getEdges()) {
-            jg.writeTree(GraphSONFactory.createJSONElementAsObjectNode(e, edgePropertyKeys, showTypes));
+            jg.writeTree(GraphSONUtility.objectNodeFromElement(e, edgePropertyKeys, showTypes));
         }
         jg.writeEndArray();
 

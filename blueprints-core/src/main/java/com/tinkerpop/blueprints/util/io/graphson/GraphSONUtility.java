@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Helps write graph elements to TinkerPop JSON format. Contains methods to support both Jackson and Jettison
@@ -30,7 +31,7 @@ import java.util.Map;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public final class GraphSONFactory {
+public final class GraphSONUtility {
 
     private static final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
     private static final JsonFactory jsonFactory = new MappingJsonFactory();
@@ -43,11 +44,13 @@ public final class GraphSONFactory {
      * @param json a single vertex in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
-    public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final boolean hasEmbeddedTypes) throws IOException{
+    public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                        final Set<String> ignoreKeys) throws IOException{
         final JsonParser jp = jsonFactory.createJsonParser(json.toString());
         final JsonNode node = jp.readValueAsTree();
-        return vertexFromJson(node, factory, hasEmbeddedTypes);
+        return vertexFromJson(node, factory, hasEmbeddedTypes, ignoreKeys);
     }
 
     /**
@@ -56,8 +59,10 @@ public final class GraphSONFactory {
      * @param node a single vertex in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
-    public static Vertex vertexFromJson(final JsonNode node, final ElementFactory factory, final boolean hasEmbeddedTypes) throws IOException{
+    public static Vertex vertexFromJson(final JsonNode node, final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                        final Set<String> ignoreKeys) throws IOException{
 
         final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
 
@@ -65,7 +70,9 @@ public final class GraphSONFactory {
         final Vertex v = factory.createVertex(vertexId);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            v.setProperty(entry.getKey(), entry.getValue());
+            if (ignoreKeys == null || !ignoreKeys.contains(entry.getKey())) {
+                v.setProperty(entry.getKey(), entry.getValue());
+            }
         }
 
         return v;
@@ -77,12 +84,14 @@ public final class GraphSONFactory {
      * @param json a single edge in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
     public static Edge edgeFromJSON(final JSONObject json, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final boolean hasEmbeddedTypes)  throws IOException {
+                                final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                final Set<String> ignoreKeys)  throws IOException {
         final JsonParser jp = jsonFactory.createJsonParser(json.toString());
         final JsonNode node = jp.readValueAsTree();
-        return edgeFromJSON(node, out, in, factory, hasEmbeddedTypes);
+        return edgeFromJSON(node, out, in, factory, hasEmbeddedTypes, ignoreKeys);
     }
 
     /**
@@ -91,19 +100,24 @@ public final class GraphSONFactory {
      * @param node a single edge in GraphSON format
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
     public static Edge edgeFromJSON(final JsonNode node, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final boolean hasEmbeddedTypes)  throws IOException {
+                                final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                final Set<String> ignoreKeys)  throws IOException {
 
-        final Map<String, Object> props = GraphSONFactory.readProperties(node, true, hasEmbeddedTypes);
+        final Map<String, Object> props = GraphSONUtility.readProperties(node, true, hasEmbeddedTypes);
 
         final Object edgeId = getTypedValueFromJsonNode(node.get(GraphSONTokens._ID));
-        final String label = node.get(GraphSONTokens._LABEL).getValueAsText();
+        final JsonNode nodeLabel = node.get(GraphSONTokens._LABEL);
+        final String label = nodeLabel == null ? null : nodeLabel.getValueAsText();
 
         final Edge e = factory.createEdge(edgeId, out, in, label);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            e.setProperty(entry.getKey(), entry.getValue());
+            if (ignoreKeys == null || !ignoreKeys.contains(entry.getKey())) {
+                e.setProperty(entry.getKey(), entry.getValue());
+            }
         }
 
         return e;
@@ -114,8 +128,8 @@ public final class GraphSONFactory {
      *
      * @param element The graph element to convert to JSON.
      */
-    public static JSONObject createJSONElement(final Element element) throws JSONException {
-        return createJSONElement(element, null, false);
+    public static JSONObject jsonFromElement(final Element element) throws JSONException {
+        return jsonFromElement(element, null, false);
     }
 
     /**
@@ -125,8 +139,8 @@ public final class GraphSONFactory {
      * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
      * @param showTypes    Data types are written to the JSON explicitly if true.
      */
-    public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
-        ObjectNode objectNode = createJSONElementAsObjectNode(element, propertyKeys, showTypes);
+    public static JSONObject jsonFromElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
+        ObjectNode objectNode = objectNodeFromElement(element, propertyKeys, showTypes);
 
         JSONObject jsonObject = null;
 
@@ -146,8 +160,8 @@ public final class GraphSONFactory {
      *
      * @param element The graph element to convert to JSON.
      */
-    public static ObjectNode createJSONElementAsObjectNode(final Element element) {
-        return createJSONElementAsObjectNode(element, null, false);
+    public static ObjectNode objectNodeFromElement(final Element element) {
+        return objectNodeFromElement(element, null, false);
     }
 
     /**
@@ -157,7 +171,7 @@ public final class GraphSONFactory {
      * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
      * @param showTypes    Data types are written to the JSON explicitly if true.
      */
-    public static ObjectNode createJSONElementAsObjectNode(final Element element, final List<String> propertyKeys, final boolean showTypes) {
+    public static ObjectNode objectNodeFromElement(final Element element, final List<String> propertyKeys, final boolean showTypes) {
 
         ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
         putObject(jsonElement, GraphSONTokens._ID, element.getId());
@@ -259,7 +273,7 @@ public final class GraphSONFactory {
         final ArrayNode jsonList = jsonNodeFactory.arrayNode();
         for (Object item : list) {
             if (item instanceof Element) {
-                jsonList.add(createJSONElementAsObjectNode((Element) item, propertyKeys, showTypes));
+                jsonList.add(objectNodeFromElement((Element) item, propertyKeys, showTypes));
             } else if (item instanceof List) {
                 jsonList.add(createJSONList((List) item, propertyKeys, showTypes));
             } else if (item instanceof Map) {
@@ -283,7 +297,7 @@ public final class GraphSONFactory {
                 } else if (value instanceof Map) {
                     value = createJSONMap((Map) value, propertyKeys, showTypes);
                 } else if (value instanceof Element) {
-                    value = createJSONElementAsObjectNode((Element) value, propertyKeys, showTypes);
+                    value = objectNodeFromElement((Element) value, propertyKeys, showTypes);
                 } else if (value.getClass().isArray()) {
                     value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
                 }
