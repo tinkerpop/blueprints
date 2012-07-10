@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public final class GraphSONFactory {
+public final class GraphSONUtility {
 
     private static final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
     private static final JsonFactory jsonFactory = new MappingJsonFactory();
@@ -106,7 +106,7 @@ public final class GraphSONFactory {
                                 final ElementFactory factory, final boolean hasEmbeddedTypes,
                                 final Set<String> ignoreKeys)  throws IOException {
 
-        final Map<String, Object> props = GraphSONFactory.readProperties(node, true, hasEmbeddedTypes);
+        final Map<String, Object> props = GraphSONUtility.readProperties(node, true, hasEmbeddedTypes);
 
         final Object edgeId = getTypedValueFromJsonNode(node.get(GraphSONTokens._ID));
         final JsonNode nodeLabel = node.get(GraphSONTokens._LABEL);
@@ -128,8 +128,8 @@ public final class GraphSONFactory {
      *
      * @param element The graph element to convert to JSON.
      */
-    public static JSONObject createJSONElement(final Element element) throws JSONException {
-        return createJSONElement(element, null, false);
+    public static JSONObject jsonFromElement(final Element element) throws JSONException {
+        return jsonFromElement(element, null, false);
     }
 
     /**
@@ -139,8 +139,8 @@ public final class GraphSONFactory {
      * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
      * @param showTypes    Data types are written to the JSON explicitly if true.
      */
-    public static JSONObject createJSONElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
-        ObjectNode objectNode = createJSONElementAsObjectNode(element, propertyKeys, showTypes);
+    public static JSONObject jsonFromElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
+        ObjectNode objectNode = objectNodeFromElement(element, propertyKeys, showTypes);
 
         JSONObject jsonObject = null;
 
@@ -160,8 +160,8 @@ public final class GraphSONFactory {
      *
      * @param element The graph element to convert to JSON.
      */
-    public static ObjectNode createJSONElementAsObjectNode(final Element element) {
-        return createJSONElementAsObjectNode(element, null, false);
+    public static ObjectNode objectNodeFromElement(final Element element) {
+        return objectNodeFromElement(element, null, false);
     }
 
     /**
@@ -171,7 +171,7 @@ public final class GraphSONFactory {
      * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
      * @param showTypes    Data types are written to the JSON explicitly if true.
      */
-    public static ObjectNode createJSONElementAsObjectNode(final Element element, final List<String> propertyKeys, final boolean showTypes) {
+    public static ObjectNode objectNodeFromElement(final Element element, final List<String> propertyKeys, final boolean showTypes) {
 
         ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
         putObject(jsonElement, GraphSONTokens._ID, element.getId());
@@ -273,7 +273,7 @@ public final class GraphSONFactory {
         final ArrayNode jsonList = jsonNodeFactory.arrayNode();
         for (Object item : list) {
             if (item instanceof Element) {
-                jsonList.add(createJSONElementAsObjectNode((Element) item, propertyKeys, showTypes));
+                jsonList.add(objectNodeFromElement((Element) item, propertyKeys, showTypes));
             } else if (item instanceof List) {
                 jsonList.add(createJSONList((List) item, propertyKeys, showTypes));
             } else if (item instanceof Map) {
@@ -297,7 +297,7 @@ public final class GraphSONFactory {
                 } else if (value instanceof Map) {
                     value = createJSONMap((Map) value, propertyKeys, showTypes);
                 } else if (value instanceof Element) {
-                    value = createJSONElementAsObjectNode((Element) value, propertyKeys, showTypes);
+                    value = objectNodeFromElement((Element) value, propertyKeys, showTypes);
                 } else if (value.getClass().isArray()) {
                     value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
                 }

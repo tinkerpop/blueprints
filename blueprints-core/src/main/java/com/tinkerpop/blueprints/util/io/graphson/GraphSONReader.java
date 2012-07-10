@@ -91,15 +91,15 @@ public class GraphSONReader {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
                     final JsonNode node = jp.readValueAsTree();
-                    GraphSONFactory.vertexFromJson(node, elementFactory, hasEmbeddedTypes, null);
+                    GraphSONUtility.vertexFromJson(node, elementFactory, hasEmbeddedTypes, null);
                 }
             } else if (fieldname.equals(GraphSONTokens.EDGES)) {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
                     final JsonNode node = jp.readValueAsTree();
-                    final Vertex inV = graph.getVertex(GraphSONFactory.getTypedValueFromJsonNode(node.get(GraphSONTokens._IN_V)));
-                    final Vertex outV = graph.getVertex(GraphSONFactory.getTypedValueFromJsonNode(node.get(GraphSONTokens._OUT_V)));
-                    GraphSONFactory.edgeFromJSON(node, outV, inV, elementFactory, hasEmbeddedTypes, null);
+                    final Vertex inV = graph.getVertex(GraphSONUtility.getTypedValueFromJsonNode(node.get(GraphSONTokens._IN_V)));
+                    final Vertex outV = graph.getVertex(GraphSONUtility.getTypedValueFromJsonNode(node.get(GraphSONTokens._OUT_V)));
+                    GraphSONUtility.edgeFromJSON(node, outV, inV, elementFactory, hasEmbeddedTypes, null);
                 }
             }
         }
