@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.util.io.MockSerializable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -214,23 +215,16 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyDate", new Date(), graph.getFeatures().supportsSerializableObjectProperty);
             trySetProperty(edge, "keyDate", new Date(), graph.getFeatures().supportsSerializableObjectProperty);
 
-            trySetProperty(vertexA, "keyListString", new ArrayList() {{
-                add("try1");
-                add("try2");
-            }}, graph.getFeatures().supportsUniformListProperty);
-            trySetProperty(edge, "keyListString", new ArrayList() {{
-                add("try1");
-                add("try2");
-            }}, graph.getFeatures().supportsUniformListProperty);
+            ArrayList<String> listA = new ArrayList<String>();
+            listA.add("try1");
+            listA.add("try2");
 
-            trySetProperty(vertexA, "keyListMixed", new ArrayList() {{
-                add("try1");
-                add(2);
-            }}, graph.getFeatures().supportsMixedListProperty);
-            trySetProperty(edge, "keyListMixed", new ArrayList() {{
-                add("try1");
-                add(2);
-            }}, graph.getFeatures().supportsMixedListProperty);
+            trySetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
+            trySetProperty(edge, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
+
+            ArrayList listB = new ArrayList();
+            trySetProperty(vertexA, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
+            trySetProperty(edge, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
 
             trySetProperty(vertexA, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
             trySetProperty(edge, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
@@ -250,10 +244,10 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyArrayBoolean", new boolean[]{false, true}, graph.getFeatures().supportsPrimitiveArrayProperty);
             trySetProperty(edge, "keyArrayBoolean", new boolean[]{false, true}, graph.getFeatures().supportsPrimitiveArrayProperty);
 
-            final Map map = new HashMap() {{
-                put("testString", "try");
-                put("testInteger", "string");
-            }};
+            final Map map = new HashMap();
+            map.put("testString", "try");
+            map.put("testInteger", "string");
+
             trySetProperty(vertexA, "keyMap", map, graph.getFeatures().supportsMapProperty);
             trySetProperty(edge, "keyMap", map, graph.getFeatures().supportsMapProperty);
 
@@ -264,10 +258,6 @@ public class GraphTestSuite extends TestSuite {
 
         }
 
-        // TODO: clearing the graph until serialization issues for map with TinkerGraph are sorted.
-        if (graph instanceof TinkerGraph) {
-            ((TinkerGraph) graph).clear();
-        }
         graph.shutdown();
     }
 
@@ -696,18 +686,5 @@ public class GraphTestSuite extends TestSuite {
 
         }
         graph.shutdown();
-    }
-
-    protected class MockSerializable implements Serializable {
-        private String testField;
-
-        public String getTestField() {
-            return this.testField;
-        }
-
-        public void setTestField(String testField) {
-            this.testField = testField;
-        }
-
     }
 }
