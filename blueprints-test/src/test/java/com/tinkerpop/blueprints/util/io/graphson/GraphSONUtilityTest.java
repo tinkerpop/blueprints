@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
@@ -7,17 +8,21 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
-public class GraphSONFactoryTest {
+public class GraphSONUtilityTest {
     private TinkerGraph graph = new TinkerGraph();
 
     @Before
@@ -26,13 +31,13 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectEdgeNoPropertiesNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementEdgeNoPropertiesNoKeysNoTypes() throws JSONException {
         Vertex v1 = this.graph.addVertex(1);
         Vertex v2 = this.graph.addVertex(2);
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
 
-        JSONObject json = GraphSONFactory.createJSONElement(e);
+        JSONObject json = GraphSONUtility.jsonFromElement(e);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -48,10 +53,10 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexNoPropertiesNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexNoPropertiesNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -61,7 +66,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexPrimitivePropertiesNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexPrimitivePropertiesNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("keyString", "string");
         v.setProperty("keyLong", 1L);
@@ -71,7 +76,7 @@ public class GraphSONFactoryTest {
         v.setProperty("keyDouble", 4.4);
         v.setProperty("keyBoolean", true);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -93,7 +98,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexMapPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexMapPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         Map map = new HashMap();
         map.put("this", "some");
@@ -101,7 +106,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyMap", map);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -117,7 +122,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexListPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexListPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<Object> list = new ArrayList<Object>();
         list.add("this");
@@ -127,7 +132,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -140,13 +145,13 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexStringArrayPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexStringArrayPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         String[] stringArray = new String[]{"this", "that", "other"};
 
         v.setProperty("keyStringArray", stringArray);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -159,13 +164,13 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexDoubleArrayPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexDoubleArrayPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         double[] doubleArray = new double[]{1.0, 2.0, 3.0};
 
         v.setProperty("keyDoubleArray", doubleArray);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -178,13 +183,13 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexIntArrayPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexIntArrayPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         int[] intArray = new int[]{1, 2, 3};
 
         v.setProperty("keyIntArray", intArray);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -197,13 +202,13 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexLongArrayPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexLongArrayPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         long[] longArray = new long[]{1l, 2l, 3l};
 
         v.setProperty("keyLongArray", longArray);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -216,13 +221,13 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectFloatArrayPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementFloatArrayPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         float[] floatArray = new float[]{1.0f, 2.0f, 3.0f};
 
         v.setProperty("keyFloatArray", floatArray);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -235,13 +240,13 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectBooleanArrayPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementBooleanArrayPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         boolean[] booleanArray = new boolean[]{true, false, true};
 
         v.setProperty("keyBooleanArray", booleanArray);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -254,11 +259,11 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexCatPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexCatPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("mycat", new Cat("smithers"));
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -268,11 +273,11 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexCatPropertyNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexCatPropertyNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("mycat", new Cat("smithers"));
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -284,7 +289,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexCatArrayPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexCatArrayPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<Cat> cats = new ArrayList<Cat>();
         cats.add(new Cat("smithers"));
@@ -292,7 +297,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("cats", cats);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -305,7 +310,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectCrazyPropertyNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementCrazyPropertyNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List mix = new ArrayList();
         mix.add(new Cat("smithers"));
@@ -330,7 +335,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("crazy-map", map);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -360,7 +365,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexNoPropertiesWithKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexNoPropertiesWithKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("x", "X");
         v.setProperty("y", "Y");
@@ -368,7 +373,7 @@ public class GraphSONFactoryTest {
 
         List<String> returnKeys = new ArrayList<String>();
         returnKeys.add("y");
-        JSONObject json = GraphSONFactory.createJSONElement(v, returnKeys, false);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, returnKeys, false);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -381,7 +386,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexVertexPropertiesWithKeysNoTypes() throws JSONException {
+    public void jsonFromElementVertexVertexPropertiesWithKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("x", "X");
         v.setProperty("y", "Y");
@@ -398,7 +403,7 @@ public class GraphSONFactoryTest {
         returnKeys.add("y");
         returnKeys.add("v");
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, returnKeys, false);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, returnKeys, false);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -418,7 +423,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexPrimitivePropertiesNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexPrimitivePropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("keyString", "string");
         v.setProperty("keyLong", 1L);
@@ -427,7 +432,7 @@ public class GraphSONFactoryTest {
         v.setProperty("keyDouble", 4.4);
         v.setProperty("keyBoolean", true);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -478,7 +483,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexListPropertiesNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexListPropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<String> list = new ArrayList<String>();
         list.add("this");
@@ -487,7 +492,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -514,7 +519,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexBooleanListPropertiesNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexBooleanListPropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<Boolean> list = new ArrayList<Boolean>();
         list.add(true);
@@ -523,7 +528,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -550,7 +555,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexLongListPropertiesNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexLongListPropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<Long> list = new ArrayList<Long>();
         list.add(1000L);
@@ -559,7 +564,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -586,7 +591,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexIntListPropertiesNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexIntListPropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<Integer> list = new ArrayList<Integer>();
         list.add(1);
@@ -595,7 +600,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -622,7 +627,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectVertexListOfListPropertiesNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexListOfListPropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<Integer> list = new ArrayList<Integer>();
         list.add(1);
@@ -634,7 +639,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyList", listList);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -662,7 +667,7 @@ public class GraphSONFactoryTest {
 
 
     @Test
-    public void createJSONObjectVertexMapPropertiesNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementVertexMapPropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
         Map map = new HashMap();
@@ -671,7 +676,7 @@ public class GraphSONFactoryTest {
 
         v.setProperty("keyMap", map);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -704,7 +709,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectNullsNoKeysNoTypes() throws JSONException {
+    public void jsonFromElementNullsNoKeysNoTypes() throws JSONException {
         Graph g = new TinkerGraph();
         Vertex v = g.addVertex(1);
         v.setProperty("key", null);
@@ -724,7 +729,7 @@ public class GraphSONFactoryTest {
         list.add("string");
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, false);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, false);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.isNull("key"));
@@ -745,7 +750,7 @@ public class GraphSONFactoryTest {
     }
 
     @Test
-    public void createJSONObjectNullsNoKeysWithTypes() throws JSONException {
+    public void jsonFromElementNullsNoKeysWithTypes() throws JSONException {
         Graph g = new TinkerGraph();
         Vertex v = g.addVertex(1);
         v.setProperty("key", null);
@@ -765,7 +770,7 @@ public class GraphSONFactoryTest {
         list.add("string");
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONFactory.createJSONElement(v, null, true);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, true);
 
         Assert.assertNotNull(json);
         JSONObject jsonObjectKey = json.optJSONObject("key");
@@ -789,6 +794,116 @@ public class GraphSONFactoryTest {
         JSONObject jsonObjectListFirst = jsonArray.getJSONObject(0);
         Assert.assertTrue(jsonObjectListFirst.isNull(GraphSONTokens.VALUE));
         Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectListFirst.optString(GraphSONTokens.TYPE));
+    }
+
+    @Test
+    public void vertexFromJsonValid() throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+
+        Vertex v = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
+
+        Assert.assertSame(v, g.getVertex(1));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("1", v.getId());
+        Assert.assertEquals("marko", v.getProperty("name"));
+        Assert.assertEquals(29, v.getProperty("age"));
+    }
+
+    @Test
+    public void vertexFromJsonIgnoreKeyValid() throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+
+        Set<String> ignoreAge = new HashSet<String>();
+        ignoreAge.add("age");
+        Vertex v = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, ignoreAge);
+
+        Assert.assertSame(v, g.getVertex(1));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("1", v.getId());
+        Assert.assertEquals("marko", v.getProperty("name"));
+        Assert.assertNull(v.getProperty("age"));
+    }
+
+    @Test
+    public void edgeFromJsonValid()  throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+        final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
+
+        final String edgeJson = "{\"weight\":0.5,\"_id\":7,\"_type\":\"edge\",\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
+
+        Vertex v1 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
+        Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false, null);
+        Edge e = GraphSONUtility.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false, null);
+
+        Assert.assertSame(v1, g.getVertex(1));
+        Assert.assertSame(v2, g.getVertex(2));
+        Assert.assertSame(e, g.getEdge(7));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("7", e.getId());
+        Assert.assertEquals(0.5d, e.getProperty("weight"));
+        Assert.assertEquals("knows", e.getLabel());
+        Assert.assertEquals(v1, e.getVertex(Direction.OUT));
+        Assert.assertEquals(v2, e.getVertex(Direction.IN));
+    }
+
+    @Test
+    public void edgeFromJsonIgnoreKeyValid()  throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+        final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
+
+        final String edgeJson = "{\"weight\":0.5,\"_id\":7,\"_type\":\"edge\",\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
+
+        Vertex v1 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
+        Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false, null);
+
+        Set<String> ignoreWeight = new HashSet<String>();
+        ignoreWeight.add("weight");
+        Edge e = GraphSONUtility.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false, ignoreWeight);
+
+        Assert.assertSame(v1, g.getVertex(1));
+        Assert.assertSame(v2, g.getVertex(2));
+        Assert.assertSame(e, g.getEdge(7));
+
+        // tinkergraph converts id to string
+        Assert.assertEquals("7", e.getId());
+        Assert.assertNull(e.getProperty("weight"));
+        Assert.assertEquals("knows", e.getLabel());
+        Assert.assertEquals(v1, e.getVertex(Direction.OUT));
+        Assert.assertEquals(v2, e.getVertex(Direction.IN));
+    }
+
+    @Test
+    public void edgeFromJsonNoTypeLabelOrIdOnEdge()  throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
+        final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
+
+        final String edgeJson = "{\"weight\":0.5,\"_outV\":1,\"_inV\":2}";
+
+        Vertex v1 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, false, null);
+        Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, false, null);
+        Edge e = GraphSONUtility.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, false, null);
+
+        Assert.assertSame(v1, g.getVertex(1));
+        Assert.assertSame(v2, g.getVertex(2));
+        Assert.assertSame(e, g.getEdge(0));
     }
 
     private class Cat {

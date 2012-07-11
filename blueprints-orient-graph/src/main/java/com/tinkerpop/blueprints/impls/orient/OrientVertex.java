@@ -110,8 +110,4 @@ public class OrientVertex extends OrientElement implements Vertex {
     public ODocument getRawVertex() {
         return this.getRawElement();
     }
-
-    public Vertex setProperty(final String key, final Object value) {
-        return (Vertex) super.setProperty(key, value);
-    }
 }

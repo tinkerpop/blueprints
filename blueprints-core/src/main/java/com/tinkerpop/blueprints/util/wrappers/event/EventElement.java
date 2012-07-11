@@ -26,7 +26,7 @@ public abstract class EventElement implements Element {
     protected final List<GraphChangedListener> graphChangedListeners;
 
     protected EventElement(final Element baseElement, final List<GraphChangedListener> graphChangedListeners,
-                           final EventTrigger trigger) {
+                        final EventTrigger trigger) {
         this.baseElement = baseElement;
         this.graphChangedListeners = graphChangedListeners;
         this.trigger = trigger;
@@ -78,7 +78,7 @@ public abstract class EventElement implements Element {
     /**
      * Raises a vertexPropertyRemoved or edgePropertyChanged event.
      */
-    public Element setProperty(final String key, final Object value) {
+    public void setProperty(final String key, final Object value) {
         this.baseElement.setProperty(key, value);
 
         if (this instanceof Vertex) {
@@ -86,8 +86,6 @@ public abstract class EventElement implements Element {
         } else if (this instanceof Edge) {
             this.onEdgePropertyChanged((Edge) this, key, value);
         }
-
-        return this;
     }
 
     public String toString() {

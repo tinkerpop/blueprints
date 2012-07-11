@@ -36,9 +36,8 @@ public abstract interface Element {
      *
      * @param key   the string key of the property
      * @param value the object value o the property
-     * @return return the element with the newly added property
      */
-    public Element setProperty(String key, Object value);
+    public void setProperty(String key, Object value);
 
     /**
      * Un-assigns a key/value property from the element.

@@ -12,6 +12,7 @@ import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OPropertyIndexDefinition;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Direction;
@@ -224,7 +225,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public Iterable<Vertex> getVertices(final String key, Object value) {
-        final OIndex<?> idx = getContext(false).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.VERTEX_CLASS_NAME + "." + key);
+        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.VERTEX_CLASS_NAME + "." + key);
         if (idx != null) {
             if (value != null && !(value instanceof String))
                 value = value.toString();
@@ -235,6 +236,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     private Iterable<Vertex> getVertices(final boolean polymorphic) {
+        getContext(true);
         return new OrientElementScanIterable<Vertex>(this, Vertex.class, polymorphic);
     }
 
@@ -243,7 +245,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public Iterable<Edge> getEdges(final String key, Object value) {
-        final OIndex<?> idx = getContext(false).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.EDGE_CLASS_NAME + "." + key);
+        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.EDGE_CLASS_NAME + "." + key);
         if (idx != null) {
             if (value != null && !(value instanceof String))
                 value = value.toString();
@@ -254,6 +256,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     private Iterable<Edge> getEdges(final boolean polymorphic) {
+        getContext(true);
         return new OrientElementScanIterable<Edge>(this, Edge.class, polymorphic);
     }
 
@@ -434,8 +437,15 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         final String className = getClassName(elementClass);
         final OClass cls = getRawGraph().getMetadata().getSchema().getClass(className);
 
+        final OType indexType;
+        final OProperty property = cls.getProperty(key);
+        if (property == null)
+            indexType = OType.STRING;
+        else
+            indexType = property.getType();
+
         getRawGraph().getMetadata().getIndexManager()
-                .createIndex(className + "." + key, "NOTUNIQUE", new OPropertyIndexDefinition(className, key, OType.STRING), cls.getClusterIds(), null);
+                .createIndex(className + "." + key, OClass.INDEX_TYPE.NOTUNIQUE.name(), new OPropertyIndexDefinition(className, key, indexType), cls.getPolymorphicClusterIds(), null);
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {

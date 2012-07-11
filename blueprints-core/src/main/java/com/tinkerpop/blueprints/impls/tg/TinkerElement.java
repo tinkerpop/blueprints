@@ -34,7 +34,7 @@ abstract class TinkerElement implements Element, Serializable {
         return this.properties.get(key);
     }
 
-    public Element setProperty(final String key, final Object value) {
+    public void setProperty(final String key, final Object value) {
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL) && this instanceof Edge)
@@ -47,8 +47,6 @@ abstract class TinkerElement implements Element, Serializable {
             this.graph.vertexKeyIndex.autoUpdate(key, value, oldValue, (TinkerVertex) this);
         else
             this.graph.edgeKeyIndex.autoUpdate(key, value, oldValue, (TinkerEdge) this);
-
-        return this;
     }
 
     public Object removeProperty(final String key) {

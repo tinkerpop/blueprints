@@ -123,10 +123,4 @@ class TinkerVertex extends TinkerElement implements Vertex, Serializable {
         }
         edges.add(edge);
     }
-
-    public Vertex setProperty(final String key, final Object value) {
-        return (Vertex) super.setProperty(key, value);
-    }
-
-
 }

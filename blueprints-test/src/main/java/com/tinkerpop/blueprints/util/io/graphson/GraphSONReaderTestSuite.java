@@ -29,46 +29,51 @@ public class GraphSONReaderTestSuite extends TestSuite {
             new GraphSONReader(graph).inputGraph(GraphSONReader.class.getResourceAsStream("graph-example-1.json"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
 
-            assertEquals(count(graph.getVertex("1").getEdges(Direction.OUT)), 3);
-            assertEquals(count(graph.getVertex("1").getEdges(Direction.IN)), 0);
-            Vertex marko = graph.getVertex("1");
+            // note that TinkerGraph converts ids to string internally, but the various WrapperGraphs
+            // might like the original data type of the ID. so...this tests getVertex with the original
+            // type (integer) but then compares on getId() are toString() to deal with scenarios
+            // where those ids are dealt with differently per graph implementation.
+
+            assertEquals(count(graph.getVertex(1).getEdges(Direction.OUT)), 3);
+            assertEquals(count(graph.getVertex(1).getEdges(Direction.IN)), 0);
+            Vertex marko = graph.getVertex(1);
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(marko.getProperty("age"), 29);
             int counter = 0;
-            for (Edge e : graph.getVertex("1").getEdges(Direction.OUT)) {
-                if (e.getVertex(Direction.IN).getId().equals("2")) {
-                    // assertEquals(e.getProperty("weight"), 0.5);
+            for (Edge e : graph.getVertex(1).getEdges(Direction.OUT)) {
+                if (e.getVertex(Direction.IN).getId().toString().equals("2")) {
+                    assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getLabel(), "knows");
-                    assertEquals(e.getId(), "7");
+                    assertEquals(e.getId().toString(), "7");
                     counter++;
-                } else if (e.getVertex(Direction.IN).getId().equals("3")) {
+                } else if (e.getVertex(Direction.IN).getId().toString().equals("3")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 0);
                     assertEquals(e.getLabel(), "created");
-                    assertEquals(e.getId(), "9");
+                    assertEquals(e.getId().toString(), "9");
                     counter++;
-                } else if (e.getVertex(Direction.IN).getId().equals("4")) {
+                } else if (e.getVertex(Direction.IN).getId().toString().equals("4")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 1);
                     assertEquals(e.getLabel(), "knows");
-                    assertEquals(e.getId(), "8");
+                    assertEquals(e.getId().toString(), "8");
                     counter++;
                 }
             }
 
-            assertEquals(count(graph.getVertex("4").getEdges(Direction.OUT)), 2);
-            assertEquals(count(graph.getVertex("4").getEdges(Direction.IN)), 1);
-            Vertex josh = graph.getVertex("4");
+            assertEquals(count(graph.getVertex(4).getEdges(Direction.OUT)), 2);
+            assertEquals(count(graph.getVertex(4).getEdges(Direction.IN)), 1);
+            Vertex josh = graph.getVertex(4);
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), 32);
-            for (Edge e : graph.getVertex("4").getEdges(Direction.OUT)) {
-                if (e.getVertex(Direction.IN).getId().equals("3")) {
+            for (Edge e : graph.getVertex(4).getEdges(Direction.OUT)) {
+                if (e.getVertex(Direction.IN).getId().toString().equals("3")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 0);
                     assertEquals(e.getLabel(), "created");
-                    assertEquals(e.getId(), "11");
+                    assertEquals(e.getId().toString(), "11");
                     counter++;
-                } else if (e.getVertex(Direction.IN).getId().equals("5")) {
+                } else if (e.getVertex(Direction.IN).getId().toString().equals("5")) {
                     assertEquals(Math.round((Double) e.getProperty("weight")), 1);
                     assertEquals(e.getLabel(), "created");
-                    assertEquals(e.getId(), "10");
+                    assertEquals(e.getId().toString(), "10");
                     counter++;
                 }
             }

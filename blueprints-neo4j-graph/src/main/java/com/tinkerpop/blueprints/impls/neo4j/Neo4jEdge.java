@@ -40,10 +40,6 @@ public class Neo4jEdge extends Neo4jElement implements Edge {
         return StringFactory.edgeString(this);
     }
 
-    public Edge setProperty(final String key, final Object value) {
-        return (Edge) super.setProperty(key, value);
-    }
-
     public Relationship getRawEdge() {
         return (Relationship) this.rawElement;
     }
