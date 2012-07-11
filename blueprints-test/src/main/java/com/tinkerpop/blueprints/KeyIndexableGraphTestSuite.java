@@ -208,4 +208,21 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         }
         graph.shutdown();
     }
+
+    /*
+    public void testKeyIndicesConsistentWithElementRemoval() throws Exception {
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+
+        graph.createKeyIndex("foo", Vertex.class);
+
+        Vertex v1 = graph.addVertex(null);
+        v1.setProperty("foo", 42);
+        vertexCount(graph, 1);
+
+        graph.removeVertex(v1);
+        vertexCount(graph, 0);
+        assertEquals(0, count(graph.getVertices("foo", 42)));
+
+        graph.shutdown();
+    }*/
 }

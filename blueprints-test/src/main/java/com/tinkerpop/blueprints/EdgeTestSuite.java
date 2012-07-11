@@ -497,25 +497,34 @@ public class EdgeTestSuite extends TestSuite {
             Edge edge = graph.addEdge(convertId(graph, "3"), a, b, "knows");
             assertEquals(edge.getPropertyKeys().size(), 0);
             assertNull(edge.getProperty("weight"));
-            edge.setProperty("weight", 0.5);
-            assertEquals(edge.getPropertyKeys().size(), 1);
-            assertEquals(edge.getProperty("weight"), 0.5);
 
-            edge.setProperty("weight", 0.6);
-            assertEquals(edge.getPropertyKeys().size(), 1);
-            assertEquals(edge.getProperty("weight"), 0.6);
-            assertEquals(edge.removeProperty("weight"), 0.6);
-            assertNull(edge.getProperty("weight"));
-            assertEquals(edge.getPropertyKeys().size(), 0);
-            edge.setProperty("blah", "marko");
-            edge.setProperty("blah2", "josh");
-            assertEquals(edge.getPropertyKeys().size(), 2);
+            if (graph.getFeatures().supportsDoubleProperty){
+                edge.setProperty("weight", 0.5);
+                assertEquals(edge.getPropertyKeys().size(), 1);
+                assertEquals(edge.getProperty("weight"), 0.5);
+
+                edge.setProperty("weight", 0.6);
+                assertEquals(edge.getPropertyKeys().size(), 1);
+                assertEquals(edge.getProperty("weight"), 0.6);
+                assertEquals(edge.removeProperty("weight"), 0.6);
+                assertNull(edge.getProperty("weight"));
+                assertEquals(edge.getPropertyKeys().size(), 0);
+            }
+
+            if (graph.getFeatures().supportsStringProperty) {
+                edge.setProperty("blah", "marko");
+                edge.setProperty("blah2", "josh");
+                assertEquals(edge.getPropertyKeys().size(), 2);
+            }
         }
         graph.shutdown();
     }
 
     public void testAddingLabelAndIdProperty() {
         Graph graph = graphTest.generateGraph();
+
+        // no point in testing graph features for setting string properties because the intent is for it to
+        // fail based on the id or label properties.
         if (graph.getFeatures().supportsEdgeProperties) {
 
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
@@ -555,6 +564,9 @@ public class EdgeTestSuite extends TestSuite {
 
     public void testEmptyKeyProperty() {
         final Graph graph = graphTest.generateGraph();
+
+        // no point in testing graph features for setting string properties because the intent is for it to
+        // fail based on the empty key.
         if (graph.getFeatures().supportsEdgeProperties) {
             final Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "friend");
             try {

@@ -257,6 +257,4 @@ public class Neo4jGraphTest extends GraphTest {
         graph.shutdown();
         deleteDirectory(new File(directory));
     }
-
-
 }

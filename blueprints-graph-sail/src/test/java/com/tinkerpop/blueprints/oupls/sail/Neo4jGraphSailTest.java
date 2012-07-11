@@ -10,7 +10,7 @@ import java.io.File;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class Neo4jGraphSailTest {//} extends GraphSailTest {
+public class Neo4jGraphSailTest { //{extends GraphSailTest {
 
     private String getWorkingDirectory() throws Exception {
         File dir = File.createTempFile("blueprints", "-neo4j-test");
@@ -64,13 +64,13 @@ public class Neo4jGraphSailTest {//} extends GraphSailTest {
 
     protected KeyIndexableGraph createGraph() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
-        if (directory == null)
+        if (directory == null) {
             directory = this.getWorkingDirectory();
-        Neo4jGraph g = new Neo4jGraph(directory);
-        //g.setCheckElementsInTransaction(true);
+        }
 
-        //g.clear();
-        //g.setMaxBufferSize(0);
+        Neo4jGraph g = new Neo4jGraph(directory);
+        g.setCheckElementsInTransaction(true);
+
         return g;
     }
 }
