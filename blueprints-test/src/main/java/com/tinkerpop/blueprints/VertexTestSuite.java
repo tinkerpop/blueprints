@@ -242,13 +242,19 @@ public class VertexTestSuite extends TestSuite {
             Vertex v1 = graph.addVertex(convertId(graph, "1"));
             Vertex v2 = graph.addVertex(convertId(graph, "2"));
 
-            v1.setProperty("key1", "value1");
-            v1.setProperty("key2", 10);
-            v2.setProperty("key2", 20);
+            if (graph.getFeatures().supportsStringProperty) {
+                v1.setProperty("key1", "value1");
+                assertEquals("value1", v1.getProperty("key1"));
+            }
 
-            assertEquals("value1", v1.getProperty("key1"));
-            assertEquals(10, v1.getProperty("key2"));
-            assertEquals(20, v2.getProperty("key2"));
+            if (graph.getFeatures().supportsIntegerProperty) {
+                v1.setProperty("key2", 10);
+                v2.setProperty("key2", 20);
+
+                assertEquals(10, v1.getProperty("key2"));
+                assertEquals(20, v2.getProperty("key2"));
+            }
+
         } else if (graph.getFeatures().isRDFModel) {
             Vertex v1 = graph.addVertex("\"1\"^^<http://www.w3.org/2001/XMLSchema#int>");
             assertEquals("http://www.w3.org/2001/XMLSchema#int", v1.getProperty(SailTokens.DATATYPE));
@@ -267,7 +273,7 @@ public class VertexTestSuite extends TestSuite {
 
     public void testAddManyVertexProperties() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexProperties) {
+        if (graph.getFeatures().supportsVertexProperties && graph.getFeatures().supportsStringProperty) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             this.stopWatch();
             for (int i = 0; i < 50; i++) {
@@ -322,29 +328,44 @@ public class VertexTestSuite extends TestSuite {
             assertNull(v1.removeProperty("key2"));
             assertNull(v2.removeProperty("key2"));
 
-            v1.setProperty("key1", "value1");
-            v1.setProperty("key2", 10);
-            v2.setProperty("key2", 20);
+            if (graph.getFeatures().supportsStringProperty) {
+                v1.setProperty("key1", "value1");
+                assertEquals("value1", v1.removeProperty("key1"));
+            }
 
-            assertEquals("value1", v1.removeProperty("key1"));
-            assertEquals(10, v1.removeProperty("key2"));
-            assertEquals(20, v2.removeProperty("key2"));
+            if (graph.getFeatures().supportsIntegerProperty) {
+                v1.setProperty("key2", 10);
+                v2.setProperty("key2", 20);
+
+                assertEquals(10, v1.removeProperty("key2"));
+                assertEquals(20, v2.removeProperty("key2"));
+            }
 
             assertNull(v1.removeProperty("key1"));
             assertNull(v1.removeProperty("key2"));
             assertNull(v2.removeProperty("key2"));
 
-            v1.setProperty("key1", "value1");
-            v1.setProperty("key2", 10);
-            v2.setProperty("key2", 20);
+            if (graph.getFeatures().supportsStringProperty) {
+                v1.setProperty("key1", "value1");
+            }
+
+            if (graph.getFeatures().supportsIntegerProperty) {
+                v1.setProperty("key2", 10);
+                v2.setProperty("key2", 20);
+            }
 
             if (!graph.getFeatures().ignoresSuppliedIds) {
                 v1 = graph.getVertex("1");
                 v2 = graph.getVertex("2");
 
-                assertEquals("value1", v1.removeProperty("key1"));
-                assertEquals(10, v1.removeProperty("key2"));
-                assertEquals(20, v2.removeProperty("key2"));
+                if (graph.getFeatures().supportsStringProperty) {
+                    assertEquals("value1", v1.removeProperty("key1"));
+                }
+
+                if (graph.getFeatures().supportsIntegerProperty) {
+                    assertEquals(10, v1.removeProperty("key2"));
+                    assertEquals(20, v2.removeProperty("key2"));
+                }
 
                 assertNull(v1.removeProperty("key1"));
                 assertNull(v1.removeProperty("key2"));
@@ -353,13 +374,18 @@ public class VertexTestSuite extends TestSuite {
                 v1 = graph.getVertex("1");
                 v2 = graph.getVertex("2");
 
-                v1.setProperty("key1", "value2");
-                v1.setProperty("key2", 20);
-                v2.setProperty("key2", 30);
+                if (graph.getFeatures().supportsStringProperty) {
+                    v1.setProperty("key1", "value2");
+                    assertEquals("value2", v1.removeProperty("key1"));
+                }
 
-                assertEquals("value2", v1.removeProperty("key1"));
-                assertEquals(20, v1.removeProperty("key2"));
-                assertEquals(30, v2.removeProperty("key2"));
+                if (graph.getFeatures().supportsIntegerProperty) {
+                    v1.setProperty("key2", 20);
+                    v2.setProperty("key2", 30);
+
+                    assertEquals(20, v1.removeProperty("key2"));
+                    assertEquals(30, v2.removeProperty("key2"));
+                }
 
                 assertNull(v1.removeProperty("key1"));
                 assertNull(v1.removeProperty("key2"));
@@ -487,6 +513,9 @@ public class VertexTestSuite extends TestSuite {
 
     public void testEmptyKeyProperty() {
         final Graph graph = graphTest.generateGraph();
+
+        // no point in testing graph features for setting string properties because the intent is for it to
+        // fail based on the empty key.
         if (graph.getFeatures().supportsVertexProperties) {
             final Vertex v = graph.addVertex(null);
             try {

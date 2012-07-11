@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
+import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.LongIDVertexCache;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.ObjectIDVertexCache;
@@ -39,7 +40,7 @@ import java.util.Set;
  * <br />
  * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use
  * {@link #setVertexIdKey(String)} and {@link #setEdgeIdKey(String)} to set the keys for the vertex and edge properties
- * respectively. This allows to make the loaded graph compatible for later wrapping with {@link IdGraph}.
+ * respectively. This allows to make the loaded baseGraph compatible for later wrapping with {@link IdGraph}.
  *
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */
@@ -76,7 +77,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     }
 
-    private final T graph;
+    private final T baseGraph;
 
     private String vertexIdKey;
     private String edgeIdKey;
@@ -90,7 +91,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     private Edge currentEdgeCached = null;
 
     /**
-     * Constructs a BatchGraph wrapping the provided graph, using the specified buffer size and expecting vertex ids of
+     * Constructs a BatchGraph wrapping the provided baseGraph, using the specified buffer size and expecting vertex ids of
      * the specified IdType. Supplying vertex ids which do not match this type will throw exceptions.
      *
      * @param graph      Graph to be wrapped
@@ -101,19 +102,19 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         if (graph == null) throw new IllegalArgumentException("Graph may not be null");
         if (type == null) throw new IllegalArgumentException("Type may not be null");
         if (bufferSize <= 0) throw new IllegalArgumentException("BufferSize must be positive");
-        this.graph = graph;
+        this.baseGraph = graph;
         this.bufferSize = bufferSize;
 
         vertexIdKey = null;
         edgeIdKey = null;
 
-        cache = type.getVertexCache(this.graph);
+        cache = type.getVertexCache(this.baseGraph);
 
         remainingBufferSize = this.bufferSize;
     }
 
     /**
-     * Constructs a BatchGraph wrapping the provided graph.
+     * Constructs a BatchGraph wrapping the provided baseGraph.
      *
      * @param graph Graph to be wrapped
      */
@@ -122,7 +123,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     }
 
     /**
-     * Constructs a BatchGraph wrapping the provided graph. Immediately returns the graph if its a BatchGraph
+     * Constructs a BatchGraph wrapping the provided baseGraph. Immediately returns the baseGraph if its a BatchGraph
      * and wraps non-transactional graphs in an additional {@link WritethroughGraph}.
      *
      * @param graph Graph to be wrapped
@@ -134,7 +135,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     }
 
     /**
-     * Constructs a BatchGraph wrapping the provided graph. Immediately returns the graph if its a BatchGraph
+     * Constructs a BatchGraph wrapping the provided baseGraph. Immediately returns the baseGraph if its a BatchGraph
      * and wraps non-transactional graphs in an additional {@link WritethroughGraph}.
      *
      * @param graph  Graph to be wrapped
@@ -150,7 +151,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     /**
      * Sets the key to be used when setting the vertex id as a property on the respective vertex.
      * If the key is null, then no property will be set.
-     * If the loaded graph should later be wrapped with {@link IdGraph} use IdGraph.ID.
+     * If the loaded baseGraph should later be wrapped with {@link IdGraph} use IdGraph.ID.
      *
      * @param key Key to be used.
      */
@@ -161,7 +162,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     /**
      * Sets the key to be used when setting the edge id as a property on the respective edge.
      * If the key is null, then no property will be set.
-     * If the loaded graph should later be wrapped with {@link IdGraph} use IdGraph.ID.
+     * If the loaded baseGraph should later be wrapped with {@link IdGraph} use IdGraph.ID.
      *
      * @param key Key to be used.
      */
@@ -173,7 +174,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         currentEdge = null;
         currentEdgeCached = null;
         if (remainingBufferSize <= 0) {
-            graph.stopTransaction(Conclusion.SUCCESS);
+            baseGraph.stopTransaction(Conclusion.SUCCESS);
             cache.newTransaction();
             remainingBufferSize = bufferSize;
         }
@@ -192,25 +193,25 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         currentEdge = null;
         currentEdgeCached = null;
         remainingBufferSize = 0;
-        graph.stopTransaction(Conclusion.SUCCESS);
+        baseGraph.stopTransaction(Conclusion.SUCCESS);
     }
 
     @Override
     public void shutdown() {
-        graph.stopTransaction(Conclusion.SUCCESS);
-        graph.shutdown();
+        baseGraph.stopTransaction(Conclusion.SUCCESS);
+        baseGraph.shutdown();
         currentEdge = null;
         currentEdgeCached = null;
     }
 
     @Override
     public T getBaseGraph() {
-        return graph;
+        return baseGraph;
     }
 
     @Override
     public Features getFeatures() {
-        Features features = graph.getFeatures().copyFeatures();
+        Features features = baseGraph.getFeatures().copyFeatures();
         features.ignoresSuppliedIds = false;
         features.isWrapper = true;
         features.supportsEdgeIteration = false;
@@ -237,7 +238,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         if (id == null) throw ExceptionFactory.vertexIdCanNotBeNull();
         nextElement();
 
-        Vertex v = graph.addVertex(id);
+        Vertex v = baseGraph.addVertex(id);
         if (vertexIdKey != null) {
             v.setProperty(vertexIdKey, id);
         }
@@ -248,17 +249,22 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     @Override
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         if (!BatchVertex.class.isInstance(outVertex) || !BatchVertex.class.isInstance(inVertex))
-            throw new IllegalArgumentException("Given element was not created in this graph");
+            throw new IllegalArgumentException("Given element was not created in this baseGraph");
         nextElement();
         final Vertex ov = getCachedVertex(outVertex.getId());
         final Vertex iv = getCachedVertex(inVertex.getId());
-        currentEdgeCached = graph.addEdge(id, ov, iv, label);
+        currentEdgeCached = baseGraph.addEdge(id, ov, iv, label);
         if (edgeIdKey != null && id != null) {
             currentEdgeCached.setProperty(edgeIdKey, id);
         }
 
         currentEdge = new BatchEdge();
         return currentEdge;
+    }
+    
+    @Override
+    public String toString() {
+        return StringFactory.graphString(this, this.baseGraph.toString());
     }
 
     // ################### Unsupported Graph Methods ####################
@@ -346,6 +352,11 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         public Object removeProperty(String key) {
             return getCachedVertex(externalID).removeProperty(key);
         }
+        
+        @Override
+        public String toString() {
+            return "v["+externalID+"]";
+        }
     }
 
     private class BatchEdge implements Edge {
@@ -391,6 +402,12 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
             }
             return currentEdgeCached;
         }
+        
+        @Override
+        public String toString() {
+            return getWrappedEdge().toString();
+        }
+        
     }
 
 

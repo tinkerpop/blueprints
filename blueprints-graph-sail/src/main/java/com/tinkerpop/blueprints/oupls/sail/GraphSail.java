@@ -120,7 +120,6 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         createIndices();
 
         store.manualTransactions = store.graph instanceof TransactionalGraph;
-        //&& 0 == ((TransactionalGraph) store.graph).getMaxBufferSize();
 
         store.namespaces = store.getReferenceVertex();
         if (null == store.namespaces) {
@@ -287,21 +286,13 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         }
 
         public Vertex findVertex(final Value value) {
-            Iterator<Vertex> i = store.graph.getVertices(VALUE, value.stringValue()).iterator();
-            // TODO: restore the close()
-            //try {
-            while (i.hasNext()) {
-                Vertex v = i.next();
-
+            for (Vertex v : store.graph.getVertices(VALUE, value.stringValue())) {
                 if (matches(v, value)) {
                     return v;
                 }
             }
 
             return null;
-            //} finally {
-            //    i.close();
-            //}
         }
 
         public boolean matches(final Vertex vertex,

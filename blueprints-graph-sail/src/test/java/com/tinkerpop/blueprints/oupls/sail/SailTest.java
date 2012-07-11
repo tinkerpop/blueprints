@@ -1343,22 +1343,26 @@ public abstract class SailTest {
             count = countStatements(sc, uriA, null, null);
             assertEquals(0, count);
             sc.close();
+
             sc = sail.getConnection();
             sc.addStatement(uriA, uriB, uriC);
             count = countStatements(sc, uriA, null, null);
             assertEquals(1, count);
             sc.commit();
             sc.close();
+
             sc = sail.getConnection();
             count = countStatements(sc, uriA, null, null);
             assertEquals(1, count);
             sc.close();
+
             sc = sail.getConnection();
             sc.removeStatements(uriA, null, null);
             count = countStatements(sc, uriA, null, null);
             assertEquals(0, count);
             sc.commit();
             sc.close();
+
             sc = sail.getConnection();
             count = countStatements(sc, uriA, null, null);
             assertEquals(0, count);
