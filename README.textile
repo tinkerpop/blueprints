@@ -10,6 +10,7 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "OrientDB":http://www.orientechnologies.com/ graph database
 ** "DEX":http://www.sparsity-technologies.com/dex graph database
 ** "InfiniteGraph":http://www.infinitegraph.com/ (available "here":http://wiki.infinitegraph.com/2.1/w/index.php?title=InfiniteGraph_Tinkerpop_Blueprints_Implementation)
+** "Titan":http://thinkaurelius.github.com/titan/ (available "here":http://thinkaurelius.github.com/titan/)
 ** "Rexster":http://rexster.tinkerpop.com graph server
 ** "Datomic":http://www.datomic.com/ database
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
@@ -21,8 +22,11 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "GML":http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html Reader/Writer utility
 ** "GraphML":http://graphml.graphdrawing.org/ Reader/Writer utility
 ** "GraphSON":https://github.com/tinkerpop/blueprints/wiki/GraphSON-Reader-and-Writer-Library Reader/Writer utility
+** @BatchGraph@ wrapper
 ** @ReadOnlyGraph@ wrapper
 ** @EventGraph@ wrapper
+** @PartitionGraph@ wrapper
+** @IdGraph@ wrapper
 ** Various helper utilities
 
 The documentation for Blueprints can be found at this "location":http://blueprints.tinkerpop.com. Finally, please visit "TinkerPop":http://tinkerpop.com for other software products.

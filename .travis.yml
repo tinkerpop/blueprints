@@ -1,0 +1,11 @@
+language: java
+notifications:
+  email:
+    - okrammarko@gmail.com
+    - spmallette@gmail.com
+    - parcour@gmail.com
+    - me@matthiasb.com
+jdk:
+  - oraclejdk7
+  - openjdk7
+  - openjdk6

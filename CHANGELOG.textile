@@ -1,27 +1,72 @@
 Blueprints: A Property Graph Model Interface
 "http://blueprints.tinkerpop.com":http://blueprints.tinkerpop.com
 
-==<hr/>==
+h2. Blueprints 2.y.z
 
-h3. Version 1.2 (NOT OFFICIALLY RELEASED YET)
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
+
+h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>1.3-SNAPSHOT</version>
+  <version>2.1.0-SNAPSHOT</version>
+</dependency>
+```
+
+* Enable tests for @KeyIndexableGraph@ under @RexsterGraph@.  Issue with casting index values resolved.
+* Optimized the pom.xml for both the parent and child projects
+* Added Travis continuous integration support
+* Made @OrientGraph@ and @Neo4jGraph@ Element constructors public
+* Provided a method to turn on/off @Neo4jGraph@ transaction consistency checking. Default behavior being native Neo4j.
+* Removed @TransactionalGraph.startTransaction()@ as transactions are auto-started
+* Bumped to support Dex 4.6.0
+* Bumped to support Neo4j 1.8.M05
+* An @Element@ can not have a property key that is the empty string
+* Update @RexsterGraph@ to utilize Vertex Query API of Rexster.
+
+
+==<hr/>==
+
+h3. Version 2.0.0 (May 23, 2012)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>2.0.0</version>
 </dependency>
 ```
 
 * Added a var args based @ElementHelper.setProperties()@ method
-* GML Reader/Writer utility
-* Bumped to support Neo4j 1.7.M01
-* Neo4jGraph makes use of the kernel properties for more efficient index handling
+* Added GML Reader/Writer utility
+* Bumped to support Neo4j 1.8.M02
 * @RexsterGraph@ supports Rexster Authentication
 * @Neo4jElement@ will accept a @Collection@ as a property (as long as all items within it are of the same data type), internally converting it to an array for storage in Neo4j
 * Fixed a couple of API naming convention errors in @PartitionGraph@
+* Updated core @Vertex@ API to support the notion of 'push down predicates' (lower level element filtering)
+* Added internal support for Neo4j's @Node@ var args of @RelationshipTypes@
+* Speed improvements to the much used @MultiIterable@
+* Removed @CloseableSequence@ and replaced with @CloseableIterable@ (now real Java @Iterable@ semantics respected)
+* Redesign to @IndexableGraph@ where @AutomaticIndex@ no longer exists as is default
+* Introduced new interface called @KeyIndexedGraph@ for basic key/value property indexing
+* Reduce the number of vertices/edges created in various test suites to speed up testing
+* Added @Features@ so developers can learn about the various quirks of any @Graph@ implementation
+* Support for Neo4j's native automatic indices in @Neo4jGraph@
+* Support for Neo4j's native automatic indices in @Neo4jBatchGraph@
+* Added @ExceptionFactory@ so all exceptions have the same message and type amongst graph implementations
+* Removed superfluous @util@ packages on all @Graph@ implementations
+* @EventGraph@ wrapper set now includes @EventTransactionalGraph@ which will fire queued sets of events in conjunction with successful commits to the graph.
+* Added @IdGraph@ to support the user defined ids for those @Graphs@ that ignore user supplied ids
+* Added @ThreadTransactionalGraph@ to support multiple threads within a single transaction
+* Changed the @Vertex@ API to only have three methods: @getEdges()@, @getVertices()@, and @query()@
+* Bumped to support OrientDB 1.0.1
+* Added @BatchGraph@ to support bulk loading of data
 
 ==<hr/>==
+
+h2. Blueprints 1.x
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-bluesky.png!
 
@@ -102,7 +147,7 @@ h3. Version 1.0 (Blueprints -- September 18, 2011)
 * Added @StringFactory.graphString()@ for a unified @String@ representation of a Blueprints graph
 * Added @Neo4jBatchGraph@ to support bulk inserting of graph data into a Neo4j instance
 
-==<hr/>==
+h2. Blueprints 0.x
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-marvin.png!
 
