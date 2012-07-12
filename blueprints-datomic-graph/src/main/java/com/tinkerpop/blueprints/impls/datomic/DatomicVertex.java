@@ -4,7 +4,6 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.datomic.util.DatomicUtil;
 import com.tinkerpop.blueprints.util.DefaultQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -12,10 +11,8 @@ import datomic.Database;
 import datomic.Datom;
 import datomic.Peer;
 import datomic.Util;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+
+import java.util.*;
 
 /**
  * @author Davy Suvee (http://datablend.be)
@@ -25,8 +22,8 @@ public class DatomicVertex extends DatomicElement implements Vertex {
     public DatomicVertex(final DatomicGraph graph) {
         super(graph);
         graph.addToTransaction(Util.map(":db/id", id,
-                ":graph.element/type", ":graph.element.type/vertex",
-                ":db/ident", uuid));
+                                        ":graph.element/type", ":graph.element.type/vertex",
+                                        ":db/ident", uuid));
     }
 
     public DatomicVertex(final DatomicGraph graph, final Object id) {
@@ -38,40 +35,32 @@ public class DatomicVertex extends DatomicElement implements Vertex {
         if (labels.length == 0) {
             return getInEdges();
         }
-        Iterator<List<Object>> edgesit = Peer.q("[:find ?edge " +
-                ":in $ ?vertex [?label ...] " +
-                ":where [?edge :graph.edge/inVertex ?vertex] " +
-                "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), id, labels).iterator();
-        return DatomicUtil.getEdgeSequence(edgesit, graph);
+        Collection<List<Object>> inEdges = Peer.q("[:find ?edge " +
+                                                  ":in $ ?vertex [?label ...] " +
+                                                  ":where [?edge :graph.edge/inVertex ?vertex] " +
+                                                         "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), id, labels);
+        return new DatomicIterable(inEdges, graph, Edge.class);
     }
 
     public Iterable<Edge> getInEdges() {
-        Iterator<Datom> edgesit = graph.getRawGraph().datoms(Database.AVET, graph.GRAPH_EDGE_IN_VERTEX, getId()).iterator();
-        List<Object> edges = new ArrayList<Object>();
-        while (edgesit.hasNext()) {
-            edges.add(edgesit.next().e());
-        }
-        return new DatomicIterable(edges, this.graph, Edge.class);
+        Iterable<Datom> inEdges = graph.getRawGraph().datoms(Database.AVET, graph.GRAPH_EDGE_IN_VERTEX, getId());
+        return new DatomicIterable(inEdges, this.graph, Edge.class);
     }
 
     public Iterable<Edge> getOutEdges(final String... labels) {
         if (labels.length == 0) {
             return getOutEdges();
         }
-        Iterator<List<Object>> edgesit = Peer.q("[:find ?edge " +
-                ":in $ ?vertex [?label ...] " +
-                ":where [?edge :graph.edge/outVertex ?vertex] " +
-                "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), id, labels).iterator();
-        return DatomicUtil.getEdgeSequence(edgesit, graph);
+        Collection<List<Object>> outEdges = Peer.q("[:find ?edge " +
+                                                  ":in $ ?vertex [?label ...] " +
+                                                  ":where [?edge :graph.edge/outVertex ?vertex] " +
+                                                         "[?edge :graph.edge/label ?label ] ]", graph.getRawGraph(), id, labels);
+        return new DatomicIterable(outEdges, graph, Edge.class);
     }
 
     public Iterable<Edge> getOutEdges() {
-        Iterator<Datom> edgesit = graph.getRawGraph().datoms(Database.AVET, graph.GRAPH_EDGE_OUT_VERTEX, getId()).iterator();
-        List<Object> edges = new ArrayList<Object>();
-        while (edgesit.hasNext()) {
-            edges.add(edgesit.next().e());
-        }
-        return new DatomicIterable(edges, this.graph, Edge.class);
+        Iterable<Datom> outEdges = graph.getRawGraph().datoms(Database.AVET, graph.GRAPH_EDGE_OUT_VERTEX, getId());
+        return new DatomicIterable(outEdges, this.graph, Edge.class);
     }
 
     public boolean equals(final Object object) {

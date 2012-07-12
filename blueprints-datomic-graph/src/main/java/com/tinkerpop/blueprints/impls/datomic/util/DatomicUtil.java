@@ -1,11 +1,7 @@
 package com.tinkerpop.blueprints.impls.datomic.util;
 
 import clojure.lang.Keyword;
-import com.tinkerpop.blueprints.CloseableIterable;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.datomic.DatomicGraph;
-import com.tinkerpop.blueprints.impls.datomic.DatomicIterable;
 import datomic.Peer;
 import datomic.Util;
 import java.util.*;
@@ -94,24 +90,6 @@ public class DatomicUtil {
     // Creates a unique key for each key-valuetype attribute (as only one attribute with the same name can be specified)
     public static Keyword createKey(final String key, final Object value) {
         return Keyword.intern(key.replace("_","$") + "." + mapJavaTypeToDatomicType(value).split("/")[1]);
-    }
-
-    // Creates an edge sequence
-    public static CloseableIterable getEdgeSequence(Iterator<List<Object>> edgesit, DatomicGraph graph) {
-        List<Object> edges = new ArrayList<Object>();
-        while (edgesit.hasNext()) {
-            edges.add(edgesit.next().get(0));
-        }
-        return new DatomicIterable(edges, graph, Edge.class);
-    }
-
-    // Creates a vertex sequence
-    public static CloseableIterable getVertexSequence(Iterator<List<Object>> verticessit, DatomicGraph graph) {
-        List<Object> vertices = new ArrayList<Object>();
-        while (verticessit.hasNext()) {
-            vertices.add(verticessit.next().get(0));
-        }
-        return new DatomicIterable(vertices, graph, Vertex.class);
     }
 
 }

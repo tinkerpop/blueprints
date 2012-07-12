@@ -115,8 +115,7 @@ public class DatomicGraph implements MetaGraph<Database> {
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
         try {
-            final Long longId = Long.valueOf(id.toString()).longValue();
-            return new DatomicEdge(this, longId);
+            return new DatomicEdge(this, Long.valueOf(id.toString()).longValue());
         } catch (NumberFormatException e) {
             return null;
         } catch (RuntimeException re) {
@@ -125,11 +124,7 @@ public class DatomicGraph implements MetaGraph<Database> {
     }
 
     public Iterable<Edge> getEdges() {
-        Iterator<Datom> edgesit = getRawGraph().datoms(Database.AVET, GRAPH_ELEMENT_TYPE, GRAPH_ELEMENT_TYPE_EDGE).iterator();
-        List<Object> edges = new ArrayList<Object>();
-        while (edgesit.hasNext()) {
-            edges.add(edgesit.next().e());
-        }
+        Iterable<Datom> edges = getRawGraph().datoms(Database.AVET, GRAPH_ELEMENT_TYPE, GRAPH_ELEMENT_TYPE_EDGE);
         return new DatomicIterable<Edge>(edges, this, Edge.class);
     }
 
@@ -142,9 +137,9 @@ public class DatomicGraph implements MetaGraph<Database> {
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         final DatomicEdge edge = new DatomicEdge(this);
         tx.get().add(Util.map(":db/id", edge.id,
-                ":graph.edge/label", label,
-                ":graph.edge/inVertex", inVertex.getId(),
-                ":graph.edge/outVertex", outVertex.getId()));
+                              ":graph.edge/label", label,
+                              ":graph.edge/inVertex", inVertex.getId(),
+                              ":graph.edge/outVertex", outVertex.getId()));
         transact();
         edge.setId(getRawGraph().entid(edge.uuid));
         return edge;
@@ -156,7 +151,7 @@ public class DatomicGraph implements MetaGraph<Database> {
 
     public void removeEdge(final Edge edge, boolean transact) {
         DatomicEdge theedge =  (DatomicEdge)edge;
-        tx.get().add(Util.list(":db.fn/retractEntity", theedge.id));
+        tx.get().add(Util.list(":db.fn/retractEntity", theedge.getId()));
         if (transact) transact();
     }
 
@@ -186,11 +181,7 @@ public class DatomicGraph implements MetaGraph<Database> {
     }
 
     public Iterable<Vertex> getVertices() {
-        Iterator<Datom> verticesit = getRawGraph().datoms(Database.AVET, this.GRAPH_ELEMENT_TYPE, this.GRAPH_ELEMENT_TYPE_VERTEX).iterator();
-        List<Object> vertices = new ArrayList<Object>();
-        while (verticesit.hasNext()) {
-            vertices.add(verticesit.next().e());
-        }
+        Iterable<Datom> vertices = getRawGraph().datoms(Database.AVET, this.GRAPH_ELEMENT_TYPE, this.GRAPH_ELEMENT_TYPE_VERTEX);
         return new DatomicIterable(vertices, this, Vertex.class);
     }
 

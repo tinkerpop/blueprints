@@ -1,9 +1,7 @@
 package com.tinkerpop.blueprints.impls.datomic;
 
 import clojure.lang.Keyword;
-import com.tinkerpop.blueprints.CloseableIterable;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.datomic.util.DatomicUtil;
 import datomic.Peer;
 import java.util.*;
@@ -55,19 +53,19 @@ public class DatomicAutomaticIndex<T extends Element> implements Index<T> {
         }
         if (matched && DatomicUtil.existingAttributeDefinition(attribute, graph)) {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
-                return DatomicUtil.getVertexSequence(getElements(attribute, value, Keyword.intern("graph.element.type/vertex")).iterator(), graph);
+                return new DatomicIterable(getElements(attribute, value, Keyword.intern("graph.element.type/vertex")), graph, Vertex.class);
             }
             if (this.getIndexClass().isAssignableFrom(DatomicEdge.class)) {
-                return DatomicUtil.getEdgeSequence(getElements(attribute, value, Keyword.intern("graph.element.type/edge")).iterator(), graph);
+                return new DatomicIterable(getElements(attribute, value, Keyword.intern("graph.element.type/edge")), graph, Edge.class);
             }
             throw new RuntimeException(DatomicGraph.DATOMIC_ERROR_EXCEPTION_MESSAGE);
         }
         else {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
-                return DatomicUtil.getVertexSequence(new ArrayList<List<Object>>().iterator(), graph);
+                return new DatomicIterable(new ArrayList<List<Object>>(), graph, Vertex.class);
             }
             if (this.getIndexClass().isAssignableFrom(DatomicEdge.class)) {
-                return DatomicUtil.getEdgeSequence(new ArrayList<List<Object>>().iterator(), graph);
+                return new DatomicIterable(new ArrayList<List<Object>>(), graph, Edge.class);
             }
             throw new RuntimeException(DatomicGraph.DATOMIC_ERROR_EXCEPTION_MESSAGE);
         }
