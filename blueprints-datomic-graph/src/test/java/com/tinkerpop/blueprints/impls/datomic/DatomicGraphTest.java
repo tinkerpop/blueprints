@@ -59,29 +59,11 @@ public class DatomicGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
-/*    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
     public void testKeyIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new KeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
-
-    public void testTransactionalGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new TransactionalGraphTestSuite(this));
-        printTestPerformance("TransactionGraphTestSuite", this.stopWatch());
-    }*/
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();

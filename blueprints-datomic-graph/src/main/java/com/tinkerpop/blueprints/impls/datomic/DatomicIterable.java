@@ -58,6 +58,7 @@ public class DatomicIterable<T extends Element> implements CloseableIterable<T> 
     public void close() {
     }
 
+    // Iterator for datoms
     private class DatomicDatomIterator implements Iterator<T> {
         private Iterator<Datom> iterator = datoms.iterator();
 
@@ -87,6 +88,7 @@ public class DatomicIterable<T extends Element> implements CloseableIterable<T> 
 
     }
 
+    // Iterator for datomic query results
     private class DatomicQueryIterator implements Iterator<T> {
         private Iterator<List<Object>> iterator = objects.iterator();
 
@@ -116,6 +118,7 @@ public class DatomicIterable<T extends Element> implements CloseableIterable<T> 
 
     }
 
+    // Iterator for datomic ids
     private class DatomicIdIterator implements Iterator<T> {
         private Iterator<Object> iterator = ids.iterator();
 

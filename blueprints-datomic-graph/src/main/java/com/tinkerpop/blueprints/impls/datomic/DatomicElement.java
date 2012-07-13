@@ -78,22 +78,22 @@ public abstract class DatomicElement implements Element {
             // If the property does not exist yet, create the attribute if required and create the appropriate transaction
             if (getProperty(key) == null) {
                 // We first need to create the new attribute on the fly
-                DatomicUtil.createAttributeDefinition(key, value, graph);
+                DatomicUtil.createAttributeDefinition(key, value.getClass(), this.getClass(), graph);
                 this.graph.addToTransaction(Util.map(":db/id", id,
-                        DatomicUtil.createKey(key, value), value));
+                        DatomicUtil.createKey(key, value.getClass(), this.getClass()), value));
             }
             else {
                 // Value types match, just perform an update
                 if (getProperty(key).getClass().equals(value.getClass())) {
                     this.graph.addToTransaction(Util.map(":db/id", id,
-                            DatomicUtil.createKey(key, value), value));
+                            DatomicUtil.createKey(key, value.getClass(), this.getClass()), value));
                 }
                 // Value types do not match. Retract original fact and add new one
                 else {
-                    DatomicUtil.createAttributeDefinition(key, value, graph);
-                    this.graph.addToTransaction(Util.list(":db/retract", id, DatomicUtil.createKey(key, value), getProperty(key)));
+                    DatomicUtil.createAttributeDefinition(key, value.getClass(), this.getClass(), graph);
+                    this.graph.addToTransaction(Util.list(":db/retract", id, DatomicUtil.createKey(key, value.getClass(), this.getClass()), getProperty(key)));
                     this.graph.addToTransaction(Util.map(":db/id", id,
-                            DatomicUtil.createKey(key, value), value));
+                            DatomicUtil.createKey(key, value.getClass(), this.getClass()), value));
                 }
             }
         }
@@ -110,7 +110,7 @@ public abstract class DatomicElement implements Element {
         if (oldvalue != null) {
             if (!DatomicUtil.isReservedKey(key)) {
                 this.graph.addToTransaction(Util.list(":db/retract", id,
-                        DatomicUtil.createKey(key, oldvalue), oldvalue));
+                        DatomicUtil.createKey(key, oldvalue.getClass(), this.getClass()), oldvalue));
             }
         }
         this.graph.transact();

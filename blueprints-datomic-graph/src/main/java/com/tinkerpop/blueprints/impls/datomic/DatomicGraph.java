@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.impls.datomic;
 
 import clojure.lang.Keyword;
 import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.impls.datomic.util.DatomicUtil;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import datomic.*;
@@ -14,7 +15,7 @@ import java.util.concurrent.ExecutionException;
  *
  * @author Davy Suvee (http://datablend.be)
  */
-public class DatomicGraph implements MetaGraph<Database> {
+public class DatomicGraph implements MetaGraph<Database>, KeyIndexableGraph {
 
     private final String graphURI;
     private final Connection connection;
@@ -26,6 +27,9 @@ public class DatomicGraph implements MetaGraph<Database> {
     public final Object GRAPH_EDGE_IN_VERTEX;
     public final Object GRAPH_EDGE_OUT_VERTEX;
     public final Object GRAPH_EDGE_LABEL;
+
+    private final DatomicIndex vertexIndex = new DatomicIndex("vertexIndex", this, Vertex.class);
+    private final DatomicIndex edgeIndex = new DatomicIndex("edgeIndex", this, Edge.class);
 
     private final ThreadLocal<List> tx = new ThreadLocal<List>() {
         protected List initialValue() {
@@ -68,7 +72,7 @@ public class DatomicGraph implements MetaGraph<Database> {
         FEATURES.supportsMapProperty = false;
         FEATURES.supportsStringProperty = true;
 
-        FEATURES.isWrapper = false;
+        FEATURES.isWrapper = true;
         FEATURES.supportsKeyIndices = true;
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
@@ -130,8 +134,7 @@ public class DatomicGraph implements MetaGraph<Database> {
 
     @Override
     public Iterable<Edge> getEdges(String key, Object value) {
-        DatomicAutomaticIndex index = new DatomicAutomaticIndex("test", this, Edge.class);
-        return index.get(key, value);
+        return edgeIndex.get(key, value);
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
@@ -187,8 +190,7 @@ public class DatomicGraph implements MetaGraph<Database> {
 
     @Override
     public Iterable<Vertex> getVertices(String key, Object value) {
-        DatomicAutomaticIndex index = new DatomicAutomaticIndex("test", this, Vertex.class);
-        return index.get(key, value);
+        return vertexIndex.get(key, value);
     }
 
     public void removeVertex(final Vertex vertex) {
@@ -259,45 +261,6 @@ public class DatomicGraph implements MetaGraph<Database> {
         this.checkpoint.set(transaction);
     }
 
-    //public <T extends Element> Index<T> createManualIndex(String indexName, Class<T> indexClass, Parameter... indexParameters) {
-    //    throw new UnsupportedOperationException();
-    //}
-
-//    public <T extends Element> void createKeyIndex(String key, Class<T> indexClass) {
-//        if (this.autoIndices.containsKey(indexName))
-//            throw new RuntimeException("Index already exists: " + indexName);
-//        final DatomicAutomaticIndex<T> newindex = new DatomicAutomaticIndex(indexName, this, indexClass, indexKeys);
-//        this.autoIndices.put(indexName, newindex);
-//        return newindex;
-//    }
-//
-//    public <T extends Element> Index<T> getIndex(String indexName, Class<T> indexClass) {
-//        Index index = this.autoIndices.get(indexName);
-//        if (null == index)
-//            return null;
-//        if (!indexClass.isAssignableFrom(index.getIndexClass()))
-//            throw new RuntimeException(indexClass + " is not assignable from " + index.getIndexClass());
-//        else
-//            return (Index<T>) index;
-//    }
-
-//    @Override
-//    public <T extends Element> Index<T> createIndex(String indexName, Class<T> indexClass, Parameter... indexParameters) {
-//        return null;  //To change body of implemented methods use File | Settings | File Templates.
-//    }
-//
-//    public Iterable<Index<? extends Element>> getIndices() {
-//        final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-//        for (Index index : autoIndices.values()) {
-//            list.add(index);
-//        }
-//        return list;
-//    }
-//
-//    public void dropIndex(String indexName) {
-//         this.autoIndices.remove(indexName);
-//    }
-
     // Setup of the various attribute types required for DatomicGraph
     private void setupMetaModel() throws ExecutionException, InterruptedException {
         // The graph element type attribute
@@ -355,6 +318,21 @@ public class DatomicGraph implements MetaGraph<Database> {
 
     public String toString() {
         return StringFactory.graphString(this, graphURI);
+    }
+
+    @Override
+    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+        DatomicUtil.removeAttributeIndex(key, elementClass, this);
+    }
+
+    @Override
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+        DatomicUtil.createAttributeIndex(key, elementClass, this);
+    }
+
+    @Override
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return DatomicUtil.getIndexedAttributes(elementClass, this);
     }
 
 }

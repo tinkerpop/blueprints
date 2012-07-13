@@ -8,21 +8,22 @@ import java.util.*;
 
 /**
  * @author Davy Suvee (http://datablend.be)
+ * Helper class to retrieve elements. If an Datomic index exists for a particular attribute, it will be used under the covers.
  */
-public class DatomicAutomaticIndex<T extends Element> implements Index<T> {
+public class DatomicIndex<T extends Element> implements Index<T> {
 
     private DatomicGraph graph = null;
     private Class<T> clazz = null;
     private String name = null;
     private Set<String> indexKeys = null;
 
-    public DatomicAutomaticIndex(final String name, final DatomicGraph g, final Class<T> clazz) {
+    public DatomicIndex(final String name, final DatomicGraph g, final Class<T> clazz) {
         this.name = name;
         this.graph = g;
         this.clazz = clazz;
     }
 
-    public DatomicAutomaticIndex(final String name, final DatomicGraph g, final Class<T> clazz, Set<String> indexKeys) {
+    public DatomicIndex(final String name, final DatomicGraph g, final Class<T> clazz, Set<String> indexKeys) {
         this.name = name;
         this.graph = g;
         this.clazz = clazz;
@@ -49,7 +50,7 @@ public class DatomicAutomaticIndex<T extends Element> implements Index<T> {
             attribute = Keyword.intern("graph.edge/label");
         }
         else {
-            attribute = DatomicUtil.createKey(key, value);
+            attribute = DatomicUtil.createKey(key, value.getClass(), clazz);
         }
         if (matched && DatomicUtil.existingAttributeDefinition(attribute, graph)) {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
@@ -83,7 +84,7 @@ public class DatomicAutomaticIndex<T extends Element> implements Index<T> {
             attribute = Keyword.intern("graph.edge/label");
         }
         else {
-            attribute = DatomicUtil.createKey(key, value);
+            attribute = DatomicUtil.createKey(key, value.getClass(), clazz);
         }
         if (matched && DatomicUtil.existingAttributeDefinition(attribute, graph)) {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
@@ -108,14 +109,6 @@ public class DatomicAutomaticIndex<T extends Element> implements Index<T> {
                 ":in $ ?attribute ?value ?type " +
                 ":where [?element :graph.element/type ?type] " +
                 "[?element ?attribute ?value] ]", graph.getRawGraph(), attribute, value, type);
-    }
-
-    private Collection<List<Object>> getAttributes(Keyword type) {
-        return Peer.q("[:find ?key " +
-                ":in $ ?type " +
-                ":where [?element :graph.element/type ?type] " +
-                "[?element ?attribute _] " +
-                "[?attribute :db/ident ?key] ]", graph.getRawGraph(), type);
     }
 
 }
