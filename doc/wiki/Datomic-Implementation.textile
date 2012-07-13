@@ -1,0 +1,42 @@
+!https://github.com/datablend/blueprints/raw/master/doc/images/datomic-logo.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-datomic-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new DatomicGraph("datomic:mem://tinkerpop");
+```
+
+*Datomic Graph Introduction*
+"Datomic":http://www.datomic.com/ is a distributed database system designed to enable scalable, flexible and intelligent applications, running on next-generation cloud architectures. Datomic stores facts (i.e. your data points) as *datoms*. A datom represents the addition (or retraction) of a relation between an *entity*, an *attribute*, a *value*, and a *transaction*. The *RDF* and *SPARQL* feel of the Datomic datamodel and query approach makes it a good target for the implementation of a property graph. For a summary of the Datomic database, please review the following "presentations":http://www.datomic.com/company/resources/introduction_video.
+
+The @blueprints-datomic-graph@ implementation supports the property graph data model defined by Blueprints. However, there are a few peculiarities:
+
+# *No user defined element identifiers*: Datomic is the gatekeeper and creator of vertex and edge identifiers. Thus, when creating a new vertex or edge instance, the provided object identifier is ignored.
+# @DatomicGraph@ implements @IndexableGraph@. However, the use of indices is limited when working with Datomic and is explained as follows:
+## There is no support to create indices.
+## By default, there is an @AutomaticIndex@ for both vertices and edges. These indexes contain a key for each existing property.
+
+
+*Temporal Graph Database*
+The @DatomicGraph@ implementation natively supports the notion of *time* by allowing *queries* to be performed against a version of the graph in the past. Users can *shift time*, by employing the @setCheckPoint@-method, which takes a @java.lang.Date@ as input. Once set, the graph reflects the vertices, edges and their corresponding properties at the *specified time point*.   
+
+```java
+DatomicGraph graph = new DatomicGraph("datomic:mem://tinkerpop");
+graph.setCheckPoint(someDate); // Set the graph state at some specific (time-)point in the past
+... // Do stuff
+graph.setCheckPoint(new Date()); // Restore the graph state (current state)
+```
+
+*DatomicGraph Setup*
+The Datomic Peer library is (currently) not redistributable through Maven. Make sure to download the latest Datomic build through the Datomic website and install the datomic-xxx.jar *manually* into Maven.
+
+```
+mvn install:install-file -DgroupId=com.datomic -DartifactId=datomic -Dfile=datomic-xxx.jar -DpomFile=pom.xml
+```
+Datomic provides several Storage Service options (in memory, DynamoDB, Infinispan and SQL-database). Consult the information on the Datomic "website":http://www.datomic.com/company/resources/storage to choose and setup the appropriate Storage Service.

@@ -12,6 +12,7 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "InfiniteGraph":http://www.infinitegraph.com/ (available "here":http://wiki.infinitegraph.com/2.1/w/index.php?title=InfiniteGraph_Tinkerpop_Blueprints_Implementation)
 ** "Titan":http://thinkaurelius.github.com/titan/ (available "here":http://thinkaurelius.github.com/titan/)
 ** "Rexster":http://rexster.tinkerpop.com graph server
+** "Datomic":http://www.datomic.com/ database
 ** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
 **** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail, "SPARQLRepository":http://www.openrdf.org/doc/sesame2/api/org/openrdf/repository/sparql/SPARQLRepository.html
 * Ouplementations:

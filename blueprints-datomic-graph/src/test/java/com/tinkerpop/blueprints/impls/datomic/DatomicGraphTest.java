@@ -1,6 +1,5 @@
-package com.tinkerpop.blueprints.impls.orient;
+package com.tinkerpop.blueprints.impls.datomic;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
@@ -12,26 +11,28 @@ import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.impls.datomic.DatomicGraph;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 /**
- * Test suite for OrientDB graph implementation.
+ * Test suite for Datomic graph implementation.
  *
- * @author Luca Garulli (http://www.orientechnologies.com)
+ * @author Davy Suvee (http://datablend.be)
  */
-public class OrientGraphTest extends GraphTest {
+public class DatomicGraphTest extends GraphTest {
 
-    private OrientGraph currentGraph;
+    private DatomicGraph currentGraph;
 
-    /*public void testOrientBenchmarkTestSuite() throws Exception {
+    /*public void testDatomicBenchmarkTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new OrientBenchmarkTestSuite(this));
-        printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
+        doTestSuite(new DatomicBenchmarkTestSuite(this));
+        printTestPerformance("DatomicBenchmarkTestSuite", this.stopWatch());
     }*/
 
     public void testVertexTestSuite() throws Exception {
@@ -58,28 +59,10 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
     public void testKeyIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new KeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testTransactionalGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new TransactionalGraphTestSuite(this));
-        printTestPerformance("TransactionGraphTestSuite", this.stopWatch());
     }
 
     public void testGraphMLReaderTestSuite() throws Exception {
@@ -101,14 +84,11 @@ public class OrientGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        String directory = getWorkingDirectory();
-        this.currentGraph = new OrientGraph("local:" + directory + "/graph");
+        this.currentGraph = new DatomicGraph("datomic:mem://blueprints" + UUID.randomUUID());
         return this.currentGraph;
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        String directory = getWorkingDirectory();
-        deleteDirectory(new File(directory));
         for (Method method : testSuite.getClass().getDeclaredMethods()) {
             if (method.getName().startsWith("test")) {
                 System.out.println("Testing " + method.getName() + "...");
@@ -118,14 +98,8 @@ public class OrientGraphTest extends GraphTest {
                         this.currentGraph.shutdown();
                 } catch (Exception e) {
                 }
-                OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
-                if (g.exists())
-                    g.open("admin", "admin").drop();
             }
         }
     }
 
-    private String getWorkingDirectory() {
-        return this.computeTestDataRoot().getAbsolutePath();
-    }
 }
