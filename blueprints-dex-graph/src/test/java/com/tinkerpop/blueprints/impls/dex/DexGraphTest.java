@@ -66,7 +66,7 @@ public class DexGraphTest extends GraphTest {
         doTestSuite(new KeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
-    */
+    //*/
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
