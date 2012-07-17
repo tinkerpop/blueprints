@@ -82,6 +82,7 @@ public class GraphTestSuite extends TestSuite {
             Iterator<Vertex> itty = vertices.iterator();
             int counter = 0;
             while (itty.hasNext()) {
+                assertTrue(itty.hasNext());
                 itty.next();
                 counter++;
             }
@@ -94,13 +95,16 @@ public class GraphTestSuite extends TestSuite {
             Iterator<Edge> itty = edges.iterator();
             int counter = 0;
             while (itty.hasNext()) {
+                assertTrue(itty.hasNext());
                 itty.next();
                 counter++;
             }
             assertEquals(counter, 15);
         }
+        
         graph.shutdown();
     }
+    
 
     public void testGettingVerticesAndEdgesWithKeyValue() {
         Graph graph = graphTest.generateGraph();
