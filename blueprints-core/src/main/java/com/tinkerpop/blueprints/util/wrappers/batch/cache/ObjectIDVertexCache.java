@@ -25,20 +25,12 @@ public class ObjectIDVertexCache implements VertexCache {
 
 
     @Override
-    public Vertex getVertex(Object externalID) {
-        Object o = map.get(externalID);
-        if (o instanceof Vertex) {
-            return (Vertex) o;
-        } else if (o != null) { //o is the internal id
-            Vertex v = graph.getVertex(o);
-            map.put(externalID, o);
-            return v;
-        } else return null;
+    public Object getEntry(Object externalID) {
+        return map.get(externalID);
     }
 
     @Override
-    public void add(Vertex vertex, Object externalID) {
-        assert !map.containsKey(externalID);
+    public void set(Vertex vertex, Object externalID) {
         map.put(externalID, vertex);
     }
 
