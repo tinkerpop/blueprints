@@ -176,14 +176,16 @@ public final class GraphSONUtility {
         ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
         putObject(jsonElement, GraphSONTokens._ID, element.getId());
 
-        if (element instanceof Vertex) {
-            jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
-        } else if (element instanceof Edge) {
+        // it's important to keep the order of these straight.  check Edge first and then Vertex because there
+        // are graph implementations that have Edge extend from Vertex
+        if (element instanceof Edge) {
             final Edge edge = (Edge) element;
             jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
             putObject(jsonElement, GraphSONTokens._OUT_V, edge.getVertex(Direction.OUT).getId());
             putObject(jsonElement, GraphSONTokens._IN_V, edge.getVertex(Direction.IN).getId());
             jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
+        } else if (element instanceof Vertex) {
+            jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
         }
 
         return jsonElement;

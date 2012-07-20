@@ -31,22 +31,14 @@ public class StringIDVertexCache implements VertexCache {
     }
 
     @Override
-    public Vertex getVertex(Object externalID) {
+    public Object getEntry(Object externalID) {
         String id = compression.compress((String) externalID);
-        Object o = map.get(id);
-        if (o instanceof Vertex) {
-            return (Vertex) o;
-        } else if (o != null) { //o is the internal id
-            Vertex v = graph.getVertex(o);
-            map.put(id, o);
-            return v;
-        } else return null;
+        return map.get(id);
     }
 
     @Override
-    public void add(Vertex vertex, Object externalID) {
+    public void set(Vertex vertex, Object externalID) {
         String id = compression.compress((String) externalID);
-        assert !map.containsKey(id);
         map.put(id, vertex);
     }
 
