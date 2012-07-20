@@ -54,8 +54,7 @@ public class BatchGraphTest extends TestCase {
         loadingTest(5000, 100, BatchGraph.IdType.URL, new URLLoadingFactory());
         loadingTest(200000, 10000, BatchGraph.IdType.URL, new URLLoadingFactory());
     }
-    
-    
+
     public void testQuadLoading() {
         int numEdges = 10000;
         String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
@@ -71,6 +70,64 @@ public class BatchGraphTest extends TestCase {
             edge.setProperty("annotation",quad[3]);
         }
         assertEquals(numEdges,BaseTest.count(graph.getEdges()));
+    }
+
+    public void testLoadingWithExisting1() {
+        int numEdges = 1000;
+        String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
+        TinkerGraph tg = new TinkerGraph();
+        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
+        bg.setLoadingFromScratch(false);
+        Graph graph = null;
+        int counter = 0;
+        for (String[] quad : quads) {
+            if (counter<numEdges/2) graph = tg;
+            else graph = bg;
+
+            Vertex[] vertices = new Vertex[2];
+            for (int i=0;i<2;i++) {
+                vertices[i] = graph.getVertex(quad[i]);
+                if (vertices[i]==null) vertices[i]=graph.addVertex(quad[i]);
+            }
+            Edge edge = graph.addEdge(null,vertices[0],vertices[1],quad[2]);
+            edge.setProperty("annotation",quad[3]);
+            counter++;
+        }
+        assertEquals(numEdges,BaseTest.count(tg.getEdges()));
+    }
+
+    public void testLoadingWithExisting2() {
+        int numEdges = 1000;
+        String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
+        TinkerGraph tg = new IgnoreIdTinkerGraph();
+        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
+        try {
+            bg.setLoadingFromScratch(false);
+            fail();
+        } catch (IllegalStateException e) {}
+        bg.setVertexIdKey("uid");
+        bg.setLoadingFromScratch(false);
+        try {
+            bg.setVertexIdKey(null);
+            fail();
+        } catch (IllegalStateException e) {}
+        
+        Graph graph = null;
+        int counter = 0;
+        for (String[] quad : quads) {
+            if (counter<numEdges/2) graph = tg;
+            else graph = bg;
+
+            Vertex[] vertices = new Vertex[2];
+            for (int i=0;i<2;i++) {
+                vertices[i] = graph.getVertex(quad[i]);
+                if (vertices[i]==null) vertices[i]=graph.addVertex(quad[i]);
+            }
+            Edge edge = graph.addEdge(null,vertices[0],vertices[1],quad[2]);
+            edge.setProperty("annotation",quad[3]);
+            counter++;
+        }
+        assertEquals(numEdges,BaseTest.count(tg.getEdges()));
     }
     
     

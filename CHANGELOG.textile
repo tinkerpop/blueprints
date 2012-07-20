@@ -22,10 +22,11 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 * Provided a method to turn on/off @Neo4jGraph@ transaction consistency checking. Default behavior being native Neo4j.
 * Removed @TransactionalGraph.startTransaction()@ as transactions are auto-started
 * Bumped to support Dex 4.6.0
-* Bumped to support Neo4j 1.8.M05
+* Bumped to support Neo4j 1.8.M06
 * An @Element@ can not have a property key that is the empty string
 * Update @RexsterGraph@ to utilize Vertex Query API of Rexster.
 * Renaming of GraphSONFactory to GraphSONUtility and various method renaming within that class.
+* Fixed an iterable consistency issue in @Neo4jGraph@
 
 ==<hr/>==
 

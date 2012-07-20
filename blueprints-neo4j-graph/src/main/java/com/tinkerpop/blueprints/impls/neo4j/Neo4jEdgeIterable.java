@@ -41,15 +41,19 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
                 if (!checkTransaction) {
                     return new Neo4jEdge(this.itty.next(), graph);
                 } else {
-                    if (null != this.nextRelationship)
-                        return new Neo4jEdge(this.nextRelationship, graph);
-                    while (true) {
-                        final Relationship relationship = this.itty.next();
-                        try {
-                            relationship.hasProperty(DUMMY_PROPERTY);
-                            return new Neo4jEdge(relationship, graph);
-                        } catch (final IllegalStateException e) {
-                            // tried to access a relationship not available to the transaction
+                    if (null != this.nextRelationship) {
+                        final Relationship temp = this.nextRelationship;
+                        this.nextRelationship = null;
+                        return new Neo4jEdge(temp, graph);
+                    } else {
+                        while (true) {
+                            final Relationship relationship = this.itty.next();
+                            try {
+                                relationship.hasProperty(DUMMY_PROPERTY);
+                                return new Neo4jEdge(relationship, graph);
+                            } catch (final IllegalStateException e) {
+                                // tried to access a relationship not available to the transaction
+                            }
                         }
                     }
                 }
@@ -59,16 +63,21 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
                 if (!checkTransaction)
                     return this.itty.hasNext();
                 else {
-                    while (this.itty.hasNext()) {
-                        final Relationship relationship = this.itty.next();
-                        try {
-                            relationship.hasProperty(DUMMY_PROPERTY);
-                            this.nextRelationship = relationship;
-                            return true;
-                        } catch (final IllegalStateException e) {
+                    if (null != this.nextRelationship)
+                        return true;
+                    else {
+                        while (this.itty.hasNext()) {
+                            final Relationship relationship = this.itty.next();
+                            try {
+                                relationship.hasProperty(DUMMY_PROPERTY);
+                                this.nextRelationship = relationship;
+                                return true;
+                            } catch (final IllegalStateException e) {
+                            }
                         }
+                        return false;
                     }
-                    return false;
+
                 }
             }
         };

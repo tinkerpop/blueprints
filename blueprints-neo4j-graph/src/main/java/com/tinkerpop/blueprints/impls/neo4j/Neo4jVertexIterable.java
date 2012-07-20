@@ -41,15 +41,19 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
                 if (!checkTransaction) {
                     return new Neo4jVertex(this.itty.next(), graph);
                 } else {
-                    if (null != this.nextNode)
-                        return new Neo4jVertex(this.nextNode, graph);
-                    while (true) {
-                        final Node node = this.itty.next();
-                        try {
-                            node.hasProperty(DUMMY_PROPERTY);
-                            return new Neo4jVertex(node, graph);
-                        } catch (final IllegalStateException e) {
-                            // tried to access a node not available to the transaction
+                    if (null != this.nextNode) {
+                        final Node temp = this.nextNode;
+                        this.nextNode = null;
+                        return new Neo4jVertex(temp, graph);
+                    } else {
+                        while (true) {
+                            final Node node = this.itty.next();
+                            try {
+                                node.hasProperty(DUMMY_PROPERTY);
+                                return new Neo4jVertex(node, graph);
+                            } catch (final IllegalStateException e) {
+                                // tried to access a node not available to the transaction
+                            }
                         }
                     }
                 }
@@ -59,16 +63,20 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
                 if (!checkTransaction)
                     return this.itty.hasNext();
                 else {
-                    while (this.itty.hasNext()) {
-                        final Node node = this.itty.next();
-                        try {
-                            node.hasProperty(DUMMY_PROPERTY);
-                            this.nextNode = node;
-                            return true;
-                        } catch (final IllegalStateException e) {
+                    if (null != this.nextNode)
+                        return true;
+                    else {
+                        while (this.itty.hasNext()) {
+                            final Node node = this.itty.next();
+                            try {
+                                node.hasProperty(DUMMY_PROPERTY);
+                                this.nextNode = node;
+                                return true;
+                            } catch (final IllegalStateException e) {
+                            }
                         }
+                        return false;
                     }
-                    return false;
                 }
             }
         };
