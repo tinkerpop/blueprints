@@ -70,6 +70,8 @@ public class BatchGraphTest extends TestCase {
             edge.setProperty("annotation",quad[3]);
         }
         assertEquals(numEdges,BaseTest.count(graph.getEdges()));
+
+        bgraph.shutdown();
     }
 
     public void testLoadingWithExisting1() {
@@ -94,6 +96,8 @@ public class BatchGraphTest extends TestCase {
             counter++;
         }
         assertEquals(numEdges,BaseTest.count(tg.getEdges()));
+
+        bg.shutdown();
     }
 
     public void testLoadingWithExisting2() {
@@ -128,6 +132,8 @@ public class BatchGraphTest extends TestCase {
             counter++;
         }
         assertEquals(numEdges,BaseTest.count(tg.getEdges()));
+
+        bg.shutdown();
     }
     
     
