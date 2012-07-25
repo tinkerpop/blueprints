@@ -192,11 +192,11 @@ public class GraphTestSuite extends TestSuite {
     }
 
     public void testDataTypeValidationOnProperties() {
-        Graph graph = graphTest.generateGraph();
+        final Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsElementProperties() && !graph.getFeatures().isWrapper) {
-            Vertex vertexA = graph.addVertex(null);
-            Vertex vertexB = graph.addVertex(null);
-            Edge edge = graph.addEdge(null, vertexA, vertexB, convertId(graph, "knows"));
+            final Vertex vertexA = graph.addVertex(null);
+            final Vertex vertexB = graph.addVertex(null);
+            final Edge edge = graph.addEdge(null, vertexA, vertexB, convertId(graph, "knows"));
 
             trySetProperty(vertexA, "keyString", "value", graph.getFeatures().supportsStringProperty);
             trySetProperty(edge, "keyString", "value", graph.getFeatures().supportsStringProperty);
@@ -219,14 +219,17 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyDate", new Date(), graph.getFeatures().supportsSerializableObjectProperty);
             trySetProperty(edge, "keyDate", new Date(), graph.getFeatures().supportsSerializableObjectProperty);
 
-            ArrayList<String> listA = new ArrayList<String>();
+            final ArrayList<String> listA = new ArrayList<String>();
             listA.add("try1");
             listA.add("try2");
 
             trySetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
             trySetProperty(edge, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
 
-            ArrayList listB = new ArrayList();
+            final ArrayList listB = new ArrayList();
+            listB.add("try1");
+            listB.add(2);
+
             trySetProperty(vertexA, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
             trySetProperty(edge, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
 
@@ -255,7 +258,7 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyMap", map, graph.getFeatures().supportsMapProperty);
             trySetProperty(edge, "keyMap", map, graph.getFeatures().supportsMapProperty);
 
-            MockSerializable mockSerializable = new MockSerializable();
+            final MockSerializable mockSerializable = new MockSerializable();
             mockSerializable.setTestField("test");
             trySetProperty(vertexA, "keySerializable", mockSerializable, graph.getFeatures().supportsSerializableObjectProperty);
             trySetProperty(edge, "keySerializable", mockSerializable, graph.getFeatures().supportsSerializableObjectProperty);
