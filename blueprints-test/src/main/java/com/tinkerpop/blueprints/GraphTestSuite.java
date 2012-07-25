@@ -1,10 +1,8 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.MockSerializable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -101,10 +99,10 @@ public class GraphTestSuite extends TestSuite {
             }
             assertEquals(counter, 15);
         }
-        
+
         graph.shutdown();
     }
-    
+
 
     public void testGettingVerticesAndEdgesWithKeyValue() {
         Graph graph = graphTest.generateGraph();
@@ -164,14 +162,16 @@ public class GraphTestSuite extends TestSuite {
         }
         try {
             graph.removeEdge(edge);
-            if (graph.getFeatures().supportsEdgeIteration) {
-                assertEquals(0, count(graph.getEdges()));
-            }
-            if (graph.getFeatures().supportsVertexIteration) {
-                assertEquals(1, count(graph.getVertices()));
-            }
+//TODO: doesn't work with wrapper graphs            assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
+        }
+
+        if (graph.getFeatures().supportsEdgeIteration) {
+            assertEquals(0, count(graph.getEdges()));
+        }
+        if (graph.getFeatures().supportsVertexIteration) {
+            assertEquals(1, count(graph.getVertices()));
         }
 
         graph.shutdown();
