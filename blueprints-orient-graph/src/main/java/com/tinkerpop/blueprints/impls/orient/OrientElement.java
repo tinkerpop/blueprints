@@ -1,8 +1,5 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
 import com.orientechnologies.orient.core.exception.OSerializationException;
@@ -16,6 +13,9 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -38,25 +38,16 @@ abstract class OrientElement implements Element, OSerializableStream, OIdentifia
         if (key.equals(StringFactory.EMPTY_STRING))
             throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
-        //try {
-            this.graph.autoStartTransaction();
-            this.rawElement.field(key, value);
-            this.graph.getRawGraph().save(rawElement);
-        //} catch (Exception e) {
-        //    throw new RuntimeException(e.getMessage(), e);
-        //}
+        this.graph.autoStartTransaction();
+        this.rawElement.field(key, value);
+        this.graph.getRawGraph().save(rawElement);
     }
 
     public Object removeProperty(final String key) {
-        //try {
-            this.graph.autoStartTransaction();
-            final Object oldValue = this.rawElement.removeField(key);
-            this.save();
-            return oldValue;
-
-        //} catch (Exception e) {
-        //    throw new RuntimeException(e.getMessage(), e);
-        //}
+        this.graph.autoStartTransaction();
+        final Object oldValue = this.rawElement.removeField(key);
+        this.save();
+        return oldValue;
     }
 
     public Object getProperty(final String key) {

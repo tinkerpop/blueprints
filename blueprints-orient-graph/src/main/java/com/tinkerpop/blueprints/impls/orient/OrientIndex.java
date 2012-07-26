@@ -1,10 +1,5 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexTxAware;
@@ -23,9 +18,13 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -76,78 +75,74 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             doc.save();
 
         graph.autoStartTransaction();
-        //try {
-            underlying.put(keyTemp, doc);
-        //} catch (Exception e) {
-        //    throw new RuntimeException(e.getMessage(), e);
-        //}
+        underlying.put(keyTemp, doc);
     }
 
     @SuppressWarnings("rawtypes")
     public CloseableIterable<T> get(final String key, final Object iValue) {
         final String keyTemp = key + SEPARATOR + iValue;
         Collection<OIdentifiable> records = null;
-        
+
         // PATCH FOR 1.1.0. REMOVE IT WITH > 1.2.x
-        if( underlying instanceof OIndexTxAware<?>) {
-          try{
-            records = (Collection<OIdentifiable>) underlying.get(keyTemp);
-          } catch( NullPointerException  e ){
-            records = new ArrayList<OIdentifiable>();
-          }
-          
-          final OTransactionIndexChanges indexChanges = graph.getRawGraph().getTransaction().getIndexChanges(underlying.getName());
-          if( indexChanges != null ){
-            if (indexChanges.containsChangesPerKey(keyTemp)) {
-              final OTransactionIndexChangesPerKey value = indexChanges.getChangesPerKey(keyTemp);
-              if (value != null) {
-                for (final OTransactionIndexEntry entry : value.entries) {
-                  if (entry.operation == OPERATION.REMOVE) {
-                    if (entry.value == null) {
-                      // REMOVE THE ENTIRE KEY, SO RESULT SET IS EMPTY
-                      records.clear();
-                      break;
-                    } else
-                      // REMOVE ONLY THIS RID
-                      records.remove(entry.value);
-                  } else if (entry.operation == OPERATION.PUT) {
-                    // ADD ALSO THIS RID
-                    records.add(entry.value);
-                  }
-                }
-              }
+        if (underlying instanceof OIndexTxAware<?>) {
+            try {
+                records = (Collection<OIdentifiable>) underlying.get(keyTemp);
+            } catch (NullPointerException e) {
+                records = new ArrayList<OIdentifiable>();
             }
 
-            if (indexChanges.containsChangesCrossKey()) {
-              final OTransactionIndexChangesPerKey value = indexChanges.getChangesCrossKey();
-              if (value != null) {
-                for (final OTransactionIndexEntry entry : value.entries) {
-                  if (entry.operation == OPERATION.REMOVE) {
-                    if (entry.value == null) {
-                      // REMOVE THE ENTIRE KEY, SO RESULT SET IS EMPTY
-                      records.clear();
-                      break;
-                    } else
-                      // REMOVE ONLY THIS RID
-                      records.remove(entry.value);
-                  } else if (entry.operation == OPERATION.PUT) {
-                    // ADD ALSO THIS RID
-                    records.add(entry.value);
-                  }
+            final OTransactionIndexChanges indexChanges = graph.getRawGraph().getTransaction().getIndexChanges(underlying.getName());
+            if (indexChanges != null) {
+                if (indexChanges.containsChangesPerKey(keyTemp)) {
+                    final OTransactionIndexChangesPerKey value = indexChanges.getChangesPerKey(keyTemp);
+                    if (value != null) {
+                        for (final OTransactionIndexEntry entry : value.entries) {
+                            if (entry.operation == OPERATION.REMOVE) {
+                                if (entry.value == null) {
+                                    // REMOVE THE ENTIRE KEY, SO RESULT SET IS EMPTY
+                                    records.clear();
+                                    break;
+                                } else
+                                    // REMOVE ONLY THIS RID
+                                    records.remove(entry.value);
+                            } else if (entry.operation == OPERATION.PUT) {
+                                // ADD ALSO THIS RID
+                                records.add(entry.value);
+                            }
+                        }
+                    }
                 }
-              }
+
+                if (indexChanges.containsChangesCrossKey()) {
+                    final OTransactionIndexChangesPerKey value = indexChanges.getChangesCrossKey();
+                    if (value != null) {
+                        for (final OTransactionIndexEntry entry : value.entries) {
+                            if (entry.operation == OPERATION.REMOVE) {
+                                if (entry.value == null) {
+                                    // REMOVE THE ENTIRE KEY, SO RESULT SET IS EMPTY
+                                    records.clear();
+                                    break;
+                                } else
+                                    // REMOVE ONLY THIS RID
+                                    records.remove(entry.value);
+                            } else if (entry.operation == OPERATION.PUT) {
+                                // ADD ALSO THIS RID
+                                records.add(entry.value);
+                            }
+                        }
+                    }
+                }
             }
-          }
-          
-          // FILTER THE RESULT SET REMOVING NULL VALUES
-          final Iterator<OIdentifiable> it = records.iterator();
-          while( it.hasNext() )
-          if( it.next() == null )
-              it.remove();
-          
+
+            // FILTER THE RESULT SET REMOVING NULL VALUES
+            final Iterator<OIdentifiable> it = records.iterator();
+            while (it.hasNext())
+                if (it.next() == null)
+                    it.remove();
+
         } else
-          records = (Collection<OIdentifiable>) underlying.get(keyTemp);
-        
+            records = (Collection<OIdentifiable>) underlying.get(keyTemp);
+
         if (records == null || records.isEmpty())
             return new WrappingCloseableIterable(Collections.emptySet());
 
@@ -169,7 +164,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         graph.autoStartTransaction();
         try {
             underlying.remove(keyTemp, element.getRawElement());
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
