@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.orient;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
@@ -14,8 +15,8 @@ import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.tx.OTransactionIndexChanges;
-import com.orientechnologies.orient.core.tx.OTransactionIndexChangesPerKey;
 import com.orientechnologies.orient.core.tx.OTransactionIndexChanges.OPERATION;
+import com.orientechnologies.orient.core.tx.OTransactionIndexChangesPerKey;
 import com.orientechnologies.orient.core.tx.OTransactionIndexChangesPerKey.OTransactionIndexEntry;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
@@ -136,6 +137,13 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
               }
             }
           }
+          
+          // FILTER THE RESULT SET REMOVING NULL VALUES
+          final Iterator<OIdentifiable> it = records.iterator();
+          while( it.hasNext() )
+          if( it.next() == null )
+              it.remove();
+          
         } else
           records = (Collection<OIdentifiable>) underlying.get(keyTemp);
         
