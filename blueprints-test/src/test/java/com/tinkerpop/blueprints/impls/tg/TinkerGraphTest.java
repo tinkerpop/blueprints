@@ -135,4 +135,25 @@ public class TinkerGraphTest extends GraphTest {
 
         graph.shutdown();
     }
+    
+    public void testShutdownStartManyTimes() {
+        deleteDirectory(new File(getDirectory()));
+        TinkerGraph graph = (TinkerGraph) this.generateGraph();
+        for (int i = 0; i < 25; i++) {
+            Vertex a = graph.addVertex(null);
+            Vertex b = graph.addVertex(null);
+            graph.addEdge(null, a, b, "knows");
+        }
+        graph.shutdown();
+        this.stopWatch();
+        int iterations = 250;
+        for(int i=0; i<iterations; i++) {
+            graph = (TinkerGraph) this.generateGraph();
+            assertEquals(50, count(graph.getVertices()));
+            assertEquals(25, count(graph.getEdges()));
+
+            graph.shutdown();
+        }
+        printPerformance(graph.toString(), iterations, "iterations of shutdown and restart", this.stopWatch());
+    }
 }
