@@ -67,7 +67,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     @SuppressWarnings("unchecked")
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         final OrientGraphContext context = getContext(true);
-
+        
+        if( getRawGraph().getTransaction().isActive() )
+          stopTransaction(Conclusion.SUCCESS);
+        
         synchronized (contexts) {
             if (context.manualIndices.containsKey(indexName))
                 throw ExceptionFactory.indexAlreadyExists(indexName);
@@ -113,8 +116,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public void dropIndex(final String indexName) {
-
-        this.autoStartTransaction();
+        if( getRawGraph().getTransaction().isActive() )
+          stopTransaction(Conclusion.SUCCESS);
+  
         try {
             synchronized (contexts) {
                 for (OrientGraphContext ctx : contexts) {
@@ -124,7 +128,6 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
             getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
             saveIndexConfiguration();
-            this.stopTransaction(Conclusion.SUCCESS);
         } catch (Exception e) {
             this.stopTransaction(Conclusion.FAILURE);
             throw new RuntimeException(e.getMessage(), e);
@@ -429,13 +432,21 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
+        if( getRawGraph().getTransaction().isActive() )
+          stopTransaction(Conclusion.SUCCESS);
+  
         final String className = getClassName(elementClass);
         getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
     }
 
     public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass) {
         final String className = getClassName(elementClass);
-        final OClass cls = getRawGraph().getMetadata().getSchema().getClass(className);
+        final OGraphDatabase db = getRawGraph();
+        
+        if( db.getTransaction().isActive() )
+          stopTransaction(Conclusion.SUCCESS);
+        
+        final OClass cls = db.getMetadata().getSchema().getClass(className);
 
         final OType indexType;
         final OProperty property = cls.getProperty(key);
@@ -444,7 +455,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         else
             indexType = property.getType();
 
-        getRawGraph().getMetadata().getIndexManager()
+        db.getMetadata().getIndexManager()
                 .createIndex(className + "." + key, OClass.INDEX_TYPE.NOTUNIQUE.name(), new OPropertyIndexDefinition(className, key, indexType), cls.getPolymorphicClusterIds(), null);
     }
 
