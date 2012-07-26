@@ -28,11 +28,11 @@ public class OrientGraphTest extends GraphTest {
 
     private OrientGraph currentGraph;
 
-    public void testOrientBenchmarkTestSuite() throws Exception {
+    /*public void testOrientBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new OrientBenchmarkTestSuite(this));
         printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
-    }
+    }*/
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -58,11 +58,11 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
+    /*public void testIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new IndexableGraphTestSuite(this));
         printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
+    }*/
 
     public void testIndexTestSuite() throws Exception {
         this.stopWatch();
@@ -76,11 +76,11 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
 
-    public void testTransactionalGraphTestSuite() throws Exception {
+    /*public void testTransactionalGraphTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionGraphTestSuite", this.stopWatch());
-    }
+    }*/
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();

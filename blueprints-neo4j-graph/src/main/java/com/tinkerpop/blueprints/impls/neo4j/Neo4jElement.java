@@ -43,31 +43,18 @@ abstract class Neo4jElement implements Element {
         if (key.equals(StringFactory.EMPTY_STRING))
             throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
-        //try {
-        // attempts to take a collection and convert it to an array so that Neo4j can consume it
         this.graph.autoStartTransaction();
+        // attempts to take a collection and convert it to an array so that Neo4j can consume it
         this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
-        //} catch (IllegalArgumentException iae) {
-        //    throw iae;
-        //} catch (Exception e) {
-        //    throw new RuntimeException(e.getMessage(), e);
-        //}
     }
 
     public Object removeProperty(final String key) {
-        //try {
-
         if (!this.rawElement.hasProperty(key))
             return null;
         else {
             this.graph.autoStartTransaction();
             return this.rawElement.removeProperty(key);
         }
-        //} catch (NotFoundException e) {
-        //   return null;
-        //} catch (Exception e) {
-        //    throw new RuntimeException(e.getMessage(), e);
-        //}
     }
 
     public Set<String> getPropertyKeys() {

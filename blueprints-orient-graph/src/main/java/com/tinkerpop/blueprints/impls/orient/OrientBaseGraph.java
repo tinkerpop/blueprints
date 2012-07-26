@@ -67,10 +67,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     @SuppressWarnings("unchecked")
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         final OrientGraphContext context = getContext(true);
-        
+
         if( getRawGraph().getTransaction().isActive() )
           stopTransaction(Conclusion.SUCCESS);
-        
+
         synchronized (contexts) {
             if (context.manualIndices.containsKey(indexName))
                 throw ExceptionFactory.indexAlreadyExists(indexName);
@@ -118,7 +118,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     public void dropIndex(final String indexName) {
         if( getRawGraph().getTransaction().isActive() )
           stopTransaction(Conclusion.SUCCESS);
-  
+
         try {
             synchronized (contexts) {
                 for (OrientGraphContext ctx : contexts) {
@@ -137,19 +137,19 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     public Vertex addVertex(final Object id) {
         final OGraphDatabase db = getRawGraph();
         this.autoStartTransaction();
-        try {
+        //try {
             final OrientVertex vertex = new OrientVertex(this, db.createVertex(null));
             vertex.save();
             return vertex;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+       // } catch (Exception e) {
+       //     throw new RuntimeException(e.getMessage(), e);
+       // }
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
         final OGraphDatabase db = getRawGraph();
         this.autoStartTransaction();
-        try {
+        //try {
             final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement());
             final OrientEdge edge = new OrientEdge(this, edgeDoc, label);
 
@@ -158,9 +158,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             db.save(((OrientVertex) inVertex).getRawElement());
             edge.save();
             return edge;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        //} catch (Exception e) {
+        //    throw new RuntimeException(e.getMessage(), e);
+        //}
     }
 
     public Vertex getVertex(final Object id) {
@@ -197,7 +197,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             return;
 
         this.autoStartTransaction();
-        try {
+        //try {
             final Set<Edge> allEdges = new HashSet<Edge>();
             for (Edge e : oVertex.getEdges(Direction.BOTH))
                 allEdges.add(e);
@@ -218,9 +218,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             }
 
             getRawGraph().removeVertex(oVertex.rawElement);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+       // } catch (Exception e) {
+       //     throw new RuntimeException(e.getMessage(), e);
+       // }
     }
 
     public Iterable<Vertex> getVertices() {
@@ -293,7 +293,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             return;
 
         this.autoStartTransaction();
-        try {
+        //try {
             for (final Index<? extends Element> index : this.getManualIndices()) {
                 if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                     @SuppressWarnings("unchecked")
@@ -303,9 +303,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             }
 
             getRawGraph().removeEdge(oEdge.rawElement);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+       // } catch (Exception e) {
+       //     throw new RuntimeException(e.getMessage(), e);
+       // }
     }
 
     /**
@@ -434,7 +434,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
         if( getRawGraph().getTransaction().isActive() )
           stopTransaction(Conclusion.SUCCESS);
-  
+
         final String className = getClassName(elementClass);
         getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
     }
@@ -442,10 +442,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass) {
         final String className = getClassName(elementClass);
         final OGraphDatabase db = getRawGraph();
-        
+
         if( db.getTransaction().isActive() )
           stopTransaction(Conclusion.SUCCESS);
-        
+
         final OClass cls = db.getMetadata().getSchema().getClass(className);
 
         final OType indexType;

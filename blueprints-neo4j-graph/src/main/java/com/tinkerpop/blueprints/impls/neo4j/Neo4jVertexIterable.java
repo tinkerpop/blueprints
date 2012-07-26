@@ -16,7 +16,7 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
     private final Iterable<Node> nodes;
     private final Neo4jGraph graph;
     private final boolean checkTransaction;
-    private final String DUMMY_PROPERTY = "a";
+    private static final String DUMMY_PROPERTY = "a";
 
     public Neo4jVertexIterable(final Iterable<Node> nodes, final Neo4jGraph graph, final boolean checkTransaction) {
         this.graph = graph;

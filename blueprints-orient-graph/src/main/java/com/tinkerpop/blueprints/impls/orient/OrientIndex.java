@@ -22,6 +22,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 
@@ -74,11 +75,11 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
             doc.save();
 
         graph.autoStartTransaction();
-        try {
+        //try {
             underlying.put(keyTemp, doc);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        //} catch (Exception e) {
+        //    throw new RuntimeException(e.getMessage(), e);
+        //}
     }
 
     @SuppressWarnings("rawtypes")
@@ -160,7 +161,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         graph.autoStartTransaction();
         try {
             underlying.remove(keyTemp, element.getRawElement());
-        } catch (Exception e) {
+        }catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }

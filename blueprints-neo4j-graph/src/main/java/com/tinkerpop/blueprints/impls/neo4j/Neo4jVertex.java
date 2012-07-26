@@ -83,8 +83,6 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
                 itty = node.getRelationships(direction).iterator();
 
             return new Iterator<Neo4jVertex>() {
-
-
                 public Neo4jVertex next() {
                     return new Neo4jVertex(itty.next().getOtherNode(node), graph);
                 }
@@ -125,8 +123,6 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
                 itty = node.getRelationships(direction).iterator();
 
             return new Iterator<Neo4jEdge>() {
-
-
                 public Neo4jEdge next() {
                     return new Neo4jEdge(itty.next(), graph);
                 }

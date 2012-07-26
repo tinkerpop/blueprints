@@ -16,7 +16,7 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
     private final Iterable<Relationship> relationships;
     private final Neo4jGraph graph;
     private final boolean checkTransaction;
-    private final String DUMMY_PROPERTY = "a";
+    private static final String DUMMY_PROPERTY = "a";
 
     public Neo4jEdgeIterable(final Iterable<Relationship> relationships, final Neo4jGraph graph, final boolean checkTransaction) {
         this.relationships = relationships;

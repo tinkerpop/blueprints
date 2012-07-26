@@ -38,25 +38,25 @@ abstract class OrientElement implements Element, OSerializableStream, OIdentifia
         if (key.equals(StringFactory.EMPTY_STRING))
             throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
-        try {
+        //try {
             this.graph.autoStartTransaction();
             this.rawElement.field(key, value);
             this.graph.getRawGraph().save(rawElement);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        //} catch (Exception e) {
+        //    throw new RuntimeException(e.getMessage(), e);
+        //}
     }
 
     public Object removeProperty(final String key) {
-        try {
+        //try {
             this.graph.autoStartTransaction();
             final Object oldValue = this.rawElement.removeField(key);
             this.save();
             return oldValue;
 
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        //} catch (Exception e) {
+        //    throw new RuntimeException(e.getMessage(), e);
+        //}
     }
 
     public Object getProperty(final String key) {

@@ -336,7 +336,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     public void shutdown() {
         if (null != this.directory) {
             try {
-                File file = new File(this.directory + GRAPH_FILE);
+                final File file = new File(this.directory + GRAPH_FILE);
                 if (file.exists()) {
                     file.delete();
                 }
