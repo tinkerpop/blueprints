@@ -334,7 +334,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     public Iterable<Vertex> getVertices(final String key, final Object value) {
         final AutoIndexer indexer = this.rawGraph.index().getNodeAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
-            return new Neo4jVertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this);
+            return new Neo4jVertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this, this.checkElementsInTransaction());
         else
             return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
     }
@@ -356,7 +356,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     public Iterable<Edge> getEdges(final String key, final Object value) {
         final AutoIndexer indexer = this.rawGraph.index().getRelationshipAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
-            return new Neo4jEdgeIterable(this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndex().get(key, value), this);
+            return new Neo4jEdgeIterable(this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndex().get(key, value), this, this.checkElementsInTransaction());
         else
             return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
