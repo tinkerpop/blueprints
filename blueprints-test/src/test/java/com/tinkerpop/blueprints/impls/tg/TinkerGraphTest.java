@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.impls.tg;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
@@ -16,6 +17,7 @@ import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -134,5 +136,34 @@ public class TinkerGraphTest extends GraphTest {
         assertEquals(0, count(graph.getEdges()));
 
         graph.shutdown();
+    }
+
+    public void testShutdownStartManyTimes() {
+        deleteDirectory(new File(getDirectory()));
+        TinkerGraph graph = (TinkerGraph) this.generateGraph();
+        for (int i = 0; i < 25; i++) {
+            Vertex a = graph.addVertex(null);
+            a.setProperty("name", "a" + UUID.randomUUID());
+            Vertex b = graph.addVertex(null);
+            b.setProperty("name", "b" + UUID.randomUUID());
+            graph.addEdge(null, a, b, "knows").setProperty("weight", 1);
+        }
+        graph.shutdown();
+        this.stopWatch();
+        int iterations = 150;
+        for (int i = 0; i < iterations; i++) {
+            graph = (TinkerGraph) this.generateGraph();
+            assertEquals(50, count(graph.getVertices()));
+            for (final Vertex v : graph.getVertices()) {
+                assertTrue(v.getProperty("name").toString().startsWith("a") || v.getProperty("name").toString().startsWith("b"));
+            }
+            assertEquals(25, count(graph.getEdges()));
+            for (final Edge e : graph.getEdges()) {
+                assertEquals(e.getProperty("weight"), 1);
+            }
+
+            graph.shutdown();
+        }
+        printPerformance(graph.toString(), iterations, "iterations of shutdown and restart", this.stopWatch());
     }
 }

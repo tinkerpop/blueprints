@@ -27,6 +27,8 @@ h3. Version 2.1.0 (NOT OFFICIALLY RELEASED YET)
 * Update @RexsterGraph@ to utilize Vertex Query API of Rexster.
 * Renaming of GraphSONFactory to GraphSONUtility and various method renaming within that class.
 * Fixed an iterable consistency issue in @Neo4jGraph@
+* Removed unneeded Exception catching in both @Neo4jGraph@ and @OrientGraph@
+* Bumped to support Orient 1.1.0
 
 ==<hr/>==
 

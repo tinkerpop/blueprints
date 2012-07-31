@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 
@@ -44,25 +43,17 @@ abstract class Neo4jElement implements Element {
         if (key.equals(StringFactory.EMPTY_STRING))
             throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
-        try {
-            // attempts to take a collection and convert it to an array so that Neo4j can consume it
-            this.graph.autoStartTransaction();
-            this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
-        } catch (IllegalArgumentException iae) {
-            throw iae;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        this.graph.autoStartTransaction();
+        // attempts to take a collection and convert it to an array so that Neo4j can consume it
+        this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
     }
 
     public Object removeProperty(final String key) {
-        try {
+        if (!this.rawElement.hasProperty(key))
+            return null;
+        else {
             this.graph.autoStartTransaction();
             return this.rawElement.removeProperty(key);
-        } catch (NotFoundException e) {
-            return null;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
         }
     }
 
@@ -111,7 +102,7 @@ abstract class Neo4jElement implements Element {
                     array[i] = object;
                 }
                 return array;
-            } catch (ArrayStoreException ase) {
+            } catch (final ArrayStoreException ase) {
                 // this fires off if the collection is not all of the same type
                 return value;
             }
