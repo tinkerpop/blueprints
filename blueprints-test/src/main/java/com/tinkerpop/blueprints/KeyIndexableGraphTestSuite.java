@@ -209,7 +209,6 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    /*
     public void testKeyIndicesConsistentWithElementRemoval() throws Exception {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
 
@@ -224,5 +223,5 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         assertEquals(0, count(graph.getVertices("foo", 42)));
 
         graph.shutdown();
-    }*/
+    }
 }
