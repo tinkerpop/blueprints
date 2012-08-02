@@ -32,6 +32,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     public static final String ID = "__id";
 
     private final T baseGraph;
+
     private final IdFactory vertexIdFactory;
     private final IdFactory edgeIdFactory;
 
@@ -80,6 +81,14 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         this.edgeIdFactory = null == edgeIdFactory ? new DefaultIdFactory() : edgeIdFactory;
 
         createIndices();
+    }
+
+    public IdFactory getVertexIdFactory() {
+        return vertexIdFactory;
+    }
+
+    public IdFactory getEdgeIdFactory() {
+        return edgeIdFactory;
     }
 
     private void createIndices() {
