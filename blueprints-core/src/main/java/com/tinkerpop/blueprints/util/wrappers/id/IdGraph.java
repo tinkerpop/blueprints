@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
@@ -25,7 +26,7 @@ import java.util.UUID;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, WrapperGraph<T>, IndexableGraph {
+public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, WrapperGraph<T>, IndexableGraph, TransactionalGraph {
 
     // Note: using "__id" instead of "_id" avoids collision with Rexster's "_id"
     public static final String ID = "__id";
@@ -206,6 +207,14 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
             return new IdEdgeIterable(baseGraph.getEdges(key, value));
+        }
+    }
+
+    public void stopTransaction(Conclusion conclusion) {
+        if (baseGraph instanceof TransactionalGraph) {
+            ((TransactionalGraph) baseGraph).stopTransaction(conclusion);
+        } else {
+            throw new IllegalStateException("base graph is not an instance of TransactionalGraph");
         }
     }
 
