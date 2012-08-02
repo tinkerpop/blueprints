@@ -219,11 +219,10 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         }
     }
 
+    // Note: this is a no-op if the base graph is not an instance of TransactionalGraph
     public void stopTransaction(Conclusion conclusion) {
         if (baseGraph instanceof TransactionalGraph) {
             ((TransactionalGraph) baseGraph).stopTransaction(conclusion);
-        } else {
-            throw new IllegalStateException("base graph is not an instance of TransactionalGraph");
         }
     }
 
