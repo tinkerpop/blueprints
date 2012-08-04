@@ -1,0 +1,62 @@
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4jbatch-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new Neo4jBatchGraph("/tmp/neo4j");
+// do your batch insertion
+graph.shutdown();
+graph = new Neo4jGraph("/tmp/neo4j");
+```
+
+@Neo4jBatchGraph@ provides support for the bulk insertion of data into a "Neo4j":http://neo4j.org graph. This Blueprints implementation is single-threaded and non-transactional. It is meant for initial dumps of raw data into a Neo4j graph and is much faster than doing the equivalent process using @Neo4jGraph@ (see [[Neo4j Implementation]]).
+
+*Note*: This is not a pure Blueprints implementation.  Consider the following issues when using @Neo4jBatchGraph@:
+
+# Delete methods (except for @Element.removeProperty()@) are not supported.
+# Key indices are not available until after the graph has been shutdown.
+
+Unlike @Neo4jGraph@, and like @TinkerGraph@, @Neo4jBatchGraph@ can accept a @long@ id on vertex creation:
+
+```java
+long id = 1L;
+graph.addVertex(id)
+```
+
+When utilizing @Neo4jBatchGraph@ it is important to make use of the @flush@ method on @Neo4jBatchIndex@. This method must be called before querying the index for data to ensure that it returns results consistently. This method is not a standard @Index@ API method and thus, be sure to typecast the index to @Neo4jBatchIndex@.  Note that calling @flush@ (and using indices in general) has a noticeable impact on the performance when writing to the graph. Finally, see @Neo4jBatchGraph.flushIndices()@ for flushing all indices at once.
+
+h2. Neo4jBatchGraph Feature List
+
+```
+supportsDuplicateEdges: true
+supportsSelfLoops: true
+supportsSerializableObjectProperty: false
+supportsBooleanProperty: true
+supportsDoubleProperty: true
+supportsFloatProperty: true
+supportsIntegerProperty: true
+supportsPrimitiveArrayProperty: true
+supportsUniformListProperty: true
+supportsMixedListProperty: false
+supportsLongProperty: true
+supportsMapProperty: false
+supportsStringProperty: true
+ignoresSuppliedIds: false
+isPersistent: true
+isRDFModel: false
+isWrapper: false
+supportsIndices: true
+supportsVertexIndex: true
+supportsEdgeIndex: true
+supportsKeyIndices: true
+supportsVertexKeyIndex: true
+supportsEdgeKeyIndex: true
+supportsEdgeIteration: false
+supportsVertexIteration: false
+supportsTransactions: false
+supportsThreadedTransactions: false
+```

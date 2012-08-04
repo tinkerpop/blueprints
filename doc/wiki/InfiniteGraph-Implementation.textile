@@ -1,0 +1,7 @@
+!https://download.infinitegraph.com/images/Objy-InfiniteGraph-with-slogan_Brandmark.png!
+
+"InfiniteGraph":http://www.infinitegraph.com/ is a distributed graph database that provides an implementation of the Blueprints API. This implementation is not distributed with Blueprints, but instead, with InfiniteGraph. The InfiniteGraph implementation may not be completely faithful to the Blueprints API. Please see this "Wiki Page":http://wiki.infinitegraph.com/2.1/w/index.php?title=Understanding_InfiniteGraph_Blueprints_Capabilities_and_Limitations for known limitations.
+
+```java
+Graph graph = new IGGraph("myGraph.boot")
+```

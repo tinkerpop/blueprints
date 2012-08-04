@@ -1,0 +1,63 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/orientdb-logo.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-orient-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new OrientGraph("local:/tmp/orient");
+```
+
+"Orient Technologies":http://www.orientechnologies.com/ are the developers of "OrientDB":http://www.orientechnologies.com/orient-db.htm.
+
+h2. OrientGraph Feature List
+
+```
+supportsDuplicateEdges: true
+supportsSelfLoops: true
+supportsSerializableObjectProperty: true
+supportsBooleanProperty: true
+supportsDoubleProperty: true
+supportsFloatProperty: true
+supportsIntegerProperty: true
+supportsPrimitiveArrayProperty: true
+supportsUniformListProperty: true
+supportsMixedListProperty: true
+supportsLongProperty: true
+supportsMapProperty: true
+supportsStringProperty: true
+ignoresSuppliedIds: true
+isPersistent: true
+isRDFModel: false
+isWrapper: false
+supportsIndices: true
+supportsVertexIndex: true
+supportsEdgeIndex: true
+supportsKeyIndices: true
+supportsVertexKeyIndex: true
+supportsEdgeKeyIndex: true
+supportsEdgeIteration: true
+supportsVertexIteration: true
+supportsTransactions: true
+supportsThreadedTransactions: false
+```
+
+h2. Notes on Caching and Concurrency
+
+By default, "OrientDB keeps a per-database instance cache":http://code.google.com/p/orient/wiki/Caching of vertices and their properties. This can cause issues with concurrent access to the database where different threads will receive inconsistent results when querying the database after writes.
+
+A way around this is to disable OrientDB's L1 cache. This option can slow performance when doing certain graph operations. You can do this in code, before you create your graph with:
+
+```java
+OGlobalConfiguration.CACHE_LEVEL1_ENABLED.setValue(false);
+```
+
+A more fine grained option is to have Orient force reload vertices when appropriate using ODocument's reload() command:
+
+```java
+((ODocument)((OrientVertex)vertex).getRawElement()).reload();
+```

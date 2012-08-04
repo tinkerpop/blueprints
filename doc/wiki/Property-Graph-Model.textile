@@ -1,0 +1,25 @@
+[[https://github.com/tinkerpop/blueprints/raw/master/doc/images/graph-example-1.jpg|height=486px]]
+
+Blueprints provides a set of interfaces for the property graph data model. An example instance is diagrammed above. In order to make a data management system "Blueprints-enabled," the Blueprints interfaces must be implemented. However, note that there are various @Graph@ interfaces, each with different types of functionality. For example, if an application only needs a @Graph@, then a @TransactionalGraph@ implementation is not required of the underlying graph.
+
+The following diagram identifies the names of the different components of a @Graph@. In general, these are the basic components of a property graph.
+
+* *Graph*: An object that contains vertices and edges.
+** *Element*: An object that can have any number of key/value pairs associated with it (i.e. properties)
+*** *Vertex*: An object that has incoming and outgoing edges.
+*** *Edge*: An object that has a tail and head vertex.
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/property-graph-model.jpg!
+
+A property graph has these elements:
+  # a set of vertices
+  ** each vertex has a unique identifier.
+  ** each vertex has a set of outgoing edges.
+  ** each vertex has a set of incoming edges.
+  ** each vertex has a collection of properties defined by a map from key to value.
+  # a set of edges
+  ** each edge has a unique identifier.
+  ** each edge has an outgoing tail vertex.
+  ** each edge has an incoming head vertex.
+  ** each edge has a label that denotes the type of relationship between its two vertices.
+  ** each edge has a collection of properties defined by a map from key to value.
