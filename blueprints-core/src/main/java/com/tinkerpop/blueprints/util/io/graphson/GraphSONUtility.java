@@ -17,6 +17,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,8 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Helps write graph elements to TinkerPop JSON format. Contains methods to support both Jackson and Jettison
- * for JSON processing.
+ * Helps write individual graph elements to TinkerPop JSON format known as GraphSON.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
@@ -41,14 +41,27 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
      *
-     * @param json a single vertex in GraphSON format
+     * @param json a single vertex in GraphSON format as Jettison JSONObject
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
      * @param ignoreKeys a list of keys to ignore on reading of element properties
      */
     public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final boolean hasEmbeddedTypes,
-                                        final Set<String> ignoreKeys) throws IOException{
-        final JsonParser jp = jsonFactory.createJsonParser(json.toString());
+                                        final Set<String> ignoreKeys) throws IOException {
+        return vertexFromJson(json.toString(), factory, hasEmbeddedTypes, ignoreKeys);
+    }
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param json a single vertex in GraphSON format as a String.
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     */
+    public static Vertex vertexFromJson(final String json, final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                        final Set<String> ignoreKeys) throws IOException {
+        final JsonParser jp = jsonFactory.createJsonParser(json);
         final JsonNode node = jp.readValueAsTree();
         return vertexFromJson(node, factory, hasEmbeddedTypes, ignoreKeys);
     }
@@ -56,7 +69,22 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
      *
-     * @param node a single vertex in GraphSON format
+     * @param json a single vertex in GraphSON format as an InputStream.
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     */
+    public static Vertex vertexFromJson(final InputStream json, final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                        final Set<String> ignoreKeys) throws IOException {
+        final JsonParser jp = jsonFactory.createJsonParser(json);
+        final JsonNode node = jp.readValueAsTree();
+        return vertexFromJson(node, factory, hasEmbeddedTypes, ignoreKeys);
+    }
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param node a single vertex in GraphSON format as Jackson JsonNode
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
      * @param ignoreKeys a list of keys to ignore on reading of element properties
@@ -81,7 +109,7 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
      *
-     * @param json a single edge in GraphSON format
+     * @param json a single edge in GraphSON format as a Jettison JSONObject
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
      * @param ignoreKeys a list of keys to ignore on reading of element properties
@@ -89,7 +117,21 @@ public final class GraphSONUtility {
     public static Edge edgeFromJSON(final JSONObject json, final Vertex out, final Vertex in,
                                 final ElementFactory factory, final boolean hasEmbeddedTypes,
                                 final Set<String> ignoreKeys)  throws IOException {
-        final JsonParser jp = jsonFactory.createJsonParser(json.toString());
+        return edgeFromJSON(json.toString(), out, in, factory, hasEmbeddedTypes, ignoreKeys);
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param json a single edge in GraphSON format as a String
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     */
+    public static Edge edgeFromJSON(final String json, final Vertex out, final Vertex in,
+                                    final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                    final Set<String> ignoreKeys)  throws IOException {
+        final JsonParser jp = jsonFactory.createJsonParser(json);
         final JsonNode node = jp.readValueAsTree();
         return edgeFromJSON(node, out, in, factory, hasEmbeddedTypes, ignoreKeys);
     }
@@ -97,7 +139,23 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
      *
-     * @param node a single edge in GraphSON format
+     * @param json a single edge in GraphSON format as an InputStream
+     * @param factory the factory responsible for constructing graph elements
+     * @param hasEmbeddedTypes the GraphSON has embedded types
+     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     */
+    public static Edge edgeFromJSON(final InputStream json, final Vertex out, final Vertex in,
+                                    final ElementFactory factory, final boolean hasEmbeddedTypes,
+                                    final Set<String> ignoreKeys)  throws IOException {
+        final JsonParser jp = jsonFactory.createJsonParser(json);
+        final JsonNode node = jp.readValueAsTree();
+        return edgeFromJSON(node, out, in, factory, hasEmbeddedTypes, ignoreKeys);
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param node a single edge in GraphSON format as a Jackson JsonNode
      * @param factory the factory responsible for constructing graph elements
      * @param hasEmbeddedTypes the GraphSON has embedded types
      * @param ignoreKeys a list of keys to ignore on reading of element properties

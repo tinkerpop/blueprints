@@ -5,7 +5,8 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
- * The standard factory used for most graph element creation.
+ * The standard factory used for most graph element creation.  It uses an actual
+ * Graph implementation to construct vertices and edges
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
