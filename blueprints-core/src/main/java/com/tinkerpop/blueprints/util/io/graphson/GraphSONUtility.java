@@ -198,19 +198,28 @@ public final class GraphSONUtility {
      * @param showTypes    Data types are written to the JSON explicitly if true.
      */
     public static JSONObject jsonFromElement(final Element element, final List<String> propertyKeys, final boolean showTypes) throws JSONException {
-        ObjectNode objectNode = objectNodeFromElement(element, propertyKeys, showTypes);
+        return jsonFromElement(element, propertyKeys, showTypes, false);
+    }
 
-        JSONObject jsonObject = null;
+        /**
+        * Creates a Jettison JSONObject from a graph element.
+        *
+        * @param element      the graph element to convert to JSON.
+        * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
+        * @param showTypes    Data types are written to the JSON explicitly if true.
+        * @param compact      True if the type of graph element is not needed in the output and false otherwise.
+        */
+    public static JSONObject jsonFromElement(final Element element, final List<String> propertyKeys,
+                                             final boolean showTypes, final boolean compact) throws JSONException {
+        final ObjectNode objectNode = objectNodeFromElement(element, propertyKeys, showTypes, compact);
 
         try {
-            jsonObject = new JSONObject(new JSONTokener(mapper.writeValueAsString(objectNode)));
+            return new JSONObject(new JSONTokener(mapper.writeValueAsString(objectNode)));
         } catch (IOException ioe) {
             // repackage this as a JSONException...seems sensible as the caller will only know about
             // the jettison object not being created
             throw new JSONException(ioe);
         }
-
-        return jsonObject;
     }
 
     /**
@@ -221,7 +230,6 @@ public final class GraphSONUtility {
     public static ObjectNode objectNodeFromElement(final Element element) {
         return objectNodeFromElement(element, null, false);
     }
-
     /**
      * Creates a Jackson ObjectNode from a graph element.
      *
@@ -230,20 +238,39 @@ public final class GraphSONUtility {
      * @param showTypes    Data types are written to the JSON explicitly if true.
      */
     public static ObjectNode objectNodeFromElement(final Element element, final List<String> propertyKeys, final boolean showTypes) {
+        return objectNodeFromElement(element, propertyKeys, showTypes, false);
+    }
 
-        ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
+    /**
+     * Creates a Jackson ObjectNode from a graph element.
+     *
+     * @param element      the graph element to convert to JSON.
+     * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
+     * @param showTypes    Data types are written to the JSON explicitly if true.
+     * @param compact      True if the type of graph element is not needed in the output and false otherwise.
+     */
+    public static ObjectNode objectNodeFromElement(final Element element, final List<String> propertyKeys,
+                                                   final boolean showTypes, final boolean compact) {
+
+        final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
         putObject(jsonElement, GraphSONTokens._ID, element.getId());
 
         // it's important to keep the order of these straight.  check Edge first and then Vertex because there
         // are graph implementations that have Edge extend from Vertex
         if (element instanceof Edge) {
             final Edge edge = (Edge) element;
-            jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
+
+            if (!compact) {
+                jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
+            }
+
             putObject(jsonElement, GraphSONTokens._OUT_V, edge.getVertex(Direction.OUT).getId());
             putObject(jsonElement, GraphSONTokens._IN_V, edge.getVertex(Direction.IN).getId());
             jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
         } else if (element instanceof Vertex) {
-            jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
+            if (!compact) {
+                jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
+            }
         }
 
         return jsonElement;

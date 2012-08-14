@@ -72,6 +72,19 @@ public class GraphSONUtilityTest {
     }
 
     @Test
+    public void jsonFromElementEdgeCompact() throws JSONException {
+        Vertex v1 = this.graph.addVertex(1);
+        Vertex v2 = this.graph.addVertex(2);
+
+        Edge e = this.graph.addEdge(3, v1, v2, "test");
+
+        JSONObject json = GraphSONUtility.jsonFromElement(e, null, false, true);
+
+        Assert.assertNotNull(json);
+        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
+    }
+
+    @Test
     public void jsonFromElementVertexNoPropertiesNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
@@ -82,6 +95,16 @@ public class GraphSONUtilityTest {
         Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has(GraphSONTokens._TYPE));
         Assert.assertEquals("vertex", json.optString(GraphSONTokens._TYPE));
+    }
+
+    @Test
+    public void jsonFromElementVertexCompact() throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, false, true);
+
+        Assert.assertNotNull(json);
+        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
     }
 
     @Test
