@@ -5,7 +5,7 @@ h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
-h3. Version 2.2.0 (NOT OFFICIALLY RELEASED)
+h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
@@ -14,6 +14,8 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED)
   <version>2.2.0-SNAPSHOT</version>
 </dependency>
 ```
+
+* Refactoring of @GraphSONUtility@ and related reader/writer classes to improve performance and offer more control over how GraphSON is read and written.
 
 h3. Version 2.1.0 (August 4, 2012)
 
