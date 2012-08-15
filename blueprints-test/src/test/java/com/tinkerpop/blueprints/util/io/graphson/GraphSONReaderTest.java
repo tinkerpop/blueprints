@@ -20,10 +20,10 @@ import java.util.Map;
 public class GraphSONReaderTest {
 
     @Test
-    public void inputGraphWithTypes() throws IOException {
+    public void inputGraphModeExtended() throws IOException {
         TinkerGraph graph = new TinkerGraph();
 
-        String json = "{ \"embeddedTypes\":true, \"vertices\": [ {\"_id\":1, \"test\": { \"type\":\"string\", \"value\":\"please work\"}, \"testlist\":{\"type\":\"list\", \"value\":[{\"type\":\"int\", \"value\":1}, {\"type\":\"int\",\"value\":2}, {\"type\":\"int\",\"value\":3}, {\"type\":\"unknown\",\"value\":null}]}, \"testmap\":{\"type\":\"map\", \"value\":{\"big\":{\"type\":\"long\", \"value\":10000000000}, \"small\":{\"type\":\"double\", \"value\":0.4954959595959}, \"nullKey\":{\"type\":\"unknown\", \"value\":null}}}}, {\"_id\":2, \"testagain\":{\"type\":\"string\", \"value\":\"please work again\"}}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": {\"type\":\"string\", \"value\":\"please worke\"}, \"keyNull\":{\"type\":\"unknown\", \"value\":null}}]}";
+        String json = "{ \"mode\":\"EXTENDED\", \"vertices\": [ {\"_id\":1, \"_type\":\"vertex\", \"test\": { \"type\":\"string\", \"value\":\"please work\"}, \"testlist\":{\"type\":\"list\", \"value\":[{\"type\":\"int\", \"value\":1}, {\"type\":\"int\",\"value\":2}, {\"type\":\"int\",\"value\":3}, {\"type\":\"unknown\",\"value\":null}]}, \"testmap\":{\"type\":\"map\", \"value\":{\"big\":{\"type\":\"long\", \"value\":10000000000}, \"small\":{\"type\":\"double\", \"value\":0.4954959595959}, \"nullKey\":{\"type\":\"unknown\", \"value\":null}}}}, {\"_id\":2, \"_type\":\"vertex\", \"testagain\":{\"type\":\"string\", \"value\":\"please work again\"}}], \"edges\":[{\"_id\":100, \"_type\":\"edge\", \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": {\"type\":\"string\", \"value\":\"please worke\"}, \"keyNull\":{\"type\":\"unknown\", \"value\":null}}]}";
 
         byte[] bytes = json.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
@@ -71,10 +71,61 @@ public class GraphSONReaderTest {
     }
 
     @Test
-    public void inputGraphNoTypes() throws IOException {
+    public void inputGraphModeNormal() throws IOException {
         TinkerGraph graph = new TinkerGraph();
 
-        String json = "{ \"vertices\": [ {\"_id\":1, \"test\": \"please work\", \"testlist\":[1, 2, 3, null], \"testmap\":{\"big\":10000000000, \"small\":0.4954959595959, \"nullKey\":null}}, {\"_id\":2, \"testagain\":\"please work again\"}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": \"please worke\", \"keyNull\":null}]}";
+        String json = "{ \"mode\":\"NORMAL\",\"vertices\": [ {\"_id\":1, \"_type\":\"vertex\", \"test\": \"please work\", \"testlist\":[1, 2, 3, null], \"testmap\":{\"big\":10000000000, \"small\":0.4954959595959, \"nullKey\":null}}, {\"_id\":2, \"_type\":\"vertex\", \"testagain\":\"please work again\"}], \"edges\":[{\"_id\":100, \"_type\":\"edge\", \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": \"please worke\", \"keyNull\":null}]}";
+
+        byte[] bytes = json.getBytes();
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+
+        GraphSONReader.inputGraph(graph, inputStream);
+
+        Assert.assertEquals(2, getIterableCount(graph.getVertices()));
+        Assert.assertEquals(1, getIterableCount(graph.getEdges()));
+
+        Vertex v1 = graph.getVertex(1);
+        Assert.assertNotNull(v1);
+        Assert.assertEquals("please work", v1.getProperty("test"));
+
+        Map map = (Map) v1.getProperty("testmap");
+        Assert.assertNotNull(map);
+        Assert.assertEquals(10000000000l, Long.parseLong(map.get("big").toString()));
+        Assert.assertEquals(0.4954959595959, Double.parseDouble(map.get("small").toString()), 0);
+        Assert.assertNull(map.get("nullKey"));
+
+        List list = (List) v1.getProperty("testlist");
+        Assert.assertEquals(4, list.size());
+
+        boolean foundNull = false;
+        for (int ix = 0; ix < list.size(); ix++) {
+            if (list.get(ix) == null) {
+                foundNull = true;
+                break;
+            }
+        }
+
+        Assert.assertTrue(foundNull);
+
+        Vertex v2 = graph.getVertex(2);
+        Assert.assertNotNull(v2);
+        Assert.assertEquals("please work again", v2.getProperty("testagain"));
+
+        Edge e = graph.getEdge(100);
+        Assert.assertNotNull(e);
+        Assert.assertEquals("works", e.getLabel());
+        Assert.assertEquals(v1, e.getVertex(Direction.OUT));
+        Assert.assertEquals(v2, e.getVertex(Direction.IN));
+        Assert.assertEquals("please worke", e.getProperty("teste"));
+        Assert.assertNull(e.getProperty("keyNull"));
+
+    }
+
+    @Test
+    public void inputGraphModeCompact() throws IOException {
+        TinkerGraph graph = new TinkerGraph();
+
+        String json = "{ \"mode\":\"COMPACT\",\"vertices\": [ {\"_id\":1, \"test\": \"please work\", \"testlist\":[1, 2, 3, null], \"testmap\":{\"big\":10000000000, \"small\":0.4954959595959, \"nullKey\":null}}, {\"_id\":2, \"testagain\":\"please work again\"}], \"edges\":[{\"_id\":100, \"_outV\":1, \"_inV\":2, \"_label\":\"works\", \"teste\": \"please worke\", \"keyNull\":null}]}";
 
         byte[] bytes = json.getBytes();
         InputStream inputStream = new ByteArrayInputStream(bytes);
@@ -128,7 +179,7 @@ public class GraphSONReaderTest {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
         GraphSONWriter writer = new GraphSONWriter(graph);
-        writer.outputGraph(stream, null, null, true);
+        writer.outputGraph(stream, null, null, GraphSONMode.EXTENDED);
 
         stream.flush();
         stream.close();

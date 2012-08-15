@@ -18,6 +18,7 @@ import java.util.List;
  * @author Stephen Mallette
  */
 public class GraphSONWriter {
+    private static final JsonFactory jsonFactory = new MappingJsonFactory();
     private final Graph graph;
 
     /**
@@ -33,30 +34,27 @@ public class GraphSONWriter {
      * @param jsonOutputStream   the JSON OutputStream to write the Graph data to
      * @param edgePropertyKeys   the keys of the edge elements to write to JSON
      * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
-     * @param showTypes          determines if types are written explicitly to the JSON
+     * @param mode               determines the format of the GraphSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
-    public void outputGraph(final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys, final boolean showTypes) throws IOException {
-
-        JsonFactory jsonFactory = new MappingJsonFactory();
-        JsonGenerator jg = jsonFactory.createJsonGenerator(jsonOutputStream);
+    public void outputGraph(final OutputStream jsonOutputStream, final List<String> edgePropertyKeys,
+                            final List<String> vertexPropertyKeys, final GraphSONMode mode) throws IOException {
+        final JsonGenerator jg = jsonFactory.createJsonGenerator(jsonOutputStream);
 
         jg.writeStartObject();
 
-        if (showTypes) {
-            jg.writeBooleanField(GraphSONTokens.EMBEDDED_TYPES, showTypes);
-        }
+        jg.writeStringField(GraphSONTokens.MODE, mode.toString());
 
         jg.writeArrayFieldStart(GraphSONTokens.VERTICES);
         for (Vertex v : this.graph.getVertices()) {
-            jg.writeTree(GraphSONUtility.objectNodeFromElement(v, vertexPropertyKeys, showTypes));
+            jg.writeTree(GraphSONUtility.objectNodeFromElement(v, vertexPropertyKeys, mode));
         }
 
         jg.writeEndArray();
 
         jg.writeArrayFieldStart(GraphSONTokens.EDGES);
         for (Edge e : this.graph.getEdges()) {
-            jg.writeTree(GraphSONUtility.objectNodeFromElement(e, edgePropertyKeys, showTypes));
+            jg.writeTree(GraphSONUtility.objectNodeFromElement(e, edgePropertyKeys, mode));
         }
         jg.writeEndArray();
 
@@ -67,15 +65,16 @@ public class GraphSONWriter {
     }
 
     /**
-     * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
+     * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON. Utilizing
+     * GraphSONMode.NORMAL.
      *
      * @param graph            the graph to serialize to JSON
      * @param jsonOutputStream the JSON OutputStream to write the Graph data to
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream) throws IOException {
-        GraphSONWriter writer = new GraphSONWriter(graph);
-        writer.outputGraph(jsonOutputStream, null, null, false);
+        final GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(jsonOutputStream, null, null, GraphSONMode.NORMAL);
     }
 
     /**
@@ -83,12 +82,13 @@ public class GraphSONWriter {
      *
      * @param graph            the graph to serialize to JSON
      * @param jsonOutputStream the JSON OutputStream to write the Graph data to
-     * @param showTypes        determines if types are explicitly defined in the JSON
+     * @param mode             determines the format of the GraphSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
-    public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final boolean showTypes) throws IOException {
-        GraphSONWriter writer = new GraphSONWriter(graph);
-        writer.outputGraph(jsonOutputStream, null, null, showTypes);
+    public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream,
+                                   final GraphSONMode mode) throws IOException {
+        final GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(jsonOutputStream, null, null, mode);
     }
 
     /**
@@ -98,12 +98,14 @@ public class GraphSONWriter {
      * @param jsonOutputStream   the JSON OutputStream to write the Graph data to
      * @param edgePropertyKeys   the keys of the edge elements to write to JSON
      * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
-     * @param showTypes          determines if types are explicitly defined in the JSON
+     * @param mode               determines the format of the GraphSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
-    public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream, final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys, final boolean showTypes) throws IOException {
-        GraphSONWriter writer = new GraphSONWriter(graph);
-        writer.outputGraph(jsonOutputStream, edgePropertyKeys, vertexPropertyKeys, showTypes);
+    public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream,
+                                   final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys,
+                                   final GraphSONMode mode) throws IOException {
+        final GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(jsonOutputStream, edgePropertyKeys, vertexPropertyKeys, mode);
     }
 
 }

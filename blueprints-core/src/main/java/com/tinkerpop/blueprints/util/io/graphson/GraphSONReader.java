@@ -19,6 +19,7 @@ import java.io.InputStream;
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class GraphSONReader {
+    private static final JsonFactory jsonFactory = new MappingJsonFactory();
     private final Graph graph;
 
     /**
@@ -73,8 +74,7 @@ public class GraphSONReader {
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph inputGraph, final InputStream jsonInputStream, int bufferSize) throws IOException {
-        boolean hasEmbeddedTypes = false;
-        final JsonFactory jsonFactory = new MappingJsonFactory();
+        GraphSONMode mode = GraphSONMode.NORMAL;
         final JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
         // if this is a transactional graph then we're buffering
@@ -84,14 +84,14 @@ public class GraphSONReader {
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
             final String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();
-            if (fieldname.equals(GraphSONTokens.EMBEDDED_TYPES)) {
+            if (fieldname.equals(GraphSONTokens.MODE)) {
                 jp.nextToken();
-                hasEmbeddedTypes = jp.getBooleanValue();
+                mode = GraphSONMode.valueOf(jp.getText());
             } else if (fieldname.equals(GraphSONTokens.VERTICES)) {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
                     final JsonNode node = jp.readValueAsTree();
-                    GraphSONUtility.vertexFromJson(node, elementFactory, hasEmbeddedTypes, null);
+                    GraphSONUtility.vertexFromJson(node, elementFactory, mode, null);
                 }
             } else if (fieldname.equals(GraphSONTokens.EDGES)) {
                 jp.nextToken();
@@ -99,7 +99,7 @@ public class GraphSONReader {
                     final JsonNode node = jp.readValueAsTree();
                     final Vertex inV = graph.getVertex(GraphSONUtility.getTypedValueFromJsonNode(node.get(GraphSONTokens._IN_V)));
                     final Vertex outV = graph.getVertex(GraphSONUtility.getTypedValueFromJsonNode(node.get(GraphSONTokens._OUT_V)));
-                    GraphSONUtility.edgeFromJSON(node, outV, inV, elementFactory, hasEmbeddedTypes, null);
+                    GraphSONUtility.edgeFromJSON(node, outV, inV, elementFactory, mode, null);
                 }
             }
         }
