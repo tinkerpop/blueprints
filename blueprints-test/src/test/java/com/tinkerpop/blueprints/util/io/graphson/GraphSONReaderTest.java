@@ -13,9 +13,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GraphSONReaderTest {
 
@@ -173,7 +175,7 @@ public class GraphSONReaderTest {
     }
 
     @Test
-    public void inputGraphWithTypesFullCycle() throws IOException {
+    public void inputGraphExtendedFullCycle() throws IOException {
         TinkerGraph graph = TinkerGraphFactory.createTinkerGraph();
 
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -216,6 +218,96 @@ public class GraphSONReaderTest {
         }
 
     }
+
+    @Test
+    public void inputGraphCompactFullCycle() throws IOException {
+        TinkerGraph graph = TinkerGraphFactory.createTinkerGraph();
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        Set<String> edgeKeys = new HashSet<String>();
+        edgeKeys.add(GraphSONTokens._ID);
+        edgeKeys.add(GraphSONTokens._IN_V);
+        edgeKeys.add(GraphSONTokens._OUT_V);
+        edgeKeys.add(GraphSONTokens._LABEL);
+
+        Set<String> vertexKeys = new HashSet<String>();
+        vertexKeys.add(GraphSONTokens._ID);
+
+        GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(stream, edgeKeys, vertexKeys, GraphSONMode.COMPACT);
+
+        stream.flush();
+        stream.close();
+
+        String jsonString = new String(stream.toByteArray());
+
+        byte[] bytes = jsonString.getBytes();
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+
+        TinkerGraph emptyGraph = new TinkerGraph();
+        GraphSONReader.inputGraph(emptyGraph, inputStream);
+
+        Assert.assertEquals(6, getIterableCount(emptyGraph.getVertices()));
+        Assert.assertEquals(6, getIterableCount(emptyGraph.getEdges()));
+
+        for (Vertex v : graph.getVertices()) {
+            Vertex found = emptyGraph.getVertex(v.getId());
+
+            Assert.assertNotNull(v);
+
+            for (String key : found.getPropertyKeys()) {
+                Assert.assertEquals(v.getProperty(key), found.getProperty(key));
+            }
+
+            // no properties should be here
+            Assert.assertEquals(null, found.getProperty("name"));
+        }
+
+        for (Edge e : graph.getEdges()) {
+            Edge found = emptyGraph.getEdge(e.getId());
+
+            Assert.assertNotNull(e);
+
+            for (String key : found.getPropertyKeys()) {
+                Assert.assertEquals(e.getProperty(key), found.getProperty(key));
+            }
+
+            // no properties should be here
+            Assert.assertEquals(null, found.getProperty("weight"));
+        }
+
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void inputGraphCompactFullCycleBroken() throws IOException {
+        TinkerGraph graph = TinkerGraphFactory.createTinkerGraph();
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        Set<String> edgeKeys = new HashSet<String>();
+        edgeKeys.add(GraphSONTokens._IN_V);
+        edgeKeys.add(GraphSONTokens._OUT_V);
+        edgeKeys.add(GraphSONTokens._LABEL);
+
+        Set<String> vertexKeys = new HashSet<String>();
+
+        GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(stream, edgeKeys, vertexKeys, GraphSONMode.COMPACT);
+
+        stream.flush();
+        stream.close();
+
+        String jsonString = new String(stream.toByteArray());
+
+        byte[] bytes = jsonString.getBytes();
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+
+        TinkerGraph emptyGraph = new TinkerGraph();
+        GraphSONReader.inputGraph(emptyGraph, inputStream);
+
+    }
+
 
     private int getIterableCount(Iterable elements) {
         int counter = 0;

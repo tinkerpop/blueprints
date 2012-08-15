@@ -12,6 +12,7 @@ import org.codehaus.jackson.map.MappingJsonFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 
 /**
  * GraphSONReader reads the data from a TinkerPop JSON stream to a graph.
@@ -61,7 +62,11 @@ public class GraphSONReader {
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph graph, final InputStream jsonInputStream) throws IOException {
-        GraphSONReader.inputGraph(graph, jsonInputStream, 1000);
+        inputGraph(graph, jsonInputStream, 1000);
+    }
+
+    public static void inputGraph(final Graph inputGraph, final InputStream jsonInputStream, int bufferSize) throws IOException {
+        inputGraph(inputGraph, jsonInputStream, bufferSize, null, null);
     }
 
     /**
@@ -73,25 +78,29 @@ public class GraphSONReader {
      * @param bufferSize      the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
-    public static void inputGraph(final Graph inputGraph, final InputStream jsonInputStream, int bufferSize) throws IOException {
-        GraphSONMode mode = GraphSONMode.NORMAL;
+    public static void inputGraph(final Graph inputGraph, final InputStream jsonInputStream, int bufferSize,
+                                  final Set<String> edgePropertyKeys, final Set<String> vertexPropertyKeys) throws IOException {
+
         final JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
         // if this is a transactional graph then we're buffering
         final BatchGraph graph = BatchGraph.wrap(inputGraph, bufferSize);
 
         final ElementFactory elementFactory = new GraphElementFactory(graph);
+        GraphSONUtility graphson = new GraphSONUtility(GraphSONMode.NORMAL, elementFactory,
+                vertexPropertyKeys, edgePropertyKeys);
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
             final String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();
             if (fieldname.equals(GraphSONTokens.MODE)) {
                 jp.nextToken();
-                mode = GraphSONMode.valueOf(jp.getText());
+                final GraphSONMode mode = GraphSONMode.valueOf(jp.getText());
+                graphson = new GraphSONUtility(mode, elementFactory, vertexPropertyKeys, edgePropertyKeys);
             } else if (fieldname.equals(GraphSONTokens.VERTICES)) {
                 jp.nextToken();
                 while (jp.nextToken() != JsonToken.END_ARRAY) {
                     final JsonNode node = jp.readValueAsTree();
-                    GraphSONUtility.vertexFromJson(node, elementFactory, mode, null);
+                    graphson.vertexFromJson(node);
                 }
             } else if (fieldname.equals(GraphSONTokens.EDGES)) {
                 jp.nextToken();
@@ -99,7 +108,7 @@ public class GraphSONReader {
                     final JsonNode node = jp.readValueAsTree();
                     final Vertex inV = graph.getVertex(GraphSONUtility.getTypedValueFromJsonNode(node.get(GraphSONTokens._IN_V)));
                     final Vertex outV = graph.getVertex(GraphSONUtility.getTypedValueFromJsonNode(node.get(GraphSONTokens._OUT_V)));
-                    GraphSONUtility.edgeFromJSON(node, outV, inV, elementFactory, mode, null);
+                    graphson.edgeFromJson(node, outV, inV);
                 }
             }
         }

@@ -52,7 +52,7 @@ public class GraphSONUtilityTest {
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
 
-        JSONObject json = GraphSONUtility.jsonFromElement(e);
+        JSONObject json = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -74,7 +74,7 @@ public class GraphSONUtilityTest {
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
 
-        List<String> propertiesToInclude = new ArrayList<String>() {{
+        Set<String> propertiesToInclude = new HashSet<String>() {{
             add(GraphSONTokens._ID);
         }};
 
@@ -109,7 +109,7 @@ public class GraphSONUtilityTest {
     public void jsonFromElementVertexNoPropertiesNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -122,7 +122,7 @@ public class GraphSONUtilityTest {
     public void jsonFromElementVertexCompactIdOnly() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
-        List<String> propertiesToInclude = new ArrayList<String>() {{
+        Set<String> propertiesToInclude = new HashSet<String>() {{
             add(GraphSONTokens._ID);
         }};
 
@@ -155,7 +155,7 @@ public class GraphSONUtilityTest {
         v.setProperty("keyDouble", 4.4);
         v.setProperty("keyBoolean", true);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -185,7 +185,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyMap", map);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -211,7 +211,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyList", list);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -230,7 +230,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyStringArray", stringArray);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -249,7 +249,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyDoubleArray", doubleArray);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -268,7 +268,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyIntArray", intArray);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -287,7 +287,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyLongArray", longArray);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -306,7 +306,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyFloatArray", floatArray);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -325,7 +325,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("keyBooleanArray", booleanArray);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -342,7 +342,7 @@ public class GraphSONUtilityTest {
         Vertex v = this.graph.addVertex(1);
         v.setProperty("mycat", new Cat("smithers"));
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -376,7 +376,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("cats", cats);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -414,7 +414,7 @@ public class GraphSONUtilityTest {
 
         v.setProperty("crazy-map", map);
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -450,9 +450,9 @@ public class GraphSONUtilityTest {
         v.setProperty("y", "Y");
         v.setProperty("z", "Z");
 
-        List<String> returnKeys = new ArrayList<String>();
-        returnKeys.add("y");
-        JSONObject json = GraphSONUtility.jsonFromElement(v, returnKeys, GraphSONMode.NORMAL);
+        Set<String> propertiesToInclude = new HashSet<String>();
+        propertiesToInclude.add("y");
+        JSONObject json = GraphSONUtility.jsonFromElement(v, propertiesToInclude, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -478,11 +478,11 @@ public class GraphSONUtilityTest {
 
         v.setProperty("v", innerV);
 
-        List<String> returnKeys = new ArrayList<String>();
-        returnKeys.add("y");
-        returnKeys.add("v");
+        Set<String> propertiesToInclude = new HashSet<String>();
+        propertiesToInclude.add("y");
+        propertiesToInclude.add("v");
 
-        JSONObject json = GraphSONUtility.jsonFromElement(v, returnKeys, GraphSONMode.NORMAL);
+        JSONObject json = GraphSONUtility.jsonFromElement(v, propertiesToInclude, GraphSONMode.NORMAL);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._ID));
@@ -926,7 +926,7 @@ public class GraphSONUtilityTest {
         ElementFactory factory = new GraphElementFactory(g);
 
         Set<String> ignoreAge = new HashSet<String>();
-        ignoreAge.add("age");
+        ignoreAge.add("name");
         Vertex v = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, GraphSONMode.NORMAL, ignoreAge);
 
         Assert.assertSame(v, g.getVertex(1));
@@ -944,7 +944,7 @@ public class GraphSONUtilityTest {
 
         Vertex v1 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, GraphSONMode.NORMAL, null);
         Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, GraphSONMode.NORMAL, null);
-        Edge e = GraphSONUtility.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, GraphSONMode.NORMAL, null);
+        Edge e = GraphSONUtility.edgeFromJson(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, GraphSONMode.NORMAL, null);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));
@@ -965,7 +965,7 @@ public class GraphSONUtilityTest {
 
         Vertex v1 = GraphSONUtility.vertexFromJson(vertexJson1, factory, GraphSONMode.NORMAL, null);
         Vertex v2 = GraphSONUtility.vertexFromJson(vertexJson2, factory, GraphSONMode.NORMAL, null);
-        Edge e = GraphSONUtility.edgeFromJSON(edgeJson, v1, v2, factory, GraphSONMode.NORMAL, null);
+        Edge e = GraphSONUtility.edgeFromJson(edgeJson, v1, v2, factory, GraphSONMode.NORMAL, null);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));
@@ -980,7 +980,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void edgeFromJsonIgnoreKeyValid()  throws IOException, JSONException {
+    public void edgeFromJsonIgnoreWeightValid()  throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 
@@ -988,8 +988,7 @@ public class GraphSONUtilityTest {
         Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, GraphSONMode.NORMAL, null);
 
         Set<String> ignoreWeight = new HashSet<String>();
-        ignoreWeight.add("weight");
-        Edge e = GraphSONUtility.edgeFromJSON(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, GraphSONMode.NORMAL, ignoreWeight);
+        Edge e = GraphSONUtility.edgeFromJson(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, GraphSONMode.NORMAL, ignoreWeight);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));
@@ -1010,7 +1009,7 @@ public class GraphSONUtilityTest {
 
         Vertex v1 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, GraphSONMode.NORMAL, null);
         Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, GraphSONMode.NORMAL, null);
-        Edge e = GraphSONUtility.edgeFromJSON(new JSONObject(new JSONTokener(edgeJsonLight)), v1, v2, factory, GraphSONMode.NORMAL, null);
+        Edge e = GraphSONUtility.edgeFromJson(new JSONObject(new JSONTokener(edgeJsonLight)), v1, v2, factory, GraphSONMode.NORMAL, null);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));
@@ -1024,7 +1023,31 @@ public class GraphSONUtilityTest {
 
         Vertex v1 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, GraphSONMode.COMPACT, null);
         Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, GraphSONMode.COMPACT, null);
-        Edge e = GraphSONUtility.edgeFromJSON(inputStreamEdgeJsonLight, v1, v2, factory, GraphSONMode.COMPACT, null);
+        Edge e = GraphSONUtility.edgeFromJson(inputStreamEdgeJsonLight, v1, v2, factory, GraphSONMode.COMPACT, null);
+
+        Assert.assertSame(v1, g.getVertex(1));
+        Assert.assertSame(v2, g.getVertex(2));
+        Assert.assertSame(e, g.getEdge(0));
+    }
+
+    @Test
+    public void edgeFromJsonInputStreamCompactNoIdOnEdge()  throws IOException, JSONException {
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        Set<String> vertexKeys = new HashSet<String>() {{
+            add(GraphSONTokens._ID);
+        }};
+
+        Set<String> edgeKeys = new HashSet<String>() {{
+            add(GraphSONTokens._IN_V);
+        }};
+
+        GraphSONUtility graphson = new GraphSONUtility(GraphSONMode.COMPACT, factory, vertexKeys, edgeKeys);
+
+        Vertex v1 = graphson.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)));
+        Vertex v2 = graphson.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)));
+        Edge e = graphson.edgeFromJson(inputStreamEdgeJsonLight, v1, v2);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));

@@ -38,68 +38,73 @@ public final class GraphSONUtility {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    /**
-     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
-     *
-     * @param json a single vertex in GraphSON format as Jettison JSONObject
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
-     */
-    public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final GraphSONMode mode,
-                                        final Set<String> ignoreKeys) throws IOException {
-        return vertexFromJson(json.toString(), factory, mode, ignoreKeys);
+    private final GraphSONMode mode;
+    private final Set<String> vertexPropertyKeys;
+    private final Set<String> edgePropertyKeys;
+    private final ElementFactory factory;
+    private final boolean hasEmbeddedTypes;
+
+    private final boolean includeReservedVertexId;
+    private final boolean includeReservedEdgeId;
+    private final boolean includeReservedVertexType;
+    private final boolean includeReservedEdgeType;
+    private final boolean includeReservedEdgeLabel;
+    private final boolean includeReservedEdgeOutV;
+    private final boolean includeReservedEdgeInV;
+
+    public GraphSONUtility(final GraphSONMode mode, final ElementFactory factory,
+                           final Set<String> vertexPropertyKeys, final Set<String> edgePropertyKeys) {
+        this.vertexPropertyKeys = vertexPropertyKeys;
+        this.edgePropertyKeys = edgePropertyKeys;
+        this.mode = mode;
+        this.factory = factory;
+        this.hasEmbeddedTypes = mode == GraphSONMode.EXTENDED;
+
+        includeReservedVertexId = includeReservedKey(mode, GraphSONTokens._ID, vertexPropertyKeys);
+        includeReservedEdgeId = includeReservedKey(mode, GraphSONTokens._ID, edgePropertyKeys);
+        includeReservedVertexType = includeReservedKey(mode, GraphSONTokens._TYPE, vertexPropertyKeys);
+        includeReservedEdgeType = includeReservedKey(mode, GraphSONTokens._TYPE, edgePropertyKeys);
+        includeReservedEdgeLabel = includeReservedKey(mode, GraphSONTokens._LABEL, edgePropertyKeys);
+        includeReservedEdgeOutV = includeReservedKey(mode, GraphSONTokens._OUT_V, edgePropertyKeys);
+        includeReservedEdgeInV = includeReservedKey(mode, GraphSONTokens._IN_V, edgePropertyKeys);
     }
 
     /**
-     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
-     *
-     * @param json a single vertex in GraphSON format as a String.
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     * Creates a vertex from GraphSON using settings supplied in the constructor.
      */
-    public static Vertex vertexFromJson(final String json, final ElementFactory factory, final GraphSONMode mode,
-                                        final Set<String> ignoreKeys) throws IOException {
+    public Vertex vertexFromJson(final JSONObject json) throws IOException  {
+        return this.vertexFromJson(json.toString());
+    }
+
+    /**
+     * Creates a vertex from GraphSON using settings supplied in the constructor.
+     */
+    public Vertex vertexFromJson(final String json) throws IOException {
         final JsonParser jp = jsonFactory.createJsonParser(json);
         final JsonNode node = jp.readValueAsTree();
-        return vertexFromJson(node, factory, mode, ignoreKeys);
+        return this.vertexFromJson(node);
     }
 
     /**
-     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
-     *
-     * @param json a single vertex in GraphSON format as an InputStream.
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     * Creates a vertex from GraphSON using settings supplied in the constructor.
      */
-    public static Vertex vertexFromJson(final InputStream json, final ElementFactory factory, final GraphSONMode mode,
-                                        final Set<String> ignoreKeys) throws IOException {
+    public Vertex vertexFromJson(final InputStream json) throws IOException {
         final JsonParser jp = jsonFactory.createJsonParser(json);
         final JsonNode node = jp.readValueAsTree();
-        return vertexFromJson(node, factory, mode, ignoreKeys);
+        return this.vertexFromJson(node);
     }
 
     /**
-     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
-     *
-     * @param node a single vertex in GraphSON format as Jackson JsonNode
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     * Creates a vertex from GraphSON using settings supplied in the constructor.
      */
-    public static Vertex vertexFromJson(final JsonNode node, final ElementFactory factory, final GraphSONMode mode,
-                                        final Set<String> ignoreKeys) throws IOException{
+    public Vertex vertexFromJson(final JsonNode json) throws IOException {
+        final Map<String, Object> props = readProperties(json, true, this.hasEmbeddedTypes);
 
-        final boolean hasEmbeddedTypes = mode == GraphSONMode.EXTENDED;
-        final Map<String, Object> props = readProperties(node, true, hasEmbeddedTypes);
-
-        final Object vertexId = getTypedValueFromJsonNode(node.get(GraphSONTokens._ID));
+        final Object vertexId = getTypedValueFromJsonNode(json.get(GraphSONTokens._ID));
         final Vertex v = factory.createVertex(vertexId);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            if (ignoreKeys == null || !ignoreKeys.contains(entry.getKey())) {
+            if (this.vertexPropertyKeys == null || vertexPropertyKeys.contains(entry.getKey())) {
                 v.setProperty(entry.getKey(), entry.getValue());
             }
         }
@@ -108,74 +113,44 @@ public final class GraphSONUtility {
     }
 
     /**
-     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
-     *
-     * @param json a single edge in GraphSON format as a Jettison JSONObject
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     * Creates an edge from GraphSON using settings supplied in the constructor.
      */
-    public static Edge edgeFromJSON(final JSONObject json, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final GraphSONMode mode,
-                                final Set<String> ignoreKeys)  throws IOException {
-        return edgeFromJSON(json.toString(), out, in, factory, mode, ignoreKeys);
+    public Edge edgeFromJson(final JSONObject json, final Vertex out, final Vertex in) throws IOException  {
+        return this.edgeFromJson(json.toString(), out, in);
     }
 
     /**
-     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
-     *
-     * @param json a single edge in GraphSON format as a String
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     * Creates an edge from GraphSON using settings supplied in the constructor.
      */
-    public static Edge edgeFromJSON(final String json, final Vertex out, final Vertex in,
-                                    final ElementFactory factory, final GraphSONMode mode,
-                                    final Set<String> ignoreKeys)  throws IOException {
+    public Edge edgeFromJson(final String json, final Vertex out, final Vertex in) throws IOException {
         final JsonParser jp = jsonFactory.createJsonParser(json);
         final JsonNode node = jp.readValueAsTree();
-        return edgeFromJSON(node, out, in, factory, mode, ignoreKeys);
+        return this.edgeFromJson(node, out, in);
     }
 
     /**
-     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
-     *
-     * @param json a single edge in GraphSON format as an InputStream
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     * Creates an edge from GraphSON using settings supplied in the constructor.
      */
-    public static Edge edgeFromJSON(final InputStream json, final Vertex out, final Vertex in,
-                                    final ElementFactory factory, final GraphSONMode mode,
-                                    final Set<String> ignoreKeys)  throws IOException {
+    public Edge edgeFromJson(final InputStream json, final Vertex out, final Vertex in) throws IOException {
         final JsonParser jp = jsonFactory.createJsonParser(json);
         final JsonNode node = jp.readValueAsTree();
-        return edgeFromJSON(node, out, in, factory, mode, ignoreKeys);
+        return this.edgeFromJson(node, out, in);
     }
 
     /**
-     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
-     *
-     * @param node a single edge in GraphSON format as a Jackson JsonNode
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
-     * @param ignoreKeys a list of keys to ignore on reading of element properties
+     * Creates an edge from GraphSON using settings supplied in the constructor.
      */
-    public static Edge edgeFromJSON(final JsonNode node, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final GraphSONMode mode,
-                                final Set<String> ignoreKeys)  throws IOException {
+    public Edge edgeFromJson(final JsonNode json, final Vertex out, final Vertex in) throws IOException {
+        final Map<String, Object> props = GraphSONUtility.readProperties(json, true, this.hasEmbeddedTypes);
 
-        final boolean hasEmbeddedTypes = mode == GraphSONMode.EXTENDED;
-        final Map<String, Object> props = GraphSONUtility.readProperties(node, true, hasEmbeddedTypes);
-
-        final Object edgeId = getTypedValueFromJsonNode(node.get(GraphSONTokens._ID));
-        final JsonNode nodeLabel = node.get(GraphSONTokens._LABEL);
+        final Object edgeId = getTypedValueFromJsonNode(json.get(GraphSONTokens._ID));
+        final JsonNode nodeLabel = json.get(GraphSONTokens._LABEL);
         final String label = nodeLabel == null ? null : nodeLabel.getValueAsText();
 
         final Edge e = factory.createEdge(edgeId, out, in, label);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            if (ignoreKeys == null || !ignoreKeys.contains(entry.getKey())) {
+            if (this.edgePropertyKeys == null || this.edgePropertyKeys.contains(entry.getKey())) {
                 e.setProperty(entry.getKey(), entry.getValue());
             }
         }
@@ -184,24 +159,10 @@ public final class GraphSONUtility {
     }
 
     /**
-     * Creates a Jettison JSONObject from a graph element. Uses GraphSONMode.NORMAL.
-     *
-     * @param element The graph element to convert to JSON.
+     * Creates GraphSON for a single graph element.
      */
-    public static JSONObject jsonFromElement(final Element element) throws JSONException {
-        return jsonFromElement(element, null, GraphSONMode.NORMAL);
-    }
-
-    /**
-     * Creates a Jettison JSONObject from a graph element.
-     *
-     * @param element      the graph element to convert to JSON.
-     * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
-     * @param mode         the type of GraphSON to be generated.
-     */
-    public static JSONObject jsonFromElement(final Element element, final List<String> propertyKeys,
-                                             final GraphSONMode mode) throws JSONException {
-        final ObjectNode objectNode = objectNodeFromElement(element, propertyKeys, mode);
+    public JSONObject jsonFromElement(final Element element) throws JSONException {
+        final ObjectNode objectNode = this.objectNodeFromElement(element);
 
         try {
             return new JSONObject(new JSONTokener(mapper.writeValueAsString(objectNode)));
@@ -213,13 +174,186 @@ public final class GraphSONUtility {
     }
 
     /**
-     * Creates a Jackson ObjectNode from a graph element. Utilizes GraphSON.NORMAL.
-     *
-     * @param element The graph element to convert to JSON.
+     * Creates GraphSON for a single graph element.
      */
-    public static ObjectNode objectNodeFromElement(final Element element) {
-        return objectNodeFromElement(element, null, GraphSONMode.NORMAL);
+    public ObjectNode objectNodeFromElement(final Element element) {
+        final boolean isEdge = element instanceof Edge;
+        final boolean showTypes = mode == GraphSONMode.EXTENDED;
+        final Set<String> propertyKeys = isEdge ? this.edgePropertyKeys : this.vertexPropertyKeys;
+
+        final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
+
+        if ((isEdge && this.includeReservedEdgeId) || (!isEdge && this.includeReservedVertexId)) {
+            putObject(jsonElement, GraphSONTokens._ID, element.getId());
+        }
+
+        // it's important to keep the order of these straight.  check Edge first and then Vertex because there
+        // are graph implementations that have Edge extend from Vertex
+        if (element instanceof Edge) {
+            final Edge edge = (Edge) element;
+
+            if (this.includeReservedEdgeId) {
+                putObject(jsonElement, GraphSONTokens._ID, element.getId());
+            }
+
+            if (this.includeReservedEdgeType) {
+                jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
+            }
+
+            if (this.includeReservedEdgeOutV) {
+                putObject(jsonElement, GraphSONTokens._OUT_V, edge.getVertex(Direction.OUT).getId());
+            }
+
+            if (this.includeReservedEdgeInV) {
+                putObject(jsonElement, GraphSONTokens._IN_V, edge.getVertex(Direction.IN).getId());
+            }
+
+            if (this.includeReservedEdgeLabel) {
+                jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
+            }
+        } else if (element instanceof Vertex) {
+            if (this.includeReservedVertexId) {
+                putObject(jsonElement, GraphSONTokens._ID, element.getId());
+            }
+
+            if (this.includeReservedVertexType) {
+                jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
+            }
+        }
+
+        return jsonElement;
     }
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param json a single vertex in GraphSON format as Jettison JSONObject
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to ignore on reading of element properties
+     */
+    public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final GraphSONMode mode,
+                                        final Set<String> propertyKeys) throws IOException {
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, propertyKeys, null);
+        return graphson.vertexFromJson(json);
+    }
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param json a single vertex in GraphSON format as a String.
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to ignore on reading of element properties
+     */
+    public static Vertex vertexFromJson(final String json, final ElementFactory factory, final GraphSONMode mode,
+                                        final Set<String> propertyKeys) throws IOException {
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, propertyKeys, null);
+        return graphson.vertexFromJson(json);
+    }
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param json a single vertex in GraphSON format as an InputStream.
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to ignore on reading of element properties
+     */
+    public static Vertex vertexFromJson(final InputStream json, final ElementFactory factory, final GraphSONMode mode,
+                                        final Set<String> propertyKeys) throws IOException {
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, propertyKeys, null);
+        return graphson.vertexFromJson(json);
+    }
+
+    /**
+     * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
+     *
+     * @param json a single vertex in GraphSON format as Jackson JsonNode
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to ignore on reading of element properties
+     */
+    public static Vertex vertexFromJson(final JsonNode json, final ElementFactory factory, final GraphSONMode mode,
+                                        final Set<String> propertyKeys) throws IOException{
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, propertyKeys, null);
+        return graphson.vertexFromJson(json);
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param json a single edge in GraphSON format as a Jettison JSONObject
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to include when reading of element properties
+     */
+    public static Edge edgeFromJson(final JSONObject json, final Vertex out, final Vertex in,
+                                final ElementFactory factory, final GraphSONMode mode,
+                                final Set<String> propertyKeys)  throws IOException {
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
+        return graphson.edgeFromJson(json, out, in);
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param json a single edge in GraphSON format as a String
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to include when reading of element properties
+     */
+    public static Edge edgeFromJson(final String json, final Vertex out, final Vertex in,
+                                    final ElementFactory factory, final GraphSONMode mode,
+                                    final Set<String> propertyKeys)  throws IOException {
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
+        return graphson.edgeFromJson(json, out, in);
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param json a single edge in GraphSON format as an InputStream
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to include when reading of element properties
+     */
+    public static Edge edgeFromJson(final InputStream json, final Vertex out, final Vertex in,
+                                    final ElementFactory factory, final GraphSONMode mode,
+                                    final Set<String> propertyKeys)  throws IOException {
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
+        return graphson.edgeFromJson(json, out, in);
+    }
+
+    /**
+     * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
+     *
+     * @param json a single edge in GraphSON format as a Jackson JsonNode
+     * @param factory the factory responsible for constructing graph elements
+     * @param mode the mode of the GraphSON
+     * @param propertyKeys a list of keys to include when reading of element properties
+     */
+    public static Edge edgeFromJson(final JsonNode json, final Vertex out, final Vertex in,
+                                final ElementFactory factory, final GraphSONMode mode,
+                                final Set<String> propertyKeys)  throws IOException {
+        final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
+        return graphson.edgeFromJson(json, out, in);
+    }
+
+    /**
+     * Creates a Jettison JSONObject from a graph element.
+     *
+     * @param element      the graph element to convert to JSON.
+     * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
+     * @param mode         the type of GraphSON to be generated.
+     */
+    public static JSONObject jsonFromElement(final Element element, final Set<String> propertyKeys,
+                                             final GraphSONMode mode) throws JSONException {
+        final GraphSONUtility graphson = element instanceof Edge ? new GraphSONUtility(mode, null, null, propertyKeys)
+                : new GraphSONUtility(mode, null, propertyKeys, null);
+        return graphson.jsonFromElement(element);
+    }
+
     /**
      * Creates a Jackson ObjectNode from a graph element.
      *
@@ -227,43 +361,10 @@ public final class GraphSONUtility {
      * @param propertyKeys The property keys at the root of the element to serialize.  If null, then all keys are serialized.
      * @param mode         The type of GraphSON to generate.
      */
-    public static ObjectNode objectNodeFromElement(final Element element, final List<String> propertyKeys, final GraphSONMode mode) {
-        final boolean showTypes = mode == GraphSONMode.EXTENDED;
-        final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
-
-        if (includeReservedKey(mode, GraphSONTokens._ID, propertyKeys)) {
-            putObject(jsonElement, GraphSONTokens._ID, element.getId());
-        }
-
-        final boolean includeReservedType = includeReservedKey(mode, GraphSONTokens._TYPE, propertyKeys);
-
-        // it's important to keep the order of these straight.  check Edge first and then Vertex because there
-        // are graph implementations that have Edge extend from Vertex
-        if (element instanceof Edge) {
-            final Edge edge = (Edge) element;
-
-            if (includeReservedType) {
-                jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
-            }
-
-            if (includeReservedKey(mode, GraphSONTokens._OUT_V, propertyKeys)) {
-                putObject(jsonElement, GraphSONTokens._OUT_V, edge.getVertex(Direction.OUT).getId());
-            }
-
-            if (includeReservedKey(mode, GraphSONTokens._IN_V, propertyKeys)) {
-                putObject(jsonElement, GraphSONTokens._IN_V, edge.getVertex(Direction.IN).getId());
-            }
-
-            if (includeReservedKey(mode, GraphSONTokens._LABEL, propertyKeys)) {
-                jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
-            }
-        } else if (element instanceof Vertex) {
-            if (includeReservedType) {
-                jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
-            }
-        }
-
-        return jsonElement;
+    public static ObjectNode objectNodeFromElement(final Element element, final Set<String> propertyKeys, final GraphSONMode mode) {
+        final GraphSONUtility graphson = element instanceof Edge ? new GraphSONUtility(mode, null, null, propertyKeys)
+                : new GraphSONUtility(mode, null, propertyKeys, null);
+        return graphson.objectNodeFromElement(element);
     }
 
     static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {
@@ -273,7 +374,7 @@ public final class GraphSONUtility {
         while (iterator.hasNext()) {
             final Map.Entry<String, JsonNode> entry = iterator.next();
 
-            if (!ignoreReservedKeys || (ignoreReservedKeys && !isReservedKey(entry.getKey()))) {
+            if (!ignoreReservedKeys || !isReservedKey(entry.getKey())) {
                 map.put(entry.getKey(), readProperty(entry.getValue(), hasEmbeddedTypes));
             }
         }
@@ -281,7 +382,7 @@ public final class GraphSONUtility {
         return map;
     }
 
-    private static boolean includeReservedKey(final GraphSONMode mode, final String key, final List<String> propertyKeys) {
+    private static boolean includeReservedKey(final GraphSONMode mode, final String key, final Set<String> propertyKeys) {
         // the key is always included in modes other than compact.  if it is compact, then validate that the
         //  key is in the property key list
         return mode != GraphSONMode.COMPACT || propertyKeys == null || propertyKeys.contains(key);
@@ -352,7 +453,7 @@ public final class GraphSONUtility {
         return array;
     }
 
-    private static ArrayNode createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes) {
+    private static ArrayNode createJSONList(final List list, final Set<String> propertyKeys, final boolean showTypes) {
         final ArrayNode jsonList = jsonNodeFactory.arrayNode();
         for (Object item : list) {
             if (item instanceof Element) {
@@ -371,7 +472,7 @@ public final class GraphSONUtility {
         return jsonList;
     }
 
-    private static ObjectNode createJSONMap(final Map map, final List<String> propertyKeys, final boolean showTypes) {
+    private static ObjectNode createJSONMap(final Map map, final Set<String> propertyKeys, final boolean showTypes) {
         final ObjectNode jsonMap = jsonNodeFactory.objectNode();
         for (Object key : map.keySet()) {
             Object value = map.get(key);
@@ -442,7 +543,7 @@ public final class GraphSONUtility {
         }
     }
 
-    private static Map createPropertyMap(final Element element, final List<String> propertyKeys) {
+    private static Map createPropertyMap(final Element element, final Set<String> propertyKeys) {
         final Map map = new HashMap<String, Object>();
 
         if (propertyKeys == null) {

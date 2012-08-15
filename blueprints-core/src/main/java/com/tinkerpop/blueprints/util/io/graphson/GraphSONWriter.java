@@ -11,6 +11,7 @@ import org.codehaus.jackson.map.MappingJsonFactory;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Set;
 
 /**
  * GraphSONWriter writes a Graph to a TinkerPop JSON OutputStream.
@@ -37,9 +38,10 @@ public class GraphSONWriter {
      * @param mode               determines the format of the GraphSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
-    public void outputGraph(final OutputStream jsonOutputStream, final List<String> edgePropertyKeys,
-                            final List<String> vertexPropertyKeys, final GraphSONMode mode) throws IOException {
+    public void outputGraph(final OutputStream jsonOutputStream, final Set<String> edgePropertyKeys,
+                            final Set<String> vertexPropertyKeys, final GraphSONMode mode) throws IOException {
         final JsonGenerator jg = jsonFactory.createJsonGenerator(jsonOutputStream);
+        final GraphSONUtility graphson = new GraphSONUtility(mode, null, vertexPropertyKeys, edgePropertyKeys);
 
         jg.writeStartObject();
 
@@ -47,14 +49,14 @@ public class GraphSONWriter {
 
         jg.writeArrayFieldStart(GraphSONTokens.VERTICES);
         for (Vertex v : this.graph.getVertices()) {
-            jg.writeTree(GraphSONUtility.objectNodeFromElement(v, vertexPropertyKeys, mode));
+            jg.writeTree(graphson.objectNodeFromElement(v));
         }
 
         jg.writeEndArray();
 
         jg.writeArrayFieldStart(GraphSONTokens.EDGES);
         for (Edge e : this.graph.getEdges()) {
-            jg.writeTree(GraphSONUtility.objectNodeFromElement(e, edgePropertyKeys, mode));
+            jg.writeTree(graphson.objectNodeFromElement(e));
         }
         jg.writeEndArray();
 
@@ -102,7 +104,7 @@ public class GraphSONWriter {
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final OutputStream jsonOutputStream,
-                                   final List<String> edgePropertyKeys, final List<String> vertexPropertyKeys,
+                                   final Set<String> edgePropertyKeys, final Set<String> vertexPropertyKeys,
                                    final GraphSONMode mode) throws IOException {
         final GraphSONWriter writer = new GraphSONWriter(graph);
         writer.outputGraph(jsonOutputStream, edgePropertyKeys, vertexPropertyKeys, mode);
