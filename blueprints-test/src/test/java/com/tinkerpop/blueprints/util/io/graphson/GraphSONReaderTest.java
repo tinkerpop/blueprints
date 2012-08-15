@@ -235,7 +235,7 @@ public class GraphSONReaderTest {
         vertexKeys.add(GraphSONTokens._ID);
 
         GraphSONWriter writer = new GraphSONWriter(graph);
-        writer.outputGraph(stream, edgeKeys, vertexKeys, GraphSONMode.COMPACT);
+        writer.outputGraph(stream, vertexKeys, edgeKeys, GraphSONMode.COMPACT);
 
         stream.flush();
         stream.close();
@@ -293,7 +293,7 @@ public class GraphSONReaderTest {
         Set<String> vertexKeys = new HashSet<String>();
 
         GraphSONWriter writer = new GraphSONWriter(graph);
-        writer.outputGraph(stream, edgeKeys, vertexKeys, GraphSONMode.COMPACT);
+        writer.outputGraph(stream, vertexKeys, edgeKeys, GraphSONMode.COMPACT);
 
         stream.flush();
         stream.close();
