@@ -7,8 +7,8 @@ package com.tinkerpop.blueprints.util.io.graphson;
  */
 public enum GraphSONMode {
     /**
-     * COMPACT constructs GraphSON without the _type field which denotes the type
-     * of the element: edge or vertex.
+     * COMPACT constructs GraphSON on the assumption that all property keys
+     * are fair game for exclusion including _type, _inV, _outV, _label and _id
      */
     COMPACT,
 

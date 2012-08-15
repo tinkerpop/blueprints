@@ -68,7 +68,27 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void jsonFromElementEdgeCompact() throws JSONException {
+    public void jsonFromElementEdgeCompactIdOnly() throws JSONException {
+        Vertex v1 = this.graph.addVertex(1);
+        Vertex v2 = this.graph.addVertex(2);
+
+        Edge e = this.graph.addEdge(3, v1, v2, "test");
+
+        List<String> propertiesToInclude = new ArrayList<String>() {{
+            add(GraphSONTokens._ID);
+        }};
+
+        JSONObject json = GraphSONUtility.jsonFromElement(e, propertiesToInclude, GraphSONMode.COMPACT);
+
+        Assert.assertNotNull(json);
+        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
+        Assert.assertFalse(json.has(GraphSONTokens._LABEL));
+        Assert.assertFalse(json.has(GraphSONTokens._IN_V));
+        Assert.assertFalse(json.has(GraphSONTokens._OUT_V));
+    }
+
+    @Test
+    public void jsonFromElementEdgeCompactAllKeys() throws JSONException {
         Vertex v1 = this.graph.addVertex(1);
         Vertex v2 = this.graph.addVertex(2);
 
@@ -77,8 +97,13 @@ public class GraphSONUtilityTest {
         JSONObject json = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.COMPACT);
 
         Assert.assertNotNull(json);
-        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertTrue(json.has(GraphSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._LABEL));
+        Assert.assertTrue(json.has(GraphSONTokens._IN_V));
+        Assert.assertTrue(json.has(GraphSONTokens._OUT_V));
     }
+
 
     @Test
     public void jsonFromElementVertexNoPropertiesNoKeysNoTypes() throws JSONException {
@@ -94,13 +119,29 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void jsonFromElementVertexCompact() throws JSONException {
+    public void jsonFromElementVertexCompactIdOnly() throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+
+        List<String> propertiesToInclude = new ArrayList<String>() {{
+            add(GraphSONTokens._ID);
+        }};
+
+        JSONObject json = GraphSONUtility.jsonFromElement(v, propertiesToInclude, GraphSONMode.COMPACT);
+
+        Assert.assertNotNull(json);
+        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+    }
+
+    @Test
+    public void jsonFromElementVertexCompactAllOnly() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
         JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.COMPACT);
 
         Assert.assertNotNull(json);
-        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
     }
 
     @Test

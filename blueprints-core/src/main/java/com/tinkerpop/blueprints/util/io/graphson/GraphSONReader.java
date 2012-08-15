@@ -80,7 +80,7 @@ public class GraphSONReader {
         // if this is a transactional graph then we're buffering
         final BatchGraph graph = BatchGraph.wrap(inputGraph, bufferSize);
 
-        ElementFactory elementFactory = new GraphElementFactory(graph);
+        final ElementFactory elementFactory = new GraphElementFactory(graph);
 
         while (jp.nextToken() != JsonToken.END_OBJECT) {
             final String fieldname = jp.getCurrentName() == null ? "" : jp.getCurrentName();

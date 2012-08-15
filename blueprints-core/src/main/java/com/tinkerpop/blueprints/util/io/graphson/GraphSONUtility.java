@@ -230,22 +230,35 @@ public final class GraphSONUtility {
     public static ObjectNode objectNodeFromElement(final Element element, final List<String> propertyKeys, final GraphSONMode mode) {
         final boolean showTypes = mode == GraphSONMode.EXTENDED;
         final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
-        putObject(jsonElement, GraphSONTokens._ID, element.getId());
+
+        if (includeReservedKey(mode, GraphSONTokens._ID, propertyKeys)) {
+            putObject(jsonElement, GraphSONTokens._ID, element.getId());
+        }
+
+        final boolean includeReservedType = includeReservedKey(mode, GraphSONTokens._TYPE, propertyKeys);
 
         // it's important to keep the order of these straight.  check Edge first and then Vertex because there
         // are graph implementations that have Edge extend from Vertex
         if (element instanceof Edge) {
             final Edge edge = (Edge) element;
 
-            if (mode != GraphSONMode.COMPACT) {
+            if (includeReservedType) {
                 jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.EDGE);
             }
 
-            putObject(jsonElement, GraphSONTokens._OUT_V, edge.getVertex(Direction.OUT).getId());
-            putObject(jsonElement, GraphSONTokens._IN_V, edge.getVertex(Direction.IN).getId());
-            jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
+            if (includeReservedKey(mode, GraphSONTokens._OUT_V, propertyKeys)) {
+                putObject(jsonElement, GraphSONTokens._OUT_V, edge.getVertex(Direction.OUT).getId());
+            }
+
+            if (includeReservedKey(mode, GraphSONTokens._IN_V, propertyKeys)) {
+                putObject(jsonElement, GraphSONTokens._IN_V, edge.getVertex(Direction.IN).getId());
+            }
+
+            if (includeReservedKey(mode, GraphSONTokens._LABEL, propertyKeys)) {
+                jsonElement.put(GraphSONTokens._LABEL, edge.getLabel());
+            }
         } else if (element instanceof Vertex) {
-            if (mode != GraphSONMode.COMPACT) {
+            if (includeReservedType) {
                 jsonElement.put(GraphSONTokens._TYPE, GraphSONTokens.VERTEX);
             }
         }
@@ -266,6 +279,12 @@ public final class GraphSONUtility {
         }
 
         return map;
+    }
+
+    private static boolean includeReservedKey(final GraphSONMode mode, final String key, final List<String> propertyKeys) {
+        // the key is always included in modes other than compact.  if it is compact, then validate that the
+        //  key is in the property key list
+        return mode != GraphSONMode.COMPACT || propertyKeys == null || propertyKeys.contains(key);
     }
 
     private static boolean isReservedKey(final String key) {
