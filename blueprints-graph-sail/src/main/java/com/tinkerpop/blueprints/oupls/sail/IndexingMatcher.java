@@ -32,7 +32,11 @@ public class IndexingMatcher extends Matcher {
      * @param c     whether the context is specified
      * @param store the Blueprints data store
      */
-    public IndexingMatcher(final boolean s, final boolean p, final boolean o, final boolean c, final GraphSail.DataStore store) {
+    public IndexingMatcher(final boolean s,
+                           final boolean p,
+                           final boolean o,
+                           final boolean c,
+                           final GraphSail.DataStore store) {
         super(s, p, o, c);
 
         this.store = store;
@@ -53,9 +57,14 @@ public class IndexingMatcher extends Matcher {
         propertyName = sb.toString();
     }
 
-    public Iterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
-        // FIXME: the temporary linked list is a little wasty
-        List<PartOfSpeechCriterion> criteria = new LinkedList<PartOfSpeechCriterion>();
+    public Iterable<Edge> match(final Resource subject,
+                                final URI predicate,
+                                final Value object,
+                                final Resource context,
+                                final boolean includeInferred) {
+
+        // TODO: the temporary linked list is a little wasty
+        List<FilteredIterator.Criterion<Edge>> criteria = new LinkedList<FilteredIterator.Criterion<Edge>>();
 
         StringBuilder sb = new StringBuilder();
 
@@ -64,6 +73,7 @@ public class IndexingMatcher extends Matcher {
         } else if (null != context) {
             criteria.add(new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, store.resourceToNative(context)));
         }
+
         if (s) {
             sb.append(GraphSail.SEPARATOR).append(store.resourceToNative(subject));
         } else if (null != subject) {
@@ -82,6 +92,10 @@ public class IndexingMatcher extends Matcher {
             criteria.add(new PartOfSpeechCriterion(PartOfSpeech.OBJECT, store.valueToNative(object)));
         }
 
+        if (!includeInferred) {
+            criteria.add(new NoInferenceCriterion());
+        }
+
         //System.out.println("spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("\ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
 
@@ -89,8 +103,9 @@ public class IndexingMatcher extends Matcher {
         //System.out.println("\tstore.edges = " + store.edges);
         Iterable<Edge> results = store.graph.getEdges(propertyName, sb.toString().substring(1));
 
-        for (PartOfSpeechCriterion m : criteria) {
-            results = new FilteredIterator<Edge>(results, m);
+        if (criteria.size() > 0) {
+            FilteredIterator.Criterion<Edge> c = new FilteredIterator.CompoundCriterion<Edge>(criteria);
+            results = new FilteredIterator<Edge>(results, c);
         }
 
         return results;

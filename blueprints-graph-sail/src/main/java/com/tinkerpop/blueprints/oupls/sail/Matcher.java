@@ -42,7 +42,11 @@ public abstract class Matcher {
      * @param context   the context of matching statements
      * @return an iterator over all matching statements
      */
-    public abstract Iterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context);
+    public abstract Iterable<Edge> match(final Resource subject,
+                                         final URI predicate,
+                                         final Value object,
+                                         final Resource context,
+                                         final boolean includeInferred);
 
     public String toString() {
         StringBuilder sb = new StringBuilder("matcher[");
@@ -60,5 +64,18 @@ public abstract class Matcher {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    /**
+     * A criterion which excludes inferred statements.
+     * At the Graph level, any edge with a value for the "inferred" property is considered to be inferred,
+     * even if the value is something other than a boolean <code>true</code>.
+     *
+     * @author Joshua Shinavier (http://fortytwo.net)
+     */
+    protected static class NoInferenceCriterion implements FilteredIterator.Criterion<Edge> {
+        public boolean fulfilledBy(final Edge edge) {
+            return null == edge.getProperty(GraphSail.INFERRED);
+        }
     }
 }

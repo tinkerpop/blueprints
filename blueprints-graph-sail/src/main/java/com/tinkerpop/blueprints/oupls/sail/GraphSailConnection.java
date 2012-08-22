@@ -119,7 +119,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
 
         if (0 == contexts.length) {
-            return createIteration(store.matchers[index].match(subject, predicate, object, null));
+            return createIteration(store.matchers[index].match(subject, predicate, object, null, includeInferred));
         } else {
             Collection<CloseableIteration<Statement, SailException>> iterations = new LinkedList<CloseableIteration<Statement, SailException>>();
 
@@ -128,21 +128,22 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 index |= 0x8;
 
                 Matcher m = store.matchers[index];
-                iterations.add(createIteration(m.match(subject, predicate, object, context)));
+                iterations.add(createIteration(m.match(subject, predicate, object, context, includeInferred)));
             }
 
             return new CompoundCloseableIteration<Statement, SailException>(iterations);
         }
     }
 
+    // Note: inferred statements are not counted
     public long sizeInternal(final Resource... contexts) throws SailException {
         if (0 == contexts.length) {
-            return countIterator(store.matchers[0x0].match(null, null, null, null));
+            return countIterator(store.matchers[0x0].match(null, null, null, null, false));
         } else {
             int count = 0;
 
             for (Resource context : contexts) {
-                count += countIterator(store.matchers[0x8].match(null, null, null, context));
+                count += countIterator(store.matchers[0x8].match(null, null, null, context, false));
             }
 
             return count;
@@ -210,7 +211,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             Vertex in = getOrCreateVertex(object);
             Edge edge = store.graph.addEdge(null, out, in, predicate.stringValue());
             if (inferred) {
-                edge.setProperty(GraphSail.INFERRED, inferred);
+                //System.out.println("inferred!");
+                edge.setProperty(GraphSail.INFERRED, true);
             }
 
             for (IndexingMatcher m : (Collection<IndexingMatcher>) store.indexers) {
@@ -280,7 +282,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
 
         if (0 == contexts.length) {
-            Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, null);
+            Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, null, inferred);
             for (Edge anI : i) {
                 edgesToRemove.add(anI);
             }
@@ -290,7 +292,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 index |= 0x8;
 
                 //System.out.println("matcher: " + indexes.matchers[index]);
-                Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, context);
+                Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, context, inferred);
                 for (Edge e : i) {
                     Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
                     if ((!inferred && null == b)
@@ -343,11 +345,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
 
         if (0 == contexts.length) {
-            deleteEdgesInIterator(inferred, store.matchers[0x0].match(null, null, null, null));
+            deleteEdgesInIterator(inferred, store.matchers[0x0].match(null, null, null, null, inferred));
         } else {
             for (Resource context : contexts) {
                 // Note: order of operands to the "or" is important here
-                deleteEdgesInIterator(inferred, store.matchers[0x8].match(null, null, null, context));
+                deleteEdgesInIterator(inferred, store.matchers[0x8].match(null, null, null, context, inferred));
             }
         }
     }
@@ -641,11 +643,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
         private final SimpleStatement s = new SimpleStatement();
-        private final Iterable<Edge> iterator;
         private final Iterator<Edge> iter;
 
         public VolatileStatementIteration(final Iterable<Edge> iterator) {
-            this.iterator = iterator;
             iter = iterator.iterator();
         }
 

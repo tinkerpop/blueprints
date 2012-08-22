@@ -33,7 +33,11 @@ public class GraphBasedMatcher extends Matcher {
         this.store = store;
     }
 
-    public Iterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
+    public Iterable<Edge> match(final Resource subject,
+                                final URI predicate,
+                                final Value object,
+                                final Resource context,
+                                final boolean includeInferred) {
         //System.out.println("+ spoc: " + s + " " + p + " " + o + " " + c);
         //System.out.println("+ \ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
         final String contextStr = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
@@ -51,7 +55,8 @@ public class GraphBasedMatcher extends Matcher {
                     public boolean fulfilledBy(final Edge edge) {
                         return store.matches(edge.getVertex(Direction.IN), object)
                                 && (!p || edge.getLabel().equals(predicate.stringValue()))
-                                && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
+                                && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr))
+                                && (includeInferred || null == edge.getProperty(GraphSail.INFERRED));
                     }
                 });
             }
@@ -61,7 +66,8 @@ public class GraphBasedMatcher extends Matcher {
                     : new FilteredIterator<Edge>(vs.getEdges(Direction.OUT), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
-                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
+                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr))
+                            && (includeInferred || null == edge.getProperty(GraphSail.INFERRED));
                 }
             });
         } else {
@@ -70,7 +76,8 @@ public class GraphBasedMatcher extends Matcher {
                     : new FilteredIterator<Edge>(vo.getEdges(Direction.IN), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
                     return (!p || edge.getLabel().equals(predicate.stringValue()))
-                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr));
+                            && (!c || edge.getProperty(GraphSail.CONTEXT_PROP).equals(contextStr))
+                            && (includeInferred || null == edge.getProperty(GraphSail.INFERRED));
                 }
             });
         }
