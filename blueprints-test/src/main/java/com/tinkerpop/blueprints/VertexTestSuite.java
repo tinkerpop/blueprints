@@ -273,38 +273,40 @@ public class VertexTestSuite extends TestSuite {
 
     public void testAddManyVertexProperties() {
         Graph graph = graphTest.generateGraph();
+        int numVertices = 50;
+        int numProperties = 50;
         if (graph.getFeatures().supportsVertexProperties && graph.getFeatures().supportsStringProperty) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             this.stopWatch();
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < numVertices; i++) {
                 Vertex vertex = graph.addVertex(null);
-                for (int j = 0; j < 15; j++) {
+                for (int j = 0; j < numProperties; j++) {
                     vertex.setProperty(UUID.randomUUID().toString(), UUID.randomUUID().toString());
                 }
                 vertices.add(vertex);
             }
-            printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
+            printPerformance(graph.toString(), numProperties * numVertices, "vertex properties added (with vertices being added too)", this.stopWatch());
 
             if (graph.getFeatures().supportsVertexIteration)
-                assertEquals(50, count(graph.getVertices()));
-            assertEquals(50, vertices.size());
+                assertEquals(numVertices, count(graph.getVertices()));
+            assertEquals(numVertices, vertices.size());
             for (Vertex vertex : vertices) {
-                assertEquals(15, vertex.getPropertyKeys().size());
+                assertEquals(numProperties, vertex.getPropertyKeys().size());
             }
         } else if (graph.getFeatures().isRDFModel) {
             Set<Vertex> vertices = new HashSet<Vertex>();
             this.stopWatch();
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < numVertices; i++) {
                 Vertex vertex = graph.addVertex("\"" + UUID.randomUUID().toString() + "\"");
                 for (int j = 0; j < 15; j++) {
                     vertex.setProperty(SailTokens.DATATYPE, "http://www.w3.org/2001/XMLSchema#anyURI");
                 }
                 vertices.add(vertex);
             }
-            printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
+            printPerformance(graph.toString(), 15 * numVertices, "vertex properties added (with vertices being added too)", this.stopWatch());
             if (graph.getFeatures().supportsVertexIteration)
-                assertEquals(count(graph.getVertices()), 50);
-            assertEquals(vertices.size(), 50);
+                assertEquals(count(graph.getVertices()), numVertices);
+            assertEquals(vertices.size(), numVertices);
             for (Vertex vertex : vertices) {
                 assertEquals(3, vertex.getPropertyKeys().size());
                 assertTrue(vertex.getPropertyKeys().contains(SailTokens.DATATYPE));

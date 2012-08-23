@@ -3,6 +3,9 @@ package com.tinkerpop.blueprints.impls.tg;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.impls.tg.properties.PropertyArray;
+import com.tinkerpop.blueprints.impls.tg.properties.PropertyContainer;
+import com.tinkerpop.blueprints.impls.tg.properties.PropertyMap;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -17,17 +20,18 @@ import java.util.Set;
  */
 abstract class TinkerElement implements Element, Serializable {
 
-    protected Map<String, Object> properties = new HashMap<String, Object>();
+    private PropertyContainer properties;
     protected final String id;
     protected final TinkerGraph graph;
 
     protected TinkerElement(final String id, final TinkerGraph graph) {
         this.graph = graph;
         this.id = id;
+        this.properties = new PropertyArray();
     }
 
     public Set<String> getPropertyKeys() {
-        return this.properties.keySet();
+        return this.properties.getPropertyKeys();
     }
 
     public Object getProperty(final String key) {
@@ -42,7 +46,9 @@ abstract class TinkerElement implements Element, Serializable {
         if (key.equals(StringFactory.EMPTY_STRING))
             throw ExceptionFactory.elementKeyCanNotBeEmpty();
 
-        Object oldValue = this.properties.put(key, value);
+
+        Object oldValue = this.properties.get(key);
+        this.properties=this.properties.setProperty(key,value);
         if (this instanceof TinkerVertex)
             this.graph.vertexKeyIndex.autoUpdate(key, value, oldValue, (TinkerVertex) this);
         else
@@ -50,7 +56,8 @@ abstract class TinkerElement implements Element, Serializable {
     }
 
     public Object removeProperty(final String key) {
-        Object oldValue = this.properties.remove(key);
+        Object oldValue = this.properties.get(key);
+        this.properties=this.properties.removeProperty(key);
         if (this instanceof TinkerVertex)
             this.graph.vertexKeyIndex.autoRemove(key, oldValue, (TinkerVertex) this);
         else
