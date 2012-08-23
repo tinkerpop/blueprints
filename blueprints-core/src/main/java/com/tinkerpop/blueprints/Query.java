@@ -8,7 +8,25 @@ package com.tinkerpop.blueprints;
  */
 public interface Query {
 
-    public enum Compare {EQUAL, NOT_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL}
+    public enum Compare {
+        EQUAL, NOT_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL;
+
+        public Compare opposite() {
+            if (this.equals(EQUAL))
+                return NOT_EQUAL;
+            else if (this.equals(NOT_EQUAL))
+                return EQUAL;
+            else if (this.equals(GREATER_THAN))
+                return LESS_THAN_EQUAL;
+            else if (this.equals(GREATER_THAN_EQUAL))
+                return LESS_THAN;
+            else if (this.equals(LESS_THAN))
+                return GREATER_THAN_EQUAL;
+            else
+                return GREATER_THAN;
+        }
+
+    }
 
     /**
      * Filter out the edge if it does not have a property with the specified value.
