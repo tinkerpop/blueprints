@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  * GMLWriter writes a Graph to a GML OutputStream.
@@ -40,6 +42,12 @@ public class GMLWriter {
     private boolean useId = false;
     private String vertexIdKey = GMLTokens.BLUEPRINTS_ID;
     private String edgeIdKey = GMLTokens.BLUEPRINTS_ID;
+
+    /**
+     * Property keys must be alphanumeric and not exceed 254 characters. They must start with an alpha character.
+     */
+    private static final String GML_PROPERTY_KEY_REGEX = "[a-zA-Z][a-zA-Z0-9]{0,253}";
+    private static final Pattern regex = Pattern.compile(GML_PROPERTY_KEY_REGEX);
 
     /**
      * @param graph the Graph to pull the data from
@@ -68,14 +76,14 @@ public class GMLWriter {
     /**
      * @param vertexIdKey gml property to use for the blueprints vertex id, defaults to {@link GMLTokens#BLUEPRINTS_ID}
      */
-    public void setVertexIdKey(String vertexIdKey) {
+    public void setVertexIdKey(final String vertexIdKey) {
         this.vertexIdKey = vertexIdKey;
     }
 
     /**
      * @param edgeIdKey gml property to use for the blueprints edges id, defaults to {@link GMLTokens#BLUEPRINTS_ID}
      */
-    public void setEdgeIdKey(String edgeIdKey) {
+    public void setEdgeIdKey(final String edgeIdKey) {
         this.edgeIdKey = edgeIdKey;
     }
 
@@ -88,15 +96,15 @@ public class GMLWriter {
     public void outputGraph(final OutputStream gMLOutputStream) throws IOException {
 
         // ISO 8859-1 as specified in the GML documentation
-        Writer writer = new BufferedWriter(new OutputStreamWriter(gMLOutputStream, Charset.forName("ISO-8859-1")));
+        final Writer writer = new BufferedWriter(new OutputStreamWriter(gMLOutputStream, Charset.forName("ISO-8859-1")));
 
-        List<Vertex> vertices = new ArrayList<Vertex>();
-        List<Edge> edges = new ArrayList<Edge>();
+        final List<Vertex> vertices = new ArrayList<Vertex>();
+        final List<Edge> edges = new ArrayList<Edge>();
 
         populateLists(vertices, edges);
 
         if (normalize) {
-            LexicographicalElementComparator comparator = new LexicographicalElementComparator();
+            final LexicographicalElementComparator comparator = new LexicographicalElementComparator();
             Collections.sort(vertices, comparator);
             Collections.sort(edges, comparator);
         }
@@ -107,8 +115,8 @@ public class GMLWriter {
         writer.close();
     }
 
-    private void writeGraph(Writer writer, List<Vertex> vertices, List<Edge> edges) throws IOException {
-        Map<Vertex, Integer> ids = new HashMap<Vertex, Integer>();
+    private void writeGraph(final Writer writer, final List<Vertex> vertices, final List<Edge> edges) throws IOException {
+        final Map<Vertex, Integer> ids = new HashMap<Vertex, Integer>();
 
         writer.write(GMLTokens.GRAPH);
         writer.write(OPEN_LIST);
@@ -118,11 +126,12 @@ public class GMLWriter {
 
     }
 
-    private void writeVertices(Writer writer, List<Vertex> vertices, Map<Vertex, Integer> ids) throws IOException {
+    private void writeVertices(final Writer writer, final List<Vertex> vertices,
+                               final Map<Vertex, Integer> ids) throws IOException {
         int count = 1;
         for (Vertex v : vertices) {
             if (useId) {
-                Integer id = Integer.valueOf(v.getId().toString());
+                final Integer id = Integer.valueOf(v.getId().toString());
                 writeVertex(writer, v, id);
                 ids.put(v, id);
             } else {
@@ -133,7 +142,7 @@ public class GMLWriter {
         }
     }
 
-    private void writeVertex(Writer writer, Vertex v, int id) throws IOException {
+    private void writeVertex(final Writer writer, final Vertex v, final int id) throws IOException {
         writer.write(TAB);
         writer.write(GMLTokens.NODE);
         writer.write(OPEN_LIST);
@@ -144,13 +153,15 @@ public class GMLWriter {
         writer.write(CLOSE_LIST);
     }
 
-    private void writeEdges(Writer writer, List<Edge> edges, Map<Vertex, Integer> ids) throws IOException {
+    private void writeEdges(final Writer writer, final List<Edge> edges,
+                            final Map<Vertex, Integer> ids) throws IOException {
         for (Edge e : edges) {
             writeEdgeProperties(writer, e, ids.get(e.getVertex(Direction.OUT)), ids.get(e.getVertex(Direction.IN)));
         }
     }
 
-    private void writeEdgeProperties(Writer writer, Edge e, Integer source, Integer target) throws IOException {
+    private void writeEdgeProperties(final Writer writer, final Edge e,
+                                     final Integer source, final Integer target) throws IOException {
         writer.write(TAB);
         writer.write(GMLTokens.EDGE);
         writer.write(OPEN_LIST);
@@ -165,8 +176,8 @@ public class GMLWriter {
         writer.write(CLOSE_LIST);
     }
 
-    private void writeVertexProperties(Writer writer, Vertex e) throws IOException {
-        Object blueprintsId = e.getId();
+    private void writeVertexProperties(final Writer writer, final Vertex e) throws IOException {
+        final Object blueprintsId = e.getId();
         if (!useId) {
             writeKey(writer, vertexIdKey);
             if (blueprintsId instanceof Number) {
@@ -178,8 +189,8 @@ public class GMLWriter {
         writeProperties(writer, e);
     }
 
-    private void writeEdgeProperties(Writer writer, Edge e) throws IOException {
-        Object blueprintsId = e.getId();
+    private void writeEdgeProperties(final Writer writer, final Edge e) throws IOException {
+        final Object blueprintsId = e.getId();
         if (!useId) {
             writeKey(writer, edgeIdKey);
             if (blueprintsId instanceof Number) {
@@ -191,15 +202,17 @@ public class GMLWriter {
         writeProperties(writer, e);
     }
 
-    private void writeProperties(Writer writer, Element e) throws IOException {
+    private void writeProperties(final Writer writer, final Element e) throws IOException {
         for (String key : e.getPropertyKeys()) {
-            Object property = e.getProperty(key);
-            writeKey(writer, key);
-            writeProperty(writer, property, 0);
+            if (regex.matcher(key).matches()) {
+                final Object property = e.getProperty(key);
+                writeKey(writer, key);
+                writeProperty(writer, property, 0);
+            }
         }
     }
 
-    private void writeProperty(Writer writer, Object property, int tab) throws IOException {
+    private void writeProperty(final Writer writer, final Object property, int tab) throws IOException {
         if (property instanceof Number) {
             writeNumberProperty(writer, (Number) property);
         } else if (property instanceof Map) {
@@ -209,7 +222,7 @@ public class GMLWriter {
         }
     }
 
-    private void writeMapProperty(Writer writer, Map<?, ?> map, int tabs) throws IOException {
+    private void writeMapProperty(final Writer writer, final Map<?, ?> map, int tabs) throws IOException {
         writer.write(OPEN_LIST);
         tabs++;
         for (Entry<?, ?> entry : map.entrySet()) {
@@ -222,32 +235,32 @@ public class GMLWriter {
 
     }
 
-    private void writeTabs(Writer writer, int tabs) throws IOException {
+    private void writeTabs(final Writer writer, final int tabs) throws IOException {
         for (int i = 0; i <= tabs; i++) {
             writer.write(TAB);
         }
     }
 
-    private void writeNumberProperty(Writer writer, Number integer) throws IOException {
+    private void writeNumberProperty(final Writer writer, final Number integer) throws IOException {
         writer.write(integer.toString());
         writer.write(NEW_LINE);
     }
 
-    private void writeStringProperty(Writer writer, Object string) throws IOException {
+    private void writeStringProperty(final Writer writer, final Object string) throws IOException {
         writer.write("\"");
         writer.write(string.toString());
         writer.write("\"");
         writer.write(NEW_LINE);
     }
 
-    private void writeKey(Writer writer, String command) throws IOException {
+    private void writeKey(final Writer writer, final String command) throws IOException {
         writer.write(TAB);
         writer.write(TAB);
         writer.write(command);
         writer.write(DELIMITER);
     }
 
-    private void populateLists(List<Vertex> vertices, List<Edge> edges) {
+    private void populateLists(final List<Vertex> vertices, final List<Edge> edges) {
         for (Vertex v : graph.getVertices()) {
             vertices.add(v);
         }
@@ -264,7 +277,7 @@ public class GMLWriter {
      * @throws IOException thrown if there is an error generating the GML data
      */
     public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream) throws IOException {
-        GMLWriter writer = new GMLWriter(graph);
+        final GMLWriter writer = new GMLWriter(graph);
         writer.outputGraph(graphMLOutputStream);
     }
 }

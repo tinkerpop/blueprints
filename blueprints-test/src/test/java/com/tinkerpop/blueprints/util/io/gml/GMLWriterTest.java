@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.io.ByteArrayInputStream;
@@ -68,6 +69,51 @@ public class GMLWriterTest extends TestCase {
 
         assertEquals(getIterableCount(g1.getVertices()), getIterableCount(g2.getVertices()));
         assertEquals(getIterableCount(g1.getEdges()), getIterableCount(g2.getEdges()));
+
+    }
+
+    public void testRoundTripIgnoreBadProperties() throws Exception {
+        TinkerGraph g1 = TinkerGraphFactory.createTinkerGraph();
+        Vertex v = g1.getVertex(1);
+        v.setProperty("bad_property", "underscore");
+        v.setProperty("bad property", "space");
+        v.setProperty("bad-property", "dash");
+        v.setProperty("bad$property", "other stuff");
+        v.setProperty("badproperty_", "but don't get too fancy");
+        v.setProperty("_badproperty", "or it won't work");
+        v.setProperty("55", "numbers alone are bad");
+        v.setProperty("5badproperty", "must start with alpha");
+        v.setProperty("badpropertyajflalfjsajfdfjdkfjsdiahfshfksajdhfkjdhfkjhaskdfhaksdhfsalkjdfhkjdhkahsdfkjasdhfkajfdhkajfhkadhfkjsdafhkajfdhasdkfhakfdhakjsdfhkadhfakjfhaksdjhfkajfhakhfaksfdhkahdfkahfkajsdhfkjahdfkahsdfkjahfkhakfsdjhakjksfhakfhaksdhfkadhfakhfdkasfdhiuerfaeafdkjhakfdhfdadfasdfsdafadf", "super long keys won't work");
+        v.setProperty("good5property", "numbers are cool");
+        v.setProperty("goodproperty5", "numbers are cool");
+        v.setProperty("a", "one letter is ok");
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        GMLWriter w = new GMLWriter(g1);
+        w.setUseId(true);
+        w.outputGraph(bos);
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+
+        Graph g2 = new TinkerGraph();
+        GMLReader.inputGraph(g2, bis);
+
+        assertEquals(getIterableCount(g1.getVertices()), getIterableCount(g2.getVertices()));
+        assertEquals(getIterableCount(g1.getEdges()), getIterableCount(g2.getEdges()));
+
+        Vertex v1 = g2.getVertex(1);
+        Assert.assertNull(v1.getProperty("bad_property"));
+        Assert.assertNull(v1.getProperty("bad property"));
+        Assert.assertNull(v1.getProperty("bad-property"));
+        Assert.assertNull(v1.getProperty("bad$property"));
+        Assert.assertNull(v1.getProperty("_badproperty"));
+        Assert.assertNull(v1.getProperty("badproperty_"));
+        Assert.assertNull(v1.getProperty("5badproperty"));
+        Assert.assertNull(v1.getProperty("55"));
+        Assert.assertNull(v1.getProperty("badpropertyajflalfjsajfdfjdkfjsdiahfshfksajdhfkjdhfkjhaskdfhaksdhfsalkjdfhkjdhkahsdfkjasdhfkajfdhkajfhkadhfkjsdafhkajfdhasdkfhakfdhakjsdfhkadhfakjfhaksdjhfkajfhakhfaksfdhkahdfkahfkajsdhfkjahdfkahsdfkjahfkhakfsdjhakjksfhakfhaksdhfkadhfakhfdkasfdhiuerfaeafdkjhakfdhfdadfasdfsdafadf"));
+        Assert.assertEquals("numbers are cool", v1.getProperty("good5property"));
+        Assert.assertEquals("numbers are cool", v1.getProperty("goodproperty5"));
+        Assert.assertEquals("one letter is ok", v1.getProperty("a"));
 
     }
 
