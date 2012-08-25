@@ -17,6 +17,8 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 
 * Refactoring of @GraphSONUtility@ and related reader/writer classes to improve performance and offer more control over how GraphSON is read and written
 * Added support for @Compare.opposite()@ to get the inverse of a comparator
+* Added support for property inclusion and exclusion in the GraphMLReader/Writer.
+* GMLWriter ignores any property keys that are not allowable by GML standards.
 
 h3. Version 2.1.0 (August 4, 2012)
 
