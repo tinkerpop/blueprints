@@ -21,7 +21,17 @@ public class TrivialMatcher extends Matcher {
     }
 
     @Override
-    public Iterable<Edge> match(final Resource subject, final URI predicate, final Value object, final Resource context) {
-        return new IteratorCloseableIterable<Edge>(graph.getEdges().iterator());
+    public Iterable<Edge> match(final Resource subject,
+                                final URI predicate,
+                                final Value object,
+                                final Resource context,
+                                final boolean includeInferred) {
+        Iterable<Edge> i = graph.getEdges();
+
+        if (!includeInferred) {
+            i = new FilteredIterator<Edge>(i, new NoInferenceCriterion());
+        }
+
+        return new IteratorCloseableIterable<Edge>(i.iterator());
     }
 }

@@ -41,7 +41,7 @@ public abstract class GraphSailTest extends SailTest {
         uniqueStatements = true;
 
         graph = createGraph();
-        GraphSail g = new GraphSail(graph);
+        GraphSail<KeyIndexableGraph> g = new GraphSail<KeyIndexableGraph>(graph);
         g.enforceUniqueStatements(uniqueStatements);
 
         return g;
@@ -91,21 +91,21 @@ public abstract class GraphSailTest extends SailTest {
         sc = sail.getConnection();
         //showStatements(sc, null, null, null);
         try {
-            assertEquals(14, countStatements(sc, null, null, null));
+            assertEquals(14, countStatements(sc, null, null, null, false));
             assertEquals(edgesBefore + 14, countEdges());
             assertEquals(verticesBefore + 10, countVertices());
 
             sc.removeStatements(ref, null, null);
             sc.commit();
 
-            assertEquals(13, countStatements(sc, null, null, null));
+            assertEquals(13, countStatements(sc, null, null, null, false));
             assertEquals(edgesBefore + 13, countEdges());
             assertEquals(verticesBefore + 9, countVertices());
 
             sc.clear();
             sc.commit();
 
-            assertEquals(0, countStatements(sc, null, null, null));
+            assertEquals(0, countStatements(sc, null, null, null, false));
             assertEquals(0, countEdges());
             // Namespaces vertex is still present.
             assertEquals(verticesBefore, countVertices());
@@ -135,7 +135,7 @@ public abstract class GraphSailTest extends SailTest {
 
         sc = sail.getConnection();
         try {
-            assertEquals(3, countStatements(sc, class1, RDFS.SUBCLASSOF, null));
+            assertEquals(3, countStatements(sc, class1, RDFS.SUBCLASSOF, null, false));
             assertEquals(edgesBefore + 14, countEdges());
             assertEquals(verticesBefore + 10, countVertices());
         } finally {
@@ -149,7 +149,7 @@ public abstract class GraphSailTest extends SailTest {
 
         sc = sail.getConnection();
         try {
-            assertEquals(5, countStatements(sc, class1, RDFS.SUBCLASSOF, null));
+            assertEquals(5, countStatements(sc, class1, RDFS.SUBCLASSOF, null, false));
             assertEquals(edgesBefore + 23, countEdges());
             assertEquals(verticesBefore + 12, countVertices());
         } finally {

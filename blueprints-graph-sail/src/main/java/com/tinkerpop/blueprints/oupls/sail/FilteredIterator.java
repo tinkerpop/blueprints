@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.oupls.sail;
 import com.tinkerpop.blueprints.CloseableIterable;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An Iterator which constrains results based on a specified criterion.
@@ -61,7 +62,25 @@ class FilteredIterator<T> implements CloseableIterable<T>, Iterator<T> {
         return this;
     }
 
-    public interface Criterion<T> {
+    public static interface Criterion<T> {
         boolean fulfilledBy(T t);
+    }
+
+    public static class CompoundCriterion<T> implements Criterion<T> {
+        private final List<Criterion<T>> criteria;
+
+        public CompoundCriterion(List<Criterion<T>> criteria) {
+            this.criteria = criteria;
+        }
+
+        public boolean fulfilledBy(T t) {
+            for (Criterion<T> c : criteria) {
+                if (!c.fulfilledBy(t)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

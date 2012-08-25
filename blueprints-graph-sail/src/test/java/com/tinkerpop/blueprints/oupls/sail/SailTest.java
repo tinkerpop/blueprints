@@ -108,10 +108,10 @@ public abstract class SailTest {
             // default context, different S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            before = countStatements(sc, uriA, null, null);
+            before = countStatements(sc, uriA, null, null, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
-            after = countStatements(sc, uriA, null, null);
+            after = countStatements(sc, uriA, null, null, false);
             assertEquals(0, before);
             System.out.flush();
             assertEquals(1, after);
@@ -119,30 +119,30 @@ public abstract class SailTest {
             // one specific context, different S,P,O
             sc.removeStatements(uriA, null, null, uriD);
             sc.commit();
-            before = countStatements(sc, uriA, null, null, uriD);
+            before = countStatements(sc, uriA, null, null, false, uriD);
             sc.addStatement(uriA, uriB, uriC, uriD);
             sc.commit();
-            after = countStatements(sc, uriA, null, null, uriD);
+            after = countStatements(sc, uriA, null, null, false, uriD);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // one specific context, same S,P,O,G
             sc.removeStatements(uriA, null, null, uriA);
             sc.commit();
-            before = countStatements(sc, uriA, null, null, uriA);
+            before = countStatements(sc, uriA, null, null, false, uriA);
             sc.addStatement(uriA, uriB, uriC, uriA);
             sc.commit();
-            after = countStatements(sc, uriA, null, null, uriA);
+            after = countStatements(sc, uriA, null, null, false, uriA);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // default context, same S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            before = countStatements(sc, uriA, null, null);
+            before = countStatements(sc, uriA, null, null, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
-            after = countStatements(sc, uriA, null, null);
+            after = countStatements(sc, uriA, null, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
@@ -161,10 +161,10 @@ public abstract class SailTest {
 
             // Add statement to the implicit null context.
             sc.removeStatements(null, null, null);
-            before = countStatements(sc, uriA, uriB, null);
+            before = countStatements(sc, uriA, uriB, null, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
-            after = countStatements(sc, uriA, uriB, null);
+            after = countStatements(sc, uriA, uriB, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
@@ -186,30 +186,30 @@ public abstract class SailTest {
             // Add statement to a specific context.
             sc.removeStatements(null, null, uriA, uriA);
             sc.commit();
-            before = countStatements(sc, null, null, uriA);
+            before = countStatements(sc, null, null, uriA, false);
             sc.addStatement(uriB, uriC, uriA);
             sc.commit();
-            after = countStatements(sc, null, null, uriA);
+            after = countStatements(sc, null, null, uriA, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // Add plain literal statement to the default context.
             sc.removeStatements(null, null, plainLitA);
             sc.commit();
-            before = countStatements(sc, null, null, plainLitA);
+            before = countStatements(sc, null, null, plainLitA, false);
             sc.addStatement(uriA, uriA, plainLitA);
             sc.commit();
-            after = countStatements(sc, null, null, plainLitA);
+            after = countStatements(sc, null, null, plainLitA, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // Add string-typed literal statement to the default context.
             sc.removeStatements(null, null, plainLitA);
             sc.commit();
-            before = countStatements(sc, null, null, stringLitA);
+            before = countStatements(sc, null, null, stringLitA, false);
             sc.addStatement(uriA, uriA, stringLitA);
             sc.commit();
-            after = countStatements(sc, null, null, stringLitA);
+            after = countStatements(sc, null, null, stringLitA, false);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
@@ -232,32 +232,32 @@ public abstract class SailTest {
             // Add statement to the implicit null context.
             sc.removeStatements(null, null, null, uriA);
             sc.commit();
-            before = countStatements(sc, null, uriA, uriB);
+            before = countStatements(sc, null, uriA, uriB, false);
             sc.addStatement(uriA, uriA, uriB);
             sc.commit();
-            after = countStatements(sc, null, uriA, uriB);
+            after = countStatements(sc, null, uriA, uriB, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // Add plain literal statement to the default context.
             sc.removeStatements(null, null, plainLitA);
             sc.commit();
-            before = countStatements(sc, null, uriA, plainLitA);
+            before = countStatements(sc, null, uriA, plainLitA, false);
             sc.addStatement(uriA, uriA, plainLitA);
             sc.addStatement(uriA, uriB, plainLitA);
             sc.addStatement(uriB, uriB, plainLitA);
             sc.commit();
-            after = countStatements(sc, null, uriA, plainLitA);
+            after = countStatements(sc, null, uriA, plainLitA, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // Add string-typed literal statement to the default context.
             sc.removeStatements(null, null, fooLabel);
             sc.commit();
-            before = countStatements(sc, null, firstName, fooLabel);
+            before = countStatements(sc, null, firstName, fooLabel, false);
             sc.addStatement(foo, firstName, fooLabel);
             sc.commit();
-            after = countStatements(sc, null, firstName, fooLabel);
+            after = countStatements(sc, null, firstName, fooLabel, false);
             assertEquals(0, before);
             assertEquals(1, after);
             assertEquals(foo, toSet(sc.getStatements(null, firstName, fooLabel, false)).iterator().next().getSubject());
@@ -280,40 +280,40 @@ public abstract class SailTest {
             // default context, different S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            before = countStatements(sc, uriA, uriB, uriC);
+            before = countStatements(sc, uriA, uriB, uriC, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
-            after = countStatements(sc, uriA, uriB, uriC);
+            after = countStatements(sc, uriA, uriB, uriC, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // default context, same S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            before = countStatements(sc, uriA, uriB, uriC);
+            before = countStatements(sc, uriA, uriB, uriC, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
-            after = countStatements(sc, uriA, uriB, uriC);
+            after = countStatements(sc, uriA, uriB, uriC, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // one specific context, different S,P,O
             sc.removeStatements(uriA, null, null, uriD);
             sc.commit();
-            before = countStatements(sc, uriA, uriB, uriC, uriD);
+            before = countStatements(sc, uriA, uriB, uriC, false, uriD);
             sc.addStatement(uriA, uriB, uriC, uriD);
             sc.commit();
-            after = countStatements(sc, uriA, uriB, uriC, uriD);
+            after = countStatements(sc, uriA, uriB, uriC, false, uriD);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // one specific context, same S,P,O,G
             sc.removeStatements(uriA, null, null, uriA);
             sc.commit();
-            before = countStatements(sc, uriA, uriB, uriC, uriA);
+            before = countStatements(sc, uriA, uriB, uriC, false, uriA);
             sc.addStatement(uriA, uriB, uriC, uriA);
             sc.commit();
-            after = countStatements(sc, uriA, uriB, uriC, uriA);
+            after = countStatements(sc, uriA, uriB, uriC, false, uriA);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
@@ -337,32 +337,32 @@ public abstract class SailTest {
             // Add statement to the implicit null context.
             sc.removeStatements(null, uriA, null);
             sc.commit();
-            before = countStatements(sc, null, uriA, null);
+            before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriB, uriA, uriC);
             sc.commit();
-            after = countStatements(sc, null, uriA, null);
+            after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // Add plain literal statement to the default context.
             sc.removeStatements(null, uriA, null);
             sc.commit();
-            before = countStatements(sc, null, uriA, null);
+            before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriA, uriA, plainLitA);
             sc.addStatement(uriA, uriB, plainLitA);
             sc.addStatement(uriB, uriB, plainLitA);
             sc.commit();
-            after = countStatements(sc, null, uriA, null);
+            after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             // Add string-typed literal statement to the default context.
             sc.removeStatements(null, firstName, null);
             sc.commit();
-            before = countStatements(sc, null, firstName, null);
+            before = countStatements(sc, null, firstName, null, false);
             sc.addStatement(foo, firstName, fooLabel);
             sc.commit();
-            after = countStatements(sc, null, firstName, null);
+            after = countStatements(sc, null, firstName, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
             assertEquals(foo, toSet(sc.getStatements(null, firstName, null, false)).iterator().next().getSubject());
@@ -370,22 +370,22 @@ public abstract class SailTest {
             // Add statement to a non-null context.
             sc.removeStatements(null, uriA, null);
             sc.commit();
-            before = countStatements(sc, null, uriA, null);
+            before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriB, uriA, uriC, uriA);
             sc.commit();
-            after = countStatements(sc, null, uriA, null);
+            after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             sc.removeStatements(null, uriA, null);
             sc.commit();
-            before = countStatements(sc, null, uriA, null);
+            before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriB, uriA, uriC, uriC);
             sc.addStatement(uriC, uriA, uriA, uriA);
             sc.commit();
             sc.addStatement(uriA, uriA, uriB, uriB);
             sc.commit();
-            after = countStatements(sc, null, uriA, null);
+            after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(3, after);
 
@@ -410,22 +410,22 @@ public abstract class SailTest {
             sc.commit();
 
             // Get statements from all contexts.
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
 
             // Get statements from a specific partition context.
-            count = countStatements(sc, null, null, null, uriA);
+            count = countStatements(sc, null, null, null, false, uriA);
             assertEquals(1, count);
 
             // Get statements from the null context.
             Resource[] c = {null};
-            count = countStatements(sc, null, null, null, c);
+            count = countStatements(sc, null, null, null, false, c);
             //assertTrue(count > 0);
             assertEquals(1, count);
             int countLast = count;
 
             // Get statements from more than one context.
-            count = countStatements(sc, null, null, null, contexts);
+            count = countStatements(sc, null, null, null, false, contexts);
             assertEquals(1 + countLast, count);
 
         } finally {
@@ -446,59 +446,59 @@ public abstract class SailTest {
             // Remove from all contexts.
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
 
             // Remove from one partition context.
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             Resource[] oneContext = {uriA};
             sc.removeStatements(uriA, null, null, oneContext);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
 
             // Remove from the null context.
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             Resource[] nullContext = {null};
             sc.removeStatements(uriA, null, null, nullContext);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
 
             // Remove from more than one context.
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             sc.removeStatements(uriA, null, null);
             sc.commit();
-            count = countStatements(sc, uriA, null, null, contexts);
+            count = countStatements(sc, uriA, null, null, false, contexts);
             assertEquals(0, count);
 
         } finally {
@@ -595,15 +595,15 @@ public abstract class SailTest {
             SailConnection sc = sail.getConnection();
             try {
                 sc.clear();
-                assertEquals(0, countStatements(sc, uriA, uriB, uriC));
+                assertEquals(0, countStatements(sc, uriA, uriB, uriC, false));
                 sc.addStatement(uriA, uriB, uriC);
-                assertEquals(1, countStatements(sc, uriA, uriB, uriC));
+                assertEquals(1, countStatements(sc, uriA, uriB, uriC, false));
                 sc.addStatement(uriA, uriB, uriC);
-                assertEquals(1, countStatements(sc, uriA, uriB, uriC));
+                assertEquals(1, countStatements(sc, uriA, uriB, uriC, false));
 
                 sc.addStatement(uriA, uriB, uriC, uriC);
-                assertEquals(2, countStatements(sc, uriA, uriB, uriC));
-                assertEquals(1, countStatements(sc, uriA, uriB, uriC, uriC));
+                assertEquals(2, countStatements(sc, uriA, uriB, uriC, false));
+                assertEquals(1, countStatements(sc, uriA, uriB, uriC, false, uriC));
             } finally {
                 sc.close();
             }
@@ -1340,31 +1340,31 @@ public abstract class SailTest {
         URI uriC = sail.getValueFactory().createURI("http://example.org/test/persistentCommits#c");
         sc = sail.getConnection();
         try {
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.close();
 
             sc = sail.getConnection();
             sc.addStatement(uriA, uriB, uriC);
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
             sc.commit();
             sc.close();
 
             sc = sail.getConnection();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
             sc.close();
 
             sc = sail.getConnection();
             sc.removeStatements(uriA, null, null);
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.commit();
             sc.close();
 
             sc = sail.getConnection();
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
         } finally {
             sc.close();
@@ -1416,7 +1416,7 @@ public abstract class SailTest {
 
         SailConnection sc = sail.getConnection();
         try {
-            count = countStatements(sc, uriA, null, null);
+            count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC);
             Statement statement = sc.getStatements(uriA, uriB, uriC, false, new Resource[]{null}).next();
@@ -1449,26 +1449,29 @@ public abstract class SailTest {
 
                 //showStatements(sc, uriA, RDF.TYPE, null);
 
-                assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null));
-                assertEquals(2, countStatements(sc, uriB, RDF.TYPE, null));
+                assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null, true));
+                assertEquals(1, countStatements(sc, uriA, RDF.TYPE, null, false));
+                assertEquals(2, countStatements(sc, uriB, RDF.TYPE, null, true));
+                assertEquals(1, countStatements(sc, uriB, RDF.TYPE, null, false));
 
                 if (uniqueStatements) {
                     sc.addStatement(uriA, RDF.TYPE, classY);
                     sc.commit();
 
                     //showStatements(sc, uriA, RDF.TYPE, null);
-                    assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null));
+                    assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null, true));
+                    assertEquals(2, countStatements(sc, uriA, RDF.TYPE, null, false));
 
                     sc.removeStatements(uriA, RDF.TYPE, classY);
                     sc.commit();
 
-                    assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null));
+                    assertEquals(3, countStatements(sc, uriA, RDF.TYPE, null, true));
+                    assertEquals(2, countStatements(sc, uriA, RDF.TYPE, null, false));
 
                     //sc.removeStatements(uriA, RDF.TYPE, classX);
                     //sc.commit();
                     //assertEquals(1, countStatements(sc, uriA, RDF.TYPE, null));
                 }
-
             } finally {
                 sc.close();
             }
@@ -1519,8 +1522,9 @@ public abstract class SailTest {
                                   final Resource subject,
                                   final URI predicate,
                                   final Value object,
+                                  final boolean includeInferred,
                                   final Resource... contexts) throws SailException {
-        CloseableIteration<?, SailException> statements = sc.getStatements(subject, predicate, object, true, contexts);
+        CloseableIteration<?, SailException> statements = sc.getStatements(subject, predicate, object, includeInferred, contexts);
         int count = 0;
         try {
             while (statements.hasNext()) {
