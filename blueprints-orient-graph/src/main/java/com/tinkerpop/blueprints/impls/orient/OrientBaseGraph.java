@@ -302,7 +302,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
         synchronized (this) {
             OrientGraphContext context = threadContext.get();
-            if (context == null || context.rawGraph != iDatabase) {
+            if (context == null || !context.rawGraph.getName().equals( iDatabase.getName() ) ) {
                 removeContext();
                 context = new OrientGraphContext();
                 context.rawGraph = iDatabase;
