@@ -35,6 +35,11 @@ import java.util.Set;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGraphDatabase>, KeyIndexableGraph {
+    /**
+   * 
+   */
+  private static final String CLASS_PREFIX = "class:";
+
     protected final static String ADMIN = "admin";
 
     private String url;
@@ -135,17 +140,28 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public Vertex addVertex(final Object id) {
+        String className = null; 
+        if( id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
+          // GET THE CLASS NAME
+          className = id.toString().substring( CLASS_PREFIX.length() );
+        
         final OGraphDatabase db = getRawGraph();
         this.autoStartTransaction();
-        final OrientVertex vertex = new OrientVertex(this, db.createVertex(null));
+        final OrientVertex vertex = new OrientVertex(this, db.createVertex(className));
         vertex.save();
         return vertex;
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        String className = null; 
+        if( id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
+          // GET THE CLASS NAME
+          className = id.toString().substring( CLASS_PREFIX.length() );
+
+      
         final OGraphDatabase db = getRawGraph();
         this.autoStartTransaction();
-        final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement());
+        final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement(), className);
         final OrientEdge edge = new OrientEdge(this, edgeDoc, label);
 
         // SAVE THE VERTICES TO ASSURE THEY ARE IN TX
