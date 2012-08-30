@@ -101,7 +101,12 @@ abstract class Neo4jElement implements Element {
 
                     array[i] = object;
                 }
-                return array;
+                if (array != null) {
+                    return array;
+                }
+                else {
+                    return new int[0];
+                }
             } catch (final ArrayStoreException ase) {
                 // this fires off if the collection is not all of the same type
                 return value;

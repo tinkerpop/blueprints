@@ -24,6 +24,7 @@ import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -229,6 +230,64 @@ public class Neo4jGraphTest extends GraphTest {
             assertEquals(itty.next(), a);
         }
         assertEquals(counter, 1);
+
+        graph.shutdown();
+        deleteDirectory(new File(this.getWorkingDirectory()));
+    }
+
+    public void testArrayProperty() throws Exception {
+        String directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
+        Neo4jGraph graph = new Neo4jGraph(directory);
+
+        // Test non empty native array
+        int[] v0 = new int[2];
+        v0[0] = 1;
+        v0[1] = 2;
+        Vertex a0 = graph.addVertex(null);
+        a0.setProperty("array_property", v0);
+        int[] r0 = (int[]) a0.getProperty("array_property");
+        assertEquals(r0.length, 2);
+        assertEquals(r0[0], 1);
+        assertEquals(r0[1], 2);
+
+        // Test empty native array
+        int[] v1 = new int[0];
+        Vertex a1 = graph.addVertex(null);
+        a1.setProperty("array_property", v1);
+        int[] r1 = (int[]) a1.getProperty("array_property");
+        assertEquals(r1.length, 0);
+
+        // Test non empty, uniform array list
+        ArrayList v2 = new ArrayList();
+        v2.add(1);
+        v2.add(2);
+        Vertex a2 = graph.addVertex(null);
+        a2.setProperty("array_property", v2);
+        int[] r2 = (int[]) a2.getProperty("array_property");
+        assertEquals(r2.length, 2);
+        assertEquals(r2[0], 1);
+        assertEquals(r2[1], 2);
+
+        // Test non empty, non-uniform array list - neo4j does not support this
+        ArrayList v3 = new ArrayList();
+        v3.add(1);
+        v3.add("2");
+        Vertex a3 = graph.addVertex(null);
+        try {
+          a3.setProperty("array_property", v3);
+          assertTrue(false);
+        } catch (java.lang.IllegalArgumentException e) {
+          assertTrue(true);
+        }
+
+        // Test empty array list
+        ArrayList v4 = new ArrayList();
+        Vertex a4 = graph.addVertex(null);
+        a4.setProperty("array_property", v4);
+        int[] r4 = (int[]) a4.getProperty("array_property");
+        assertEquals(r4.length, 0);
 
         graph.shutdown();
         deleteDirectory(new File(this.getWorkingDirectory()));
