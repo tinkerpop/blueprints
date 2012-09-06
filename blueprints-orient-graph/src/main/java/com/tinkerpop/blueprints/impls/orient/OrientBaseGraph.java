@@ -76,11 +76,23 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         if (getRawGraph().getTransaction().isActive())
             stopTransaction(Conclusion.SUCCESS);
 
+        // READ THE PARAMETERS IF ANY
+        OType indexType = OType.STRING;
+        
+        if( indexParameters!=null ) {
+          for( Parameter<?,?> p : indexParameters ){
+            final String key = p.getKey().toString();
+            
+            if( key.equals( "type" ) )
+              indexType = OType.valueOf(key.toUpperCase());
+          }
+        }
+        
         synchronized (contexts) {
             if (context.manualIndices.containsKey(indexName))
                 throw ExceptionFactory.indexAlreadyExists(indexName);
 
-            final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(this, indexName, indexClass, null);
+            final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(this, indexName, indexClass, indexType );
 
             // ADD THE INDEX IN ALL CURRENT CONTEXTS
             for (OrientGraphContext ctx : contexts)
@@ -233,12 +245,13 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
     public Iterable<Vertex> getVertices(final String key, Object value) {
         final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.VERTEX_CLASS_NAME + "." + key);
-        if (idx != null) {
-            if (value != null && !(value instanceof String))
-                value = value.toString();
-
+        if (idx != null){
+            if( !( value instanceof String ) && OType.STRING.equals( idx.getDefinition().getTypes()[0]) )
+              value = value.toString();
+            
             return new OrientElementIterable<Vertex>(this, (Iterable<?>) idx.get(value));
         }
+        
         return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
     }
 
@@ -432,14 +445,21 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
-        if (getRawGraph().getTransaction().isActive())
+        final OGraphDatabase rawGraph = getRawGraph();
+        
+        if (rawGraph.getTransaction().isActive())
             stopTransaction(Conclusion.SUCCESS);
 
         final String className = getClassName(elementClass);
-        getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
+        rawGraph.getMetadata().getIndexManager().dropIndex(className + "." + key);
+        
+        // REMOVE THE PROPERTY IS EXISTS
+        final OClass cls = rawGraph.getMetadata().getSchema().getClass(className);
+        if( cls != null && cls.existsProperty(key) )
+          cls.dropProperty(key);
     }
 
-    public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass) {
+    public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
         final String className = getClassName(elementClass);
         final OGraphDatabase db = getRawGraph();
 
@@ -448,15 +468,38 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
         final OClass cls = db.getMetadata().getSchema().getClass(className);
 
-        final OType indexType;
+        OType type = null;
+        OType embeddedType = null;
+        
+        // READ THE PARAMETERS IF ANY
+        if( indexParameters!=null ) {
+          for( Parameter<?,?> p : indexParameters ){
+            final String k = p.getKey().toString();
+            
+            if( k.equalsIgnoreCase( "type" ) )
+              type = OType.valueOf(p.getValue().toString().toUpperCase());
+            else if( k.equalsIgnoreCase( "embeddedType" ) )
+              embeddedType = OType.valueOf(p.getValue().toString().toUpperCase());
+          }
+        }
+        
         final OProperty property = cls.getProperty(key);
-        if (property == null)
-            indexType = OType.STRING;
-        else
-            indexType = property.getType();
+        if (property != null)
+          type = property.getType();
+        else if( type != null ) {
+          // CREATE A PROPERTY
+          cls.createProperty(key, type, embeddedType);
+        }
 
-        db.getMetadata().getIndexManager()
-                .createIndex(className + "." + key, OClass.INDEX_TYPE.NOTUNIQUE.name(), new OPropertyIndexDefinition(className, key, indexType), cls.getPolymorphicClusterIds(), null);
+        if( type != null )
+          // CREATE THE INDEX AGAINST THE PROPERTY
+          cls.createIndex(className + "." + key, OClass.INDEX_TYPE.NOTUNIQUE.name(), key);
+        else
+          // CREATE AN INDEX AD-HOC
+          db.getMetadata().getIndexManager().createIndex(className + "." + key, 
+              OClass.INDEX_TYPE.NOTUNIQUE.name(), 
+              new OPropertyIndexDefinition(className, key, OType.STRING), 
+              cls.getPolymorphicClusterIds(), null);
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
