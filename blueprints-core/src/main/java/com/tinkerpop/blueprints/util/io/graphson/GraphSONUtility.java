@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.tinkerpop.blueprints.util.io.graphson.ElementPropertyConfig.ElementPropertiesRule;
+
 /**
  * Helps write individual graph elements to TinkerPop JSON format known as GraphSON.
  *
@@ -43,6 +45,8 @@ public final class GraphSONUtility {
     private final Set<String> edgePropertyKeys;
     private final ElementFactory factory;
     private final boolean hasEmbeddedTypes;
+    private final ElementPropertiesRule vertexPropertiesRule;
+    private final ElementPropertiesRule edgePropertiesRule;
 
     private final boolean includeReservedVertexId;
     private final boolean includeReservedEdgeId;
@@ -52,21 +56,39 @@ public final class GraphSONUtility {
     private final boolean includeReservedEdgeOutV;
     private final boolean includeReservedEdgeInV;
 
+    /**
+     * A GraphSONUtiltiy that includes all properties of vertices and edges.
+     */
+    public GraphSONUtility(final GraphSONMode mode, final ElementFactory factory) {
+        this(mode, factory, ElementPropertyConfig.AllProperties);
+    }
+
+    /**
+     * A GraphSONUtility that includes the specified properties.
+     */
     public GraphSONUtility(final GraphSONMode mode, final ElementFactory factory,
                            final Set<String> vertexPropertyKeys, final Set<String> edgePropertyKeys) {
-        this.vertexPropertyKeys = vertexPropertyKeys;
-        this.edgePropertyKeys = edgePropertyKeys;
+        this(mode, factory, ElementPropertyConfig.IncludeProperties(vertexPropertyKeys, edgePropertyKeys));
+    }
+
+    public GraphSONUtility(final GraphSONMode mode, final ElementFactory factory,
+                           final ElementPropertyConfig config) {
+        this.vertexPropertyKeys = config.getVertexPropertyKeys();
+        this.edgePropertyKeys = config.getEdgePropertyKeys();
+        this.vertexPropertiesRule = config.getVertexPropertiesRule();
+        this.edgePropertiesRule = config.getEdgePropertiesRule();
+
         this.mode = mode;
         this.factory = factory;
         this.hasEmbeddedTypes = mode == GraphSONMode.EXTENDED;
 
-        includeReservedVertexId = includeReservedKey(mode, GraphSONTokens._ID, vertexPropertyKeys);
-        includeReservedEdgeId = includeReservedKey(mode, GraphSONTokens._ID, edgePropertyKeys);
-        includeReservedVertexType = includeReservedKey(mode, GraphSONTokens._TYPE, vertexPropertyKeys);
-        includeReservedEdgeType = includeReservedKey(mode, GraphSONTokens._TYPE, edgePropertyKeys);
-        includeReservedEdgeLabel = includeReservedKey(mode, GraphSONTokens._LABEL, edgePropertyKeys);
-        includeReservedEdgeOutV = includeReservedKey(mode, GraphSONTokens._OUT_V, edgePropertyKeys);
-        includeReservedEdgeInV = includeReservedKey(mode, GraphSONTokens._IN_V, edgePropertyKeys);
+        this.includeReservedVertexId = includeReservedKey(mode, GraphSONTokens._ID, vertexPropertyKeys, this.vertexPropertiesRule);
+        this.includeReservedEdgeId = includeReservedKey(mode, GraphSONTokens._ID, edgePropertyKeys, this.edgePropertiesRule);
+        this.includeReservedVertexType = includeReservedKey(mode, GraphSONTokens._TYPE, vertexPropertyKeys, this.vertexPropertiesRule);
+        this.includeReservedEdgeType = includeReservedKey(mode, GraphSONTokens._TYPE, edgePropertyKeys, this.edgePropertiesRule);
+        this.includeReservedEdgeLabel = includeReservedKey(mode, GraphSONTokens._LABEL, edgePropertyKeys, this.edgePropertiesRule);
+        this.includeReservedEdgeOutV = includeReservedKey(mode, GraphSONTokens._OUT_V, edgePropertyKeys, this.edgePropertiesRule);
+        this.includeReservedEdgeInV = includeReservedKey(mode, GraphSONTokens._IN_V, edgePropertyKeys, this.edgePropertiesRule);
     }
 
     /**
@@ -104,7 +126,8 @@ public final class GraphSONUtility {
         final Vertex v = factory.createVertex(vertexId);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            if (this.vertexPropertyKeys == null || vertexPropertyKeys.contains(entry.getKey())) {
+            //if (this.vertexPropertyKeys == null || vertexPropertyKeys.contains(entry.getKey())) {
+            if (includeKey(entry.getKey(), vertexPropertyKeys, this.vertexPropertiesRule)) {
                 v.setProperty(entry.getKey(), entry.getValue());
             }
         }
@@ -150,7 +173,8 @@ public final class GraphSONUtility {
         final Edge e = factory.createEdge(edgeId, out, in, label);
 
         for (Map.Entry<String, Object> entry : props.entrySet()) {
-            if (this.edgePropertyKeys == null || this.edgePropertyKeys.contains(entry.getKey())) {
+            // if (this.edgePropertyKeys == null || this.edgePropertyKeys.contains(entry.getKey())) {
+            if (includeKey(entry.getKey(), edgePropertyKeys, this.edgePropertiesRule)) {
                 e.setProperty(entry.getKey(), entry.getValue());
             }
         }
@@ -230,7 +254,7 @@ public final class GraphSONUtility {
      * @param json a single vertex in GraphSON format as Jettison JSONObject
      * @param factory the factory responsible for constructing graph elements
      * @param mode the mode of the GraphSON
-     * @param propertyKeys a list of keys to ignore on reading of element properties
+     * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final GraphSONMode mode,
                                         final Set<String> propertyKeys) throws IOException {
@@ -244,7 +268,7 @@ public final class GraphSONUtility {
      * @param json a single vertex in GraphSON format as a String.
      * @param factory the factory responsible for constructing graph elements
      * @param mode the mode of the GraphSON
-     * @param propertyKeys a list of keys to ignore on reading of element properties
+     * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final String json, final ElementFactory factory, final GraphSONMode mode,
                                         final Set<String> propertyKeys) throws IOException {
@@ -258,7 +282,7 @@ public final class GraphSONUtility {
      * @param json a single vertex in GraphSON format as an InputStream.
      * @param factory the factory responsible for constructing graph elements
      * @param mode the mode of the GraphSON
-     * @param propertyKeys a list of keys to ignore on reading of element properties
+     * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final InputStream json, final ElementFactory factory, final GraphSONMode mode,
                                         final Set<String> propertyKeys) throws IOException {
@@ -272,7 +296,7 @@ public final class GraphSONUtility {
      * @param json a single vertex in GraphSON format as Jackson JsonNode
      * @param factory the factory responsible for constructing graph elements
      * @param mode the mode of the GraphSON
-     * @param propertyKeys a list of keys to ignore on reading of element properties
+     * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final JsonNode json, final ElementFactory factory, final GraphSONMode mode,
                                         final Set<String> propertyKeys) throws IOException{
@@ -382,10 +406,35 @@ public final class GraphSONUtility {
         return map;
     }
 
-    private static boolean includeReservedKey(final GraphSONMode mode, final String key, final Set<String> propertyKeys) {
+    private static boolean includeReservedKey(final GraphSONMode mode, final String key,
+                                              final Set<String> propertyKeys,
+                                              final ElementPropertiesRule rule) {
         // the key is always included in modes other than compact.  if it is compact, then validate that the
-        //  key is in the property key list
-        return mode != GraphSONMode.COMPACT || propertyKeys == null || propertyKeys.contains(key);
+        // key is in the property key list
+        return mode != GraphSONMode.COMPACT || includeKey(key, propertyKeys, rule);
+    }
+
+    private static boolean includeKey(final String key, final Set<String> propertyKeys,
+                                      final ElementPropertiesRule rule) {
+        if (propertyKeys == null) {
+            // when null always include the key and shortcut this piece
+            return true;
+        }
+
+        // default the key situation.  if it's included then it should be explicitly defined in the
+        // property keys list to be included or the reverse otherwise
+        boolean keySituation = rule == ElementPropertiesRule.INCLUDE;
+
+        switch (rule) {
+            case INCLUDE :
+                keySituation = propertyKeys.contains(key);
+                break;
+            case EXCLUDE :
+                keySituation = !propertyKeys.contains(key);
+                break;
+        }
+
+        return keySituation;
     }
 
     private static boolean isReservedKey(final String key) {

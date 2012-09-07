@@ -16,7 +16,7 @@ public class ElementHelper {
     /**
      * Copy the properties (key and value) from one element to another.
      * The properties are preserved on the from element.
-     * Properties that share the same key on the to element are overwritten.
+     * ElementPropertiesRule that share the same key on the to element are overwritten.
      *
      * @param from the element to copy properties from
      * @param to   the element to copy properties to

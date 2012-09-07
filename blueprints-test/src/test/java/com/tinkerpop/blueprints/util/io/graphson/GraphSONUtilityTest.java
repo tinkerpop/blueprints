@@ -68,7 +68,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void jsonFromElementEdgeCompactIdOnly() throws JSONException {
+    public void jsonFromElementEdgeCompactIdOnlyAsInclude() throws JSONException {
         Vertex v1 = this.graph.addVertex(1);
         Vertex v2 = this.graph.addVertex(2);
 
@@ -85,6 +85,39 @@ public class GraphSONUtilityTest {
         Assert.assertFalse(json.has(GraphSONTokens._LABEL));
         Assert.assertFalse(json.has(GraphSONTokens._IN_V));
         Assert.assertFalse(json.has(GraphSONTokens._OUT_V));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertFalse(json.has("weight"));
+    }
+
+    @Test
+    public void jsonFromElementEdgeCompactIdOnlyAsExclude() throws JSONException {
+        ElementFactory factory = new GraphElementFactory(this.graph);
+        Vertex v1 = this.graph.addVertex(1);
+        Vertex v2 = this.graph.addVertex(2);
+
+        Edge e = this.graph.addEdge(3, v1, v2, "test");
+
+        Set<String> propertiesToExclude = new HashSet<String>() {{
+            add(GraphSONTokens._TYPE);
+            add(GraphSONTokens._LABEL);
+            add(GraphSONTokens._IN_V);
+            add(GraphSONTokens._OUT_V);
+            add("weight");
+        }};
+
+        ElementPropertyConfig config = new ElementPropertyConfig(null, propertiesToExclude,
+                ElementPropertyConfig.ElementPropertiesRule.INCLUDE,
+                ElementPropertyConfig.ElementPropertiesRule.EXCLUDE);
+        GraphSONUtility utility = new GraphSONUtility(GraphSONMode.COMPACT, factory, config);
+        JSONObject json = utility.jsonFromElement(e);
+
+        Assert.assertNotNull(json);
+        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
+        Assert.assertFalse(json.has(GraphSONTokens._LABEL));
+        Assert.assertFalse(json.has(GraphSONTokens._IN_V));
+        Assert.assertFalse(json.has(GraphSONTokens._OUT_V));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertFalse(json.has("weight"));
     }
 
     @Test
@@ -119,7 +152,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void jsonFromElementVertexCompactIdOnly() throws JSONException {
+    public void jsonFromElementVertexCompactIdOnlyAsInclude() throws JSONException {
         Vertex v = this.graph.addVertex(1);
 
         Set<String> propertiesToInclude = new HashSet<String>() {{
@@ -127,6 +160,27 @@ public class GraphSONUtilityTest {
         }};
 
         JSONObject json = GraphSONUtility.jsonFromElement(v, propertiesToInclude, GraphSONMode.COMPACT);
+
+        Assert.assertNotNull(json);
+        Assert.assertFalse(json.has(GraphSONTokens._TYPE));
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+    }
+
+    @Test
+    public void jsonFromElementVertexCompactIdOnlyAsExclude() throws JSONException {
+        GraphElementFactory factory = new GraphElementFactory(this.graph);
+        Vertex v = this.graph.addVertex(1);
+
+        Set<String> propertiesToExclude = new HashSet<String>() {{
+            add(GraphSONTokens._TYPE);
+        }};
+
+        ElementPropertyConfig config = new ElementPropertyConfig(propertiesToExclude, null,
+                ElementPropertyConfig.ElementPropertiesRule.EXCLUDE,
+                ElementPropertyConfig.ElementPropertiesRule.EXCLUDE);
+
+        GraphSONUtility utility = new GraphSONUtility(GraphSONMode.COMPACT, factory, config);
+        JSONObject json = utility.jsonFromElement(v);
 
         Assert.assertNotNull(json);
         Assert.assertFalse(json.has(GraphSONTokens._TYPE));
@@ -926,8 +980,10 @@ public class GraphSONUtilityTest {
         ElementFactory factory = new GraphElementFactory(g);
 
         Set<String> ignoreAge = new HashSet<String>();
-        ignoreAge.add("name");
-        Vertex v = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)), factory, GraphSONMode.NORMAL, ignoreAge);
+        ignoreAge.add("age");
+        ElementPropertyConfig config = ElementPropertyConfig.ExcludeProperties(ignoreAge, null);
+        GraphSONUtility utility = new GraphSONUtility(GraphSONMode.NORMAL, factory, config);
+        Vertex v = utility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)));
 
         Assert.assertSame(v, g.getVertex(1));
 
@@ -988,7 +1044,10 @@ public class GraphSONUtilityTest {
         Vertex v2 = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson2)), factory, GraphSONMode.NORMAL, null);
 
         Set<String> ignoreWeight = new HashSet<String>();
-        Edge e = GraphSONUtility.edgeFromJson(new JSONObject(new JSONTokener(edgeJson)), v1, v2, factory, GraphSONMode.NORMAL, ignoreWeight);
+        ignoreWeight.add("weight");
+        ElementPropertyConfig config = ElementPropertyConfig.ExcludeProperties(null, ignoreWeight);
+        GraphSONUtility utility = new GraphSONUtility(GraphSONMode.NORMAL, factory, config);
+        Edge e = utility.edgeFromJson(new JSONObject(new JSONTokener(edgeJson)), v1, v2);
 
         Assert.assertSame(v1, g.getVertex(1));
         Assert.assertSame(v2, g.getVertex(2));
