@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.impls.datomic;
 
 import clojure.lang.Keyword;
 import com.tinkerpop.blueprints.*;
-import com.tinkerpop.blueprints.impls.datomic.util.DatomicUtil;
+import datomic.Database;
 import datomic.Peer;
 import java.util.*;
 
@@ -16,18 +16,21 @@ public class DatomicIndex<T extends Element> implements Index<T> {
     private Class<T> clazz = null;
     private String name = null;
     private Set<String> indexKeys = null;
+    private Database database;
 
-    public DatomicIndex(final String name, final DatomicGraph g, final Class<T> clazz) {
+    public DatomicIndex(final String name, final DatomicGraph g, final Database database, final Class<T> clazz) {
         this.name = name;
         this.graph = g;
         this.clazz = clazz;
+        this.database = database;
     }
 
-    public DatomicIndex(final String name, final DatomicGraph g, final Class<T> clazz, Set<String> indexKeys) {
+    public DatomicIndex(final String name, final DatomicGraph g, final Database database, final Class<T> clazz, Set<String> indexKeys) {
         this.name = name;
         this.graph = g;
         this.clazz = clazz;
         this.indexKeys = indexKeys;
+        this.database = database;
     }
 
     public String getIndexName() {
@@ -36,6 +39,13 @@ public class DatomicIndex<T extends Element> implements Index<T> {
 
     public Class<T> getIndexClass() {
         return clazz;
+    }
+
+    public Database getDatabase() {
+        if (database == null) {
+            return graph.getRawGraph();
+        }
+        return database;
     }
 
 
@@ -54,19 +64,19 @@ public class DatomicIndex<T extends Element> implements Index<T> {
         }
         if (matched && DatomicUtil.existingAttributeDefinition(attribute, graph)) {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
-                return new DatomicIterable(getElements(attribute, value, Keyword.intern("graph.element.type/vertex")), graph, Vertex.class);
+                return new DatomicIterable(getElements(attribute, value, Keyword.intern("graph.element.type/vertex"), getDatabase()), graph, database, Vertex.class);
             }
             if (this.getIndexClass().isAssignableFrom(DatomicEdge.class)) {
-                return new DatomicIterable(getElements(attribute, value, Keyword.intern("graph.element.type/edge")), graph, Edge.class);
+                return new DatomicIterable(getElements(attribute, value, Keyword.intern("graph.element.type/edge"), getDatabase()), graph, database, Edge.class);
             }
             throw new RuntimeException(DatomicGraph.DATOMIC_ERROR_EXCEPTION_MESSAGE);
         }
         else {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
-                return new DatomicIterable(new ArrayList<List<Object>>(), graph, Vertex.class);
+                return new DatomicIterable(new ArrayList<List<Object>>(), graph, database, Vertex.class);
             }
             if (this.getIndexClass().isAssignableFrom(DatomicEdge.class)) {
-                return new DatomicIterable(new ArrayList<List<Object>>(), graph, Edge.class);
+                return new DatomicIterable(new ArrayList<List<Object>>(), graph, database, Edge.class);
             }
             throw new RuntimeException(DatomicGraph.DATOMIC_ERROR_EXCEPTION_MESSAGE);
         }
@@ -88,10 +98,10 @@ public class DatomicIndex<T extends Element> implements Index<T> {
         }
         if (matched && DatomicUtil.existingAttributeDefinition(attribute, graph)) {
             if (this.getIndexClass().isAssignableFrom(DatomicVertex.class)) {
-                return getElements(attribute, value, Keyword.intern("graph.element.type/vertex")).size();
+                return getElements(attribute, value, Keyword.intern("graph.element.type/vertex"), getDatabase()).size();
             }
             if (this.getIndexClass().isAssignableFrom(DatomicEdge.class)) {
-                return getElements(attribute, value, Keyword.intern("graph.element.type/edge")).size();
+                return getElements(attribute, value, Keyword.intern("graph.element.type/edge"), getDatabase()).size();
             }
             throw new RuntimeException(DatomicGraph.DATOMIC_ERROR_EXCEPTION_MESSAGE);
         }
@@ -104,11 +114,11 @@ public class DatomicIndex<T extends Element> implements Index<T> {
         throw new UnsupportedOperationException();
     }
 
-    private Collection<List<Object>> getElements(Keyword attribute, Object value, Keyword type) {
+    private Collection<List<Object>> getElements(Keyword attribute, Object value, Keyword type, Database database) {
         return Peer.q("[:find ?element " +
-                ":in $ ?attribute ?value ?type " +
-                ":where [?element :graph.element/type ?type] " +
-                "[?element ?attribute ?value] ]", graph.getRawGraph(), attribute, value, type);
+                       ":in $ ?attribute ?value ?type " +
+                       ":where [?element :graph.element/type ?type] " +
+                              "[?element ?attribute ?value] ]", database, attribute, value, type);
     }
 
 }

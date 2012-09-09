@@ -1,10 +1,8 @@
-package com.tinkerpop.blueprints.impls.datomic.util;
+package com.tinkerpop.blueprints.impls.datomic;
 
 import clojure.lang.Keyword;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.impls.datomic.DatomicEdge;
-import com.tinkerpop.blueprints.impls.datomic.DatomicGraph;
-import com.tinkerpop.blueprints.impls.datomic.DatomicVertex;
+import com.tinkerpop.blueprints.TimeAwareElement;
+import datomic.Database;
 import datomic.Peer;
 import datomic.Util;
 import java.util.*;
@@ -59,11 +57,20 @@ public class DatomicUtil {
     public static void createAttributeDefinition(final String key, final Class valueClazz, final Class elementClazz, DatomicGraph graph) {
         if (!existingAttributeDefinition(key, valueClazz, elementClazz, graph)) {
             try {
-                graph.getConnection().transact(Util.list(Util.map(":db/id", Peer.tempid(":db.part/db"),
-                                                                  ":db/ident", createKey(key, valueClazz, elementClazz),
-                                                                  ":db/valueType", mapJavaTypeToDatomicType(valueClazz),
-                                                                  ":db/cardinality", ":db.cardinality/one",
-                                                                  ":db.install/_attribute", ":db.part/db"))).get();
+                if (graph.getTransactionTime() == null) {
+                    graph.getConnection().transact(Util.list(Util.map(":db/id", Peer.tempid(":db.part/db"),
+                                                                      ":db/ident", createKey(key, valueClazz, elementClazz),
+                                                                      ":db/valueType", mapJavaTypeToDatomicType(valueClazz),
+                                                                      ":db/cardinality", ":db.cardinality/one",
+                                                                      ":db.install/_attribute", ":db.part/db"))).get();
+                }
+                else {
+                    graph.getConnection().transact(Util.list(Util.map(":db/id", Peer.tempid(":db.part/db"),
+                                                                      ":db/ident", createKey(key, valueClazz, elementClazz),
+                                                                      ":db/valueType", mapJavaTypeToDatomicType(valueClazz),
+                                                                      ":db/cardinality", ":db.cardinality/one",
+                                                                      ":db.install/_attribute", ":db.part/db"), datomic.Util.map(":db/id", datomic.Peer.tempid(":db.part/tx"), ":db/txInstant", graph.getTransactionTime()))).get();
+                }
             } catch (InterruptedException e) {
                 throw new RuntimeException(DatomicGraph.DATOMIC_ERROR_EXCEPTION_MESSAGE);
             } catch (ExecutionException e) {
@@ -128,9 +135,9 @@ public class DatomicUtil {
     public static Set<String> getIndexedAttributes(final Class elementClazz, final DatomicGraph graph) {
         Set<String> results = new HashSet<String>();
         Collection<List<Object>> indexedAttributes = Peer.q("[:find ?key " +
-                ":in $ " +
-                ":where [?attribute :db/ident ?key] " +
-                "[?attribute :db/index true] ]", graph.getRawGraph());
+                                                             ":in $ " +
+                                                             ":where [?attribute :db/ident ?key] " +
+                                                                    "[?attribute :db/index true] ]", graph.getRawGraph());
         for(List<Object> indexedAttribute : indexedAttributes) {
             String elementClazzName = elementClazz.getSimpleName();
             if (indexedAttribute.get(0).toString().endsWith("." + elementClazzName.toLowerCase())) {
@@ -156,6 +163,69 @@ public class DatomicUtil {
             elementType = "edge";
         }
         return Keyword.intern(key.replace("_","$") + "." + mapJavaTypeToDatomicType(valueClazz).split("/")[1] + "." + elementType);
+    }
+
+    // Returns the previous transaction for a particular time aware element
+    public static Object getPreviousTransaction(DatomicGraph graph, TimeAwareElement element) {
+        Iterator<List<Object>> previoustransaction  = (Peer.q("[:find ?previousTransactionId " +
+                                                               ":in $ ?currentTransactionId ?id " +
+                                                               ":where [?currentTransactionId :graph.element/previousTransaction ?previousTransaction] " +
+                                                                      "[?previousTransaction :graph.element/previousTransaction/elementId ?id] " +
+                                                                      "[?previousTransaction :graph.element/previousTransaction/transactionId ?previousTransactionId] ]", graph.getRawGraph(), element.getTimeId(), element.getId())).iterator();
+        if (previoustransaction.hasNext()) {
+            return previoustransaction.next().get(0);
+        }
+        return null;
+    }
+
+    // Returns the next transaction for a particular time aware element (null if the transaction id does not exist)
+    public static Object getNextTransactionId(DatomicGraph graph, TimeAwareElement element) {
+        // Retrieve the last encountered transaction before the input transaction
+        Iterator<List<Object>> nexttransaction = (Peer.q("[:find ?nextTransactionId " +
+                                                          ":in $ ?currenttransactionId ?id " +
+                                                          ":where [?nextTransactionId :graph.element/previousTransaction ?currenttransaction] " +
+                                                                 "[?currenttransaction :graph.element/previousTransaction/elementId ?id] " +
+                                                                 "[?currenttransaction :graph.element/previousTransaction/transactionId ?currenttransactionId] ]", graph.getRawGraph(), element.getTimeId(), element.getId())).iterator();
+        if (nexttransaction.hasNext()) {
+            return nexttransaction.next().get(0);
+        }
+        return null;
+    }
+
+    public static Object getActualTimeId(Database database, TimeAwareElement element) {
+        // Get the actual time id for a particular element and database value
+        String timeRule = "[ [ (previous ?id ?tx) [?id _ _ ?tx] ] " +
+                            "[ (previous ?id ?tx) [_ :graph.element/previousTransaction/elementId ?id ?tx] ] ] ]";
+        Collection<List<Object>> alltxs = (datomic.Peer.q("[:find ?tx " +
+                                                           ":in $ ?id % " +
+                                                           ":where [previous ?id ?tx] ]", database.history(), element.getId(), timeRule));
+        Iterator<List<Object>> tx = alltxs.iterator();
+        Object lastTransaction = null;
+        if (tx.hasNext()) {
+            java.util.List<Object> transactionElement = tx.next();
+            lastTransaction = transactionElement.get(0);
+        }
+        while (tx.hasNext()) {
+            java.util.List<Object> transactionElement = tx.next();
+            if ((Long)transactionElement.get(0) > (Long)lastTransaction) {
+                lastTransaction = transactionElement.get(0);
+            }
+        }
+
+        return lastTransaction;
+    }
+
+    // Helper method to retrieve the date associated with a particular transaction id
+    public static Date getTransactionDate(DatomicGraph graph, Object transaction) {
+        return (Date)datomic.Peer.q("[:find ?time " +
+                                     ":in $ ?tx " +
+                                     ":where [?tx :db/txInstant ?time] ]", graph.getRawGraph(), transaction).iterator().next().get(0);
+    }
+
+    public static Object getIdForAttribute(DatomicGraph graph, String attribute) {
+        return Peer.q("[:find ?entity " +
+                       ":in $ ?attribute " +
+                       ":where [?entity :db/ident ?attribute] ] ", graph.getRawGraph(), Keyword.intern(attribute)).iterator().next().get(0);
     }
 
 }
