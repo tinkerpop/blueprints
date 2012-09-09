@@ -77,6 +77,10 @@ public class Features {
      */
     public Boolean isPersistent = null;
     /**
+     * Does the graph support time-aware versioning of its elements
+     */
+    public Boolean isTimeAware = null;
+    /**
      * Is the graph an RDF framework?
      * @deprecated thus far, isRDFModel describes a collection of features. Use actual features to describe your data model.
      */
