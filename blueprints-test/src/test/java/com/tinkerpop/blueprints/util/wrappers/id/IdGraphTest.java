@@ -169,6 +169,10 @@ public class IdGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
+        return generateGraph("");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
         return new IdGraph<TinkerGraph>(new TinkerGraph());
     }
 

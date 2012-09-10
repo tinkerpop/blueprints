@@ -79,8 +79,11 @@ public class EventGraphTest extends GraphTest {
         printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
     }
 
-
     public Graph generateGraph() {
+        return generateGraph("");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
         return new EventIndexableGraph<TinkerGraph>(new TinkerGraph());
     }
 

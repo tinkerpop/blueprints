@@ -103,9 +103,14 @@ public class Neo4jGraphTest extends GraphTest {
         printTestPerformance("GMLReaderTestSuite", this.stopWatch());
     }
 
+
     public Graph generateGraph() {
-        String directory = this.getWorkingDirectory();
-        Neo4jGraph graph = new Neo4jGraph(directory);
+        return generateGraph("graph");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
+        final String directory = getWorkingDirectory();
+        Neo4jGraph graph = new Neo4jGraph(directory + "/" + graphDirectoryName);
         graph.setCheckElementsInTransaction(true);
         return graph;
     }

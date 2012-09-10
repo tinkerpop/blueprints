@@ -202,6 +202,10 @@ public class SailGraphTest extends GraphTest {
         return new SailGraph(new MemoryStore());
     }
 
+    public Graph generateGraph(final String graphDirectoryName) {
+        return new SailGraph(new MemoryStore());
+    }
+
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         for (Method method : testSuite.getClass().getDeclaredMethods()) {
             if (method.getName().startsWith("test")) {

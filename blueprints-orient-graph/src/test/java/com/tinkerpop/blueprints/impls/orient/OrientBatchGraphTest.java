@@ -60,8 +60,12 @@ public class OrientBatchGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
-        String directory = getWorkingDirectory();
-        this.currentGraph = new OrientBatchGraph("local:" + directory + "/graph");
+        return generateGraph("graph");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
+        final String directory = getWorkingDirectory();
+        this.currentGraph = new OrientBatchGraph("local:" + directory + "/" + graphDirectoryName);
         return this.currentGraph;
     }
 

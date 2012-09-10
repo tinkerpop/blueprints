@@ -2,10 +2,12 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import junit.framework.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -445,6 +447,54 @@ public class TransactionalGraphTestSuite extends TestSuite {
         edgeCount(graph,edges.get());
         vertexCount(graph,vertices.get());
         graph.shutdown();
+    }
+
+    public void testCompetingThreadsOnMultipleDbInstances() throws Exception {
+        final TransactionalGraph graph1 = (TransactionalGraph) graphTest.generateGraph("first");
+        final TransactionalGraph graph2 = (TransactionalGraph) graphTest.generateGraph("second");
+
+        if (!graph1.getFeatures().isRDFModel) {
+
+            final CountDownLatch firstBlocker = new CountDownLatch(1);
+
+            new Thread() {
+                public void run() {
+                    final Vertex v = graph1.addVertex(null);
+                    v.setProperty("name", "stephen");
+                    graph1.stopTransaction(Conclusion.SUCCESS);
+                    firstBlocker.countDown();
+                }
+            }.run();
+
+            firstBlocker.await();
+
+            final CountDownLatch secondBlocker = new CountDownLatch(1);
+
+            new Thread() {
+                public void run() {
+                    int counter = 0;
+                    for (Vertex v : graph1.getVertices()) {
+                        counter++;
+                    }
+
+                    Assert.assertEquals(1, counter);
+
+                    counter = 0;
+                    for (Vertex v : graph2.getVertices()) {
+                        counter++;
+                    }
+
+                    Assert.assertEquals(0, counter);
+
+                    secondBlocker.countDown();
+                }
+            }.run();
+
+            secondBlocker.await();
+        }
+
+        graph1.shutdown();
+        graph2.shutdown();
     }
 
     public void testRemoveInTransaction() {
