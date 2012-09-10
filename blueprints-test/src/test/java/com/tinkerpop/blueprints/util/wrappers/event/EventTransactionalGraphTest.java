@@ -79,6 +79,10 @@ public class EventTransactionalGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
+        return generateGraph("");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
         return new EventTransactionalIndexableGraph<TinkerTransactionalGraph>(new TinkerTransactionalGraph());
     }
 

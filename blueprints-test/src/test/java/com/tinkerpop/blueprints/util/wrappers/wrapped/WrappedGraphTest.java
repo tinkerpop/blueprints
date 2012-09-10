@@ -69,6 +69,10 @@ public class WrappedGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
+        return generateGraph("");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
         return new WrappedIndexableGraph<TinkerGraph>(new TinkerGraph());
     }
 

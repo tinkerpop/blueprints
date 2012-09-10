@@ -57,6 +57,10 @@ public class WritethroughGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
+        return generateGraph("");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
         return new WritethroughGraph<TinkerGraph>(new TinkerGraph());
     }
 

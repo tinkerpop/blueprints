@@ -86,7 +86,12 @@ public class TinkerGraphTest extends GraphTest {
 
     @Override
     public Graph generateGraph() {
-        return new TinkerGraph(getDirectory());
+        return generateGraph("graph");
+    }
+
+    @Override
+    public Graph generateGraph(final String graphDirectoryName) {
+        return new TinkerGraph(getDirectory() + "/" + graphDirectoryName);
     }
 
     protected String getDirectory() {

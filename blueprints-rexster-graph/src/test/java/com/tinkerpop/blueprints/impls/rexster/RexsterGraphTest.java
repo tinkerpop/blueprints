@@ -84,6 +84,10 @@ public class RexsterGraphTest extends GraphTest {
         return new RexsterGraph(this.getWorkingUri(), this.username, this.password);
     }
 
+    public Graph generateGraph(final String graphDirectoryName) {
+        throw new UnsupportedOperationException();
+    }
+
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         // "http://127.0.0.1:8182/graphs/emptygraph"
         String doTest = System.getProperty("testRexsterGraph", "true");
