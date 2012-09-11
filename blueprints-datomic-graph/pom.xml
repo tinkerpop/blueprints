@@ -19,14 +19,16 @@
             <name>Sonatype Nexus Snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </repository>
+        <repository>
+            <id>clojars.org</id>
+            <url>http://clojars.org/repo</url>
+        </repository>
     </repositories>
     <dependencies>
-        <!-- datomic (use mvn install:install-file from the datomic download to install datomic into your local maven repo) -->
-        <!-- mvn install:install-file -DgroupId=com.datomic -DartifactId=datomic-free -Dfile=datomic-free-0.8.3438 -DpomFile=pom.xml -->
         <dependency>
             <groupId>com.datomic</groupId>
             <artifactId>datomic-free</artifactId>
-            <version>0.8.3438</version>
+            <version>0.8.3488</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
