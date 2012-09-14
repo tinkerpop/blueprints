@@ -1,0 +1,215 @@
+Discipline	Gold	Silver	Bronze	Date
+Modern Pentathlon - Women's Modern Pentathlon	Laura Asadauskaite (LTU)	Samantha Murray (GBR)	Yane Marques (BRA)	Sun Aug 12 17:28:22 +0000 2012
+Boxing - Men's Super Heavy	Anthony Joshua (GBR)	Roberto Cammarelle (ITA)	M. Medzhidov (AZE), Ivan Dychko (KAZ)	Sun Aug 12 14:36:09 +0000 2012
+Cycling-Mountain Bike - Men's Cross-country	Jaroslav Kulhavy (CZE)	Nino Schurter (SUI)	Marco Aurelio Fontana (ITA)	Sun Aug 12 14:31:22 +0000 2012
+Boxing - Men's Light Heavy (81kg)	Egor Mekhontcev (RUS)	Adilbek Niyazymbetov (KAZ)	Oleksandr Gvozdyk (UKR),Yamaguchi Falcao Florentino (BRA)	Sun Aug 12 14:05:34 +0000 2012
+Wrestling - Men's 96kg Freestyle	Jacob Stephen Varner (USA)	Valerii Andriitsev (UKR)	George Gogshelidze (GEO),Khetag Gazyumov (AZE)	Sun Aug 12 13:51:57 +0000 2012
+Boxing - Men's Welter (69kg)	Serik Sapiyev (KAZ)	Freddie Evans (GBR)	Taras Shelestyuk (UKR),Andrey Zamkovoy (RUS) 	Sun Aug 12 13:50:00 +0000 2012
+Wrestling -Men's 66kg Freest.	Tatsuhiro Yonemitsu (JPN)	Sushil Kumar (IND)	 Akzhurek Tanatarov (KAZ),Livan Lopez (CUB)	Sun Aug 12 13:06:04 +0000 2012
+Boxing - Men's Light	Vasyl Lomachenko (UKR)	Soonchul Han (KOR)	Evaldas Petrauskas (LTU),Yasniel Toledo Lopez (CUB)	Sun Aug 12 13:03:41 +0000 2012
+Boxing - Men's Fly	Robeisy Ramirez Carrazana (CUB)	Tugstsogt Nyambayar (MGL)	Misha Aloian (RUS),Michael Conlan (IRL)	Sun Aug 12 12:55:39 +0000 2012
+Athletics - Marathon	Stephen Kiprotich (UGA)	Abel Kirui (KEN)	Wilson Kipsang Kiprotich (KEN)	Sun Aug 12 12:10:28 +0000 2012
+Taekwondo - Men's -68kg	Servet Tazegul (TUR)	Mohammad Bagheri Motamed (IRI)	Terrence Jennings (USA),Rohullah Nikpah (AFG)	Thu Aug 09 22:31:24 +0000 2012
+Taekwondo - Women's -57kg	Jade Jones (GBR)	Yuzhuo Hou (CHN)	Li-Cheng Tseng (TPE),Marlene Harnois (FRA)	Thu Aug 09 21:34:43 +0000 2012
+Athletics - Women's Javelin Throw	Barbora Spotakova (CZE)	Christina Obergfoll (GER)	Linda Stahl (GER)	Thu Aug 09 21:19:12 +0000 2012
+Beach Volleyball - Men's Beach Volleyball	Brink & Reckermann (GER)	Cerutti & Rego (BRA)	Plavin & Smedin (LAT)	Thu Aug 09 21:04:48 +0000 2012
+Athletics - Men's Decathlon 1.500	Ashton Eaton (USA)	Trey Hardee (USA)	Leonel Suarez (USA)	Thu Aug 09 20:50:39 +0000 2012
+Athletics - Men's Triple Jump	Christian Taylor (USA)	Will Claye (USA)	Fabrizio Donato (ITA)	Thu Aug 09 20:03:44 +0000 2012
+Athletics - Men's 200m	Usain Bolt (JAM)	Yohan Blake (JAM)	Warren Weir (JAM)	Thu Aug 09 19:59:30 +0000 2012
+Diving - Women's 10m Platform	Ruolin Chen (CHN)	Brittany Broben (AUS)	Pandelela Rinong Pamg (MAS)	Thu Aug 09 19:16:30 +0000 2012
+Wrestling - Women's 72kg Freestyle	Natalia Vorobieva (RUS)	Stanka Zlateva Hristova (BUL)	Guzel Manyurova (KAZ),Maider Unda (SPA)	Thu Aug 09 19:07:33 +0000 2012
+Athletics - Men's 800m	David Lekuta Rudisha (KEN)	Nijel Amos (BOT)	Timothy Kitum (KEN)	Thu Aug 09 19:06:21 +0000 2012
+Wrestling - Women's 55kg Freestyle	Saori Yoshida (JPN)	Tonya Lynn Verbeek (CAN)	Jackeline Renteria Castillo (COL),Yuliya Ratkevich (AZE)	Thu Aug 09 18:18:32 +0000 2012
+Boxing - Women's Middle (75kg)	Claressa Shields (USA)	Nadezda Torlopova (RUS	Jinzi Li (CHN),Marina Volnova (KAZ)	Thu Aug 09 16:39:20 +0000 2012
+Boxing - Women's Light (60kg)	Katie Taylor (IRL)	Sofya Ochigava (RUS	Adriana Araujo (BRA),Mavzuna Chorieva (TJK)	Thu Aug 09 16:16:22 +0000 2012
+Boxing - Women's Fly	 Nicola Adams (GBR)	Cancan Ren (CHN	Chungneijang Mery Kom Hmangte (IND),Marlen Esparza (USA)	Thu Aug 09 15:44:41 +0000 2012
+Equestrian - Individual Dressage	 Charlotte Dujardin (GBR)	Adelinde Cornelissen (NED	Laura Bechtolsheimer (GBR)	Thu Aug 09 15:18:04 +0000 2012
+Swimming - Women's 10km Marathon	Eva Risztov (HUN)	Haley Anderson (USA)	Martina Grimaldi (ITA)	Thu Aug 09 13:37:46 +0000 2012
+Canoe Sprint - Women's Kayak Double (K2) 500m	Weber & Dietze (GER)	Kovacs & Douchev (HUN)	Naja & Mikolajczyk (POL)	Thu Aug 09 09:51:07 +0000 2012
+Canoe Sprint - Women's K1 500m	Danuta Kozak (HUN)	Inna Osypenko-Radomska (UKR)	Bridgitte Hartley (RSA)	Thu Aug 09 09:34:42 +0000 2012
+Canoe Sprint- Men's C2 1000m	Kretschmer & Kuschela (GER)	Bahdanovich & Bahdanovich (BLR)	Korovashkov & Pervukhin (RUS)	Thu Aug 09 09:23:51 +0000 2012
+Taekwondo -Men's -58kg	Joel Gonzalez Bonilla (SPA)	Daehoon Lee (KOR)	Alexey Denisenko (RUS),Oscar Munoz Oviedo (COL)	Wed Aug 08 21:47:10 +0000 2012
+Taekwondo -Women's -49kg	Jingyu Wu (CHN)	Brigitte Yague Enrique (SPA)	Chanatip Sonkham (THA),Lucija Zaninovic (CRO)	Wed Aug 08 21:26:46 +0000 2012
+Beach Volleyball - Women's Beach Volleyball	Walsh & May-Treanor (USA)	Ross & Kessy (USA)	Franca & Silva (BRA	Wed Aug 08 20:40:58 +0000 2012
+Athletics - Women's Long Jump	Brittney Reese (USA)	Elena Sokolova (RUS)	Janay Deloach (USA)	Wed Aug 08 20:25:17 +0000 2012
+Athletics - Men's 110m Hurdles	Aries Merritt (USA)	Jason Richardson (USA)	Hansle Parchment (JAM)	Wed Aug 08 20:17:09 +0000 2012
+Athletics - Women's 200m	Allyson Felix (USA)	Veronica Campbell-Brown (JAM)	Carmelita Jeter (USA)	Wed Aug 08 20:02:11 +0000 2012
+Athletics - Women's 400m Hurdles	Natalya Antyukh (RUS)	Lashinda Demus (USA)	Zuzana Hejnova (CZE)	Wed Aug 08 19:51:06 +0000 2012
+Wrestling - Women's 63kg Freestyle	Kaori Icho (JPN)	Ruixue Jing (JPN)	Battsetseg Soronzonbold (MGL),Lubov Volosova (RUS) 	Wed Aug 08 19:46:49 +0000 2012
+Wrestling - Women's 48kg Freestyle	Hitomi Obara (JPN)	Mariya Stadnyk (AZE)	Carol Huynh (CAN),Clarissa Kyoko Mei Ling Chun (USA)	Wed Aug 08 18:16:51 +0000 2012
+Equestrian - Individual Jumping	Steve Guerdat (SUI)	Gerco Schroder (NED)	Cian O'Connor (IRL)	Wed Aug 08 15:20:59 +0000 2012
+Sailing - Men's 49er	Outteridge & Jensen (AUS)	Burling & Tuke (NZL)	Norregaard & Lang (DEN)	Wed Aug 08 13:46:34 +0000 2012
+Canoe Sprint - Men's Kayak Double (K2) 1000m	Dombi & Kokeny (HUN)	Pimenta & Silva (POR)	Hollstein & Ihle (ALE)	Wed Aug 08 09:29:25 +0000 2012
+Canoe Sprint - Men's Canoe Single (C1) 1000m	Sebastian Brendel (GER)	David Cal Figueroa (ESP)	Mark Oldershaw (CAN)	Wed Aug 08 09:01:34 +0000 2012
+Canoe Sprint - Men's Kayak Single (K1) 1000m	Eirik Veras Larsen (NOR)	Adam van Koeverden (CAN)	Max Hoff (GER)	Wed Aug 08 08:42:57 +0000 2012
+Athletics - Men's 1500m	Taoufik Makhloufi (ALG	 Silver: Leonel Manzano (USA	Abdalaati Iguider (MAR	Tue Aug 07 20:21:57 +0000 2012
+Athletics - Women's 100m Hurdles	Sally Pearson (AUS	 Silver: Dawn Harper (USA	Kellie Wells (USA	Tue Aug 07 20:04:13 +0000 2012
+Athletics - Men's Discus Throw	Robert Harting (GER)	Ehsan Hadadi (IRI)	Gerd Kanter (EST)	Tue Aug 07 19:51:36 +0000 2012
+Athletics - Men's High Jump	Ivan Ukhov (RUS)	Erik Kynard (USA)	Mutaz Essa Barshim (QAT),Derek Drouin (CAN),Robert Grabarz (GBR)	Tue Aug 07 19:43:57 +0000 2012
+Weightlifting - Men's +105kg	Behdad Salimikordasiabi (IRI)	Sajjad Anoushiravani Hamlabad (IRI)	Ruslan Albegov (RUS)	Tue Aug 07 19:29:21 +0000 2012
+Diving - Men's 3m Springboard	Ilya Zakharov (RUS)	Kai Qin (CHN)	Chong He (CHN)	Tue Aug 07 19:22:20 +0000 2012
+Wrestling - Men's 96kg Greco-Roman	Ghasem Gholamreza Rezaei (IRI)	Rustam Totrov (RUS)	 Artur Aleksanyan (ARM),Jimmy Lidberg (SWE)	Tue Aug 07 19:04:01 +0000 2012
+Wrestling - Men's 66kg Greco-Roman	Hyeonwoo Kim (KOR)	Tamas Lorincz (HUN)	Manuchar Tskhadaia (GEO),Steeve Guenot (FRA)	Tue Aug 07 18:18:00 +0000 2012
+Cycling-Track - Women's Sprint	Anna Meares (AUS)	Victoria Pendleton (GBR	Shuang Guo (CHN	Tue Aug 07 17:39:11 +0000 2012
+Cycling-Track - Men's Keirin	Chris Hoy (GBR)	Maximilian Levy (ALE)	Simon van Velthooven (NZL),Teun Mulder (NED)	Tue Aug 07 17:37:01 +0000 2012
+Cycling-Track - Women's Omnium	Laura Trott (GBR)	Sarah Hammer (USA)	Annette Edmondson (AUS)	Tue Aug 07 16:22:42 +0000 2012
+Gymnastics-Artistic - Women's Floor Exercise	Alexandra Raisman (USA)	Catalina Ponor (ROU)	Aliya Mustafina (RUS)	Tue Aug 07 16:21:48 +0000 2012
+Gymnastics-Artistic - Men's Horizontal Bar	Epke Zonderland (NED)	Fabian Hambuchen (GER)	Kai Zou (CHN)	Tue Aug 07 15:19:17 +0000 2012
+Synchronised Swimming - Women's Duets	Ishchenko & Romashina (RUS)	Carbonell & Fuentes (SPA)	Huang & Liu (CHN)	Tue Aug 07 15:16:25 +0000 2012
+Gymnastics-Artistic - Women's Beam	Linlin Deng (CHN)	Lu Sui (CHN)	Alexandra Raisman (USA)	Tue Aug 07 15:10:10 +0000 2012
+Gymnastics-Artistic - Men's Parallel Bars	Zhe Feng (CHN)	Marcel Nguyen (GER)	Hamilton Sabot (FRA)	Tue Aug 07 13:39:29 +0000 2012
+Sailing - Women's RS-X	Marina Alabau Neira (ESP)	Tuuli Petaja (FIN)	Zofia Noceti-Klepacka (POL)	Tue Aug 07 13:26:43 +0000 2012
+Sailing - Men's RS-X	Dorian van Rijsselberge (NED)	Nick Dempsey (GBR)	Przemyslaw Miarczynski (POL)	Tue Aug 07 12:59:30 +0000 2012
+Triathlon - Men's Triathlon	Alistair Brownlee (GBR)	Javier Gomez (SPA)	Jonathan Brownlee (GBR)	Tue Aug 07 12:17:40 +0000 2012
+Ahletics - Women's Pole Vault	Jennifer Suhr (USA)	Yarisley Silva (CUB)	Elena Isinbaeva (RUS)	Mon Aug 06 20:45:50 +0000 2012
+Ahletics - Men's 400m	Kirani James (GRN)	Luguelin Santos (DOM)	Lalonde Gordon (TRI)	Mon Aug 06 20:33:35 +0000 2012
+Ahletics - Women's 3000m Steeplechase	Yuliya Zaripova (RUS)	Habiba Ghribi (TUN)	Sofia Assefa (ETH)	Mon Aug 06 20:16:16 +0000 2012
+Wrestling - Men's 120kg Greco-Roman	Mijain Lopez Nunez (CUB)	Heiki Nabi (EST)	Riza Kayaalp (TUR),Johan Euren (SWE)	Mon Aug 06 19:57:37 +0000 2012
+Ahletics - Women's Shot Put	Nadzeya Ostapchuk (BLR)	Valerie Adams (NZL)	Evgeniia Kolodko (RUS)	Mon Aug 06 19:53:46 +0000 2012
+Weightlifting - Men's 105kg	Oleksiy Torokhtiy (UKR)	Navab Nasirshelal (IRI)	Bartlomiej Wojciech Bonk (POL)	Mon Aug 06 19:49:43 +0000 2012
+Ahletics - Men's 400m Hurdles	Felix Sanchez (DOM)	Michael Tinsley (USA)	Javier Culson (PUR)	Mon Aug 06 19:48:34 +0000 2012
+Wrestling - Men's 84kg Greco-Roman	Alan Khugaev (RUS)	Karam Mohamed Gaber Ebrahim (EGY)	Danyal Gajiyev (KAZ),Damian Janikowski (POL)	Mon Aug 06 19:11:17 +0000 2012
+Wrestling - Men's 60kg Greco-Roman	Omid Haji Noroozi (IRI)	Revaz Lashkhi (GEO)	Zaur Kuramagomedov (RUS),Ryutaro Matsumoto (JPN)	Mon Aug 06 18:20:58 +0000 2012
+Cycling-Track - Men's Sprint	Jason Kenny (GBR)	Gregory Bauge (FRA)	Shane Perkins (AUS)	Mon Aug 06 17:35:53 +0000 2012
+Sailing - Men's Laser	Tom Slingsby (AUS)	Pavlos Kontides (CYP)	Rasmus Myrgren (SWE)	Mon Aug 06 15:49:57 +0000 2012
+Shooting - Men's Trap	Giovanni Cernogoraz (CRO)	Massimo Fabbrizi (ITA)	Fehaid Aldeehani (KUW)	Mon Aug 06 15:48:26 +0000 2012
+Gymnastics-Artistic - Men's Vault	Hak Seon Yang (KOR)	Denis Ablyazin (RUS)	Igor Radivilov (UKR)	Mon Aug 06 15:23:09 +0000 2012
+Gymnastics-Artistic - Women's Uneven Bars	Aliya Mustafina (RUS)	Kexin He (CHN)	Elizabeth Tweddle (GBR)	Mon Aug 06 14:38:26 +0000 2012
+Sailing - Women's Laser Radial	Lijia Xu (CHN)	Marit Bouwmeester (NED)	Evi Van Acker (BEL)	Mon Aug 06 14:18:06 +0000 2012
+Shooting - Men's 50m Rifle 3 Positions	Niccolo Campriani (ITA)	Jonghyun Kim (KOR)	Matthew Emmons (USA)	Mon Aug 06 14:16:47 +0000 2012
+Gymnastics-Artistic - Men's Rings	Arthur Nabarrete Zanetti (BRA)	Yibing Chen (CHN)	Matteo Morandi (ITA)	Mon Aug 06 14:15:34 +0000 2012
+Athletics - Men's Hammer Throw	Krisztian Pars (HUN)	Primoz Kozmus (SLO)	Koji Murofushi (JPN)	Sun Aug 05 21:12:38 +0000 2012
+Athletics - Men's 100m	Usain Bolt (JAM)	Yohan Blake (JAM)	Justin Gatlin (USA)	Sun Aug 05 20:52:46 +0000 2012
+Athletics - Men's 3000m Steeplechase	Ezekiel Kemboi (KEN)	Mahiedine Mekhissi-Benabbad (FRA)	Abel Kiprop Mutai (KEN)	Sun Aug 05 20:35:15 +0000 2012
+Athletics - Women's Triple Jump	Olga Rypakova (KAZ)	Caterine Ibarguen (COL)	Olha Saladuha (UKR)	Sun Aug 05 20:21:14 +0000 2012
+Athletics - Women's 400m	Sanya Richards-Ross (USA)	Christine Ohuruogu (GBR)	DeeDee Trotter (USA)	Sun Aug 05 20:16:35 +0000 2012
+Tennis - Mixed Doubles	Azarenka & Mirnyi (BLR	Robson & Murray (GBR	Raymond & Bryan (USA)	Sun Aug 05 20:00:43 +0000 2012
+Wrestling - Men's 74kg Greco-Roman	Roman Vlasov (RUS)	Arsen Julfalakyan (ARM)	Aleksandr Kazakevic (LTU),Emin Ahmadov (AZE)	Sun Aug 05 19:08:38 +0000 2012
+Diving - Women's 3m Springboard	Minxia Wu (CHN)	Zi He (CHN)	Laura Sanchez Soto (MEX)	Sun Aug 05 19:07:16 +0000 2012
+Wrestling - Men's 55kg Greco-Roman	Hamid Mohammad Soryan Reihanpour (IRA)	Rovshan Bayramov (AZE)	Peter Modos (HUN),Mingiyan Semenov (RUS)	Sun Aug 05 18:12:17 +0000 2012
+Cycling-Track - Men's Omnium	Lasse Norman Hansen (DEN)	Bryan Coquard (FRA)	Edward Clancy (GBR)	Sun Aug 05 17:55:31 +0000 2012
+Tennis - Women's Doubles	Williams & Williams (USA)	Hlavackova & Hradecka (CZE)	Kirilenko & Petrova (RUS)	Sun Aug 05 17:16:35 +0000 2012
+Weightlifting - Women's +75kg	Lulu Zhou (CHN)	Tatiana Kashirina (RUS)	Hripsime Khurshudyan (ARM)	Sun Aug 05 17:00:59 +0000 2012
+Gymnastics-Artistic - Men's Pommel Horse	Krisztian Berki (HUN)	Louis Smith (GBR)	Max Whitlock (GBR)	Sun Aug 05 15:21:20 +0000 2012
+Tennis - Men's Singles	Andy Murray (GBR)	Roger Federer (SUI)	Juan Martín del Potro (ARG)	Sun Aug 05 15:14:17 +0000 2012
+Gymnastics-Artistic - Women's Vault	Sandra Raluca Izbasa (ROU)	Mc Kayla Maroney (USA)	Maria Paseka (RUS)	Sun Aug 05 14:44:07 +0000 2012
+Badminton - Men's Doubles	Cai & FU (CHN)	Boe & Mogensen (DEN)	Chung & Lee (KOR)	Sun Aug 05 14:43:06 +0000 2012
+Gymnastics-Artistic - Men's Floor Exercise	Kai Zou (CHN)	Kohei Uchimura (JPN)	Denis Ablyazin (RUS)	Sun Aug 05 14:09:08 +0000 2012
+Sailing - Men's Finn	Ben Ainslie (GBR)	Jonas Hogh-Christensen (DEN)	Jonathan Lobert (FRA)	Sun Aug 05 14:06:39 +0000 2012
+Badminton - Men's Singles	Dan Lin (CHN)	Chong Wei Lee (MAS)	Long Chen (CHN)	Sun Aug 05 13:20:44 +0000 2012
+Athletics - Women's Marathon	Tiki Gelana (ETH)	Priscah Jeptoo (KEN)	Tatyana Petrova Arkhipova (RUS)	Sun Aug 05 12:25:00 +0000 2012
+Shooting - Men's 50m Pistol	Jongoh Jin (KOR)	Young Rae Choi (KOR)	Zhiwei Wang (CHN)	Sun Aug 05 12:19:59 +0000 2012
+Athletics - Women's Heptathlon	Jessica Ennis (GBR	Lilli Schwarzkopf (GER	Tatyana Chernova (RUS)	Sat Aug 04 21:05:25 +0000 2012
+Athletics - Women's 100m	Shelly-Ann Fraser-Pryce (JAM)	Carmelita Jeter (USA)	Veronica Campbell-Brown (JAM)	Sat Aug 04 20:58:53 +0000 2012
+Athletics - Men's 10,000m	Mohamed Farah (GBR)	Galen Rupp (USA)	Tariku Bekele (ETH)	Sat Aug 04 20:48:36 +0000 2012
+Athletics - Men's Long Jump	Greg Rutherford (GBR)	Mitchell Watt (AUS)	Will Claye (USA)	Sat Aug 04 20:25:43 +0000 2012
+Athletics - Women's Discus Throw	Sandra Perkovic (CRO)	Darya Pishchalnikova (RUS)	Yanfeng Li (CHN)	Sat Aug 04 19:59:52 +0000 2012
+Weightlifting - Men's 94kg	Ilya Ilyin (KAZ)	Alexandr Ivanov (RUS)	Anatoli Ciricu (MDA)	Sat Aug 04 19:43:01 +0000 2012
+Swimming - Men's 1500m Freestyle	Yang Sun (CHN)	Ryan Cochrane (CAN)	Oussama Mellouli (TUN)	Sat Aug 04 18:56:37 +0000 2012
+Swimming - Women's 50m Freestyle	Ranomi Kromowidjojo (NED)	Aliaksandra Herasimenia (BLR)	Marleen Veldhuis (NED)	Sat Aug 04 18:34:43 +0000 2012
+Athletics - Men's 20km Race Walk	Ding Chen (CHN)	Erick Barrondo (GUA)	Zhen Wang (CHN)	Sat Aug 04 17:20:26 +0000 2012
+Tennis - Men's Doubles	Bryan & Bryan (USA)	Llodra & Tsonga (FRA)	Benneteau & Gasquet (FRA)	Sat Aug 04 16:38:16 +0000 2012
+Badminton - Women's Doubles	Tian & Zhao (CHN)	Fuji & Kakiwa (JPN)	 Sorokina & Vislova (RUS)	Sat Aug 04 16:20:34 +0000 2012
+Trampoline - Women's Trampoline	Rosannagh Maclennan (CAN)	Shanshan Huang (CHN)	Wenna He (CHN)	Sat Aug 04 15:13:14 +0000 2012
+Shooting - Women's Trap	Jessica Rossi (ITA)	Zuzana Stefecekova (SVK)	Delphine Reau (FRA)	Sat Aug 04 15:11:57 +0000 2012
+Badminton - Women's Singles	Xuerui Li (CHN)	Yihan Wang (CHN)	Saina Nehwal (IND)	Sat Aug 04 14:37:59 +0000 2012
+Tennis - Women's Singles	Serena Williams (USA)	Maria Sharapova (RUS)	Victoria Azarenka (BLR)	Sat Aug 04 14:25:56 +0000 2012
+Rowing - Women's Single Sculls	Miroslava Knapkova (CZE)	Fie Udby Erichsen (DIN)	Kim Crow (AUS)	Sat Aug 04 12:35:08 +0000 2012
+Rowing - Men's Lightweight Double Sculls	Rasmussen & Quist (DEN)	Purchase & Hunter (GBR)	Uru & Taylor (NZL)	Sat Aug 04 12:24:16 +0000 2012
+Shooting - Women's 50m Rifle 3 Positions	Jamie Lynn Gray (USA)	Ivana Maksimovic (SRB)	Adela Sykorova (CZE)	Sat Aug 04 12:23:02 +0000 2012
+Rowing - Women's Lightweight Double Sculls	Copeland & Hosking (GBR)	Xu & Huang (CHN)	Giazitidou & Tsiavou (GRE)	Sat Aug 04 12:21:48 +0000 2012
+Triathlon - Women's Triathlon	Nicola Spirig (SUI)	Lisa Norden (SWE)	Erin Densham (AUS)	Sat Aug 04 10:51:15 +0000 2012
+Athletics - Women's 10,000m	Tirunesh Dibaba (ETH)	Sally Jepkosgei Kipyego (KEN)	Vivian Jepkemoi Cheruiyot (KEN)	Fri Aug 03 21:08:22 +0000 2012
+Athletics - Men's Shot put	Tomasz Majewski (POL)	David Storl (GER)	Reese Hoffa (USA)	Fri Aug 03 20:39:25 +0000 2012
+Weightlifting - Men's 85kg	Adrian Edward Zielinski (POL)	 Apti Aukhadov (RUS)	Kianoush Rostami (IRI)	Fri Aug 03 20:02:07 +0000 2012
+Swimming - Men's 50m Freestyle	Florent Manadou (FRA)	Cullen Jones (USA)	Cesar Cielo (BRA)	Fri Aug 03 19:15:05 +0000 2012
+Swimming - Women's 800m Freestyle	Katie Ledecky (USA)	Mireia Belmonte Garcia (SPA)	Rebecca Adlington (GBR)	Fri Aug 03 18:59:19 +0000 2012
+Swimming - Men's 100m Butterfly	Michael Phelps (USA)	Evgeny Korotyshkin (RUS)	Chad LeClos (RSA)	Fri Aug 03 18:43:28 +0000 2012
+Swimming - Women's 200m Backstroke	Missy Franklin (USA)	Anastasia Zueva (RUS)	Elizabeth Beisel (USA)	Fri Aug 03 18:36:20 +0000 2012
+Cycling-Track - Women's Keirin	Victoria Pendleton (GBR)	Shuang Guo (CHN)	Wai Sze Lee (HKG)	Fri Aug 03 18:33:01 +0000 2012
+Weightlifting - Women's 75kg	Svetlana Podobedova (KAZ)	Natalya Zabolotnaya (RUS)	Iryna Kulesha (BLR)	Fri Aug 03 15:53:03 +0000 2012
+Judo - Men's +100kg	Teddy Riner (FRA)	Alexander Mikhaylin (RUS)	Andreas Toelzer (GER),Rafael Silva (BRA)	Fri Aug 03 15:25:39 +0000 2012
+Judo - Women's +78kg	Idalys Ortiz (CUB)	Mika Sugimoto (JPN)	Karina Bryant (GBR,Wen Tong (CHN)	Fri Aug 03 15:14:28 +0000 2012
+Trampoline - Men's Trampoline	Dong Dong (CHN)	Dmitry Ushakov (RUS)	Chunlong Lu (CHN)	Fri Aug 03 15:13:02 +0000 2012
+Archery - Men's Individual	Jin Hyek Oh (KOR)	Takaharu Furukawa (JPN)	Xiaoxiang Dai (CHN)	Fri Aug 03 15:11:57 +0000 2012
+Badminton - Mixed Doubles	Zhang & Zhao (CHN)	Xu & Ma (CHN)	Fischer & Pedersen (DEN)	Fri Aug 03 15:11:25 +0000 2012
+Shooting - Men's 25m Rapid Fire Pistol	Leuris Pupo (CUB)	Vijay Kumar (IND)	Feng Ding (CHN)	Fri Aug 03 14:13:18 +0000 2012
+Rowing - Women's Double Sculls	Watkins & Grainger (GBR)	Crow & Pratley (AUS)	Fularczyk & Michalska (POL)	Fri Aug 03 12:09:44 +0000 2012
+Rowing - Men's Single Sculls	Mahe Drysdale (NZL)	Ondrej Synek (CZE)	Alan Campbell (GBR)	Fri Aug 03 12:08:19 +0000 2012
+Shooting - Men's 50m Rifle Prone	Sergei Martynov (BLR)	Lionel Cox (BEL)	Rajmond Debevec (SLO)	Fri Aug 03 11:33:45 +0000 2012
+Rowing - Men's Pair	Murray & Bond (NZL)	Chardin & Mortelett (FRA)	Nash & Satch (GBR)	Fri Aug 03 11:03:38 +0000 2012
+Swimming - Women's 100m Freestyle	Ranomi Kromowidjojo (NED)	Aliaksandra Herasimenia (BLR)	Yi Tang (CHN	Thu Aug 02 19:46:51 +0000 2012
+Swimming - Men's 200m Individual Medley	Michael Phelps (USA)	Ryan Lochte (USA)	Laszlo Cseh (HUN	Thu Aug 02 19:25:59 +0000 2012
+Swimming - Men's 200m Backstroke	Tyler Clary (USA)	Ryosuke Irie (JPN)	Ryan Lochte (USA	Thu Aug 02 18:55:17 +0000 2012
+Swimming - Women's 200m Breaststroke	Rebecca Soni (USA)	Satomi Suzuki (JPN)	Iulia Efimova (RUS	Thu Aug 02 18:51:26 +0000 2012
+Gymnastics-Artistic - Women's Individual All-Around	Gabrielle Douglas (USA)	Victoria Komova (RUS)	Aliya Mustafina (RUS	Thu Aug 02 17:18:38 +0000 2012
+Table Tennis - Men's Singles	Jike Zhang (CHN)	Hao Wang (CHN)	Dimitrij Ovtcharov (GER	Thu Aug 02 15:44:22 +0000 2012
+Judo - Men's -100kg	Tuvshinbayar Naidan (MGL)	Tagir Khaibulaev (RUS)	Dimitri Peters (GER), Henk Grol (NED)	Thu Aug 02 15:27:25 +0000 2012
+Canoe Slalom - Women's Kayak (K1)	Emilie Fer (FRA)	Jessica Fox (AUS)	Maialen Chourraut (SPA)	Thu Aug 02 15:26:08 +0000 2012
+Judo - Women's -78kg	Kayla Harrison (USA)	Gemma Gibbons (GBR)	Audrey Tcheumeo (FRA),Mayra Aguiar (BRA)	Thu Aug 02 15:13:36 +0000 2012
+Archery - Women's Individual	Bo Bae Ki (KOR)	 Aida Roman (MEX)	Mariana Avitia (MEX)	Thu Aug 02 14:56:15 +0000 2012
+Shooting - Men's Double Trap	Peter Robert Russell Wilson (GBR)	Hakan Dahlby (SWE)	Vasily Mosin (RUS)	Thu Aug 02 14:54:09 +0000 2012
+Canoe Slalom - Men's Canoe Double (C2)	Baillie & Stott (GBR)	Florence & Hounslow (GBR)	Hochschorner & Hochsch. (SVK)	Thu Aug 02 14:49:22 +0000 2012
+Rowing - Men's Double Sculls	Cohen & Sullivan (NZL)	Sartori & Battisti (ITA)	Spik & Cop (SLO)	Thu Aug 02 11:05:20 +0000 2012
+Weightlifting - Men's 77kg	Xiaojun Lu (CHN)	Haojie Lu (CHN)	Ivan Cambar Rodriguez (CUB)	Wed Aug 01 20:07:26 +0000 2012
+Fencing - Women's Individual Sabre	Jiyeon Kim (KOR)	Sofya Velikaya (RUS)	Olga Kharlan (UKR)	Wed Aug 01 20:05:54 +0000 2012
+Swimming - Men's 100m Freestyle	Nathan Adrian (USA)	James Magnussen (AUS)	Brent Hayden (CAN)	Wed Aug 01 19:27:05 +0000 2012
+Swimming - Women's 200m Butterfly	Liuyang Jiao (CHN)	Mireia Belmonte Garcia (SPA)	Natsumi Hoshi (JPN)	Wed Aug 01 19:20:52 +0000 2012
+Fencing - Men's Individual Epee	Ruben Limardo Gascon (VEN)	Bartosz Piasecki (NOR)	Jinsun Jung (KOR)	Wed Aug 01 19:17:45 +0000 2012
+Swimming - Men's 200m Breaststroke	Daniel Gyurta (HUN)	Michael Jamieson (GBR)	Ryo Tateishi (JPN)	Wed Aug 01 18:36:28 +0000 2012
+Gymnastics-Artistic - Men's Individual All-Around	Kohei Uchimura (JPN)	Marcel Nguyen (GER)	Danell Leyva (USA)	Wed Aug 01 17:58:45 +0000 2012
+Weightlifting - Women's 69kg	Jong Sim Rim (PRK)	Roxana Daniela Cocos (ROU)	Maryna Shkermankova (BLR)	Wed Aug 01 16:17:05 +0000 2012
+Judo - Men's -90kg	Dae-Nam Song (KOR)	Asley Gonzalez (CUB)	Ilias Iliadis (GRE),Masashi Nishiyama (JPN)	Wed Aug 01 15:45:20 +0000 2012
+Table Tennis - Women's Singles	Xiaoxia Li (CHN)	Ning Ding (CHN)	Tianwei Feng (SIN)	Wed Aug 01 15:44:07 +0000 2012
+Judo - Women's -70kg	Lucie Decosse (FRA)	Kerstin Thiele (GER)	Yuri Alvear (COL),Edith Bosch (NED)	Wed Aug 01 15:42:16 +0000 2012
+Cycling-Road - Men's Individual Time Trial	Bradley Wiggins (GBR)	Tony Martin (GER)	Christopher Froome (GBR)	Wed Aug 01 15:05:28 +0000 2012
+Diving - Men's Synchronised 3m Springboard	Luo & Qin (CHN)	Zakharov & Kuznetsov (RUS)	Dumais & Ipsen (USA)	Wed Aug 01 15:01:43 +0000 2012
+Canoe Slalom - Men's Kayak (K1)	Daniele Molmenti (ITA)	Vavrinec Hradilek (CZE)	Hannes Aigner (GER)	Wed Aug 01 15:00:29 +0000 2012
+Shooting - Women's 25m Pistol	Jangmi Kim (KOR)	Ying Chen (CHN)	Olena Kostevych (UKR)	Wed Aug 01 15:00:09 +0000 2012
+Cycling-Road - Women's Individual Time Trial	Kristin Armstrong (USA)	Judith Arndt (GER)	Olga Zabelinskaya (RUS)	Wed Aug 01 14:18:11 +0000 2012
+Rowing - Women's Pair	Glover & Stanning (GBR)	Hornsey & Tait (AUS)	Haigh & Scown (NZL)	Wed Aug 01 11:08:22 +0000 2012
+Weightlifting - Men's 69kg	Qingfeng Lin (CHN)	Triyatno Triyatno (INA)	Razvan Constantin Martin (ROU)	Tue Jul 31 20:05:25 +0000 2012
+Swimming - Women's 200m Individual Medley	Shiwen Ye (CHN)	Alicia Coutts (AUS)	Caitlin Leverenz (USA)	Tue Jul 31 19:51:45 +0000 2012
+Fencing - Men's Individual Foil	Sheng Lei (CHN)	Alaaeldin Abouelkassem (EGY)	Byungchul Choi (KOR)	Tue Jul 31 19:42:41 +0000 2012
+Swimming -Men's 200m Butterfly	Chad le Clos (RSA)	Michael Phelps (USA)	Takeshi Matsuda (JPN)	Tue Jul 31 18:55:36 +0000 2012
+Swimming -Women's 200m Freestyle	Allison Schmitt (USA)	Camille Muffat (FRA)	Bronte Barratt (AUS)	Tue Jul 31 18:46:34 +0000 2012
+Weightlifting - Women's 63kg	Maiya Maneza (KAZ)	Svetlana Tsarukaeva (RUS)	Christine Girard (CAN)	Tue Jul 31 16:18:39 +0000 2012
+Judo-Men's -81kg	Jae-Bum Kim (KOR)	Ole Bischof (GER)	Ivan Nifontov (RUS),Antoine Valois-Fortier (CAN)	Tue Jul 31 15:44:10 +0000 2012
+Diving - Women's Synchronised 10m Platform	Chen & Wang (CHN)	Espinosa & Orozco (MEX)	Benfeito & Filion (CAN)	Tue Jul 31 15:34:50 +0000 2012
+Judo-Women's -63kg	Urska Zolnir (SLO)	Lili Xu (CHN)	Yoshie Ueno (JPN),Gevrise Emane (FRA)	Tue Jul 31 15:31:56 +0000 2012
+Equestrian - Individual Eventing	Michael Jung (GER)	Sara Algotsson Ostholt (SWE)	Sandra Auffarth (GER)	Tue Jul 31 14:38:03 +0000 2012
+Shooting - Men's Skeet	Vincent Hancock (USA)	Anders Golding (DEN)	Nasser Al-Attiya (QAT)	Tue Jul 31 14:34:05 +0000 2012
+Canoe Slalom - Men's Canoe Single (C1)	Tony Estanguet (FRA)	Sideris Tasiadis (GER)	Benjamin Michal Martikan (SVK)	Tue Jul 31 14:29:16 +0000 2012
+Fencing - Women's Individual Epee	Yana Shemyakina (UKR)	Britta Heidemann (GER)	Yujie Sun (CHN)	Mon Jul 30 19:57:28 +0000 2012
+Weightlifting - Men's 62kg	Un Guk Kim (PRK)	Oscar Albeiro Figueroa Mosquera (COL)	Irawan Eko Yuli (INA)	Mon Jul 30 19:37:48 +0000 2012
+Swimming - Women's 100m Breaststroke	Ruta Meilutyte (LTU)	Rebecca Soni (USA)	Satomi Suzuki (JPN)	Mon Jul 30 19:25:43 +0000 2012
+Swimming - Men's 100m Backstroke	Matthew Grevers (USA)	Nick Thoman (USA)	Ryosuke Irie (JPN)	Mon Jul 30 19:03:12 +0000 2012
+Swimming - Men's 200m Freestyle: two silver medals	Yannick Agnel (FRA)	Taehwan Park (KOR)	Yang Sun (CHN)	Mon Jul 30 18:57:19 +0000 2012
+Swimming - Women's 100m Backstroke	Missy Franklin (USA)	Emily Seebohm (AUS)	Aya Terakawa (JPN)	Mon Jul 30 18:56:14 +0000 2012
+Weightlifting - Women's 58kg	Xueying Li (CHN)	Pimsiri Sirikaew (THA)	Yuliya Kalina (UKR)	Mon Jul 30 16:22:00 +0000 2012
+Judo-Men's -73kg	Mansur Isaev (RUS)	Riki Nakaya (JPN)	Nyam-Ochir Sainjargal (MGL),Ugo Legrand (FRA)	Mon Jul 30 15:48:20 +0000 2012
+Judo-Women's -57kg	Kaori Matsumoto (JPN)	Corina Caprioriu (ROU)	Marti Malloy (USA),Automne Pavia (FRA)	Mon Jul 30 15:33:46 +0000 2012
+Diving - Men's Synchronised 10m Platform	Zhang & Cao (CHN)	Garcia & Sanchez (MEX)	Boudia & McCrory (USA)	Mon Jul 30 15:02:55 +0000 2012
+Shooting - Men's 10m Air Rifle	Alin George Moldoveanu (ROU)	Niccolo Campriani (ITA)	Gagan Narang (IND)	Mon Jul 30 11:58:18 +0000 2012
+Weightlifting - Men's 56kg	Yun Chol Om (PRK)	Jingbiao Wu (CHN)	Valentin Hristov (AZE)	Sun Jul 29 20:01:06 +0000 2012
+Swimming - Women's 400m Freestyle	Camille Muffat (FRA)	Allison Schmitt (USA)	Rebecca Adlington (GBR)	Sun Jul 29 19:26:24 +0000 2012
+Swimming - Men's 100m Breaststroke	Cameron van der Burgh (RSA)	Christian Sprenger (AUS)	Brendan Hansen (USA)	Sun Jul 29 19:17:22 +0000 2012
+Swimming - Women's 100m Butterfly	Dana Vollmer (USA)	Ying Lu (CHN)	Alicia Coutts (AUS)	Sun Jul 29 18:34:59 +0000 2012
+Fencing - Men's Individual Sabre	Aron Szilagyi (HUN)	Diego Occhiuzzi (ITA)	Nikolay Kovalev (RUS)	Sun Jul 29 18:30:02 +0000 2012
+Weightlifting - Women's 53kg	Zulfiya Chinshanlo (KAZ)	Shu-Ching Hsu (TPE)	Cristina Iovu (MDA)	Sun Jul 29 16:14:07 +0000 2012
+Judo - Men's-66kg	Lasha Shavdatuashvili (GEO)	Miklos Ungvari (HUN)	Jun-Ho Cho (KOR),Masashi Ebinuma (JPN)	Sun Jul 29 15:56:28 +0000 2012
+Judo - Women's-52kg	Kum Ae An (PRK)	Yanet Bermoy Acosta (CUB)	Rosalba Forciniti (ITA),Priscilla Gneto (FRA)	Sun Jul 29 15:36:02 +0000 2012
+Diving - Women's Synchronised 3m Springboard	He & Wu (CHN)	Bryant & Johnston (USA)	Abel & Heymans (CAN)	Sun Jul 29 14:46:50 +0000 2012
+Cycling-Road - Women's Road Race	Marianne Vos (NED)	Elizabeth Armitstead (GBR)	Olga Zabelinskaya (RUS)	Sun Jul 29 14:37:48 +0000 2012
+Shooting - Women's skeet	Kimberly Rhode (USA)	Ning Wei (CHN)	Danka Bartekova (SVK)	Sun Jul 29 13:53:30 +0000 2012
+Shooting - Women's 10m Air Pistol	Wenjun Guo (CHN)	Celine Goberville (FRA)	Olena Kostevych (UKR)	Sun Jul 29 11:13:46 +0000 2012
+Swimming - Women's 400m Individual Medley	Shiwen Ye (CHN)	Elizabeth Beisel (USA)	Xuanxu Li (CHN)	Sat Jul 28 19:21:43 +0000 2012
+Fencing - Women's Individual Foil	Elisa Di Francisca (ITA)	Arianna Errigo (ITA)	Valentina Vezzali (ITA)	Sat Jul 28 19:17:39 +0000 2012
+Swimming - Men's 400m Freestyle	Yang Sun (CHN)	Taehwan Park (KOR)	Peter Vanderkaay (USA)	Sat Jul 28 18:58:59 +0000 2012
+Swimming - Men's 400m Individual Medley	Ryan Lochte (USA)	Thiago Pereira (BRA)	Kosuke Hagino (JPN)	Sat Jul 28 18:38:10 +0000 2012
+Weightlifting - Women's 48kg	Mingjuan Wang (CHN)	Hiromi Miyake (JPN)	Chun Hwa Ryang (PRK)	Sat Jul 28 17:06:27 +0000 2012
+Judo - Men's -60kg	Arsen Galstyan (RUS)	Hiroaki Hiraoka (JPN)	Felipe Kitadai (BRA),Rishod Sobirov (UZB)	Sat Jul 28 15:42:24 +0000 2012
+Judo - Women's -48kg	Sarah Menezes (BRA)	Alina Dumitru (ROU)	Charline van Snick (BEL),Eva Csernoviczki (HUN)	Sat Jul 28 15:40:38 +0000 2012
+Shooting - Men's 10m Air Pistol	Jongoh Jin (COR)	Luca Tesconi (ITA)	Andrija Zlatic (SRB)	Sat Jul 28 14:52:37 +0000 2012
+Cycling-Road - Men's Road Race	 Alexandr Vinokurov (KAZ)	Rigoberto Urvan (COL)	Alexander Kristoff (NOR)	Sat Jul 28 14:49:38 +0000 2012
+Shooting - Women's 10m Air Rifle	Siling Yi (CHN)	Sylwia Bogacka (POL)	Dan Yu (CHN)	Sat Jul 28 11:29:46 +0000 2012
