@@ -298,6 +298,16 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         return v;
     }
 
+
+
+    /**
+     *
+     * If the input data are sorted, then out vertex will be repeated for several edges in a row.
+     * In this case, bypass cache and instead immediately return a new vertex using the known id.
+     * This gives a modest performance boost, especially when the cache is large or there are 
+     * on average many edges per vertex.
+     * 
+     */
     @Override
     public Vertex getVertex(final Object id) {
         
@@ -347,11 +357,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
             throw new IllegalArgumentException("Given element was not created in this baseGraph");
         nextElement();
         
-        final Vertex iv = getCachedVertex(inVertex.getId());
         final Vertex ov = getCachedVertex(outVertex.getId());
+        final Vertex iv = getCachedVertex(inVertex.getId());
 
-
-        previousOutVertexId = outVertex.getId();
+        previousOutVertexId = outVertex.getId();  //keep track of the previous out vertex id
 
         currentEdgeCached = baseGraph.addEdge(id, ov, iv, label);
         if (edgeIdKey != null && id != null) {
