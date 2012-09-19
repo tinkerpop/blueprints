@@ -91,7 +91,9 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     private BatchEdge currentEdge = null;
     private Edge currentEdgeCached = null;
-
+    
+    private Object previousOutVertexId = null;
+    
     /**
      * Constructs a BatchGraph wrapping the provided baseGraph, using the specified buffer size and expecting vertex ids of
      * the specified IdType. Supplying vertex ids which do not match this type will throw exceptions.
@@ -298,24 +300,31 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     @Override
     public Vertex getVertex(final Object id) {
-        Vertex v = retrieveFromCache(id);
-        if (v == null) {
-            if (loadingFromScratch) return null;
-            else {
-                if (baseGraph.getFeatures().ignoresSuppliedIds) {
-                    assert vertexIdKey!=null;
-                    Iterator<Vertex> iter = baseGraph.getVertices(vertexIdKey,id).iterator();
-                    if (!iter.hasNext()) return null;
-                    v = iter.next();
-                    if (iter.hasNext()) throw new IllegalArgumentException("There are multiple vertices with the provided id in the database: " + id);
-                } else {
-                    v = baseGraph.getVertex(id);
-                    if (v==null) return null;
-                }
-                cache.set(v,id);
+        
+        if ( (previousOutVertexId != null) &&  (previousOutVertexId.equals(id))) {
+                return new BatchVertex(previousOutVertexId);
             }
+        else {
+
+            Vertex v = retrieveFromCache(id);
+            if (v == null) {
+                if (loadingFromScratch) return null;
+                else {
+                    if (baseGraph.getFeatures().ignoresSuppliedIds) {
+                        assert vertexIdKey!=null;
+                        Iterator<Vertex> iter = baseGraph.getVertices(vertexIdKey,id).iterator();
+                        if (!iter.hasNext()) return null;
+                        v = iter.next();
+                        if (iter.hasNext()) throw new IllegalArgumentException("There are multiple vertices with the provided id in the database: " + id);
+                    } else {
+                        v = baseGraph.getVertex(id);
+                        if (v==null) return null;
+                    }
+                    cache.set(v,id);
+                }
+            }
+            return new BatchVertex(id);
         }
-        return new BatchVertex(id);
     }
 
     @Override
@@ -337,8 +346,13 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         if (!BatchVertex.class.isInstance(outVertex) || !BatchVertex.class.isInstance(inVertex))
             throw new IllegalArgumentException("Given element was not created in this baseGraph");
         nextElement();
-        final Vertex ov = getCachedVertex(outVertex.getId());
+        
         final Vertex iv = getCachedVertex(inVertex.getId());
+        final Vertex ov = getCachedVertex(outVertex.getId());
+
+
+        previousOutVertexId = outVertex.getId();
+
         currentEdgeCached = baseGraph.addEdge(id, ov, iv, label);
         if (edgeIdKey != null && id != null) {
             currentEdgeCached.setProperty(edgeIdKey, id);
