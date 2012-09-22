@@ -73,23 +73,29 @@ public class RexsterGraphTest extends GraphTest {
     }
 
     public void testEncoding() throws Exception {
-        final Graph g = generateGraph();
-        this.resetGraph();
+        final String doTest = System.getProperty("testRexsterGraph", "true");
+        if (doTest.equals("true")) {
+            final Graph g = generateGraph();
+            this.resetGraph();
 
-        final Vertex v = g.addVertex(null);
-        v.setProperty("test", "déja-vu");
+            final Vertex v = g.addVertex(null);
+            v.setProperty("test", "déja-vu");
 
-        Assert.assertEquals("déja-vu", g.getVertex(v.getId()).getProperty("test"));
+            Assert.assertEquals("déja-vu", g.getVertex(v.getId()).getProperty("test"));
+        }
     }
 
     public void testOuterParens() throws Exception {
-        final Graph g = generateGraph();
-        this.resetGraph();
+        final String doTest = System.getProperty("testRexsterGraph", "true");
+        if (doTest.equals("true")) {
+            final Graph g = generateGraph();
+            this.resetGraph();
 
-        final Vertex v = g.addVertex(null);
-        v.setProperty("test", "(sometext)");
+            final Vertex v = g.addVertex(null);
+            v.setProperty("test", "(sometext)");
 
-        Assert.assertEquals("(sometext)", g.getVertex(v.getId()).getProperty("test"));
+            Assert.assertEquals("(sometext)", g.getVertex(v.getId()).getProperty("test"));
+        }
     }
 
     /*
