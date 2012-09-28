@@ -15,6 +15,7 @@ import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import junit.framework.Assert;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -71,6 +72,32 @@ public class RexsterGraphTest extends GraphTest {
         printTestPerformance("IndexTestSuite", this.stopWatch());
     }
 
+    public void testEncoding() throws Exception {
+        final String doTest = System.getProperty("testRexsterGraph", "true");
+        if (doTest.equals("true")) {
+            final Graph g = generateGraph();
+            this.resetGraph();
+
+            final Vertex v = g.addVertex(null);
+            v.setProperty("test", "déja-vu");
+
+            Assert.assertEquals("déja-vu", g.getVertex(v.getId()).getProperty("test"));
+        }
+    }
+
+    public void testOuterParens() throws Exception {
+        final String doTest = System.getProperty("testRexsterGraph", "true");
+        if (doTest.equals("true")) {
+            final Graph g = generateGraph();
+            this.resetGraph();
+
+            final Vertex v = g.addVertex(null);
+            v.setProperty("test", "(sometext)");
+
+            Assert.assertEquals("(sometext)", g.getVertex(v.getId()).getProperty("test"));
+        }
+    }
+
     /*
     TODO: Create a respective test case that doesn't require underscore prefixed properties
     public void testGraphMLReaderTestSuite() throws Exception {
@@ -105,7 +132,7 @@ public class RexsterGraphTest extends GraphTest {
     }
 
     private void resetGraph() {
-        final KeyIndexableGraph graph = new RexsterGraph(this.getWorkingUri(), this.username, this.password);
+        final KeyIndexableGraph graph = (KeyIndexableGraph) this.generateGraph();
         final IndexableGraph idxGraph = (IndexableGraph) graph;
 
         // since we don't have graph.clear() anymore we manually reset the graph.
