@@ -46,7 +46,7 @@ public class DistributionGeneratorTest extends TestCase {
         assertEquals(0,degreeSum);
 
         //scale free
-        n = new ScaleFreeDistribution(2.9);
+        n = new PowerLawDistribution(2.9);
         n = n.initialize(numNodes,numEdges);
         degreeSum = 0;
         for (int i=0;i<numNodes;i++) {
@@ -68,19 +68,19 @@ public class DistributionGeneratorTest extends TestCase {
     }
 
     public void testGeneratorScaleFree1() {
-        distributionGeneratorTest(new ScaleFreeDistribution(2.9), null);
+        distributionGeneratorTest(new PowerLawDistribution(2.9), null);
     }
 
     public void testGeneratorScaleFree2() {
-        distributionGeneratorTest(new ScaleFreeDistribution(2.1), null);
+        distributionGeneratorTest(new PowerLawDistribution(2.1), null);
     }
 
     public void testGeneratorScaleFree3() {
-        distributionGeneratorTest(new ScaleFreeDistribution(3.9), null);
+        distributionGeneratorTest(new PowerLawDistribution(3.9), null);
     }
 
     public void testGeneratorScaleFree4() {
-        distributionGeneratorTest(new ScaleFreeDistribution(2.3), new ScaleFreeDistribution(2.8));
+        distributionGeneratorTest(new PowerLawDistribution(2.3), new PowerLawDistribution(2.8));
     }
 
     private void distributionGeneratorTest(Distribution indist, Distribution outdist) {
@@ -99,11 +99,11 @@ public class DistributionGeneratorTest extends TestCase {
     }
 
     public void testCommunityGenerator1() {
-        communityGeneratorTest(new NormalDistribution(2),new ScaleFreeDistribution(2.4),0.1);
+        communityGeneratorTest(new NormalDistribution(2),new PowerLawDistribution(2.4),0.1);
     }
 
     public void testCommunityGenerator2() {
-        communityGeneratorTest(new NormalDistribution(2),new ScaleFreeDistribution(2.4),0.5);
+        communityGeneratorTest(new NormalDistribution(2),new PowerLawDistribution(2.4),0.5);
     }
 
     public void testCommunityGenerator3() {
@@ -115,11 +115,11 @@ public class DistributionGeneratorTest extends TestCase {
     }
 
     public void testCommunityGenerator5() {
-        communityGeneratorTest(new ScaleFreeDistribution(2.3),new ScaleFreeDistribution(2.4),0.2);
+        communityGeneratorTest(new PowerLawDistribution(2.3),new PowerLawDistribution(2.4),0.2);
     }
 
     public void testCommunityGenerator6() {
-        communityGeneratorTest(new ScaleFreeDistribution(2.3),new NormalDistribution(4),0.2);
+        communityGeneratorTest(new PowerLawDistribution(2.3),new NormalDistribution(4),0.2);
     }
 
 
