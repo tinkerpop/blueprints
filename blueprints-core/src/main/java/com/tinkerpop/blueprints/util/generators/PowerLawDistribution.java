@@ -5,13 +5,14 @@ import java.util.Random;
 /**
  * Generates values according to a scale-free distribution with the configured gamma value.
  *
- * Read about <a href="http://en.wikipedia.org/wiki/Scale-free_network">scale-free netowrks</a> for more information
+ * Read about <a href="http://en.wikipedia.org/wiki/Scale-free_network">scale-free netowrks</a> for more information on power
+ * law distributions and how they relate to scale-free networks.
  *
- * @see <a href="http://en.wikipedia.org/wiki/Scale-free_network">scale-free netowrks</a>
+ * @see <a href="http://en.wikipedia.org/wiki/Scale-free_network">scale-free netowrks and power law distribution</a>
  *
  * (c) Matthias Broecheler (me@matthiasb.com)
  */
-public class ScaleFreeDistribution implements Distribution {
+public class PowerLawDistribution implements Distribution {
 
     private final double gamma;
     private final double multiplier;
@@ -21,11 +22,11 @@ public class ScaleFreeDistribution implements Distribution {
      *
      * @param gamma
      */
-    public ScaleFreeDistribution(double gamma) {
+    public PowerLawDistribution(double gamma) {
         this(gamma,0.0);
     }
 
-    private ScaleFreeDistribution(double gamma, double multiplier) {
+    private PowerLawDistribution(double gamma, double multiplier) {
         if (gamma <=2.0) throw new IllegalArgumentException("Beta must be bigger than 2: " + gamma);
         if (multiplier<0) throw new IllegalArgumentException("Invalid multiplier value: " + multiplier);
         this.gamma = gamma;
@@ -36,7 +37,7 @@ public class ScaleFreeDistribution implements Distribution {
     public Distribution initialize(int invocations, int expectedTotal) {
         double multiplier = expectedTotal /((gamma -1)/(gamma -2) * invocations) * 2; //times two because we are generating stubs
         assert multiplier>0;
-        return new ScaleFreeDistribution(gamma,multiplier);
+        return new PowerLawDistribution(gamma,multiplier);
     }
 
     @Override
