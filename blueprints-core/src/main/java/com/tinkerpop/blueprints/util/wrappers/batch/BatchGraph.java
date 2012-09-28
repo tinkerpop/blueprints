@@ -53,30 +53,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      */
     public static final long DEFAULT_BUFFER_SIZE = 100000;
 
-    /**
-     * Type of vertex ids expected by BatchGraph. The default is IdType.OBJECT.
-     * Use the IdType that best matches the used vertex id types in order to save memory.
-     */
-    public static enum IdType {
 
-        OBJECT, NUMBER, STRING, URL;
-
-        private VertexCache getVertexCache(Graph g) {
-            switch (this) {
-                case OBJECT:
-                    return new ObjectIDVertexCache(g);
-                case NUMBER:
-                    return new LongIDVertexCache(g);
-                case STRING:
-                    return new StringIDVertexCache(g);
-                case URL:
-                    return new StringIDVertexCache(g, new URLCompression());
-                default:
-                    throw new IllegalArgumentException("Unrecognized ID type: " + this);
-            }
-        }
-
-    }
 
     private final T baseGraph;
 
@@ -100,7 +77,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * @param type       Type of vertex id expected. This information is used to optimize the vertex cache memory footprint.
      * @param bufferSize Defines the number of vertices and edges loaded before starting a new transaction. The larger this value, the more memory is required but the faster the loading process.
      */
-    public BatchGraph(final T graph, final IdType type, final long bufferSize) {
+    public BatchGraph(final T graph, final VertexIDType type, final long bufferSize) {
         if (graph == null) throw new IllegalArgumentException("Graph may not be null");
         if (type == null) throw new IllegalArgumentException("Type may not be null");
         if (bufferSize <= 0) throw new IllegalArgumentException("BufferSize must be positive");
@@ -110,7 +87,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         vertexIdKey = null;
         edgeIdKey = null;
 
-        cache = type.getVertexCache(this.baseGraph);
+        cache = type.getVertexCache();
 
         remainingBufferSize = this.bufferSize;
     }
@@ -121,7 +98,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * @param graph Graph to be wrapped
      */
     public BatchGraph(final T graph) {
-        this(graph, IdType.OBJECT, DEFAULT_BUFFER_SIZE);
+        this(graph, VertexIDType.OBJECT, DEFAULT_BUFFER_SIZE);
     }
 
     /**
@@ -146,8 +123,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     public static BatchGraph wrap(final Graph graph, final long buffer) {
         if (graph instanceof BatchGraph) return (BatchGraph) graph;
         else if (graph instanceof TransactionalGraph)
-            return new BatchGraph((TransactionalGraph) graph, IdType.OBJECT, buffer);
-        else return new BatchGraph(new WritethroughGraph(graph), IdType.OBJECT, buffer);
+            return new BatchGraph((TransactionalGraph) graph, VertexIDType.OBJECT, buffer);
+        else return new BatchGraph(new WritethroughGraph(graph), VertexIDType.OBJECT, buffer);
     }
 
     /**

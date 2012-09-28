@@ -26,40 +26,40 @@ public class BatchGraphTest extends TestCase {
     private static boolean ignoreIDs = false;
 
     public void testNumberIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.NUMBER, new NumberLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.NUMBER, new NumberLoadingFactory());
 
         assignKeys=true;
-        loadingTest(5000,100, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
-        loadingTest(50000,10000, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
+        loadingTest(5000,100, VertexIDType.NUMBER,new NumberLoadingFactory());
+        loadingTest(50000,10000, VertexIDType.NUMBER,new NumberLoadingFactory());
         assignKeys=false;
 
         ignoreIDs=true;
-        loadingTest(5000,100, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
-        loadingTest(50000,10000, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
+        loadingTest(5000,100, VertexIDType.NUMBER,new NumberLoadingFactory());
+        loadingTest(50000,10000, VertexIDType.NUMBER,new NumberLoadingFactory());
         ignoreIDs=false;
     }
 
     public void testObjectIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.OBJECT, new StringLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.OBJECT, new StringLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.OBJECT, new StringLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.OBJECT, new StringLoadingFactory());
     }
 
     public void testStringIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.STRING, new StringLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.STRING, new StringLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.STRING, new StringLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.STRING, new StringLoadingFactory());
     }
 
     public void testURLIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.URL, new URLLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.URL, new URLLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.URL, new URLLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.URL, new URLLoadingFactory());
     }
 
     public void testQuadLoading() {
         int numEdges = 10000;
         String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
         TinkerGraph graph = new TinkerGraph();
-        BatchGraph bgraph = new BatchGraph(new WritethroughGraph(graph), BatchGraph.IdType.STRING, 1000);
+        BatchGraph bgraph = new BatchGraph(new WritethroughGraph(graph), VertexIDType.STRING, 1000);
         for (String[] quad : quads) {
             Vertex[] vertices = new Vertex[2];
             for (int i=0;i<2;i++) {
@@ -78,7 +78,7 @@ public class BatchGraphTest extends TestCase {
         int numEdges = 1000;
         String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
         TinkerGraph tg = new TinkerGraph();
-        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
+        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), VertexIDType.STRING, 100);
         bg.setLoadingFromScratch(false);
         Graph graph = null;
         int counter = 0;
@@ -104,7 +104,7 @@ public class BatchGraphTest extends TestCase {
         int numEdges = 1000;
         String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
         TinkerGraph tg = new IgnoreIdTinkerGraph();
-        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
+        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), VertexIDType.STRING, 100);
         try {
             bg.setLoadingFromScratch(false);
             fail();
@@ -150,7 +150,7 @@ public class BatchGraphTest extends TestCase {
     }
 
 
-    public void loadingTest(int total, int bufferSize, BatchGraph.IdType type, LoadingFactory ids) {
+    public void loadingTest(int total, int bufferSize, VertexIDType type, LoadingFactory ids) {
         final VertexEdgeCounter counter = new VertexEdgeCounter();
 
         MockTransactionalGraph tgraph = null;
