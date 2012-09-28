@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.util.generators;
 
-import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 
@@ -9,6 +8,10 @@ import java.util.Collections;
 import java.util.Random;
 
 /**
+ * Generates a synthetic network for a given out- and (optionally) in-degree distribution.
+ * 
+ * After construction, at least the out-degree distribution must be set via {@link #setOutDistribution}
+ * 
  * (c) Matthias Broecheler (me@matthiasb.com)
  */
 
@@ -18,46 +21,109 @@ public class DistributionGenerator extends AbstractGenerator {
     private Distribution inDistribution;
 
     private boolean allowLoops = true;
-    
+
+    /**
+     * 
+     * @param label
+     * @param annotator
+     * @see AbstractGenerator#AbstractGenerator(String, EdgeAnnotator) 
+     */
     public DistributionGenerator(String label, EdgeAnnotator annotator) {
         super(label,annotator);
     }
-    
+
+    /**
+     * 
+     * @param label
+     * @see AbstractGenerator#AbstractGenerator(String) 
+     */
     public DistributionGenerator(String label) {
         super(label);
     }
-    
-    public void setOutDistributions(Distribution distribution) {
+
+    /**
+     * Sets the out-degree distribution to be used by this generator. 
+     * 
+     * This method must be called prior to generating the network.
+     * 
+     * @param distribution
+     */
+    public void setOutDistribution(Distribution distribution) {
         if (distribution==null) throw new NullPointerException();
         this.outDistribution=distribution;
     }
 
-    public void setInDistributions(Distribution distribution) {
+    /**
+     * Sets the in-degree distribution to be used by this generator.
+     * 
+     * If the in-degree distribution is not specified, {@link CopyDistribution} is used by default.
+     *
+     * @param distribution
+     */
+    public void setInDistribution(Distribution distribution) {
         if (distribution==null) throw new NullPointerException();
         this.inDistribution=distribution;
     }
-    
+
+    /**
+     * Clears the in-degree distribution
+     */
     public void clearInDistribution() {
         this.inDistribution=null;
     }
 
+    /**
+     * Whether edge loops are allowed
+     *
+     * @return
+     */
     public boolean hasAllowLoops() {
         return allowLoops;
     }
 
+    /**
+     * Sets whether loops, i.e. edges with the same start and end vertex, are allowed to be generated.
+     * @param allowLoops
+     */
     public void setAllowLoops(boolean allowLoops) {
         this.allowLoops=allowLoops;
     }
 
-    
+    /**
+     * Generates a synthetic network connecting all vertices in the provided graph with the expected number
+     * of edges.
+     *
+     * @param graph
+     * @param expectedNumEdges
+     * @return The number of generated edges. Not that this number may not be equal to the expected number of edges
+     */
     public int generate(Graph graph, int expectedNumEdges) {
         return generate(graph,graph.getVertices(),expectedNumEdges);
     }
-    
-    public int generate(Graph graph, Iterable<Vertex> out, int expectedNumEdges) {
-        return generate(graph,out,out,expectedNumEdges);
-    }    
-    
+
+    /**
+     * Generates a synthetic network connecting the given vertices by the expected number of directed edges
+     * in the provided graph.
+     *
+     * @param graph
+     * @param vertices
+     * @param expectedNumEdges
+     * @return The number of generated edges. Not that this number may not be equal to the expected number of edges
+     */
+    public int generate(Graph graph, Iterable<Vertex> vertices, int expectedNumEdges) {
+        return generate(graph,vertices,vertices,expectedNumEdges);
+    }
+
+    /**
+     * Generates a synthetic network connecting the vertices in <i>out</i> by directed edges
+     * with those in <i>in</i> with the given number of expected edges in the provided graph.
+     *
+     * @param graph
+     * @param out
+     * @param in
+     * @param expectedNumEdges
+     * @return The number of generated edges. Not that this number may not be equal to the expected number of edges
+     */
     public int generate(Graph graph, Iterable<Vertex> out, Iterable<Vertex> in, int expectedNumEdges) {
         if (outDistribution==null) throw new IllegalStateException("Must set out-distribution before generating edges");
         
@@ -74,7 +140,7 @@ public class DistributionGenerator extends AbstractGenerator {
         Random outRandom = new Random(seed);
         ArrayList<Vertex> outStubs = new ArrayList<Vertex>(expectedNumEdges);
         for (Vertex v : out) {
-            int degree = outDist.getDegree(outRandom);
+            int degree = outDist.nextValue(outRandom);
             for (int i=0;i<degree;i++) {
                 outStubs.add(v);
             }
@@ -87,7 +153,7 @@ public class DistributionGenerator extends AbstractGenerator {
         int addedEdges = 0;
         int position = 0;
         for (Vertex v : in) {
-            int degree = inDist.getConditionalDegree(inRandom, outDist.getDegree(outRandom));
+            int degree = inDist.nextConditionalValue(inRandom, outDist.nextValue(outRandom));
             for (int i=0;i<degree;i++) {
                 Vertex other = null;
                 while (other==null) {

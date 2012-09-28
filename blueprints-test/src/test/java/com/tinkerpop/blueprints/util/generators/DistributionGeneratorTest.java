@@ -32,7 +32,7 @@ public class DistributionGeneratorTest extends TestCase {
         n = n.initialize(numNodes,numEdges);
         int degreeSum = 0;
         for (int i=0;i<numNodes;i++) {
-            int degree=n.getDegree(random);
+            int degree=n.nextValue(random);
             degreeSum+=degree;
         }
         System.out.println(degreeSum);
@@ -41,7 +41,7 @@ public class DistributionGeneratorTest extends TestCase {
         n = new NormalDistribution(2);
         n = n.initialize(numNodes,numEdges);
         for (int i=0;i<numNodes;i++) {
-            degreeSum-=n.getDegree(random);
+            degreeSum-=n.nextValue(random);
         }
         assertEquals(0,degreeSum);
 
@@ -50,7 +50,7 @@ public class DistributionGeneratorTest extends TestCase {
         n = n.initialize(numNodes,numEdges);
         degreeSum = 0;
         for (int i=0;i<numNodes;i++) {
-            int degree=n.getDegree(random);
+            int degree=n.nextValue(random);
             //System.out.println(degree);
             degreeSum+=degree;
         }
@@ -89,8 +89,8 @@ public class DistributionGeneratorTest extends TestCase {
         for (int i=0;i<numNodes;i++) graph.addVertex(i);
 
         DistributionGenerator generator = new DistributionGenerator("knows");
-        generator.setOutDistributions(indist);
-        if (outdist!=null) generator.setOutDistributions(outdist);
+        generator.setOutDistribution(indist);
+        if (outdist!=null) generator.setOutDistribution(outdist);
         int numEdges = generator.generate(graph,numNodes*10);
         assertEquals(numEdges, SizableIterable.sizeOf(graph.getEdges()));
         System.out.println(graph);

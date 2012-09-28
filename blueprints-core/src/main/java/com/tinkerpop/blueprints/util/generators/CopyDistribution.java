@@ -3,23 +3,28 @@ package com.tinkerpop.blueprints.util.generators;
 import java.util.Random;
 
 /**
+ * CopyDistribution returns the conditional value.
+ *
+ * Hence, this class can be used as the in-degree distribution to ensure that
+ * the in-degree of a vertex is equal to the out-degree.
+ *
  * (c) Matthias Broecheler (me@matthiasb.com)
  */
 
-public class CopyDistribution extends Distribution {
+public class CopyDistribution implements Distribution {
 
     @Override
-    Distribution initialize(int numNodes, int numEdges) {
+    public Distribution initialize(int invocations, int expectedTotal) {
         return this;
     }
 
     @Override
-    int getDegree(Random random) {
+    public int nextValue(Random random) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    int getConditionalDegree(Random random, int degree) {
-        return degree;
+    public int nextConditionalValue(Random random, int otherValue) {
+        return otherValue;
     }
 }
