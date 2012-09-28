@@ -14,12 +14,9 @@ public class LongIDVertexCache implements VertexCache {
 
     private static final int INITIAL_CAPACITY = 1000;
 
-    private final Graph graph;
     private final AbstractLongObjectMap map;
 
-    public LongIDVertexCache(final Graph graph) {
-        if (graph == null) throw new IllegalArgumentException("Graph expected.");
-        this.graph = graph;
+    public LongIDVertexCache() {
         map = new OpenLongObjectHashMap(INITIAL_CAPACITY);
     }
 
@@ -30,15 +27,25 @@ public class LongIDVertexCache implements VertexCache {
 
 
     @Override
-    public Object getEntry(Object externalID) {
-        long id = getID(externalID);
+    public Object getEntry(Object externalId) {
+        long id = getID(externalId);
         return map.get(id);
     }
 
     @Override
-    public void set(Vertex vertex, Object externalID) {
-        long id = getID(externalID);
-        map.put(id, vertex);
+    public void set(Vertex vertex, Object externalId) {
+        setId(vertex,externalId);
+    }
+
+    @Override
+    public void setId(Object vertexId, Object externalId) {
+        long id = getID(externalId);
+        map.put(id, vertexId);
+    }
+    
+    @Override
+    public boolean contains(Object externalId) {
+        return map.containsKey(getID(externalId));
     }
 
     @Override
