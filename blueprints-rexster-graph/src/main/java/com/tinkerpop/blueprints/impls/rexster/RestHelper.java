@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 
@@ -15,6 +16,7 @@ import java.net.URLEncoder;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Stephen Mallette (http://stephen.genoprime.com)
  */
 public class RestHelper {
 
@@ -48,8 +50,8 @@ public class RestHelper {
     }
 
     public static JSONObject postResultObject(final String uri) {
+        // should probably factor this out
         try {
-            // convert querystring into POST form data
             URL url = new URL(postUri(uri));
             String data = postData(uri);
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -59,6 +61,32 @@ public class RestHelper {
             }
             connection.setDoOutput(true);
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+            writer.write(data); // post data with Content-Length automatically set
+            writer.close();
+
+            final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
+            final JSONObject resultObject = new JSONObject(tokener);
+            final JSONObject retObject = resultObject.optJSONObject(RexsterTokens.RESULTS);
+
+            return retObject;
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public static JSONObject postResultObject(final String uri, final JSONObject json) {
+        try {
+            final URL url = new URL(postUri(uri));
+            final String data = json.toString();
+            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Content-Type", RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
+            if (Authentication.isAuthenticationEnabled()) {
+                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
+            }
+            connection.setDoOutput(true);
+
+            final OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             writer.write(data); // post data with Content-Length automatically set
             writer.close();
 
@@ -166,7 +194,7 @@ public class RestHelper {
 
     public static String uriCast(final Object value) {
         if (value instanceof String)
-            return value.toString();
+            return "(" + RexsterTokens.STRING + "," + value.toString() + ")";
         else if (value instanceof Integer)
             return "(" + RexsterTokens.INTEGER + "," + value + ")";
         else if (value instanceof Long)
@@ -176,7 +204,7 @@ public class RestHelper {
         else if (value instanceof Double)
             return "(" + RexsterTokens.DOUBLE + "," + value + ")";
         else
-            return value.toString();
+            return "(s," + value.toString() + ")";
 
     }
 
