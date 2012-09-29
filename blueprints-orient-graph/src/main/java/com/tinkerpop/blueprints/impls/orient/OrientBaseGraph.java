@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import com.orientechnologies.common.io.OFileUtils;
+import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -63,7 +65,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public OrientBaseGraph(final String url, final String username, final String password) {
-        this.url = url;
+        this.url = OFileUtils.getPath(url);
         this.username = username;
         this.password = password;
         this.openOrCreate();
@@ -371,8 +373,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
     protected OrientGraphContext getContext(final boolean create) {
         OrientGraphContext context = threadContext.get();
-        if (context == null && create)
+        if (context == null || !context.rawGraph.getURL().equals( url )) {
+          if (create)
             context = openOrCreate();
+        }
         return context;
     }
 
