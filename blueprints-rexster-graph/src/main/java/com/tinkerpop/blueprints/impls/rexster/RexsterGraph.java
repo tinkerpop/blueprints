@@ -15,8 +15,10 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -176,10 +178,16 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        final Map<String, Object> data = new HashMap<String, Object>();
+        data.put(RexsterTokens._OUTV, outVertex.getId());
+        data.put(RexsterTokens._INV, inVertex.getId());
+        data.put(RexsterTokens._LABEL, label);
+        final JSONObject json = new JSONObject(data);
+
         if (null == id)
-            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + RestHelper.encode(outVertex.getId()) + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + RestHelper.encode(inVertex.getId()) + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + RestHelper.encode(label)), this);
+            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES , json), this);
         else
-            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id) + RexsterTokens.QUESTION + RexsterTokens._OUTV + RexsterTokens.EQUALS + RestHelper.encode(outVertex.getId()) + RexsterTokens.AND + RexsterTokens._INV + RexsterTokens.EQUALS + RestHelper.encode(inVertex.getId()) + RexsterTokens.AND + RexsterTokens._LABEL + RexsterTokens.EQUALS + RestHelper.encode(label)), this);
+            return new RexsterEdge(RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(id), json), this);
     }
 
     public void removeEdge(final Edge edge) {
@@ -231,7 +239,11 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         final String c = getKeyIndexClass(indexClass);
 
-        JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName) + RexsterTokens.QUESTION + RexsterTokens.AND + RexsterTokens.CLASS_EQUALS + c);
+        final Map<String, Object> data = new HashMap<String, Object>();
+        data.put(RexsterTokens.CLASS, c);
+        final JSONObject json = new JSONObject(data);
+
+        final JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName), json);
         if (!index.opt(RexsterTokens.NAME).equals(indexName))
             throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
 
