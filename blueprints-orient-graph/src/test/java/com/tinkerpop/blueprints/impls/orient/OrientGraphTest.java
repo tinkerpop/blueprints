@@ -130,7 +130,6 @@ public class OrientGraphTest extends GraphTest {
                 if (g.exists())
                     g.open("admin", "admin").drop();
                 deleteDirectory(new File(directory));
-                
             }
         }
     }
