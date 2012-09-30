@@ -28,11 +28,11 @@ public class OrientGraphTest extends GraphTest {
 
     private OrientGraph currentGraph;
 
-    /*public void testOrientBenchmarkTestSuite() throws Exception {
+    public void testOrientBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new OrientBenchmarkTestSuite(this));
         printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
-    }*/
+    }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -117,9 +117,8 @@ public class OrientGraphTest extends GraphTest {
             if (method.getName().startsWith("test")) {
                 System.out.println("Testing " + method.getName() + "...");
                 method.invoke(testSuite);
-                deleteDirectory(new File(directory));
 
-                /* why is this necessary...just delete the root directory
+                // this is necessary on windows systems: deleting the directory is not enough because it takes a while to unlock files.
                 try {
                     if (this.currentGraph != null)
                         this.currentGraph.shutdown();
@@ -128,7 +127,8 @@ public class OrientGraphTest extends GraphTest {
                 OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
                 if (g.exists())
                     g.open("admin", "admin").drop();
-                */
+                deleteDirectory(new File(directory));
+                
             }
         }
     }

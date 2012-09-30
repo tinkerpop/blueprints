@@ -48,7 +48,7 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
         FEATURES.supportsLongProperty = true;
         FEATURES.supportsMapProperty = true;
         FEATURES.supportsStringProperty = true;
-        FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsThreadedTransactions = true;
     }
 
     /**
