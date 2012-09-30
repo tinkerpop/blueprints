@@ -330,7 +330,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
      */
     public OrientBaseGraph reuse(final OGraphDatabase iDatabase) {
         this.url = iDatabase.getURL();
-        this.url = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
+        this.username = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
         synchronized (this) {
             OrientGraphContext context = threadContext.get();
             if (context == null || !context.rawGraph.getName().equals( iDatabase.getName() ) ) {
