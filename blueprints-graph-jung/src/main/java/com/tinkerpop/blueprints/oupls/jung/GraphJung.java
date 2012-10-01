@@ -11,6 +11,7 @@ import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,7 +59,7 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
 
     public boolean addEdge(final Edge edge, final Collection<? extends Vertex> vertices) {
         if (vertices.size() == 2) {
-            Iterator<? extends Vertex> itty = vertices.iterator();
+            final Iterator<? extends Vertex> itty = vertices.iterator();
             this.addEdge(edge, itty.next(), itty.next());
         } else {
             throw new IllegalArgumentException();
@@ -94,7 +95,7 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Edge findEdge(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
+        for (final Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getVertex(Direction.IN).equals(inVertex)) {
                 return edge;
             }
@@ -103,8 +104,8 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Edge> findEdgeSet(final Vertex outVertex, final Vertex inVertex) {
-        Set<Edge> edges = new HashSet<Edge>();
-        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
+        final Set<Edge> edges = new HashSet<Edge>();
+        for (final Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getVertex(Direction.IN).equals(inVertex)) {
                 edges.add(edge);
             }
@@ -117,11 +118,11 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Edge> getIncidentEdges(final Vertex vertex) {
-        Set<Edge> edges = new HashSet<Edge>();
-        for (Edge edge : vertex.getEdges(Direction.IN)) {
+        final Set<Edge> edges = new HashSet<Edge>();
+        for (final Edge edge : vertex.getEdges(Direction.IN)) {
             edges.add(edge);
         }
-        for (Edge edge : vertex.getEdges(Direction.OUT)) {
+        for (final Edge edge : vertex.getEdges(Direction.OUT)) {
             edges.add(edge);
         }
         return edges;
@@ -143,12 +144,12 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public int getVertexCount() {
-        Iterable<Vertex> itty = this.graph.getVertices();
+        final Iterable<Vertex> itty = this.graph.getVertices();
         if (itty instanceof Collection) {
             return ((Collection) itty).size();
         } else {
             int count = 0;
-            for (Vertex vertex : itty) {
+            for (final Vertex vertex : itty) {
                 count++;
             }
             return count;
@@ -157,19 +158,19 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
 
     public int getEdgeCount() {
         int count = 0;
-        for (Edge edge : this.graph.getEdges()) {
+        for (final Edge edge : this.graph.getEdges()) {
             count++;
         }
         return count;
     }
 
     public Collection<Edge> getEdges() {
-        Iterable<Edge> itty = this.graph.getEdges();
+        final Iterable<Edge> itty = this.graph.getEdges();
         if (itty instanceof Collection) {
             return (Collection<Edge>) itty;
         } else {
-            List<Edge> edges = new ArrayList<Edge>();
-            for (Edge e : itty) {
+            final List<Edge> edges = new ArrayList<Edge>();
+            for (final Edge e : itty) {
                 edges.add(e);
             }
             return edges;
@@ -177,12 +178,12 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Vertex> getVertices() {
-        Iterable<Vertex> itty = this.graph.getVertices();
+        final Iterable<Vertex> itty = this.graph.getVertices();
         if (itty instanceof Collection) {
             return (Collection<Vertex>) itty;
         } else {
-            List<Vertex> vertices = new ArrayList<Vertex>();
-            for (Vertex v : itty) {
+            final List<Vertex> vertices = new ArrayList<Vertex>();
+            for (final Vertex v : itty) {
                 vertices.add(v);
             }
             return vertices;
@@ -190,10 +191,7 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Vertex> getIncidentVertices(final Edge edge) {
-        List<Vertex> vertices = new ArrayList<Vertex>();
-        vertices.add(edge.getVertex(Direction.IN));
-        vertices.add(edge.getVertex(Direction.OUT));
-        return vertices;
+        return Arrays.asList(edge.getVertex(Direction.IN), edge.getVertex(Direction.OUT));
     }
 
     public Vertex getDest(final Edge edge) {
@@ -209,11 +207,11 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public boolean isNeighbor(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
+        for (final Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getVertex(Direction.IN).equals(inVertex))
                 return true;
         }
-        for (Edge edge : outVertex.getEdges(Direction.IN)) {
+        for (final Edge edge : outVertex.getEdges(Direction.IN)) {
             if (edge.getVertex(Direction.OUT).equals(inVertex))
                 return true;
         }
@@ -225,11 +223,11 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Vertex> getNeighbors(final Vertex vertex) {
-        Set<Vertex> vertices = new HashSet<Vertex>();
-        for (Edge e : vertex.getEdges(Direction.OUT)) {
+        final Set<Vertex> vertices = new HashSet<Vertex>();
+        for (final Edge e : vertex.getEdges(Direction.OUT)) {
             vertices.add(e.getVertex(Direction.IN));
         }
-        for (Edge e : vertex.getEdges(Direction.IN)) {
+        for (final Edge e : vertex.getEdges(Direction.IN)) {
             vertices.add(e.getVertex(Direction.OUT));
         }
         return vertices;
@@ -243,13 +241,12 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Edge> getOutEdges(final Vertex vertex) {
-
-        Iterable<Edge> itty = vertex.getEdges(Direction.OUT);
+        final Iterable<Edge> itty = vertex.getEdges(Direction.OUT);
         if (itty instanceof Collection) {
             return (Collection<Edge>) itty;
         } else {
-            List<Edge> edges = new ArrayList<Edge>();
-            for (Edge edge : itty) {
+            final List<Edge> edges = new ArrayList<Edge>();
+            for (final Edge edge : itty) {
                 edges.add(edge);
             }
             return edges;
@@ -257,12 +254,12 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Edge> getInEdges(final Vertex vertex) {
-        Iterable<Edge> itty = vertex.getEdges(Direction.IN);
+        final Iterable<Edge> itty = vertex.getEdges(Direction.IN);
         if (itty instanceof Collection) {
             return (Collection<Edge>) itty;
         } else {
-            Set<Edge> edges = new HashSet<Edge>();
-            for (Edge edge : itty) {
+            final List<Edge> edges = new ArrayList<Edge>();
+            for (final Edge edge : itty) {
                 edges.add(edge);
             }
             return edges;
@@ -274,8 +271,8 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Vertex> getPredecessors(final Vertex vertex) {
-        Set<Vertex> vertices = new HashSet<Vertex>();
-        for (Edge edge : vertex.getEdges(Direction.IN)) {
+        final Set<Vertex> vertices = new HashSet<Vertex>();
+        for (final Edge edge : vertex.getEdges(Direction.IN)) {
             vertices.add(edge.getVertex(Direction.OUT));
         }
         return vertices;
@@ -286,20 +283,20 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public Collection<Vertex> getSuccessors(final Vertex vertex) {
-        Set<Vertex> vertices = new HashSet<Vertex>();
-        for (Edge edge : vertex.getEdges(Direction.OUT)) {
+        final Set<Vertex> vertices = new HashSet<Vertex>();
+        for (final Edge edge : vertex.getEdges(Direction.OUT)) {
             vertices.add(edge.getVertex(Direction.IN));
         }
         return vertices;
     }
 
     public int inDegree(final Vertex vertex) {
-        Iterable<Edge> itty = vertex.getEdges(Direction.IN);
+        final Iterable<Edge> itty = vertex.getEdges(Direction.IN);
         if (itty instanceof Collection) {
             return ((Collection) itty).size();
         } else {
             int count = 0;
-            for (Edge edge : itty) {
+            for (final Edge edge : itty) {
                 count++;
             }
             return count;
@@ -307,12 +304,12 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public int outDegree(final Vertex vertex) {
-        Iterable<Edge> itty = vertex.getEdges(Direction.OUT);
+        final Iterable<Edge> itty = vertex.getEdges(Direction.OUT);
         if (itty instanceof Collection) {
             return ((Collection) itty).size();
         } else {
             int count = 0;
-            for (Edge edge : itty) {
+            for (final Edge edge : itty) {
                 count++;
             }
             return count;
@@ -333,7 +330,7 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public boolean isPredecessor(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getEdges(Direction.IN)) {
+        for (final Edge edge : outVertex.getEdges(Direction.IN)) {
             if (edge.getVertex(Direction.OUT).equals(inVertex))
                 return true;
         }
@@ -341,7 +338,7 @@ public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, 
     }
 
     public boolean isSuccessor(final Vertex outVertex, final Vertex inVertex) {
-        for (Edge edge : outVertex.getEdges(Direction.OUT)) {
+        for (final Edge edge : outVertex.getEdges(Direction.OUT)) {
             if (edge.getVertex(Direction.IN).equals(inVertex))
                 return true;
         }
