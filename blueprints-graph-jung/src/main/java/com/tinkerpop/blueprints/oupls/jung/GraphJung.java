@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
+import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 
@@ -24,7 +25,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class GraphJung<T extends Graph> implements edu.uci.ics.jung.graph.Graph<Vertex, Edge>, WrapperGraph<T> {
+public class GraphJung<T extends Graph> implements DirectedGraph<Vertex, Edge>, WrapperGraph<T> {
 
     private final T graph;
 
