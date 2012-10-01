@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.io.File;
+import java.lang.reflect.Method;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -15,9 +18,6 @@ import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
-
-import java.io.File;
-import java.lang.reflect.Method;
 
 /**
  * Test suite for OrientDB graph implementation.
@@ -118,7 +118,8 @@ public class OrientGraphTest extends GraphTest {
                 System.out.println("Testing " + method.getName() + "...");
                 method.invoke(testSuite);
 
-                // this is necessary on windows systems: deleting the directory is not enough because it takes a while to unlock files.
+                // this is necessary on windows systems: deleting the directory is not enough because it takes a
+                // while to unlock files
                 try {
                     if (this.currentGraph != null)
                         this.currentGraph.shutdown();
@@ -127,8 +128,8 @@ public class OrientGraphTest extends GraphTest {
                 OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
                 if (g.exists())
                     g.open("admin", "admin").drop();
+
                 deleteDirectory(new File(directory));
-                
             }
         }
     }

@@ -1,7 +1,12 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.orientechnologies.common.io.OFileUtils;
-import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -24,12 +29,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
@@ -374,8 +373,8 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     protected OrientGraphContext getContext(final boolean create) {
         OrientGraphContext context = threadContext.get();
         if (context == null || !context.rawGraph.getURL().equals( url )) {
-          if (create)
-            context = openOrCreate();
+            if (create)
+                context = openOrCreate();
         }
         return context;
     }
