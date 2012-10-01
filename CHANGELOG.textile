@@ -22,6 +22,7 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 * OrientDB graph implementation supports passing @class@ as an argument to the @addVertex@ method.
 * Removed a class type check in @KeyIndexableGraphTestSuite@ that unnecessarily assumes an implementation specific
 * Fixed a state bug in @WrapperQuery@
+* @GraphJung@ implements JUNG's @DirectedGraph@ interface and did various small optimizations to implementation
 
 h3. Version 2.1.0 (August 4, 2012)
 
