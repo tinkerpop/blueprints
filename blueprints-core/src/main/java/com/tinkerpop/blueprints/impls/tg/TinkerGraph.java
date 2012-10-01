@@ -133,7 +133,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         }
     }
 
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
+    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
         if (Vertex.class.isAssignableFrom(elementClass)) {
             this.vertexKeyIndex.createKeyIndex(key);
         } else if (Edge.class.isAssignableFrom(elementClass)) {

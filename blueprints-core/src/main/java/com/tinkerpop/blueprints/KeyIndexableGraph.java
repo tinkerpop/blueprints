@@ -27,7 +27,7 @@ public interface KeyIndexableGraph extends Graph {
      * @param elementClass the element class that the index is for
      * @param <T>          the element class specification
      */
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass);
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters);
 
     /**
      * Return all the index keys associated with a particular element class.
