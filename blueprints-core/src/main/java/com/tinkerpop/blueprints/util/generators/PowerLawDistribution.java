@@ -5,11 +5,6 @@ import java.util.Random;
 /**
  * Generates values according to a scale-free distribution with the configured gamma value.
  *
- * Read about <a href="http://en.wikipedia.org/wiki/Scale-free_network">scale-free netowrks</a> for more information on power
- * law distributions and how they relate to scale-free networks.
- *
- * @see <a href="http://en.wikipedia.org/wiki/Scale-free_network">scale-free netowrks and power law distribution</a>
- *
  * (c) Matthias Broecheler (me@matthiasb.com)
  */
 public class PowerLawDistribution implements Distribution {
