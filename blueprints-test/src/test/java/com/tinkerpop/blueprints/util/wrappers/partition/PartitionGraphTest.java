@@ -74,6 +74,10 @@ public class PartitionGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
+        return generateGraph("");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
         return new PartitionIndexableGraph<TinkerGraph>(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph")));
     }
 

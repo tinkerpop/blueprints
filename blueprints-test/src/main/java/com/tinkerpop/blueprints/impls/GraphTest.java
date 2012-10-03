@@ -11,6 +11,8 @@ public abstract class GraphTest extends BaseTest {
 
     public abstract Graph generateGraph();
 
+    public abstract Graph generateGraph(final String graphDirectoryName);
+
     public abstract void doTestSuite(final TestSuite testSuite) throws Exception;
 
 }

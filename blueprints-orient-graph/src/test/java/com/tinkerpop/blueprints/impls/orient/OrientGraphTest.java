@@ -101,8 +101,12 @@ public class OrientGraphTest extends GraphTest {
     }
 
     public Graph generateGraph() {
+        return generateGraph("graph");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
         String directory = getWorkingDirectory();
-        this.currentGraph = new OrientGraph("local:" + directory + "/graph");
+        this.currentGraph = new OrientGraph("local:" + directory + "/" + graphDirectoryName);
         return this.currentGraph;
     }
 
@@ -113,6 +117,9 @@ public class OrientGraphTest extends GraphTest {
             if (method.getName().startsWith("test")) {
                 System.out.println("Testing " + method.getName() + "...");
                 method.invoke(testSuite);
+
+                // this is necessary on windows systems: deleting the directory is not enough because it takes a
+                // while to unlock files
                 try {
                     if (this.currentGraph != null)
                         this.currentGraph.shutdown();
@@ -121,6 +128,8 @@ public class OrientGraphTest extends GraphTest {
                 OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
                 if (g.exists())
                     g.open("admin", "admin").drop();
+
+                deleteDirectory(new File(directory));
             }
         }
     }

@@ -5,10 +5,6 @@ import java.util.Random;
 /**
  * Generates values according to a normal distribution with the configured standard deviation.
  *
- * Read about <a href="http://en.wikipedia.org/wiki/Normal_distribution">normal distributions</a> for more information
- *
- * @see <a href="http://en.wikipedia.org/wiki/Normal_distribution">normal distributions</a>
- *
  * (c) Matthias Broecheler (me@matthiasb.com)
  */
 public class NormalDistribution implements Distribution {

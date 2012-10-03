@@ -184,23 +184,30 @@ public class DexGraphTest extends GraphTest {
     }
 
     public Graph generateGraph(boolean create) {
-        String db = this.computeTestDataRoot() + "/blueprints_test.dex";
+        return this.generateGraph(create, "blueprints_test.dex");
+    }
+
+    public Graph generateGraph(final String graphDirectoryName) {
+        return this.generateGraph(false, graphDirectoryName);
+    }
+
+    public Graph generateGraph(boolean create, final String graphDirectoryName) {
+        String db = this.computeTestDataRoot() + "/" + graphDirectoryName;
 
         if (create) {
-            File f = new File(db);
-            if (f.exists()) f.delete();
+            deleteDirectory(this.computeTestDataRoot());
         }
+
         return new DexGraph(db);
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        File fDB = new File(this.computeTestDataRoot() + "/blueprints_test.dex");
-        fDB.delete();
+        deleteDirectory(this.computeTestDataRoot());
         for (Method method : testSuite.getClass().getDeclaredMethods()) {
             if (method.getName().startsWith("test")) {
                 System.out.println("Testing " + method.getName() + "...");
                 method.invoke(testSuite);
-                fDB.delete();
+                deleteDirectory(this.computeTestDataRoot());
             }
         }
     }
