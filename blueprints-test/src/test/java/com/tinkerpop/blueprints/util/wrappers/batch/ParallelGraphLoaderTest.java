@@ -7,7 +7,7 @@ import com.tinkerpop.blueprints.impls.tg.MockTransactionalGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.generators.DistributionGenerator;
 import com.tinkerpop.blueprints.util.generators.EdgeAnnotator;
-import com.tinkerpop.blueprints.util.generators.ScaleFreeDistribution;
+import com.tinkerpop.blueprints.util.generators.PowerLawDistribution;
 import com.tinkerpop.blueprints.util.generators.SizableIterable;
 import com.tinkerpop.blueprints.util.io.triple.DelimitedTripleWriter;
 import com.tinkerpop.blueprints.util.wrappers.batch.loader.ParallelGraphLoader;
@@ -44,7 +44,7 @@ public class ParallelGraphLoaderTest extends TestCase {
                 edge.setProperty("time",random.nextInt(10000)+1);
             }
         });
-        generator.setOutDistribution(new ScaleFreeDistribution(2.1));
+        generator.setOutDistribution(new PowerLawDistribution(2.1));
         int numEdges = generator.generate(g,numNodes*10);
         
         assertEquals(numNodes, SizableIterable.sizeOf(g.getVertices()));
