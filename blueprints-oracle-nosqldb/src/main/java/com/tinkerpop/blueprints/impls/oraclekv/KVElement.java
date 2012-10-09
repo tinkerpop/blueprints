@@ -35,11 +35,14 @@ public class KVElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        Set<String> finalproperties = new HashSet<String>();
-        Key elementKey = keyFromString(this.id.toString()+"/properties");
-        ValueVersion propertyValueVersion = graph.getRawGraph().get(elementKey);
-        HashMap propertyHash = (HashMap)fromByteArray(propertyValueVersion.getValue().getValue());
-        finalproperties = propertyHash.keySet();
+        Key elementKey = keyFromString(this.id.toString());
+        SortedSet<Key> propertyKeys = multiGetKeys(elementKey);
+        Set<String> finalproperties = new Set<String>();
+        for (Key k : propertyKeys)
+        {
+            for (String p : propertyKeys.getMinorPath())
+                finalproperties.add(p);
+        }
         return finalproperties;
     }
 
@@ -49,10 +52,7 @@ public class KVElement implements Element {
             /* if this is a real property
             1) get the lookup key */
             Key elementKey = keyFromString(this.id.toString()+"/properties");
-            ValueVersion propertyValueVersion = graph.getRawGraph().get(elementKey);
-            HashMap propertyHash = (HashMap)fromByteArray(propertyValueVersion.getValue().getValue());
-            element = propertyHash.get(key);
-            
+            element = getValue(graph.getRawGraph(), elementKey);
         }
         return element;
     }
@@ -65,25 +65,16 @@ public class KVElement implements Element {
         if (key.equals(StringFactory.EMPTY_STRING))
             throw ExceptionFactory.elementKeyCanNotBeEmpty();
         
-        Key elementKey = Key.createKey(this.id.toString()+"/properties");
-        ValueVersion propertyValueVersion = graph.getRawGraph().get(elementKey);
-        HashMap propertyHash = (HashMap)fromByteArray(propertyValueVersion.getValue().getValue());
-        propertyHash.put(key, value);
-        Value propertyValue = Value.createValue(toByteArray(propertyHash));
-        graph.getRawGraph().put(elementKey, propertyValue);
+        Key elementKey = keyFromString(this.id.toString()+"/"+key);
+        putValue(graph.getRawGraph(), elementKey, value);
     }
 
     public Object removeProperty(final String key) {
-        Key elementKey = Key.createKey(this.id.toString()+"/properties");
+        Key elementKey = keyFromString(this.id.toString()+"/"+key);
         ValueVersion propertyValueVersion = graph.getRawGraph().get(elementKey);
-        HashMap propertyHash = (HashMap)fromByteArray(propertyValueVersion.getValue().getValue());
-
-        Object oldvalue = propertyHash.get(key);
-        propertyHash.remove(key);
+        Object oldvalue = fromByteArray(propertyValueVersion.getValue().getValue());
         
-        Value propertyValue = Value.createValue(toByteArray(propertyHash));
-        graph.getRawGraph().put(elementKey, propertyValue);
-
+        graph.getRawGraph().delete(elementKey);
         return oldvalue;
     }
 

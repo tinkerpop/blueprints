@@ -115,16 +115,13 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     {
         /* get a new vertex and its uuid*/
         KVVertex vertex = new KVVertex(this);
-        String vertexId = vertex.getId().toString()+"/properties";
+        String vertexId = vertex.getId().toString()+"/ID";
         
         /* build the KVstore keys */
         Key vertexKey = keyFromString(vertexId);
-        
-        /*set the value as an empty hash */
-        HashMap properties = new HashMap();
-        
+                
         /* set the key and value */
-        Value vertexValue = Value.createValue(toByteArray(properties));
+        Value vertexValue = Value.createValue(toByteArray(vertex.getId()));
         
         /* write */
         try {
@@ -172,7 +169,7 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     {
         /* get a new vertex and its uuid*/
         KVEdge edge = new KVEdge(this);
-        String edgeId = edge.getId().toString()+"/properties";
+        String edgeId = edge.getId().toString()+"/ID";
         String edgeInV = edge.getId().toString()+"/IN";
         String edgeOutV = edge.getId().toString()+"/OUT";
         String edgeLabel = edge.getId().toString()+"/LABEL";
@@ -182,11 +179,10 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
         Key edgeOutKey = keyFromString(edgeOutV);
         Key edgeLabelKey = keyFromString(edgeLabel);
         
-        /*set the value as an empty hash */
-        HashMap properties = new HashMap();
+
         
         /* set the key and value */
-        Value edgeValue = Value.createValue(toByteArray(properties));
+        Value edgeValue = Value.createValue(toByteArray(edge.getId()));
         Value edgeInVal = Value.createValue(toByteArray(inVertex.getId()));
         Value edgeOutVal = Value.createValue(toByteArray(outVertex.getId()));
         Value edgeLabelVal = Value.createValue(toByteArray(label));
