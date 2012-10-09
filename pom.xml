@@ -73,6 +73,7 @@
         <module>blueprints-orient-graph</module>
         <module>blueprints-graph-sail</module>
         <module>blueprints-sail-graph</module>
+        <module>blueprints-oracle-nosqldb</module>
     </modules>
 
     <properties>
