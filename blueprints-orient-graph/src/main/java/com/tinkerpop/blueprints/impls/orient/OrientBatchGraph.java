@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.impls.orient;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
-import com.orientechnologies.orient.core.intent.OIntentMassiveInsert;
 import com.tinkerpop.blueprints.Features;
 
 /**
@@ -45,7 +44,7 @@ public class OrientBatchGraph extends OrientBaseGraph {
         FEATURES.supportsLongProperty = true;
         FEATURES.supportsMapProperty = true;
         FEATURES.supportsStringProperty = true;
-        FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsThreadedTransactions = true;
     }
 
     /**
@@ -55,17 +54,14 @@ public class OrientBatchGraph extends OrientBaseGraph {
      */
     public OrientBatchGraph(final OGraphDatabase iDatabase) {
         super(iDatabase);
-        getRawGraph().declareIntent( new OIntentMassiveInsert() );
     }
 
     public OrientBatchGraph(final String url) {
         super(url, ADMIN, ADMIN);
-        getRawGraph().declareIntent( new OIntentMassiveInsert() );
     }
 
     public OrientBatchGraph(final String url, final String username, final String password) {
         super(url, username, password);
-        getRawGraph().declareIntent( new OIntentMassiveInsert() );
     }
 
     public Features getFeatures() {

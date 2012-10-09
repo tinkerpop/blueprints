@@ -84,6 +84,8 @@ public class OrientBatchGraphTest extends GraphTest {
                 OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
                 if (g.exists())
                     g.open("admin", "admin").drop();
+                
+                deleteDirectory(new File(directory));
             }
         }
     }
