@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.impls.oraclekv;
 
+import oracle.kv.Depth;
 import oracle.kv.KVStore;
 import oracle.kv.KVStoreConfig;
 import oracle.kv.KVStoreFactory;
@@ -149,7 +150,7 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
         /* use multiDelete to wipe out all properties */
         Key vertexKey = keyFromString(vertexToRemove.getId().toString());
         this.store.multiDelete(vertexKey, null, Depth.DESCENDANTS_ONLY);
-    
+    }
     /**
      * Return the edge referenced by the provided object identifier.
      * If no edge is referenced by that identifier, then return null.
