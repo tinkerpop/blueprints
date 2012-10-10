@@ -39,7 +39,15 @@ public class KVVertex extends KVElement implements Vertex {
     public KVVertex(final KVGraph graph, final Object id) {
         super(graph);
         this.store = graph.getRawGraph();
-        this.id = graph.getGraphKey() + "/Vertex/"+id.toString();
+        this.id = id.toString();
+    }
+    
+    public boolean exists()
+    {
+    	if (graph.getRawGraph().get(keyFromString(this.id.toString()+"/ID")) != null)
+    			return true;
+    	else
+    		return false;
     }
 
     /**

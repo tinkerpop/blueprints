@@ -8,6 +8,7 @@ import oracle.kv.Value;
 import oracle.kv.ValueVersion;
 import com.tinkerpop.blueprints.impls.oraclekv.*;
 import static com.tinkerpop.blueprints.impls.oraclekv.util.KVUtil.*;
+
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
@@ -37,9 +38,16 @@ public class KVEdge extends KVElement implements Edge {
     public KVEdge(final KVGraph graph, final Object id) {
         super(graph);
         this.store = graph.getRawGraph();
-        this.id = graph.getGraphKey() + "/Edge/"+id.toString();
+        this.id = id.toString();
     }
     
+    public boolean exists()
+    {
+    	if (graph.getRawGraph().get(keyFromString(this.id.toString()+"/ID")) != null)
+			return true;
+    	else
+    		return false;
+    }
     
     @Override
     public Vertex getVertex(Direction direction) throws IllegalArgumentException {

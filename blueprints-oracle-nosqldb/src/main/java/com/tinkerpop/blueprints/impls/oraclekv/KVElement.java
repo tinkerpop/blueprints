@@ -38,7 +38,7 @@ public class KVElement implements Element {
 
     public Set<String> getPropertyKeys() {
         Key elementKey = keyFromString(this.id.toString());
-        SortedSet<Key> propertyKeys = this.graph.getRawGraph().multiGetKeys(elementKey, new KeyRange("*"), Depth.CHILDREN_ONLY);
+        SortedSet<Key> propertyKeys = this.graph.getRawGraph().multiGetKeys(elementKey, null, Depth.CHILDREN_ONLY);
         HashSet<String> finalproperties = new HashSet<String>();
         for (Key k : propertyKeys)
         {
@@ -53,7 +53,7 @@ public class KVElement implements Element {
         if (!key.equals("")) {
             /* if this is a real property
             1) get the lookup key */
-            Key elementKey = keyFromString(this.id.toString()+"/properties");
+            Key elementKey = keyFromString(this.id.toString()+"/"+key);
             element = getValue(graph.getRawGraph(), elementKey);
         }
         return element;
