@@ -1,12 +1,14 @@
 package com.tinkerpop.blueprints.impls.oraclekv;
 
 
+import oracle.kv.Depth;
 import oracle.kv.KVStore;
 import oracle.kv.KVStoreConfig;
 import oracle.kv.KVStoreFactory;
 import oracle.kv.Key;
 import oracle.kv.Value;
 import oracle.kv.ValueVersion;
+import oracle.kv.KeyRange;
 import com.tinkerpop.blueprints.impls.oraclekv.*;
 import com.tinkerpop.blueprints.impls.oraclekv.util.KVUtil;
 import static com.tinkerpop.blueprints.impls.oraclekv.util.KVUtil.*;
@@ -36,11 +38,11 @@ public class KVElement implements Element {
 
     public Set<String> getPropertyKeys() {
         Key elementKey = keyFromString(this.id.toString());
-        SortedSet<Key> propertyKeys = multiGetKeys(elementKey);
-        Set<String> finalproperties = new Set<String>();
+        SortedSet<Key> propertyKeys = this.graph.getRawGraph().multiGetKeys(elementKey, new KeyRange("*"), Depth.CHILDREN_ONLY);
+        HashSet<String> finalproperties = new HashSet<String>();
         for (Key k : propertyKeys)
         {
-            for (String p : propertyKeys.getMinorPath())
+            for (String p : k.getMinorPath())
                 finalproperties.add(p);
         }
         return finalproperties;

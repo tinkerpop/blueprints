@@ -1,9 +1,11 @@
 package com.tinkerpop.blueprints.impls.oraclekv;
 
+import oracle.kv.Depth;
 import oracle.kv.KVStore;
 import oracle.kv.KVStoreConfig;
 import oracle.kv.KVStoreFactory;
 import oracle.kv.Key;
+import oracle.kv.KeyRange;
 import oracle.kv.Value;
 import oracle.kv.Operation;
 import oracle.kv.OperationFactory;
@@ -151,7 +153,14 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     
     public Vertex removeVertex(final Object id) {
         KVVertex vertexToRemove = new KVVertex(this, id);
-        /* TODO: Remove all connected edges */
+        Iterable<Edge> edgesToRemove = vertexToRemove.getEdges(Direction.BOTH);
+        for (Edge edge : edgesToRemove)
+        {
+        	removeEdge(edge);
+        }
+        /* use multiDelete to wipe out all properties */
+        Key vertexKey = keyFromString(vertexToRemove.getId().toString());
+        this.store.multiDelete(vertexKey, new KeyRange("*"), Depth.DESCENDANTS_ONLY);
         return vertexToRemove;
     }   
     
