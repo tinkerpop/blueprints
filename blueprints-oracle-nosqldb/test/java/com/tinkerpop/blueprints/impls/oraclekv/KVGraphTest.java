@@ -27,10 +27,10 @@ import java.util.List;
  */
 public class KVGraphTest extends GraphTest {
 
-	private String graphName = "KVGraph"
-	private String storeName = "kvlite"
-	private String hostName = "localhost"
-	private int hostPort = 5000;
+	private String graphName = null;
+	private String storeName = null;
+	private String hostName = null;
+	private int hostPort = null;
 	
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -101,17 +101,24 @@ public class KVGraphTest extends GraphTest {
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        // "http://127.0.0.1:8182/graphs/emptygraph"
-        String doTest = System.getProperty("testKVGraph", "true");
-        if (doTest.equals("true")) {
-        	
-            this.resetGraph();
-            for (Method method : testSuite.getClass().getDeclaredMethods()) {
-                if (method.getName().startsWith("test")) {
-                    System.out.println("Testing " + method.getName() + "...");
-                    this.resetGraph();
-                    method.invoke(testSuite);
-                    this.resetGraph();
+        public void doTestSuite(final TestSuite testSuite) throws Exception {
+            // "http://127.0.0.1:8182/graphs/emptygraph"
+            String doTest = System.getProperty("testKVGraph", "true");
+            if (doTest.equals("true")) {
+
+                this.graphName = System.getProperty("graphName");
+                this.storeName = System.getProperty("storeName");
+                this.hostName = System.getProperty("hostname");
+                this.hostPort = new Integer(System.getProperty("hostPort")).intValue();
+            	
+                this.resetGraph();
+                for (Method method : testSuite.getClass().getDeclaredMethods()) {
+                    if (method.getName().startsWith("test")) {
+                        System.out.println("Testing " + method.getName() + "...");
+                        this.resetGraph();
+                        method.invoke(testSuite);
+                        this.resetGraph();
+                    }
                 }
             }
         }
