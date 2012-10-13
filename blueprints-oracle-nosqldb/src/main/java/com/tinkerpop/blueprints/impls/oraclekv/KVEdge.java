@@ -28,17 +28,25 @@ import java.util.UUID;
  */
 public class KVEdge extends KVElement implements Edge {
     private final KVStore store;
-    
+    private final String idString;
+
     public KVEdge(final KVGraph graph) {
         super(graph);
         this.store = graph.getRawGraph();
-        this.id = graph.getGraphKey() + "/Edge/"+UUID.randomUUID().toString();
+        this.idString = UUID.randomUUID().toString();
+        this.id = graph.getGraphKey() + "/Edge/"+this.idString;
     }
 
     public KVEdge(final KVGraph graph, final Object id) {
         super(graph);
         this.store = graph.getRawGraph();
-        this.id = id.toString();
+        this.idString = id.toString();
+        this.id = graph.getGraphKey() + "/Edge/"+this.idString;
+    }
+    
+    public Object getId()
+    {
+        return this.idString;
     }
     
     public boolean exists()

@@ -32,6 +32,22 @@ public class KVUtil {
         
     }
     
+    public static Key majorKeyFromString(String key)
+    {
+        List<String> majorComponents = new ArrayList<String>();
+        String [] keyComponents = StringUtils.split(key,"/");
+        
+        for (int i = 0; i < keyComponents.length; i ++)
+            majorComponents.add(keyComponents[i]);
+            
+        Key kvKey = Key.createKey(majorComponents);
+        List<String> vertexAddress = kvKey.getFullPath();
+        String vId = StringUtils.join(vertexAddress, ",");
+        System.out.println("major key is:" +vId);
+        return kvKey;
+        
+    }
+    
     public static Key keyFromString(String key, int splitIndex)
     {
         List<String> majorComponents = new ArrayList<String>();
@@ -107,8 +123,14 @@ public class KVUtil {
     
     public static Object getValue(KVStore s, Key k)
     {
-        ValueVersion vv = s.get(k);        
-        return fromByteArray(vv.getValue().getValue());
+        Object returnVal = null;
+        if (k != null && s != null)
+        {
+            ValueVersion vv = s.get(k);        
+            if (vv != null)
+                returnVal = fromByteArray(vv.getValue().getValue());
+        }
+        return returnVal;
     }
     
     public static void putValue(KVStore s, Key k, Object v)

@@ -29,17 +29,25 @@ import java.util.*;
  */
 public class KVVertex extends KVElement implements Vertex {
     private final KVStore store;
+    private final String idString;
     
     public KVVertex(final KVGraph graph) {
         super(graph);
         this.store = graph.getRawGraph();
-        this.id = graph.getGraphKey() + "/Vertex/"+UUID.randomUUID().toString();
+        this.idString = UUID.randomUUID().toString();
+        this.id = graph.getGraphKey() + "/Vertex/"+this.idString;
     }
 
     public KVVertex(final KVGraph graph, final Object id) {
         super(graph);
         this.store = graph.getRawGraph();
-        this.id = id.toString();
+        this.idString = id.toString();
+        this.id = graph.getGraphKey() + "/Vertex/"+this.idString;
+    }
+    
+    public Object getId()
+    {
+        return this.idString;
     }
     
     public boolean exists()

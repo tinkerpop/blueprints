@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.oraclekv;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexTestSuite;
@@ -30,7 +31,7 @@ public class KVGraphTest extends GraphTest {
 	private String graphName = null;
 	private String storeName = null;
 	private String hostName = null;
-	private int hostPort = null;
+	private int hostPort = 5000;
 	
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -59,6 +60,11 @@ public class KVGraphTest extends GraphTest {
 
     public void testEncoding() throws Exception {
         final String doTest = System.getProperty("testKVGraph", "true");
+        this.graphName = System.getProperty("graphName");
+        this.storeName = System.getProperty("storeName");
+        this.hostName = System.getProperty("hostname");
+        this.hostPort = new Integer(System.getProperty("hostPort")).intValue();
+        
         if (doTest.equals("true")) {
             final Graph g = generateGraph();
             this.resetGraph();
@@ -71,6 +77,10 @@ public class KVGraphTest extends GraphTest {
     }
 
     public void testOuterParens() throws Exception {
+        this.graphName = System.getProperty("graphName");
+        this.storeName = System.getProperty("storeName");
+        this.hostName = System.getProperty("hostname");
+        this.hostPort = new Integer(System.getProperty("hostPort")).intValue();
         final String doTest = System.getProperty("testKVGraph", "true");
         if (doTest.equals("true")) {
             final Graph g = generateGraph();
@@ -101,7 +111,6 @@ public class KVGraphTest extends GraphTest {
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
-        public void doTestSuite(final TestSuite testSuite) throws Exception {
             // "http://127.0.0.1:8182/graphs/emptygraph"
             String doTest = System.getProperty("testKVGraph", "true");
             if (doTest.equals("true")) {
@@ -121,7 +130,7 @@ public class KVGraphTest extends GraphTest {
                     }
                 }
             }
-        }
+        
     }
 
     private void resetGraph() {
@@ -138,17 +147,17 @@ public class KVGraphTest extends GraphTest {
             graph.removeVertex(vertexToRemove);
         }
 
-        for (String key : graph.getIndexedKeys(Vertex.class)) {
-            graph.dropKeyIndex(key, Vertex.class);
-        }
+        // for (String key : graph.getIndexedKeys(Vertex.class)) {
+        //             graph.dropKeyIndex(key, Vertex.class);
+        //         }
 
-        for (String key : graph.getIndexedKeys(Edge.class)) {
-            graph.dropKeyIndex(key, Edge.class);
-        }
-
-        for (Index idx : idxGraph.getIndices()) {
-            idxGraph.dropIndex(idx.getIndexName());
-        }
+        // for (String key : graph.getIndexedKeys(Edge.class)) {
+        //     graph.dropKeyIndex(key, Edge.class);
+        // }
+        // 
+        // for (Index idx : idxGraph.getIndices()) {
+        //     idxGraph.dropIndex(idx.getIndexName());
+        // }
     }
 
 

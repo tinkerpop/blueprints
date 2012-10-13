@@ -60,6 +60,7 @@ public class KVElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
+        // System.out.println("Setting property "+ key + " on store "+graph.storestring);
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL))

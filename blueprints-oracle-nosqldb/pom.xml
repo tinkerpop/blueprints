@@ -69,7 +69,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-                    <argLine>-DtestKVGraph=true -DgraphName=blueprint -DstoreName=kvstore -Dhostname=DMCCLARY-LAP -DhostPort=5000
+                    <argLine>-DtestKVGraph=true -DgraphName=blueprint -DstoreName=kvstore -Dhostname=Daniel-McClarys-MacBook-Pro.local -DhostPort=5000
                     </argLine>
                 </configuration>
             </plugin>

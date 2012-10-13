@@ -6,6 +6,8 @@ import oracle.kv.KVStoreConfig;
 import oracle.kv.KVStoreFactory;
 import oracle.kv.Key;
 import oracle.kv.Value;
+import oracle.kv.KeyRange;
+import oracle.kv.KeyValueVersion;
 import oracle.kv.Operation;
 import oracle.kv.OperationFactory;
 import oracle.kv.ValueVersion;
@@ -27,8 +29,10 @@ import java.util.*;
  *
  * @author Dan McClary
  */
-public abstract class KVGraph implements MetaGraph<KVStore> {
+public class KVGraph implements MetaGraph<KVStore> {
     private final KVStore store;
+    protected final String storestring;
+    protected final String hostname;
     private final String graphKeyString;
     public static final String NOSQLDB_ERROR_EXCEPTION_MESSAGE = "An error occured within the Oracle NoSQL DB datastore";
 
@@ -39,11 +43,14 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     */
     public KVGraph(final String graphName, final String storeName, final String hostName, final int hostPort) {
        graphKeyString = graphName;
+       storestring = storeName;
+       hostname = hostName;
        try {
            store = KVStoreFactory.getStore
-               (new KVStoreConfig(storeName, hostName + ":" + hostPort));
+               (new KVStoreConfig(storestring, hostName + ":" + hostPort));
                
        } catch (Exception e) {
+                System.out.println(e.toString());
                throw new RuntimeException(KVGraph.NOSQLDB_ERROR_EXCEPTION_MESSAGE);
        }
     }
@@ -116,12 +123,22 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     public Vertex addVertex(Object id)
     {
         /* get a new vertex and its uuid*/
-        KVVertex vertex = new KVVertex(this);
+        KVVertex vertex;
+        if (id != null) 
+        {
+            vertex = new KVVertex(this, id);
+        }
+        else
+        {
+            vertex = new KVVertex(this);
+        }
+        System.out.println("Added "+this.getGraphKey() + "/Vertex/"+vertex.getId());
         vertex.setProperty("ID", vertex.getId().toString());
         return vertex;
     }
-    
+        
     public Vertex getVertex(final Object id) {
+        System.out.println("getting id "+id);
         Vertex vert = null;
     	if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
@@ -129,6 +146,7 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
         try {
             final String theId = id.toString();
             KVVertex v = new KVVertex(this, theId);
+            System.out.println("Vertex match is "+v.getId().toString().equals(theId));
             if (v.exists())
             	vert = (Vertex)v;
         } 
@@ -222,7 +240,14 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label)
     {
         /* get a new vertex and its uuid*/
-        KVEdge edge = new KVEdge(this);
+        KVEdge edge;
+        if (id != null)
+        {
+             edge = new KVEdge(this, id);
+        }
+        else
+            edge = new KVEdge(this);
+            
         edge.setProperty("ID", edge.getId());
         edge.setProperty("IN", inVertex.getId());
         edge.setProperty("OUT", outVertex.getId());
@@ -256,17 +281,31 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Vertex> vertices = new ArrayList<Vertex>();
     	/* get all immediate children of the graph with Vertex in the major key */
-    	Iterator<Key> vertexKeys = this.store.storeKeysIterator(oracle.kv.Direction.FORWARD, 0,keyFromString(this.getGraphKey()+"/Vertex"), null, Depth.CHILDREN_ONLY);
+    	List<String> majorComponents = new ArrayList<String>();
+        majorComponents.add(this.getGraphKey());
+        majorComponents.add("Vertex");
+        Key searchKey= Key.createKey(majorComponents);
+    	SortedSet <Key> vertexKeys = this.store.multiGetKeys(searchKey, null, null);
+    	System.out.println("Has this many v keys:"+vertexKeys.size());
+    	int vcount = 0;
     	
-    	while (vertexKeys.hasNext())
+    	for (Key vk:vertexKeys)
     	{
-    		Key vk = vertexKeys.next();
+    	    System.out.println("in iterator");
+            //          vcount++;
+            // Key vk = vertexKeys.next();
+            System.out.println("has key "+vk);
     		List<String> vertexAddress = vk.getFullPath();
     		String vId = StringUtils.join(vertexAddress, ",");
+    		System.out.println("Fetching "+vId);
     		Vertex vertex = this.getVertex(vId);
     		if (vertex != null)
+    		{
     			vertices.add(vertex);
+    			System.out.println("added vertex " + vertex.getId().toString());
+    		}
     	}
+        // System.out.println("There are "+vcount + " keys");
     	
     	return vertices;
     }
@@ -284,11 +323,13 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Vertex> vertices = new ArrayList<Vertex>();
     	/* get all immediate children of the graph with Vertex in the major key */
-    	Iterator<Key> vertexKeys = this.store.storeKeysIterator(oracle.kv.Direction.FORWARD, 0,keyFromString(this.getGraphKey()+"/Vertex"), null, Depth.CHILDREN_ONLY);
+    	Iterator <KeyValueVersion> vertexKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/Vertex"), null,null);
+    	
+        // Iterator<Key> vertexKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 0,majorKeyFromString(this.getGraphKey()+"/Vertex"), new KeyRange(null, true, null, true), Depth.CHILDREN_ONLY);
     	
     	while (vertexKeys.hasNext())
     	{
-    		Key vk = vertexKeys.next();
+    		Key vk = vertexKeys.next().getKey();
     		List<String> vertexAddress = vk.getFullPath();
     		String vId = StringUtils.join(vertexAddress, ",");
     		KVVertex vertex = new KVVertex(this, vId);
@@ -315,10 +356,12 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Edge> edges = new ArrayList<Edge>();
     	/* get all immediate children of the graph with Edge in the major key */
-    	Iterator<Key> edgeKeys = this.store.storeKeysIterator(oracle.kv.Direction.FORWARD, 0,keyFromString(this.getGraphKey()+"/Edge"), null, Depth.CHILDREN_ONLY);
+    	Iterator <KeyValueVersion> edgeKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), null,null);
+    	
+        // Iterator<Key> edgeKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), new KeyRange(null, true, null, true), Depth.CHILDREN_ONLY);
     	while (edgeKeys.hasNext())
     	{
-    		Key ek = edgeKeys.next();
+    		Key ek = edgeKeys.next().getKey();
     		List<String> edgeAddress = ek.getFullPath();
     		String eId = StringUtils.join(edgeAddress, ",");
     		Edge edge = this.getEdge(eId);
@@ -342,10 +385,12 @@ public abstract class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Edge> edges = new ArrayList<Edge>();
     	/* get all immediate children of the graph with Edge in the major key */
-    	Iterator<Key> edgeKeys = this.store.storeKeysIterator(oracle.kv.Direction.FORWARD, 0,keyFromString(this.getGraphKey()+"/Edge"), null, Depth.CHILDREN_ONLY);
+    	Iterator <KeyValueVersion> edgeKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), null,null);
+
+        // Iterator<Key> edgeKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), new KeyRange(null, true, null, true), Depth.CHILDREN_ONLY);
     	while (edgeKeys.hasNext())
     	{
-    		Key ek = edgeKeys.next();
+    		Key ek = edgeKeys.next().getKey();
     		List<String> edgeAddress = ek.getFullPath();
     		String eId = StringUtils.join(edgeAddress, ",");
     		KVEdge edge = new KVEdge(this, eId);
