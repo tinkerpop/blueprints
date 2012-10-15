@@ -50,7 +50,6 @@ public class KVGraph implements MetaGraph<KVStore> {
                (new KVStoreConfig(storestring, hostName + ":" + hostPort));
                
        } catch (Exception e) {
-                System.out.println(e.toString());
                throw new RuntimeException(KVGraph.NOSQLDB_ERROR_EXCEPTION_MESSAGE);
        }
     }
@@ -64,7 +63,7 @@ public class KVGraph implements MetaGraph<KVStore> {
         FEATURES.supportsEdgeIteration = true;
         FEATURES.supportsVertexIndex = false;
         FEATURES.supportsEdgeIndex = false;
-        FEATURES.ignoresSuppliedIds = true;
+        FEATURES.ignoresSuppliedIds = false;
         FEATURES.supportsEdgeRetrieval = true;
         FEATURES.supportsVertexProperties = true;
         FEATURES.supportsEdgeProperties = true;
@@ -92,6 +91,12 @@ public class KVGraph implements MetaGraph<KVStore> {
 
     public void shutdown() {
         store.close();
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.getClass().getSimpleName().toLowerCase();
     }
 
     @Override
@@ -132,13 +137,13 @@ public class KVGraph implements MetaGraph<KVStore> {
         {
             vertex = new KVVertex(this);
         }
-        System.out.println("Added "+this.getGraphKey() + "/Vertex/"+vertex.getId());
+        putValue(this.store, keyFromString(this.getGraphKey()+"/VertexIndex/"+vertex.getId()), "");
         vertex.setProperty("ID", vertex.getId().toString());
+        
         return vertex;
     }
         
     public Vertex getVertex(final Object id) {
-        System.out.println("getting id "+id);
         Vertex vert = null;
     	if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
@@ -146,7 +151,6 @@ public class KVGraph implements MetaGraph<KVStore> {
         try {
             final String theId = id.toString();
             KVVertex v = new KVVertex(this, theId);
-            System.out.println("Vertex match is "+v.getId().toString().equals(theId));
             if (v.exists())
             	vert = (Vertex)v;
         } 
@@ -161,13 +165,17 @@ public class KVGraph implements MetaGraph<KVStore> {
     public void removeVertex(Vertex v) {
         KVVertex vertexToRemove = new KVVertex(this, v.getId());
         Iterable<Edge> edgesToRemove = vertexToRemove.getEdges(Direction.BOTH);
-        for (Edge edge : edgesToRemove)
+        if (edgesToRemove != null)
         {
-        	removeEdge(edge);
+            for (Edge edge : edgesToRemove)
+            {
+            	removeEdge(edge);
+            }
         }
         /* use multiDelete to wipe out all properties */
-        Key vertexKey = keyFromString(vertexToRemove.getId().toString());
+        Key vertexKey = majorKeyFromString(this.getGraphKey()+"/Vertex/"+vertexToRemove.getId());
         this.store.multiDelete(vertexKey, null, Depth.DESCENDANTS_ONLY);
+        this.store.delete(keyFromString(this.getGraphKey()+"/VertexIndex/"+vertexToRemove.getId()));
     }
     /**
      * Return the edge referenced by the provided object identifier.
@@ -207,24 +215,38 @@ public class KVGraph implements MetaGraph<KVStore> {
          
     	 /* for the IN Vertex, remove the edge ID */
     	 String inVString = (String)edgeToRemove.getProperty("IN");
-    	 KVVertex inV = new KVVertex(this, inVString);
+         Set<String> edgelist;
+    	 if (inVString != null)
+    	 {
+        	 KVVertex inV = new KVVertex(this, inVString);
     	 
-    	 Set<String> edgelist = (Set<String>)inV.getProperty("IN");
-    	 edgelist.remove(edgeToRemove.id.toString());
-    	 inV.setProperty("IN", edgelist);
+             edgelist= (Set<String>)inV.getProperty("IN");
+        	 if (edgelist != null)
+        	 {
+            	 edgelist.remove(edgeToRemove.getId());
+            	 inV.setProperty("IN", edgelist);
+        	 }
+    	 }
     	 
     	 
     	 /* for the OUT Vertex, remove the edge ID */
     	 String outVString = (String)edgeToRemove.getProperty("OUT");
-    	 KVVertex outV = new KVVertex(this, outVString);
-    	 edgelist = (Set<String>)outV.getProperty("OUT");
-    	 edgelist.remove(edgeToRemove.id.toString());
-    	 outV.setProperty("OUT",edgelist);
+    	 if (outVString != null)
+    	 {
+        	 KVVertex outV = new KVVertex(this, outVString);
+        	 edgelist = (Set<String>)outV.getProperty("OUT");
+        	 if (edgelist != null)
+        	 {
+        	     edgelist.remove(edgeToRemove.getId());
+        	     outV.setProperty("OUT",edgelist);
+    	     }
+	     }
     	 
     	 
          /* use multiDelete to wipe out all properties */
-         Key edgeKey = keyFromString(edgeToRemove.getId().toString());
+         Key edgeKey = majorKeyFromString(this.getGraphKey()+"/Edge/"+edgeToRemove.getId());
          this.store.multiDelete(edgeKey, null, Depth.DESCENDANTS_ONLY);
+         this.store.delete(keyFromString(this.getGraphKey()+"/EdgeIndex/"+edgeToRemove.getId()));
     }
     
     /**
@@ -253,14 +275,15 @@ public class KVGraph implements MetaGraph<KVStore> {
         edge.setProperty("OUT", outVertex.getId());
         edge.setProperty("LABEL", label);
         
+        // System.out.println("Adding edge:"+inVertex.getId()+"<-"+label+"-"+edge.getId()+"<-"+outVertex.getId());
         /*for the In Vertex, add this edge ID to the set of IN Edges*/
         Set<String> inEdges = (Set<String>) inVertex.getProperty("IN");
         if (inEdges == null)
         	inEdges = new HashSet<String>();
         
         inEdges.add(edge.getId().toString());
+
         inVertex.setProperty("IN", inEdges);
-        
         /* for the Out Vertex, add this edge ID to the set of OUT edges*/
         
         Set<String> outEdges = (Set<String>) outVertex.getProperty("OUT");
@@ -268,7 +291,8 @@ public class KVGraph implements MetaGraph<KVStore> {
         	outEdges = new HashSet<String>();
         outEdges.add(edge.getId().toString());
         outVertex.setProperty("OUT", outEdges);
-                return edge;
+        putValue(this.store, keyFromString(this.getGraphKey()+"/EdgeIndex/"+edge.getId()), "");
+        return edge;
         
     } 
     /**
@@ -281,31 +305,28 @@ public class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Vertex> vertices = new ArrayList<Vertex>();
     	/* get all immediate children of the graph with Vertex in the major key */
-    	List<String> majorComponents = new ArrayList<String>();
-        majorComponents.add(this.getGraphKey());
-        majorComponents.add("Vertex");
-        Key searchKey= Key.createKey(majorComponents);
-    	SortedSet <Key> vertexKeys = this.store.multiGetKeys(searchKey, null, null);
-    	System.out.println("Has this many v keys:"+vertexKeys.size());
+        Iterator <KeyValueVersion> vertexKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/VertexIndex"), null,null);
+        // Iterator<Key> vertexKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 1,majorKeyFromString(this.getGraphKey()+"/Vertex"), null, Depth.CHILDREN_ONLY);
+
     	int vcount = 0;
     	
-    	for (Key vk:vertexKeys)
+    	while (vertexKeys.hasNext())
     	{
-    	    System.out.println("in iterator");
-            //          vcount++;
-            // Key vk = vertexKeys.next();
-            System.out.println("has key "+vk);
+            vcount++;
+            Key vk = vertexKeys.next().getKey();
+            
     		List<String> vertexAddress = vk.getFullPath();
-    		String vId = StringUtils.join(vertexAddress, ",");
-    		System.out.println("Fetching "+vId);
+    		String vId = vertexAddress.get(vertexAddress.size()-1);
+    		
     		Vertex vertex = this.getVertex(vId);
     		if (vertex != null)
     		{
     			vertices.add(vertex);
-    			System.out.println("added vertex " + vertex.getId().toString());
+    			
     		}
     	}
-        // System.out.println("There are "+vcount + " keys");
+        //System.out.println("There are "+vcount + " keys");
+        //System.out.println("There are "+vertices.size() + " vertices");
     	
     	return vertices;
     }
@@ -323,21 +344,21 @@ public class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Vertex> vertices = new ArrayList<Vertex>();
     	/* get all immediate children of the graph with Vertex in the major key */
-    	Iterator <KeyValueVersion> vertexKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/Vertex"), null,null);
-    	
-        // Iterator<Key> vertexKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 0,majorKeyFromString(this.getGraphKey()+"/Vertex"), new KeyRange(null, true, null, true), Depth.CHILDREN_ONLY);
+        // Iterator <KeyValueVersion> vertexKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/Vertex"), null,null);
+        Iterator <KeyValueVersion> vertexKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/VertexIndex"), null,null);    	
+        // Iterator<Key> vertexKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 0,majorKeyFromString(this.getGraphKey()+"/Vertex"), null, Depth.CHILDREN_ONLY);
     	
     	while (vertexKeys.hasNext())
     	{
     		Key vk = vertexKeys.next().getKey();
     		List<String> vertexAddress = vk.getFullPath();
-    		String vId = StringUtils.join(vertexAddress, ",");
+    		String vId = vertexAddress.get(vertexAddress.size()-1);
     		KVVertex vertex = new KVVertex(this, vId);
     		if (vertex.exists())
     		{
     			if (vertex.getPropertyKeys().contains(key))
     			{
-    				if (vertex.getProperty(key) == value)
+    				if (vertex.getProperty(key).equals(value))
     					vertices.add(vertex);
     			}
     		}
@@ -356,19 +377,22 @@ public class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Edge> edges = new ArrayList<Edge>();
     	/* get all immediate children of the graph with Edge in the major key */
-    	Iterator <KeyValueVersion> edgeKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), null,null);
+    	Iterator <KeyValueVersion> edgeKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/EdgeIndex"), null,null);
     	
         // Iterator<Key> edgeKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), new KeyRange(null, true, null, true), Depth.CHILDREN_ONLY);
+        int ecount = 0;
     	while (edgeKeys.hasNext())
     	{
+    	    ecount++;
     		Key ek = edgeKeys.next().getKey();
     		List<String> edgeAddress = ek.getFullPath();
-    		String eId = StringUtils.join(edgeAddress, ",");
+    		String eId = edgeAddress.get(edgeAddress.size()-1);
     		Edge edge = this.getEdge(eId);
     		if (edge != null)
     			edges.add(edge);
     	}
-    	
+    	// System.out.println("ecount:"+ecount);
+    	// System.out.println("edges:"+edges.size());
     	return edges;
     }
     
@@ -385,20 +409,22 @@ public class KVGraph implements MetaGraph<KVStore> {
     {
     	ArrayList<Edge> edges = new ArrayList<Edge>();
     	/* get all immediate children of the graph with Edge in the major key */
-    	Iterator <KeyValueVersion> edgeKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), null,null);
+        Iterator <KeyValueVersion> edgeKeys = this.store.multiGetIterator(oracle.kv.Direction.FORWARD, 0,majorKeyFromString(this.getGraphKey()+"/EdgeIndex"), null,null);
 
         // Iterator<Key> edgeKeys = this.store.storeKeysIterator(oracle.kv.Direction.UNORDERED, 0,majorKeyFromString(this.getGraphKey()+"/Edge"), new KeyRange(null, true, null, true), Depth.CHILDREN_ONLY);
     	while (edgeKeys.hasNext())
     	{
     		Key ek = edgeKeys.next().getKey();
     		List<String> edgeAddress = ek.getFullPath();
-    		String eId = StringUtils.join(edgeAddress, ",");
+    		String eId = edgeAddress.get(edgeAddress.size()-1);
     		KVEdge edge = new KVEdge(this, eId);
     		if (edge.exists())
     		{
+
     			if (edge.getPropertyKeys().contains(key))
     			{
-    				if (edge.getProperty(key) == value)
+
+    				if (edge.getProperty(key).equals(value))
     					edges.add(edge);
     			}
     		}

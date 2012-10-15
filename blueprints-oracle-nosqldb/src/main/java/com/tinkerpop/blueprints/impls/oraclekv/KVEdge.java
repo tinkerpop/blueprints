@@ -59,19 +59,21 @@ public class KVEdge extends KVElement implements Edge {
     
     @Override
     public Vertex getVertex(Direction direction) throws IllegalArgumentException {
-        KVVertex result = null;
+        Vertex result = null;
         if (direction.equals(Direction.OUT))
         {
-            String vertexId = (String)getValue(this.store, keyFromString(this.id+"/OUT"));
-            result = new KVVertex(this.graph, vertexId);
+            String vertexId = (String)this.getProperty("OUT");
+            result = this.graph.getVertex(vertexId);
         }
         else if (direction.equals(Direction.IN))
         {
-            String vertexId = (String)getValue(this.store, keyFromString(this.id+"/IN"));
-            result = new KVVertex(this.graph, vertexId);
+            String vertexId = (String)this.getProperty("IN");
+            result = this.graph.getVertex(vertexId);
         }
         else
-          throw ExceptionFactory.bothIsNotSupported();
+        {
+            throw ExceptionFactory.bothIsNotSupported();
+        }
           
         return result;
     }

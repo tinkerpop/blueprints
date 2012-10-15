@@ -43,7 +43,7 @@ public class KVUtil {
         Key kvKey = Key.createKey(majorComponents);
         List<String> vertexAddress = kvKey.getFullPath();
         String vId = StringUtils.join(vertexAddress, ",");
-        System.out.println("major key is:" +vId);
+        //System.out.println("major key is:" +vId);
         return kvKey;
         
     }

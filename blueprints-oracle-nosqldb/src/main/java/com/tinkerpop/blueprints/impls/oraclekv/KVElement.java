@@ -37,14 +37,21 @@ public class KVElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        Key elementKey = keyFromString(this.id.toString());
+        Key elementKey = majorKeyFromString(this.id.toString());
         SortedSet<Key> propertyKeys = this.graph.getRawGraph().multiGetKeys(elementKey, null, Depth.CHILDREN_ONLY);
+
         HashSet<String> finalproperties = new HashSet<String>();
         for (Key k : propertyKeys)
         {
             for (String p : k.getMinorPath())
+            {
                 finalproperties.add(p);
+            }
         }
+        finalproperties.remove("ID");
+        finalproperties.remove("OUT");
+        finalproperties.remove("IN");
+        finalproperties.remove("LABEL");
         return finalproperties;
     }
 
@@ -60,7 +67,6 @@ public class KVElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        // System.out.println("Setting property "+ key + " on store "+graph.storestring);
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL))
@@ -74,8 +80,7 @@ public class KVElement implements Element {
 
     public Object removeProperty(final String key) {
         Key elementKey = keyFromString(this.id.toString()+"/"+key);
-        ValueVersion propertyValueVersion = graph.getRawGraph().get(elementKey);
-        Object oldvalue = fromByteArray(propertyValueVersion.getValue().getValue());
+        Object oldvalue = this.getProperty(key);
         
         graph.getRawGraph().delete(elementKey);
         return oldvalue;

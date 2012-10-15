@@ -81,7 +81,12 @@ public class KVVertex extends KVElement implements Vertex {
     	else if (direction == Direction.BOTH)
     	{
     		edges = this.getOutEdges(labels);
-    		((ArrayList<Edge>)edges).addAll(this.getInEdges(labels));
+    		if (edges != null)
+    		{
+    		    Iterable<Edge> inEdges = this.getInEdges(labels);
+    		    if (inEdges != null)
+    		        ((ArrayList<Edge>)edges).addAll((ArrayList<Edge>)inEdges);
+		    }
     	}
     	
     	return edges;
@@ -110,7 +115,7 @@ public class KVVertex extends KVElement implements Vertex {
     		/* for each edge, get the OUT node */
     		for (Edge e : edgeList)
     		{
-    			vertices.add(((KVEdge)e).getVertex(direction));
+    			vertices.add(e.getVertex(Direction.IN));
     		}
     		
     	}
@@ -122,71 +127,100 @@ public class KVVertex extends KVElement implements Vertex {
     		/* for each edge, get the IN node */
     		for (Edge e : edgeList)
     		{
-    			vertices.add(((KVEdge)e).getVertex(direction));
+    			vertices.add(e.getVertex(Direction.OUT));
     		}
     		
     	}
     	
-    	else
+    	else if (direction == Direction.BOTH)
     	{
     		/* get the outbound edges */
         	ArrayList<Edge> edgeList = this.getOutEdges(labels);
         	/* for each edge, get the OUT node */
         	for (Edge e : edgeList)
         	{
-        		vertices.add(((KVEdge)e).getVertex(direction));
+    			vertices.add(e.getVertex(Direction.IN));
         	}
         	
         	edgeList = this.getInEdges(labels);
         	/* for each edge, get the IN node */
         	for (Edge e : edgeList)
         	{
-        		vertices.add(((KVEdge)e).getVertex(direction));
+        		vertices.add(e.getVertex(Direction.OUT));
         	}
     	}
-        		
     	
     	return vertices;
     }
     
     private ArrayList<Edge> getOutEdges(final String... labels) {
         /*get the set of Edge IDs that are outbound */
-        Set<String> outEdgeIds = (Set<String>)getValue(this.store, keyFromString(this.id+"/OUT"));
+        Set<String> outEdgeIds = (Set<String>)this.getProperty("OUT");
+        if (outEdgeIds == null)
+            outEdgeIds = new HashSet<String>();
+
         ArrayList<Edge> outEdges = new ArrayList<Edge>();
-        for(String edgeId : outEdgeIds)
+        if (!outEdgeIds.isEmpty())
         {
-            /*Get the edges for the collection*/
-            KVEdge e = new KVEdge(this.graph, edgeId);
-            if (labels.length == 0)
-            	outEdges.add((Edge)e);
-            else if (labels.length == 1)
-            	if (e.getLabel() == labels[0])
-            		outEdges.add((Edge)e);
-            else
-            	if (Arrays.asList(labels).contains(e.getLabel()))
-            		outEdges.add((Edge)e);
+            for(String edgeId : outEdgeIds)
+            {
+                /*Get the edges for the collection*/
+                KVEdge e = new KVEdge(this.graph, edgeId);
+
+                if (labels.length == 0)
+                	outEdges.add((Edge)e);
+                else if (labels.length == 1)
+                {
+                	if (e.getLabel().equals(labels[0]))
+                		outEdges.add((Edge)e);
+            	}
+            	
+                else
+                {
+
+                	if (Arrays.asList(labels).contains(e.getLabel()))
+                	{
+                		outEdges.add((Edge)e);
+            		}
+            	}
                 
+            }
         }
         return outEdges;
     }
     
     private ArrayList<Edge> getInEdges(final String... labels) {
     	/*get the set of Edge IDs that are inbound */
-        Set<String> inEdgeIds = (Set<String>)getValue(this.store, keyFromString(this.id+"/IN"));
+        Set<String> inEdgeIds = (Set<String>)this.getProperty("IN");
+        if (inEdgeIds == null)
+            inEdgeIds = new HashSet<String>();
+            
         ArrayList<Edge> inEdges = new ArrayList<Edge>();
-        for(String edgeId : inEdgeIds)
+        if (!inEdgeIds.isEmpty())
         {
-            /*Get the edges for the collection*/
-        	/*Get the edges for the collection*/
-            KVEdge e = new KVEdge(this.graph, edgeId);
-            if (labels.length == 0)
-            	inEdges.add((Edge)e);
-            else if (labels.length == 1)
-            	if (e.getLabel() == labels[0])
-            		inEdges.add((Edge)e);
-            else
-            	if (Arrays.asList(labels).contains(e.getLabel()))
-            		inEdges.add((Edge)e);
+            for(String edgeId : inEdgeIds)
+            {
+                /*Get the edges for the collection*/
+
+                KVEdge e = new KVEdge(this.graph, edgeId);
+
+                if (labels.length == 0)
+                	inEdges.add((Edge)e);
+                else if (labels.length == 1)
+                {
+                	if (e.getLabel().equals(labels[0]))
+                		inEdges.add((Edge)e);
+            	}
+            	
+                else
+                {
+
+                	if (Arrays.asList(labels).contains(e.getLabel()))
+                	{
+                		inEdges.add((Edge)e);
+            		}
+            	}
+            }
         }
         return inEdges;
     }
