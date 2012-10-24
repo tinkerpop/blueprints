@@ -187,13 +187,13 @@ public class SailVertex implements Vertex {
 
     private Iterable<Edge> getInEdges(final String... labels) {
         if (labels.length == 0) {
-            return new SailEdgeIterable(null, null, (Resource) this.rawVertex, this.graph);
+            return new SailEdgeIterable(null, null, this.rawVertex, this.graph);
         } else if (labels.length == 1) {
-            return new SailEdgeIterable(null, new URIImpl(this.graph.expandPrefix(labels[0])), (Resource) this.rawVertex, this.graph);
+            return new SailEdgeIterable(null, new URIImpl(this.graph.expandPrefix(labels[0])), this.rawVertex, this.graph);
         } else {
             final List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
             for (final String label : labels) {
-                edges.add(new SailEdgeIterable(null, new URIImpl(this.graph.expandPrefix(label)), (Resource) this.rawVertex, this.graph));
+                edges.add(new SailEdgeIterable(null, new URIImpl(this.graph.expandPrefix(label)), this.rawVertex, this.graph));
             }
             return new MultiIterable<Edge>(edges);
         }

@@ -5,6 +5,7 @@ import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.sail.SailException;
 
 import java.util.Iterator;
@@ -19,9 +20,9 @@ class SailEdgeIterable implements Iterable<Edge> {
     private final SailGraph graph;
     private final Resource subject;
     private final URI predicate;
-    private final Resource object;
+    private final Value object;
 
-    public SailEdgeIterable(Resource subject, URI predicate, Resource object, final SailGraph graph) {
+    public SailEdgeIterable(Resource subject, URI predicate, Value object, final SailGraph graph) {
         this.subject = subject;
         this.object = object;
         this.predicate = predicate;
