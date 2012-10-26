@@ -23,6 +23,7 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 * Removed a class type check in @KeyIndexableGraphTestSuite@ that unnecessarily assumes an implementation specific
 * Fixed a state bug in @WrapperQuery@
 * @GraphJung@ implements JUNG's @DirectedGraph@ interface and did various small optimizations to implementation
+* Bumped to support Dex 4.7.0
 
 h3. Version 2.1.0 (August 4, 2012)
 
