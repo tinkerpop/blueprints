@@ -40,6 +40,7 @@ public class GMLWriter {
     private final Graph graph;
     private boolean normalize = false;
     private boolean useId = false;
+    private boolean strict = false;
     private String vertexIdKey = GMLTokens.BLUEPRINTS_ID;
     private String edgeIdKey = GMLTokens.BLUEPRINTS_ID;
 
@@ -54,6 +55,14 @@ public class GMLWriter {
      */
     public GMLWriter(final Graph graph) {
         this.graph = graph;
+    }
+
+    /**
+     * @param strict when set to true, property keys in the graph that do not meet the exact guidelines of the GML
+     *               specification are ignored.  By default this value is false.
+     */
+    public void setStrict(final boolean strict) {
+        this.strict = strict;
     }
 
     /**
@@ -204,7 +213,7 @@ public class GMLWriter {
 
     private void writeProperties(final Writer writer, final Element e) throws IOException {
         for (String key : e.getPropertyKeys()) {
-            if (regex.matcher(key).matches()) {
+            if (!this.strict || regex.matcher(key).matches()) {
                 final Object property = e.getProperty(key);
                 writeKey(writer, key);
                 writeProperty(writer, property, 0);
