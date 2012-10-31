@@ -112,6 +112,9 @@ class DexElement implements Element {
                 case Integer:
                     result = v.getInteger();
                     break;
+                case Long:
+                    result = v.getLong();
+                    break;
                 case String:
                     result = v.getString();
                     break;
@@ -169,6 +172,8 @@ class DexElement implements Element {
                 datatype = com.sparsity.dex.gdb.DataType.Boolean;
             } else if (value instanceof Integer) {
                 datatype = com.sparsity.dex.gdb.DataType.Integer;
+            } else if (value instanceof Long) {
+                datatype = com.sparsity.dex.gdb.DataType.Long;
             } else if (value instanceof String) {
                 datatype = com.sparsity.dex.gdb.DataType.String;
             } else if (value instanceof Double || value instanceof Float) {
@@ -198,6 +203,15 @@ class DexElement implements Element {
                     break;
                 case Integer:
                     v.setIntegerVoid((Integer) value);
+                    break;
+                case Long:
+                    if (value instanceof Long) {
+                        v.setLongVoid((Long) value);
+                    } else if (value instanceof Integer) {
+                        v.setLongVoid(((Integer)value).longValue());
+                    } else {
+                        throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+                    }
                     break;
                 case String:
                     v.setString((String) value);
