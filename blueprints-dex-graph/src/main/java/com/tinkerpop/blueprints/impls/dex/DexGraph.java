@@ -115,7 +115,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         FEATURES.supportsPrimitiveArrayProperty = false;
         FEATURES.supportsUniformListProperty = false;
         FEATURES.supportsMixedListProperty = false;
-        FEATURES.supportsLongProperty = false;
+        FEATURES.supportsLongProperty = true;
         FEATURES.supportsMapProperty = false;
         FEATURES.supportsStringProperty = true;
 
