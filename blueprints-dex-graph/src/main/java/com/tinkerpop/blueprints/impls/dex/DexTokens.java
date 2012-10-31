@@ -5,5 +5,5 @@ package com.tinkerpop.blueprints.impls.dex;
  */
 class DexTokens {
 
-    public static final String TYPE_EXCEPTION_MESSAGE = "Boolean, integer, string, floats, and doubles are the only supported property value types";
+    public static final String TYPE_EXCEPTION_MESSAGE = "Boolean, integer, long, string, floats, and doubles are the only supported property value types";
 }
