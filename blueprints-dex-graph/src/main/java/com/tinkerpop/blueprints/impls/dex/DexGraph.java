@@ -714,7 +714,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         return ret;
     }
     
-    private void autoStartTransaction() {
+    void autoStartTransaction() {
         if (session == null) {
             session = gpool.newSession();
             rawGraph = session.getGraph();

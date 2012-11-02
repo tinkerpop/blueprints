@@ -36,6 +36,8 @@ class DexVertex extends DexElement implements Vertex {
     }
 
     public CloseableIterable<Edge> getEdges(final Direction direction, final String... labels) {
+        graph.autoStartTransaction();
+        
         if (direction.equals(Direction.OUT)) {
             return this.getOutEdges(labels);
         } else if (direction.equals(Direction.IN))
@@ -46,6 +48,8 @@ class DexVertex extends DexElement implements Vertex {
     }
 
     public CloseableIterable<Vertex> getVertices(final Direction direction, final String... labels) {
+        graph.autoStartTransaction();
+        
         if (direction.equals(Direction.OUT)) {
             return this.getOutVertices(labels);
         } else if (direction.equals(Direction.IN))
