@@ -36,6 +36,9 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     private final IdFactory vertexIdFactory;
     private final IdFactory edgeIdFactory;
 
+    private final boolean vertexIndexing;
+    private final boolean edgeIndexing;
+
     private final Features features;
 
     private boolean uniqueIds = true;
@@ -79,6 +82,9 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
         this.vertexIdFactory = null == vertexIdFactory ? new DefaultIdFactory() : vertexIdFactory;
         this.edgeIdFactory = null == edgeIdFactory ? new DefaultIdFactory() : edgeIdFactory;
+
+        vertexIndexing = baseGraph.getFeatures().supportsVertexIndex;
+        edgeIndexing = baseGraph.getFeatures().supportsEdgeIndex;
 
         createIndices();
     }

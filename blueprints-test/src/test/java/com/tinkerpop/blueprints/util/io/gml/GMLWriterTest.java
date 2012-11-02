@@ -90,6 +90,7 @@ public class GMLWriterTest extends TestCase {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GMLWriter w = new GMLWriter(g1);
+        w.setStrict(true);
         w.setUseId(true);
         w.outputGraph(bos);
 

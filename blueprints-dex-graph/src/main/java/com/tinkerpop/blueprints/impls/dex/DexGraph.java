@@ -115,7 +115,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         FEATURES.supportsPrimitiveArrayProperty = false;
         FEATURES.supportsUniformListProperty = false;
         FEATURES.supportsMixedListProperty = false;
-        FEATURES.supportsLongProperty = false;
+        FEATURES.supportsLongProperty = true;
         FEATURES.supportsMapProperty = false;
         FEATURES.supportsStringProperty = true;
 
@@ -175,6 +175,16 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * @param fileName Database persistent file.
      */
     public DexGraph(final String fileName) {
+        this(fileName, null);
+    }
+    
+        /**
+         * Creates a new instance.
+         *
+         * @param fileName Database persistent file.
+         * @param config Dex configuration file.
+         */
+    public DexGraph(final String fileName, final String config) {
         try {
             final File db = new File(fileName);
             final File dbPath = db.getParentFile();
@@ -188,6 +198,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             final boolean create = !db.exists();
 
             this.db = db;
+            if (config != null) com.sparsity.dex.gdb.DexProperties.load(config);
             dex = new com.sparsity.dex.gdb.Dex(new com.sparsity.dex.gdb.DexConfig());
             gpool = (create ? dex.create(db.getPath(), db.getName()) : dex.open(db.getPath(), false));
             session = gpool.newSession();

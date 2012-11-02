@@ -367,6 +367,23 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testVertexCountOnPreTransactionCommit() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Vertex v1 = graph.addVertex(null);
+        graph.stopTransaction(Conclusion.SUCCESS);
+
+        vertexCount(graph, 1);
+
+        Vertex v2 = graph.addVertex(null);
+        graph.addEdge(null, v1, v2, convertId(graph, "friend"));
+
+        vertexCount(graph, 2);
+
+        graph.stopTransaction(Conclusion.SUCCESS);
+
+        vertexCount(graph, 2);
+
+    }
 
     public void testBulkTransactionsOnEdges() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();

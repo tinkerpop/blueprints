@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.impls.sail;
 
+import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -215,5 +216,19 @@ public class SailGraphTest extends GraphTest {
                 graph.shutdown();
             }
         }
+    }
+
+    public void testNavigateThroughLiteralVertex() {
+        SailGraph graph = new MemoryStoreSailGraph();
+        SailGraphFactory.createTinkerGraph(graph);
+
+        Vertex v1 = graph.getVertex("tg:1");
+        SailVertex vx = new SailVertex(new LiteralImpl("Marko"), graph);
+        graph.addEdge(null, v1, vx, "tg:name");
+
+        Vertex v = v1.getEdges(Direction.OUT, "tg:name").iterator().next().getVertex(Direction.IN);
+        assertEquals("Marko", v.getProperty(SailTokens.VALUE));
+        v1 = v.getEdges(Direction.IN, "tg:name").iterator().next().getVertex(Direction.OUT);
+        assertEquals("http://tinkerpop.com#1", v1.getId());
     }
 }
