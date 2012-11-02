@@ -7,8 +7,10 @@ import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
+import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
@@ -178,6 +180,35 @@ public class DexGraphTest extends GraphTest {
         printTestPerformance("Dex specific #testKeyIndex", this.stopWatch());
         graph.shutdown();
     }
+    
+    public void testTx() {
+        TransactionalGraph graph = (TransactionalGraph) generateGraph(true);
+        this.stopWatch();
+
+        graph.stopTransaction(Conclusion.SUCCESS);
+
+        graph.addVertex(null).setProperty("name", "sergio");
+        graph.addVertex(null).setProperty("name", "marko");
+        assertTrue(graph.getVertices("name", "sergio").iterator().next().getProperty("name").equals("sergio"));
+        graph.stopTransaction(Conclusion.SUCCESS);
+        assertTrue(((DexGraph)graph).getRawSession() == null); // it checks out iterators have been closed
+
+        assertTrue(graph.getVertices("name", "sergio").iterator().next().getProperty("name").equals("sergio"));
+        graph.stopTransaction(Conclusion.SUCCESS);
+        assertTrue(((DexGraph)graph).getRawSession() == null); // it checks out iterators have been closed
+
+        graph.stopTransaction(Conclusion.SUCCESS);
+        assertTrue(((DexGraph)graph).getRawSession() == null); // it checks out iterators have been closed
+        graph.stopTransaction(Conclusion.SUCCESS);
+        assertTrue(((DexGraph)graph).getRawSession() == null); // it checks out iterators have been closed
+
+        graph.addVertex(null);
+        graph.shutdown();
+        assertTrue(((DexGraph)graph).getRawSession() == null); // it checks out iterators have been closed
+
+        printTestPerformance("Dex specific #testTx", this.stopWatch());
+    }
+    
 
     public Graph generateGraph() {
         return generateGraph(false);
