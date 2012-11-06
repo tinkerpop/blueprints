@@ -15,6 +15,7 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Removed the @SailGraph@ constraint preventing traversal from literal vertices to non-literal resource vertices
 * Refactoring of @GraphSONUtility@ and related reader/writer classes to improve performance and offer more control over how GraphSON is read and written
 * Added support for @Compare.opposite()@ to get the inverse of a comparator
 * Added support for property inclusion and exclusion in the GraphMLReader/Writer
