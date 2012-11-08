@@ -32,6 +32,10 @@ public class ExceptionFactory {
 
     // Element related exceptions
 
+    public static IllegalArgumentException propertyKeyIsReserved(final String key) {
+        return new IllegalArgumentException("Property key is reserved for all elements: " + key);
+    }
+
     public static IllegalArgumentException propertyKeyIdIsReserved() {
         return new IllegalArgumentException("Property key is reserved for all elements: id");
     }

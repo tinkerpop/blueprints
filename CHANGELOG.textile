@@ -25,6 +25,9 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 * Fixed a state bug in @WrapperQuery@
 * @GraphJung@ implements JUNG's @DirectedGraph@ interface and did various small optimizations to implementation
 * Bumped to support Dex 4.7.0
+* Bumped to support Neo4j 1.9.M01
+* @ExceptionFactory@ support for @_@ metadata properties
+* Added more constructors to @Neo4jHaGraph@
 
 h3. Version 2.1.0 (August 4, 2012)
 
