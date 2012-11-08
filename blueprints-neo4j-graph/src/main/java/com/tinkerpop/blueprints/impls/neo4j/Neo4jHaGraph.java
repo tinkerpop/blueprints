@@ -17,7 +17,7 @@ public class Neo4jHaGraph extends Neo4jGraph {
     }
 
     public Neo4jHaGraph(final String directory, final Map<String, String> configuration) {
-        super(new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabaseBuilder(directory).setConfig(configuration).newGraphDatabase())
+        super(new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabaseBuilder(directory).setConfig(configuration).newGraphDatabase());
     }
 
     public Neo4jHaGraph(final HighlyAvailableGraphDatabase rawGraph) {
