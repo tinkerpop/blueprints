@@ -21,6 +21,8 @@ import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
+import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -259,6 +261,15 @@ public class Neo4jGraphTest extends GraphTest {
         assertEquals(count(graph.getVertices("name", "matthias")), 1);
         assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
         assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
+        graph.shutdown();
+        deleteDirectory(new File(directory));
+    }
+
+    public void testHaGraph() throws Exception {
+        assertTrue(InternalAbstractGraphDatabase.class.isAssignableFrom(HighlyAvailableGraphDatabase.class));
+
+        String directory = this.getWorkingDirectory();
+        Neo4jHaGraph graph = new Neo4jHaGraph(directory);
         graph.shutdown();
         deleteDirectory(new File(directory));
     }

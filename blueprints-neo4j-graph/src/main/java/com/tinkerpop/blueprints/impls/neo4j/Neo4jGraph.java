@@ -24,9 +24,9 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.graphdb.index.RelationshipIndex;
+import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.HighlyAvailableGraphDatabase;
+import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.File;
@@ -123,10 +123,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         this(directory, null);
     }
 
-    public Neo4jGraph(final String directory, final Map<String, String> configuration) {
-        this(directory, configuration, false);
-    }
-
     public Neo4jGraph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
         this.loadKeyIndices();
@@ -138,17 +134,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             this.freshLoad();
     }
 
-    protected Neo4jGraph(final String directory, final Map<String, String> configuration, boolean highAvailabilityMode) {
-        if (highAvailabilityMode && configuration == null) {
-            throw new IllegalArgumentException("Configuration parameters must be supplied when using HA mode.");
-        }
+    public Neo4jGraph(final String directory, final Map<String, String> configuration) {
         boolean fresh = !new File(directory).exists();
         try {
             if (null != configuration)
-                if (highAvailabilityMode)
-                    this.rawGraph = new HighlyAvailableGraphDatabase(directory, configuration);
-                else
-                    this.rawGraph = new EmbeddedGraphDatabase(directory, configuration);
+                this.rawGraph = new EmbeddedGraphDatabase(directory, configuration);
             else
                 this.rawGraph = new EmbeddedGraphDatabase(directory);
 
@@ -186,7 +176,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     private <T extends Element> void createInternalIndexKey(final String key, final Class<T> elementClass) {
         final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getKernelData().properties();
+        final PropertyContainer pc = ((InternalAbstractGraphDatabase) this.rawGraph).getNodeManager().getGraphProperties();
         try {
             final String[] keys = (String[]) pc.getProperty(propertyName);
             final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
@@ -201,7 +191,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     private <T extends Element> void dropInternalIndexKey(final String key, final Class<T> elementClass) {
         final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getKernelData().properties();
+        final PropertyContainer pc = ((InternalAbstractGraphDatabase) this.rawGraph).getNodeManager().getGraphProperties();
         try {
             final String[] keys = (String[]) pc.getProperty(propertyName);
             final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
@@ -214,7 +204,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public <T extends Element> Set<String> getInternalIndexKeys(final Class<T> elementClass) {
         final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getKernelData().properties();
+        final PropertyContainer pc = ((InternalAbstractGraphDatabase) this.rawGraph).getNodeManager().getGraphProperties();
         try {
             final String[] keys = (String[]) pc.getProperty(propertyName);
             return new HashSet<String>(Arrays.asList(keys));

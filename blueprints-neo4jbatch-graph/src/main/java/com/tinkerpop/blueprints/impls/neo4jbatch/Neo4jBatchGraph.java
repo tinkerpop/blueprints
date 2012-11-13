@@ -20,12 +20,13 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSetting;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.AutoIndexer;
+import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
 import org.neo4j.kernel.AbstractGraphDatabase;
+import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
-import org.neo4j.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -170,7 +171,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         final Set<String> properties = rawAutoIndexer.getAutoIndexedProperties();
         Transaction tx = rawGraphDB.beginTx();
 
-        final PropertyContainer kernel = ((AbstractGraphDatabase) rawGraphDB).getKernelData().properties();
+        final PropertyContainer kernel = ((InternalAbstractGraphDatabase) rawGraphDB).getNodeManager().getGraphProperties();
         kernel.setProperty(elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX, properties.toArray(new String[properties.size()]));
 
         int count = 0;

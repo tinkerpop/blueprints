@@ -27,6 +27,8 @@ class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
     }
 
     public void setProperty(final String key, final Object value) {
+        if (key.isEmpty())
+            throw ExceptionFactory.elementKeyCanNotBeEmpty();
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
 
