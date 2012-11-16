@@ -21,7 +21,6 @@ import org.neo4j.graphdb.factory.GraphDatabaseSetting;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
-import org.neo4j.kernel.AbstractGraphDatabase;
 import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
@@ -98,12 +97,15 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
 
     public Neo4jBatchGraph(final String directory) {
         this.rawGraph = BatchInserters.inserter(directory);
-        this.indexProvider = new LuceneBatchInserterIndexProvider(rawGraph);
+        this.indexProvider = new LuceneBatchInserterIndexProvider(this.rawGraph);
     }
 
     public Neo4jBatchGraph(final String directory, final Map<String, String> parameters) {
-        this.rawGraph = BatchInserters.inserter(directory, parameters);
-        this.indexProvider = new LuceneBatchInserterIndexProvider(rawGraph);
+        if (null == parameters)
+            this.rawGraph = BatchInserters.inserter(directory);
+        else
+            this.rawGraph = BatchInserters.inserter(directory, parameters);
+        this.indexProvider = new LuceneBatchInserterIndexProvider(this.rawGraph);
     }
 
     public Neo4jBatchGraph(final BatchInserter rawGraph, final BatchInserterIndexProvider indexProvider) {
