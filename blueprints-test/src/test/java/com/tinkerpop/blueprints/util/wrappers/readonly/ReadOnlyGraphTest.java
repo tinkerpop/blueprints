@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
@@ -122,5 +123,25 @@ public class ReadOnlyGraphTest extends BaseTest {
         }
         assertTrue(Vertex.class.isAssignableFrom(index.getIndexClass()));
         assertEquals(index.getIndexName(), "blah");
+    }
+
+    public void testReadOnlyKeyIndices() {
+        KeyIndexableGraph graph = new ReadOnlyKeyIndexableGraph<TinkerGraph>(TinkerGraphFactory.createTinkerGraph());
+        ((KeyIndexableGraph)((WrapperGraph<IndexableGraph>) graph).getBaseGraph()).createKeyIndex("blah", Vertex.class);
+        assertTrue(graph.getIndexedKeys(Vertex.class) instanceof Set);
+        assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
+        assertTrue(graph.getIndexedKeys(Vertex.class).contains("blah"));
+        try {
+            graph.createKeyIndex("whatever", Vertex.class);
+            assertTrue(false);
+        } catch (UnsupportedOperationException e) {
+            assertTrue(true);
+        }
+        try {
+            graph.dropKeyIndex("blah", Vertex.class);
+            assertTrue(false);
+        } catch (UnsupportedOperationException e) {
+            assertTrue(true);
+        }
     }
 }
