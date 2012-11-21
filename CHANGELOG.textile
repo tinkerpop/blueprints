@@ -28,6 +28,7 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 * Bumped to support Neo4j 1.9.M01
 * @ExceptionFactory@ support for @_@ metadata properties
 * Added more constructors to @Neo4jHaGraph@
+* @ReadOnlyGraph@ supports the non-mutating methods of @KeyIndexableGraph@.
 
 h3. Version 2.1.0 (August 4, 2012)
 
