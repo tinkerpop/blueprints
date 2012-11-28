@@ -7,3 +7,6 @@ target/
 *.ipr
 buildAll.sh
 build_output.txt
+.classpath
+.project
+.settings
