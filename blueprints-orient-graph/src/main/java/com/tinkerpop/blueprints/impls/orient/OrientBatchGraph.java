@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.impls.orient;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
-import com.orientechnologies.orient.core.intent.OIntentMassiveInsert;
 import com.tinkerpop.blueprints.Features;
 
 /**
@@ -45,7 +44,7 @@ public class OrientBatchGraph extends OrientBaseGraph {
         FEATURES.supportsLongProperty = true;
         FEATURES.supportsMapProperty = true;
         FEATURES.supportsStringProperty = true;
-        FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsThreadedTransactions = true;
     }
 
     /**

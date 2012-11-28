@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.io.File;
+import java.lang.reflect.Method;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -16,9 +19,6 @@ import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 
-import java.io.File;
-import java.lang.reflect.Method;
-
 /**
  * Test suite for OrientDB graph implementation.
  *
@@ -28,11 +28,11 @@ public class OrientGraphTest extends GraphTest {
 
     private OrientGraph currentGraph;
 
-    /*public void testOrientBenchmarkTestSuite() throws Exception {
+    public void testOrientBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new OrientBenchmarkTestSuite(this));
         printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
-    }*/
+    }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();

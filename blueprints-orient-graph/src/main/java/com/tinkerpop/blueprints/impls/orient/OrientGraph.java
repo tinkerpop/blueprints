@@ -34,7 +34,6 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
         FEATURES.supportsVertexProperties = true;
         FEATURES.supportsEdgeProperties = true;
 
-
         // For more information on supported types, please see:
         // http://code.google.com/p/orient/wiki/Types
         FEATURES.supportsSerializableObjectProperty = true;
