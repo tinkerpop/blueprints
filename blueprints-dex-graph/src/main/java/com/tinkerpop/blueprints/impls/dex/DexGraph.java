@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
+import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.MultiIterable;
@@ -16,8 +17,10 @@ import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,12 +48,13 @@ import java.util.Set;
  * actually return a {@link CloseableIterable} collection. Thus users can
  * {@link CloseableIterable#close()} the collection to free resources.
  * Otherwise, all those collections will automatically be closed when the
- * database is stopped ( {@link #shutdown()}).
+ * transaction is stopped ({@link #stopTransaction(com.tinkerpop.blueprints.TransactionalGraph.Conclusion)}
+ * or if the database is stopped ( {@link #shutdown()}).
  * 
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndexableGraph {
+public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndexableGraph, TransactionalGraph {
 
     /**
      * Default Vertex label.
@@ -82,12 +86,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     /**
      * Database persistent file.
      */
-    private File db = null;
+    private File dbFile = null;
 
     private com.sparsity.dex.gdb.Dex dex = null;
-    private com.sparsity.dex.gdb.Database gpool = null;
-    private com.sparsity.dex.gdb.Session session = null;
-    private com.sparsity.dex.gdb.Graph rawGraph = null;
+    private com.sparsity.dex.gdb.Database db = null;
+    
+    private ThreadLocal<com.sparsity.dex.gdb.Session> session = new ThreadLocal<com.sparsity.dex.gdb.Session>() {
+        @Override
+        protected com.sparsity.dex.gdb.Session initialValue() {
+            return null;
+        }
+    };
 
     private static final Features FEATURES = new Features();
 
@@ -132,23 +141,41 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * @return Dex raw graph.
      */
     public com.sparsity.dex.gdb.Graph getRawGraph() {
-        return rawGraph;
+        com.sparsity.dex.gdb.Session sess = getRawSession(false);
+        if (sess == null) {
+            throw new IllegalStateException("Transaction has not been started");
+        }
+        return sess.getGraph();
     }
 
     /**
-     * Gets the Dex
+     * Gets the Dex Session
      *
-     * @return The Dex
+     * @return The Dex Session
      */
     com.sparsity.dex.gdb.Session getRawSession() {
-        return session;
+        return getRawSession(true);
+    }
+
+    /**
+     * Gets the Dex Session
+     *
+     * @return The Dex Session
+     */
+    com.sparsity.dex.gdb.Session getRawSession(boolean exception) {
+        com.sparsity.dex.gdb.Session sess = session.get();
+        if (sess == null && exception) {
+            throw new IllegalStateException("Transaction has not been started");
+        }
+        return sess;
     }
 
     /**
      * All iterables are registered here to be automatically closed when the
      * database is stopped (at {@link #shutdown()}).
      */
-    private List<DexIterable<? extends Element>> iterables = new ArrayList<DexIterable<? extends Element>>();
+    private Map<com.sparsity.dex.gdb.Session, List<DexIterable<? extends Element>>> sessCollections =
+            new HashMap<com.sparsity.dex.gdb.Session, List<DexIterable<? extends Element>>>();
 
 
     /**
@@ -156,8 +183,15 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      *
      * @param col Collection to be registered.
      */
-    protected void register(final DexIterable<? extends Element> col) {
-        iterables.add(col);
+    protected synchronized void register(final DexIterable<? extends Element> col) {
+        com.sparsity.dex.gdb.Session sess = getRawSession();
+        List<DexIterable<? extends Element>> list = sessCollections.get(sess);
+        if (list == null) {
+            list = new ArrayList<DexIterable<? extends Element>>();
+            sessCollections.put(sess, list);
+        }
+        list.add(col);
+        //System.out.println("> register " + sess + ":" + col);
     }
 
     /**
@@ -165,8 +199,14 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      *
      * @param col Collection to be unregistered
      */
-    protected void unregister(final DexIterable<? extends Element> col) {
-        iterables.remove(col);
+    protected synchronized void unregister(final DexIterable<? extends Element> col) {
+        com.sparsity.dex.gdb.Session sess = getRawSession();
+        List<DexIterable<? extends Element>> list = sessCollections.get(sess);
+        if (list == null) {
+            throw new IllegalStateException("Session with no collections");
+        }
+        list.remove(col);
+        //System.out.println("< unregister " + sess + ":" + col);
     }
 
     /**
@@ -186,8 +226,8 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
          */
     public DexGraph(final String fileName, final String config) {
         try {
-            final File db = new File(fileName);
-            final File dbPath = db.getParentFile();
+            this.dbFile = new File(fileName);
+            final File dbPath = dbFile.getParentFile();
 
             if (!dbPath.exists()) {
                 if (!dbPath.mkdirs()) {
@@ -195,14 +235,11 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
                 }
             }
 
-            final boolean create = !db.exists();
+            final boolean create = !dbFile.exists();
 
-            this.db = db;
             if (config != null) com.sparsity.dex.gdb.DexProperties.load(config);
             dex = new com.sparsity.dex.gdb.Dex(new com.sparsity.dex.gdb.DexConfig());
-            gpool = (create ? dex.create(db.getPath(), db.getName()) : dex.open(db.getPath(), false));
-            session = gpool.newSession();
-            rawGraph = session.getGraph();
+            db = (create ? dex.create(dbFile.getPath(), dbFile.getName()) : dex.open(dbFile.getPath(), false));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -223,8 +260,11 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      */
     @Override
     public Vertex addVertex(final Object id) {
+        autoStartTransaction();
+        
         String label = this.label.get() == null ? DEFAULT_DEX_VERTEX_LABEL : this.label.get();
-        int type = this.getRawGraph().findType(label);
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        int type = rawGraph.findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newNodeType(label);
@@ -242,10 +282,13 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public Vertex getVertex(final Object id) {
+        autoStartTransaction();
+
         if (null == id)
             throw ExceptionFactory.vertexIdCanNotBeNull();
         try {
             final Long longId = Double.valueOf(id.toString()).longValue();
+            com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
             final int type = rawGraph.getObjectType(longId);
             if (type != com.sparsity.dex.gdb.Type.InvalidType)
                 return new DexVertex(this, longId);
@@ -268,8 +311,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public void removeVertex(final Vertex vertex) {
+        autoStartTransaction();
+
         assert vertex instanceof DexVertex;
-        rawGraph.drop((Long) vertex.getId());
+        getRawGraph().drop((Long) vertex.getId());
     }
 
     /*
@@ -279,6 +324,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public CloseableIterable<Vertex> getVertices() {
+        autoStartTransaction();
+
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
         List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer type : tlist) {
@@ -306,14 +354,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      */
     @Override
     public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
+        autoStartTransaction();
+
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
 
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
 
-            int type = this.getRawGraph().findType(value.toString());
+            int type = rawGraph.findType(value.toString());
             if (type != com.sparsity.dex.gdb.Type.InvalidType) {
-                com.sparsity.dex.gdb.Type tdata = this.getRawGraph().getType(type);
+                com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
                 if (tdata.getObjectType() == ObjectType.Node) {
-                    com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                    com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
                     return new DexIterable<Vertex>(this, objs, Vertex.class);
                 }
             }
@@ -323,14 +374,14 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         String label = this.label.get();
         if (label == null) { // all vertex types
 
-            com.sparsity.dex.gdb.TypeList tlist = this.getRawGraph().findNodeTypes();
+            com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
             List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
             for (Integer type : tlist) {
-                int attr = this.getRawGraph().findAttribute(type, key);
+                int attr = rawGraph.findAttribute(type, key);
                 if (com.sparsity.dex.gdb.Attribute.InvalidAttribute != attr) {
-                    com.sparsity.dex.gdb.Attribute adata = this.getRawGraph().getAttribute(attr);
+                    com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
                     if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                        com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                        com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
                         vertices.add(new PropertyFilteredIterable<Vertex>(key, value, new DexIterable<Vertex>(this, objs, Vertex.class)));
                     } else { // use the index
                         vertices.add(new DexIterable<Vertex>(this, this.rawGet(adata, value), Vertex.class));
@@ -345,24 +396,24 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
         } else { // restricted to a type
 
-            int type = this.getRawGraph().findType(label);
+            int type = rawGraph.findType(label);
             if (type == com.sparsity.dex.gdb.Type.InvalidType) {
                 throw new IllegalArgumentException("Unnexisting vertex label: " + label);
             }
-            com.sparsity.dex.gdb.Type tdata = this.getRawGraph().getType(type);
+            com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
             if (tdata.getObjectType() != com.sparsity.dex.gdb.ObjectType.Node) {
                 throw new IllegalArgumentException("Given label is not a vertex label: " + label);
             }
 
-            int attr = this.getRawGraph().findAttribute(type, key);
+            int attr = rawGraph.findAttribute(type, key);
             if (com.sparsity.dex.gdb.Attribute.InvalidAttribute == attr) {
                 throw new IllegalArgumentException("The given attribute '" + key
                         + "' does not exist for the given node label '" + label + "'");
             }
 
-            com.sparsity.dex.gdb.Attribute adata = this.getRawGraph().getAttribute(attr);
+            com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
             if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
                 return new PropertyFilteredIterable<Vertex>(key, value, new DexIterable<Vertex>(this, objs, Vertex.class));
             } else { // use the index
                 return new DexIterable<Vertex>(this, this.rawGet(adata, value), Vertex.class);
@@ -379,7 +430,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        int type = this.getRawGraph().findType(label);
+        autoStartTransaction();
+
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        int type = rawGraph.findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newEdgeType(label, true, true);
@@ -398,9 +452,12 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public Edge getEdge(final Object id) {
+        autoStartTransaction();
+
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
         try {
+            com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
             Long longId = Double.valueOf(id.toString()).longValue();
             int type = rawGraph.getObjectType(longId);
             if (type != com.sparsity.dex.gdb.Type.InvalidType)
@@ -425,8 +482,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public void removeEdge(final Edge edge) {
+        autoStartTransaction();
+
         assert edge instanceof DexEdge;
-        rawGraph.drop((Long) edge.getId());
+        getRawGraph().drop((Long) edge.getId());
     }
 
     /*
@@ -436,6 +495,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public CloseableIterable<Edge> getEdges() {
+        autoStartTransaction();
+
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
         com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
         List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer type : tlist) {
@@ -463,14 +525,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      */
     @Override
     public CloseableIterable<Edge> getEdges(final String key, final Object value) {
+        autoStartTransaction();
 
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
 
-            int type = this.getRawGraph().findType(value.toString());
+            int type = rawGraph.findType(value.toString());
             if (type != com.sparsity.dex.gdb.Type.InvalidType) {
-                com.sparsity.dex.gdb.Type tdata = this.getRawGraph().getType(type);
+                com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
                 if (tdata.getObjectType() == ObjectType.Edge) {
-                    com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                    com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
                     return new DexIterable<Edge>(this, objs, Edge.class);
                 }
             }
@@ -480,14 +545,14 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         String label = this.label.get();
         if (label == null) { // all vertex types
 
-            com.sparsity.dex.gdb.TypeList tlist = this.getRawGraph().findEdgeTypes();
+            com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
             List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
             for (Integer type : tlist) {
-                int attr = this.getRawGraph().findAttribute(type, key);
+                int attr = rawGraph.findAttribute(type, key);
                 if (com.sparsity.dex.gdb.Attribute.InvalidAttribute != attr) {
-                    com.sparsity.dex.gdb.Attribute adata = this.getRawGraph().getAttribute(attr);
+                    com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
                     if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                        com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                        com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
                         edges.add(new PropertyFilteredIterable<Edge>(key, value, new DexIterable<Edge>(this, objs, Edge.class)));
                     } else { // use the index
                         edges.add(new DexIterable<Edge>(this, this.rawGet(adata, value), Edge.class));
@@ -502,24 +567,24 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
         } else { // restricted to a type
 
-            int type = this.getRawGraph().findType(label);
+            int type = rawGraph.findType(label);
             if (type == com.sparsity.dex.gdb.Type.InvalidType) {
                 throw new IllegalArgumentException("Unnexisting edge label: " + label);
             }
-            com.sparsity.dex.gdb.Type tdata = this.getRawGraph().getType(type);
+            com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
             if (tdata.getObjectType() != com.sparsity.dex.gdb.ObjectType.Edge) {
                 throw new IllegalArgumentException("Given label is not a edge label: " + label);
             }
 
-            int attr = this.getRawGraph().findAttribute(type, key);
+            int attr = rawGraph.findAttribute(type, key);
             if (com.sparsity.dex.gdb.Attribute.InvalidAttribute == attr) {
                 throw new IllegalArgumentException("The given attribute '" + key
                         + "' does not exist for the given edge label '" + label + "'");
             }
 
-            com.sparsity.dex.gdb.Attribute adata = this.getRawGraph().getAttribute(attr);
+            com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
             if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                com.sparsity.dex.gdb.Objects objs = this.getRawGraph().select(type);
+                com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
                 return new PropertyFilteredIterable<Edge>(key, value, new DexIterable<Edge>(this, objs, Edge.class));
             } else { // use the index
                 return new DexIterable<Edge>(this, this.rawGet(adata, value), Edge.class);
@@ -530,10 +595,15 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     /**
      * Closes all non-closed iterables.
      */
-    protected void closeAllCollections() {
-        while (!iterables.isEmpty()) {
-            iterables.remove(iterables.size() - 1).close();
+    protected synchronized void closeAllSessionCollections() {
+        com.sparsity.dex.gdb.Session sess = getRawSession();
+        List<DexIterable<? extends Element>> list = sessCollections.get(sess);
+        if (list != null) {
+            while (list.size() > 0) {
+                list.get(0).close(); // closing also unregisters!
+            }
         }
+        sessCollections.remove(sess);
     }
 
     /*
@@ -543,17 +613,19 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public void shutdown() {
-        closeAllCollections();
-
-        rawGraph = null;
-        session.close();
-        gpool.close();
+        stopTransaction(Conclusion.SUCCESS);
+        
+        if (sessCollections.size() > 0) {
+            throw new IllegalStateException("Non closed transactions");
+        }
+        
+        db.close();
         dex.close();
     }
 
     @Override
     public String toString() {
-        return StringFactory.graphString(this, db.getPath());
+        return StringFactory.graphString(this, dbFile.getPath());
     }
 
     public Features getFeatures() {
@@ -614,24 +686,28 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     @Override
     public <T extends Element> void createKeyIndex(String key,
                                                    Class<T> elementClass) {
+        autoStartTransaction();
+
         String label = this.label.get();
         if (label == null) {
             throw new IllegalArgumentException("Label must be given");
         }
 
-        int type = this.getRawGraph().findType(label);
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        
+        int type = rawGraph.findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             // create the node/edge type
             if (Vertex.class.isAssignableFrom(elementClass)) {
-                type = this.getRawGraph().newNodeType(label);
+                type = rawGraph.newNodeType(label);
             } else if (Edge.class.isAssignableFrom(elementClass)) {
-                type = this.getRawGraph().newEdgeType(label, true, true);
+                type = rawGraph.newEdgeType(label, true, true);
             } else {
                 throw ExceptionFactory.classIsNotIndexable(elementClass);
             }
         } else {
             // validate the node/edge type
-            com.sparsity.dex.gdb.Type tdata = this.getRawGraph().getType(type);
+            com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
             if (tdata.getObjectType() == ObjectType.Node) {
                 if (!Vertex.class.isAssignableFrom(elementClass)) {
                     throw new IllegalArgumentException("Given element class '"
@@ -649,39 +725,42 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             }
         }
 
-        int attr = this.getRawGraph().findAttribute(type, key);
+        int attr = rawGraph.findAttribute(type, key);
         if (com.sparsity.dex.gdb.Attribute.InvalidAttribute == attr) {
             // create the attribute (indexed)
-            attr = this.getRawGraph().newAttribute(type, key,
+            attr = rawGraph.newAttribute(type, key,
                     com.sparsity.dex.gdb.DataType.String,
                     com.sparsity.dex.gdb.AttributeKind.Indexed);
         } else {
             // it already exists, let's indexe it if necessary
-            com.sparsity.dex.gdb.Attribute adata = this.getRawGraph().getAttribute(attr);
+            com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
             if (adata.getKind() == AttributeKind.Indexed || adata.getKind() == AttributeKind.Unique) {
                 throw ExceptionFactory.indexAlreadyExists(label + " " + key);
             }
-            this.getRawGraph().indexAttribute(attr,
+            rawGraph.indexAttribute(attr,
                     com.sparsity.dex.gdb.AttributeKind.Indexed);
         }
     }
 
     @Override
     public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        autoStartTransaction();
+
         com.sparsity.dex.gdb.TypeList tlist = null;
+        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
         if (Vertex.class.isAssignableFrom(elementClass)) {
-            tlist = this.getRawGraph().findNodeTypes();
+            tlist = rawGraph.findNodeTypes();
         } else if (Edge.class.isAssignableFrom(elementClass)) {
-            tlist = this.getRawGraph().findEdgeTypes();
+            tlist = rawGraph.findEdgeTypes();
         } else {
             throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
         boolean found = false;
         Set<String> ret = new HashSet<String>();
         for (Integer type : tlist) {
-            com.sparsity.dex.gdb.AttributeList alist = this.getRawGraph().findAttributes(type);
+            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(type);
             for (Integer attr : alist) {
-                com.sparsity.dex.gdb.Attribute adata = this.getRawGraph().getAttribute(attr);
+                com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
                 if (adata.getKind() == AttributeKind.Indexed || adata.getKind() == AttributeKind.Unique) {
                     ret.add(adata.getName());
                 }
@@ -693,5 +772,39 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         tlist = null;
         return ret;
     }
+    
+    void autoStartTransaction() {
+        com.sparsity.dex.gdb.Session sess = getRawSession(false);
+        
+        if (sess == null) {
+            sess = db.newSession();
+            session.set(sess);
+            //System.out.println("> th=" + Thread.currentThread().getId() + " starts tx with sess=" + sess);
+        } else {
+            assert !sess.isClosed();
+        }
+    }
+    
+    @Override
+    public void stopTransaction(Conclusion conclusion) {
+        com.sparsity.dex.gdb.Session sess = getRawSession(false);
+        if (sess == null) {
+            // already closed session
+            return;
+        }
 
+        if (Conclusion.FAILURE == conclusion) {
+            throw new UnsupportedOperationException("FAILURE conclusion is not supported");
+        }
+        //
+        // Close Session
+        //
+        closeAllSessionCollections();
+        if (sess != null && !sess.isClosed()) {
+            sess.close();
+        }
+        session.set(null);
+        
+        //System.out.println("< th=" + Thread.currentThread().getId() + " ends tx with sess=" + sess);
+    }
 }
