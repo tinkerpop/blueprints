@@ -36,8 +36,6 @@ import java.util.LinkedList;
 public class GraphSailConnection extends NotifyingSailConnectionBase implements InferencerConnection {
     private static final Resource[] NULL_CONTEXT_ARRAY = {null};
 
-    private static final String DEFAULT_NAMESPACE_PREFIX_KEY = "default.namespace";
-
     private final GraphSail.DataStore store;
 
     private final Collection<WriteAction> writeBuffer = new LinkedList<WriteAction>();
@@ -718,11 +716,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     // value conversion ////////////////////////////////////////////////////////
 
     private String toNativePrefixKey(final String prefix) {
-        return 0 == prefix.length() ? DEFAULT_NAMESPACE_PREFIX_KEY : prefix;
+        return 0 == prefix.length() ? GraphSail.DEFAULT_NAMESPACE_PREFIX_KEY : prefix;
     }
 
     private String fromNativePrefixKey(final String prefix) {
-        return prefix.equals(DEFAULT_NAMESPACE_PREFIX_KEY) ? "" : prefix;
+        return prefix.equals(GraphSail.DEFAULT_NAMESPACE_PREFIX_KEY) ? "" : prefix;
     }
 
     private Value toSesame(final Vertex v) {

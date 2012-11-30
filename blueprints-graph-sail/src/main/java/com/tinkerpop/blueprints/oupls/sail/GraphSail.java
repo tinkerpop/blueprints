@@ -80,7 +80,9 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
             URI = "uri",
             VALUE = "value";
 
-    public static final String NULL_CONTEXT_NATIVE = "" + GraphSail.NULL_CONTEXT_PREFIX;
+    public static final String DEFAULT_NAMESPACE_PREFIX_KEY = "default-namespace";
+
+    public static final String NULL_CONTEXT_NATIVE = "" + NULL_CONTEXT_PREFIX;
 
     private static final String[][] ALTERNATIVES = {{"s", ""}, {"p", ""}, {"o", ""}, {"c", ""}, {"sp", "s", "p"}, {"so", "s", "o"}, {"sc", "s", "c"}, {"po", "o", "p"}, {"pc", "p", "c"}, {"oc", "o", "c"}, {"spo", "so", "sp", "po"}, {"spc", "sc", "sp", "pc"}, {"soc", "so", "sc", "oc"}, {"poc", "po", "oc", "pc"}, {"spoc", "spo", "soc", "spc", "poc"},};
 

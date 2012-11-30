@@ -539,6 +539,7 @@ public abstract class SailTest {
             assertEquals(3L, sc.size());
             sc.clear();
             assertEquals(0L, sc.size());
+            sc.commit();
         } finally {
             sc.close();
         }
@@ -581,6 +582,7 @@ public abstract class SailTest {
             assertEquals(4L, sc.size(uriA, uriB, null));
             assertEquals(4L, sc.size(uriA, uriB, uriC, null));
             assertEquals(3L, sc.size(uriA, uriB));
+            sc.commit();
         } finally {
             sc.close();
         }
@@ -604,6 +606,7 @@ public abstract class SailTest {
                 sc.addStatement(uriA, uriB, uriC, uriC);
                 assertEquals(2, countStatements(sc, uriA, uriB, uriC, false));
                 assertEquals(1, countStatements(sc, uriA, uriB, uriC, false, uriC));
+                sc.commit();
             } finally {
                 sc.close();
             }
@@ -806,6 +809,7 @@ public abstract class SailTest {
                 // FIXME: not supporting blank nodes ATM
                 assertTrue(se.getCause() instanceof UnsupportedOperationException);
             }
+            sc.commit();
         } finally {
             sc.close();
         }
