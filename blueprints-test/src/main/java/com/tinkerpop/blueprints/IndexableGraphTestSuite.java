@@ -67,6 +67,7 @@ public class IndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getIndices()), 0);
             printPerformance(graph.toString(), 10, "indices created and then dropped", this.stopWatch());
 
+            this.stopWatch();
             Index<Vertex> index1 = graph.createIndex("index1", Vertex.class);
             Index<Vertex> index2 = graph.createIndex("index2", Vertex.class);
             printPerformance(graph.toString(), 2, "indices created", this.stopWatch());
