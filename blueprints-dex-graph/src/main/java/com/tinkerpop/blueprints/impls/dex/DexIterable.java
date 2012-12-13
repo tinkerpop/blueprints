@@ -50,15 +50,20 @@ class DexIterable<T extends Element> implements CloseableIterable<T> {
      * Close the collection closes iterators too.
      */
     public void close() {
+        close(true);
+    }
+    
+    void close(boolean unregister) {
         for (final DexIterator itty : iterators) {
             itty.close();
         }
         iterable.close();
-        graph.unregister(this);
+        if (unregister) {
+            graph.unregister(this);
+        }
         iterable = null;
         graph = null;
     }
-
 
     private class DexIterator implements Iterator<T> {
         private com.sparsity.dex.gdb.ObjectsIterator itty = iterable.iterator();
