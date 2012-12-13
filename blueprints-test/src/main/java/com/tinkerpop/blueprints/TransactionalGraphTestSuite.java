@@ -468,27 +468,27 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testCompetingThreadsOnMultipleDbInstances() throws Exception {
+        // the idea behind this test is to simulate a rexster environment where two graphs of the same type
+        // are being mutated by multiple threads.  the test itself surfaced issues with OrientDB in such
+        // an environment and remains relevant for any graph that might be exposed through rexster.
+
         final TransactionalGraph graph1 = (TransactionalGraph) graphTest.generateGraph("first");
         final TransactionalGraph graph2 = (TransactionalGraph) graphTest.generateGraph("second");
 
         if (!graph1.getFeatures().isRDFModel) {
 
-            final CountDownLatch firstBlocker = new CountDownLatch(1);
-
-            new Thread() {
+            final Thread threadModFirstGraph = new Thread() {
                 public void run() {
                     final Vertex v = graph1.addVertex(null);
                     v.setProperty("name", "stephen");
                     graph1.stopTransaction(Conclusion.SUCCESS);
-                    firstBlocker.countDown();
                 }
-            }.run();
+            };
 
-            firstBlocker.await();
+            threadModFirstGraph.run();
+            threadModFirstGraph.join();
 
-            final CountDownLatch secondBlocker = new CountDownLatch(1);
-
-            new Thread() {
+            final Thread threadReadBothGraphs = new Thread() {
                 public void run() {
                     int counter = 0;
                     for (Vertex v : graph1.getVertices()) {
@@ -503,12 +503,11 @@ public class TransactionalGraphTestSuite extends TestSuite {
                     }
 
                     Assert.assertEquals(0, counter);
-
-                    secondBlocker.countDown();
                 }
-            }.run();
+            };
 
-            secondBlocker.await();
+            threadReadBothGraphs.run();
+            threadReadBothGraphs.join();
         }
 
         graph1.shutdown();
