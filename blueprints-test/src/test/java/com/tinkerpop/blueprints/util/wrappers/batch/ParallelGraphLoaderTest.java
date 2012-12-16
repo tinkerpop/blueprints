@@ -1,14 +1,11 @@
 package com.tinkerpop.blueprints.util.wrappers.batch;
 
+import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.MockTransactionalGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-import com.tinkerpop.blueprints.util.generators.DistributionGenerator;
-import com.tinkerpop.blueprints.util.generators.EdgeAnnotator;
-import com.tinkerpop.blueprints.util.generators.PowerLawDistribution;
-import com.tinkerpop.blueprints.util.generators.SizableIterable;
 import com.tinkerpop.blueprints.util.io.triple.DelimitedTripleWriter;
 import com.tinkerpop.blueprints.util.wrappers.batch.loader.ParallelGraphLoader;
 import com.tinkerpop.blueprints.util.wrappers.batch.loader.io.DelimitedTripleLoader;
@@ -26,29 +23,30 @@ import java.util.Random;
 
 public class ParallelGraphLoaderTest extends TestCase {
     
-    private static final String filename = "./target/testfile.tmp";
+    private static final String filename = "target"+File.separator+"testfile.tmp";
     
     public void testIntegration() throws IOException {
-        int numNodes = 1000;
+        int numVertices = 1000, outdegree = 10;
         final Random random = new Random();
         TinkerGraph g = new TinkerGraph();
-        for (int i=0;i<numNodes;i++) {
-            Vertex v = g.addVertex("v"+(i+1));
-            v.setProperty("name","Vertex"+(i+1));
+        for (int i=0;i<numVertices;i++) {
+            Vertex v = g.addVertex(i);
+            v.setProperty("name","Vertex"+i);
         }
-
         
-        DistributionGenerator generator = new DistributionGenerator("knows", new EdgeAnnotator() {
-            @Override
-            public void annotate(Edge edge) {
-                edge.setProperty("time",random.nextInt(10000)+1);
+        for (int i=0;i<numVertices;i++) {
+            Vertex v = g.getVertex(i);
+            for (int d=0;d<outdegree;d++) {
+                int other = i;
+                while (other==i) other=random.nextInt(numVertices);
+                Edge e = g.addEdge(null,v,g.getVertex(other),"knows");
+                e.setProperty("time",random.nextInt(10000)+1);
             }
-        });
-        generator.setOutDistribution(new PowerLawDistribution(2.1));
-        int numEdges = generator.generate(g,numNodes*10);
+        }
+        int numEdges = outdegree*numVertices;
         
-        assertEquals(numNodes, SizableIterable.sizeOf(g.getVertices()));
-        assertEquals(numEdges, SizableIterable.sizeOf(g.getEdges()));
+        assertEquals(numVertices, BaseTest.count(g.getVertices()));
+        assertEquals(numEdges, BaseTest.count(g.getEdges()));
 
         try {
             FileOutputStream out = new FileOutputStream(filename);
@@ -56,7 +54,7 @@ public class ParallelGraphLoaderTest extends TestCase {
             out.close();
             
             DelimitedTripleLoader triples = new DelimitedTripleLoader(filename);
-            assertEquals(numNodes+numEdges,SizableIterable.sizeOf(triples));
+            assertEquals(numVertices+numEdges,BaseTest.count(triples));
 
             TransactionalGraph graph = new MockTransactionalGraph(new TinkerTransactionalGraph());
             ParallelGraphLoader loader = new ParallelGraphLoader(graph,VertexIDType.STRING);
@@ -64,8 +62,8 @@ public class ParallelGraphLoaderTest extends TestCase {
             loader.setVertexIdKey("uid");
             loader.load(triples);
 
-            assertEquals(numNodes, SizableIterable.sizeOf(graph.getVertices()));
-            assertEquals(numEdges, SizableIterable.sizeOf(graph.getEdges()));
+            assertEquals(numVertices, BaseTest.count(graph.getVertices()));
+            assertEquals(numEdges, BaseTest.count(graph.getEdges()));
 
             
         } finally {
