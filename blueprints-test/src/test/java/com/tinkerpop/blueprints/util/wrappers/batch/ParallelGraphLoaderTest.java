@@ -23,6 +23,7 @@ import java.util.Random;
 
 public class ParallelGraphLoaderTest extends TestCase {
     
+
     private static final String filename = "target"+File.separator+"testfile.tmp";
     
     public void testIntegration() throws IOException {
@@ -48,6 +49,7 @@ public class ParallelGraphLoaderTest extends TestCase {
         assertEquals(numVertices, BaseTest.count(g.getVertices()));
         assertEquals(numEdges, BaseTest.count(g.getEdges()));
 
+
         try {
             FileOutputStream out = new FileOutputStream(filename);
             DelimitedTripleWriter.outputGraph(g,out);
@@ -64,6 +66,7 @@ public class ParallelGraphLoaderTest extends TestCase {
 
             assertEquals(numVertices, BaseTest.count(graph.getVertices()));
             assertEquals(numEdges, BaseTest.count(graph.getEdges()));
+
 
             
         } finally {
