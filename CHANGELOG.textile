@@ -15,18 +15,19 @@ h3. Version 2.2.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Renamed GraphSail property default.namespace to default-namespace for compatibility with OrientDB
+* Renamed @GraphSail@ property default.namespace to default-namespace for compatibility with OrientDB
 * Removed the @SailGraph@ constraint preventing traversal from literal vertices to non-literal resource vertices
 * Refactoring of @GraphSONUtility@ and related reader/writer classes to improve performance and offer more control over how GraphSON is read and written
 * Added support for @Compare.opposite()@ to get the inverse of a comparator
 * Added support for property inclusion and exclusion in the GraphMLReader/Writer
-* GMLWriter ignores any property keys that are not allowable by GML standards when the "strict" flag on the writer is set to @true@
+* @GMLWriter@ ignores any property keys that are not allowable by GML standards when the "strict" flag on the writer is set to @true@
 * OrientDB graph implementation supports passing @class@ as an argument to the @addVertex@ method.
-* Removed a class type check in @KeyIndexableGraphTestSuite@ that unnecessarily assumes an implementation specific
+* Removed a class type check in @KeyIndexableGraphTestSuite@ that unnecessarily assumes a specific implementation
 * Fixed a state bug in @WrapperQuery@
 * @GraphJung@ implements JUNG's @DirectedGraph@ interface and did various small optimizations to implementation
 * Bumped to support Dex 4.7.0
-* Bumped to support Neo4j 1.9.M01
+* Bumped to support Neo4j 1.9.M02
+* Bumped to support OrientDB 1.3.0
 * @ExceptionFactory@ support for @_@ metadata properties
 * Added more constructors to @Neo4jHaGraph@
 * @ReadOnlyGraph@ supports the non-mutating methods of @KeyIndexableGraph@.
