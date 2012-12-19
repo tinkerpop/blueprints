@@ -9,7 +9,7 @@ Below is a list of desired implementations. This list is not intended to be exha
 * "InfoGrid":http://infogrid.org/
 * "vertexdb":http://www.dekorte.com/projects/opensource/vertexdb/
 * "Redis":http://code.google.com/p/redis/ - see "Blueredis":https://github.com/dmitriid/blueredis
-* "AvocadoDB":http://www.avocadodb.org/
+* "ArangoDB":http://www.arangodb.org
 * "Lucene":http://lucene.apache.org/core/ - see "Lumeo":https://github.com/karussell/lumeo
 * "Azure Table Storage":http://www.windowsazure.com/en-us/home/features/storage/
 * Sail-based RDF Stores (very easy to do as only a @Sail@ constructor is needed)

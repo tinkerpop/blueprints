@@ -61,3 +61,8 @@ A more fine grained option is to have Orient force reload vertices when appropri
 ```java
 ((ODocument)((OrientVertex)vertex).getRawElement()).reload();
 ```
+
+h2. Custom Types
+
+OrientDB supports custom types for vertices and edges in an Object Oriented manner. Even if this isn't supported directly by Blueprints there are some tricks to use them. For more information look at "Custom types":http://code.google.com/p/orient/wiki/GraphDatabaseTinkerpop#Custom_types.
+

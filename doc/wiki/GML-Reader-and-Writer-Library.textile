@@ -122,3 +122,5 @@ reader.setEdgeId("propertyToUseAsEdgeId");
 reader.setEdgeLabel("propertyToUseAsEdgeLabel");
 ```
 If set manually the reader assumes that the ids are unique. There are a number of static method overloads that offer more options and control.
+
+Note that the @GMLWriter@ has a @strict@ option that will enforce the GML specification for property keys, such that keys names not meeting the specification are ignored.  By default, this value is set to @false@.  This value can be changed using the @setStrict@ method on a @GMLWriter@ instance.

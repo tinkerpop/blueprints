@@ -20,7 +20,6 @@ The following events are raised:
 * Edge property removed
 * Vertex removed
 * Edge removed
-* Graph cleared
 
 To start processing events from a @Graph@ first implement the @GraphChangedListener@ interface.  An example of this implementation is the @ConsoleGraphChangedListener@ which writes output to the console for each event.
 

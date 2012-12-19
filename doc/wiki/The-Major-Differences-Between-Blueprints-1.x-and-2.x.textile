@@ -21,6 +21,15 @@ graph.createKeyIndex("name", Vertex.class);
 Now, when @graph.getVertices("name", "stephen")@ is evaluated, the @name@ index is used. If no such key index was created, then a linear scan of all the vertices in the graph would occur. Thus, be sure to add the appropriate indices to make an @n@-lookup a @log(n)@-lookup.
 
 For "manual indexing," there is still the notion of @IndexableGraph@ and the @Index@ class. This is used by graph engines like @Neo4jGraph@, @OrientGraph@, and @TinkerGraph@.
+
+Since automatic indices in Blueprints 1.x are now just normal indices in Blueprints 2.x, it is relatively easy to convert them as follows: 
+
+```java
+graph.dropIndex("blueprints-1-auto-index-name") 
+graph.createKeyIndex(....) 
+```
+
+When @graph.createKeyIndex()@ is executed, it will automatically re-index the graph.  The amount of time taken to complete this re-indexing is dependent upon the size of the graph and what is being indexed.  As an added step for safety, be sure to back up the Neo4j directory prior to re-indexing. 
  
 h2. Vertex/Edge API and the Direction Enum
 

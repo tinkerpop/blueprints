@@ -9,7 +9,7 @@
 ```
 
 
-"Sail":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/Sail.html is an "RDF":http://www.w3.org/RDF/ triple/quad store interface developed by "OpenRDF":http://openrdf.org. Any database the implements the Sail interfaces properly is a valid RDF triple/quad store. A graph database is a great way to build a triple/quad store because its possible to mix indexing and graph traversals to solve the RDF "pattern match" problem. To go from @Graph@ to @Sail@, simply use @GraphSail@. @GraphSail@ requires an @IndexableGraph@ (e.g. @TinkerGraph@, @Neo4jGraph@, @OrientGraph@). The examples below use [[TinkerGraph]] and expose it as a @GraphSail@ and thus, a @Sail@. While some basic examples are provided, please refer to the "OpenRDF":http://openrdf.org Sail documentation for a complete review of the framework.
+"Sail":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/Sail.html is an "RDF":http://www.w3.org/RDF/ triple/quad store interface developed by "OpenRDF":http://openrdf.org. Any database the implements the Sail interfaces properly is a valid RDF triple/quad store. A graph database is a great way to build a triple/quad store because its possible to mix indexing and graph traversals to solve the RDF "pattern match" problem. To go from @Graph@ to @Sail@, simply use @GraphSail@. @GraphSail@ requires an @IndexableGraph@ (e.g. @TinkerGraph@, @Neo4jGraph@, @OrientGraph@). @DexGraph@ is not supported at this time (see [[#279|https://github.com/tinkerpop/blueprints/issues/279]]). The examples below use [[TinkerGraph]] and expose it as a @GraphSail@ and thus, a @Sail@. While some basic examples are provided, please refer to the "OpenRDF":http://openrdf.org Sail documentation for a complete review of the framework.
 
 *NOTE ON TRANSACTION SAFETY:* as of Blueprints 2.0, there are issues in the @Neo4jGraph@ and @OrientGraph@ implementations which affect the transaction safety of GraphSail (see "here":https://github.com/tinkerpop/blueprints/issues/236, and "here":https://github.com/tinkerpop/blueprints/issues/268), among other applications.  There is a workaround for the Neo4jGraph issue (see below), while the OrientGraph issue has yet to be resolved.  In the meantime, please "contact us":mailto:josh@fortytwo.net if you encounter any problems, and we will do our best to come up with a targeted solution.
 
@@ -90,7 +90,7 @@ h2. Moving Between Sail and Graph
 Its possible to get the @Graph@ that is being modeled as a @Sail@ and work from the Blueprints API perspective. In this way, its possible to leverage the tools provided for both @Sail@ and Blueprints @Graph@.
 
 ```java
-Graph graph = ((GraphSail) sail).getGraph();
+Graph graph = ((GraphSail) sail).getBaseGraph();
 System.out.println();
 for (Vertex v : graph.getVertices()) {
     System.out.println("------");
@@ -100,10 +100,11 @@ for (Vertex v : graph.getVertices()) {
     }
 }
 for (Edge e : graph.getEdges()) {
-System.out.println("------");
-System.out.println(e);
-for (String key : e.getPropertyKeys()) {
-    System.out.println(key + "=" + e.getProperty(key));
+    System.out.println("------");
+    System.out.println(e);
+    for (String key : e.getPropertyKeys()) {
+        System.out.println(key + "=" + e.getProperty(key));
+    }
 }
 ```
 

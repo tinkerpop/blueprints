@@ -15,6 +15,7 @@ The following example shows the format without explicit data types:
 ```javascript
 {
     "graph": {
+        "mode":"NORMAL",
         "vertices": [
             {
                 "name": "lop",
@@ -111,7 +112,7 @@ The following example shows the format with explicit data types:
 
 ```javascript
 {
-    "embeddedTypes":true,
+    "mode":"EXTENDED",
     "vertices": [
         {
             "name": {
@@ -257,7 +258,9 @@ The following example shows the format with explicit data types:
 }
 ```
 
-There are a few differences between the formats.  If types are embedded, the JSON must start with an @embeddedTypes@ key with a value of @true@.  This key acts as a hint to the reader that it must extract property values in a different manner.  If the key is omitted, that setting is assumed to be false.
+There are a few differences between the formats.  If types are embedded, the JSON must start with a @mode@ key with a value of @EMBEDDED@.  This key acts as a hint to the reader that it must extract property values in a different manner.  If the key is omitted, that setting is assumed to be @NORMAL@.  
+
+There is a third option for the @mode@, which is @COMPACT@.  This mode allows more complete control over exactly what element properties get serialized to the GraphSON output.  As there is complete control, there is a possibility that the GraphSON will not be viable for reading (ie. if an important property is not serialized out, like the vertex @_id@).  
 
 All values of keys, short of the values for reserved keys that start with an underscore, must contain an object that has two keys: @type@ and @value@.  The @type@ must be one of the following: @boolean@, @string@, @integer@, @long@, @float@, @double@, @list@, or @map@.
 
@@ -304,7 +307,8 @@ Vertex v = graph.getVertex(1);
 JSONObject json = GraphSONUtility.jsonFromElement(v);
 System.out.println(json.toString())
 
-Vertex convertedBack = GraphSONUtility.vertexFromJson(json, new GraphElementFactory(graph), false, null);
+Vertex convertedBack = GraphSONUtility.vertexFromJson(json, 
+    new GraphElementFactory(graph), GraphSONMode.NORMAL, null);
 ```
 
 The @GraphElementFactory@ is an implementation of the @ElementFactory@ class, that utilizes a @Graph@ instance to construct @Vertex@ and @Edge@ instances.  In most cases, the @GraphElementFactory@ is all that is needed to use the @GraphSONUtility@, though in cases where vertices or edges need to be constructed outside of the context of a @Graph@ implementation, it might be necessary to implement a custom implementation.

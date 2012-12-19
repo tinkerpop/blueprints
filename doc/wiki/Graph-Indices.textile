@@ -1,6 +1,6 @@
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/indices-example.png!
 
-And index is a data structure that supports the fast lookup of elements by some key/value pair. Lookups are usually in @log(n)@ time where @n@ is the number of elements in the index. There are two types of indexing structures supported by Blueprints. These are reflected in the two respective interfaces: @KeyIndexableGraph@ and @IndexableGraph@. 
+An index is a data structure that supports the fast lookup of elements by some key/value pair. Lookups are usually in @log(n)@ time where @n@ is the number of elements in the index. There are two types of indexing structures supported by Blueprints. These are reflected in the two respective interfaces: @KeyIndexableGraph@ and @IndexableGraph@. 
 
 h2. KeyIndexableGraph and Fast LookUp of Elements by Key/Value Pairs
 
