@@ -204,8 +204,9 @@ public final class GraphSONUtility {
         final boolean isEdge = element instanceof Edge;
         final boolean showTypes = mode == GraphSONMode.EXTENDED;
         final Set<String> propertyKeys = isEdge ? this.edgePropertyKeys : this.vertexPropertyKeys;
+        final ElementPropertiesRule elementPropertyConfig = isEdge ? this.edgePropertiesRule : this.vertexPropertiesRule;
 
-        final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys), propertyKeys, showTypes);
+        final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys, elementPropertyConfig), propertyKeys, showTypes);
 
         if ((isEdge && this.includeReservedEdgeId) || (!isEdge && this.includeReservedVertexId)) {
             putObject(jsonElement, GraphSONTokens._ID, element.getId());
@@ -592,7 +593,7 @@ public final class GraphSONUtility {
         }
     }
 
-    private static Map createPropertyMap(final Element element, final Set<String> propertyKeys) {
+    private static Map createPropertyMap(final Element element, final Set<String> propertyKeys, final ElementPropertiesRule rule) {
         final Map map = new HashMap<String, Object>();
 
         if (propertyKeys == null) {
@@ -600,10 +601,18 @@ public final class GraphSONUtility {
                 map.put(key, element.getProperty(key));
             }
         } else {
-            for (String key : propertyKeys) {
-                Object valToPutInMap = element.getProperty(key);
-                if (valToPutInMap != null) {
-                    map.put(key, valToPutInMap);
+            if (rule == ElementPropertiesRule.INCLUDE) {
+                for (String key : propertyKeys) {
+                    Object valToPutInMap = element.getProperty(key);
+                    if (valToPutInMap != null) {
+                        map.put(key, valToPutInMap);
+                    }
+                }
+            } else {
+                for (String key : element.getPropertyKeys()) {
+                    if (!propertyKeys.contains(key)) {
+                        map.put(key, element.getProperty(key));
+                    }
                 }
             }
         }

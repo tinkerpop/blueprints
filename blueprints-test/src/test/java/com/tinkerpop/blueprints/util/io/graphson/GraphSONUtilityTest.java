@@ -51,6 +51,7 @@ public class GraphSONUtilityTest {
         Vertex v2 = this.graph.addVertex(2);
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
+        e.setProperty("weight", 0.5f);
 
         JSONObject json = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL);
 
@@ -65,6 +66,8 @@ public class GraphSONUtilityTest {
         Assert.assertEquals(2, json.optInt(GraphSONTokens._IN_V));
         Assert.assertTrue(json.has(GraphSONTokens._OUT_V));
         Assert.assertEquals(1, json.optInt(GraphSONTokens._OUT_V));
+        Assert.assertTrue(json.has("weight"));
+        Assert.assertEquals(0.5d, json.optDouble("weight"), 0.0d);
     }
 
     @Test
@@ -73,6 +76,7 @@ public class GraphSONUtilityTest {
         Vertex v2 = this.graph.addVertex(2);
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
+        e.setProperty("weight", 0.5f);
 
         Set<String> propertiesToInclude = new HashSet<String>() {{
             add(GraphSONTokens._ID);
@@ -96,6 +100,8 @@ public class GraphSONUtilityTest {
         Vertex v2 = this.graph.addVertex(2);
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
+        e.setProperty("weight", 0.5f);
+        e.setProperty("x", "y");
 
         Set<String> propertiesToExclude = new HashSet<String>() {{
             add(GraphSONTokens._TYPE);
@@ -118,6 +124,8 @@ public class GraphSONUtilityTest {
         Assert.assertFalse(json.has(GraphSONTokens._OUT_V));
         Assert.assertTrue(json.has(GraphSONTokens._ID));
         Assert.assertFalse(json.has("weight"));
+        Assert.assertTrue(json.has("x"));
+        Assert.assertEquals("y", json.optString("x"));
     }
 
     @Test
@@ -126,6 +134,7 @@ public class GraphSONUtilityTest {
         Vertex v2 = this.graph.addVertex(2);
 
         Edge e = this.graph.addEdge(3, v1, v2, "test");
+        e.setProperty("weight", 0.5f);
 
         JSONObject json = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.COMPACT);
 
@@ -135,12 +144,14 @@ public class GraphSONUtilityTest {
         Assert.assertTrue(json.has(GraphSONTokens._LABEL));
         Assert.assertTrue(json.has(GraphSONTokens._IN_V));
         Assert.assertTrue(json.has(GraphSONTokens._OUT_V));
+        Assert.assertEquals(0.5d, json.optDouble("weight"), 0.0d);
     }
 
 
     @Test
     public void jsonFromElementVertexNoPropertiesNoKeysNoTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
+        v.setProperty("name", "marko");
 
         JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
 
@@ -149,11 +160,13 @@ public class GraphSONUtilityTest {
         Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
         Assert.assertTrue(json.has(GraphSONTokens._TYPE));
         Assert.assertEquals("vertex", json.optString(GraphSONTokens._TYPE));
+        Assert.assertEquals("marko", json.optString("name"));
     }
 
     @Test
     public void jsonFromElementVertexCompactIdOnlyAsInclude() throws JSONException {
         Vertex v = this.graph.addVertex(1);
+        v.setProperty("name", "marko");
 
         Set<String> propertiesToInclude = new HashSet<String>() {{
             add(GraphSONTokens._ID);
@@ -164,12 +177,14 @@ public class GraphSONUtilityTest {
         Assert.assertNotNull(json);
         Assert.assertFalse(json.has(GraphSONTokens._TYPE));
         Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertFalse(json.has("name"));
     }
 
     @Test
-    public void jsonFromElementVertexCompactIdOnlyAsExclude() throws JSONException {
+    public void jsonFromElementVertexCompactIdNameOnlyAsExclude() throws JSONException {
         GraphElementFactory factory = new GraphElementFactory(this.graph);
         Vertex v = this.graph.addVertex(1);
+        v.setProperty("name", "marko");
 
         Set<String> propertiesToExclude = new HashSet<String>() {{
             add(GraphSONTokens._TYPE);
@@ -185,17 +200,20 @@ public class GraphSONUtilityTest {
         Assert.assertNotNull(json);
         Assert.assertFalse(json.has(GraphSONTokens._TYPE));
         Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertTrue(json.has("name"));
     }
 
     @Test
     public void jsonFromElementVertexCompactAllOnly() throws JSONException {
         Vertex v = this.graph.addVertex(1);
+        v.setProperty("name", "marko");
 
         JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.COMPACT);
 
         Assert.assertNotNull(json);
         Assert.assertTrue(json.has(GraphSONTokens._TYPE));
         Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertTrue(json.has("name"));
     }
 
     @Test
