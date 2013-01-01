@@ -10,6 +10,14 @@ public class TinkerTransactionalGraph extends TinkerGraph implements Transaction
     public void stopTransaction(Conclusion conclusion) {
     }
 
+    public void rollback() {
+
+    }
+
+    public void commit() {
+
+    }
+
     public static TinkerTransactionalGraph createTinkerGraph() {
 
         TinkerTransactionalGraph graph = new TinkerTransactionalGraph();

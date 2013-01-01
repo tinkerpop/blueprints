@@ -1,14 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.id;
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 
@@ -229,6 +221,18 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     public void stopTransaction(Conclusion conclusion) {
         if (baseGraph instanceof TransactionalGraph) {
             ((TransactionalGraph) baseGraph).stopTransaction(conclusion);
+        }
+    }
+
+    public void rollback() {
+        if (baseGraph instanceof TransactionalGraph) {
+            ((TransactionalGraph) baseGraph).rollback();
+        }
+    }
+
+    public void commit() {
+        if (baseGraph instanceof TransactionalGraph) {
+            ((TransactionalGraph) baseGraph).commit();
         }
     }
 

@@ -498,7 +498,7 @@ public class EdgeTestSuite extends TestSuite {
             assertEquals(edge.getPropertyKeys().size(), 0);
             assertNull(edge.getProperty("weight"));
 
-            if (graph.getFeatures().supportsDoubleProperty){
+            if (graph.getFeatures().supportsDoubleProperty) {
                 edge.setProperty("weight", 0.5);
                 assertEquals(edge.getPropertyKeys().size(), 1);
                 assertEquals(edge.getProperty("weight"), 0.5);

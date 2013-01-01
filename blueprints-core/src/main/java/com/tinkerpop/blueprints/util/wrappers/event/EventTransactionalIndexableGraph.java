@@ -44,4 +44,12 @@ public class EventTransactionalIndexableGraph<T extends IndexableGraph & Transac
             }
         }
     }
+
+    public void commit() {
+        // TODO: Stephen, please implement these according to your specified semantics.
+    }
+
+    public void rollback() {
+        // TODO: Stephen, please implement these according to your specified semantics.
+    }
 }

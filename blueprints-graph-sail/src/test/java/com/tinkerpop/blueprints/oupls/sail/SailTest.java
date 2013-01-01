@@ -4,14 +4,7 @@ import info.aduna.iteration.CloseableIteration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openrdf.model.BNode;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Namespace;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.model.ValueFactory;
+import org.openrdf.model.*;
 import org.openrdf.model.datatypes.XMLDatatypeUtil;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
@@ -21,35 +14,16 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandler;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.Rio;
-import org.openrdf.sail.NotifyingSail;
-import org.openrdf.sail.NotifyingSailConnection;
-import org.openrdf.sail.Sail;
-import org.openrdf.sail.SailChangedEvent;
-import org.openrdf.sail.SailChangedListener;
-import org.openrdf.sail.SailConnection;
-import org.openrdf.sail.SailConnectionListener;
-import org.openrdf.sail.SailException;
+import org.openrdf.rio.*;
+import org.openrdf.sail.*;
 import org.openrdf.sail.inferencer.InferencerConnection;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)

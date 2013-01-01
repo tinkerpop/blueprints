@@ -7,12 +7,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

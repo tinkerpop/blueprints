@@ -61,11 +61,11 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
     }
 
     public OrientGraph(final String url) {
-      super(url, ADMIN, ADMIN);
+        super(url, ADMIN, ADMIN);
     }
 
     public OrientGraph(final String url, final String username, final String password) {
-       super(url, username, password);
+        super(url, username, password);
     }
 
     @Override
@@ -74,6 +74,14 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
             this.getRawGraph().rollback();
         } else
             this.getRawGraph().commit();
+    }
+
+    public void commit() {
+        this.getRawGraph().commit();
+    }
+
+    public void rollback() {
+        this.getRawGraph().rollback();
     }
 
     @Override

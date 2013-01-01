@@ -28,17 +28,22 @@ public interface TransactionalGraph extends Graph {
      * Stop the current transaction.
      * Specify whether the transaction was successful or not.
      * A failing transaction will rollback all updates to before the transaction was started.
-     *
+     * <p/>
      * If there is currently no open transaction (i.e. no operations on the graph), then calling this method
      * has no effect other than potentially re-initializing data structures.
      *
      * @param conclusion whether or not the current transaction was successful
      */
+    @Deprecated
     public void stopTransaction(Conclusion conclusion);
 
     /**
      * When the graph is shutdown, any open transactions should be successfully committed.
      */
     public void shutdown();
+
+    public void commit();
+
+    public void rollback();
 
 }

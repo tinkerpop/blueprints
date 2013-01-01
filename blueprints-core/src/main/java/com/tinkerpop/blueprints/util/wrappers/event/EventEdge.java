@@ -16,7 +16,7 @@ import java.util.List;
 public class EventEdge extends EventElement implements Edge {
 
     protected EventEdge(final Edge rawEdge, final List<GraphChangedListener> graphChangedListeners,
-                     final EventTrigger trigger) {
+                        final EventTrigger trigger) {
         super(rawEdge, graphChangedListeners, trigger);
     }
 

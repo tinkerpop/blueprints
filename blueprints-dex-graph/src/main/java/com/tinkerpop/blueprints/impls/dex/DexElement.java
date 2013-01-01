@@ -90,7 +90,7 @@ class DexElement implements Element {
     @Override
     public Object getProperty(final String key) {
         graph.autoStartTransaction();
-        
+
         int type = getObjectType();
         if (key.compareTo(StringFactory.LABEL) == 0) {
             com.sparsity.dex.gdb.Type tdata = graph.getRawGraph().getType(type);
@@ -138,7 +138,7 @@ class DexElement implements Element {
     @Override
     public Set<String> getPropertyKeys() {
         graph.autoStartTransaction();
-        
+
         com.sparsity.dex.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
         Set<String> attrKeys = new HashSet<String>();
         for (Integer attr : alist) {
@@ -159,7 +159,7 @@ class DexElement implements Element {
     @Override
     public void setProperty(final String key, final Object value) {
         graph.autoStartTransaction();
-        
+
         //System.out.println(this + "!!" + key + "!!" + value);
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
@@ -214,7 +214,7 @@ class DexElement implements Element {
                     if (value instanceof Long) {
                         v.setLongVoid((Long) value);
                     } else if (value instanceof Integer) {
-                        v.setLongVoid(((Integer)value).longValue());
+                        v.setLongVoid(((Integer) value).longValue());
                     } else {
                         throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
                     }
@@ -252,7 +252,7 @@ class DexElement implements Element {
     @Override
     public Object removeProperty(final String key) {
         graph.autoStartTransaction();
-        
+
         try {
             Object ret = getProperty(key);
             com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
@@ -276,7 +276,7 @@ class DexElement implements Element {
 
     public boolean equals(final Object object) {
         graph.autoStartTransaction();
-        
+
         return ElementHelper.areEqual(this, object);
     }
 

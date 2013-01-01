@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 

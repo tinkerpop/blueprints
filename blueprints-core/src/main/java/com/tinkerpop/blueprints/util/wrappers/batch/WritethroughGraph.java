@@ -1,10 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.batch;
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 
@@ -41,6 +37,14 @@ class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Transaction
     @Override
     public void stopTransaction(final Conclusion conclusion) {
         if (conclusion == Conclusion.FAILURE) throw new IllegalArgumentException("Failure not accepted");
+    }
+
+    public void rollback() {
+        throw new IllegalStateException("Transactions can not be rolled back");
+    }
+
+    public void commit() {
+
     }
 
     /**

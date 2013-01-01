@@ -3,11 +3,7 @@
  */
 package com.tinkerpop.blueprints.impls.dex;
 
-import com.tinkerpop.blueprints.CloseableIterable;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.DefaultQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -37,7 +33,7 @@ class DexVertex extends DexElement implements Vertex {
 
     public CloseableIterable<Edge> getEdges(final Direction direction, final String... labels) {
         graph.autoStartTransaction();
-        
+
         if (direction.equals(Direction.OUT)) {
             return this.getOutEdges(labels);
         } else if (direction.equals(Direction.IN))
@@ -49,7 +45,7 @@ class DexVertex extends DexElement implements Vertex {
 
     public CloseableIterable<Vertex> getVertices(final Direction direction, final String... labels) {
         graph.autoStartTransaction();
-        
+
         if (direction.equals(Direction.OUT)) {
             return this.getOutVertices(labels);
         } else if (direction.equals(Direction.IN))

@@ -1,18 +1,11 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Query;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -104,7 +97,7 @@ public class RexsterQuery implements Query {
         }
 
         final JSONObject jsonObject = RestHelper.get(buildUri(directionReturnToken));
-        final long count  = jsonObject.optLong(RexsterTokens.TOTAL_SIZE);
+        final long count = jsonObject.optLong(RexsterTokens.TOTAL_SIZE);
 
         return count;
     }
@@ -183,7 +176,7 @@ public class RexsterQuery implements Query {
     private static String getCompareString(Compare compare) {
         if (compare == Compare.EQUAL) {
             return "=";
-        } else if (compare == Compare.GREATER_THAN){
+        } else if (compare == Compare.GREATER_THAN) {
             return ">";
         } else if (compare == Compare.GREATER_THAN_EQUAL) {
             return ">=";

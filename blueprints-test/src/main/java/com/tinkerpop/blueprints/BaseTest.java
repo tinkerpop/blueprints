@@ -14,15 +14,15 @@ import java.util.List;
 public abstract class BaseTest extends TestCase {
 
     double timer = -1.0d;
-    
-    public static<T> T getOnlyElement(final Iterator<T> iterator) {
+
+    public static <T> T getOnlyElement(final Iterator<T> iterator) {
         if (!iterator.hasNext()) return null;
         T element = iterator.next();
         if (iterator.hasNext()) throw new IllegalArgumentException("Iterator has multiple elmenets");
         return element;
     }
 
-    public static<T> T getOnlyElement(final Iterable<T> iterable) {
+    public static <T> T getOnlyElement(final Iterable<T> iterable) {
         return getOnlyElement(iterable.iterator());
     }
 
@@ -88,7 +88,7 @@ public abstract class BaseTest extends TestCase {
     }
 
     public File computeTestDataRoot() {
-        final String clsUri = this.getClass().getName().replace('.','/') + ".class";
+        final String clsUri = this.getClass().getName().replace('.', '/') + ".class";
         final URL url = this.getClass().getClassLoader().getResource(clsUri);
         final String clsPath = url.getPath();
         final File root = new File(clsPath.substring(0, clsPath.length() - clsUri.length()));

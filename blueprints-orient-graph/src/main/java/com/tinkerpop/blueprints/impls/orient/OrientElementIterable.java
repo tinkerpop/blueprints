@@ -1,9 +1,9 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import java.util.Iterator;
-
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
+
+import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

@@ -1,23 +1,14 @@
 package com.tinkerpop.blueprints.impls.sail;
 
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.MetaGraph;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.nquads.NQuadsFormat;
 import org.apache.log4j.PropertyConfigurator;
-import org.openrdf.model.Literal;
-import org.openrdf.model.Namespace;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
+import org.openrdf.model.*;
 import org.openrdf.model.impl.BNodeImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
@@ -27,23 +18,13 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.impl.MapBindingSet;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.sparql.SPARQLParser;
-import org.openrdf.rio.RDFFormat;
-import org.openrdf.rio.RDFHandler;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFParser;
-import org.openrdf.rio.Rio;
+import org.openrdf.rio.*;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * A Blueprints implementation of the RDF-based Sail interfaces by Aduna (http://openrdf.org).
@@ -430,6 +411,22 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
             } else {
                 this.sailConnection.get().rollback();
             }
+        } catch (SailException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public void commit() {
+        try {
+            this.sailConnection.get().commit();
+        } catch (SailException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public void rollback() {
+        try {
+            this.sailConnection.get().rollback();
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

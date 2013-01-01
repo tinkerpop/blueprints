@@ -1,10 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Query;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;

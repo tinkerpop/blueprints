@@ -21,11 +21,11 @@ public class IgnoreIdTinkerGraph extends TinkerGraph {
     public IgnoreIdTinkerGraph(String directory) {
         super(directory);
     }
-    
+
     @Override
     public Features getFeatures() {
         Features f = super.getFeatures().copyFeatures();
-        f.ignoresSuppliedIds=true;
+        f.ignoresSuppliedIds = true;
         return f;
     }
 
@@ -33,10 +33,10 @@ public class IgnoreIdTinkerGraph extends TinkerGraph {
     public Vertex addVertex(Object id) {
         return super.addVertex(null);
     }
-    
+
     @Override
     public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
-        return super.addEdge(null,outVertex,inVertex,label);
+        return super.addEdge(null, outVertex, inVertex, label);
     }
-    
+
 }

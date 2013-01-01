@@ -69,7 +69,7 @@ class DexEdge extends DexElement implements Edge {
     @Override
     public Vertex getVertex(final Direction direction) {
         graph.autoStartTransaction();
-        
+
         setEdges();
         if (direction.equals(Direction.OUT))
             return new DexVertex(graph, out);
@@ -87,13 +87,13 @@ class DexEdge extends DexElement implements Edge {
     @Override
     public String getLabel() {
         graph.autoStartTransaction();
-        
+
         return getTypeLabel();
     }
 
     public String toString() {
         graph.autoStartTransaction();
-        
+
         return StringFactory.edgeString(this);
     }
 }

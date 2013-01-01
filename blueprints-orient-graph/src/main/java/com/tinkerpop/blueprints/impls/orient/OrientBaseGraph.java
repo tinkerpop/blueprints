@@ -10,25 +10,13 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.MetaGraph;
-import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
@@ -37,9 +25,9 @@ import java.util.Set;
  */
 public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGraphDatabase>, KeyIndexableGraph {
     /**
-   * 
-   */
-  private static final String CLASS_PREFIX = "class:";
+     *
+     */
+    private static final String CLASS_PREFIX = "class:";
 
     protected final static String ADMIN = "admin";
 
@@ -141,11 +129,11 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public Vertex addVertex(final Object id) {
-        String className = null; 
-        if( id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
-          // GET THE CLASS NAME
-          className = id.toString().substring( CLASS_PREFIX.length() );
-        
+        String className = null;
+        if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
+            // GET THE CLASS NAME
+            className = id.toString().substring(CLASS_PREFIX.length());
+
         final OGraphDatabase db = getRawGraph();
         this.autoStartTransaction();
         final OrientVertex vertex = new OrientVertex(this, db.createVertex(className));
@@ -154,12 +142,12 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        String className = null; 
-        if( id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
-          // GET THE CLASS NAME
-          className = id.toString().substring( CLASS_PREFIX.length() );
+        String className = null;
+        if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
+            // GET THE CLASS NAME
+            className = id.toString().substring(CLASS_PREFIX.length());
 
-      
+
         final OGraphDatabase db = getRawGraph();
         this.autoStartTransaction();
         final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement(), className);
@@ -319,7 +307,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         this.username = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
         synchronized (this) {
             OrientGraphContext context = threadContext.get();
-            if (context == null || !context.rawGraph.getName().equals( iDatabase.getName() ) ) {
+            if (context == null || !context.rawGraph.getName().equals(iDatabase.getName())) {
                 removeContext();
                 context = new OrientGraphContext();
                 context.rawGraph = iDatabase;
@@ -359,7 +347,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
     protected OrientGraphContext getContext(final boolean create) {
         OrientGraphContext context = threadContext.get();
-        if (context == null || !context.rawGraph.getURL().equals( url )) {
+        if (context == null || !context.rawGraph.getURL().equals(url)) {
             if (create)
                 context = openOrCreate();
         }

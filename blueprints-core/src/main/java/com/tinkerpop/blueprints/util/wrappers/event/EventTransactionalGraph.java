@@ -41,4 +41,12 @@ public class EventTransactionalGraph<T extends TransactionalGraph> extends Event
             }
         }
     }
+
+    public void commit() {
+        // TODO: Stephen, please implement these according to your specified semantics.
+    }
+
+    public void rollback() {
+        // TODO: Stephen, please implement these according to your specified semantics.
+    }
 }

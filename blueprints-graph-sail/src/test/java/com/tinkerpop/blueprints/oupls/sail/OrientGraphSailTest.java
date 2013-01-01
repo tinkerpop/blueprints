@@ -20,7 +20,7 @@ public class OrientGraphSailTest extends GraphSailTest {
 
         OGraphDatabase db = new OGraphDatabase("local:" + directory + "/graph");
 
-        if( db.exists())
+        if (db.exists())
             db.open("admin", "admin").drop();
 
         return new OrientGraph("local:" + directory + "/graph");

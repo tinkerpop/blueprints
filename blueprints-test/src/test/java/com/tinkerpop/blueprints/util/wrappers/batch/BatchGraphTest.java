@@ -13,6 +13,7 @@ import java.util.Random;
  * <br />
  * Tests the various different Vertex caches and different length of chains.
  * <br />
+ *
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 
@@ -29,15 +30,15 @@ public class BatchGraphTest extends TestCase {
         loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
         loadingTest(200000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
 
-        assignKeys=true;
-        loadingTest(5000,100, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
-        loadingTest(50000,10000, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
-        assignKeys=false;
+        assignKeys = true;
+        loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        loadingTest(50000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        assignKeys = false;
 
-        ignoreIDs=true;
-        loadingTest(5000,100, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
-        loadingTest(50000,10000, BatchGraph.IdType.NUMBER,new NumberLoadingFactory());
-        ignoreIDs=false;
+        ignoreIDs = true;
+        loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        loadingTest(50000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        ignoreIDs = false;
     }
 
     public void testObjectIdLoading() {
@@ -57,94 +58,96 @@ public class BatchGraphTest extends TestCase {
 
     public void testQuadLoading() {
         int numEdges = 10000;
-        String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
+        String[][] quads = generateQuads(100, numEdges, new String[]{"knows", "friend"});
         TinkerGraph graph = new TinkerGraph();
         BatchGraph bgraph = new BatchGraph(new WritethroughGraph(graph), BatchGraph.IdType.STRING, 1000);
         for (String[] quad : quads) {
             Vertex[] vertices = new Vertex[2];
-            for (int i=0;i<2;i++) {
+            for (int i = 0; i < 2; i++) {
                 vertices[i] = bgraph.getVertex(quad[i]);
-                if (vertices[i]==null) vertices[i]=bgraph.addVertex(quad[i]);
+                if (vertices[i] == null) vertices[i] = bgraph.addVertex(quad[i]);
             }
-            Edge edge = bgraph.addEdge(null,vertices[0],vertices[1],quad[2]);
-            edge.setProperty("annotation",quad[3]);
+            Edge edge = bgraph.addEdge(null, vertices[0], vertices[1], quad[2]);
+            edge.setProperty("annotation", quad[3]);
         }
-        assertEquals(numEdges,BaseTest.count(graph.getEdges()));
+        assertEquals(numEdges, BaseTest.count(graph.getEdges()));
 
         bgraph.shutdown();
     }
 
     public void testLoadingWithExisting1() {
         int numEdges = 1000;
-        String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
+        String[][] quads = generateQuads(100, numEdges, new String[]{"knows", "friend"});
         TinkerGraph tg = new TinkerGraph();
         BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
         bg.setLoadingFromScratch(false);
         Graph graph = null;
         int counter = 0;
         for (String[] quad : quads) {
-            if (counter<numEdges/2) graph = tg;
+            if (counter < numEdges / 2) graph = tg;
             else graph = bg;
 
             Vertex[] vertices = new Vertex[2];
-            for (int i=0;i<2;i++) {
+            for (int i = 0; i < 2; i++) {
                 vertices[i] = graph.getVertex(quad[i]);
-                if (vertices[i]==null) vertices[i]=graph.addVertex(quad[i]);
+                if (vertices[i] == null) vertices[i] = graph.addVertex(quad[i]);
             }
-            Edge edge = graph.addEdge(null,vertices[0],vertices[1],quad[2]);
-            edge.setProperty("annotation",quad[3]);
+            Edge edge = graph.addEdge(null, vertices[0], vertices[1], quad[2]);
+            edge.setProperty("annotation", quad[3]);
             counter++;
         }
-        assertEquals(numEdges,BaseTest.count(tg.getEdges()));
+        assertEquals(numEdges, BaseTest.count(tg.getEdges()));
 
         bg.shutdown();
     }
 
     public void testLoadingWithExisting2() {
         int numEdges = 1000;
-        String[][] quads = generateQuads(100,numEdges,new String[]{"knows","friend"});
+        String[][] quads = generateQuads(100, numEdges, new String[]{"knows", "friend"});
         TinkerGraph tg = new IgnoreIdTinkerGraph();
         BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
         try {
             bg.setLoadingFromScratch(false);
             fail();
-        } catch (IllegalStateException e) {}
+        } catch (IllegalStateException e) {
+        }
         bg.setVertexIdKey("uid");
         bg.setLoadingFromScratch(false);
         try {
             bg.setVertexIdKey(null);
             fail();
-        } catch (IllegalStateException e) {}
-        
+        } catch (IllegalStateException e) {
+        }
+
         Graph graph = null;
         int counter = 0;
         for (String[] quad : quads) {
-            if (counter<numEdges/2) graph = tg;
+            if (counter < numEdges / 2) graph = tg;
             else graph = bg;
 
             Vertex[] vertices = new Vertex[2];
-            for (int i=0;i<2;i++) {
+            for (int i = 0; i < 2; i++) {
                 vertices[i] = graph.getVertex(quad[i]);
-                if (vertices[i]==null) vertices[i]=graph.addVertex(quad[i]);
+                if (vertices[i] == null) vertices[i] = graph.addVertex(quad[i]);
             }
-            Edge edge = graph.addEdge(null,vertices[0],vertices[1],quad[2]);
-            edge.setProperty("annotation",quad[3]);
+            Edge edge = graph.addEdge(null, vertices[0], vertices[1], quad[2]);
+            edge.setProperty("annotation", quad[3]);
             counter++;
         }
-        assertEquals(numEdges,BaseTest.count(tg.getEdges()));
+        assertEquals(numEdges, BaseTest.count(tg.getEdges()));
 
         bg.shutdown();
     }
-    
-    
+
+
     public static String[][] generateQuads(int numVertices, int numEdges, String[] labels) {
         Random random = new Random();
         String[][] edges = new String[numEdges][4];
-        for (int i=0;i<numEdges;i++) {
-            edges[i][0] = "v"+random.nextInt(numVertices)+1;
-            edges[i][1] = "v"+random.nextInt(numVertices)+1;
+        for (int i = 0; i < numEdges; i++) {
+            edges[i][0] = "v" + random.nextInt(numVertices) + 1;
+            edges[i][1] = "v" + random.nextInt(numVertices) + 1;
             edges[i][2] = labels[random.nextInt(labels.length)];
-            edges[i][3] = ""+random.nextInt();
+            edges[i][3] = "" + random.nextInt();
         }
         return edges;
     }
@@ -160,8 +163,8 @@ public class BatchGraphTest extends TestCase {
             tgraph = new MockTransactionalGraph(new TinkerGraph());
         }
 
-        BLGraph graph = new BLGraph(tgraph,counter,ids);
-        BatchGraph<BLGraph> loader = new BatchGraph<BLGraph>(graph,type,bufferSize);
+        BLGraph graph = new BLGraph(tgraph, counter, ids);
+        BatchGraph<BLGraph> loader = new BatchGraph<BLGraph>(graph, type, bufferSize);
 
         if (assignKeys) {
             loader.setVertexIdKey(vertexIDKey);
@@ -198,9 +201,9 @@ public class BatchGraphTest extends TestCase {
 
     }
 
-    
+
     static class BLGraph implements TransactionalGraph {
-        
+
         private static final int keepLast = 10;
 
         private final VertexEdgeCounter counter;
@@ -208,11 +211,11 @@ public class BatchGraphTest extends TestCase {
         private final LoadingFactory ids;
 
         private final TransactionalGraph graph;
-                
+
         BLGraph(TransactionalGraph graph, final VertexEdgeCounter counter, LoadingFactory ids) {
-            this.graph=graph;
-            this.counter=counter;
-            this.ids=ids;
+            this.graph = graph;
+            this.counter = counter;
+            this.ids = ids;
         }
 
         private static final Object parseID(Object id) {
@@ -230,25 +233,25 @@ public class BatchGraphTest extends TestCase {
             graph.stopTransaction(conclusion);
             //System.out.println("Committed (vertices/edges): " + counter.numVertices + " / " + counter.numEdges);
             assertEquals(counter.numVertices, BaseTest.count(graph.getVertices()) - (first ? 0 : keepLast));
-            assertEquals(counter.numEdges,BaseTest.count(graph.getEdges()));
+            assertEquals(counter.numEdges, BaseTest.count(graph.getEdges()));
             for (Edge e : getEdges()) {
-                int id = ((Number)e.getProperty(UID)).intValue();
+                int id = ((Number) e.getProperty(UID)).intValue();
                 if (!ignoreIDs) {
-                    assertEquals(ids.getEdgeID(id),parseID(e.getId()));
+                    assertEquals(ids.getEdgeID(id), parseID(e.getId()));
                 }
-                assertEquals(1,(Integer)e.getVertex(Direction.IN).getProperty(UID)-(Integer)e.getVertex(Direction.OUT).getProperty(UID));
+                assertEquals(1, (Integer) e.getVertex(Direction.IN).getProperty(UID) - (Integer) e.getVertex(Direction.OUT).getProperty(UID));
                 if (assignKeys) {
                     assertEquals(ids.getEdgeID(id), e.getProperty(edgeIDKey));
                 }
             }
             for (Vertex v : getVertices()) {
-                int id = ((Number)v.getProperty(UID)).intValue();
+                int id = ((Number) v.getProperty(UID)).intValue();
                 if (!ignoreIDs) {
-                    assertEquals(ids.getVertexID(id),parseID(v.getId()));
+                    assertEquals(ids.getVertexID(id), parseID(v.getId()));
                 }
-                assertTrue(2>=BaseTest.count(v.getEdges(Direction.BOTH)));
-                assertTrue(1>=BaseTest.count(v.getEdges(Direction.IN)));
-                assertTrue(1>=BaseTest.count(v.getEdges(Direction.OUT)));
+                assertTrue(2 >= BaseTest.count(v.getEdges(Direction.BOTH)));
+                assertTrue(1 >= BaseTest.count(v.getEdges(Direction.IN)));
+                assertTrue(1 >= BaseTest.count(v.getEdges(Direction.OUT)));
 
                 if (assignKeys) {
                     assertEquals(ids.getVertexID(id), v.getProperty(vertexIDKey));
@@ -256,17 +259,25 @@ public class BatchGraphTest extends TestCase {
 
             }
             for (Vertex v : getVertices()) {
-                int id = ((Number)v.getProperty(UID)).intValue();
-                if (id<counter.totalVertices-keepLast) {
+                int id = ((Number) v.getProperty(UID)).intValue();
+                if (id < counter.totalVertices - keepLast) {
                     removeVertex(v);
                 }
             }
             for (Edge e : getEdges()) removeEdge(e);
-            assertEquals(keepLast,BaseTest.count(graph.getVertices()));
-            counter.numVertices=0;
-            counter.numEdges=0;
+            assertEquals(keepLast, BaseTest.count(graph.getVertices()));
+            counter.numVertices = 0;
+            counter.numEdges = 0;
             first = false;
             //System.out.println("------");
+        }
+
+        public void rollback() {
+            this.stopTransaction(Conclusion.FAILURE);
+        }
+
+        public void commit() {
+            this.stopTransaction(Conclusion.SUCCESS);
         }
 
         @Override
@@ -296,12 +307,12 @@ public class BatchGraphTest extends TestCase {
 
         @Override
         public Iterable<Vertex> getVertices(String key, Object value) {
-            return graph.getVertices(key,value);
+            return graph.getVertices(key, value);
         }
 
         @Override
         public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
-            return graph.addEdge(id,outVertex,inVertex,label);
+            return graph.addEdge(id, outVertex, inVertex, label);
         }
 
         @Override
@@ -321,7 +332,7 @@ public class BatchGraphTest extends TestCase {
 
         @Override
         public Iterable<Edge> getEdges(String key, Object value) {
-            return graph.getEdges(key,value);
+            return graph.getEdges(key, value);
         }
 
         @Override

@@ -18,13 +18,7 @@ import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.tinkerpop.blueprints.util.io.graphson.ElementPropertyConfig.ElementPropertiesRule;
 
@@ -94,7 +88,7 @@ public final class GraphSONUtility {
     /**
      * Creates a vertex from GraphSON using settings supplied in the constructor.
      */
-    public Vertex vertexFromJson(final JSONObject json) throws IOException  {
+    public Vertex vertexFromJson(final JSONObject json) throws IOException {
         return this.vertexFromJson(json.toString());
     }
 
@@ -138,7 +132,7 @@ public final class GraphSONUtility {
     /**
      * Creates an edge from GraphSON using settings supplied in the constructor.
      */
-    public Edge edgeFromJson(final JSONObject json, final Vertex out, final Vertex in) throws IOException  {
+    public Edge edgeFromJson(final JSONObject json, final Vertex out, final Vertex in) throws IOException {
         return this.edgeFromJson(json.toString(), out, in);
     }
 
@@ -252,9 +246,9 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
      *
-     * @param json a single vertex in GraphSON format as Jettison JSONObject
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single vertex in GraphSON format as Jettison JSONObject
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final JSONObject json, final ElementFactory factory, final GraphSONMode mode,
@@ -266,9 +260,9 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
      *
-     * @param json a single vertex in GraphSON format as a String.
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single vertex in GraphSON format as a String.
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final String json, final ElementFactory factory, final GraphSONMode mode,
@@ -280,9 +274,9 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
      *
-     * @param json a single vertex in GraphSON format as an InputStream.
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single vertex in GraphSON format as an InputStream.
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final InputStream json, final ElementFactory factory, final GraphSONMode mode,
@@ -294,13 +288,13 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Vertex from JSON.  The vertex must match the accepted GraphSON format.
      *
-     * @param json a single vertex in GraphSON format as Jackson JsonNode
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single vertex in GraphSON format as Jackson JsonNode
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include on reading of element properties
      */
     public static Vertex vertexFromJson(final JsonNode json, final ElementFactory factory, final GraphSONMode mode,
-                                        final Set<String> propertyKeys) throws IOException{
+                                        final Set<String> propertyKeys) throws IOException {
         final GraphSONUtility graphson = new GraphSONUtility(mode, factory, propertyKeys, null);
         return graphson.vertexFromJson(json);
     }
@@ -308,14 +302,14 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
      *
-     * @param json a single edge in GraphSON format as a Jettison JSONObject
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single edge in GraphSON format as a Jettison JSONObject
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include when reading of element properties
      */
     public static Edge edgeFromJson(final JSONObject json, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final GraphSONMode mode,
-                                final Set<String> propertyKeys)  throws IOException {
+                                    final ElementFactory factory, final GraphSONMode mode,
+                                    final Set<String> propertyKeys) throws IOException {
         final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
         return graphson.edgeFromJson(json, out, in);
     }
@@ -323,14 +317,14 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
      *
-     * @param json a single edge in GraphSON format as a String
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single edge in GraphSON format as a String
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include when reading of element properties
      */
     public static Edge edgeFromJson(final String json, final Vertex out, final Vertex in,
                                     final ElementFactory factory, final GraphSONMode mode,
-                                    final Set<String> propertyKeys)  throws IOException {
+                                    final Set<String> propertyKeys) throws IOException {
         final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
         return graphson.edgeFromJson(json, out, in);
     }
@@ -338,14 +332,14 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
      *
-     * @param json a single edge in GraphSON format as an InputStream
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single edge in GraphSON format as an InputStream
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include when reading of element properties
      */
     public static Edge edgeFromJson(final InputStream json, final Vertex out, final Vertex in,
                                     final ElementFactory factory, final GraphSONMode mode,
-                                    final Set<String> propertyKeys)  throws IOException {
+                                    final Set<String> propertyKeys) throws IOException {
         final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
         return graphson.edgeFromJson(json, out, in);
     }
@@ -353,14 +347,14 @@ public final class GraphSONUtility {
     /**
      * Reads an individual Edge from JSON.  The edge must match the accepted GraphSON format.
      *
-     * @param json a single edge in GraphSON format as a Jackson JsonNode
-     * @param factory the factory responsible for constructing graph elements
-     * @param mode the mode of the GraphSON
+     * @param json         a single edge in GraphSON format as a Jackson JsonNode
+     * @param factory      the factory responsible for constructing graph elements
+     * @param mode         the mode of the GraphSON
      * @param propertyKeys a list of keys to include when reading of element properties
      */
     public static Edge edgeFromJson(final JsonNode json, final Vertex out, final Vertex in,
-                                final ElementFactory factory, final GraphSONMode mode,
-                                final Set<String> propertyKeys)  throws IOException {
+                                    final ElementFactory factory, final GraphSONMode mode,
+                                    final Set<String> propertyKeys) throws IOException {
         final GraphSONUtility graphson = new GraphSONUtility(mode, factory, null, propertyKeys);
         return graphson.edgeFromJson(json, out, in);
     }
@@ -427,10 +421,10 @@ public final class GraphSONUtility {
         boolean keySituation = rule == ElementPropertiesRule.INCLUDE;
 
         switch (rule) {
-            case INCLUDE :
+            case INCLUDE:
                 keySituation = propertyKeys.contains(key);
                 break;
-            case EXCLUDE :
+            case EXCLUDE:
                 keySituation = !propertyKeys.contains(key);
                 break;
         }

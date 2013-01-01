@@ -7,9 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.tinkerpop.blueprints.Direction.BOTH;
-import static com.tinkerpop.blueprints.Direction.IN;
-import static com.tinkerpop.blueprints.Direction.OUT;
+import static com.tinkerpop.blueprints.Direction.*;
 
 
 /**

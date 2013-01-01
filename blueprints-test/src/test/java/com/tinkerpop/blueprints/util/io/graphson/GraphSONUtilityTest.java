@@ -16,19 +16,14 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class GraphSONUtilityTest {
     private TinkerGraph graph = new TinkerGraph();
 
     private final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
-    private final String vertexJson2 =  "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
+    private final String vertexJson2 = "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
 
     private final String edgeJsonLight = "{\"weight\":0.5,\"_outV\":1,\"_inV\":2}";
     private final String edgeJson = "{\"weight\":0.5,\"_id\":7,\"_type\":\"edge\",\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
@@ -1012,7 +1007,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void edgeFromJsonValid()  throws IOException, JSONException {
+    public void edgeFromJsonValid() throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 
@@ -1033,7 +1028,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void edgeFromJsonStringValid()  throws IOException, JSONException {
+    public void edgeFromJsonStringValid() throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 
@@ -1054,7 +1049,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void edgeFromJsonIgnoreWeightValid()  throws IOException, JSONException {
+    public void edgeFromJsonIgnoreWeightValid() throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 
@@ -1080,7 +1075,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void edgeFromJsonNormalLabelOrIdOnEdge()  throws IOException, JSONException {
+    public void edgeFromJsonNormalLabelOrIdOnEdge() throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 
@@ -1094,7 +1089,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void edgeFromJsonInputStreamCompactLabelOrIdOnEdge()  throws IOException, JSONException {
+    public void edgeFromJsonInputStreamCompactLabelOrIdOnEdge() throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 
@@ -1108,7 +1103,7 @@ public class GraphSONUtilityTest {
     }
 
     @Test
-    public void edgeFromJsonInputStreamCompactNoIdOnEdge()  throws IOException, JSONException {
+    public void edgeFromJsonInputStreamCompactNoIdOnEdge() throws IOException, JSONException {
         Graph g = new TinkerGraph();
         ElementFactory factory = new GraphElementFactory(g);
 

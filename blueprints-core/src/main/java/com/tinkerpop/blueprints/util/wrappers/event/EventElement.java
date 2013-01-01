@@ -4,11 +4,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgePropertyChangedEvent;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgePropertyRemovedEvent;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.VertexPropertyChangedEvent;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.VertexPropertyRemovedEvent;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.*;
 
 import java.util.List;
 import java.util.Set;
@@ -26,7 +22,7 @@ public abstract class EventElement implements Element {
     protected final List<GraphChangedListener> graphChangedListeners;
 
     protected EventElement(final Element baseElement, final List<GraphChangedListener> graphChangedListeners,
-                        final EventTrigger trigger) {
+                           final EventTrigger trigger) {
         this.baseElement = baseElement;
         this.graphChangedListeners = graphChangedListeners;
         this.trigger = trigger;

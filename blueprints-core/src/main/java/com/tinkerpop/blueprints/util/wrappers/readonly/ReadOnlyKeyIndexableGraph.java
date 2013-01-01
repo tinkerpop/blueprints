@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
-import java.util.Set;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
+
+import java.util.Set;
 
 /**
  * A ReadOnlyKeyIndexableGraph wraps a KeyIndexableGraph and overrides the underlying graph's mutating methods.
@@ -14,7 +14,7 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
  */
 public class ReadOnlyKeyIndexableGraph<T extends KeyIndexableGraph> extends ReadOnlyIndexableGraph<IndexableGraph> implements KeyIndexableGraph {
     public ReadOnlyKeyIndexableGraph(final T baseKIGraph) {
-        super((IndexableGraph)baseKIGraph);
+        super((IndexableGraph) baseKIGraph);
     }
 
     /**
@@ -32,6 +32,6 @@ public class ReadOnlyKeyIndexableGraph<T extends KeyIndexableGraph> extends Read
     }
 
     public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        return ((KeyIndexableGraph)this.baseGraph).getIndexedKeys(elementClass);
+        return ((KeyIndexableGraph) this.baseGraph).getIndexedKeys(elementClass);
     }
 }

@@ -49,7 +49,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-DtestRexsterGraph=false -Dusername=rexster -Dpassword=rexster -DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph
+                    <argLine>-DtestRexsterGraph=false -Dusername=rexster -Dpassword=rexster
+                        -DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph
                     </argLine>
                 </configuration>
             </plugin>

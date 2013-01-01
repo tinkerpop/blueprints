@@ -2,26 +2,14 @@ package com.tinkerpop.blueprints.impls.dex;
 
 import com.sparsity.dex.gdb.AttributeKind;
 import com.sparsity.dex.gdb.ObjectType;
-import com.tinkerpop.blueprints.CloseableIterable;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.MetaGraph;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Dex is a graph database developed by Sparsity Technologies.
@@ -50,7 +38,7 @@ import java.util.Set;
  * Otherwise, all those collections will automatically be closed when the
  * transaction is stopped ({@link #stopTransaction(com.tinkerpop.blueprints.TransactionalGraph.Conclusion)}
  * or if the database is stopped ( {@link #shutdown()}).
- * 
+ *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
@@ -90,7 +78,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     private com.sparsity.dex.gdb.Dex dex = null;
     private com.sparsity.dex.gdb.Database db = null;
-    
+
     private ThreadLocal<com.sparsity.dex.gdb.Session> session = new ThreadLocal<com.sparsity.dex.gdb.Session>() {
         @Override
         protected com.sparsity.dex.gdb.Session initialValue() {
@@ -217,13 +205,13 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public DexGraph(final String fileName) {
         this(fileName, null);
     }
-    
-        /**
-         * Creates a new instance.
-         *
-         * @param fileName Database persistent file.
-         * @param config Dex configuration file.
-         */
+
+    /**
+     * Creates a new instance.
+     *
+     * @param fileName Database persistent file.
+     * @param config   Dex configuration file.
+     */
     public DexGraph(final String fileName, final String config) {
         try {
             this.dbFile = new File(fileName);
@@ -261,7 +249,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     @Override
     public Vertex addVertex(final Object id) {
         autoStartTransaction();
-        
+
         String label = this.label.get() == null ? DEFAULT_DEX_VERTEX_LABEL : this.label.get();
         com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
         int type = rawGraph.findType(label);
@@ -528,7 +516,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         autoStartTransaction();
 
         com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
-        
+
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
 
             int type = rawGraph.findType(value.toString());
@@ -614,11 +602,11 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     @Override
     public void shutdown() {
         stopTransaction(Conclusion.SUCCESS);
-        
+
         if (sessCollections.size() > 0) {
             throw new IllegalStateException("Non closed transactions");
         }
-        
+
         db.close();
         dex.close();
     }
@@ -694,7 +682,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         }
 
         com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
-        
+
         int type = rawGraph.findType(label);
         if (type == com.sparsity.dex.gdb.Type.InvalidType) {
             // create the node/edge type
@@ -772,10 +760,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         tlist = null;
         return ret;
     }
-    
+
     void autoStartTransaction() {
         com.sparsity.dex.gdb.Session sess = getRawSession(false);
-        
+
         if (sess == null) {
             sess = db.newSession();
             session.set(sess);
@@ -784,7 +772,24 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             assert !sess.isClosed();
         }
     }
-    
+
+    public void commit() {
+        com.sparsity.dex.gdb.Session sess = getRawSession(false);
+        if (sess == null) {
+            // already closed session
+            return;
+        }
+        closeAllSessionCollections();
+        if (sess != null && !sess.isClosed()) {
+            sess.close();
+        }
+        session.set(null);
+    }
+
+    public void rollback() {
+        throw new UnsupportedOperationException("Rollback is not supported");
+    }
+
     @Override
     public void stopTransaction(Conclusion conclusion) {
         com.sparsity.dex.gdb.Session sess = getRawSession(false);
@@ -804,7 +809,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             sess.close();
         }
         session.set(null);
-        
+
         //System.out.println("< th=" + Thread.currentThread().getId() + " ends tx with sess=" + sess);
     }
 }

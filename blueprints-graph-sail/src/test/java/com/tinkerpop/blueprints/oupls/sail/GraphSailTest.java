@@ -280,7 +280,7 @@ public abstract class GraphSailTest extends SailTest {
     }
 
     protected File computeTestDataRoot() {
-        final String clsUri = this.getClass().getName().replace('.','/') + ".class";
+        final String clsUri = this.getClass().getName().replace('.', '/') + ".class";
         final URL url = this.getClass().getClassLoader().getResource(clsUri);
         final String clsPath = url.getPath();
         final File root = new File(clsPath.substring(0, clsPath.length() - clsUri.length()));

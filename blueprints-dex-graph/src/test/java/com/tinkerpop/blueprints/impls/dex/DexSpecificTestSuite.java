@@ -1,21 +1,15 @@
 package com.tinkerpop.blueprints.impls.dex;
 
+import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
+import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.tinkerpop.blueprints.Direction;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.util.StringFactory;
-import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 
 /**
  */
@@ -123,7 +117,7 @@ public class DexSpecificTestSuite extends TestSuite {
                 .getProperty("name").equals("sergio"));
         graph.stopTransaction(Conclusion.SUCCESS);
         assertTrue(((DexGraph) graph).getRawSession(false) == null);
-        
+
         assertTrue(graph.getVertices("name", "sergio").iterator().next().getProperty("name").equals("sergio"));
         graph.stopTransaction(Conclusion.SUCCESS);
         assertTrue(((DexGraph) graph).getRawSession(false) == null);
