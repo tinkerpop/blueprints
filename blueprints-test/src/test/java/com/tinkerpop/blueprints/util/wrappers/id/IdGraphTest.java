@@ -1,6 +1,15 @@
 package com.tinkerpop.blueprints.util.wrappers.id;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.EdgeTestSuite;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphTestSuite;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
+import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;

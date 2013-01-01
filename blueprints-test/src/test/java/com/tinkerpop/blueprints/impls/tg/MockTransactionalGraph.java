@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.impls.tg;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
 
 /**
  * Mocking TinkerGraph as a transactional graph for testing purposes. This implementation does not actually

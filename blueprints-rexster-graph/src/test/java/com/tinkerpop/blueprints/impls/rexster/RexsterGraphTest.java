@@ -1,6 +1,19 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.EdgeTestSuite;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphTestSuite;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.IndexTestSuite;
+import com.tinkerpop.blueprints.IndexableGraph;
+import com.tinkerpop.blueprints.IndexableGraphTestSuite;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
+import com.tinkerpop.blueprints.QueryTestSuite;
+import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import junit.framework.Assert;
 

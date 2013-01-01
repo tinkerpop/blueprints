@@ -1,6 +1,12 @@
 package com.tinkerpop.blueprints.util.wrappers.batch;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.IgnoreIdTinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.MockTransactionalGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;

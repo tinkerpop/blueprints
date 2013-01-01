@@ -5,14 +5,29 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.*;
+import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.ElementHelper;
+import com.tinkerpop.blueprints.util.MultiIterable;
+import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
 import info.aduna.iteration.CloseableIteration;
-import org.openrdf.model.*;
+import org.openrdf.model.Literal;
+import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
+import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.sail.SailException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

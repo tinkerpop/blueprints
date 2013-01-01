@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.CloseableIterable;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 /**

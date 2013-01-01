@@ -2,7 +2,11 @@ package com.tinkerpop.blueprints.util;
 
 import com.tinkerpop.blueprints.Element;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)

@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.util;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.BaseTest;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 

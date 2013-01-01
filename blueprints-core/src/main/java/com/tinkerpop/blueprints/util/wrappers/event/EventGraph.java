@@ -6,7 +6,11 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.*;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgeAddedEvent;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgeRemovedEvent;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.VertexAddedEvent;
+import com.tinkerpop.blueprints.util.wrappers.event.listener.VertexRemovedEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
