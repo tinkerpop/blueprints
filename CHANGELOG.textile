@@ -17,6 +17,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Bumped to support Neo4j 1.9.M03
+* Improved transaction concurrency in @DexGraph@
 
 ==<hr/>==
 
