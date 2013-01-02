@@ -42,11 +42,40 @@ public class EventTransactionalGraph<T extends TransactionalGraph> extends Event
         }
     }
 
+    /**
+     * A commit only fires the event queue on successful operation.  If the commit operation to the underlying
+     * graph fails, the event queue will not fire and the queue will not be reset.
+     */
     public void commit() {
-        // TODO: Stephen, please implement these according to your specified semantics.
+        boolean transactionFailure = false;
+        try {
+            this.baseGraph.commit();
+        } catch (RuntimeException re) {
+            transactionFailure = true;
+            throw re;
+        } finally {
+            if (!transactionFailure) {
+                trigger.fireEventQueue();
+                trigger.resetEventQueue();
+            }
+        }
     }
 
+    /**
+     * A rollback only resets the event queue on successful operation.  If the rollback operation to the underlying
+     * graph fails, the event queue will not be reset.
+     */
     public void rollback() {
-        // TODO: Stephen, please implement these according to your specified semantics.
+        boolean transactionFailure = false;
+        try {
+            this.baseGraph.rollback();
+        } catch (RuntimeException re) {
+            transactionFailure = true;
+            throw re;
+        } finally {
+            if (!transactionFailure) {
+                trigger.resetEventQueue();
+            }
+        }
     }
 }
