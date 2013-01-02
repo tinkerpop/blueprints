@@ -1,5 +1,12 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.orientechnologies.common.io.OFileUtils;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.id.ORID;
@@ -23,12 +30,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
@@ -238,7 +239,11 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             if (value != null && !(value instanceof String))
                 value = value.toString();
 
-            return new OrientElementIterable<Vertex>(this, (Iterable<?>) idx.get(value));
+            Object indexValue = (Iterable<?>) idx.get(value);
+            if( indexValue != null && !( indexValue instanceof Iterable<?> ) )
+              indexValue = Arrays.asList(indexValue);
+            
+            return new OrientElementIterable<Vertex>(this, (Iterable<?>) indexValue );
         }
         return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
     }
@@ -258,7 +263,11 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             if (value != null && !(value instanceof String))
                 value = value.toString();
 
-            return (Iterable<Edge>) new OrientElementIterable<Edge>(this, (Iterable<?>) idx.get(value));
+            Object indexValue = (Iterable<?>) idx.get(value);
+            if( indexValue != null && !( indexValue instanceof Iterable<?> ) )
+              indexValue = Arrays.asList(indexValue);
+            
+            return new OrientElementIterable<Edge>(this, (Iterable<?>) indexValue );            
         }
         return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
