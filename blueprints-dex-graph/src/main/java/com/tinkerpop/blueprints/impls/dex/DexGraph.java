@@ -17,10 +17,8 @@ import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -90,11 +88,16 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     private com.sparsity.dex.gdb.Dex dex = null;
     private com.sparsity.dex.gdb.Database db = null;
-
-    private ThreadLocal<com.sparsity.dex.gdb.Session> session = new ThreadLocal<com.sparsity.dex.gdb.Session>() {
+    
+    private class Metadata {
+        com.sparsity.dex.gdb.Session session = null;
+        List<DexIterable<? extends Element>> collection = null;
+    };
+    
+    private ThreadLocal<Metadata> sessionData = new ThreadLocal<Metadata>() {
         @Override
-        protected com.sparsity.dex.gdb.Session initialValue() {
-            return null;
+        protected Metadata initialValue() {
+            return new Metadata();
         }
     };
 
@@ -163,7 +166,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * @return The Dex Session
      */
     com.sparsity.dex.gdb.Session getRawSession(boolean exception) {
-        com.sparsity.dex.gdb.Session sess = session.get();
+        com.sparsity.dex.gdb.Session sess = sessionData.get().session;
         if (sess == null && exception) {
             throw new IllegalStateException("Transaction has not been started");
         }
@@ -171,26 +174,15 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     /**
-     * All iterables are registered here to be automatically closed when the
-     * database is stopped (at {@link #shutdown()}).
-     */
-    private Map<com.sparsity.dex.gdb.Session, List<DexIterable<? extends Element>>> sessCollections =
-            new HashMap<com.sparsity.dex.gdb.Session, List<DexIterable<? extends Element>>>();
-
-
-    /**
      * Registers a collection.
      *
      * @param col Collection to be registered.
      */
-    protected synchronized void register(final DexIterable<? extends Element> col) {
-        com.sparsity.dex.gdb.Session sess = getRawSession();
-        List<DexIterable<? extends Element>> list = sessCollections.get(sess);
-        if (list == null) {
-            list = new ArrayList<DexIterable<? extends Element>>();
-            sessCollections.put(sess, list);
+    protected void register(final DexIterable<? extends Element> col) {
+        if (sessionData.get().collection == null) {
+            sessionData.get().collection = new ArrayList<DexIterable<? extends Element>>();
         }
-        list.add(col);
+        sessionData.get().collection.add(col);
         //System.out.println("> register " + sess + ":" + col);
     }
 
@@ -199,13 +191,11 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      *
      * @param col Collection to be unregistered
      */
-    protected synchronized void unregister(final DexIterable<? extends Element> col) {
-        com.sparsity.dex.gdb.Session sess = getRawSession();
-        List<DexIterable<? extends Element>> list = sessCollections.get(sess);
-        if (list == null) {
+    protected void unregister(final DexIterable<? extends Element> col) {
+        if (sessionData.get().collection == null) {
             throw new IllegalStateException("Session with no collections");
         }
-        list.remove(col);
+        sessionData.get().collection.remove(col);
         //System.out.println("< unregister " + sess + ":" + col);
     }
 
@@ -595,15 +585,13 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     /**
      * Closes all non-closed iterables.
      */
-    protected synchronized void closeAllSessionCollections() {
-        com.sparsity.dex.gdb.Session sess = getRawSession();
-        List<DexIterable<? extends Element>> list = sessCollections.get(sess);
-        if (list != null) {
-            while (list.size() > 0) {
-                list.get(0).close(); // closing also unregisters!
+    protected void closeAllSessionCollections() {
+        if (sessionData.get().collection != null) {
+            for (DexIterable<? extends Element> elem : sessionData.get().collection) {
+                elem.close(false);
             }
+            sessionData.get().collection.clear();
         }
-        sessCollections.remove(sess);
     }
 
     /*
@@ -614,11 +602,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     @Override
     public void shutdown() {
         stopTransaction(Conclusion.SUCCESS);
-
-        if (sessCollections.size() > 0) {
-            throw new IllegalStateException("Non closed transactions");
-        }
-
+        
         db.close();
         dex.close();
     }
@@ -755,7 +739,6 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         } else {
             throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
-        boolean found = false;
         Set<String> ret = new HashSet<String>();
         for (Integer type : tlist) {
             com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(type);
@@ -774,14 +757,11 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     void autoStartTransaction() {
-        com.sparsity.dex.gdb.Session sess = getRawSession(false);
-
-        if (sess == null) {
-            sess = db.newSession();
-            session.set(sess);
+        if (sessionData.get().session == null) {
+            sessionData.get().session = db.newSession();
             //System.out.println("> th=" + Thread.currentThread().getId() + " starts tx with sess=" + sess);
         } else {
-            assert !sess.isClosed();
+            assert !sessionData.get().session.isClosed();
         }
     }
 
@@ -795,7 +775,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         if (sess != null && !sess.isClosed()) {
             sess.close();
         }
-        session.set(null);
+        sessionData.set(null);
     }
 
     public void rollback() {
@@ -804,12 +784,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     @Override
     public void stopTransaction(Conclusion conclusion) {
-        com.sparsity.dex.gdb.Session sess = getRawSession(false);
-        if (sess == null) {
+        if (sessionData.get().session == null) {
             // already closed session
             return;
         }
-
         if (Conclusion.FAILURE == conclusion) {
             throw new UnsupportedOperationException("FAILURE conclusion is not supported");
         }
@@ -817,11 +795,11 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         // Close Session
         //
         closeAllSessionCollections();
-        if (sess != null && !sess.isClosed()) {
-            sess.close();
+        if (sessionData.get().session != null && !sessionData.get().session.isClosed()) {
+            sessionData.get().session.close();
         }
-        session.set(null);
-
+        sessionData.get().session = null;
+        
         //System.out.println("< th=" + Thread.currentThread().getId() + " ends tx with sess=" + sess);
     }
 }
