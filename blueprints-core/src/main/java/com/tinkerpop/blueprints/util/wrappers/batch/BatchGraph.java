@@ -249,12 +249,11 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * @param conclusion whether or not the current transaction was successful
      */
     @Override
-    public void stopTransaction(final Conclusion conclusion) {
-        if (conclusion != Conclusion.SUCCESS) throw new IllegalArgumentException("Cannot abort batch loading");
-        currentEdge = null;
-        currentEdgeCached = null;
-        remainingBufferSize = 0;
-        baseGraph.commit();
+    public void stopTransaction(Conclusion conclusion) {
+        if (Conclusion.SUCCESS == conclusion)
+            commit();
+        else
+            rollback();
     }
 
     public void commit() {

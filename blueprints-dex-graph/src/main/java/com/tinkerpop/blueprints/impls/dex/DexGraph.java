@@ -88,12 +88,14 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     private com.sparsity.dex.gdb.Dex dex = null;
     private com.sparsity.dex.gdb.Database db = null;
-    
+
     private class Metadata {
         com.sparsity.dex.gdb.Session session = null;
         List<DexIterable<? extends Element>> collection = null;
-    };
-    
+    }
+
+    ;
+
     private ThreadLocal<Metadata> sessionData = new ThreadLocal<Metadata>() {
         @Override
         protected Metadata initialValue() {
@@ -602,7 +604,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     @Override
     public void shutdown() {
         commit();
-        
+
         db.close();
         dex.close();
     }
@@ -766,16 +768,15 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     public void commit() {
-        com.sparsity.dex.gdb.Session sess = getRawSession(false);
-        if (sess == null) {
+        if (sessionData.get().session == null) {
             // already closed session
             return;
         }
         closeAllSessionCollections();
-        if (sess != null && !sess.isClosed()) {
-            sess.close();
+        if (sessionData.get().session != null && !sessionData.get().session.isClosed()) {
+            sessionData.get().session.close();
         }
-        sessionData.set(null);
+        sessionData.get().session = null;
     }
 
     public void rollback() {
@@ -784,22 +785,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     @Override
     public void stopTransaction(Conclusion conclusion) {
-        if (sessionData.get().session == null) {
-            // already closed session
-            return;
-        }
-        if (Conclusion.FAILURE == conclusion) {
-            throw new UnsupportedOperationException("FAILURE conclusion is not supported");
-        }
-        //
-        // Close Session
-        //
-        closeAllSessionCollections();
-        if (sessionData.get().session != null && !sessionData.get().session.isClosed()) {
-            sessionData.get().session.close();
-        }
-        sessionData.get().session = null;
-        
-        //System.out.println("< th=" + Thread.currentThread().getId() + " ends tx with sess=" + sess);
+        if (Conclusion.SUCCESS == conclusion)
+            commit();
+        else
+            rollback();
     }
 }

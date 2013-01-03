@@ -423,16 +423,11 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         return uri;
     }
 
-    public void stopTransaction(final Conclusion conclusion) {
-        try {
-            if (Conclusion.SUCCESS == conclusion) {
-                this.sailConnection.get().commit();
-            } else {
-                this.sailConnection.get().rollback();
-            }
-        } catch (SailException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+    public void stopTransaction(Conclusion conclusion) {
+        if (Conclusion.SUCCESS == conclusion)
+            commit();
+        else
+            rollback();
     }
 
     public void commit() {

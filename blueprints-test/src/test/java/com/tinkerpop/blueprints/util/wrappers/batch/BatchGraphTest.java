@@ -279,11 +279,11 @@ public class BatchGraphTest extends TestCase {
         }
 
         public void rollback() {
-            this.rollback();
+            this.stopTransaction(Conclusion.FAILURE);
         }
 
         public void commit() {
-            this.commit();
+            this.stopTransaction(Conclusion.SUCCESS);
         }
 
         @Override
