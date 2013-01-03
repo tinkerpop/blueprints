@@ -115,7 +115,7 @@ public class GraphSONReader {
 
         jp.close();
 
-        graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        graph.commit();;
     }
 
 

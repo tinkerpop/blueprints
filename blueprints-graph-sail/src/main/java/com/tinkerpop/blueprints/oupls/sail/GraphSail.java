@@ -142,7 +142,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
                 store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
             } finally {
                 if (store.manualTransactions) {
-                    ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+                    ((TransactionalGraph) graph).commit();;
                 }
             }
         }

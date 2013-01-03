@@ -193,7 +193,7 @@ public class BatchGraphTest extends TestCase {
             previous = next;
         }
 
-        loader.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        loader.commit();;
         assertTrue(tgraph.allSuccessful());
 
         loader.shutdown();
@@ -279,11 +279,11 @@ public class BatchGraphTest extends TestCase {
         }
 
         public void rollback() {
-            this.stopTransaction(Conclusion.FAILURE);
+            this.rollback();
         }
 
         public void commit() {
-            this.stopTransaction(Conclusion.SUCCESS);
+            this.commit();
         }
 
         @Override

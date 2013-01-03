@@ -235,7 +235,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         currentEdge = null;
         currentEdgeCached = null;
         if (remainingBufferSize <= 0) {
-            baseGraph.stopTransaction(Conclusion.SUCCESS);
+            baseGraph.commit();
             cache.newTransaction();
             remainingBufferSize = bufferSize;
         }
@@ -254,7 +254,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         currentEdge = null;
         currentEdgeCached = null;
         remainingBufferSize = 0;
-        baseGraph.stopTransaction(Conclusion.SUCCESS);
+        baseGraph.commit();
     }
 
     public void commit() {
@@ -270,7 +270,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     @Override
     public void shutdown() {
-        baseGraph.stopTransaction(Conclusion.SUCCESS);
+        baseGraph.commit();
         baseGraph.shutdown();
         currentEdge = null;
         currentEdgeCached = null;

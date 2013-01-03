@@ -151,7 +151,7 @@ public class GMLReader {
 
             new GMLParser(graph, defaultEdgeLabel, vertexIdKey, edgeIdKey, edgeLabelKey).parse(st);
 
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.commit();;
         } catch (IOException e) {
             throw new IOException("GML malformed line number " + st.lineno() + ": ", e);
         }
