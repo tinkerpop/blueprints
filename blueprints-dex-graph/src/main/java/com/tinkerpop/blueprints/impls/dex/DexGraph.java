@@ -601,7 +601,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
       */
     @Override
     public void shutdown() {
-        stopTransaction(Conclusion.SUCCESS);
+        commit();
         
         db.close();
         dex.close();

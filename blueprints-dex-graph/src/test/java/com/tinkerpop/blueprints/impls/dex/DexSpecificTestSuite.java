@@ -115,19 +115,19 @@ public class DexSpecificTestSuite extends TestSuite {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
         this.stopWatch();
 
-        graph.stopTransaction(Conclusion.SUCCESS);
+        graph.commit();
 
         graph.addVertex(null).setProperty("name", "sergio");
         graph.addVertex(null).setProperty("name", "marko");
         assertTrue(graph.getVertices("name", "sergio").iterator().next()
                 .getProperty("name").equals("sergio"));
-        graph.stopTransaction(Conclusion.SUCCESS);
+        graph.commit();
         assertTrue(((DexGraph) graph).getRawSession(false) == null);
 
         assertTrue(graph.getVertices("name", "sergio").iterator().next().getProperty("name").equals("sergio"));
-        graph.stopTransaction(Conclusion.SUCCESS);
+        graph.commit();
         assertTrue(((DexGraph) graph).getRawSession(false) == null);
-        graph.stopTransaction(Conclusion.SUCCESS);
+        graph.commit();
         assertTrue(((DexGraph) graph).getRawSession(false) == null);
 
         graph.addVertex(null);
@@ -156,7 +156,7 @@ public class DexSpecificTestSuite extends TestSuite {
                     }
                 }
             }
-            tg.stopTransaction(Conclusion.SUCCESS);
+            tg.commit();
             finished = true;
         }
     }
