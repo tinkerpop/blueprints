@@ -5,6 +5,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -25,16 +26,9 @@ class RestHelper {
 
     static JSONObject get(final String uri) {
         try {
-            final URL url = new URL(safeUri(uri));
-            final URLConnection connection = url.openConnection();
-            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
-            if (Authentication.isAuthenticationEnabled()) {
-                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
-            }
+            final URLConnection connection = createConnection(uri, null, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
             connection.connect();
-            final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
-            final JSONObject object = new JSONObject(tokener);
-            return object;
+            return new JSONObject(new JSONTokener(convertStreamToString(connection.getInputStream())));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -49,138 +43,29 @@ class RestHelper {
     }
 
     static JSONArray postResultArray(final String uri, final JSONObject json) {
-        try {
-            final URL url = new URL(postUri(uri));
-            final String data = json.toString();
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty(RexsterTokens.ACCEPT, "application/json");
-
-            if (Authentication.isAuthenticationEnabled()) {
-                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
-            }
-            connection.setDoOutput(true);
-
-            final OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(data); // post data with Content-Length automatically set
-            writer.close();
-
-            final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
-            final JSONObject resultObject = new JSONObject(tokener);
-            final JSONArray retObject = resultObject.optJSONArray(RexsterTokens.RESULTS);
-
-            return retObject;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return post(uri, json.toString(), RexsterTokens.APPLICATION_JSON,
+                RexsterTokens.APPLICATION_JSON, false).optJSONArray(RexsterTokens.RESULTS);
     }
 
     static JSONObject postResultObject(final String uri) {
-        // should probably factor this out
-        try {
-            URL url = new URL(postUri(uri));
-            String data = postData(uri);
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
-            if (Authentication.isAuthenticationEnabled()) {
-                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
-            }
-            connection.setDoOutput(true);
-
-            final OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(data); // post data with Content-Length automatically set
-            writer.close();
-
-            final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
-            final JSONObject resultObject = new JSONObject(tokener);
-            final JSONObject retObject = resultObject.optJSONObject(RexsterTokens.RESULTS);
-
-            return retObject;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return post(uri, postData(uri), null, RexsterTokens.APPLICATION_JSON, false).optJSONObject(RexsterTokens.RESULTS);
     }
 
     static JSONObject postResultObject(final String uri, final JSONObject json) {
-        try {
-            final URL url = new URL(postUri(uri));
-            final String data = json.toString();
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("Content-Type", RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
-            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
-
-            if (Authentication.isAuthenticationEnabled()) {
-                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
-            }
-            connection.setDoOutput(true);
-
-            final OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(data); // post data with Content-Length automatically set
-            writer.close();
-
-            final JSONTokener tokener = new JSONTokener(convertStreamToString(connection.getInputStream()));
-            final JSONObject resultObject = new JSONObject(tokener);
-            final JSONObject retObject = resultObject.optJSONObject(RexsterTokens.RESULTS);
-
-            return retObject;
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        return post(uri, json.toString(), RexsterTokens.APPLICATION_REXSTER_TYPED_JSON,
+                RexsterTokens.APPLICATION_REXSTER_TYPED_JSON, false).optJSONObject(RexsterTokens.RESULTS);
     }
 
     static void post(final String uri) {
-        try {
-            // convert querystring into POST form data
-            URL url = new URL(postUri(uri));
-            String data = postData(uri);
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
-            if (Authentication.isAuthenticationEnabled()) {
-                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
-            }
-            connection.setDoOutput(true);
-            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-            writer.write(data); // post data with Content-Length automatically set
-            writer.close();
-
-            InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            reader.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        post(uri, postData(uri), null, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON, false);
     }
 
     static void delete(final String uri) {
-        try {
-            final URL url = new URL(uri);
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
-            if (Authentication.isAuthenticationEnabled()) {
-                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
-            }
-            connection.setRequestMethod(DELETE);
-            final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            reader.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        act(uri, DELETE, null, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
     }
 
     static void put(final String uri) {
-        try {
-            final URL url = new URL(uri);
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty(RexsterTokens.ACCEPT, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
-            if (Authentication.isAuthenticationEnabled()) {
-                connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
-            }
-            connection.setRequestMethod(PUT);
-            final InputStreamReader reader = new InputStreamReader(connection.getInputStream());
-            reader.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        act(uri, PUT, null, RexsterTokens.APPLICATION_REXSTER_TYPED_JSON);
     }
 
     static Object typeCast(final String type, final Object value) {
@@ -219,6 +104,56 @@ class RestHelper {
             return URLEncoder.encode(id.toString());
         else
             return id.toString();
+    }
+
+    private static void act(final String uri, final String verb, final String contentType,
+                            final String accept) {
+        try {
+            final HttpURLConnection connection = createConnection(uri, contentType, accept);
+            connection.setRequestMethod(verb);
+            new InputStreamReader(connection.getInputStream()).close();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    private static HttpURLConnection createConnection(final String uri, final String contentType,
+                                                      final String accept) throws IOException {
+        final URL url = new URL(safeUri(uri));
+        final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        if (contentType != null) {
+            connection.setRequestProperty("Content-Type", contentType);
+        }
+
+        if (accept != null) {
+            connection.setRequestProperty(RexsterTokens.ACCEPT, accept);
+        }
+
+        if (Authentication.isAuthenticationEnabled()) {
+            connection.setRequestProperty(RexsterTokens.AUTHORIZATION, Authentication.getAuthenticationHeaderValue());
+        }
+        return connection;
+    }
+
+    private static JSONObject post(final String uri, final String postData, final String contentType,
+                                   final String accept, final boolean noResult) {
+        try {
+            final HttpURLConnection connection = createConnection(uri, contentType, accept);
+            connection.setDoOutput(true);
+
+            final OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+            writer.write(postData); // post data with Content-Length automatically set
+            writer.close();
+
+            if (noResult) {
+                new InputStreamReader(connection.getInputStream()).close();
+                return null;
+            } else {
+                return new JSONObject(new JSONTokener(convertStreamToString(connection.getInputStream())));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     private static String postUri(final String uri) {

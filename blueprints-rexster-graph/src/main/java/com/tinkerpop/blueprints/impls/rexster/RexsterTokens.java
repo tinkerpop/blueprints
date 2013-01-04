@@ -89,5 +89,6 @@ class RexsterTokens {
     public static final String ACCEPT = "Accept";
     public static final String AUTHORIZATION = "Authorization";
     public static final String APPLICATION_REXSTER_TYPED_JSON = "application/vnd.rexster-typed-v1+json";
+    public static final String APPLICATION_JSON = "application/json";
 
 }
