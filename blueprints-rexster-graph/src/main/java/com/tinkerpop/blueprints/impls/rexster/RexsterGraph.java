@@ -291,6 +291,30 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         return keys;
     }
 
+    public JSONArray execute(final String gremlinScript) {
+         return execute(gremlinScript, (JSONObject) null);
+    }
+
+    public JSONArray execute(final String gremlinScript, final Map<String, Object> scriptParams) {
+        JSONObject json = null;
+        if (scriptParams != null && scriptParams.size() > 0) {
+            json = new JSONObject(scriptParams);
+        }
+
+        return execute(gremlinScript, json);
+    }
+
+    public JSONArray execute(final String gremlinScript, final JSONObject scriptParams) {
+        final Map<String, Object> scriptArgs = new HashMap<String, Object>();
+        scriptArgs.put("script", gremlinScript);
+
+        if (scriptParams != null) {
+            scriptArgs.put("params", scriptParams);
+        }
+
+        return RestHelper.postResultArray(this.graphURI + RexsterTokens.SLASH_GREMLIN, new JSONObject(scriptArgs));
+    }
+
     private static <T extends Element> String getKeyIndexClass(Class<T> elementClass) {
         String c;
         if (Vertex.class.isAssignableFrom(elementClass))

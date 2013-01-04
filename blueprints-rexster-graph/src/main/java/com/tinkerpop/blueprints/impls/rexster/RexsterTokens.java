@@ -53,6 +53,8 @@ class RexsterTokens {
     public static final String SLASH_INIDS = "/inIds";
     public static final String SLASH_BOTHIDS = "/bothv";
 
+    public static final String SLASH_GREMLIN = "/tp/gremlin";
+
     public static final String AND = "&";
     public static final String COMMA = ",";
     public static final String EQUALS = "=";
