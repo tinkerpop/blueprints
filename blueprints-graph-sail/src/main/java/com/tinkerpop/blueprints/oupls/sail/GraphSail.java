@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -54,6 +55,9 @@ import java.util.regex.Pattern;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase implements WrapperGraph<T> {
+
+    private static final Logger LOGGER = Logger.getLogger(GraphSail.class.getName());
+
     public static final String SEPARATOR = " ";
 
     public static final String
@@ -91,7 +95,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
     private final DataStore store = new DataStore();
 
     /**
-     * Create a new RDF store using the provided Blueprints graph.  Default edge indices will be used.
+     * Create a new RDF store using the provided Blueprints graph.  Default edge indices ("p,c,pc") will be used.
      *
      * @param graph the storage layer.  If the provided graph implements TransactionalGraph and is in manual transaction
      *              mode, then this Sail will also be transactional.
@@ -108,8 +112,10 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
      * @param graph           the storage layer.  If the provided graph implements TransactionalGraph and is in manual transaction
      *                        mode, then this Sail will also be transactional.
      *                        Any vertices and edges in the graph should have been previously created with GraphSail.
-     * @param indexedPatterns a comma-delimited list of triple patterns for index-based statement matching.  Only p,c are required,
-     *                        while the default patterns are p,c,pc.
+     * @param indexedPatterns a comma-delimited list of triple patterns for index-based statement matching.
+     *                        The "p" and "c" patterns are necessary for efficient answering of certain queries, but are not required.
+     *                        The default list of patterns is "p,c,pc".
+     *                        To use GraphSail with a base Graph which does not support edge indices, provide "" as the argument.
      */
     public GraphSail(final T graph, final String indexedPatterns) {
         //if (graph instanceof TransactionalGraph)
@@ -119,44 +125,26 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         store.sail = this;
         store.graph = graph;
 
-        createIndices();
-
         store.manualTransactions = store.graph instanceof TransactionalGraph;
 
-        store.namespaces = store.getReferenceVertex();
-        if (null == store.namespaces) {
-            try {
-                // FIXME: with FAKE_VERTEX_IDS, an extra "namespace" called "value" is present.  Perhaps namespaces
-                // should be given individual nodes, rather than being encapsulated in properties of the namespaces node.
-                store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
-            } finally {
-                if (store.manualTransactions) {
-                    ((TransactionalGraph) graph).stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
-                }
-            }
+        if (!store.graph.getIndexedKeys(Vertex.class).contains(VALUE)) {
+            store.graph.createKeyIndex(VALUE, Vertex.class);
         }
 
         store.matchers[0] = new TrivialMatcher(graph);
 
-        parseTripleIndices(indexedPatterns);
+        createTripleIndices(indexedPatterns);
         assignUnassignedTriplePatterns();
-    }
 
-    private void createIndices() {
-        String[] allKeys = {"s", "p", "o", "c",
-                "sp", "so", "sc", "po", "pc", "oc",
-                "spo", "spc", "soc", "poc",
-                "spoc"};
-
-        // TODO: indices for all keys are not required
-        for (String key : allKeys) {
-            if (!store.graph.getIndexedKeys(Edge.class).contains(key)) {
-                store.graph.createKeyIndex(key, Edge.class);
+        store.namespaces = store.getReferenceVertex();
+        if (null == store.namespaces) {
+            try {
+                store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
+            } finally {
+                if (store.manualTransactions) {
+                    ((TransactionalGraph) graph).commit();;
+                }
             }
-        }
-
-        if (!store.graph.getIndexedKeys(Vertex.class).contains(VALUE)) {
-            store.graph.createKeyIndex(VALUE, Vertex.class);
         }
     }
 
@@ -390,7 +378,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         }
     }
 
-    private void parseTripleIndices(final String tripleIndexes) {
+    private void createTripleIndices(final String tripleIndexes) {
         if (null == tripleIndexes) {
             throw new IllegalArgumentException("index list, if supplied, must be non-null");
         }
@@ -398,19 +386,23 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         Set<String> u = new HashSet<String>();
 
         String[] a = tripleIndexes.split(",");
-        if (0 == a.length) {
-            throw new IllegalArgumentException("index list, if supplied, must be non-empty");
-        }
         for (String s : a) {
             u.add(s.trim());
         }
 
-        // These two patterns are required for efficient operation.
-        u.add("p");
-        u.add("c");
+        if (!u.contains("p")) {
+            LOGGER.warning("no (?s p ?o ?c) index. Certain query operations will be inefficient");
+        }
+        if (!u.contains("c")) {
+            LOGGER.warning("no (?s ?p ?o c) index. Certain query operations will be inefficient");
+        }
 
-        for (String s : u) {
-            createIndexingMatcher(s);
+        for (String key : u) {
+            if (!store.graph.getIndexedKeys(Edge.class).contains(key)) {
+                store.graph.createKeyIndex(key, Edge.class);
+            }
+
+            createIndexingMatcher(key);
         }
     }
 

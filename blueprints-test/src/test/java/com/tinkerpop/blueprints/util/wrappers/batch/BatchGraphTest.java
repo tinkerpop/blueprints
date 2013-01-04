@@ -193,7 +193,7 @@ public class BatchGraphTest extends TestCase {
             previous = next;
         }
 
-        loader.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        loader.commit();;
         assertTrue(tgraph.allSuccessful());
 
         loader.shutdown();

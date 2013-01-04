@@ -69,11 +69,11 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
     }
 
     @Override
-    public void stopTransaction(final Conclusion conclusion) {
-        if (conclusion == Conclusion.FAILURE) {
-            this.getRawGraph().rollback();
-        } else
-            this.getRawGraph().commit();
+    public void stopTransaction(Conclusion conclusion) {
+        if (Conclusion.SUCCESS == conclusion)
+            commit();
+        else
+            rollback();
     }
 
     public void commit() {

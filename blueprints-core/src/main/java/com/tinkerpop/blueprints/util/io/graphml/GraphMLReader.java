@@ -243,7 +243,7 @@ public class GraphMLReader {
 
             reader.close();
 
-            graph.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+            graph.commit();;
         } catch (XMLStreamException xse) {
             throw new IOException(xse);
         }

@@ -167,9 +167,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         try {
             this.autoStartTransaction();
             this.removeVertex(this.getVertex(0));
-            this.stopTransaction(Conclusion.SUCCESS);
+            this.commit();
         } catch (Exception e) {
-            this.stopTransaction(Conclusion.FAILURE);
+            this.rollback();
         }
     }
 
@@ -263,7 +263,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 relationshipIndex.delete();
             }
         }
-        this.stopTransaction(Conclusion.SUCCESS);
+        this.commit();
     }
 
 
@@ -443,20 +443,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
     }
 
-    public void stopTransaction(final Conclusion conclusion) {
-        if (null == tx.get()) {
-            return;
-        }
-
-        try {
-            if (conclusion.equals(Conclusion.SUCCESS))
-                tx.get().success();
-            else
-                tx.get().failure();
-        } finally {
-            tx.get().finish();
-            tx.remove();
-        }
+    public void stopTransaction(Conclusion conclusion) {
+        if (Conclusion.SUCCESS == conclusion)
+            commit();
+        else
+            rollback();
     }
 
     public void commit() {
@@ -487,7 +478,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public void shutdown() {
         try {
-            this.stopTransaction(Conclusion.SUCCESS);
+            this.commit();
         } catch (TransactionFailureException e) {
             //TODO: inspect why certain transactions fail
         }

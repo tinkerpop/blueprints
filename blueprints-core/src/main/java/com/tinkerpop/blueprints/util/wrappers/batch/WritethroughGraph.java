@@ -39,8 +39,11 @@ class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Transaction
      * @param conclusion whether or not the current transaction was successful or not
      */
     @Override
-    public void stopTransaction(final Conclusion conclusion) {
-        if (conclusion == Conclusion.FAILURE) throw new IllegalArgumentException("Failure not accepted");
+    public void stopTransaction(Conclusion conclusion) {
+        if (Conclusion.SUCCESS == conclusion)
+            commit();
+        else
+            rollback();
     }
 
     public void rollback() {

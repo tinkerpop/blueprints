@@ -323,7 +323,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      */
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
         try {
-            this.stopTransaction(Conclusion.SUCCESS);
+            this.commit();
             final SailConnection c = this.rawGraph.getConnection();
             try {
                 RDFParser p = Rio.createParser(getFormat(format));
@@ -375,7 +375,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public synchronized void shutdown() {
         try {
-            this.stopTransaction(Conclusion.SUCCESS);
+            this.commit();
             closeAllConnections();
             this.rawGraph.shutDown();
         } catch (Throwable e) {
@@ -423,16 +423,11 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         return uri;
     }
 
-    public void stopTransaction(final Conclusion conclusion) {
-        try {
-            if (Conclusion.SUCCESS == conclusion) {
-                this.sailConnection.get().commit();
-            } else {
-                this.sailConnection.get().rollback();
-            }
-        } catch (SailException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+    public void stopTransaction(Conclusion conclusion) {
+        if (Conclusion.SUCCESS == conclusion)
+            commit();
+        else
+            rollback();
     }
 
     public void commit() {
