@@ -12,12 +12,6 @@ package com.tinkerpop.blueprints;
  */
 public interface ThreadedTransactionalGraph extends TransactionalGraph {
 
-    @Deprecated
-    /**
-     * Please use newTransaction() as this method has been renamed for clarity.
-     */
-    public TransactionalGraph startTransaction();
-
     /**
      * Returns a {@link TransactionalGraph} that represents a transactional context independent of the executing transaction.
      *
