@@ -20,7 +20,9 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Improved transaction concurrency in @DexGraph@
 * Deprecated @stopTransaction()@ in favor of @commit()@ and @rollback()@
 * Deprecated @startTransaction()@ in favor of @newTransaction()@
-* Loosed restrictions on edge-indexing in @GraphSail@ (though for some types of queries, exception thrown)
+* Loosened restrictions on edge-indexing in @GraphSail@ (though for some types of queries, exception thrown)
+* @RestHelper@ in @RexsterGraph@ packages is no longer publically available.
+* Add @execute@ methods to @RexsterGraph@ to allow execution of raw Gremlin scripts to the Gremlin Extension in Rexster.
 
 ==<hr/>==
 
