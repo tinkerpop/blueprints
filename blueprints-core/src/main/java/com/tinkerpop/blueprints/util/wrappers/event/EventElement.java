@@ -32,16 +32,16 @@ public abstract class EventElement implements Element {
         this.trigger = trigger;
     }
 
-    protected void onVertexPropertyChanged(final Vertex vertex, final String key, final Object newValue) {
-        this.trigger.addEvent(new VertexPropertyChangedEvent(vertex, key, newValue));
+    protected void onVertexPropertyChanged(final Vertex vertex, final String key, final Object oldValue, final Object newValue) {
+        this.trigger.addEvent(new VertexPropertyChangedEvent(vertex, key, oldValue, newValue));
     }
 
-    protected void onEdgePropertyChanged(final Edge edge, final String key, final Object newValue) {
-        this.trigger.addEvent(new EdgePropertyChangedEvent(edge, key, newValue));
+    protected void onEdgePropertyChanged(final Edge edge, final String key, final Object oldValue, final Object newValue) {
+        this.trigger.addEvent(new EdgePropertyChangedEvent(edge, key, oldValue, newValue));
     }
 
-    protected void onVertexPropertyRemoved(final Vertex vertex, final String key, final Object newValue) {
-        this.trigger.addEvent(new VertexPropertyRemovedEvent(vertex, key, newValue));
+    protected void onVertexPropertyRemoved(final Vertex vertex, final String key, final Object removedValue) {
+        this.trigger.addEvent(new VertexPropertyRemovedEvent(vertex, key, removedValue));
     }
 
     protected void onEdgePropertyRemoved(final Edge edge, final String key, final Object removedValue) {
@@ -79,12 +79,13 @@ public abstract class EventElement implements Element {
      * Raises a vertexPropertyRemoved or edgePropertyChanged event.
      */
     public void setProperty(final String key, final Object value) {
+    	Object oldValue = this.baseElement.getProperty(key);
         this.baseElement.setProperty(key, value);
 
         if (this instanceof Vertex) {
-            this.onVertexPropertyChanged((Vertex) this, key, value);
+            this.onVertexPropertyChanged((Vertex) this, key, oldValue, value);
         } else if (this instanceof Edge) {
-            this.onEdgePropertyChanged((Edge) this, key, value);
+            this.onEdgePropertyChanged((Edge) this, key, oldValue, value);
         }
     }
 

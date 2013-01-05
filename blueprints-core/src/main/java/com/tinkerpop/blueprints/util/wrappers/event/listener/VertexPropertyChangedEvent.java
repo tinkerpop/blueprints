@@ -4,12 +4,12 @@ import com.tinkerpop.blueprints.Vertex;
 
 public class VertexPropertyChangedEvent extends VertexPropertyEvent {
 
-    public VertexPropertyChangedEvent(Vertex vertex, String key, Object newValue) {
-        super(vertex, key, newValue);
+    public VertexPropertyChangedEvent(Vertex vertex, String key, Object oldValue, Object newValue) {
+        super(vertex, key, oldValue, newValue);
     }
 
     @Override
-    void fire(GraphChangedListener listener, Vertex vertex, String key, Object newValue) {
-        listener.vertexPropertyChanged(vertex, key, newValue);
+    void fire(GraphChangedListener listener, Vertex vertex, String key, Object oldValue, Object newValue) {
+        listener.vertexPropertyChanged(vertex, key, oldValue, newValue);
     }
 }
