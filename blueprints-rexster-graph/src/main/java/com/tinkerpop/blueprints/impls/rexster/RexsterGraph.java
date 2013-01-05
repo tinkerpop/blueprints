@@ -12,6 +12,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
@@ -302,6 +303,10 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         }
 
         return execute(gremlinScript, json);
+    }
+
+    public JSONArray execute(final String gremlinScript, final String scriptParams) throws JSONException {
+        return execute(gremlinScript, new JSONObject(scriptParams));
     }
 
     public JSONArray execute(final String gremlinScript, final JSONObject scriptParams) {

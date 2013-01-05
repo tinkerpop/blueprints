@@ -18,7 +18,7 @@ import java.net.URLEncoder;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-class RestHelper {
+final class RestHelper {
 
     public static RexsterAuthentication Authentication;
     private static final String PUT = "PUT";

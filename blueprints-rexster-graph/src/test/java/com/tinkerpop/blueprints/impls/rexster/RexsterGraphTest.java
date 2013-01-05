@@ -124,6 +124,9 @@ public class RexsterGraphTest extends GraphTest {
             final JSONArray paramResults = g.execute("g.v(x)._().count()", args);
             Assert.assertEquals(1, paramResults.optInt(0));
 
+            final JSONArray jsonParamResults = g.execute("g.v(x)._().count()", "{\"x\":\"2\"}");
+            Assert.assertEquals(1, jsonParamResults.optInt(0));
+
         }
     }
 
