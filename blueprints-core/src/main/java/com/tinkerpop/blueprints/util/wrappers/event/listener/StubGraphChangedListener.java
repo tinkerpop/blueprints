@@ -40,9 +40,9 @@ public class StubGraphChangedListener implements GraphChangedListener {
         order.add("v-added-" + vertex.getId());
     }
 
-    public void vertexPropertyChanged(Vertex vertex, String s, Object o) {
+    public void vertexPropertyChanged(Vertex vertex, String s, Object o, Object n) {
         vertexPropertyChangedEvent++;
-        order.add("v-property-changed-" + vertex.getId() + "-" + s + ":" + o);
+        order.add("v-property-changed-" + vertex.getId() + "-" + s + ":" + o + "->" + n);
     }
 
     public void vertexPropertyRemoved(Vertex vertex, String s, Object o) {
@@ -60,9 +60,9 @@ public class StubGraphChangedListener implements GraphChangedListener {
         order.add("e-added-" + edge.getId());
     }
 
-    public void edgePropertyChanged(Edge edge, String s, Object o) {
+    public void edgePropertyChanged(Edge edge, String s, Object o, Object n) {
         edgePropertyChangedEvent++;
-        order.add("e-property-changed-" + edge.getId() + "-" + s + ":" + o);
+        order.add("e-property-changed-" + edge.getId() + "-" + s + ":" + o + "->" + n);
     }
 
     public void edgePropertyRemoved(Edge edge, String s, Object o) {

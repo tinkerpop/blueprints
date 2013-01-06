@@ -378,6 +378,7 @@ public class EventTransactionalGraphTest extends GraphTest {
         Edge e1 = graph.addEdge(100, v1, v2, "friend");
         e1.setProperty("eee", "fff");
         e1.setProperty("ggg", "hhh");
+        e1.setProperty("ggg", "hhhh");
         e1.removeProperty("eee");
 
         Edge e2 = graph.addEdge(101, v1, v2, "enemy");
@@ -391,18 +392,19 @@ public class EventTransactionalGraphTest extends GraphTest {
 
         List<String> order = graphChangedListener.getOrder();
         assertEquals("v-added-10", order.get(0));
-        assertEquals("v-property-changed-10-aaa:bbb", order.get(1));
-        assertEquals("v-property-changed-10-ccc:ddd", order.get(2));
+        assertEquals("v-property-changed-10-aaa:null->bbb", order.get(1));
+        assertEquals("v-property-changed-10-ccc:null->ddd", order.get(2));
         assertEquals("v-property-removed-10-aaa:bbb", order.get(3));
         assertEquals("v-added-20", order.get(4));
         assertEquals("v-added-30", order.get(5));
         assertEquals("e-added-100", order.get(6));
-        assertEquals("e-property-changed-100-eee:fff", order.get(7));
-        assertEquals("e-property-changed-100-ggg:hhh", order.get(8));
-        assertEquals("e-property-removed-100-eee:fff", order.get(9));
-        assertEquals("e-added-101", order.get(10));
-        assertEquals("e-removed-101", order.get(11));
-        assertEquals("v-removed-30", order.get(12));
+        assertEquals("e-property-changed-100-eee:null->fff", order.get(7));
+        assertEquals("e-property-changed-100-ggg:null->hhh", order.get(8));
+        assertEquals("e-property-changed-100-ggg:hhh->hhhh", order.get(9));
+        assertEquals("e-property-removed-100-eee:fff", order.get(10));
+        assertEquals("e-added-101", order.get(11));
+        assertEquals("e-removed-101", order.get(12));
+        assertEquals("v-removed-30", order.get(13));
 
     }
 
