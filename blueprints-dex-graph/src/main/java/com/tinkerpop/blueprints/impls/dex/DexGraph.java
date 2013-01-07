@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
@@ -671,7 +672,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      */
     @Override
     public <T extends Element> void createKeyIndex(String key,
-                                                   Class<T> elementClass) {
+                                                   Class<T> elementClass, final Parameter... indexParameters) {
         autoStartTransaction();
 
         String label = this.label.get();

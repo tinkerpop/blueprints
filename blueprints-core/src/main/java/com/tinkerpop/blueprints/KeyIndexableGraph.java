@@ -23,11 +23,12 @@ public interface KeyIndexableGraph extends Graph {
     /**
      * Create an automatic indexing structure for indexing provided key for element class.
      *
-     * @param key          the key to create the index for
-     * @param elementClass the element class that the index is for
-     * @param <T>          the element class specification
+     * @param key             the key to create the index for
+     * @param elementClass    the element class that the index is for
+     * @param indexParameters a collection of parameters for the underlying index implementation
+     * @param <T>             the element class specification
      */
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass);
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters);
 
     /**
      * Return all the index keys associated with a particular element class.

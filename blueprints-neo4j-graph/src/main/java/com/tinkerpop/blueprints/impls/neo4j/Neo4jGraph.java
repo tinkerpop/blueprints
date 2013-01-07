@@ -366,7 +366,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         this.dropInternalIndexKey(key, elementClass);
     }
 
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
+    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
         this.autoStartTransaction();
         if (Vertex.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())

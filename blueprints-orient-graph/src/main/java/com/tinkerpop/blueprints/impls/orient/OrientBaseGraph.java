@@ -451,7 +451,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
     }
 
-    public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass) {
+    public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
         final String className = getClassName(elementClass);
         final OGraphDatabase db = getRawGraph();
 

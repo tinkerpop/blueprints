@@ -268,11 +268,11 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         }
     }
 
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass) {
+    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
         if (key.equals(ID)) {
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
-            baseGraph.createKeyIndex(key, elementClass);
+            baseGraph.createKeyIndex(key, elementClass, indexParameters);
         }
     }
 

@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.util.wrappers.readonly;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Parameter;
 
 import java.util.Set;
 
@@ -27,7 +28,7 @@ public class ReadOnlyKeyIndexableGraph<T extends KeyIndexableGraph> extends Read
     /**
      * @throws UnsupportedOperationException
      */
-    public <T extends Element> void createKeyIndex(final String name, Class<T> elementClass) throws UnsupportedOperationException {
+    public <T extends Element> void createKeyIndex(final String name, Class<T> elementClass, final Parameter... indexParameters) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 

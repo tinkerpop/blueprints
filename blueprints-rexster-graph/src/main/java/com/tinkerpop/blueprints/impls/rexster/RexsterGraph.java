@@ -275,7 +275,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         RestHelper.delete(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c + RexsterTokens.SLASH + key);
     }
 
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass) {
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
         final String c = getKeyIndexClass(elementClass);
         RestHelper.post(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c + RexsterTokens.SLASH + key);
     }
