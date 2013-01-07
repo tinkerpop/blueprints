@@ -23,6 +23,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Loosened restrictions on edge-indexing in @GraphSail@ (though for some types of queries, exception thrown)
 * @RestHelper@ in @RexsterGraph@ packages is no longer publically available.
 * Add @execute@ methods to @RexsterGraph@ to allow execution of raw Gremlin scripts to the Gremlin Extension in Rexster.
+* Include the original property value in property changed/removed events generated from @EventGraph@
 
 ==<hr/>==
 
