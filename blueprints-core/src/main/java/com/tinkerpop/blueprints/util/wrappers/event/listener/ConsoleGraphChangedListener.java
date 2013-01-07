@@ -22,7 +22,7 @@ public class ConsoleGraphChangedListener implements GraphChangedListener {
     }
 
     public void vertexPropertyChanged(final Vertex vertex, final String key, final Object oldValue, final Object newValue) {
-        System.out.println("Vertex [" + vertex.toString() + "] property [" + key + "] set to value of [" + oldValue + "->" + newValue + "] in graph [" + graph.toString() + "]");
+        System.out.println("Vertex [" + vertex.toString() + "] property [" + key + "] change value from [" + oldValue + "] to [" + newValue + "] in graph [" + graph.toString() + "]");
     }
 
     public void vertexPropertyRemoved(final Vertex vertex, final String key, final Object removedValue) {
@@ -38,7 +38,7 @@ public class ConsoleGraphChangedListener implements GraphChangedListener {
     }
 
     public void edgePropertyChanged(final Edge edge, final String key, final Object oldValue, final Object newValue) {
-        System.out.println("Edge [" + edge.toString() + "] property [" + key + "] set to value of [" + oldValue + "->" + newValue + "] in graph [" + graph.toString() + "]");
+        System.out.println("Edge [" + edge.toString() + "] property [" + key + "] change value from [" + oldValue + "] to [" + newValue + "] in graph [" + graph.toString() + "]");
     }
 
     public void edgePropertyRemoved(final Edge edge, final String key, final Object removedValue) {
