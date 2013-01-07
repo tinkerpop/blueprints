@@ -27,7 +27,7 @@ public interface GraphChangedListener {
      * @param key      the key of the property that changed
      * @param setValue the new value of the property
      */
-    public void vertexPropertyChanged(final Vertex vertex, final String key, final Object setValue);
+    public void vertexPropertyChanged(final Vertex vertex, final String key, final Object oldValue, final Object setValue);
 
     /**
      * Raised after a vertex property was removed.
@@ -59,7 +59,7 @@ public interface GraphChangedListener {
      * @param key      the key of the property that changed
      * @param setValue the new value of the property
      */
-    public void edgePropertyChanged(final Edge edge, final String key, final Object setValue);
+    public void edgePropertyChanged(final Edge edge, final String key, final Object oldValue, final Object setValue);
 
     /**
      * Raised after an edge property was removed.

@@ -21,8 +21,8 @@ public class ConsoleGraphChangedListener implements GraphChangedListener {
         System.out.println("Vertex [" + vertex.toString() + "] added to graph [" + graph.toString() + "]");
     }
 
-    public void vertexPropertyChanged(final Vertex vertex, final String key, final Object setValue) {
-        System.out.println("Vertex [" + vertex.toString() + "] property [" + key + "] set to value of [" + setValue + "] in graph [" + graph.toString() + "]");
+    public void vertexPropertyChanged(final Vertex vertex, final String key, final Object oldValue, final Object newValue) {
+        System.out.println("Vertex [" + vertex.toString() + "] property [" + key + "] set to value of [" + oldValue + "->" + newValue + "] in graph [" + graph.toString() + "]");
     }
 
     public void vertexPropertyRemoved(final Vertex vertex, final String key, final Object removedValue) {
@@ -37,8 +37,8 @@ public class ConsoleGraphChangedListener implements GraphChangedListener {
         System.out.println("Edge [" + edge.toString() + "] added to graph [" + graph.toString() + "]");
     }
 
-    public void edgePropertyChanged(final Edge edge, final String key, final Object setValue) {
-        System.out.println("Edge [" + edge.toString() + "] property [" + key + "] set to value of [" + setValue + "] in graph [" + graph.toString() + "]");
+    public void edgePropertyChanged(final Edge edge, final String key, final Object oldValue, final Object newValue) {
+        System.out.println("Edge [" + edge.toString() + "] property [" + key + "] set to value of [" + oldValue + "->" + newValue + "] in graph [" + graph.toString() + "]");
     }
 
     public void edgePropertyRemoved(final Edge edge, final String key, final Object removedValue) {
