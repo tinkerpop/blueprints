@@ -5,7 +5,7 @@ import com.tinkerpop.blueprints.util.wrappers.event.listener.Event;
 import java.util.ArrayList;
 import java.util.List;
 
-class EventTrigger {
+public class EventTrigger {
 
     /**
      * A queue of events that are triggered by change to the graph.  The queue builds
