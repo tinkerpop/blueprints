@@ -8,9 +8,13 @@ import com.tinkerpop.blueprints.Vertex;
 
 public interface VertexCache {
 
-    public Object getEntry(Object externalID);
+    public Object getEntry(Object externalId);
 
-    public void set(Vertex vertex, Object externalID);
+    public void set(Vertex vertex, Object externalId);
+
+    public void setId(Object vertexId, Object externalId);
+
+    public boolean contains(Object externalId);
 
     public void newTransaction();
 

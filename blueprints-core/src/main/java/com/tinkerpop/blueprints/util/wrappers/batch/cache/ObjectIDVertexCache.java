@@ -14,25 +14,33 @@ public class ObjectIDVertexCache implements VertexCache {
 
     private static final int INITIAL_CAPACITY = 1000;
 
-    private final Graph graph;
     private final Map<Object, Object> map;
 
-    public ObjectIDVertexCache(final Graph graph) {
-        if (graph == null) throw new IllegalArgumentException("Graph expected.");
-        this.graph = graph;
+    public ObjectIDVertexCache() {
         map = new HashMap<Object, Object>(INITIAL_CAPACITY);
     }
 
 
     @Override
-    public Object getEntry(Object externalID) {
-        return map.get(externalID);
+    public Object getEntry(Object externalId) {
+        return map.get(externalId);
     }
 
     @Override
-    public void set(Vertex vertex, Object externalID) {
-        map.put(externalID, vertex);
+    public void set(Vertex vertex, Object externalId) {
+        setId(vertex,externalId);
     }
+
+    @Override
+    public void setId(Object vertexId, Object externalId) {
+        map.put(externalId, vertexId);
+    }
+
+    @Override
+    public boolean contains(Object externalId) {
+        return map.containsKey(externalId);
+    }
+
 
     @Override
     public void newTransaction() {
