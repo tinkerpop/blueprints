@@ -144,7 +144,7 @@ public class GraphMLReader {
                         String attributeName = reader.getAttributeValue(null, GraphMLTokens.ATTR_NAME);
                         String attributeType = reader.getAttributeValue(null, GraphMLTokens.ATTR_TYPE);
                         keyIdMap.put(id, attributeName);
-                        keyTypesMaps.put(attributeName, attributeType);
+                        keyTypesMaps.put(id, attributeType);
 
                     } else if (elementName.equals(GraphMLTokens.NODE)) {
                         vertexId = reader.getAttributeValue(null, GraphMLTokens.ID);
