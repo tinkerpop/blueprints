@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -101,12 +102,51 @@ public class GMLReader {
      * <p/>
      * If the file is malformed incomplete data can be loaded.
      *
+     * @param filename
+     * @throws IOException
+     */
+    public void inputGraph(String filename) throws IOException {
+        GMLReader.inputGraph(this.graph, filename, DEFAULT_BUFFER_SIZE, this.defaultEdgeLabel,
+                this.vertexIdKey, this.edgeIdKey, this.edgeLabelKey);
+    }
+
+    /**
+     * Read the GML from from the stream.
+     * <p/>
+     * If the file is malformed incomplete data can be loaded.
+     *
      * @param inputStream
+     * @param bufferSize
      * @throws IOException
      */
     public void inputGraph(InputStream inputStream, int bufferSize) throws IOException {
         GMLReader.inputGraph(this.graph, inputStream, bufferSize, this.defaultEdgeLabel,
                 this.vertexIdKey, this.edgeIdKey, this.edgeLabelKey);
+    }
+
+    /**
+     * Read the GML from from the stream.
+     * <p/>
+     * If the file is malformed incomplete data can be loaded.
+     *
+     * @param filename
+     * @param bufferSize
+     * @throws IOException
+     */
+    public void inputGraph(String filename, int bufferSize) throws IOException {
+        GMLReader.inputGraph(this.graph, filename, bufferSize, this.defaultEdgeLabel,
+                this.vertexIdKey, this.edgeIdKey, this.edgeLabelKey);
+    }
+
+    /**
+     * Load the GML file into the Graph.
+     *
+     * @param graph       to receive the data
+     * @param filename    GML file
+     * @throws IOException thrown if the data is not valid
+     */
+    public static void inputGraph(Graph graph, String filename) throws IOException {
+        inputGraph(graph, filename, DEFAULT_BUFFER_SIZE, DEFAULT_LABEL, null, null, null);
     }
 
     /**
@@ -120,6 +160,25 @@ public class GMLReader {
         inputGraph(graph, inputStream, DEFAULT_BUFFER_SIZE, DEFAULT_LABEL, null, null, null);
     }
 
+    /**
+     * Load the GML file into the Graph.
+     *
+     * @param inputGraph       to receive the data
+     * @param filename         GML file
+     * @param defaultEdgeLabel default edge label to be used if not defined in the data
+     * @param vertexIdKey      if the id of a vertex is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeIdKey        if the id of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeLabelKey     if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @throws IOException thrown if the data is not valid
+     */
+    public static void inputGraph(final Graph inputGraph, final String filename, final int bufferSize,
+                                  final String defaultEdgeLabel, final String vertexIdKey, final String edgeIdKey,
+                                  final String edgeLabelKey) throws IOException {
+        FileInputStream fis = new FileInputStream(filename);
+        GMLReader.inputGraph(inputGraph, fis, bufferSize, defaultEdgeLabel,
+                vertexIdKey, edgeIdKey, edgeLabelKey);
+        fis.close();
+    }
     /**
      * Load the GML file into the Graph.
      *
