@@ -8,6 +8,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.io.LexicographicalElementComparator;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -95,6 +96,17 @@ public class GMLWriter {
         this.edgeIdKey = edgeIdKey;
     }
 
+    /**
+     * Write the data in a Graph to a GML OutputStream.
+     *
+     * @param filename the GML file to write the Graph data to
+     * @throws IOException thrown if there is an error generating the GML data
+     */
+    public void outputGraph(final String filename) throws IOException {
+        FileOutputStream fos = new FileOutputStream(filename);
+        outputGraph(fos);
+        fos.close();
+    }
     /**
      * Write the data in a Graph to a GML OutputStream.
      *
@@ -287,5 +299,17 @@ public class GMLWriter {
     public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream) throws IOException {
         final GMLWriter writer = new GMLWriter(graph);
         writer.outputGraph(graphMLOutputStream);
+    }
+
+    /**
+     * Write the data in a Graph to a GML OutputStream.
+     *
+     * @param graph               the Graph to pull the data from
+     * @param filename            the GML file to write the Graph data to
+     * @throws IOException thrown if there is an error generating the GML data
+     */
+    public static void outputGraph(final Graph graph, final String filename) throws IOException {
+        final GMLWriter writer = new GMLWriter(graph);
+        writer.outputGraph(filename);
     }
 }
