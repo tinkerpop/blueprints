@@ -26,6 +26,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Include the original property value in property changed/removed events generated from @EventGraph@
 * Add the option for graph-specific index parameters on @createKeyIndex@ method on @KeyIndexableGraph@
 * Fix bug in @GraphMLReader@ where the reader ignored data type casting when the @attr.name@ was different from the @id@ in the @key@ element
+* Upgraded to Jackson 2 for JSON processing in GraphSON
 
 ==<hr/>==
 
