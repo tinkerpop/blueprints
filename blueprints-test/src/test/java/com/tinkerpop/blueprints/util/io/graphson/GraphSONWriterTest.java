@@ -1,10 +1,10 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jettison.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class GraphSONWriterTest {
         Assert.assertNotNull(rootNode);
 
         Assert.assertTrue(rootNode.has(GraphSONTokens.MODE));
-        Assert.assertEquals("NORMAL", rootNode.get(GraphSONTokens.MODE).getTextValue());
+        Assert.assertEquals("NORMAL", rootNode.get(GraphSONTokens.MODE).asText());
 
         Assert.assertTrue(rootNode.has(GraphSONTokens.VERTICES));
 
@@ -70,7 +70,7 @@ public class GraphSONWriterTest {
         // number of graph elements are present.  other tests already cover element formatting
         Assert.assertNotNull(rootNode);
         Assert.assertTrue(rootNode.has(GraphSONTokens.MODE));
-        Assert.assertEquals("EXTENDED", rootNode.get(GraphSONTokens.MODE).getTextValue());
+        Assert.assertEquals("EXTENDED", rootNode.get(GraphSONTokens.MODE).asText());
 
         Assert.assertTrue(rootNode.has(GraphSONTokens.VERTICES));
 
@@ -104,7 +104,7 @@ public class GraphSONWriterTest {
         // number of graph elements are present.  other tests already cover element formatting
         Assert.assertNotNull(rootNode);
         Assert.assertTrue(rootNode.has(GraphSONTokens.MODE));
-        Assert.assertEquals("COMPACT", rootNode.get(GraphSONTokens.MODE).getTextValue());
+        Assert.assertEquals("COMPACT", rootNode.get(GraphSONTokens.MODE).asText());
 
         Assert.assertTrue(rootNode.has(GraphSONTokens.VERTICES));
 
