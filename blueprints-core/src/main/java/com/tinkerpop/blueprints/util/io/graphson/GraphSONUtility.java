@@ -33,7 +33,7 @@ import static com.tinkerpop.blueprints.util.io.graphson.ElementPropertyConfig.El
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public final class GraphSONUtility {
+public class GraphSONUtility {
 
     private static final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
     private static final JsonFactory jsonFactory = new MappingJsonFactory();
