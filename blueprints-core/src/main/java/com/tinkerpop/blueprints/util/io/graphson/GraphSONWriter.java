@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
@@ -25,6 +26,22 @@ public class GraphSONWriter {
      */
     public GraphSONWriter(final Graph graph) {
         this.graph = graph;
+    }
+
+    /**
+     * Write the data in a Graph to a JSON OutputStream.
+     *
+     * @param filename           the JSON file to write the Graph data to
+     * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
+     * @param edgePropertyKeys   the keys of the edge elements to write to JSON
+     * @param mode               determines the format of the GraphSON
+     * @throws IOException thrown if there is an error generating the JSON data
+     */
+    public void outputGraph(final String filename, final Set<String> vertexPropertyKeys,
+                            final Set<String> edgePropertyKeys, final GraphSONMode mode) throws IOException {
+        FileOutputStream fos = new FileOutputStream(filename);
+        outputGraph(fos, vertexPropertyKeys, edgePropertyKeys, mode);
+        fos.close();
     }
 
     /**
@@ -78,6 +95,19 @@ public class GraphSONWriter {
     }
 
     /**
+     * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON. Utilizing
+     * GraphSONMode.NORMAL.
+     *
+     * @param graph            the graph to serialize to JSON
+     * @param filename         the JSON file to write the Graph data to
+     * @throws IOException thrown if there is an error generating the JSON data
+     */
+    public static void outputGraph(final Graph graph, final String filename) throws IOException {
+        final GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(filename, null, null, GraphSONMode.NORMAL);
+    }
+
+    /**
      * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
      *
      * @param graph            the graph to serialize to JSON
@@ -89,6 +119,20 @@ public class GraphSONWriter {
                                    final GraphSONMode mode) throws IOException {
         final GraphSONWriter writer = new GraphSONWriter(graph);
         writer.outputGraph(jsonOutputStream, null, null, mode);
+    }
+
+    /**
+     * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
+     *
+     * @param graph            the graph to serialize to JSON
+     * @param filename         the JSON file to write the Graph data to
+     * @param mode             determines the format of the GraphSON
+     * @throws IOException thrown if there is an error generating the JSON data
+     */
+    public static void outputGraph(final Graph graph, final String filename,
+                                   final GraphSONMode mode) throws IOException {
+        final GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(filename, null, null, mode);
     }
 
     /**
@@ -106,6 +150,23 @@ public class GraphSONWriter {
                                    final GraphSONMode mode) throws IOException {
         final GraphSONWriter writer = new GraphSONWriter(graph);
         writer.outputGraph(jsonOutputStream, vertexPropertyKeys, edgePropertyKeys, mode);
+    }
+
+    /**
+     * Write the data in a Graph to a JSON OutputStream.
+     *
+     * @param graph              the graph to serialize to JSON
+     * @param filename           the JSON file to write the Graph data to
+     * @param vertexPropertyKeys the keys of the vertex elements to write to JSON
+     * @param edgePropertyKeys   the keys of the edge elements to write to JSON
+     * @param mode               determines the format of the GraphSON
+     * @throws IOException thrown if there is an error generating the JSON data
+     */
+    public static void outputGraph(final Graph graph, final String filename,
+                                   final Set<String> vertexPropertyKeys, final Set<String> edgePropertyKeys,
+                                   final GraphSONMode mode) throws IOException {
+        final GraphSONWriter writer = new GraphSONWriter(graph);
+        writer.outputGraph(filename, vertexPropertyKeys, edgePropertyKeys, mode);
     }
 
 }

@@ -10,6 +10,7 @@ import javax.xml.XMLConstants;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -83,6 +84,18 @@ public class GraphMLWriter {
      */
     public void setEdgeKeyTypes(final Map<String, String> edgeKeyTypes) {
         this.edgeKeyTypes = edgeKeyTypes;
+    }
+
+    /**
+     * Write the data in a Graph to a GraphML file.
+     *
+     * @param filename the name of the file write the Graph data (as GraphML) to
+     * @throws IOException thrown if there is an error generating the GraphML data
+     */
+    public void outputGraph(final String filename) throws IOException {
+        FileOutputStream fos = new FileOutputStream(filename);
+        outputGraph(fos);
+        fos.close();
     }
 
     /**
@@ -303,6 +316,35 @@ public class GraphMLWriter {
     public static void outputGraph(final Graph graph, final OutputStream graphMLOutputStream) throws IOException {
         GraphMLWriter writer = new GraphMLWriter(graph);
         writer.outputGraph(graphMLOutputStream);
+    }
+
+    /**
+     * Write the data in a Graph to a GraphML file.
+     *
+     * @param graph               the Graph to pull the data from
+     * @param filename            the name of the file write the Graph data (as GraphML) to
+     * @throws IOException thrown if there is an error generating the GraphML data
+     */
+    public static void outputGraph(final Graph graph, final String filename) throws IOException {
+        GraphMLWriter writer = new GraphMLWriter(graph);
+        writer.outputGraph(filename);
+    }
+
+    /**
+     * Write the data in a Graph to a GraphML file.
+     *
+     * @param graph               the Graph to pull the data from
+     * @param filename            the name of the file write the Graph data (as GraphML) to
+     * @param vertexKeyTypes      a Map of the data types of the vertex keys
+     * @param edgeKeyTypes        a Map of the data types of the edge keys
+     * @throws IOException thrown if there is an error generating the GraphML data
+     */
+    public static void outputGraph(final Graph graph, final String filename,
+                                   final Map<String, String> vertexKeyTypes, final Map<String, String> edgeKeyTypes) throws IOException {
+        GraphMLWriter writer = new GraphMLWriter(graph);
+        writer.setVertexKeyTypes(vertexKeyTypes);
+        writer.setEdgeKeyTypes(edgeKeyTypes);
+        writer.outputGraph(filename);
     }
 
     /**
