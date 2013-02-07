@@ -195,10 +195,10 @@ public class TinkerGraphTest extends GraphTest {
         testGraphFileType("test-graphson", TinkerGraph.FileType.GRAPHSON);
     }
 
-    private void testGraphFileType(String directory, TinkerGraph.FileType fileType) {
-        String path = getDirectory() + "/" + directory;
+    private void testGraphFileType(final String directory, final TinkerGraph.FileType fileType) {
+        final String path = getDirectory() + "/" + directory;
 
-        File file = new File(path);
+        final File file = new File(path);
         if (file.exists()) {
             try {
                 delete(file);
@@ -209,7 +209,7 @@ public class TinkerGraphTest extends GraphTest {
         }
 
         final TinkerGraph sourceGraph = TinkerGraphFactory.createTinkerGraph();
-        TinkerGraph targetGraph = new TinkerGraph(path, fileType);
+        final TinkerGraph targetGraph = new TinkerGraph(path, fileType);
         createKeyIndices(targetGraph);
 
         copyGraphs(sourceGraph, targetGraph);
