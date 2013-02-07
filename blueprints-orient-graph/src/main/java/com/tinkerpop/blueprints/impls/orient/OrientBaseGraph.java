@@ -239,7 +239,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             if (value != null && !(value instanceof String))
                 value = value.toString();
 
-            Object indexValue = (Iterable<?>) idx.get(value);
+            Object indexValue = idx.get(value);
             if( indexValue != null && !( indexValue instanceof Iterable<?> ) )
               indexValue = Arrays.asList(indexValue);
             
