@@ -22,8 +22,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -208,19 +208,20 @@ public class TinkerGraphTest extends GraphTest {
             }
         }
 
-        TinkerGraph graph = TinkerGraphFactory.createTinkerGraph();
-        TinkerGraph g = new TinkerGraph(path, fileType);
+        final TinkerGraph sourceGraph = TinkerGraphFactory.createTinkerGraph();
+        TinkerGraph targetGraph = new TinkerGraph(path, fileType);
+        createKeyIndices(targetGraph);
 
-        copyGraphs(graph, g);
-        createIndices(graph);
-        createIndices(g);
+        copyGraphs(sourceGraph, targetGraph);
 
-        g.shutdown();
-        g = new TinkerGraph(path, fileType);
-        compareGraphs(graph, g);
+        createManualIndices(targetGraph);
+        targetGraph.shutdown();
+
+        final TinkerGraph compareGraph = new TinkerGraph(path, fileType);
+        compareGraphs(targetGraph, compareGraph);
     }
 
-    private void delete(File f) throws IOException {
+    private void delete(final File f) throws IOException {
         if (f.isDirectory()) {
             for (File c : f.listFiles()) {
                 delete(c);
@@ -232,17 +233,19 @@ public class TinkerGraphTest extends GraphTest {
         }
     }
 
-    private void createIndices(TinkerGraph g) {
+    private void createKeyIndices(final TinkerGraph g) {
         g.createKeyIndex("name", Vertex.class);
         g.createKeyIndex("weight", Edge.class);
+    }
 
-        Index ageIndex = g.createIndex("age", Vertex.class);
+    private void createManualIndices(final TinkerGraph g) {
+        Index<Vertex> ageIndex = g.createIndex("age", Vertex.class);
         Vertex v1 = g.getVertex(1);
         Vertex v2 = g.getVertex(2);
         ageIndex.put("age", v1.getProperty("age"), v1);
         ageIndex.put("age", v2.getProperty("age"), v2);
 
-        Index weightIndex = g.createIndex("weight", Edge.class);
+        Index<Edge> weightIndex = g.createIndex("weight", Edge.class);
         Edge e7 = g.getEdge(7);
         Edge e12 = g.getEdge(12);
         weightIndex.put("weight", e7.getProperty("weight"), e7);
@@ -270,24 +273,21 @@ public class TinkerGraphTest extends GraphTest {
             assertTrue(ElementHelper.areEqual(e, g2.getEdge(e.getId())));
         }
 
-        for (Index i : g1.getIndices()) {
-            Index j = g2.getIndex(i.getIndexName(), i.getIndexClass());
+        final Index idxAge = g2.getIndex("age", Vertex.class);
+        assertEquals(g2.getVertex(1), idxAge.get("age", 29).iterator().next());
+        assertEquals(g2.getVertex(2), idxAge.get("age", 27).iterator().next());
 
-            TinkerIndex tinkerIndex1 = (TinkerIndex) i;
-            TinkerIndex tinkerIndex2 = (TinkerIndex) j;
+        final Index idxWeight = g2.getIndex("weight", Edge.class);
+        assertEquals(g2.getEdge(7), idxWeight.get("weight", 0.5f).iterator().next());
+        assertEquals(g2.getEdge(12), idxWeight.get("weight", 0.2f).iterator().next());
 
-            assertEquals(tinkerIndex1.index.size(), tinkerIndex2.index.size());
+        final Iterator namesItty = g2.getVertices("name", "marko").iterator();
+        assertEquals(g2.getVertex(1), namesItty.next());
+        assertFalse(namesItty.hasNext());
 
-            for (Object o : tinkerIndex1.index.entrySet()) {
-                Object tinkerIndexItemKey1 = ((Map.Entry) o).getKey();
-                Object tinkerIndexItemValues1 = ((Map.Entry) o).getValue();
+        final Iterator weightItty = g2.getEdges("weight", 0.5f).iterator();
+        assertEquals(g2.getEdge(7), weightItty.next());
+        assertFalse(weightItty.hasNext());
 
-                assertTrue(tinkerIndex2.index.containsKey(tinkerIndexItemKey1));
-                assertTrue(tinkerIndex2.index.containsValue(tinkerIndexItemValues1));
-
-                Object tinkerIndexItemValues2 = tinkerIndex2.index.get(tinkerIndexItemKey1);
-                assertTrue(tinkerIndexItemValues1.equals(tinkerIndexItemValues2));
-            }
-        }
     }
 }
