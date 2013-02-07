@@ -310,5 +310,6 @@ public class Neo4jGraphTest extends GraphTest {
             graph.rollback();
         }
         assertTrue(!GlobalGraphOperations.at(rawGraph).getAllNodes().iterator().hasNext());
+        deleteDirectory(new File(directory));
     }
 }
