@@ -239,20 +239,20 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     private void createManualIndices(final TinkerGraph g) {
-        Index<Vertex> ageIndex = g.createIndex("age", Vertex.class);
-        Vertex v1 = g.getVertex(1);
-        Vertex v2 = g.getVertex(2);
+        final Index<Vertex> ageIndex = g.createIndex("age", Vertex.class);
+        final Vertex v1 = g.getVertex(1);
+        final Vertex v2 = g.getVertex(2);
         ageIndex.put("age", v1.getProperty("age"), v1);
         ageIndex.put("age", v2.getProperty("age"), v2);
 
-        Index<Edge> weightIndex = g.createIndex("weight", Edge.class);
-        Edge e7 = g.getEdge(7);
-        Edge e12 = g.getEdge(12);
+        final Index<Edge> weightIndex = g.createIndex("weight", Edge.class);
+        final Edge e7 = g.getEdge(7);
+        final Edge e12 = g.getEdge(12);
         weightIndex.put("weight", e7.getProperty("weight"), e7);
         weightIndex.put("weight", e12.getProperty("weight"), e12);
     }
 
-    private void copyGraphs(TinkerGraph src, TinkerGraph dst) {
+    private void copyGraphs(final TinkerGraph src, final TinkerGraph dst) {
         for (Vertex v : src.getVertices()) {
             ElementHelper.copyProperties(v, dst.addVertex(v.getId()));
         }
@@ -264,7 +264,7 @@ public class TinkerGraphTest extends GraphTest {
         }
     }
 
-    private void compareGraphs(TinkerGraph g1, TinkerGraph g2) {
+    private void compareGraphs(final TinkerGraph g1, final TinkerGraph g2) {
         for (Vertex v : g1.getVertices()) {
             // todo: need to check properties and edge counts
             assertTrue(ElementHelper.areEqual(v, g2.getVertex(v.getId())));
