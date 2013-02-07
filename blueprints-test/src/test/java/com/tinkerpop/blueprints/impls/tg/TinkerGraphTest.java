@@ -266,10 +266,12 @@ public class TinkerGraphTest extends GraphTest {
 
     private void compareGraphs(TinkerGraph g1, TinkerGraph g2) {
         for (Vertex v : g1.getVertices()) {
+            // todo: need to check properties and edge counts
             assertTrue(ElementHelper.areEqual(v, g2.getVertex(v.getId())));
         }
 
         for (Edge e : g1.getEdges()) {
+            // todo: need to check properties and in/out vertices
             assertTrue(ElementHelper.areEqual(e, g2.getEdge(e.getId())));
         }
 
