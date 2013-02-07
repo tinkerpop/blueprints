@@ -162,13 +162,13 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                             String indexName = reader.readUTF();
 
                             // Read the index type
-                            String indexType = reader.readUTF();
+                            byte indexType = reader.readByte();
 
-                            if (!indexType.equals("v") && !indexType.equals("e")) {
+                            if (indexType != 1 && indexType != 2) {
                                 throw new RuntimeException("Unknown index class type");
                             }
 
-                            TinkerIndex tinkerIndex = new TinkerIndex(indexName, indexType.equals("v") ? Vertex.class : Edge.class);
+                            TinkerIndex tinkerIndex = new TinkerIndex(indexName, indexType == 1 ? Vertex.class : Edge.class);
 
                             // Read the number of items associated with this index name
                             int indexItemCount = reader.readInt();
@@ -183,12 +183,12 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                                     int setCount = reader.readInt();
                                     for (int l = 0; l < setCount; l++) {
                                         // Read the identifiers in this set
-                                        if (indexType.equals("v")) {
+                                        if (indexType == 1) {
                                             Vertex v = graph.getVertex(reader.readUTF());
                                             if (v != null) {
                                                 tinkerIndex.put(indexItemKey, v.getProperty(indexItemKey), v);
                                             }
-                                        } else if (indexType.equals("e")) {
+                                        } else if (indexType == 2) {
                                             Edge e = graph.getEdge(reader.readUTF());
                                             if (e != null) {
                                                 tinkerIndex.put(indexItemKey, e.getProperty(indexItemKey), e);
@@ -592,7 +592,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                             Class indexClass = tinkerIndex.indexClass;
 
                             // Write the index type
-                            writer.writeUTF(indexClass.equals(Vertex.class) ? "v" : "e");
+                            writer.writeByte(indexClass.equals(Vertex.class) ? 1 : 2);
 
                             // Write the number of items associated with this index name
                             writer.writeInt(tinkerIndex.index.size());
@@ -707,22 +707,22 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
     private void writeTypedData(DataOutputStream writer, Object data) throws IOException {
         if (data instanceof String) {
-            writer.writeUTF("s");
+            writer.writeByte(1);
             writer.writeUTF((String) data);
         } else if (data instanceof Integer) {
-            writer.writeUTF("i");
+            writer.writeByte(2);
             writer.writeInt((Integer) data);
         } else if (data instanceof Long) {
-            writer.writeUTF("l");
+            writer.writeByte(3);
             writer.writeLong((Long) data);
         } else if (data instanceof Short) {
-            writer.writeUTF("t");
+            writer.writeByte(4);
             writer.writeShort((Short) data);
         } else if (data instanceof Float) {
-            writer.writeUTF("f");
+            writer.writeByte(5);
             writer.writeFloat((Float) data);
         } else if (data instanceof Double) {
-            writer.writeUTF("d");
+            writer.writeByte(6);
             writer.writeDouble((Double) data);
         } else {
             throw new IOException("unknown data type: use java serialization");
@@ -730,19 +730,19 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     private Object readTypedData(DataInputStream reader) throws IOException {
-        String type = reader.readUTF();
+        byte type = reader.readByte();
 
-        if (type.equals("s")) {
+        if (type == 1) {
             return reader.readUTF();
-        } else if (type.equals("i")) {
+        } else if (type == 2) {
             return reader.readInt();
-        } else if (type.equals("l")) {
+        } else if (type == 3) {
             return reader.readLong();
-        } else if (type.equals("t")) {
+        } else if (type == 4) {
             return reader.readShort();
-        } else if (type.equals("f")) {
+        } else if (type == 5) {
             return reader.readFloat();
-        } else if (type.equals("d")) {
+        } else if (type == 6) {
             return reader.readDouble();
         } else {
             throw new IOException("unknown data type: use java serialization");
