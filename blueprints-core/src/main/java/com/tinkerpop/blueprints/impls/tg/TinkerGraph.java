@@ -14,10 +14,20 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.io.gml.GMLReader;
+import com.tinkerpop.blueprints.util.io.gml.GMLWriter;
+import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
+import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONReader;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONWriter;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -46,7 +56,12 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     protected TinkerKeyIndex<TinkerEdge> edgeKeyIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
 
     private final String directory;
-    private static final String GRAPH_FILE = "/tinkergraph.dat";
+    private final FileType fileType;
+    private static final String GRAPH_FILE_JAVA = "/tinkergraph.dat";
+    private static final String GRAPH_FILE_GML = "/tinkergraph.gml";
+    private static final String GRAPH_FILE_GRAPHML = "/tinkergraph.xml";
+    private static final String GRAPH_FILE_GSON = "/tinkergraph.json";
+    private static final String GRAPH_FILE_METADATA = "/tinkergraph-metadata.dat";
 
     private static final Features FEATURES = new Features();
     private static final Features PERSISTENT_FEATURES;
@@ -89,8 +104,17 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         PERSISTENT_FEATURES.isPersistent = true;
     }
 
-    public TinkerGraph(final String directory) {
+    public enum FileType {
+        JAVA,
+        GML,
+        GRAPHML,
+        GRAPHSON
+    }
+
+    public TinkerGraph(final String directory, final FileType fileType) {
         this.directory = directory;
+        this.fileType = fileType;
+
         try {
             final File file = new File(directory);
             if (!file.exists()) {
@@ -98,23 +122,185 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                     throw new RuntimeException("Could not create directory");
                 }
             } else {
-                ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
-                TinkerGraph temp = (TinkerGraph) input.readObject();
-                input.close();
-                this.currentId = temp.currentId;
-                this.vertices = temp.vertices;
-                this.edges = temp.edges;
-                this.indices = temp.indices;
-                this.vertexKeyIndex = temp.vertexKeyIndex;
-                this.edgeKeyIndex = temp.edgeKeyIndex;
+                TinkerGraph graph = new TinkerGraph();
+
+                switch (fileType) {
+                    case GML:
+                        GMLReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GML));
+                        break;
+
+                    case GRAPHML:
+                        GraphMLReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GRAPHML));
+                        break;
+
+                    case GRAPHSON:
+                        GraphSONReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GSON));
+                        break;
+
+                    case JAVA:
+                        ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE_JAVA));
+                        graph = (TinkerGraph) input.readObject();
+                        input.close();
+                        break;
+                }
+
+                this.vertices = graph.vertices;
+                this.edges = graph.edges;
+
+                if (fileType != FileType.JAVA) {
+                    DataInputStream reader = null;
+                    try {
+                        reader = new DataInputStream(new FileInputStream(directory + GRAPH_FILE_METADATA));
+
+                        // Read the current ID
+                        this.currentId = reader.readLong();
+
+                        // Read the number of indices
+                        int indexCount = reader.readInt();
+                        for (int i = 0; i < indexCount; i++) {
+                            // Read the index name
+                            String indexName = reader.readUTF();
+
+                            // Read the index type
+                            String indexType = reader.readUTF();
+
+                            if (!indexType.equals("v") && !indexType.equals("e")) {
+                                throw new RuntimeException("Unknown index class type");
+                            }
+
+                            TinkerIndex tinkerIndex = new TinkerIndex(indexName, indexType.equals("v") ? Vertex.class : Edge.class);
+
+                            // Read the number of items associated with this index name
+                            int indexItemCount = reader.readInt();
+                            for (int j = 0; j < indexItemCount; j++) {
+                                // Read the index item key
+                                String indexItemKey = reader.readUTF();
+
+                                // Read the size of this index item set
+                                int indexValueItemSetCount = reader.readInt();
+                                for (int k = 0; k < indexValueItemSetCount; k++) {
+                                    // Read the size of this set
+                                    int setCount = reader.readInt();
+                                    for (int l = 0; l < setCount; l++) {
+                                        // Read the identifiers in this set
+                                        if (indexType.equals("v")) {
+                                            Vertex v = graph.getVertex(reader.readUTF());
+                                            if (v != null) {
+                                                tinkerIndex.put(indexItemKey, v.getProperty(indexItemKey), v);
+                                            }
+                                        } else if (indexType.equals("e")) {
+                                            Edge e = graph.getEdge(reader.readUTF());
+                                            if (e != null) {
+                                                tinkerIndex.put(indexItemKey, e.getProperty(indexItemKey), e);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            this.indices.put(indexName, tinkerIndex);
+                        }
+
+                        // Read the number of vertex key indices
+                        indexCount = reader.readInt();
+                        for (int i = 0; i < indexCount; i++) {
+                            // Read the vertex key index name
+                            String indexName = reader.readUTF();
+
+                            this.vertexKeyIndex.createKeyIndex(indexName);
+
+                            Map<Object, Set<TinkerVertex>> items = new HashMap<Object, Set<TinkerVertex>>();
+
+                            // Read the number of vertex sets associated with this key index name
+                            int itemCount = reader.readInt();
+                            for (int j = 0; j < itemCount; j++) {
+                                // Read the key for this vertex set
+                                Object key = readTypedData(reader);
+
+                                Set<TinkerVertex> vertices = new HashSet<TinkerVertex>();
+
+                                // Read the size of this vertex set
+                                int vertexCount = reader.readInt();
+                                for (int k = 0; k < vertexCount; k++) {
+                                    // Read the vertex identifiers in this set
+                                    Vertex v = graph.getVertex(reader.readUTF());
+                                    if (v != null) {
+                                        vertices.add((TinkerVertex) v);
+                                    }
+                                }
+
+                                items.put(key, vertices);
+                            }
+
+                            this.vertexKeyIndex.index.put(indexName, items);
+                        }
+
+                        // Read the number of edge key indices
+                        indexCount = reader.readInt();
+                        for (int i = 0; i < indexCount; i++) {
+                            // Read the edge key index name
+                            String indexName = reader.readUTF();
+
+                            this.edgeKeyIndex.createKeyIndex(indexName);
+
+                            Map<Object, Set<TinkerEdge>> items = new HashMap<Object, Set<TinkerEdge>>();
+
+                            // Read the number of edge sets associated with this key index name
+                            int itemCount = reader.readInt();
+                            for (int j = 0; j < itemCount; j++) {
+                                // Read the key for this edge set
+                                Object key = readTypedData(reader);
+
+                                Set<TinkerEdge> edges = new HashSet<TinkerEdge>();
+
+                                // Read the size of this edge set
+                                int edgeCount = reader.readInt();
+                                for (int k = 0; k < edgeCount; k++) {
+                                    // Read the edge identifiers in this set
+                                    Edge e = graph.getEdge(reader.readUTF());
+                                    if (e != null) {
+                                        edges.add((TinkerEdge) e);
+                                    }
+                                }
+
+                                items.put(key, edges);
+                            }
+
+                            this.edgeKeyIndex.index.put(indexName, items);
+                        }
+                    }
+                    catch (IOException e) {
+                        throw new RuntimeException("Could not read metadata file");
+                    }
+                    finally {
+                        try {
+                            if (reader != null) {
+                                reader.close( );
+                            }
+                        }
+                        catch (IOException e) {
+                            throw new RuntimeException("Could not read metadata file");
+                        }
+                    }
+                } else {
+                    this.currentId = graph.currentId;
+                    this.indices = graph.indices;
+                    this.vertexKeyIndex = graph.vertexKeyIndex;
+                    this.edgeKeyIndex = graph.edgeKeyIndex;
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    public TinkerGraph(final String directory) {
+        this(directory, FileType.JAVA);
+    }
+
     public TinkerGraph() {
         this.directory = null;
+        this.fileType = FileType.JAVA;
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
@@ -336,13 +522,172 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     public void shutdown() {
         if (null != this.directory) {
             try {
-                final File file = new File(this.directory + GRAPH_FILE);
-                if (file.exists()) {
-                    file.delete();
+                String path = null;
+
+                switch (this.fileType) {
+                    case GML:
+                        path = this.directory + GRAPH_FILE_GML;
+                        break;
+
+                    case GRAPHML:
+                        path = this.directory + GRAPH_FILE_GRAPHML;
+                        break;
+
+                    case GRAPHSON:
+                        path = this.directory + GRAPH_FILE_GSON;
+                        break;
+
+                    case JAVA:
+                        path = this.directory + GRAPH_FILE_JAVA;
+                        break;
                 }
-                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.directory + GRAPH_FILE));
-                out.writeObject(this);
-                out.close();
+
+                if (path != null) {
+                    final File file = new File(path);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+
+                    switch (this.fileType) {
+                       case GML:
+                           GMLWriter.outputGraph(this, new FileOutputStream(path));
+                           break;
+
+                       case GRAPHML:
+                           GraphMLWriter.outputGraph(this, new FileOutputStream(path));
+                           break;
+
+                       case GRAPHSON:
+                           GraphSONWriter.outputGraph(this, new FileOutputStream(path), GraphSONMode.EXTENDED);
+                           break;
+
+                       case JAVA:
+                           ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path));
+                           out.writeObject(this);
+                           out.close();
+                           break;
+                    }
+                }
+
+                if (this.fileType != FileType.JAVA) {
+                    final File file = new File(this.directory + GRAPH_FILE_METADATA);
+                    if (file.exists()) {
+                        file.delete();
+                    }
+
+                    DataOutputStream writer = null;
+                    try {
+                        writer = new DataOutputStream(new FileOutputStream(this.directory + GRAPH_FILE_METADATA));
+
+                        // Write the current ID
+                        writer.writeLong(this.currentId);
+
+                        // Write the number of indices
+                        writer.writeInt(this.indices.size());
+                        for (Map.Entry<String, TinkerIndex> index : this.indices.entrySet()) {
+                            // Write the index name
+                            writer.writeUTF(index.getKey());
+
+                            TinkerIndex tinkerIndex = index.getValue();
+                            Class indexClass = tinkerIndex.indexClass;
+
+                            // Write the index type
+                            writer.writeUTF(indexClass.equals(Vertex.class) ? "v" : "e");
+
+                            // Write the number of items associated with this index name
+                            writer.writeInt(tinkerIndex.index.size());
+                            for (Object o : tinkerIndex.index.entrySet()) {
+                                Map.Entry tinkerIndexItem = (Map.Entry) o;
+
+                                // Write the index item key
+                                writer.writeUTF((String) tinkerIndexItem.getKey());
+
+                                Map tinkerIndexItemSet = (Map) tinkerIndexItem.getValue();
+
+                                // Write the size of this index item set
+                                writer.writeInt(tinkerIndexItemSet.size());
+                                for (Object p : tinkerIndexItemSet.entrySet()) {
+                                    Map.Entry items = (Map.Entry) p;
+
+                                    if (indexClass.equals(Vertex.class)) {
+                                        Set<TinkerVertex> vertices = (Set<TinkerVertex>) items.getValue();
+
+                                        // Write the size of this vertex set
+                                        writer.writeInt(vertices.size());
+                                        for (TinkerVertex v : vertices) {
+                                            // Write the vertex identifiers in this set
+                                            writer.writeUTF(v.getId());
+                                        }
+                                    } else if (indexClass.equals(Edge.class)) {
+                                        Set<TinkerEdge> edges = (Set<TinkerEdge>) items.getValue();
+
+                                        // Write the size of this edge set
+                                        writer.writeInt(edges.size());
+                                        for (TinkerEdge e : edges) {
+                                            // Write the edge identifiers in this set
+                                            writer.writeUTF(e.getId());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Write the number of vertex key indices
+                        writer.writeInt(this.vertexKeyIndex.index.size());
+                        for (Map.Entry<String, Map<Object, Set<TinkerVertex>>> index : this.vertexKeyIndex.index.entrySet()) {
+                            // Write the vertex key index name
+                            writer.writeUTF(index.getKey());
+
+                            // Write the number of vertex sets associated with this key index name
+                            writer.writeInt(index.getValue().size());
+                            for (Map.Entry<Object, Set<TinkerVertex>> item : index.getValue().entrySet()) {
+                                // Write the key for this vertex set
+                                writeTypedData(writer, item.getKey());
+
+                                // Write the size of this vertex set
+                                writer.writeInt(item.getValue().size());
+                                for (TinkerVertex v : item.getValue()) {
+                                    // Write the vertex identifiers in this set
+                                    writer.writeUTF(v.getId());
+                                }
+                            }
+                        }
+
+                        // Write the number of edge key indices
+                        writer.writeInt(this.edgeKeyIndex.index.size());
+                        for (Map.Entry<String, Map<Object, Set<TinkerEdge>>> index : this.edgeKeyIndex.index.entrySet()) {
+                            // Write the edge key index name
+                            writer.writeUTF(index.getKey());
+
+                            // Write the number of edge sets associated with this key index name
+                            writer.writeInt(index.getValue().size());
+                            for (Map.Entry<Object, Set<TinkerEdge>> item : index.getValue().entrySet()) {
+                                // Write the key for this edge set
+                                writeTypedData(writer, item.getKey());
+
+                                // Write the size of this edge set
+                                writer.writeInt(item.getValue().size());
+                                for (TinkerEdge e : item.getValue()) {
+                                    // Write the edge identifiers in this set
+                                    writer.writeUTF(e.getId());
+                                }
+                            }
+                        }
+                    }
+                    catch (IOException e) {
+                        throw new RuntimeException("Could not write metadata file");
+                    }
+                    finally {
+                        try {
+                            if (writer != null) {
+                                writer.close();
+                            }
+                        }
+                        catch (IOException e) {
+                            throw new RuntimeException("Could not write metadata file");
+                        }
+                    }
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
@@ -358,6 +703,50 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                 break;
         }
         return idString;
+    }
+
+    private void writeTypedData(DataOutputStream writer, Object data) throws IOException {
+        if (data instanceof String) {
+            writer.writeUTF("s");
+            writer.writeUTF((String) data);
+        } else if (data instanceof Integer) {
+            writer.writeUTF("i");
+            writer.writeInt((Integer) data);
+        } else if (data instanceof Long) {
+            writer.writeUTF("l");
+            writer.writeLong((Long) data);
+        } else if (data instanceof Short) {
+            writer.writeUTF("t");
+            writer.writeShort((Short) data);
+        } else if (data instanceof Float) {
+            writer.writeUTF("f");
+            writer.writeFloat((Float) data);
+        } else if (data instanceof Double) {
+            writer.writeUTF("d");
+            writer.writeDouble((Double) data);
+        } else {
+            throw new IOException("unknown data type: use java serialization");
+        }
+    }
+
+    private Object readTypedData(DataInputStream reader) throws IOException {
+        String type = reader.readUTF();
+
+        if (type.equals("s")) {
+            return reader.readUTF();
+        } else if (type.equals("i")) {
+            return reader.readInt();
+        } else if (type.equals("l")) {
+            return reader.readLong();
+        } else if (type.equals("t")) {
+            return reader.readShort();
+        } else if (type.equals("f")) {
+            return reader.readFloat();
+        } else if (type.equals("d")) {
+            return reader.readDouble();
+        } else {
+            throw new IOException("unknown data type: use java serialization");
+        }
     }
 
     public Features getFeatures() {
