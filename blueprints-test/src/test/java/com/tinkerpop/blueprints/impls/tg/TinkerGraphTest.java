@@ -260,7 +260,7 @@ public class TinkerGraphTest extends GraphTest {
         for (Edge e : src.getEdges()) {
             ElementHelper.copyProperties(
                     e,
-                    dst.addEdge(e.getId(), e.getVertex(Direction.OUT), e.getVertex(Direction.IN), e.getLabel()));
+                    dst.addEdge(e.getId(), dst.getVertex(e.getVertex(Direction.OUT).getId()), dst.getVertex(e.getVertex(Direction.IN).getId()), e.getLabel()));
         }
     }
 
