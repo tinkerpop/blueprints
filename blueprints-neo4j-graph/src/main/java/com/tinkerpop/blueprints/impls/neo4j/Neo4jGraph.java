@@ -25,9 +25,13 @@ import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -468,8 +472,16 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             return;
         }
 
+        GraphDatabaseAPI graphDatabaseAPI = (GraphDatabaseAPI)getRawGraph();
+        TransactionManager transactionManager = graphDatabaseAPI.getTxManager();
         try {
+            javax.transaction.Transaction t = transactionManager.getTransaction();
+            if (t == null || t.getStatus() == Status.STATUS_ROLLEDBACK) {
+                return;
+            }
             tx.get().failure();
+        } catch (SystemException e) {
+            throw new RuntimeException(e);
         } finally {
             tx.get().finish();
             tx.remove();
