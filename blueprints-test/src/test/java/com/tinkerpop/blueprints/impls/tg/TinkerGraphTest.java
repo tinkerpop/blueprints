@@ -218,7 +218,7 @@ public class TinkerGraphTest extends GraphTest {
         targetGraph.shutdown();
 
         final TinkerGraph compareGraph = new TinkerGraph(path, fileType);
-        compareGraphs(targetGraph, compareGraph);
+        compareGraphs(targetGraph, compareGraph, fileType);
     }
 
     private void delete(final File f) throws IOException {
@@ -264,15 +264,47 @@ public class TinkerGraphTest extends GraphTest {
         }
     }
 
-    private void compareGraphs(final TinkerGraph g1, final TinkerGraph g2) {
-        for (Vertex v : g1.getVertices()) {
-            // todo: need to check properties and edge counts
-            assertTrue(ElementHelper.areEqual(v, g2.getVertex(v.getId())));
+    private void compareGraphs(final TinkerGraph g1, final TinkerGraph g2, final TinkerGraph.FileType fileType) {
+        for (Vertex v1 : g1.getVertices()) {
+            final Vertex v2 = g2.getVertex(v1.getId());
+
+            compareEdgeCounts(v1, v2, Direction.IN);
+            compareEdgeCounts(v1, v2, Direction.OUT);
+            compareEdgeCounts(v1, v2, Direction.BOTH);
+
+            assertTrue(ElementHelper.haveEqualProperties(v1, v2));
+            assertTrue(ElementHelper.areEqual(v1, v2));
         }
 
-        for (Edge e : g1.getEdges()) {
-            // todo: need to check properties and in/out vertices
-            assertTrue(ElementHelper.areEqual(e, g2.getEdge(e.getId())));
+        for (Edge e1 : g1.getEdges()) {
+            final Edge e2 = g2.getEdge(e1.getId());
+
+            compareVertices(e1, e2, Direction.IN);
+            compareVertices(e2, e2, Direction.OUT);
+
+            if (fileType == TinkerGraph.FileType.GML) {
+                // For GML we need to iterate the properties manually to catch the
+                // case where the property returned from GML is an integer
+                // while the target graph property is a float.
+                for (String p : e1.getPropertyKeys()) {
+                    final Object v1 = e1.getProperty(p);
+                    final Object v2 = e2.getProperty(p);
+
+                    if (!v1.getClass().equals(v2.getClass())) {
+                        if ((v1 instanceof Float) && (v2 instanceof Integer)) {
+                            assertEquals(v1, ((Integer) v2).floatValue());
+                        } else if ((v1 instanceof Integer) && (v2 instanceof Float)) {
+                            assertEquals(((Integer) v1).floatValue(), v2);
+                        }
+                    } else {
+                        assertEquals(v1, v2);
+                    }
+                }
+            } else {
+                assertTrue(ElementHelper.haveEqualProperties(e1, e2));
+            }
+
+            assertTrue(ElementHelper.areEqual(e1, e2));
         }
 
         final Index idxAge = g2.getIndex("age", Vertex.class);
@@ -290,6 +322,30 @@ public class TinkerGraphTest extends GraphTest {
         final Iterator weightItty = g2.getEdges("weight", 0.5f).iterator();
         assertEquals(g2.getEdge(7), weightItty.next());
         assertFalse(weightItty.hasNext());
-
     }
+
+    private void compareEdgeCounts(Vertex v1, Vertex v2, Direction direction) {
+        int c1 = 0;
+        final Iterator it1 = v1.getEdges(direction).iterator();
+        while (it1.hasNext()) {
+            it1.next();
+            c1++;
+        }
+
+        int c2 = 0;
+        final Iterator it2 = v2.getEdges(direction).iterator();
+        while (it2.hasNext()) {
+            it2.next();
+            c2++;
+        }
+
+        assertEquals(c1, c2);
+    }
+
+    private void compareVertices(Edge e1, Edge e2, Direction direction) {
+        final Vertex v1 = e1.getVertex(direction);
+        final Vertex v2 = e2.getVertex(direction);
+
+        assertEquals(v1.getId(), v2.getId());
+   }
 }

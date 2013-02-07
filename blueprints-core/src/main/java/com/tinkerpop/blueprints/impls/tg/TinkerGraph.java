@@ -173,16 +173,16 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                             // Read the number of items associated with this index name
                             int indexItemCount = reader.readInt();
                             for (int j = 0; j < indexItemCount; j++) {
-                                // Read the index item key
+                                // Read the item key
                                 String indexItemKey = reader.readUTF();
 
-                                // Read the size of this index item set
+                                // Read the number of sub-items associated with this item
                                 int indexValueItemSetCount = reader.readInt();
                                 for (int k = 0; k < indexValueItemSetCount; k++) {
-                                    // Read the size of this set
+                                    // Read the number of vertices or edges in this sub-item
                                     int setCount = reader.readInt();
                                     for (int l = 0; l < setCount; l++) {
-                                        // Read the identifiers in this set
+                                        // Read the vertex or edge identifier
                                         if (indexType == 1) {
                                             Vertex v = graph.getVertex(reader.readUTF());
                                             if (v != null) {
@@ -204,25 +204,25 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                         // Read the number of vertex key indices
                         indexCount = reader.readInt();
                         for (int i = 0; i < indexCount; i++) {
-                            // Read the vertex key index name
+                            // Read the key index name
                             String indexName = reader.readUTF();
 
                             this.vertexKeyIndex.createKeyIndex(indexName);
 
                             Map<Object, Set<TinkerVertex>> items = new HashMap<Object, Set<TinkerVertex>>();
 
-                            // Read the number of vertex sets associated with this key index name
+                            // Read the number of items associated with this key index name
                             int itemCount = reader.readInt();
                             for (int j = 0; j < itemCount; j++) {
-                                // Read the key for this vertex set
+                                // Read the item key
                                 Object key = readTypedData(reader);
 
                                 Set<TinkerVertex> vertices = new HashSet<TinkerVertex>();
 
-                                // Read the size of this vertex set
+                                // Read the number of vertices in this item
                                 int vertexCount = reader.readInt();
                                 for (int k = 0; k < vertexCount; k++) {
-                                    // Read the vertex identifiers in this set
+                                    // Read the vertex identifier
                                     Vertex v = graph.getVertex(reader.readUTF());
                                     if (v != null) {
                                         vertices.add((TinkerVertex) v);
@@ -238,25 +238,25 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                         // Read the number of edge key indices
                         indexCount = reader.readInt();
                         for (int i = 0; i < indexCount; i++) {
-                            // Read the edge key index name
+                            // Read the key index name
                             String indexName = reader.readUTF();
 
                             this.edgeKeyIndex.createKeyIndex(indexName);
 
                             Map<Object, Set<TinkerEdge>> items = new HashMap<Object, Set<TinkerEdge>>();
 
-                            // Read the number of edge sets associated with this key index name
+                            // Read the number of items associated with this key index name
                             int itemCount = reader.readInt();
                             for (int j = 0; j < itemCount; j++) {
-                                // Read the key for this edge set
+                                // Read the item key
                                 Object key = readTypedData(reader);
 
                                 Set<TinkerEdge> edges = new HashSet<TinkerEdge>();
 
-                                // Read the size of this edge set
+                                // Read the number of edges in this item
                                 int edgeCount = reader.readInt();
                                 for (int k = 0; k < edgeCount; k++) {
-                                    // Read the edge identifiers in this set
+                                    // Read the edge identifier
                                     Edge e = graph.getEdge(reader.readUTF());
                                     if (e != null) {
                                         edges.add((TinkerEdge) e);
@@ -599,12 +599,12 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                             for (Object o : tinkerIndex.index.entrySet()) {
                                 Map.Entry tinkerIndexItem = (Map.Entry) o;
 
-                                // Write the index item key
+                                // Write the item key
                                 writer.writeUTF((String) tinkerIndexItem.getKey());
 
                                 Map tinkerIndexItemSet = (Map) tinkerIndexItem.getValue();
 
-                                // Write the size of this index item set
+                                // Write the number of sub-items associated with this item
                                 writer.writeInt(tinkerIndexItemSet.size());
                                 for (Object p : tinkerIndexItemSet.entrySet()) {
                                     Map.Entry items = (Map.Entry) p;
@@ -612,19 +612,19 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                                     if (indexClass.equals(Vertex.class)) {
                                         Set<TinkerVertex> vertices = (Set<TinkerVertex>) items.getValue();
 
-                                        // Write the size of this vertex set
+                                        // Write the number of vertices in this sub-item
                                         writer.writeInt(vertices.size());
                                         for (TinkerVertex v : vertices) {
-                                            // Write the vertex identifiers in this set
+                                            // Write the vertex identifier
                                             writer.writeUTF(v.getId());
                                         }
                                     } else if (indexClass.equals(Edge.class)) {
                                         Set<TinkerEdge> edges = (Set<TinkerEdge>) items.getValue();
 
-                                        // Write the size of this edge set
+                                        // Write the number of edges in this sub-item
                                         writer.writeInt(edges.size());
                                         for (TinkerEdge e : edges) {
-                                            // Write the edge identifiers in this set
+                                            // Write the edge identifier
                                             writer.writeUTF(e.getId());
                                         }
                                     }
@@ -635,19 +635,19 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                         // Write the number of vertex key indices
                         writer.writeInt(this.vertexKeyIndex.index.size());
                         for (Map.Entry<String, Map<Object, Set<TinkerVertex>>> index : this.vertexKeyIndex.index.entrySet()) {
-                            // Write the vertex key index name
+                            // Write the key index name
                             writer.writeUTF(index.getKey());
 
-                            // Write the number of vertex sets associated with this key index name
+                            // Write the number of items associated with this key index name
                             writer.writeInt(index.getValue().size());
                             for (Map.Entry<Object, Set<TinkerVertex>> item : index.getValue().entrySet()) {
-                                // Write the key for this vertex set
+                                // Write the item key
                                 writeTypedData(writer, item.getKey());
 
-                                // Write the size of this vertex set
+                                // Write the number of vertices in this item
                                 writer.writeInt(item.getValue().size());
                                 for (TinkerVertex v : item.getValue()) {
-                                    // Write the vertex identifiers in this set
+                                    // Write the vertex identifier
                                     writer.writeUTF(v.getId());
                                 }
                             }
@@ -656,19 +656,19 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                         // Write the number of edge key indices
                         writer.writeInt(this.edgeKeyIndex.index.size());
                         for (Map.Entry<String, Map<Object, Set<TinkerEdge>>> index : this.edgeKeyIndex.index.entrySet()) {
-                            // Write the edge key index name
+                            // Write the key index name
                             writer.writeUTF(index.getKey());
 
-                            // Write the number of edge sets associated with this key index name
+                            // Write the number of items associated with this key index name
                             writer.writeInt(index.getValue().size());
                             for (Map.Entry<Object, Set<TinkerEdge>> item : index.getValue().entrySet()) {
-                                // Write the key for this edge set
+                                // Write the item key
                                 writeTypedData(writer, item.getKey());
 
-                                // Write the size of this edge set
+                                // Write the number of edges in this item
                                 writer.writeInt(item.getValue().size());
                                 for (TinkerEdge e : item.getValue()) {
-                                    // Write the edge identifiers in this set
+                                    // Write the edge identifier
                                     writer.writeUTF(e.getId());
                                 }
                             }
