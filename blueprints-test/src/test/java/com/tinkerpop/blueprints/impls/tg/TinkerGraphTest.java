@@ -239,17 +239,17 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     private void createManualIndices(final TinkerGraph g) {
-        final Index<Vertex> ageIndex = g.createIndex("age", Vertex.class);
+        final Index<Vertex> idxAge = g.createIndex("age", Vertex.class);
         final Vertex v1 = g.getVertex(1);
         final Vertex v2 = g.getVertex(2);
-        ageIndex.put("age", v1.getProperty("age"), v1);
-        ageIndex.put("age", v2.getProperty("age"), v2);
+        idxAge.put("age", v1.getProperty("age"), v1);
+        idxAge.put("age", v2.getProperty("age"), v2);
 
-        final Index<Edge> weightIndex = g.createIndex("weight", Edge.class);
+        final Index<Edge> idxWeight = g.createIndex("weight", Edge.class);
         final Edge e7 = g.getEdge(7);
         final Edge e12 = g.getEdge(12);
-        weightIndex.put("weight", e7.getProperty("weight"), e7);
-        weightIndex.put("weight", e12.getProperty("weight"), e12);
+        idxWeight.put("weight", e7.getProperty("weight"), e7);
+        idxWeight.put("weight", e12.getProperty("weight"), e12);
     }
 
     private void copyGraphs(final TinkerGraph src, final TinkerGraph dst) {
