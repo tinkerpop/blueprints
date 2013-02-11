@@ -55,11 +55,6 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
     private final String directory;
     private final FileType fileType;
-    private static final String GRAPH_FILE_JAVA = "/tinkergraph.dat";
-    private static final String GRAPH_FILE_GML = "/tinkergraph.gml";
-    private static final String GRAPH_FILE_GRAPHML = "/tinkergraph.xml";
-    private static final String GRAPH_FILE_GSON = "/tinkergraph.json";
-    private static final String GRAPH_FILE_METADATA = "/tinkergraph-metadata.dat";
 
     private static final Features FEATURES = new Features();
     private static final Features PERSISTENT_FEATURES;
@@ -120,33 +115,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                     throw new RuntimeException("Could not create directory");
                 }
             } else {
-                TinkerGraph graph = new TinkerGraph();
-
-                // final TinkerFile tinkerFile = TinkerFileFactory.getInstance().getTinkerFile(fileType);
-                // tinkerFile.load(graph, directory);
-
-                switch (fileType) {
-                    case GML:
-                        GMLReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GML));
-                        TinkerMetadataReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_METADATA));
-                        break;
-
-                    case GRAPHML:
-                        GraphMLReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GRAPHML));
-                        TinkerMetadataReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_METADATA));
-                        break;
-
-                    case GRAPHSON:
-                        GraphSONReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GSON));
-                        TinkerMetadataReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_METADATA));
-                        break;
-
-                    case JAVA:
-                        ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE_JAVA));
-                        graph = (TinkerGraph) input.readObject();
-                        input.close();
-                        break;
-                }
+                final TinkerStorage tinkerStorage = TinkerStorageFactory.getInstance().getTinkerStorage(fileType);
+                final TinkerGraph graph = tinkerStorage.load(directory);
 
                 this.vertices = graph.vertices;
                 this.edges = graph.edges;
@@ -388,40 +358,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     public void shutdown() {
         if (null != this.directory) {
             try {
-
-                // final TinkerFile tinkerFile = TinkerFileFactory.getInstance().getTinkerFile(fileType);
-                // tinkerFile.save(graph, directory);
-
-                switch (this.fileType) {
-                    case GML:
-                        deleteFile(this.directory + GRAPH_FILE_GML);
-                        GMLWriter.outputGraph(this, new FileOutputStream(this.directory + GRAPH_FILE_GML));
-                        deleteFile(this.directory + GRAPH_FILE_METADATA);
-                        TinkerMetadataWriter.outputGraph(this, new FileOutputStream(this.directory + GRAPH_FILE_METADATA));
-                        break;
-
-                    case GRAPHML:
-                        deleteFile(this.directory + GRAPH_FILE_GRAPHML);
-                        GraphMLWriter.outputGraph(this, new FileOutputStream(this.directory + GRAPH_FILE_GRAPHML));
-                        deleteFile(this.directory + GRAPH_FILE_METADATA);
-                        TinkerMetadataWriter.outputGraph(this, new FileOutputStream(this.directory + GRAPH_FILE_METADATA));
-                        break;
-
-                    case GRAPHSON:
-                        deleteFile(this.directory + GRAPH_FILE_GSON);
-                        GraphSONWriter.outputGraph(this, new FileOutputStream(this.directory + GRAPH_FILE_GSON), GraphSONMode.EXTENDED);
-                        deleteFile(this.directory + GRAPH_FILE_METADATA);
-                        TinkerMetadataWriter.outputGraph(this, new FileOutputStream(this.directory + GRAPH_FILE_METADATA));
-                        break;
-
-                    case JAVA:
-                        deleteFile(this.directory + GRAPH_FILE_JAVA);
-                        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.directory + GRAPH_FILE_JAVA));
-                        out.writeObject(this);
-                        out.close();
-                        break;
-                }
-           } catch (Exception e) {
+                final TinkerStorage tinkerStorage = TinkerStorageFactory.getInstance().getTinkerStorage(this.fileType);
+                tinkerStorage.save(this, this.directory);
+            } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
@@ -436,13 +375,6 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                 break;
         }
         return idString;
-    }
-
-    private void deleteFile(String path) throws IOException {
-        final File file = new File(path);
-        if (file.exists()) {
-            file.delete();
-        }
     }
 
     public Features getFeatures() {

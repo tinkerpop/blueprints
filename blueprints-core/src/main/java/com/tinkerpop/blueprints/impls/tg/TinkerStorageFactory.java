@@ -1,7 +1,12 @@
 package com.tinkerpop.blueprints.impls.tg;
 
+import com.tinkerpop.blueprints.util.io.gml.GMLReader;
+import com.tinkerpop.blueprints.util.io.gml.GMLWriter;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONReader;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONWriter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,30 +20,30 @@ import java.io.ObjectOutputStream;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-class TinkerFileFactory {
-    private static TinkerFileFactory factory;
+class TinkerStorageFactory {
+    private static TinkerStorageFactory factory;
 
-    private TinkerFileFactory() {
+    private TinkerStorageFactory() {
     }
 
-    public static TinkerFileFactory getInstance(final TinkerGraph.FileType fileType) {
+    public static TinkerStorageFactory getInstance() {
         if (factory == null) {
-            factory = new TinkerFileFactory();
+            factory = new TinkerStorageFactory();
         }
 
         return factory;
     }
 
-    public TinkerFile getTinkerFile(final TinkerGraph.FileType fileType) {
+    public TinkerStorage getTinkerStorage(final TinkerGraph.FileType fileType) {
         switch (fileType) {
             case GML:
-                return null;
+                return new GMLTinkerStorage();
             case GRAPHML:
-                return new GraphMLTinkerFile();
+                return new GraphMLTinkerStorage();
             case GRAPHSON:
-                return null;
+                return new GraphSONTinkerStorage();
             case JAVA:
-                return new JavaTinkerFile();
+                return new JavaTinkerStorage();
         }
 
         throw new RuntimeException(String.format("File Type [%s] is not configurable by the factory", fileType));
@@ -47,7 +52,7 @@ class TinkerFileFactory {
     /**
      * Base class for loading and saving a TinkerGraph.
      */
-    abstract class AbstractTinkerFile implements TinkerFile {
+    abstract class AbstractTinkerStorage implements TinkerStorage {
 
         /**
          * Clean up the directory that houses the TinkerGraph.
@@ -64,7 +69,7 @@ class TinkerFileFactory {
      * Base class for loading and saving a TinkerGraph where the implementation separates the data from the
      * meta data stored in the TinkerGraph.
      */
-    abstract class AbstractSeparateTinkerFile extends AbstractTinkerFile {
+    abstract class AbstractSeparateTinkerStorage extends AbstractTinkerStorage {
         protected static final String GRAPH_FILE_METADATA = "/tinkergraph-metadata.dat";
 
         /**
@@ -81,7 +86,7 @@ class TinkerFileFactory {
         public TinkerGraph load(final String directory) throws IOException {
             final TinkerGraph graph = new TinkerGraph();
             loadGraphData(graph, directory);
-            TinkerMetadataReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_METADATA));
+            TinkerMetadataReader.load(graph, new FileInputStream(directory + GRAPH_FILE_METADATA));
             return graph;
         }
 
@@ -89,14 +94,50 @@ class TinkerFileFactory {
         public void save(final TinkerGraph graph, final String directory) throws IOException {
             saveGraphData(graph, directory);
             deleteFile(directory + GRAPH_FILE_METADATA);
-            TinkerMetadataWriter.outputGraph(graph, new FileOutputStream(directory + GRAPH_FILE_METADATA));
+            TinkerMetadataWriter.save(graph, new FileOutputStream(directory + GRAPH_FILE_METADATA));
         }
     }
 
     /**
-     * Reads and writes a TinkerGraph to with GraphML as the format for the data.
+     * Reads and writes a TinkerGraph to GML as the format for the data.
      */
-    class GraphMLTinkerFile extends AbstractSeparateTinkerFile {
+    class GMLTinkerStorage extends AbstractSeparateTinkerStorage {
+        private static final String GRAPH_FILE_GML = "/tinkergraph.gml";
+
+        @Override
+        public void loadGraphData(final TinkerGraph graph, final String directory) throws IOException {
+            GMLReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GML));
+        }
+
+        @Override
+        public void saveGraphData(final TinkerGraph graph, final String directory) throws IOException {
+            deleteFile(directory + GRAPH_FILE_GML);
+            GMLWriter.outputGraph(graph, new FileOutputStream(directory + GRAPH_FILE_GML));
+        }
+    }
+
+    /**
+     * Reads and writes a TinkerGraph to GraphSON as the format for the data.
+     */
+    class GraphSONTinkerStorage extends AbstractSeparateTinkerStorage {
+        private static final String GRAPH_FILE_GRAPHSON = "/tinkergraph.json";
+
+        @Override
+        public void loadGraphData(final TinkerGraph graph, final String directory) throws IOException {
+            GraphSONReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GRAPHSON));
+        }
+
+        @Override
+        public void saveGraphData(final TinkerGraph graph, final String directory) throws IOException {
+            deleteFile(directory + GRAPH_FILE_GRAPHSON);
+            GraphSONWriter.outputGraph(graph, new FileOutputStream(directory + GRAPH_FILE_GRAPHSON), GraphSONMode.EXTENDED);
+        }
+    }
+
+    /**
+     * Reads and writes a TinkerGraph to GraphML as the format for the data.
+     */
+    class GraphMLTinkerStorage extends AbstractSeparateTinkerStorage {
         private static final String GRAPH_FILE_GRAPHML = "/tinkergraph.xml";
 
         @Override
@@ -114,7 +155,7 @@ class TinkerFileFactory {
     /**
      * Reads and writes a TinkerGraph using java object serialization.
      */
-    class JavaTinkerFile extends AbstractTinkerFile {
+    class JavaTinkerStorage extends AbstractTinkerStorage {
         private static final String GRAPH_FILE_JAVA = "/tinkergraph.dat";
 
         @Override
@@ -134,7 +175,7 @@ class TinkerFileFactory {
         public void save(final TinkerGraph graph, final String directory) throws IOException {
             deleteFile(directory + GRAPH_FILE_JAVA);
             final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(directory + GRAPH_FILE_JAVA));
-            out.writeObject(this);
+            out.writeObject(graph);
             out.close();
         }
     }

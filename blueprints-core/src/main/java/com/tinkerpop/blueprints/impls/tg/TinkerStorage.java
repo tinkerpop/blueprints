@@ -9,7 +9,7 @@ import java.io.IOException;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-interface TinkerFile {
+interface TinkerStorage {
     public TinkerGraph load(final String directory) throws IOException;
     public void save(final TinkerGraph graph, final String directory) throws IOException;
 }

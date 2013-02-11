@@ -20,7 +20,7 @@ public class TinkerMetadataWriterTest extends TestCase {
         createKeyIndices(g);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        TinkerMetadataWriter.outputGraph(g, bos);
+        TinkerMetadataWriter.save(g, bos);
 
         byte[] expected = streamToByteArray(TinkerMetadataWriterTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
         byte[] actual = bos.toByteArray();

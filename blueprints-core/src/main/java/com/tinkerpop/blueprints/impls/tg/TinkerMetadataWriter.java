@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TinkerMetadataWriter writes TinkerGraph metadata to an OutputStream.
+ * Writes TinkerGraph metadata to an OutputStream.
  *
  * @author Victor Su
  */
-public class TinkerMetadataWriter {
+class TinkerMetadataWriter {
     private final TinkerGraph graph;
 
     /**
@@ -31,9 +31,9 @@ public class TinkerMetadataWriter {
      * @param filename the name of the file to write the TinkerGraph metadata to
      * @throws IOException thrown if there is an error writing the TinkerGraph metadata
      */
-    public void outputGraph(final String filename) throws IOException {
-        FileOutputStream fos = new FileOutputStream(filename);
-        outputGraph(fos);
+    public void save(final String filename) throws IOException {
+        final FileOutputStream fos = new FileOutputStream(filename);
+        save(fos);
         fos.close();
     }
 
@@ -43,105 +43,14 @@ public class TinkerMetadataWriter {
      * @param outputStream the OutputStream to write the TinkerGraph metadata to
      * @throws IOException thrown if there is an error writing the TinkerGraph metadata
      */
-    public void outputGraph(final OutputStream outputStream) throws IOException {
+    public void save(final OutputStream outputStream) throws IOException {
         DataOutputStream writer = null;
         try {
             writer = new DataOutputStream(outputStream);
-
-            // Write the current ID
             writer.writeLong(this.graph.currentId);
-
-            // Write the number of indices
-            writer.writeInt(this.graph.indices.size());
-            for (Map.Entry<String, TinkerIndex> index : this.graph.indices.entrySet()) {
-                // Write the index name
-                writer.writeUTF(index.getKey());
-
-                TinkerIndex tinkerIndex = index.getValue();
-                Class indexClass = tinkerIndex.indexClass;
-
-                // Write the index type
-                writer.writeByte(indexClass.equals(Vertex.class) ? 1 : 2);
-
-                // Write the number of items associated with this index name
-                writer.writeInt(tinkerIndex.index.size());
-                for (Object o : tinkerIndex.index.entrySet()) {
-                    Map.Entry tinkerIndexItem = (Map.Entry) o;
-
-                    // Write the item key
-                    writer.writeUTF((String) tinkerIndexItem.getKey());
-
-                    Map tinkerIndexItemSet = (Map) tinkerIndexItem.getValue();
-
-                    // Write the number of sub-items associated with this item
-                    writer.writeInt(tinkerIndexItemSet.size());
-                    for (Object p : tinkerIndexItemSet.entrySet()) {
-                        Map.Entry items = (Map.Entry) p;
-
-                        if (indexClass.equals(Vertex.class)) {
-                            Set<TinkerVertex> vertices = (Set<TinkerVertex>) items.getValue();
-
-                            // Write the number of vertices in this sub-item
-                            writer.writeInt(vertices.size());
-                            for (TinkerVertex v : vertices) {
-                                // Write the vertex identifier
-                                writer.writeUTF(v.getId());
-                            }
-                        } else if (indexClass.equals(Edge.class)) {
-                            Set<TinkerEdge> edges = (Set<TinkerEdge>) items.getValue();
-
-                            // Write the number of edges in this sub-item
-                            writer.writeInt(edges.size());
-                            for (TinkerEdge e : edges) {
-                                // Write the edge identifier
-                                writer.writeUTF(e.getId());
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Write the number of vertex key indices
-            writer.writeInt(this.graph.vertexKeyIndex.index.size());
-            for (Map.Entry<String, Map<Object, Set<TinkerVertex>>> index : this.graph.vertexKeyIndex.index.entrySet()) {
-                // Write the key index name
-                writer.writeUTF(index.getKey());
-
-                // Write the number of items associated with this key index name
-                writer.writeInt(index.getValue().size());
-                for (Map.Entry<Object, Set<TinkerVertex>> item : index.getValue().entrySet()) {
-                    // Write the item key
-                    writeTypedData(writer, item.getKey());
-
-                    // Write the number of vertices in this item
-                    writer.writeInt(item.getValue().size());
-                    for (TinkerVertex v : item.getValue()) {
-                        // Write the vertex identifier
-                        writer.writeUTF(v.getId());
-                    }
-                }
-            }
-
-            // Write the number of edge key indices
-            writer.writeInt(this.graph.edgeKeyIndex.index.size());
-            for (Map.Entry<String, Map<Object, Set<TinkerEdge>>> index : this.graph.edgeKeyIndex.index.entrySet()) {
-                // Write the key index name
-                writer.writeUTF(index.getKey());
-
-                // Write the number of items associated with this key index name
-                writer.writeInt(index.getValue().size());
-                for (Map.Entry<Object, Set<TinkerEdge>> item : index.getValue().entrySet()) {
-                    // Write the item key
-                    writeTypedData(writer, item.getKey());
-
-                    // Write the number of edges in this item
-                    writer.writeInt(item.getValue().size());
-                    for (TinkerEdge e : item.getValue()) {
-                        // Write the edge identifier
-                        writer.writeUTF(e.getId());
-                    }
-                }
-            }
+            writeIndices(writer, this.graph);
+            writeVertexKeyIndices(writer, this.graph);
+            writeEdgeKeyIndices(writer, this.graph);
         }
         catch (IOException e) {
             throw new RuntimeException("Could not write metadata file");
@@ -165,9 +74,9 @@ public class TinkerMetadataWriter {
      * @param outputStream        the OutputStream to write the TinkerGraph metadata to
      * @throws IOException thrown if there is an error writing the TinkerGraph metadata
      */
-    public static void outputGraph(final TinkerGraph graph, final OutputStream outputStream) throws IOException {
+    public static void save(final TinkerGraph graph, final OutputStream outputStream) throws IOException {
         TinkerMetadataWriter writer = new TinkerMetadataWriter(graph);
-        writer.outputGraph(outputStream);
+        writer.save(outputStream);
     }
 
     /**
@@ -177,12 +86,113 @@ public class TinkerMetadataWriter {
      * @param filename            the name of the file to write the TinkerGraph metadata to
      * @throws IOException thrown if there is an error writing the TinkerGraph metadata
      */
-    public static void outputGraph(final TinkerGraph graph, final String filename) throws IOException {
+    public static void save(final TinkerGraph graph, final String filename) throws IOException {
         TinkerMetadataWriter writer = new TinkerMetadataWriter(graph);
-        writer.outputGraph(filename);
+        writer.save(filename);
     }
 
-    private void writeTypedData(DataOutputStream writer, Object data) throws IOException {
+    private void writeIndices(final DataOutputStream writer, final TinkerGraph graph) throws IOException {
+        // Write the number of indices
+        writer.writeInt(graph.indices.size());
+
+        for (Map.Entry<String, TinkerIndex> index : graph.indices.entrySet()) {
+            // Write the index name
+            writer.writeUTF(index.getKey());
+
+            TinkerIndex tinkerIndex = index.getValue();
+            Class indexClass = tinkerIndex.indexClass;
+
+            // Write the index type
+            writer.writeByte(indexClass.equals(Vertex.class) ? 1 : 2);
+
+            // Write the number of items associated with this index name
+            writer.writeInt(tinkerIndex.index.size());
+            for (Object o : tinkerIndex.index.entrySet()) {
+                Map.Entry tinkerIndexItem = (Map.Entry) o;
+
+                // Write the item key
+                writer.writeUTF((String) tinkerIndexItem.getKey());
+
+                Map tinkerIndexItemSet = (Map) tinkerIndexItem.getValue();
+
+                // Write the number of sub-items associated with this item
+                writer.writeInt(tinkerIndexItemSet.size());
+                for (Object p : tinkerIndexItemSet.entrySet()) {
+                    Map.Entry items = (Map.Entry) p;
+
+                    if (indexClass.equals(Vertex.class)) {
+                        Set<Vertex> vertices = (Set<Vertex>) items.getValue();
+
+                        // Write the number of vertices in this sub-item
+                        writer.writeInt(vertices.size());
+                        for (Vertex v : vertices) {
+                            // Write the vertex identifier
+                            writeTypedData(writer, v.getId());
+                        }
+                    } else if (indexClass.equals(Edge.class)) {
+                        Set<Edge> edges = (Set<Edge>) items.getValue();
+
+                        // Write the number of edges in this sub-item
+                        writer.writeInt(edges.size());
+                        for (Edge e : edges) {
+                            // Write the edge identifier
+                            writeTypedData(writer, e.getId());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void writeVertexKeyIndices(final DataOutputStream writer, final TinkerGraph graph) throws IOException {
+        // Write the number of vertex key indices
+        writer.writeInt(graph.vertexKeyIndex.index.size());
+
+        for (Map.Entry<String, Map<Object, Set<TinkerVertex>>> index : graph.vertexKeyIndex.index.entrySet()) {
+            // Write the key index name
+            writer.writeUTF(index.getKey());
+
+            // Write the number of items associated with this key index name
+            writer.writeInt(index.getValue().size());
+            for (Map.Entry<Object, Set<TinkerVertex>> item : index.getValue().entrySet()) {
+                // Write the item key
+                writeTypedData(writer, item.getKey());
+
+                // Write the number of vertices in this item
+                writer.writeInt(item.getValue().size());
+                for (Vertex v : item.getValue()) {
+                    // Write the vertex identifier
+                    writeTypedData(writer, v.getId());
+                }
+            }
+        }
+    }
+
+    private void writeEdgeKeyIndices(final DataOutputStream writer, final TinkerGraph graph) throws IOException {
+        // Write the number of edge key indices
+        writer.writeInt(graph.edgeKeyIndex.index.size());
+
+        for (Map.Entry<String, Map<Object, Set<TinkerEdge>>> index : graph.edgeKeyIndex.index.entrySet()) {
+            // Write the key index name
+            writer.writeUTF(index.getKey());
+
+            // Write the number of items associated with this key index name
+            writer.writeInt(index.getValue().size());
+            for (Map.Entry<Object, Set<TinkerEdge>> item : index.getValue().entrySet()) {
+                // Write the item key
+                writeTypedData(writer, item.getKey());
+
+                // Write the number of edges in this item
+                writer.writeInt(item.getValue().size());
+                for (Edge e : item.getValue()) {
+                    // Write the edge identifier
+                    writeTypedData(writer, e.getId());
+                }
+            }
+        }
+    }
+
+    private void writeTypedData(final DataOutputStream writer, final Object data) throws IOException {
         if (data instanceof String) {
             writer.writeByte(1);
             writer.writeUTF((String) data);

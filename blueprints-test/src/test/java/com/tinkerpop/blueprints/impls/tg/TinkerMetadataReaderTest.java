@@ -25,14 +25,14 @@ public class TinkerMetadataReaderTest {
 
     @Test
     public void exampleMetadataGetsCorrectCurrentId() throws IOException {
-        TinkerMetadataReader.inputGraph(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
+        TinkerMetadataReader.load(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
 
         Assert.assertEquals((long)this.graph.currentId, 0l);
     }
 
     @Test
     public void exampleMetadataGetsCorrectIndices() throws IOException {
-        TinkerMetadataReader.inputGraph(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
+        TinkerMetadataReader.load(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
 
         Assert.assertEquals(2, this.graph.indices.size());
 
@@ -49,7 +49,7 @@ public class TinkerMetadataReaderTest {
 
     @Test
     public void exampleMetadataGetsCorrectVertexKeyIndices() throws IOException {
-        TinkerMetadataReader.inputGraph(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
+        TinkerMetadataReader.load(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
 
         Assert.assertEquals(1, this.graph.vertexKeyIndex.index.size());
         Assert.assertEquals(1, getIterableCount(graph.getVertices("age", 27)));
@@ -57,7 +57,7 @@ public class TinkerMetadataReaderTest {
 
     @Test
     public void exampleMetadataGetsCorrectEdgeKeyIndices() throws IOException {
-        TinkerMetadataReader.inputGraph(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
+        TinkerMetadataReader.load(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
 
         Assert.assertEquals(1, this.graph.edgeKeyIndex.index.size());
         Assert.assertEquals(1, getIterableCount(graph.getEdges("weight", 0.5f)));
