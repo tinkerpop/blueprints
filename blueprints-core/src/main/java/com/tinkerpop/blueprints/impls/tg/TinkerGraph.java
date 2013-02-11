@@ -122,6 +122,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             } else {
                 TinkerGraph graph = new TinkerGraph();
 
+                // final TinkerFile tinkerFile = TinkerFileFactory.getInstance().getTinkerFile(fileType);
+                // tinkerFile.load(graph, directory);
+
                 switch (fileType) {
                     case GML:
                         GMLReader.inputGraph(graph, new FileInputStream(directory + GRAPH_FILE_GML));
@@ -385,6 +388,10 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     public void shutdown() {
         if (null != this.directory) {
             try {
+
+                // final TinkerFile tinkerFile = TinkerFileFactory.getInstance().getTinkerFile(fileType);
+                // tinkerFile.save(graph, directory);
+
                 switch (this.fileType) {
                     case GML:
                         deleteFile(this.directory + GRAPH_FILE_GML);
