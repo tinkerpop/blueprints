@@ -179,33 +179,24 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     public void testGraphFileTypeJava() {
-        testGraphFileType("test-java", TinkerGraph.FileType.JAVA);
+        testGraphFileType("graph-test-java", TinkerGraph.FileType.JAVA);
     }
 
     public void testGraphFileTypeGML() {
-        testGraphFileType("test-gml", TinkerGraph.FileType.GML);
+        testGraphFileType("graph-test-gml", TinkerGraph.FileType.GML);
     }
 
     public void testGraphFileTypeGraphML() {
-        testGraphFileType("test-graphml", TinkerGraph.FileType.GRAPHML);
+        testGraphFileType("graph-test-graphml", TinkerGraph.FileType.GRAPHML);
     }
 
     public void testGraphFileTypeGraphSON() {
-        testGraphFileType("test-graphson", TinkerGraph.FileType.GRAPHSON);
+        testGraphFileType("graph-test-graphson", TinkerGraph.FileType.GRAPHSON);
     }
 
     private void testGraphFileType(final String directory, final TinkerGraph.FileType fileType) {
         final String path = getDirectory() + "/" + directory;
-
-        final File file = new File(path);
-        if (file.exists()) {
-            try {
-                delete(file);
-            }
-            catch (IOException e) {
-                System.out.println("Cannot delete file " + file);
-            }
-        }
+        deleteDirectory(new File(path));
 
         final TinkerGraph sourceGraph = TinkerGraphFactory.createTinkerGraph();
         final TinkerGraph targetGraph = new TinkerGraph(path, fileType);
@@ -214,22 +205,16 @@ public class TinkerGraphTest extends GraphTest {
         copyGraphs(sourceGraph, targetGraph);
 
         createManualIndices(targetGraph);
+
+        this.stopWatch();
         targetGraph.shutdown();
+        printTestPerformance("save graph: " + fileType.toString(), this.stopWatch());
 
+        this.stopWatch();
         final TinkerGraph compareGraph = new TinkerGraph(path, fileType);
+        printTestPerformance("load graph: " + fileType.toString(), this.stopWatch());
+
         compareGraphs(targetGraph, compareGraph, fileType);
-    }
-
-    private void delete(final File f) throws IOException {
-        if (f.isDirectory()) {
-            for (File c : f.listFiles()) {
-                delete(c);
-            }
-        }
-
-        if (!f.delete()) {
-            throw new FileNotFoundException("Failed to delete file: " + f);
-        }
     }
 
     private void createKeyIndices(final TinkerGraph g) {
