@@ -361,6 +361,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         return currentEdge;
     }
 
+    protected Edge addEdgeSupport(final Vertex outVertex, final Vertex inVertex, final String label) {
+        return this.addEdge(null, outVertex, inVertex, label);
+    }
+
     @Override
     public String toString() {
         return StringFactory.graphString(this, this.baseGraph.toString());
@@ -427,6 +431,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
             throw retrievalNotSupported();
         }
 
+        public Edge addEdge(final String label, final Vertex vertex) {
+            return addEdgeSupport(this, vertex, label);
+        }
+
         @Override
         public void setProperty(String key, Object value) {
             getCachedVertex(externalID).setProperty(key, value);
@@ -450,6 +458,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         @Override
         public Object removeProperty(String key) {
             return getCachedVertex(externalID).removeProperty(key);
+        }
+
+        public void remove() {
+            removeVertex(this);
         }
 
         @Override
@@ -505,6 +517,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         @Override
         public String toString() {
             return getWrappedEdge().toString();
+        }
+
+        public void remove() {
+            removeEdge(this);
         }
 
     }

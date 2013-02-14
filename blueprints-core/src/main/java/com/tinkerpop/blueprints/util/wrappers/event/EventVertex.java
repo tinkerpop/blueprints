@@ -16,31 +16,34 @@ import java.util.List;
  * @author Stephen Mallette
  */
 public class EventVertex extends EventElement implements Vertex {
-    protected EventVertex(final Vertex rawVertex, final List<GraphChangedListener> graphChangedListeners,
-                          final EventTrigger trigger) {
-        super(rawVertex, graphChangedListeners, trigger);
+    protected EventVertex(final Vertex rawVertex, final EventGraph eventGraph) {
+        super(rawVertex, eventGraph);
     }
 
     public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
-        return new EventEdgeIterable(((Vertex) this.baseElement).getEdges(direction, labels), this.graphChangedListeners, trigger);
+        return new EventEdgeIterable(((Vertex) this.baseElement).getEdges(direction, labels), this.eventGraph);
     }
 
     public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
-        return new EventVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels), this.graphChangedListeners, trigger);
+        return new EventVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels), this.eventGraph);
     }
 
     public Query query() {
         return new WrapperQuery(((Vertex) this.baseElement).query()) {
             @Override
             public Iterable<Vertex> vertices() {
-                return new EventVertexIterable(this.query.vertices(), graphChangedListeners, trigger);
+                return new EventVertexIterable(this.query.vertices(), eventGraph);
             }
 
             @Override
             public Iterable<Edge> edges() {
-                return new EventEdgeIterable(this.query.edges(), graphChangedListeners, trigger);
+                return new EventEdgeIterable(this.query.edges(), eventGraph);
             }
         };
+    }
+
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.eventGraph.addEdge(null, this, vertex, label);
     }
 
     public Vertex getBaseVertex() {

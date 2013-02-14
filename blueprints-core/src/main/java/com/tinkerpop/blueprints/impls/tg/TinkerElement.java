@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.tg;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -69,5 +70,12 @@ abstract class TinkerElement implements Element, Serializable {
 
     public boolean equals(final Object object) {
         return ElementHelper.areEqual(this, object);
+    }
+
+    public void remove() {
+        if (this instanceof Vertex)
+            this.graph.removeVertex((Vertex) this);
+        else
+            this.graph.removeEdge((Edge) this);
     }
 }

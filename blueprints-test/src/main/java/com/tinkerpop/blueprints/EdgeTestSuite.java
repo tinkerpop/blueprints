@@ -578,4 +578,29 @@ public class EdgeTestSuite extends TestSuite {
         }
         graph.shutdown();
     }
+
+    public void testEdgeCentricRemoving() {
+        final Graph graph = graphTest.generateGraph();
+
+        final Edge a = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+        final Edge b = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+        final Edge c = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+
+        Object cId = c.getId();
+
+        if (graph.getFeatures().supportsEdgeIteration)
+            assertEquals(count(graph.getEdges()), 3);
+
+        a.remove();
+        b.remove();
+
+        if (graph.getFeatures().supportsEdgeRetrieval)
+            assertNotNull(graph.getEdge(cId));
+
+        if (graph.getFeatures().supportsEdgeIteration)
+            assertEquals(count(graph.getEdges()), 1);
+
+        graph.shutdown();
+
+    }
 }

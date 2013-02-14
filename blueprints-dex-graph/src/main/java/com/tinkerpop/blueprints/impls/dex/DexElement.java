@@ -3,7 +3,9 @@
  */
 package com.tinkerpop.blueprints.impls.dex;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -272,6 +274,13 @@ class DexElement implements Element {
     @Override
     public Object getId() {
         return oid;
+    }
+
+    public void remove() {
+        if (this instanceof Vertex)
+            this.graph.removeVertex((Vertex) this);
+        else
+            this.graph.removeEdge((Edge) this);
     }
 
     public boolean equals(final Object object) {

@@ -143,6 +143,10 @@ public class SailEdge implements Edge {
         }
     }
 
+    public void remove() {
+        this.graph.removeEdge(this);
+    }
+
     public boolean equals(final Object object) {
         return ElementHelper.areEqual(this, object);
     }

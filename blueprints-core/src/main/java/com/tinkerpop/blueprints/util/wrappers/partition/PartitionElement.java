@@ -1,6 +1,8 @@
 package com.tinkerpop.blueprints.util.wrappers.partition;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 
 import java.util.HashSet;
@@ -14,9 +16,9 @@ public abstract class PartitionElement implements Element {
     protected Element baseElement;
     protected PartitionGraph graph;
 
-    protected PartitionElement(final Element baseElement, final PartitionGraph graph) {
+    protected PartitionElement(final Element baseElement, final PartitionGraph partitionGraph) {
         this.baseElement = baseElement;
-        this.graph = graph;
+        this.graph = partitionGraph;
     }
 
     public void setProperty(final String key, final Object value) {
@@ -64,6 +66,13 @@ public abstract class PartitionElement implements Element {
 
     public void setPartition(final String partition) {
         this.baseElement.setProperty(this.graph.getPartitionKey(), partition);
+    }
+
+    public void remove() {
+        if (this instanceof Vertex)
+            this.graph.removeVertex((Vertex) this);
+        else
+            this.graph.removeEdge((Edge) this);
     }
 
     public String toString() {

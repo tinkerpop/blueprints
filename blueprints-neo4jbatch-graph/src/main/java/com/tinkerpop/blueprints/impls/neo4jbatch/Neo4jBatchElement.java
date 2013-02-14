@@ -47,6 +47,10 @@ abstract class Neo4jBatchElement implements Element {
         return this.getId().hashCode();
     }
 
+    public void remove() {
+        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
+    }
+
     public boolean equals(final Object object) {
         return ElementHelper.areEqual(this, object);
     }

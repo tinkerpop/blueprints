@@ -222,4 +222,8 @@ class DexVertex extends DexElement implements Vertex {
     public Query query() {
         return new DefaultQuery(this);
     }
+
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
 }

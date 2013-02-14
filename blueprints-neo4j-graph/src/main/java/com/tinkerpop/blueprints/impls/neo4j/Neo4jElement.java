@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.neo4j;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -79,6 +80,13 @@ abstract class Neo4jElement implements Element {
         } else {
             return ((Relationship) this.rawElement).getId();
         }
+    }
+
+    public void remove() {
+        if (this instanceof Vertex)
+            this.graph.removeVertex((Vertex) this);
+        else
+            this.graph.removeEdge((Edge) this);
     }
 
     public boolean equals(final Object object) {

@@ -37,6 +37,13 @@ public class WrappedVertex extends WrappedElement implements Vertex {
         };
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        if (vertex instanceof WrappedVertex)
+            return new WrappedEdge(((Vertex) this.baseElement).addEdge(label, ((WrappedVertex) vertex).getBaseVertex()));
+        else
+            return new WrappedEdge(((Vertex) this.baseElement).addEdge(label, vertex));
+    }
+
     public Vertex getBaseVertex() {
         return (Vertex) this.baseElement;
     }

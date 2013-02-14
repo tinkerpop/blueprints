@@ -23,6 +23,10 @@ class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
         return new ReadOnlyVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels));
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
+    }
+
     public Query query() {
         return new WrapperQuery(((Vertex) this.baseElement).query()) {
             @Override

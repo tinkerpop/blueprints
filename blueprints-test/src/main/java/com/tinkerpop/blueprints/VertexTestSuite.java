@@ -525,4 +525,53 @@ public class VertexTestSuite extends TestSuite {
         }
         graph.shutdown();
     }
+
+    public void testVertexCentricLinking() {
+        final Graph graph = graphTest.generateGraph();
+
+        final Vertex v = graph.addVertex(null);
+        final Vertex a = graph.addVertex(null);
+        final Vertex b = graph.addVertex(null);
+
+        v.addEdge(convertId(graph, "knows"), a);
+        v.addEdge(convertId(graph, "knows"), b);
+
+        if (graph.getFeatures().supportsVertexIteration)
+            assertEquals(count(graph.getVertices()), 3);
+        if (graph.getFeatures().supportsEdgeIteration)
+            assertEquals(count(graph.getEdges()), 2);
+
+        assertEquals(count(v.getEdges(OUT, convertId(graph, "knows"))), 2);
+        assertEquals(count(a.getEdges(OUT, convertId(graph, "knows"))), 0);
+        assertEquals(count(a.getEdges(IN, convertId(graph, "knows"))), 1);
+
+        assertEquals(count(b.getEdges(OUT, convertId(graph, "knows"))), 0);
+        assertEquals(count(b.getEdges(IN, convertId(graph, "knows"))), 1);
+
+        graph.shutdown();
+    }
+
+    public void testVertexCentricRemoving() {
+        final Graph graph = graphTest.generateGraph();
+
+        final Vertex a = graph.addVertex(null);
+        final Vertex b = graph.addVertex(null);
+        final Vertex c = graph.addVertex(null);
+
+        Object cId = c.getId();
+
+        if (graph.getFeatures().supportsVertexIteration)
+            assertEquals(count(graph.getVertices()), 3);
+
+        a.remove();
+        b.remove();
+
+        assertNotNull(graph.getVertex(cId));
+
+        if (graph.getFeatures().supportsVertexIteration)
+            assertEquals(count(graph.getVertices()), 1);
+
+        graph.shutdown();
+
+    }
 }

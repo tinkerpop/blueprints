@@ -199,6 +199,10 @@ public class SailVertex implements Vertex {
         }
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
+
     public Query query() {
         return new DefaultQuery(this);
     }
@@ -234,6 +238,10 @@ public class SailVertex implements Vertex {
         } else {
             return literal.getLabel();
         }
+    }
+
+    public void remove() {
+        this.graph.removeVertex(this);
     }
 
     public int hashCode() {

@@ -37,6 +37,10 @@ public class PartitionVertex extends PartitionElement implements Vertex {
         };
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
+
     public Vertex getBaseVertex() {
         return (Vertex) this.baseElement;
     }

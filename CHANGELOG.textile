@@ -16,6 +16,8 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* @Element@ API changed to support @Element.remove()@
+* @Vertex@ API changed to support @Vertex.addEdge(Vertex, String)@
 * Bumped to support Neo4j 1.9.M03
 * Improved transaction concurrency in @DexGraph@
 * Deprecated @stopTransaction()@ in favor of @commit()@ and @rollback()@

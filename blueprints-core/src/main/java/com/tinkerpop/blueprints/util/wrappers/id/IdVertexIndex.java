@@ -9,12 +9,13 @@ import com.tinkerpop.blueprints.Vertex;
  */
 public class IdVertexIndex implements Index<Vertex> {
     private final Index<Vertex> baseIndex;
+    private final IdGraph idGraph;
 
-    public IdVertexIndex(final Index<Vertex> baseIndex) {
+    public IdVertexIndex(final Index<Vertex> baseIndex, final IdGraph idGraph) {
         if (null == baseIndex) {
             throw new IllegalArgumentException("null base index");
         }
-
+        this.idGraph = idGraph;
         this.baseIndex = baseIndex;
     }
 
@@ -31,11 +32,11 @@ public class IdVertexIndex implements Index<Vertex> {
     }
 
     public CloseableIterable<Vertex> get(String key, Object value) {
-        return new IdVertexIterable(baseIndex.get(key, value));
+        return new IdVertexIterable(baseIndex.get(key, value), this.idGraph);
     }
 
     public CloseableIterable<Vertex> query(String key, Object query) {
-        return new IdVertexIterable(baseIndex.query(key, query));
+        return new IdVertexIterable(baseIndex.query(key, query), this.idGraph);
     }
 
     public long count(String key, Object value) {

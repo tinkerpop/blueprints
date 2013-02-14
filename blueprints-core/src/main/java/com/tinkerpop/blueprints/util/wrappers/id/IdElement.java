@@ -1,6 +1,8 @@
 package com.tinkerpop.blueprints.util.wrappers.id;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 
 import java.util.HashSet;
@@ -12,8 +14,11 @@ import java.util.Set;
 public abstract class IdElement implements Element {
     protected final Element baseElement;
 
-    protected IdElement(final Element baseElement) {
+    protected final IdGraph idGraph;
+
+    protected IdElement(final Element baseElement, final IdGraph idGraph) {
         this.baseElement = baseElement;
+        this.idGraph = idGraph;
     }
 
     public Object getProperty(final String key) {
@@ -58,5 +63,12 @@ public abstract class IdElement implements Element {
 
     public boolean equals(final Object object) {
         return ElementHelper.areEqual(this, object);
+    }
+
+    public void remove() {
+        if (this instanceof Vertex)
+            this.idGraph.removeVertex((Vertex) this);
+        else
+            this.idGraph.removeEdge((Edge) this);
     }
 }
