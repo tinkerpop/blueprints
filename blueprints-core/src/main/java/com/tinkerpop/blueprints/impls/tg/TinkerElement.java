@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ abstract class TinkerElement implements Element, Serializable {
     }
 
     public Set<String> getPropertyKeys() {
-        return this.properties.keySet();
+        return new HashSet<String>(this.properties.keySet());
     }
 
     public Object getProperty(final String key) {

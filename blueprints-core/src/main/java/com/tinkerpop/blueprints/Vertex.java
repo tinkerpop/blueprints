@@ -37,5 +37,12 @@ public interface Vertex extends Element {
      */
     public Query query();
 
+    /**
+     * Add a new outgoing edge from this vertex to the parameter vertex with provided edge label.
+     *
+     * @param label  the label of the edge
+     * @param vertex the vertex to connect to
+     * @return the newly created edge
+     */
     public Edge addEdge(String label, Vertex vertex);
 }

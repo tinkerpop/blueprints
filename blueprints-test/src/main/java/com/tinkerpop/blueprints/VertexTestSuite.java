@@ -574,4 +574,19 @@ public class VertexTestSuite extends TestSuite {
         graph.shutdown();
 
     }
+
+    public void testConcurrentModificationOnProperties() {
+        final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties) {
+            Vertex a = graph.addVertex(null);
+            a.setProperty("test1", 1);
+            a.setProperty("test2", 2);
+            a.setProperty("test3", 3);
+            a.setProperty("test4", 4);
+            for (String key : a.getPropertyKeys()) {
+                a.removeProperty(key);
+            }
+        }
+        graph.shutdown();
+    }
 }
