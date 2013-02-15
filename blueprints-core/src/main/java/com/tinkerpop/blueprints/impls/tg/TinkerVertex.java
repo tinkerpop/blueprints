@@ -106,6 +106,10 @@ class TinkerVertex extends TinkerElement implements Vertex, Serializable {
         return StringFactory.vertexString(this);
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
+
     protected void addOutEdge(final String label, final Edge edge) {
         Set<Edge> edges = this.outEdges.get(label);
         if (null == edges) {

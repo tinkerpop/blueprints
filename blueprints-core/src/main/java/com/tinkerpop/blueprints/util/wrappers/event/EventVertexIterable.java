@@ -15,15 +15,11 @@ import java.util.List;
 class EventVertexIterable implements CloseableIterable<Vertex> {
 
     private final Iterable<Vertex> iterable;
-    private final List<GraphChangedListener> graphChangedListeners;
+    private final EventGraph eventGraph;
 
-    private final EventTrigger trigger;
-
-    public EventVertexIterable(final Iterable<Vertex> iterable, final List<GraphChangedListener> graphChangedListeners,
-                               final EventTrigger trigger) {
+    public EventVertexIterable(final Iterable<Vertex> iterable, final EventGraph eventGraph) {
         this.iterable = iterable;
-        this.graphChangedListeners = graphChangedListeners;
-        this.trigger = trigger;
+        this.eventGraph = eventGraph;
     }
 
     public void close() {
@@ -41,7 +37,7 @@ class EventVertexIterable implements CloseableIterable<Vertex> {
             }
 
             public Vertex next() {
-                return new EventVertex(this.itty.next(), graphChangedListeners, trigger);
+                return new EventVertex(this.itty.next(), eventGraph);
             }
 
             public boolean hasNext() {

@@ -49,6 +49,11 @@ public abstract interface Element {
     public Object removeProperty(String key);
 
     /**
+     * Remove the element from the graph.
+     */
+    public void remove();
+
+    /**
      * An identifier that is unique to its inheriting class.
      * All vertices of a graph must have unique identifiers.
      * All edges of a graph must have unique identifiers.

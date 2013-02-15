@@ -67,6 +67,10 @@ public class RexsterVertex extends RexsterElement implements Vertex {
         }
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
+
     public Query query() {
         return new RexsterQuery(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()), graph);
     }

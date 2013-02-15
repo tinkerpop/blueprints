@@ -48,6 +48,10 @@ public abstract class WrappedElement implements Element {
         return this.baseElement;
     }
 
+    public void remove() {
+        this.baseElement.remove();
+    }
+
     public String toString() {
         return this.baseElement.toString();
     }

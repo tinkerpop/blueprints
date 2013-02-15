@@ -15,15 +15,11 @@ import java.util.List;
 class EventIndexIterable<T extends Element> implements Iterable<Index<T>> {
 
     private final Iterable<Index<T>> iterable;
-    private final List<GraphChangedListener> graphChangedListeners;
+    private final EventGraph eventGraph;
 
-    private final EventTrigger trigger;
-
-    public EventIndexIterable(final Iterable<Index<T>> iterable, List<GraphChangedListener> graphChangedListeners,
-                              final EventTrigger trigger) {
+    public EventIndexIterable(final Iterable<Index<T>> iterable, final EventGraph eventGraph) {
         this.iterable = iterable;
-        this.graphChangedListeners = graphChangedListeners;
-        this.trigger = trigger;
+        this.eventGraph = eventGraph;
     }
 
     public Iterator<Index<T>> iterator() {
@@ -35,7 +31,7 @@ class EventIndexIterable<T extends Element> implements Iterable<Index<T>> {
             }
 
             public Index<T> next() {
-                return new EventIndex<T>(this.itty.next(), graphChangedListeners, trigger);
+                return new EventIndex<T>(this.itty.next(), eventGraph);
             }
 
             public boolean hasNext() {

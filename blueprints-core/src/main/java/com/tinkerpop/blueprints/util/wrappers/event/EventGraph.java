@@ -60,6 +60,10 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return this.graphChangedListeners.iterator();
     }
 
+    public EventTrigger getTrigger() {
+        return this.trigger;
+    }
+
     public void removeListener(final GraphChangedListener listener) {
         this.graphChangedListeners.remove(listener);
     }
@@ -89,7 +93,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
             return null;
         } else {
             this.onVertexAdded(vertex);
-            return new EventVertex(vertex, this.graphChangedListeners, this.trigger);
+            return new EventVertex(vertex, this);
         }
     }
 
@@ -98,7 +102,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         if (vertex == null) {
             return null;
         } else {
-            return new EventVertex(vertex, this.graphChangedListeners, this.trigger);
+            return new EventVertex(vertex, this);
         }
     }
 
@@ -116,11 +120,11 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Vertex> getVertices() {
-        return new EventVertexIterable(this.baseGraph.getVertices(), this.graphChangedListeners, this.trigger);
+        return new EventVertexIterable(this.baseGraph.getVertices(), this);
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
-        return new EventVertexIterable(this.baseGraph.getVertices(key, value), this.graphChangedListeners, this.trigger);
+        return new EventVertexIterable(this.baseGraph.getVertices(key, value), this);
     }
 
     /**
@@ -142,7 +146,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
             return null;
         } else {
             this.onEdgeAdded(edge);
-            return new EventEdge(edge, this.graphChangedListeners, this.trigger);
+            return new EventEdge(edge, this);
         }
     }
 
@@ -151,7 +155,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         if (edge == null) {
             return null;
         } else {
-            return new EventEdge(edge, this.graphChangedListeners, this.trigger);
+            return new EventEdge(edge, this);
         }
     }
 
@@ -169,11 +173,11 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     }
 
     public Iterable<Edge> getEdges() {
-        return new EventEdgeIterable(this.baseGraph.getEdges(), this.graphChangedListeners, this.trigger);
+        return new EventEdgeIterable(this.baseGraph.getEdges(), this);
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
-        return new EventEdgeIterable(this.baseGraph.getEdges(key, value), this.graphChangedListeners, this.trigger);
+        return new EventEdgeIterable(this.baseGraph.getEdges(key, value), this);
     }
 
     public void shutdown() {

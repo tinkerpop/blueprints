@@ -10,9 +10,11 @@ import java.util.Iterator;
  */
 class IdVertexIterable implements CloseableIterable<Vertex> {
     private final Iterable<Vertex> iterable;
+    private final IdGraph idGraph;
 
-    public IdVertexIterable(Iterable<Vertex> iterable) {
+    public IdVertexIterable(final Iterable<Vertex> iterable, final IdGraph idGraph) {
         this.iterable = iterable;
+        this.idGraph = idGraph;
     }
 
     public void close() {
@@ -30,7 +32,7 @@ class IdVertexIterable implements CloseableIterable<Vertex> {
             }
 
             public Vertex next() {
-                return new IdVertex(itty.next());
+                return new IdVertex(itty.next(), idGraph);
             }
 
             public void remove() {

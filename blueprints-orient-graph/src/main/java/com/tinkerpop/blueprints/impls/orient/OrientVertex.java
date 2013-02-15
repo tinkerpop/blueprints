@@ -89,6 +89,10 @@ public class OrientVertex extends OrientElement implements Vertex {
         }
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
+
     public Query query() {
         return new DefaultQuery(this);
     }

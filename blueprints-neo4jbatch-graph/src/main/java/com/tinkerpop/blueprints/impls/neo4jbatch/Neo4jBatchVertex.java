@@ -51,6 +51,10 @@ class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
         throw new UnsupportedOperationException();
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
+
     /**
      * @throws UnsupportedOperationException
      */

@@ -10,6 +10,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -95,6 +96,13 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
         int result = 1;
         result = prime * result + ((this.rawElement == null) ? 0 : this.rawElement.hashCode());
         return result;
+    }
+
+    public void remove() {
+        if (this instanceof Vertex)
+            this.graph.removeVertex((Vertex) this);
+        else
+            this.graph.removeEdge((Edge) this);
     }
 
     public boolean equals(final Object object) {

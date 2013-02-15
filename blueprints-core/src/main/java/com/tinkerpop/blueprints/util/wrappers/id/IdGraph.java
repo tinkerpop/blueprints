@@ -126,7 +126,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
             base.setProperty(ID, v);
         }
 
-        return new IdVertex(base);
+        return new IdVertex(base, this);
     }
 
     public Vertex getVertex(final Object id) {
@@ -145,7 +145,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
                 throw new IllegalStateException("multiple vertices exist with id '" + id + "'");
             }
 
-            return new IdVertex(e);
+            return new IdVertex(e, this);
         }
     }
 
@@ -155,14 +155,14 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     public Iterable<Vertex> getVertices() {
-        return new IdVertexIterable(baseGraph.getVertices());
+        return new IdVertexIterable(baseGraph.getVertices(), this);
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
         if (key.equals(ID)) {
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
-            return new IdVertexIterable(baseGraph.getVertices(key, value));
+            return new IdVertexIterable(baseGraph.getVertices(key, value), this);
         }
     }
 
@@ -184,7 +184,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
             base.setProperty(ID, v);
         }
 
-        return new IdEdge(base);
+        return new IdEdge(base, this);
     }
 
     public Edge getEdge(final Object id) {
@@ -203,7 +203,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
                 throw new IllegalStateException("Multiple edges exist with id " + id);
             }
 
-            return new IdEdge(e);
+            return new IdEdge(e, this);
         }
     }
 
@@ -214,14 +214,14 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     public Iterable<Edge> getEdges() {
-        return new IdEdgeIterable(baseGraph.getEdges());
+        return new IdEdgeIterable(baseGraph.getEdges(), this);
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
         if (key.equals(ID)) {
             throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
         } else {
-            return new IdEdgeIterable(baseGraph.getEdges(key, value));
+            return new IdEdgeIterable(baseGraph.getEdges(key, value), this);
         }
     }
 
@@ -297,8 +297,8 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         verifyBaseGraphIsIndexableGraph();
 
         return isVertexClass(indexClass)
-                ? (Index<T>) new IdVertexIndex((Index<Vertex>) ((IndexableGraph) baseGraph).createIndex(indexName, indexClass, indexParameters))
-                : (Index<T>) new IdEdgeIndex((Index<Edge>) ((IndexableGraph) baseGraph).createIndex(indexName, indexClass, indexParameters));
+                ? (Index<T>) new IdVertexIndex((Index<Vertex>) ((IndexableGraph) baseGraph).createIndex(indexName, indexClass, indexParameters), this)
+                : (Index<T>) new IdEdgeIndex((Index<Edge>) ((IndexableGraph) baseGraph).createIndex(indexName, indexClass, indexParameters), this);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName,
@@ -307,10 +307,10 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
         if (isVertexClass(indexClass)) {
             Index<Vertex> baseIndex = (Index<Vertex>) ((IndexableGraph) baseGraph).getIndex(indexName, indexClass);
-            return null == baseIndex ? null : (Index<T>) new IdVertexIndex(baseIndex);
+            return null == baseIndex ? null : (Index<T>) new IdVertexIndex(baseIndex, this);
         } else {
             Index<Edge> baseIndex = (Index<Edge>) ((IndexableGraph) baseGraph).getIndex(indexName, indexClass);
-            return null == baseIndex ? null : (Index<T>) new IdEdgeIndex(baseIndex);
+            return null == baseIndex ? null : (Index<T>) new IdEdgeIndex(baseIndex, this);
         }
     }
 

@@ -26,7 +26,7 @@ public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T>
     }
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        return new EventIndex<T>(this.getBaseGraph().createIndex(indexName, indexClass, indexParameters), this.graphChangedListeners, this.trigger);
+        return new EventIndex<T>(this.getBaseGraph().createIndex(indexName, indexClass, indexParameters), this);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
@@ -34,10 +34,10 @@ public class EventIndexableGraph<T extends IndexableGraph> extends EventGraph<T>
         if (null == index)
             return null;
         else
-            return new EventIndex<T>(index, this.graphChangedListeners, this.trigger);
+            return new EventIndex<T>(index, this);
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        return new EventIndexIterable(this.baseGraph.getIndices(), this.graphChangedListeners, this.trigger);
+        return new EventIndexIterable(this.baseGraph.getIndices(), this);
     }
 }
