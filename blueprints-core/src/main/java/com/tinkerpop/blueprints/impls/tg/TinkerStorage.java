@@ -1,7 +1,5 @@
 package com.tinkerpop.blueprints.impls.tg;
 
-import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
-
 import java.io.IOException;
 
 /**

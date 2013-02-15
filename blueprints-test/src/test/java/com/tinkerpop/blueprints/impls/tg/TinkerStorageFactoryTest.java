@@ -1,18 +1,12 @@
 package com.tinkerpop.blueprints.impls.tg;
 
 import com.tinkerpop.blueprints.BaseTest;
-import com.tinkerpop.blueprints.CloseableIterable;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.Vertex;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * @author Victor Su
@@ -82,7 +76,7 @@ public class TinkerStorageFactoryTest extends BaseTest {
         }
 
         if (!dir.mkdirs()) {
-                throw new RuntimeException("Could not create directory");
+            throw new RuntimeException("Could not create directory");
         }
     }
 
