@@ -84,14 +84,31 @@ class TinkerStorageFactory {
 
         @Override
         public TinkerGraph load(final String directory) throws IOException {
+            final File dir = new File(directory);
+            if (!dir.exists()) {
+                throw new RuntimeException("Directory " + directory + " does not exist");
+            }
+
             final TinkerGraph graph = new TinkerGraph();
             loadGraphData(graph, directory);
-            TinkerMetadataReader.load(graph, new FileInputStream(directory + GRAPH_FILE_METADATA));
+
+            final File file = new File(directory + GRAPH_FILE_METADATA);
+            if (file.exists()) {
+                TinkerMetadataReader.load(graph, new FileInputStream(directory + GRAPH_FILE_METADATA));
+            }
+
             return graph;
         }
 
         @Override
         public void save(final TinkerGraph graph, final String directory) throws IOException {
+            final File dir = new File(directory);
+            if (!dir.exists()) {
+                if (!dir.mkdir()) {
+                    throw new RuntimeException("Could not create directory " + directory);
+                }
+            }
+
             saveGraphData(graph, directory);
             deleteFile(directory + GRAPH_FILE_METADATA);
             TinkerMetadataWriter.save(graph, new FileOutputStream(directory + GRAPH_FILE_METADATA));
