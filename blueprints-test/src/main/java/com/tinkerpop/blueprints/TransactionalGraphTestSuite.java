@@ -7,6 +7,8 @@ import junit.framework.Assert;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -507,7 +509,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
                 }
             };
 
-            threadModFirstGraph.run();
+            threadModFirstGraph.start();
             threadModFirstGraph.join();
 
             final Thread threadReadBothGraphs = new Thread() {
@@ -528,12 +530,147 @@ public class TransactionalGraphTestSuite extends TestSuite {
                 }
             };
 
-            threadReadBothGraphs.run();
+            threadReadBothGraphs.start();
             threadReadBothGraphs.join();
         }
 
         graph1.shutdown();
         graph2.shutdown();
+    }
+
+    public void untestTransactionIsolationWithSeparateThreads() throws Exception {
+        // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
+        // the graph and a separate thread reads before the transaction is committed.  the expectation is that
+        // the changes in the transaction are isolated to the thread that made the change and the second thread
+        // should not see the change until commit() in the first thread.
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        if (!graph.getFeatures().isRDFModel) {
+            final CountDownLatch latchCommit = new CountDownLatch(1);
+            final CountDownLatch latchFirstRead = new CountDownLatch(1);
+            final CountDownLatch latchSecondRead = new CountDownLatch(1);
+
+            final Thread threadMod = new Thread() {
+                public void run() {
+                    final Vertex v = graph.addVertex(null);
+                    v.setProperty("name", "stephen");
+
+                    System.out.println("added vertex");
+
+                    latchFirstRead.countDown();
+
+                    try {
+                        latchCommit.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
+                    graph.commit();
+
+                    System.out.println("committed vertex");
+
+                    latchSecondRead.countDown();
+                }
+            };
+
+            threadMod.start();
+
+            final Thread threadRead = new Thread() {
+                public void run() {
+                    try {
+                        latchFirstRead.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
+                    System.out.println("reading vertex before tx");
+                    Assert.assertFalse(graph.getVertices().iterator().hasNext());
+                    System.out.println("read vertex before tx");
+
+                    latchCommit.countDown();
+
+                    try {
+                        latchSecondRead.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
+                    System.out.println("reading vertex after tx");
+                    Assert.assertTrue(graph.getVertices().iterator().hasNext());
+                    System.out.println("read vertex after tx");
+                }
+            };
+
+            threadRead.start();
+
+            threadMod.join();
+            threadRead.join();
+        }
+
+        graph.shutdown();
+
+    }
+
+    public void testTransactionIsolationCommitCheck() throws Exception {
+        // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
+        // the graph and a separate thread cannot affect the transaction of the first
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        if (!graph.getFeatures().isRDFModel) {
+            final CountDownLatch latchCommittedInOtherThread = new CountDownLatch(1);
+            final CountDownLatch latchCommitInOtherThread = new CountDownLatch(1);
+
+            // this thread starts a transaction then waits while the second thread tries to commit it.
+            final Thread threadTxStarter = new Thread() {
+                public void run() {
+                    final Vertex v = graph.addVertex(null);
+                    v.setProperty("name", "stephen");
+
+                    System.out.println("added vertex");
+
+                    latchCommitInOtherThread.countDown();
+
+                    try {
+                        latchCommittedInOtherThread.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
+                    graph.rollback();
+
+                    // there should be no vertices here
+                    System.out.println("reading vertex before tx");
+                    Assert.assertFalse(graph.getVertices().iterator().hasNext());
+                    System.out.println("read vertex before tx");
+                }
+            };
+
+            threadTxStarter.start();
+
+            // this thread tries to commit the transaction started in the first thread above.
+            final Thread threadTryCommitTx = new Thread() {
+                public void run() {
+                    try {
+                        latchCommitInOtherThread.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
+                    // try to commit the other transaction
+                    graph.commit();
+
+                    latchCommittedInOtherThread.countDown();
+                }
+            };
+
+            threadTryCommitTx.start();
+
+            threadTxStarter.join();
+            threadTryCommitTx.join();
+        }
+
+        graph.shutdown();
+
     }
 
     public void testRemoveInTransaction() {

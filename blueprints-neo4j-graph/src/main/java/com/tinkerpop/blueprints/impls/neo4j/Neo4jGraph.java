@@ -164,6 +164,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         for (final String key : this.getInternalIndexKeys(Edge.class)) {
             this.createKeyIndex(key, Edge.class);
         }
+        this.commit();
     }
 
     private void freshLoad() {
@@ -472,7 +473,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             return;
         }
 
-        GraphDatabaseAPI graphDatabaseAPI = (GraphDatabaseAPI)getRawGraph();
+        GraphDatabaseAPI graphDatabaseAPI = (GraphDatabaseAPI) getRawGraph();
         TransactionManager transactionManager = graphDatabaseAPI.getTxManager();
         try {
             javax.transaction.Transaction t = transactionManager.getTransaction();
