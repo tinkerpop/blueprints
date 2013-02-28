@@ -124,26 +124,26 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         }
 
         if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeKeyIndex) {
-            graph.createKeyIndex("location", Edge.class);
+            graph.createKeyIndex("place", Edge.class);
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
-            assertTrue(graph.getIndexedKeys(Edge.class).contains("location"));
+            assertTrue(graph.getIndexedKeys(Edge.class).contains("place"));
 
             Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             e1.setProperty("name", "marko");
-            e1.setProperty("location", "everywhere");
+            e1.setProperty("place", "everywhere");
             Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             e2.setProperty("name", "stephen");
-            e2.setProperty("location", "everywhere");
+            e2.setProperty("place", "everywhere");
 
-            assertEquals(count(graph.getEdges("location", "everywhere")), 2);
+            assertEquals(count(graph.getEdges("place", "everywhere")), 2);
             assertEquals(count(graph.getEdges("name", "marko")), 1);
             assertEquals(count(graph.getEdges("name", "stephen")), 1);
             assertEquals(graph.getEdges("name", "marko").iterator().next(), e1);
             assertEquals(graph.getEdges("name", "stephen").iterator().next(), e2);
 
-            /*assertFalse(graph.getEdges("location", "everywhere") instanceof PropertyFilteredIterable);
-            assertFalse(graph.getEdges("location", "united states") instanceof PropertyFilteredIterable);
-            assertFalse(graph.getEdges("location", 10) instanceof PropertyFilteredIterable);
+            /*assertFalse(graph.getEdges("place", "everywhere") instanceof PropertyFilteredIterable);
+            assertFalse(graph.getEdges("place", "united states") instanceof PropertyFilteredIterable);
+            assertFalse(graph.getEdges("place", 10) instanceof PropertyFilteredIterable);
 
             if (!graph.getFeatures().isWrapper) {
                 assertTrue(graph.getEdges("blah", "gnar") instanceof PropertyFilteredIterable);
