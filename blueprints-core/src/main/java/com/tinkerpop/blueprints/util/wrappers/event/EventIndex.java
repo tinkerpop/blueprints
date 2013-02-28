@@ -6,9 +6,6 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
-
-import java.util.List;
 
 /**
  * An index that wraps graph elements in the "evented" way. This class does not directly raise graph events, but
@@ -19,15 +16,11 @@ import java.util.List;
  */
 class EventIndex<T extends Element> implements Index<T> {
     protected final Index<T> rawIndex;
-    protected final List<GraphChangedListener> graphChangedListeners;
+    private final EventGraph eventGraph;
 
-    private final EventTrigger trigger;
-
-    public EventIndex(final Index<T> rawIndex, final List<GraphChangedListener> graphChangedListeners,
-                      final EventTrigger trigger) {
+    public EventIndex(final Index<T> rawIndex, final EventGraph eventGraph) {
         this.rawIndex = rawIndex;
-        this.graphChangedListeners = graphChangedListeners;
-        this.trigger = trigger;
+        this.eventGraph = eventGraph;
     }
 
     public void remove(final String key, final Object value, final T element) {
@@ -40,21 +33,17 @@ class EventIndex<T extends Element> implements Index<T> {
 
     public CloseableIterable<T> get(final String key, final Object value) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (CloseableIterable<T>) new EventVertexIterable((Iterable<Vertex>) this.rawIndex.get(key, value),
-                    this.graphChangedListeners, this.trigger);
+            return (CloseableIterable<T>) new EventVertexIterable((Iterable<Vertex>) this.rawIndex.get(key, value), this.eventGraph);
         } else {
-            return (CloseableIterable<T>) new EventEdgeIterable((Iterable<Edge>) this.rawIndex.get(key, value),
-                    this.graphChangedListeners, this.trigger);
+            return (CloseableIterable<T>) new EventEdgeIterable((Iterable<Edge>) this.rawIndex.get(key, value), this.eventGraph);
         }
     }
 
     public CloseableIterable<T> query(final String key, final Object query) {
         if (Vertex.class.isAssignableFrom(this.getIndexClass())) {
-            return (CloseableIterable<T>) new EventVertexIterable((Iterable<Vertex>) this.rawIndex.query(key, query),
-                    this.graphChangedListeners, this.trigger);
+            return (CloseableIterable<T>) new EventVertexIterable((Iterable<Vertex>) this.rawIndex.query(key, query), this.eventGraph);
         } else {
-            return (CloseableIterable<T>) new EventEdgeIterable((Iterable<Edge>) this.rawIndex.query(key, query),
-                    this.graphChangedListeners, this.trigger);
+            return (CloseableIterable<T>) new EventEdgeIterable((Iterable<Edge>) this.rawIndex.query(key, query), this.eventGraph);
         }
     }
 

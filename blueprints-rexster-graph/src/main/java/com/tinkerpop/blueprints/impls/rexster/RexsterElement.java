@@ -56,6 +56,13 @@ abstract class RexsterElement implements Element {
         return keys;
     }
 
+    public void remove() {
+        if (this instanceof Vertex)
+            this.graph.removeVertex((Vertex) this);
+        else
+            this.graph.removeEdge((Edge) this);
+    }
+
     public Object getProperty(final String key) {
         JSONObject rawElement;
         if (this instanceof Vertex)

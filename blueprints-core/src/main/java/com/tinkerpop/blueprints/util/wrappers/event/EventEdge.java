@@ -15,13 +15,12 @@ import java.util.List;
  */
 public class EventEdge extends EventElement implements Edge {
 
-    protected EventEdge(final Edge rawEdge, final List<GraphChangedListener> graphChangedListeners,
-                        final EventTrigger trigger) {
-        super(rawEdge, graphChangedListeners, trigger);
+    protected EventEdge(final Edge rawEdge, final EventGraph eventGraph) {
+        super(rawEdge, eventGraph);
     }
 
     public Vertex getVertex(final Direction direction) throws IllegalArgumentException {
-        return new EventVertex(this.getBaseEdge().getVertex(direction), this.graphChangedListeners, this.trigger);
+        return new EventVertex(this.getBaseEdge().getVertex(direction), this.eventGraph);
     }
 
     public String getLabel() {

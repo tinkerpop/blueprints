@@ -10,6 +10,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -73,6 +74,17 @@ public class GraphMLReader {
      * Input the GraphML stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
+     * @param filename name of a file containing GraphML data
+     * @throws IOException thrown when the GraphML data is not correctly formatted
+     */
+    public void inputGraph(final String filename) throws IOException {
+        GraphMLReader.inputGraph(this.graph, filename, 1000, this.vertexIdKey, this.edgeIdKey, this.edgeLabelKey);
+    }
+
+    /**
+     * Input the GraphML stream data into the graph.
+     * In practice, usually the provided graph is empty.
+     *
      * @param graphMLInputStream an InputStream of GraphML data
      * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the GraphML data is not correctly formatted
@@ -85,12 +97,54 @@ public class GraphMLReader {
      * Input the GraphML stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
+     * @param filename name of a file containing GraphML data
+     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @throws IOException thrown when the GraphML data is not correctly formatted
+     */
+    public void inputGraph(final String filename, int bufferSize) throws IOException {
+        GraphMLReader.inputGraph(this.graph, filename, bufferSize, this.vertexIdKey, this.edgeIdKey, this.edgeLabelKey);
+    }
+
+    /**
+     * Input the GraphML stream data into the graph.
+     * In practice, usually the provided graph is empty.
+     *
      * @param inputGraph         the graph to populate with the GraphML data
      * @param graphMLInputStream an InputStream of GraphML data
      * @throws IOException thrown when the GraphML data is not correctly formatted
      */
     public static void inputGraph(final Graph inputGraph, final InputStream graphMLInputStream) throws IOException {
         GraphMLReader.inputGraph(inputGraph, graphMLInputStream, 1000, null, null, null);
+    }
+
+    /**
+     * Input the GraphML stream data into the graph.
+     * In practice, usually the provided graph is empty.
+     *
+     * @param inputGraph         the graph to populate with the GraphML data
+     * @param filename name of a file containing GraphML data
+     * @throws IOException thrown when the GraphML data is not correctly formatted
+     */
+    public static void inputGraph(final Graph inputGraph, final String filename) throws IOException {
+        GraphMLReader.inputGraph(inputGraph, filename, 1000, null, null, null);
+    }
+
+    /**
+     * Input the GraphML stream data into the graph.
+     * More control over how data is streamed is provided by this method.
+     *
+     * @param inputGraph         the graph to populate with the GraphML data
+     * @param filename name of a file containing GraphML data
+     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param vertexIdKey        if the id of a vertex is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeIdKey          if the id of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeLabelKey       if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @throws IOException thrown when the GraphML data is not correctly formatted
+     */
+    public static void inputGraph(final Graph inputGraph, final String filename, int bufferSize, String vertexIdKey, String edgeIdKey, String edgeLabelKey) throws IOException {
+        FileInputStream fis = new FileInputStream(filename);
+        GraphMLReader.inputGraph(inputGraph, fis, bufferSize, vertexIdKey, edgeIdKey, edgeLabelKey);
+        fis.close();
     }
 
     /**
@@ -144,7 +198,7 @@ public class GraphMLReader {
                         String attributeName = reader.getAttributeValue(null, GraphMLTokens.ATTR_NAME);
                         String attributeType = reader.getAttributeValue(null, GraphMLTokens.ATTR_TYPE);
                         keyIdMap.put(id, attributeName);
-                        keyTypesMaps.put(attributeName, attributeType);
+                        keyTypesMaps.put(id, attributeType);
 
                     } else if (elementName.equals(GraphMLTokens.NODE)) {
                         vertexId = reader.getAttributeValue(null, GraphMLTokens.ID);

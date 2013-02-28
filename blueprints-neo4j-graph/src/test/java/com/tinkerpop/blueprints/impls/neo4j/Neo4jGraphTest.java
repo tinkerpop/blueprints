@@ -19,10 +19,14 @@ import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.event.TransactionData;
+import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 import org.neo4j.kernel.EmbeddedReadOnlyGraphDatabase;
 import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -271,6 +275,41 @@ public class Neo4jGraphTest extends GraphTest {
         String directory = this.getWorkingDirectory();
         Neo4jHaGraph graph = new Neo4jHaGraph(directory);
         graph.shutdown();
+        deleteDirectory(new File(directory));
+    }
+
+    public void testRollbackExceptionOnBeforeTxCommit() throws Exception {
+        String directory = this.getWorkingDirectory();
+        deleteDirectory(new File(directory));
+
+        Neo4jGraph graph = new Neo4jGraph(directory);
+        GraphDatabaseService rawGraph = graph.getRawGraph();
+        rawGraph.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+            @Override
+            public Object beforeCommit(TransactionData data) throws Exception {
+                if (true) {
+                    throw new RuntimeException("jippo validation exception");
+                }
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void afterCommit(TransactionData data, Object state) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void afterRollback(TransactionData data, Object state) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        });
+        try {
+            Vertex vertex = graph.addVertex(null);
+            graph.commit();
+        } catch (Exception e) {
+            graph.rollback();
+        }
+        assertTrue(!GlobalGraphOperations.at(rawGraph).getAllNodes().iterator().hasNext());
         deleteDirectory(new File(directory));
     }
 }

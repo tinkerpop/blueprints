@@ -43,6 +43,10 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
             return new MultiIterable(Arrays.asList(new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels), new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.INCOMING, labels)));
     }
 
+    public Edge addEdge(final String label, final Vertex vertex) {
+        return this.graph.addEdge(null, this, vertex, label);
+    }
+
     public Query query() {
         return new DefaultQuery(this);
     }

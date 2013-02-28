@@ -9,12 +9,13 @@ import com.tinkerpop.blueprints.Index;
  */
 public class IdEdgeIndex implements Index<Edge> {
     private final Index<Edge> baseIndex;
+    private final IdGraph idGraph;
 
-    public IdEdgeIndex(final Index<Edge> baseIndex) {
+    public IdEdgeIndex(final Index<Edge> baseIndex, final IdGraph idGraph) {
         if (null == baseIndex) {
             throw new IllegalArgumentException("null base index");
         }
-
+        this.idGraph = idGraph;
         this.baseIndex = baseIndex;
     }
 
@@ -31,11 +32,11 @@ public class IdEdgeIndex implements Index<Edge> {
     }
 
     public CloseableIterable<Edge> get(String key, Object value) {
-        return new IdEdgeIterable(baseIndex.get(key, value));
+        return new IdEdgeIterable(baseIndex.get(key, value), this.idGraph);
     }
 
     public CloseableIterable<Edge> query(String key, Object query) {
-        return new IdEdgeIterable(baseIndex.query(key, query));
+        return new IdEdgeIterable(baseIndex.query(key, query), this.idGraph);
     }
 
     public long count(String key, Object value) {

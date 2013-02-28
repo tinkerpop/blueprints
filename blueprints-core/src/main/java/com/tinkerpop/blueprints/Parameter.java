@@ -53,6 +53,15 @@ public class Parameter<K, V> implements Map.Entry<K, V> {
         }
         return false;
     }
+    
+    @Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((key == null) ? 0 : key.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
 
     public String toString() {
         return "parameter[" + key + "," + value + "]";

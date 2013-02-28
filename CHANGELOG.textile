@@ -16,15 +16,21 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Bumped to support Neo4j 1.9.M03
+* Refactoring of wrappers to ensure proper propagation of @Graph@ reference
+* Fixed a @ConcurrentModificationException@ in TinkerGraph
+* @Element@ API changed to support @Element.remove()@
+* @Vertex@ API changed to support @Vertex.addEdge(Vertex, String)@
+* Bumped to support Neo4j 1.9.M04
 * Improved transaction concurrency in @DexGraph@
-* Deprecated @stopTransaction()@ in favor of @commit()@ and @rollback()@
-* Deprecated @startTransaction()@ in favor of @newTransaction()@
+* Deprecated @TransactionalGraph.stopTransaction()@ in favor of @commit()@ and @rollback()@
+* Renamed @ThreadedTransactionalGraph.startTransaction()@ to @ThreadedTransactionalGraph.newTransaction()@
 * Loosened restrictions on edge-indexing in @GraphSail@ (though for some types of queries, exception thrown)
 * @RestHelper@ in @RexsterGraph@ packages is no longer publicly available
 * Add @execute@ methods to @RexsterGraph@ to allow execution of raw Gremlin scripts to the Gremlin Extension in Rexster
 * Include the original property value in property changed/removed events generated from @EventGraph@
 * Add the option for graph-specific index parameters on @createKeyIndex@ method on @KeyIndexableGraph@
+* Fix bug in @GraphMLReader@ where the reader ignored data type casting when the @attr.name@ was different from the @id@ in the @key@ element
+* Upgraded to Jackson 2 for JSON processing in GraphSON
 
 ==<hr/>==
 

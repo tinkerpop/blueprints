@@ -3,14 +3,15 @@ package com.tinkerpop.blueprints.util.wrappers.id;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.StringFactory;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class IdEdge extends IdElement implements Edge {
 
-    protected IdEdge(final Edge base) {
-        super(base);
+    protected IdEdge(final Edge base, final IdGraph idGraph) {
+        super(base, idGraph);
     }
 
     public Edge getBaseEdge() {
@@ -18,7 +19,7 @@ public class IdEdge extends IdElement implements Edge {
     }
 
     public Vertex getVertex(final Direction direction) throws IllegalArgumentException {
-        return new IdVertex(((Edge) baseElement).getVertex(direction));
+        return new IdVertex(((Edge) baseElement).getVertex(direction), this.idGraph);
     }
 
     public String getLabel() {
@@ -30,6 +31,6 @@ public class IdEdge extends IdElement implements Edge {
     }
 
     public String toString() {
-        return "IdEdge(" + getId() + "," + baseElement + ")";
+       return StringFactory.edgeString(this);
     }
 }

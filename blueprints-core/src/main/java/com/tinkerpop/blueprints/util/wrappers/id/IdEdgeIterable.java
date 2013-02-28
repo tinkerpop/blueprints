@@ -10,9 +10,11 @@ import java.util.Iterator;
  */
 class IdEdgeIterable implements CloseableIterable<Edge> {
     private final Iterable<Edge> iterable;
+    private final IdGraph idGraph;
 
-    public IdEdgeIterable(Iterable<Edge> iterable) {
+    public IdEdgeIterable(Iterable<Edge> iterable, final IdGraph idGraph) {
         this.iterable = iterable;
+        this.idGraph = idGraph;
     }
 
     public void close() {
@@ -30,7 +32,7 @@ class IdEdgeIterable implements CloseableIterable<Edge> {
             }
 
             public Edge next() {
-                return new IdEdge(itty.next());
+                return new IdEdge(itty.next(), idGraph);
             }
 
             public void remove() {

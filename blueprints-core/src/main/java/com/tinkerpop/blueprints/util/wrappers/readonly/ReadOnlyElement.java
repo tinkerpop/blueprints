@@ -1,6 +1,8 @@
 package com.tinkerpop.blueprints.util.wrappers.readonly;
 
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 
 import java.util.Set;
@@ -48,6 +50,10 @@ abstract class ReadOnlyElement implements Element {
 
     public int hashCode() {
         return this.baseElement.hashCode();
+    }
+
+    public void remove() {
+       throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
     public boolean equals(final Object object) {

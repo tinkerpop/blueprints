@@ -1,17 +1,17 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
-import org.codehaus.jackson.JsonFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.map.MappingJsonFactory;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
@@ -33,7 +33,7 @@ import static com.tinkerpop.blueprints.util.io.graphson.ElementPropertyConfig.El
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public final class GraphSONUtility {
+public class GraphSONUtility {
 
     private static final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
     private static final JsonFactory jsonFactory = new MappingJsonFactory();
@@ -168,7 +168,7 @@ public final class GraphSONUtility {
 
         final Object edgeId = getTypedValueFromJsonNode(json.get(GraphSONTokens._ID));
         final JsonNode nodeLabel = json.get(GraphSONTokens._LABEL);
-        final String label = nodeLabel == null ? null : nodeLabel.getValueAsText();
+        final String label = nodeLabel == null ? null : nodeLabel.textValue();
 
         final Edge e = factory.createEdge(edgeId, out, in, label);
 
@@ -395,7 +395,7 @@ public final class GraphSONUtility {
     static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {
         final Map<String, Object> map = new HashMap<String, Object>();
 
-        final Iterator<Map.Entry<String, JsonNode>> iterator = node.getFields();
+        final Iterator<Map.Entry<String, JsonNode>> iterator = node.fields();
         while (iterator.hasNext()) {
             final Map.Entry<String, JsonNode> entry = iterator.next();
 
@@ -447,46 +447,46 @@ public final class GraphSONUtility {
         final Object propertyValue;
 
         if (hasEmbeddedTypes) {
-            if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_UNKNOWN)) {
+            if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_UNKNOWN)) {
                 propertyValue = null;
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_BOOLEAN)) {
-                propertyValue = node.get(GraphSONTokens.VALUE).getBooleanValue();
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_FLOAT)) {
-                propertyValue = Float.parseFloat(node.get(GraphSONTokens.VALUE).getValueAsText());
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_DOUBLE)) {
-                propertyValue = node.get(GraphSONTokens.VALUE).getDoubleValue();
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_INTEGER)) {
-                propertyValue = node.get(GraphSONTokens.VALUE).getIntValue();
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_LONG)) {
-                propertyValue = node.get(GraphSONTokens.VALUE).getLongValue();
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_STRING)) {
-                propertyValue = node.get(GraphSONTokens.VALUE).getTextValue();
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_LIST)) {
-                propertyValue = readProperties(node.get(GraphSONTokens.VALUE).getElements(), hasEmbeddedTypes);
-            } else if (node.get(GraphSONTokens.TYPE).getValueAsText().equals(GraphSONTokens.TYPE_MAP)) {
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_BOOLEAN)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).booleanValue();
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_FLOAT)) {
+                propertyValue = Float.parseFloat(node.get(GraphSONTokens.VALUE).asText());
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_DOUBLE)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).doubleValue();
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_INTEGER)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).intValue();
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_LONG)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).longValue();
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_STRING)) {
+                propertyValue = node.get(GraphSONTokens.VALUE).textValue();
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_LIST)) {
+                propertyValue = readProperties(node.get(GraphSONTokens.VALUE).elements(), hasEmbeddedTypes);
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_MAP)) {
                 propertyValue = readProperties(node.get(GraphSONTokens.VALUE), false, hasEmbeddedTypes);
             } else {
-                propertyValue = node.getValueAsText();
+                propertyValue = node.textValue();
             }
         } else {
             if (node.isNull()) {
                 propertyValue = null;
             } else if (node.isBoolean()) {
-                propertyValue = node.getBooleanValue();
+                propertyValue = node.booleanValue();
             } else if (node.isDouble()) {
-                propertyValue = node.getDoubleValue();
+                propertyValue = node.doubleValue();
             } else if (node.isInt()) {
-                propertyValue = node.getIntValue();
+                propertyValue = node.intValue();
             } else if (node.isLong()) {
-                propertyValue = node.getLongValue();
+                propertyValue = node.longValue();
             } else if (node.isTextual()) {
-                propertyValue = node.getTextValue();
+                propertyValue = node.textValue();
             } else if (node.isArray()) {
-                propertyValue = readProperties(node.getElements(), hasEmbeddedTypes);
+                propertyValue = readProperties(node.elements(), hasEmbeddedTypes);
             } else if (node.isObject()) {
                 propertyValue = readProperties(node, false, hasEmbeddedTypes);
             } else {
-                propertyValue = node.getValueAsText();
+                propertyValue = node.textValue();
             }
         }
 
@@ -656,7 +656,7 @@ public final class GraphSONUtility {
                 // the entire object graph within the map.
                 ObjectNode convertedMap = jsonNodeFactory.objectNode();
                 ObjectNode jsonObject = (ObjectNode) value;
-                Iterator keyIterator = jsonObject.getFieldNames();
+                Iterator keyIterator = jsonObject.fieldNames();
                 while (keyIterator.hasNext()) {
                     Object key = keyIterator.next();
 
@@ -685,21 +685,21 @@ public final class GraphSONUtility {
 
         if (node != null && !node.isNull()) {
             if (node.isBoolean()) {
-                theValue = node.getBooleanValue();
+                theValue = node.booleanValue();
             } else if (node.isDouble()) {
-                theValue = node.getDoubleValue();
+                theValue = node.doubleValue();
             } else if (node.isInt()) {
-                theValue = node.getIntValue();
+                theValue = node.intValue();
             } else if (node.isLong()) {
-                theValue = node.getLongValue();
+                theValue = node.longValue();
             } else if (node.isTextual()) {
-                theValue = node.getTextValue();
+                theValue = node.textValue();
             } else if (node.isArray()) {
                 // this is an array so just send it back so that it can be
                 // reprocessed to its primitive components
                 theValue = node;
             } else {
-                theValue = node.getValueAsText();
+                theValue = node.textValue();
             }
         }
 
