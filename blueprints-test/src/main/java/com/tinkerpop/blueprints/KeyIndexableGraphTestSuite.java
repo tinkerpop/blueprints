@@ -194,16 +194,16 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             for (int i = 0; i < 25; i++) {
                 graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");
             }
-            assertEquals(count(graph.getVertices()), 50);
-            assertEquals(count(graph.getEdges()), 25);
+            if (graph.getFeatures().supportsVertexIteration) assertEquals(count(graph.getVertices()), 50);
+            if (graph.getFeatures().supportsEdgeIteration) assertEquals(count(graph.getEdges()), 25);
             int counter = 0;
             for (final Edge edge : graph.getEdges("key", "value")) {
                 graph.removeEdge(edge);
                 counter++;
             }
             assertEquals(counter, 25);
-            assertEquals(count(graph.getVertices()), 50);
-            assertEquals(count(graph.getEdges()), 0);
+            if (graph.getFeatures().supportsVertexIteration) assertEquals(count(graph.getVertices()), 50);
+            if (graph.getFeatures().supportsEdgeIteration) assertEquals(count(graph.getEdges()), 0);
 
         }
         graph.shutdown();
