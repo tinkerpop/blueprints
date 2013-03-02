@@ -33,7 +33,7 @@ public class KeyIndexableGraphHelper {
                     element.setProperty(key, value);
 
                     if (isTransactional && (counter % 1000 == 0)) {
-                        ((TransactionalGraph) graph).commit();;
+                        ((TransactionalGraph) graph).commit();
                     }
                 }
             }

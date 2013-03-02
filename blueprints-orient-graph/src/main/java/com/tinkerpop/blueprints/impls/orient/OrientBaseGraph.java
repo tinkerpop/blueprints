@@ -76,7 +76,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         final OrientGraphContext context = getContext(true);
 
         if (getRawGraph().getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+            this.commit();
 
         synchronized (contexts) {
             if (context.manualIndices.containsKey(indexName))
@@ -124,7 +124,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
     public void dropIndex(final String indexName) {
         if (getRawGraph().getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+            this.commit();
 
         try {
             synchronized (contexts) {
@@ -136,7 +136,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
             saveIndexConfiguration();
         } catch (Exception e) {
-            this.stopTransaction(Conclusion.FAILURE);
+            this.rollback();
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -356,8 +356,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         return getContext(true).rawGraph;
     }
 
-    public void stopTransaction(final Conclusion conclusion) {
-    }
+    public void commit() {}
+
+    public void rollback() {}
 
     protected void autoStartTransaction() {
     }
@@ -445,7 +446,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
     public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
         if (getRawGraph().getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+            this.commit();
 
         final String className = getClassName(elementClass);
         getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
@@ -456,7 +457,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         final OGraphDatabase db = getRawGraph();
 
         if (db.getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+           this.commit();
 
         final OClass cls = db.getMetadata().getSchema().getClass(className);
 
