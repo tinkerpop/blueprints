@@ -2,12 +2,9 @@ package com.tinkerpop.blueprints.util.wrappers.event;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
-
-import java.util.List;
+import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
 
 /**
  * An vertex with a GraphChangedListener attached.  Those listeners are notified when changes occur to
@@ -28,8 +25,8 @@ public class EventVertex extends EventElement implements Vertex {
         return new EventVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels), this.eventGraph);
     }
 
-    public Query query() {
-        return new WrapperQuery(((Vertex) this.baseElement).query()) {
+    public VertexQuery query() {
+        return new WrapperVertexQuery(((Vertex) this.baseElement).query()) {
             @Override
             public Iterable<Vertex> vertices() {
                 return new EventVertexIterable(this.query.vertices(), eventGraph);

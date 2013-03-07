@@ -4,16 +4,12 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.LongIDVertexCache;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.ObjectIDVertexCache;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.StringIDVertexCache;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.URLCompression;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.VertexCache;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 
@@ -433,7 +429,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         }
 
         @Override
-        public Query query() {
+        public VertexQuery query() {
             throw retrievalNotSupported();
         }
 

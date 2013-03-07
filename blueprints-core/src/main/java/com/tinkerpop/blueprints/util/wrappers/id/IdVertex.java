@@ -2,10 +2,10 @@ package com.tinkerpop.blueprints.util.wrappers.id;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
-import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
+import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -28,8 +28,8 @@ public class IdVertex extends IdElement implements Vertex {
         return new IdVertexIterable(((Vertex) this.baseElement).getVertices(direction, labels), this.idGraph);
     }
 
-    public Query query() {
-        return new WrapperQuery(((Vertex) this.baseElement).query()) {
+    public VertexQuery query() {
+        return new WrapperVertexQuery(((Vertex) this.baseElement).query()) {
             @Override
             public Iterable<Vertex> vertices() {
                 return new IdVertexIterable(this.query.vertices(), idGraph);

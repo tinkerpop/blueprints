@@ -35,7 +35,7 @@ public interface Vertex extends Element {
      *
      * @return a vertex query object with methods for constraining which data is pulled from the underlying graph
      */
-    public Query query();
+    public VertexQuery query();
 
     /**
      * Add a new outgoing edge from this vertex to the parameter vertex with provided edge label.
