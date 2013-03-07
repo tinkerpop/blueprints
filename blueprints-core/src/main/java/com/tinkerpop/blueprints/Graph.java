@@ -109,6 +109,9 @@ public interface Graph {
      */
     public Iterable<Edge> getEdges(String key, Object value);
 
+
+    public GraphQuery query();
+
     /**
      * A shutdown function is required to properly close the graph.
      * This is important for implementations that utilize disk-based serializations.

@@ -38,8 +38,4 @@ public interface KeyIndexableGraph extends Graph {
      * @return the indexed keys as a Set
      */
     public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass);
-
-
-    public GraphQuery query();
-
 }
