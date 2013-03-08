@@ -6,9 +6,9 @@ package com.tinkerpop.blueprints.impls.dex;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
@@ -219,8 +219,8 @@ class DexVertex extends DexElement implements Vertex {
         }
     }
 
-    public Query query() {
-        return new DefaultQuery(this);
+    public VertexQuery query() {
+        return new DefaultVertexQuery(this);
     }
 
     public Edge addEdge(final String label, final Vertex vertex) {

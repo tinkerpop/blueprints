@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.impls.rexster;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexsterQuery implements Query {
+public class RexsterVertexQuery implements VertexQuery {
 
     private static final String[] EMPTY_LABELS = new String[]{};
 
@@ -28,38 +28,38 @@ public class RexsterQuery implements Query {
     public final String baseUri;
     public final RexsterGraph graph;
 
-    public RexsterQuery(final String uri, final RexsterGraph graph) {
+    public RexsterVertexQuery(final String uri, final RexsterGraph graph) {
         this.baseUri = uri;
         this.graph = graph;
     }
 
-    public Query has(final String key, final Object value) {
+    public VertexQuery has(final String key, final Object value) {
         this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
         return this;
     }
 
-    public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare) {
+    public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
         this.hasContainers.add(new HasContainer(key, value, compare));
         return this;
     }
 
-    public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
+    public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue) {
         this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
         this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
         return this;
     }
 
-    public Query direction(final Direction direction) {
+    public VertexQuery direction(final Direction direction) {
         this.direction = direction;
         return this;
     }
 
-    public Query labels(final String... labels) {
+    public VertexQuery labels(final String... labels) {
         this.labels = labels;
         return this;
     }
 
-    public Query limit(final long max) {
+    public VertexQuery limit(final long max) {
         this.limit = max;
         return this;
     }

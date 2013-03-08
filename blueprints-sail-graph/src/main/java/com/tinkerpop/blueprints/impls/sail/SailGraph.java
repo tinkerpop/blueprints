@@ -3,9 +3,11 @@ package com.tinkerpop.blueprints.impls.sail;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -460,6 +462,10 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public Features getFeatures() {
         return FEATURES;
+    }
+
+    public GraphQuery query() {
+        return new DefaultGraphQuery(this);
     }
 
     /**

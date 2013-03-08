@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.util.wrappers;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
@@ -11,40 +11,40 @@ import com.tinkerpop.blueprints.Vertex;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public abstract class WrapperQuery implements Query {
+public abstract class WrapperVertexQuery implements VertexQuery {
 
-    protected Query query;
+    protected VertexQuery query;
 
-    public WrapperQuery(final Query query) {
+    public WrapperVertexQuery(final VertexQuery query) {
         this.query = query;
     }
 
-    public Query has(final String key, final Object value) {
+    public VertexQuery has(final String key, final Object value) {
         this.query = this.query.has(key, value);
         return this;
     }
 
-    public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare) {
+    public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
         this.query = this.query.has(key, value, compare);
         return this;
     }
 
-    public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
+    public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue) {
         this.query = this.query.interval(key, startValue, endValue);
         return this;
     }
 
-    public Query direction(final Direction direction) {
+    public VertexQuery direction(final Direction direction) {
         this.query = this.query.direction(direction);
         return this;
     }
 
-    public Query limit(final long limit) {
+    public VertexQuery limit(final long limit) {
         this.query = this.query.limit(limit);
         return this;
     }
 
-    public Query labels(final String... labels) {
+    public VertexQuery labels(final String... labels) {
         this.query = this.query.labels(labels);
         return this;
     }

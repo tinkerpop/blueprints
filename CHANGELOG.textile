@@ -17,6 +17,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Bumped major versions of Ripple and SesameTools
+* Added @GraphQuery@ in order to support intelligent indexing systems (@Vertex.query()@ and @Graph.query()@)
 * Refactoring of wrappers to ensure proper propagation of @Graph@ reference
 * Fixed a @ConcurrentModificationException@ in TinkerGraph
 * @Element@ API changed to support @Element.remove()@

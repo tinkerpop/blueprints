@@ -3,9 +3,9 @@ package com.tinkerpop.blueprints.impls.sail;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -203,8 +203,8 @@ public class SailVertex implements Vertex {
         return this.graph.addEdge(null, this, vertex, label);
     }
 
-    public Query query() {
-        return new DefaultQuery(this);
+    public VertexQuery query() {
+        return new DefaultVertexQuery(this);
     }
 
     public String toString() {

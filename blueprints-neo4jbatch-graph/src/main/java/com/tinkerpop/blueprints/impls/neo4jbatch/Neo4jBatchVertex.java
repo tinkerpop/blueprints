@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.impls.neo4jbatch;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -58,7 +58,7 @@ class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
     /**
      * @throws UnsupportedOperationException
      */
-    public Query query() throws UnsupportedOperationException {
+    public VertexQuery query() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 

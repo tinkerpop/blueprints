@@ -3,12 +3,14 @@ package com.tinkerpop.blueprints.impls.rexster;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.codehaus.jettison.json.JSONArray;
@@ -327,6 +329,10 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         else
             c = RexsterTokens.EDGE;
         return c;
+    }
+
+    public GraphQuery query() {
+        return new DefaultGraphQuery(this);
     }
 
 }

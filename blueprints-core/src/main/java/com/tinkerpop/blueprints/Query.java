@@ -1,11 +1,9 @@
 package com.tinkerpop.blueprints;
 
 /**
- * A Query object defines a collection of filters and modifiers that are used to intelligently select edges from a vertex.
- *
- * @author Matthias Brocheler (http://matthiasb.com)
- * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * (c) Matthias Broecheler (me@matthiasb.com)
  */
+
 public interface Query {
 
     public enum Compare {
@@ -57,29 +55,6 @@ public interface Query {
      */
     public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue);
 
-    /**
-     * The direction of the edges to retrieve.
-     *
-     * @param direction whether to retrieve the incoming, outgoing, or both directions
-     * @return the modified query object
-     */
-    public Query direction(final Direction direction);
-
-    /**
-     * Filter out the edge if its label is not in set of provided labels.
-     *
-     * @param labels the labels to check against
-     * @return the modified query object
-     */
-    public Query labels(final String... labels);
-
-    /**
-     * Filter out the edge if the max number of edges to retrieve has already been reached.
-     *
-     * @param max the max number of edges to return
-     * @return the modified query object
-     */
-    public Query limit(final long max);
 
     /**
      * Execute the query and return the matching edges.
@@ -95,18 +70,14 @@ public interface Query {
      */
     public Iterable<Vertex> vertices();
 
-    /**
-     * Execute the query and return the number of edges that are unfiltered.
-     *
-     * @return the number of unfiltered edges
-     */
-    public long count();
 
     /**
-     * Return the raw ids of the vertices on the other end of the edges.
+     * Filter out the edge if the max number of edges to retrieve has already been reached.
      *
-     * @return the raw ids of the vertices on the other end of the edges
+     * @param max the max number of edges to return
+     * @return the modified query object
      */
-    public Object vertexIds();
+    public Query limit(final long max);
+
 
 }

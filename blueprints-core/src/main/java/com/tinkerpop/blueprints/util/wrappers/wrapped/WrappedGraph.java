@@ -3,8 +3,10 @@ package com.tinkerpop.blueprints.util.wrappers.wrapped;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 
 /**
@@ -79,6 +81,20 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     @Override
     public T getBaseGraph() {
         return this.baseGraph;
+    }
+
+    public GraphQuery query() {
+        return new WrappedGraphQuery(this.baseGraph.query()) {
+            @Override
+            public Iterable<Edge> edges() {
+                return new WrappedEdgeIterable(this.query.edges());
+            }
+
+            @Override
+            public Iterable<Vertex> vertices() {
+                return new WrappedVertexIterable(this.query.vertices());
+            }
+        };
     }
 
     public String toString() {

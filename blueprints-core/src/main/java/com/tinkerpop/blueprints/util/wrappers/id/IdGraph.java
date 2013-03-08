@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.util.wrappers.id;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -10,6 +11,7 @@ import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 
 import java.util.HashSet;
@@ -326,6 +328,21 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     private boolean isVertexClass(final Class c) {
         return Vertex.class.isAssignableFrom(c);
+    }
+
+    public GraphQuery query() {
+        final IdGraph idGraph = this;
+        return new WrappedGraphQuery(this.baseGraph.query()) {
+            @Override
+            public Iterable<Edge> edges() {
+                return new IdEdgeIterable(this.query.edges(), idGraph);
+            }
+
+            @Override
+            public Iterable<Vertex> vertices() {
+                return new IdVertexIterable(this.query.vertices(), idGraph);
+            }
+        };
     }
 
     /**

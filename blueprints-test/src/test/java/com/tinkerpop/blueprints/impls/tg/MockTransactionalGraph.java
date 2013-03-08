@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.tg;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 
@@ -122,6 +123,11 @@ public class MockTransactionalGraph implements TransactionalGraph {
     @Override
     public void shutdown() {
         graph.shutdown();
+    }
+
+    @Override
+    public GraphQuery query() {
+        return graph.query();
     }
 
 }
