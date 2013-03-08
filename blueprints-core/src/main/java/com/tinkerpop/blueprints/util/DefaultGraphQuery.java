@@ -10,6 +10,9 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
+ * For those graph engines that do not support the low-level querying of the vertices or edges, then DefaultQuery can be used.
+ * DefaultQuery assumes, at minimum, that Graph.getVertices() and Graph.getEdges() is implemented by the respective Graph.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
@@ -60,6 +63,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                         this.iterable = (Iterable<T>) graph.getVertices(hasContainer.key, hasContainer.value);
                     else
                         this.iterable = (Iterable<T>) graph.getEdges(hasContainer.key, hasContainer.value);
+                    break;
                 }
             }
             if (null == this.iterable) {

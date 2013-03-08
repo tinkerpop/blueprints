@@ -284,8 +284,13 @@ public class QueryTestSuite extends TestSuite {
             assertEquals(count(graph.query().has("type", "aurelius").edges()), 1);
             assertEquals(count(graph.query().has("weight", null).edges()), 1);
             assertEquals(graph.query().has("weight", null).edges().iterator().next().getProperty("type"), "aurelius");
+
             assertEquals(count(graph.query().has("weight", 1.0).edges()), 1);
             assertEquals(graph.query().has("weight", 1.0).edges().iterator().next().getProperty("type"), "tinkerpop");
+            assertEquals(count(graph.query().has("weight", 1.0).has("type", "tinkerpop").edges()), 1);
+            assertEquals(graph.query().has("weight", 1.0).has("type", "tinkerpop").edges().iterator().next().getProperty("type"), "tinkerpop");
+            assertEquals(count(graph.query().has("weight", 1.0).has("type", "aurelius").edges()), 0);
+
             assertEquals(graph.query().interval("weight", 0.0, 1.1).edges().iterator().next().getProperty("type"), "tinkerpop");
             assertEquals(count(graph.query().interval("weight", 0.0, 1.0).edges()), 0);
         }
