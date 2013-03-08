@@ -69,7 +69,6 @@
         <module>blueprints-rexster-graph</module>
         <module>blueprints-dex-graph</module>
         <module>blueprints-neo4j-graph</module>
-        <module>blueprints-neo4jbatch-graph</module>
         <module>blueprints-orient-graph</module>
         <module>blueprints-graph-sail</module>
         <module>blueprints-sail-graph</module>
