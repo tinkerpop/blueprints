@@ -70,6 +70,10 @@ public class OrientGraph extends OrientBaseGraph implements TransactionalGraph {
 
     @Override
     public void stopTransaction(Conclusion conclusion) {
+      final OrientGraphContext context = getContext(false);
+        if (context.rawGraph.isClosed() || context.rawGraph.getTransaction() instanceof OTransactionNoTx || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN)
+            return;
+      
         if (Conclusion.SUCCESS == conclusion)
             commit();
         else
