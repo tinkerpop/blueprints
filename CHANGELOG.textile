@@ -7,7 +7,6 @@ h2. Blueprints 2.y.z
 
 h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 
-
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
@@ -17,6 +16,8 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Bumped major versions of Ripple and SesameTools
+* @Neo4jBatchGraph@ project moved to @Neo4jGraph@ under @com.tinkerpop.blueprints.impls.neo4j.batch@
+* @OrientBatchGraph@ moved to @com.tinkerpop.blueprints.impls.orient.batch@
 * Added @GraphQuery@ in order to support intelligent indexing systems (@Vertex.query()@ and @Graph.query()@)
 * Refactoring of wrappers to ensure proper propagation of @Graph@ reference
 * Fixed a @ConcurrentModificationException@ in TinkerGraph
@@ -37,7 +38,6 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 ==<hr/>==
 
 h3. Version 2.2.0 (December 19, 2012)
-
 
 ```xml
 <dependency>

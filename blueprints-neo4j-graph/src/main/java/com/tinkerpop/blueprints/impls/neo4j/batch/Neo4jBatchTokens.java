@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.neo4jbatch;
+package com.tinkerpop.blueprints.impls.neo4j.batch;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
