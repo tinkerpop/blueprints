@@ -2,7 +2,9 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -34,6 +36,9 @@ public class QueryTestSuite extends TestSuite {
             aHateC.setProperty("amount", 1.0);
             cHateA.setProperty("amount", 1.0);
             cHateB.setProperty("amount", 0.4);
+
+            assertEquals(count(a.query().labels("friend").has("date", null).edges()), 1);
+            assertEquals(a.query().labels("friend").has("date", null).edges().iterator().next().getProperty("amount"), 0.5);
 
             // out edges
 
@@ -185,5 +190,61 @@ public class QueryTestSuite extends TestSuite {
         }
         graph.shutdown();
 
+    }
+
+    public void testGraphQueryForVertices() {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties && graph.getFeatures().supportsVertexIndex && graph instanceof KeyIndexableGraph) {
+            ((KeyIndexableGraph) graph).createKeyIndex("name", Vertex.class);
+
+            Vertex vertex = graph.addVertex(null);
+            vertex.setProperty(convertId(graph, "name"), "marko");
+            vertex.setProperty(convertId(graph, "age"), 33);
+            vertex = graph.addVertex(null);
+            vertex.setProperty(convertId(graph, "name"), "matthias");
+            vertex.setProperty(convertId(graph, "age"), 28);
+            graph.addVertex(null);
+
+            Iterable<Vertex> vertices = graph.query().vertices();
+            assertEquals(count(vertices), 3);
+            assertEquals(count(vertices), 3);
+            Set<String> names = new HashSet<String>();
+            for (Vertex v : vertices) {
+                names.add((String) v.getProperty(convertId(graph, "name")));
+            }
+            assertEquals(names.size(), 3);
+            assertTrue(names.contains("marko"));
+            assertTrue(names.contains(null));
+            assertTrue(names.contains("matthias"));
+
+            vertices = graph.query().has("name", "marko").vertices();
+            assertEquals(count(vertices), 1);
+//            assertEquals(vertices.iterator().next().getProperty("name"), "marko");
+
+            vertices = graph.query().has("age", 29, Query.Compare.GREATER_THAN_EQUAL).vertices();
+            assertEquals(count(vertices), 1);
+            assertEquals(vertices.iterator().next().getProperty("name"), "marko");
+            assertEquals(vertices.iterator().next().getProperty("age"), 33);
+
+            vertices = graph.query().has("age", 28, Query.Compare.GREATER_THAN_EQUAL).vertices();
+            assertEquals(count(vertices), 2);
+            names = new HashSet<String>();
+            for (Vertex v : vertices) {
+                names.add((String) v.getProperty(convertId(graph, "name")));
+            }
+            assertEquals(names.size(), 2);
+            assertTrue(names.contains("marko"));
+            assertTrue(names.contains("matthias"));
+
+            vertices = graph.query().interval("age", 28, 33).vertices();
+            assertEquals(count(vertices), 1);
+            assertEquals(vertices.iterator().next().getProperty("name"), "matthias");
+
+            assertEquals(count(graph.query().has("age", null).vertices()), 1);
+            assertEquals(count(graph.query().has("age", 28).has("name", "matthias").vertices()), 1);
+            assertEquals(count(graph.query().has("age", 28).has("name", "matthias").has("name", "matthias").vertices()), 1);
+            assertEquals(count(graph.query().interval("age", 28, 32).has("name", "marko").vertices()), 0);
+            graph.shutdown();
+        }
     }
 }

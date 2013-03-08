@@ -4,9 +4,11 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
@@ -406,6 +408,11 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     @Override
     public Iterable<Edge> getEdges(String key, Object value) {
+        throw retrievalNotSupported();
+    }
+
+    @Override
+    public GraphQuery query() {
         throw retrievalNotSupported();
     }
 

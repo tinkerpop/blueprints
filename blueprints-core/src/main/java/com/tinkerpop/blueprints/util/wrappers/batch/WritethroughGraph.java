@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.util.wrappers.batch;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -108,6 +109,11 @@ class WritethroughGraph<T extends Graph> implements WrapperGraph<T>, Transaction
     @Override
     public Iterable<Edge> getEdges() {
         return graph.getEdges();
+    }
+
+    @Override
+    public GraphQuery query() {
+        return graph.query();
     }
 
     @Override

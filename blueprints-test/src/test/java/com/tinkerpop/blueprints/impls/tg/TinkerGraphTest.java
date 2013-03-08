@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.IndexTestSuite;
 import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
+import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
@@ -46,6 +47,12 @@ public class TinkerGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new EdgeTestSuite(this));
         printTestPerformance("EdgeTestSuite", this.stopWatch());
+    }
+
+    public void testQueryTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new QueryTestSuite(this));
+        printTestPerformance("QueryTestSuite", this.stopWatch());
     }
 
     public void testKeyIndexableGraphTestSuite() throws Exception {

@@ -6,11 +6,13 @@ import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
@@ -666,13 +668,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * <p/>
      * FIXME: In case the attribute is created, this always creates an String
      * attribute, could this be set somehow?
-     *
-     * @see com.tinkerpop.blueprints.KeyIndexableGraph#createKeyIndex(String, Class)
-     * @see #label
      */
     @Override
-    public <T extends Element> void createKeyIndex(String key,
-                                                   Class<T> elementClass, final Parameter... indexParameters) {
+    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
         autoStartTransaction();
 
         String label = this.label.get();
@@ -790,5 +788,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             commit();
         else
             rollback();
+    }
+
+    public GraphQuery query() {
+        return new DefaultGraphQuery(this);
     }
 }

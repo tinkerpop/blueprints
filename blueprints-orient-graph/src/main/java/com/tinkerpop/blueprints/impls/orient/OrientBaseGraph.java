@@ -20,6 +20,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -27,6 +28,7 @@ import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -491,5 +493,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         else if (elementClass.isAssignableFrom(Edge.class))
             className = OGraphDatabase.EDGE_CLASS_NAME;
         return className;
+    }
+
+    public GraphQuery query() {
+        return new DefaultGraphQuery(this);
     }
 }

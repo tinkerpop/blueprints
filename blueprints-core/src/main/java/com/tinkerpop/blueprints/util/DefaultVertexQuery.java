@@ -17,15 +17,9 @@ import java.util.NoSuchElementException;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class DefaultVertexQuery implements VertexQuery {
-
-    private static final String[] EMPTY_LABELS = new String[]{};
+public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
     private final Vertex vertex;
-    public Direction direction = Direction.BOTH;
-    public String[] labels = EMPTY_LABELS;
-    public long limit = Long.MAX_VALUE;
-    public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
 
     public DefaultVertexQuery(final Vertex vertex) {
         this.vertex = vertex;
@@ -63,11 +57,11 @@ public class DefaultVertexQuery implements VertexQuery {
     }
 
     public Iterable<Edge> edges() {
-        return new DefaultQueryIterable<Edge>(false);
+        return new DefaultVertexQueryIterable<Edge>(false);
     }
 
     public Iterable<Vertex> vertices() {
-        return new DefaultQueryIterable<Vertex>(true);
+        return new DefaultVertexQueryIterable<Vertex>(true);
     }
 
     public long count() {
@@ -86,56 +80,12 @@ public class DefaultVertexQuery implements VertexQuery {
         return list;
     }
 
-    private class HasContainer {
-        public String key;
-        public Object value;
-        public Compare compare;
-
-        public HasContainer(final String key, final Object value, final Compare compare) {
-            this.key = key;
-            this.value = value;
-            this.compare = compare;
-        }
-
-        public boolean isLegal(final Element element) {
-            final Object elementValue = element.getProperty(key);
-            switch (compare) {
-                case EQUAL:
-                    if (null == elementValue)
-                        return value == null;
-                    return elementValue.equals(value);
-                case NOT_EQUAL:
-                    if (null == elementValue)
-                        return value != null;
-                    return !elementValue.equals(value);
-                case GREATER_THAN:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 1;
-                case LESS_THAN:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) <= -1;
-                case GREATER_THAN_EQUAL:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 0;
-                case LESS_THAN_EQUAL:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) <= 0;
-                default:
-                    throw new IllegalArgumentException("Invalid state as no valid filter was provided");
-            }
-        }
-    }
-
-    private class DefaultQueryIterable<T extends Element> implements Iterable<T> {
+    private class DefaultVertexQueryIterable<T extends Element> implements Iterable<T> {
 
         private Iterable<Edge> iterable;
         private boolean forVertex;
 
-        public DefaultQueryIterable(final boolean forVertex) {
+        public DefaultVertexQueryIterable(final boolean forVertex) {
             this.forVertex = forVertex;
             this.iterable = vertex.getEdges(direction, labels);
         }
