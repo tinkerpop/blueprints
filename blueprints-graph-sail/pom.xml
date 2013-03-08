@@ -10,7 +10,7 @@
     </parent>
     <artifactId>blueprints-graph-sail</artifactId>
     <name>Blueprints-GraphSail</name>
-    <description>Blueprints property graphs outplementation for Sesame RDS Sail</description>
+    <description>Blueprints property graph ouplementation for Sesame RDF Sail</description>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

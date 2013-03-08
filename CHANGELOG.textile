@@ -16,6 +16,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Bumped major versions of Ripple and SesameTools
 * Refactoring of wrappers to ensure proper propagation of @Graph@ reference
 * Fixed a @ConcurrentModificationException@ in TinkerGraph
 * @Element@ API changed to support @Element.remove()@

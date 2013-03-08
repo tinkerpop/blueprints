@@ -10,7 +10,6 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import info.aduna.iteration.CloseableIteration;
-import net.fortytwo.sesametools.nquads.NQuadsFormat;
 import org.apache.log4j.PropertyConfigurator;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Namespace;
@@ -99,7 +98,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         formats.put("n3", RDFFormat.N3);
         formats.put("trix", RDFFormat.TRIX);
         formats.put("trig", RDFFormat.TRIG);
-        formats.put("n-quads", NQuadsFormat.NQUADS);
+        formats.put("n-quads", RDFFormat.NQUADS);
     }
 
     public static RDFFormat getFormat(final String format) {

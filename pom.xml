@@ -77,9 +77,10 @@
 
     <properties>
         <blueprints.version>2.3.0-SNAPSHOT</blueprints.version>
-        <sesame.version>2.6.4</sesame.version>
-        <sesametools.version>1.6</sesametools.version>
-        <junit.version>4.5</junit.version>
+        <sesame.version>2.6.10</sesame.version>
+        <sesametools.version>1.7</sesametools.version>
+        <ripple.version>1.0</ripple.version>
+        <junit.version>4.11</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>

@@ -41,7 +41,7 @@
         <dependency>
             <groupId>net.fortytwo</groupId>
             <artifactId>linked-data-sail</artifactId>
-            <version>0.7</version>
+            <version>${ripple.version}</version>
         </dependency>
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>
@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>reposail</artifactId>
+            <artifactId>repository-sail</artifactId>
             <version>${sesametools.version}</version>
         </dependency>
         <!-- TESTING -->
