@@ -36,11 +36,6 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery labels(final String... labels) {
-        this.labels = labels;
-        return this;
-    }
-
     public GraphQuery limit(final long max) {
         this.limit = max;
         return this;
@@ -51,30 +46,27 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
     }
 
     public Iterable<Vertex> vertices() {
-        if (labels.length != 0)
-            throw new IllegalStateException("Graph query for vertices does not support labels");
-        else
-            return new DefaultGraphQueryIterable<Vertex>(true);
+        return new DefaultGraphQueryIterable<Vertex>(true);
     }
 
     private class DefaultGraphQueryIterable<T extends Element> implements Iterable<T> {
 
         private Iterable<T> iterable = null;
-        private boolean forVertex;
 
         public DefaultGraphQueryIterable(final boolean forVertex) {
-            this.forVertex = forVertex;
-            if (this.forVertex) {
-                for (final HasContainer hasContainer : hasContainers) {
-                    if (hasContainer.compare.equals(Compare.EQUAL)) {
+            for (final HasContainer hasContainer : hasContainers) {
+                if (hasContainer.compare.equals(Compare.EQUAL)) {
+                    if (forVertex)
                         this.iterable = (Iterable<T>) graph.getVertices(hasContainer.key, hasContainer.value);
-                    }
+                    else
+                        this.iterable = (Iterable<T>) graph.getEdges(hasContainer.key, hasContainer.value);
                 }
-                if (null == this.iterable) {
+            }
+            if (null == this.iterable) {
+                if (forVertex)
                     this.iterable = (Iterable<T>) graph.getVertices();
-                }
-            } else {
-                this.iterable = (Iterable<T>) graph.getEdges();
+                else
+                    this.iterable = (Iterable<T>) graph.getEdges();
             }
         }
 
@@ -116,18 +108,18 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                         final T element = this.itty.next();
                         boolean filter = false;
 
-                        if (!forVertex) {
+                        /*if (!forVertex) {
                             filter = !containsLabel(((Edge) element).getLabel(), labels);
-                        }
+                        }*/
 
-                        if (!filter) {
-                            for (final HasContainer hasContainer : hasContainers) {
-                                if (!hasContainer.isLegal(element)) {
-                                    filter = true;
-                                    break;
-                                }
+                        //if (!filter) {
+                        for (final HasContainer hasContainer : hasContainers) {
+                            if (!hasContainer.isLegal(element)) {
+                                filter = true;
+                                break;
                             }
                         }
+                        //}
                         if (!filter) {
                             this.nextElement = element;
                             this.count++;
@@ -139,7 +131,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
             };
         }
 
-        private boolean containsLabel(final String label, final String[] labels) {
+        /*private boolean containsLabel(final String label, final String[] labels) {
             if (labels.length == 0)
                 return true;
 
@@ -148,7 +140,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                     return true;
             }
             return false;
-        }
+        }*/
     }
 
 }

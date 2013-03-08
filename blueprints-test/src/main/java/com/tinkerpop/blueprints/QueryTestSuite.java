@@ -218,10 +218,11 @@ public class QueryTestSuite extends TestSuite {
             assertTrue(names.contains(null));
             assertTrue(names.contains("matthias"));
 
-            assertEquals(count(graph.query().limit(0).vertices()),0);
-            assertEquals(count(graph.query().limit(1).vertices()),1);
-            assertEquals(count(graph.query().limit(2).vertices()),2);
-            assertEquals(count(graph.query().limit(3).vertices()),3);
+            assertEquals(count(graph.query().limit(0).vertices()), 0);
+            assertEquals(count(graph.query().limit(1).vertices()), 1);
+            assertEquals(count(graph.query().limit(2).vertices()), 2);
+            assertEquals(count(graph.query().limit(3).vertices()), 3);
+            assertEquals(count(graph.query().limit(4).vertices()), 3);
 
             vertices = graph.query().has("name", "marko").vertices();
             assertEquals(count(vertices), 1);
@@ -269,18 +270,25 @@ public class QueryTestSuite extends TestSuite {
 
             Edge edge = marko.addEdge("knows", stephen);
             edge.setProperty("type", "tinkerpop");
-            edge.setProperty("weight",1.0);
+            edge.setProperty("weight", 1.0);
             edge = marko.addEdge("knows", matthias);
             edge.setProperty("type", "aurelius");
 
             assertEquals(count(graph.query().edges()), 2);
-            assertEquals(count(graph.query().has("type", "tinkerpop").has("type","tinkerpop").edges()), 1);
-            assertEquals(count(graph.query().has("type", "aurelius").edges()), 1);
-            assertEquals(count(graph.query().has("weight",null).edges()), 1);
-            assertEquals(graph.query().has("weight",null).edges().iterator().next().getProperty("type"), "aurelius");
-            assertEquals(count(graph.query().has("weight",1.0).edges()), 1);
-            assertEquals(graph.query().has("weight",1.0).edges().iterator().next().getProperty("type"), "tinkerpop");
+            assertEquals(count(graph.query().limit(0).edges()), 0);
+            assertEquals(count(graph.query().limit(1).edges()), 1);
+            assertEquals(count(graph.query().limit(2).edges()), 2);
+            assertEquals(count(graph.query().limit(3).edges()), 2);
 
+            assertEquals(count(graph.query().has("type", "tinkerpop").has("type", "tinkerpop").edges()), 1);
+            assertEquals(count(graph.query().has("type", "aurelius").edges()), 1);
+            assertEquals(count(graph.query().has("weight", null).edges()), 1);
+            assertEquals(graph.query().has("weight", null).edges().iterator().next().getProperty("type"), "aurelius");
+            assertEquals(count(graph.query().has("weight", 1.0).edges()), 1);
+            assertEquals(graph.query().has("weight", 1.0).edges().iterator().next().getProperty("type"), "tinkerpop");
+            assertEquals(graph.query().interval("weight", 0.0, 1.1).edges().iterator().next().getProperty("type"), "tinkerpop");
+            assertEquals(count(graph.query().interval("weight", 0.0, 1.0).edges()), 0);
         }
+        graph.shutdown();
     }
 }
