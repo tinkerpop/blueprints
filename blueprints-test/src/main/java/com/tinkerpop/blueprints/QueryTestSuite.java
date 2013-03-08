@@ -194,9 +194,10 @@ public class QueryTestSuite extends TestSuite {
 
     public void testGraphQueryForVertices() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexProperties && graph.getFeatures().supportsVertexIndex && graph instanceof KeyIndexableGraph) {
+        if (graph.getFeatures().supportsVertexIndex && graph instanceof KeyIndexableGraph) {
             ((KeyIndexableGraph) graph).createKeyIndex("name", Vertex.class);
-
+        }
+        if (graph.getFeatures().supportsVertexProperties) {
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty(convertId(graph, "name"), "marko");
             vertex.setProperty(convertId(graph, "age"), 33);
@@ -216,6 +217,11 @@ public class QueryTestSuite extends TestSuite {
             assertTrue(names.contains("marko"));
             assertTrue(names.contains(null));
             assertTrue(names.contains("matthias"));
+
+            assertEquals(count(graph.query().limit(0).vertices()),0);
+            assertEquals(count(graph.query().limit(1).vertices()),1);
+            assertEquals(count(graph.query().limit(2).vertices()),2);
+            assertEquals(count(graph.query().limit(3).vertices()),3);
 
             vertices = graph.query().has("name", "marko").vertices();
             assertEquals(count(vertices), 1);
@@ -245,6 +251,36 @@ public class QueryTestSuite extends TestSuite {
             assertEquals(count(graph.query().has("age", 28).has("name", "matthias").has("name", "matthias").vertices()), 1);
             assertEquals(count(graph.query().interval("age", 28, 32).has("name", "marko").vertices()), 0);
             graph.shutdown();
+        }
+    }
+
+    public void testGraphQueryForEdges() {
+        Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsEdgeIndex && graph instanceof KeyIndexableGraph) {
+            ((KeyIndexableGraph) graph).createKeyIndex("type", Edge.class);
+        }
+        if (graph.getFeatures().supportsEdgeProperties && graph.getFeatures().supportsVertexProperties) {
+            Vertex marko = graph.addVertex(null);
+            marko.setProperty("name", "marko");
+            Vertex matthias = graph.addVertex(null);
+            matthias.setProperty("name", "matthias");
+            Vertex stephen = graph.addVertex(null);
+            stephen.setProperty("name", "stephen");
+
+            Edge edge = marko.addEdge("knows", stephen);
+            edge.setProperty("type", "tinkerpop");
+            edge.setProperty("weight",1.0);
+            edge = marko.addEdge("knows", matthias);
+            edge.setProperty("type", "aurelius");
+
+            assertEquals(count(graph.query().edges()), 2);
+            assertEquals(count(graph.query().has("type", "tinkerpop").has("type","tinkerpop").edges()), 1);
+            assertEquals(count(graph.query().has("type", "aurelius").edges()), 1);
+            assertEquals(count(graph.query().has("weight",null).edges()), 1);
+            assertEquals(graph.query().has("weight",null).edges().iterator().next().getProperty("type"), "aurelius");
+            assertEquals(count(graph.query().has("weight",1.0).edges()), 1);
+            assertEquals(graph.query().has("weight",1.0).edges().iterator().next().getProperty("type"), "tinkerpop");
+
         }
     }
 }
