@@ -15,7 +15,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Moved PropertyGraphSail, which provides a dynamic RDF view of any Blueprints graph, from Tinkubator into blueprints-graph-sail
+* Moved @PropertyGraphSail@, which provides a dynamic RDF view of any Blueprints graph, from Tinkubator into @blueprints-graph-sail@
 * Bumped major versions of Ripple and SesameTools
 * @Neo4jBatchGraph@ project moved to @Neo4jGraph@ under @com.tinkerpop.blueprints.impls.neo4j.batch@
 * @OrientBatchGraph@ moved to @com.tinkerpop.blueprints.impls.orient.batch@
@@ -30,7 +30,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Renamed @ThreadedTransactionalGraph.startTransaction()@ to @ThreadedTransactionalGraph.newTransaction()@
 * Loosened restrictions on edge-indexing in @GraphSail@ (though for some types of queries, exception thrown)
 * @RestHelper@ in @RexsterGraph@ packages is no longer publicly available
-* Add @execute@ methods to @RexsterGraph@ to allow execution of raw Gremlin scripts to the Gremlin Extension in Rexster
+* Added @execute@ methods to @RexsterGraph@ to allow execution of raw Gremlin scripts to the Gremlin Extension in Rexster
 * Include the original property value in property changed/removed events generated from @EventGraph@
 * Add the option for graph-specific index parameters on @createKeyIndex@ method on @KeyIndexableGraph@
 * Fix bug in @GraphMLReader@ where the reader ignored data type casting when the @attr.name@ was different from the @id@ in the @key@ element
