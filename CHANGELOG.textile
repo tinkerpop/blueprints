@@ -24,7 +24,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 * Fixed a @ConcurrentModificationException@ in TinkerGraph
 * @Element@ API changed to support @Element.remove()@
 * @Vertex@ API changed to support @Vertex.addEdge(Vertex, String)@
-* Bumped to support Neo4j 1.9.M04
+* Bumped to support Neo4j 1.9.M05
 * Improved transaction concurrency in @DexGraph@
 * Deprecated @TransactionalGraph.stopTransaction()@ in favor of @commit()@ and @rollback()@
 * Renamed @ThreadedTransactionalGraph.startTransaction()@ to @ThreadedTransactionalGraph.newTransaction()@

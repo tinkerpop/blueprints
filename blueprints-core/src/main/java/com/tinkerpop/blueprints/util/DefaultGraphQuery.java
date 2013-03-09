@@ -4,10 +4,12 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
+import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * For those graph engines that do not support the low-level querying of the vertices or edges, then DefaultQuery can be used.
@@ -57,21 +59,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         private Iterable<T> iterable = null;
 
         public DefaultGraphQueryIterable(final boolean forVertex) {
-            for (final HasContainer hasContainer : hasContainers) {
-                if (hasContainer.compare.equals(Compare.EQUAL)) {
-                    if (forVertex)
-                        this.iterable = (Iterable<T>) graph.getVertices(hasContainer.key, hasContainer.value);
-                    else
-                        this.iterable = (Iterable<T>) graph.getEdges(hasContainer.key, hasContainer.value);
-                    break;
-                }
-            }
-            if (null == this.iterable) {
-                if (forVertex)
-                    this.iterable = (Iterable<T>) graph.getVertices();
-                else
-                    this.iterable = (Iterable<T>) graph.getEdges();
-            }
+            this.iterable = (Iterable<T>) getElementIterable(forVertex ? Vertex.class : Edge.class);
         }
 
         public Iterator<T> iterator() {
@@ -112,18 +100,13 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                         final T element = this.itty.next();
                         boolean filter = false;
 
-                        /*if (!forVertex) {
-                            filter = !containsLabel(((Edge) element).getLabel(), labels);
-                        }*/
-
-                        //if (!filter) {
                         for (final HasContainer hasContainer : hasContainers) {
                             if (!hasContainer.isLegal(element)) {
                                 filter = true;
                                 break;
                             }
                         }
-                        //}
+
                         if (!filter) {
                             this.nextElement = element;
                             this.count++;
@@ -133,6 +116,34 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                     return false;
                 }
             };
+        }
+
+        private Iterable<?> getElementIterable(Class<? extends Element> elementClass) {
+            if (graph instanceof KeyIndexableGraph) {
+                final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
+                for (HasContainer hasContainer : hasContainers) {
+                    if (hasContainer.compare.equals(Compare.EQUAL) && keys.contains(hasContainer.key)) {
+                        if (Vertex.class.isAssignableFrom(elementClass))
+                            return graph.getVertices(hasContainer.key, hasContainer.value);
+                        else
+                            return graph.getEdges(hasContainer.key, hasContainer.value);
+                    }
+                }
+            }
+
+            for (final HasContainer hasContainer : hasContainers) {
+                if (hasContainer.compare.equals(Compare.EQUAL)) {
+                    if (Vertex.class.isAssignableFrom(elementClass))
+                        return graph.getVertices(hasContainer.key, hasContainer.value);
+                    else
+                        return graph.getEdges(hasContainer.key, hasContainer.value);
+                }
+            }
+
+            if (Vertex.class.isAssignableFrom(elementClass))
+                return graph.getVertices();
+            else
+                return graph.getEdges();
         }
 
         /*private boolean containsLabel(final String label, final String[] labels) {
