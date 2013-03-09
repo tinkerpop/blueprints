@@ -56,7 +56,7 @@ public abstract class EventElement implements Element {
     /**
      * Raises a vertexPropertyRemoved or edgePropertyRemoved event.
      */
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         final Object propertyRemoved = baseElement.removeProperty(key);
 
         if (this instanceof Vertex) {
@@ -65,10 +65,10 @@ public abstract class EventElement implements Element {
             this.onEdgePropertyRemoved((Edge) this, key, propertyRemoved);
         }
 
-        return propertyRemoved;
+        return (T) propertyRemoved;
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         return this.baseElement.getProperty(key);
     }
 

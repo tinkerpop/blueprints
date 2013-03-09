@@ -30,8 +30,8 @@ abstract class Neo4jBatchElement implements Element {
         return this.getPropertyMap().keySet();
     }
 
-    public Object getProperty(final String key) {
-        return this.getPropertyMap().get(key);
+    public <T> T getProperty(final String key) {
+        return (T) this.getPropertyMap().get(key);
     }
 
     protected Map<String, Object> getPropertyMapClone() {

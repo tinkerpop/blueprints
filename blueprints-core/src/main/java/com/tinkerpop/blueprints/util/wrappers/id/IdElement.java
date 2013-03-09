@@ -21,7 +21,7 @@ public abstract class IdElement implements Element {
         this.idGraph = idGraph;
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         if (key.equals(IdGraph.ID)) {
             return null;
         }
@@ -45,7 +45,7 @@ public abstract class IdElement implements Element {
         baseElement.setProperty(key, value);
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         if (key.equals(IdGraph.ID)) {
             throw new IllegalArgumentException("Unable to remove value for reserved property " + IdGraph.ID);
         }
