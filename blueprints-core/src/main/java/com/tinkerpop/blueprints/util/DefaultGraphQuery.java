@@ -12,8 +12,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * For those graph engines that do not support the low-level querying of the vertices or edges, then DefaultQuery can be used.
- * DefaultQuery assumes, at minimum, that Graph.getVertices() and Graph.getEdges() is implemented by the respective Graph.
+ * For those graph engines that do not support the low-level querying of the vertices or edges, then DefaultGraphQuery can be used.
+ * DefaultGraphQuery assumes, at minimum, that Graph.getVertices() and Graph.getEdges() is implemented by the respective Graph.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
