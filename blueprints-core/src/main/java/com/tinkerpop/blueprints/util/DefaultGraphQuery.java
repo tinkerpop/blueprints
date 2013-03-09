@@ -122,7 +122,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
             if (graph instanceof KeyIndexableGraph) {
                 final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
                 for (HasContainer hasContainer : hasContainers) {
-                    if (hasContainer.compare.equals(Compare.EQUAL) && keys.contains(hasContainer.key)) {
+                    if (hasContainer.compare.equals(Compare.EQUAL) && hasContainer.value != null && keys.contains(hasContainer.key)) {
                         if (Vertex.class.isAssignableFrom(elementClass))
                             return graph.getVertices(hasContainer.key, hasContainer.value);
                         else
