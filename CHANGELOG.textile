@@ -15,6 +15,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Moved PropertyGraphSail, which provides a dynamic RDF view of any Blueprints graph, from Tinkubator into blueprints-graph-sail
 * Bumped major versions of Ripple and SesameTools
 * @Neo4jBatchGraph@ project moved to @Neo4jGraph@ under @com.tinkerpop.blueprints.impls.neo4j.batch@
 * @OrientBatchGraph@ moved to @com.tinkerpop.blueprints.impls.orient.batch@
