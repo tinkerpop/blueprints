@@ -613,6 +613,12 @@ public class VertexTestSuite extends TestSuite {
             } catch(RuntimeException e) {
                 assertTrue(true);
             }
+            try {
+                v.setProperty(convertId(graph,"good"),null);
+                assertFalse(true);
+            } catch(RuntimeException e) {
+                assertTrue(true);
+            }
         }
         graph.shutdown();
     }

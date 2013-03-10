@@ -633,6 +633,12 @@ public class EdgeTestSuite extends TestSuite {
             } catch (RuntimeException e) {
                 assertTrue(true);
             }
+            try {
+                edge.setProperty(convertId(graph, "good"), null);
+                assertFalse(true);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
         }
         graph.shutdown();
     }
