@@ -20,11 +20,11 @@ public abstract class WrappedElement implements Element {
         this.baseElement.setProperty(key, value);
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         return this.baseElement.getProperty(key);
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         return this.baseElement.removeProperty(key);
     }
 

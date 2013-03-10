@@ -20,11 +20,11 @@ class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
         this.label = label;
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         final Map<String, Object> properties = this.getPropertyMapClone();
         final Object value = properties.remove(key);
         this.graph.getRawGraph().setRelationshipProperties(this.id, properties);
-        return value;
+        return (T) value;
 
     }
 

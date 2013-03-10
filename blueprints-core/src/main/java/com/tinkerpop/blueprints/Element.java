@@ -21,7 +21,7 @@ public abstract interface Element {
      * @param key the key of the key/value property
      * @return the object value related to the string key
      */
-    public Object getProperty(String key);
+    public <T> T getProperty(String key);
 
     /**
      * Return all the keys associated with the element.
@@ -46,7 +46,7 @@ public abstract interface Element {
      * @param key the key of the property to remove from the element
      * @return the object value associated with that key prior to removal
      */
-    public Object removeProperty(String key);
+    public <T> T removeProperty(String key);
 
     /**
      * Remove the element from the graph.

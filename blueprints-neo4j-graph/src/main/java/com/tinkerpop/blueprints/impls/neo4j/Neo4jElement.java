@@ -29,9 +29,9 @@ abstract class Neo4jElement implements Element {
         this.graph = graph;
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         if (this.rawElement.hasProperty(key))
-            return this.rawElement.getProperty(key);
+            return (T) this.rawElement.getProperty(key);
         else
             return null;
     }
@@ -49,12 +49,12 @@ abstract class Neo4jElement implements Element {
         this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         if (!this.rawElement.hasProperty(key))
             return null;
         else {
             this.graph.autoStartTransaction();
-            return this.rawElement.removeProperty(key);
+            return (T) this.rawElement.removeProperty(key);
         }
     }
 

@@ -58,13 +58,13 @@ public class SailEdge implements Edge {
         return keys;
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
             Resource resource = this.rawEdge.getContext();
             if (null == resource)
                 return null;
             else
-                return resource.stringValue();
+                return (T) resource.stringValue();
         } else
             return null;
     }
@@ -84,14 +84,14 @@ public class SailEdge implements Edge {
         }
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         if (key.equals(SailTokens.NAMED_GRAPH)) {
             try {
                 Resource ng = this.rawEdge.getContext();
                 SailHelper.removeStatement(this.rawEdge, this.graph.getSailConnection().get());
                 this.rawEdge = new StatementImpl(this.rawEdge.getSubject(), this.rawEdge.getPredicate(), this.rawEdge.getObject());
                 SailHelper.addStatement(this.rawEdge, this.graph.getSailConnection().get());
-                return ng;
+                return (T) ng;
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }

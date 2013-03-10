@@ -32,8 +32,8 @@ abstract class TinkerElement implements Element, Serializable {
         return new HashSet<String>(this.properties.keySet());
     }
 
-    public Object getProperty(final String key) {
-        return this.properties.get(key);
+    public <T> T getProperty(final String key) {
+        return (T) this.properties.get(key);
     }
 
     public void setProperty(final String key, final Object value) {
@@ -51,13 +51,13 @@ abstract class TinkerElement implements Element, Serializable {
             this.graph.edgeKeyIndex.autoUpdate(key, value, oldValue, (TinkerEdge) this);
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         Object oldValue = this.properties.remove(key);
         if (this instanceof TinkerVertex)
             this.graph.vertexKeyIndex.autoRemove(key, oldValue, (TinkerVertex) this);
         else
             this.graph.edgeKeyIndex.autoRemove(key, oldValue, (TinkerEdge) this);
-        return oldValue;
+        return (T) oldValue;
     }
 
 
