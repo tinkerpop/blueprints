@@ -84,7 +84,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
             URI = "uri",
             VALUE = "value";
 
-    public static final String DEFAULT_NAMESPACE_PREFIX_KEY = "_defaultNamespace";
+    public static final String DEFAULT_NAMESPACE_PREFIX_KEY = "default-namespace";
 
     public static final String NULL_CONTEXT_NATIVE = "" + NULL_CONTEXT_PREFIX;
 
