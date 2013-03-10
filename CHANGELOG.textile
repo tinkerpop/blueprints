@@ -15,6 +15,7 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Stricter testing of property keys/value to ensure legal Blueprints values (no id, label, empty string, null)
 * @Element.getProperty()@ API signature changed to support automatic typing to declared variable type
 * Moved @PropertyGraphSail@, which provides a dynamic RDF view of any Blueprints graph, from Tinkubator into @blueprints-graph-sail@
 * Bumped major versions of Ripple and SesameTools

@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.HashSet;
@@ -160,15 +159,10 @@ class DexElement implements Element {
       */
     @Override
     public void setProperty(final String key, final Object value) {
-        graph.autoStartTransaction();
-
-        //System.out.println(this + "!!" + key + "!!" + value);
-        if (key.equals(StringFactory.ID))
-            throw ExceptionFactory.propertyKeyIdIsReserved();
+        ElementHelper.validateProperty(this, key, value);
         if (key.equals(StringFactory.LABEL))
-            throw new IllegalArgumentException("Property key is reserved for all nodes and edges: " + StringFactory.LABEL);
-        if (key.equals(StringFactory.EMPTY_STRING))
-            throw ExceptionFactory.elementKeyCanNotBeEmpty();
+            throw new IllegalArgumentException("Property key is reserved for all vertices and edges: " + StringFactory.LABEL);
+        graph.autoStartTransaction();
 
         int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
         com.sparsity.dex.gdb.DataType datatype = null;

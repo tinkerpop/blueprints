@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -602,5 +603,37 @@ public class EdgeTestSuite extends TestSuite {
 
         graph.shutdown();
 
+    }
+
+    public void testSettingBadVertexProperties() {
+        final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties) {
+            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            try {
+                edge.setProperty(null, -1);
+                assertFalse(true);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
+            try {
+                edge.setProperty("", -1);
+                assertFalse(true);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
+            try {
+                edge.setProperty(StringFactory.ID, -1);
+                assertFalse(true);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
+            try {
+                edge.setProperty(StringFactory.LABEL, "friend");
+                assertFalse(true);
+            } catch (RuntimeException e) {
+                assertTrue(true);
+            }
+        }
+        graph.shutdown();
     }
 }

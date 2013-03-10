@@ -44,8 +44,16 @@ public class ExceptionFactory {
         return new IllegalArgumentException("Property key is reserved for all edges: label");
     }
 
-    public static IllegalArgumentException elementKeyCanNotBeEmpty() {
+    public static IllegalArgumentException propertyKeyCanNotBeEmpty() {
         return new IllegalArgumentException("Property key can not be the empty string");
+    }
+
+    public static IllegalArgumentException propertyKeyCanNotBeNull() {
+        return new IllegalArgumentException("Property key can not be null");
+    }
+
+    public static IllegalArgumentException propertyValueCanNotBeNull() {
+        return new IllegalArgumentException("Property value can not be null");
     }
 
     // IndexableGraph related exceptions

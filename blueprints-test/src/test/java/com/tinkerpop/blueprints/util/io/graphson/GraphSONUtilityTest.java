@@ -863,7 +863,7 @@ public class GraphSONUtilityTest {
     public void jsonFromElementNullsNoKeysNoTypes() throws JSONException {
         Graph g = new TinkerGraph();
         Vertex v = g.addVertex(1);
-        v.setProperty("key", null);
+        //v.setProperty("key", null);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("innerkey", null);
@@ -904,7 +904,7 @@ public class GraphSONUtilityTest {
     public void jsonFromElementNullsNoKeysWithTypes() throws JSONException {
         Graph g = new TinkerGraph();
         Vertex v = g.addVertex(1);
-        v.setProperty("key", null);
+        // v.setProperty("key", null);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("innerkey", null);
@@ -925,8 +925,8 @@ public class GraphSONUtilityTest {
 
         Assert.assertNotNull(json);
         JSONObject jsonObjectKey = json.optJSONObject("key");
-        Assert.assertTrue(jsonObjectKey.isNull(GraphSONTokens.VALUE));
-        Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectKey.optString(GraphSONTokens.TYPE));
+//        Assert.assertTrue(jsonObjectKey.isNull(GraphSONTokens.VALUE));
+//       Assert.assertEquals(GraphSONTokens.TYPE_UNKNOWN, jsonObjectKey.optString(GraphSONTokens.TYPE));
 
         JSONObject jsonMap = json.optJSONObject("keyMap").optJSONObject(GraphSONTokens.VALUE);
         Assert.assertNotNull(jsonMap);

@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.sail.SailTokens;
+import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -585,6 +586,32 @@ public class VertexTestSuite extends TestSuite {
             a.setProperty("test4", 4);
             for (String key : a.getPropertyKeys()) {
                 a.removeProperty(key);
+            }
+        }
+        graph.shutdown();
+    }
+
+    public void testSettingBadVertexProperties() {
+        final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties) {
+            Vertex v = graph.addVertex(null);
+            try {
+                v.setProperty(null,-1);
+                assertFalse(true);
+            } catch(RuntimeException e) {
+                assertTrue(true);
+            }
+            try {
+                v.setProperty("",-1);
+                assertFalse(true);
+            } catch(RuntimeException e) {
+                assertTrue(true);
+            }
+            try {
+                v.setProperty(StringFactory.ID,-1);
+                assertFalse(true);
+            } catch(RuntimeException e) {
+                assertTrue(true);
             }
         }
         graph.shutdown();
