@@ -93,7 +93,7 @@ public class SailVertex implements Vertex {
         }
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         if (this.rawVertex instanceof Resource) {
             throw new RuntimeException(URI_BLANK_NODE_PROPERTIES);
         } else {
@@ -103,35 +103,35 @@ public class SailVertex implements Vertex {
                 this.updateLiteral(oldLiteral, (Literal) this.rawVertex);
             }
             if (key.equals(SailTokens.DATATYPE)) {
-                return oldLiteral.getDatatype().toString();
+                return (T) oldLiteral.getDatatype().toString();
             } else if (key.equals(SailTokens.LANGUAGE)) {
-                return oldLiteral.getLanguage();
+                return (T) oldLiteral.getLanguage();
             }
         }
         return null;
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         if (key.equals(SailTokens.KIND)) {
             if (this.rawVertex instanceof Literal)
-                return SailTokens.LITERAL;
+                return (T) SailTokens.LITERAL;
             else if (this.rawVertex instanceof URI)
-                return SailTokens.URI;
+                return (T) SailTokens.URI;
             else
-                return SailTokens.BNODE;
+                return (T) SailTokens.BNODE;
         }
 
         if (this.rawVertex instanceof Literal) {
             final Literal literal = (Literal) rawVertex;
             if (key.equals(SailTokens.DATATYPE)) {
                 if (null != literal.getDatatype())
-                    return literal.getDatatype().stringValue();
+                    return (T) literal.getDatatype().stringValue();
                 else
                     return null;
             } else if (key.equals(SailTokens.LANGUAGE)) {
-                return literal.getLanguage();
+                return (T) literal.getLanguage();
             } else if (key.equals(SailTokens.VALUE)) {
-                return castLiteral(literal);
+                return (T) castLiteral(literal);
             }
         }
         return null;

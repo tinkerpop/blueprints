@@ -18,11 +18,11 @@ class Neo4jBatchVertex extends Neo4jBatchElement implements Vertex {
         super(graph, id);
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         final Map<String, Object> properties = this.getPropertyMapClone();
         final Object value = properties.remove(key);
         this.graph.getRawGraph().setNodeProperties(this.id, properties);
-        return value;
+        return (T) value;
 
     }
 

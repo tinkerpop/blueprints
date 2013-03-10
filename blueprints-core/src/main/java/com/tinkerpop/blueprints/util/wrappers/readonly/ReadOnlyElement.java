@@ -33,7 +33,7 @@ abstract class ReadOnlyElement implements Element {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         return this.baseElement.getProperty(key);
     }
 
