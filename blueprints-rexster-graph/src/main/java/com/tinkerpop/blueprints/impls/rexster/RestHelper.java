@@ -84,6 +84,8 @@ final class RestHelper {
     }
 
     static String uriCast(final Object value) {
+        if (value == null)
+            return "(null,\"\")";
         if (value instanceof String)
             return "(" + RexsterTokens.STRING + "," + value.toString() + ")";
         else if (value instanceof Integer)
