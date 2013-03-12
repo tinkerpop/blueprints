@@ -30,7 +30,7 @@ class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
 
     public void setProperty(final String key, final Object value) {
         if (key.isEmpty())
-            throw ExceptionFactory.elementKeyCanNotBeEmpty();
+            throw ExceptionFactory.propertyKeyCanNotBeEmpty();
         if (key.equals(StringFactory.ID))
             throw ExceptionFactory.propertyKeyIdIsReserved();
         if (key.equals(StringFactory.LABEL))

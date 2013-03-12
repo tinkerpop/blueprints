@@ -126,6 +126,52 @@ public class IdGraphTest extends GraphTest {
         graph.addVertex("whop");
     }
 
+    public void testCustomIdFactory() throws Exception {
+        IdGraph.IdFactory f = new IdGraph.IdFactory() {
+            private int count = 0;
+            public Object createId() {
+                return "vertex" + ++count;
+            }
+        };
+
+        IdGraph graph = (IdGraph) this.generateGraph();
+        graph.setVertexIdFactory(f);
+
+        Vertex v = graph.addVertex(null);
+        assertEquals("vertex1", v.getId());
+    }
+
+    public void testUnsupportCustomVertexOrEdgeIds() throws Exception {
+        TinkerGraph baseGraph = new TinkerGraph();
+        IdGraph<TinkerGraph> graph = new IdGraph<TinkerGraph>(baseGraph, true, false);
+
+        IdGraph.IdFactory vFactory = new IdGraph.IdFactory() {
+            private int count = 0;
+            public Object createId() {
+                return "vertex" + ++count;
+            }
+        };
+
+        IdGraph.IdFactory eFactory = new IdGraph.IdFactory() {
+            private int count = 0;
+            public Object createId() {
+                return "vertex" + ++count;
+            }
+        };
+
+        graph.setVertexIdFactory(vFactory);
+        graph.setEdgeIdFactory(eFactory);
+
+        Vertex v1 = graph.addVertex(null);
+        assertEquals("vertex1", v1.getId());
+        Vertex v2 = graph.addVertex(null);
+        assertEquals("vertex2", v2.getId());
+
+        Edge e1 = graph.addEdge(null, v1, v2, "connected-to");
+        // the custom id factory for edges is not used, because the base graph's ids are used instead
+        assertFalse(e1.getId().equals("edge1"));
+    }
+
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new VertexTestSuite(this));

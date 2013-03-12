@@ -12,8 +12,9 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
  */
 public class IdVertex extends IdElement implements Vertex {
 
-    protected IdVertex(final Vertex baseVertex, final IdGraph idGraph) {
-        super(baseVertex, idGraph);
+    protected IdVertex(final Vertex baseVertex,
+                       final IdGraph idGraph) {
+        super(baseVertex, idGraph, idGraph.getSupportVertexIds());
     }
 
     public Vertex getBaseVertex() {

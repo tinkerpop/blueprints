@@ -32,13 +32,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
     }
 
     public void setProperty(final String key, final Object value) {
-        if (key.equals(StringFactory.ID))
-            throw ExceptionFactory.propertyKeyIdIsReserved();
-        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
-            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
-        if (key.equals(StringFactory.EMPTY_STRING))
-            throw ExceptionFactory.elementKeyCanNotBeEmpty();
-
+        ElementHelper.validateProperty(this, key, value);
         this.graph.autoStartTransaction();
         this.rawElement.field(key, value);
         this.graph.getRawGraph().save(rawElement);

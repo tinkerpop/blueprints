@@ -108,19 +108,6 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getVertices("name", "stephen")), 1);
             assertEquals(graph.getVertices("name", "marko").iterator().next(), v1);
             assertEquals(graph.getVertices("name", "stephen").iterator().next(), v2);
-
-            /*if (!graph.getFeatures().isWrapper) {
-                assertTrue(graph.getVertices("location", "everywhere") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getVertices("location", "united states") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getVertices("location", 10) instanceof PropertyFilteredIterable);
-                assertTrue(graph.getVertices("blah", "gnar") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getVertices("bloop", "ulapor states") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getVertices("bleep", 50) instanceof PropertyFilteredIterable);
-            }
-
-            assertFalse(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
-            assertFalse(graph.getVertices("name", "rodriguez") instanceof PropertyFilteredIterable);
-            assertFalse(graph.getVertices("name", 768) instanceof PropertyFilteredIterable);*/
         }
 
         if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeKeyIndex) {
@@ -140,19 +127,6 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(count(graph.getEdges("name", "stephen")), 1);
             assertEquals(graph.getEdges("name", "marko").iterator().next(), e1);
             assertEquals(graph.getEdges("name", "stephen").iterator().next(), e2);
-
-            /*assertFalse(graph.getEdges("place", "everywhere") instanceof PropertyFilteredIterable);
-            assertFalse(graph.getEdges("place", "united states") instanceof PropertyFilteredIterable);
-            assertFalse(graph.getEdges("place", 10) instanceof PropertyFilteredIterable);
-
-            if (!graph.getFeatures().isWrapper) {
-                assertTrue(graph.getEdges("blah", "gnar") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getEdges("bloop", "ulapor states") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getEdges("bleep", 50) instanceof PropertyFilteredIterable);
-                assertTrue(graph.getEdges("name", "marko") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getEdges("name", "rodriguez") instanceof PropertyFilteredIterable);
-                assertTrue(graph.getEdges("name", 768) instanceof PropertyFilteredIterable);
-            }*/
         }
         graph.shutdown();
     }

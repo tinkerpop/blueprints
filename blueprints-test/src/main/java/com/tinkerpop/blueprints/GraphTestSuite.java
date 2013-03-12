@@ -697,4 +697,45 @@ public class GraphTestSuite extends TestSuite {
         }
         graph.shutdown();
     }
+
+    public void testAutotypingOfProperties() {
+        final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties) {
+            Vertex v = graph.addVertex(null);
+            v.setProperty(convertId(graph,"string"), "marko");
+            v.setProperty(convertId(graph,"integer"), 33);
+            v.setProperty(convertId(graph,"boolean"), true);
+
+            String name = v.getProperty(convertId(graph,"string"));
+            assertEquals(name, "marko");
+            Integer age = v.getProperty(convertId(graph,"integer"));
+            assertEquals(age, Integer.valueOf(33));
+            Boolean best = v.getProperty(convertId(graph,"boolean"));
+            assertTrue(best);
+
+            name = v.removeProperty(convertId(graph,"string"));
+            assertEquals(name, "marko");
+            age = v.removeProperty(convertId(graph,"integer"));
+            assertEquals(age, Integer.valueOf(33));
+            best = v.removeProperty(convertId(graph,"boolean"));
+            assertTrue(best);
+        }
+
+        if (graph.getFeatures().supportsEdgeProperties) {
+            Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            e.setProperty(convertId(graph,"string"), "friend");
+            e.setProperty(convertId(graph,"double"), 1.0d);
+
+            String type = e.getProperty(convertId(graph,"string"));
+            assertEquals(type, "friend");
+            Double weight = e.getProperty(convertId(graph,"double"));
+            assertEquals(weight, 1.0d);
+
+            type = e.removeProperty(convertId(graph,"string"));
+            assertEquals(type, "friend");
+            weight = e.removeProperty(convertId(graph,"double"));
+            assertEquals(weight, 1.0d);
+        }
+        graph.shutdown();
+    }
 }
