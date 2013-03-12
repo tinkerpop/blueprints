@@ -11,7 +11,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 public class IdEdge extends IdElement implements Edge {
 
     protected IdEdge(final Edge base, final IdGraph idGraph) {
-        super(base, idGraph);
+        super(base, idGraph, idGraph.getSupportEdgeIds());
     }
 
     public Edge getBaseEdge() {
