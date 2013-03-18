@@ -25,6 +25,7 @@ import java.util.UUID;
  * <p/>
  * The base Graph must be an instance of KeyIndexableGraph.
  * It *may* be an instance of IndexableGraph, in which case its indices will be wrapped appropriately.
+ * It *may* be an instance of TransactionalGraph, in which case transaction operations will be passed through.
  * For those graphs which support vertex indices but not edge indices (or vice versa),
  * you may configure IdGraph to use custom IDs only for vertices or only for edges.
  *
@@ -49,13 +50,19 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     /**
      * Adds custom ID functionality to the given graph,
      * supporting both custom vertex IDs and custom edge IDs.
+     * @param baseGraph the base graph which does not necessarily support custom IDs
      */
     public IdGraph(final T baseGraph) {
         this(baseGraph, true, true);
     }
 
+
     /**
-     * Adds custom ID functionality to the given graph.
+     * Adds custom ID functionality to the given graph,
+     * supporting either custom vertex IDs, custom edge IDs, or both.
+     * @param baseGraph the base graph which does not necessarily support custom IDs
+     * @param supportVertexIds whether to support custom vertex IDs
+     * @param supportEdgeIds whether to support custom edge IDs
      */
     public IdGraph(final T baseGraph,
                    final boolean supportVertexIds,
@@ -108,16 +115,6 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
      */
     public IdFactory getEdgeIdFactory() {
         return edgeIdFactory;
-    }
-
-    private void createIndices() {
-        if (supportVertexIds && !baseGraph.getIndexedKeys(Vertex.class).contains(ID)) {
-            baseGraph.createKeyIndex(ID, Vertex.class);
-        }
-
-        if (supportEdgeIds && !baseGraph.getIndexedKeys(Edge.class).contains(ID)) {
-            baseGraph.createKeyIndex(ID, Edge.class);
-        }
     }
 
     public Features getFeatures() {
@@ -277,13 +274,6 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         baseGraph.shutdown();
     }
 
-    private static void verifyNativeElement(final Element e) {
-        if (!(e instanceof IdElement)) {
-            throw new IllegalArgumentException("given element was not created in this graph");
-        }
-    }
-
-    @Override
     public String toString() {
         return StringFactory.graphString(this, this.baseGraph.toString());
     }
@@ -367,16 +357,6 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         ((IndexableGraph) baseGraph).dropIndex(indexName);
     }
 
-    private void verifyBaseGraphIsIndexableGraph() {
-        if (!(baseGraph instanceof IndexableGraph)) {
-            throw new IllegalStateException("base graph is not an indexable graph");
-        }
-    }
-
-    private boolean isVertexClass(final Class c) {
-        return Vertex.class.isAssignableFrom(c);
-    }
-
     public GraphQuery query() {
         final IdGraph idGraph = this;
         return new WrappedGraphQuery(this.baseGraph.query()) {
@@ -410,6 +390,32 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     private static class DefaultIdFactory implements IdFactory {
         public Object createId() {
             return UUID.randomUUID().toString();
+        }
+    }
+
+    private void verifyBaseGraphIsIndexableGraph() {
+        if (!(baseGraph instanceof IndexableGraph)) {
+            throw new IllegalStateException("base graph is not an indexable graph");
+        }
+    }
+
+    private boolean isVertexClass(final Class c) {
+        return Vertex.class.isAssignableFrom(c);
+    }
+
+    private void createIndices() {
+        if (supportVertexIds && !baseGraph.getIndexedKeys(Vertex.class).contains(ID)) {
+            baseGraph.createKeyIndex(ID, Vertex.class);
+        }
+
+        if (supportEdgeIds && !baseGraph.getIndexedKeys(Edge.class).contains(ID)) {
+            baseGraph.createKeyIndex(ID, Edge.class);
+        }
+    }
+
+    private static void verifyNativeElement(final Element e) {
+        if (!(e instanceof IdElement)) {
+            throw new IllegalArgumentException("given element was not created in this graph");
         }
     }
 }
