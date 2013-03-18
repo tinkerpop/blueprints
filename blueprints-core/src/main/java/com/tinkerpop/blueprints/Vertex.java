@@ -40,9 +40,9 @@ public interface Vertex extends Element {
     /**
      * Add a new outgoing edge from this vertex to the parameter vertex with provided edge label.
      *
-     * @param label  the label of the edge
-     * @param vertex the vertex to connect to
+     * @param label    the label of the edge
+     * @param inVertex the vertex to connect to with an incoming edge
      * @return the newly created edge
      */
-    public Edge addEdge(String label, Vertex vertex);
+    public Edge addEdge(String label, Vertex inVertex);
 }
