@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Graph Transactions</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Blueprints</a></h3>
+  <h1>Graph Transactions</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Graph-Transactions"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Graph-Transactions"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p>A <code>Graph</code> that implements the <code>TransactionalGraph</code> or <code>ThreadedTransactionalGraph</code> interfaces must natively support <a href="http://en.wikipedia.org/wiki/Database_transaction">transaction handling</a>. A transaction describes a coherent and complete unit of work comprised of multiple read and write operations to be executed against the database together or not at all. In addition, transactions are needed to handle conflicts and consistency issues that arise when multiple users interact with the <code>Graph</code> concurrently. The exact <a href="http://en.wikipedia.org/wiki/ACID"><span class="caps">ACID</span></a> and <a href="http://en.wikipedia.org/wiki/Isolation_(database_systems)">isolation</a> level guarantees extended by a <code>TransactionalGraph</code> or <code>ThreadedTransactionalGraph</code> depend on the specific implementation.</p>
+<h2>TransactionalGraph and Starting and Stopping Transactions</h2>
+<p>A <code>TransactionalGraph</code> has just two methods for terminating the transaction:</p>
+<pre><code>public void commit();
+public void rollback();</code></pre>
+<p>Transactions are automatically started with the first operation on the graph, that is, any read or write operation. Hence, a transaction does <span class="caps">NOT</span> need to be started. Transactions need to be manually closed to mark the end of a transactional context and to inform the graph database whether the transaction was successful or not. Calling <code>TransactionalGraph.commit()</code> persists the transactional state to the database whereas <code>TransactionalGraph.rollback()</code> fails the transaction and discards any mutations.</p>
+<p>Transactions are bound to the current thread, which means that any graph operation executed by the thread occurs in the context of that transaction and that there may only be one thread executing in a single transaction. For thread independent transactions that allow concurrent thread access, use <code>ThreadedTransactionalGraph</code>.</p>
+<p>When a transaction is started, all the subsequent read and write operations occur within this transaction context. When the transaction is successfully committed, those mutations operations are persisted and visible to other contexts interacting with the graph and all locks are released. If a transaction is rolled back, then the mutation operations in that transaction are discarded as if they never happened.</p>
+<p><code>TransactionalGraph</code> makes no assumptions about how transactions are implemented by a graph database. Hence, a transaction may fail at any point if a conflict arises that could not be resolved.</p>
+<p>Note, that a <code>TransactionalGraph.shutdown()</code> will automatically successfully commit any open transaction. Also note, that keeping transactions open for a long time may result in <code>OutOfMemoryException</code> if too many mutations have occurred and possible dead-locks if locks are held for too long in multi-user environments.</p>
+<p>Note, that element references created in a transactional context may not be accessed outside the transactional context.  Doing so may cause an exception. A transaction marks a complete unit of work and after it is stopped, its state may be discarded. Moreover, concurrently running transaction can render such references out-of-sync. Any references created during the transaction may therefore no longer be alive. Hence, the following code snippet may cause an exception:</p>
+<pre><code>Vertex v = graph.addVertex(null);
+//More operations inside the transaction
+graph.commit();
+//Other code
+v.setProperty("name","marko");</code></pre>
+<p>In such cases, the transactional context should be extended until all operations have been completed. In other words, the <code>commit()</code> call should be moved after the <code>v.setProperty("name","marko");</code> write operation.<br />
+In cases where the element reference needs to be accessed outside its original transactional context, it should be re-instantiated based on the element id. For example:</p>
+<pre><code>Vertex v = graph.addVertex(null);
+//More operations inside the transaction
+graph.commit();
+//Other code
+v = graph.getVertex(v.getId());
+v.setProperty("name","marko");</code></pre>
+<h2>ThreadedTransactionalGraph and Multi-Threads for One Transaction</h2>
+<p><code>ThreadedTransactionalGraph</code> provides more fine grained control over the transactional context.  While <code>TransactionalGraph</code> binds each transaction to the executing thread, <code>ThreadedTransactionalGraph.newTransaction()</code> returns a <code>TransactionalGraph</code> that represents its own transactional context independent of the executing thread.<br />
+Hence, one can have multiple threads operating against a single transaction represented by the returned TransactionalGraph object. This is useful for parallelizing graph algorithms.</p>
+<p>A <code>ThreadedTransactionalGraph</code> extends <code>TransactionalGraph</code> with a single method.</p>
+<pre><code>public TransactionalGraph newTransaction()</code></pre>
+<p>The returned transaction represented by a <code>TransactionalGraph</code> object needs to be explicitly closed by calling <code>TransactionalGraph.stopTransaction(Conclusion conclusion)</code>. Calling <code>TransactionalGraph.shutdown()</code> will successfully commit the transaction without closing the underlying graph database.</p>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>joshsh</b>, 2013-03-20 04:57:12</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

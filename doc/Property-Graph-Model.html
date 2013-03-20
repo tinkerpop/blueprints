@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href=" css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href=" css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href=" css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src=" css/jquery.js"></script>
+  <script type="text/javascript" src=" css/gollum.js"></script>
+  <script type="text/javascript" src=" css/gollum.dialog.js"></script>
+  <script type="text/javascript" src=" css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src=" css/editor/gollum.editor.js"></script>
+  <title>Property Graph Model</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.3.0</a> - <a href="Home.html">Blueprints</a></h3>
+  <h1>Property Graph Model</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Property-Graph-Model"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Property-Graph-Model"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src=" images/graph-example-1.jpg" height="486px" /></p>
+<p>Blueprints provides a set of interfaces for the property graph data model. An example instance is diagrammed above. In order to make a data management system &#x201C;Blueprints-enabled,&#x201D; the Blueprints interfaces must be implemented. However, note that there are various <code>Graph</code> interfaces, each with different types of functionality. For example, if an application only needs a <code>Graph</code>, then a <code>TransactionalGraph</code> implementation is not required of the underlying graph.</p>
+<p>The following diagram identifies the names of the different components of a <code>Graph</code>. In general, these are the basic components of a property graph.</p>
+<ul><li><strong>Graph</strong>: An object that contains vertices and edges.
+	<ul><li><strong>Element</strong>: An object that can have any number of key/value pairs associated with it (i.e. properties)
+		<ul><li><strong>Vertex</strong>: An object that has incoming and outgoing edges.</li>
+			<li><strong>Edge</strong>: An object that has a tail and head vertex.</li>
+		</ul></li>
+	</ul></li>
+</ul><p><img src=" images/property-graph-model.jpg" alt="" /></p>
+<p>A property graph has these elements:</p>
+<ol><li>a set of vertices
+	<ul><li>each vertex has a unique identifier.</li>
+		<li>each vertex has a set of outgoing edges.</li>
+		<li>each vertex has a set of incoming edges.</li>
+		<li>each vertex has a collection of properties defined by a map from key to value.</li>
+	</ul></li>
+	<li>a set of edges
+	<ul><li>each edge has a unique identifier.</li>
+		<li>each edge has an outgoing tail vertex.</li>
+		<li>each edge has an incoming head vertex.</li>
+		<li>each edge has a label that denotes the type of relationship between its two vertices.</li>
+		<li>each edge has a collection of properties defined by a map from key to value.</li>
+	</ul></li>
+</ol>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>joshsh</b>, 2013-03-20 04:57:12</p>
+</div>
+</div>
+
+<script type="text/javascript" src=" css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>
