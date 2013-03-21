@@ -4,32 +4,32 @@ import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.Features;
 
 /**
- * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
+ * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com) that supports indexable edges.
  * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraph extends OrientTransactionalGraph {
+public class OrientGraphNonDynamic extends OrientTransactionalGraph {
   private static final Features FEATURES    = new Features();
 
   static {
-    FEATURES.supportsDuplicateEdges = false;
+    FEATURES.supportsDuplicateEdges = true;
     FEATURES.supportsSelfLoops = true;
     FEATURES.isPersistent = true;
     FEATURES.isRDFModel = false;
     FEATURES.supportsVertexIteration = true;
-    FEATURES.supportsEdgeIteration = false;
+    FEATURES.supportsEdgeIteration = true;
     FEATURES.supportsVertexIndex = true;
-    FEATURES.supportsEdgeIndex = false;
+    FEATURES.supportsEdgeIndex = true;
     FEATURES.ignoresSuppliedIds = true;
     FEATURES.supportsTransactions = true;
-    FEATURES.supportsEdgeKeyIndex = false;
+    FEATURES.supportsEdgeKeyIndex = true;
     FEATURES.supportsVertexKeyIndex = true;
     FEATURES.supportsKeyIndices = true;
     FEATURES.isWrapper = false;
     FEATURES.supportsIndices = true;
-    FEATURES.supportsEdgeRetrieval = false;
+    FEATURES.supportsEdgeRetrieval = true;
     FEATURES.supportsVertexProperties = true;
-    FEATURES.supportsEdgeProperties = true; // ACTUALLY THIS IS DYNAMIC
+    FEATURES.supportsEdgeProperties = true;
 
     // For more information on supported types, please see:
     // http://code.google.com/p/orient/wiki/Types
@@ -55,16 +55,19 @@ public class OrientGraph extends OrientTransactionalGraph {
    * @param iDatabase
    *          Underlying OGraphDatabase object to attach
    */
-  public OrientGraph(final OGraphDatabase iDatabase) {
+  public OrientGraphNonDynamic(final OGraphDatabase iDatabase) {
     super(iDatabase);
+    useDynamicEdges = false;
   }
 
-  public OrientGraph(final String url) {
+  public OrientGraphNonDynamic(final String url) {
     super(url, ADMIN, ADMIN);
+    useDynamicEdges = false;
   }
 
-  public OrientGraph(final String url, final String username, final String password) {
+  public OrientGraphNonDynamic(final String url, final String username, final String password) {
     super(url, username, password);
+    useDynamicEdges = false;
   }
 
   public Features getFeatures() {

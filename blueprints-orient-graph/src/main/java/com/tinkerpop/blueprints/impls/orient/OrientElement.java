@@ -1,149 +1,193 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Map;
+
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
 import com.orientechnologies.orient.core.exception.OSerializationException;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
-import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
-import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
-import com.tinkerpop.blueprints.util.StringFactory;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
+ * Base Graph Element where OrientVertex and OrientEdge classes extends from. Labels are managed as OrientDB classes.
+ * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
+@SuppressWarnings("unchecked")
 public abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
+  private static final long       serialVersionUID = 1L;
 
-    protected final OrientBaseGraph graph;
-    protected final ODocument rawElement;
+  // TODO: CAN REMOVE THIS REF IN FAVOR OF CONTEXT INSTANCE?
+  protected final OrientBaseGraph graph;
+  protected OIdentifiable         rawElement;
 
-    protected OrientElement(final OrientBaseGraph rawGraph, final ODocument rawElement) {
-        this.graph = rawGraph;
-        this.rawElement = rawElement;
+  protected OrientElement(final OrientBaseGraph rawGraph, final OIdentifiable iRawElement) {
+    graph = rawGraph;
+    rawElement = iRawElement;
+  }
+
+  public abstract String getBaseClassName();
+
+  public abstract String getElementType();
+
+  @Override
+  public void remove() {
+    getRecord().delete();
+  }
+
+  public <T extends OrientElement> T setProperties(final Object... fields) {
+    if (fields != null) {
+      graph.autoStartTransaction();
+      if (fields.length == 1) {
+        Object f = fields[0];
+        if (f instanceof Map<?, ?>) {
+          for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) f).entrySet())
+            setPropertyInternal(this, (ODocument) rawElement.getRecord(), entry.getKey().toString(), entry.getValue());
+
+        } else
+          throw new IllegalArgumentException(
+              "Invalid fields: expecting a pairs of fields as String,Object or a single Map<String,Object>, but found: " + f);
+      } else
+        // SET THE FIELDS
+        for (int i = 0; i < fields.length; i += 2)
+          setPropertyInternal(this, (ODocument) rawElement.getRecord(), fields[i].toString(), fields[i + 1]);
+
+      save();
     }
+    return (T) this;
+  }
 
-    public void setProperty(final String key, final Object value) {
-        ElementHelper.validateProperty(this, key, value);
-        this.graph.autoStartTransaction();
-        this.rawElement.field(key, value);
-        this.graph.getRawGraph().save(rawElement);
-    }
+  public void setProperty(final String key, final Object value) {
+    ElementHelper.validateProperty(this, key, value);
+    graph.autoStartTransaction();
+    getRecord().field(key, value);
+    save();
+  }
 
-    public <T> T removeProperty(final String key) {
-        this.graph.autoStartTransaction();
-        final Object oldValue = this.rawElement.removeField(key);
-        this.save();
-        return (T) oldValue;
-    }
+  public <T> T removeProperty(final String key) {
+    graph.autoStartTransaction();
+    final Object oldValue = getRecord().removeField(key);
+    save();
+    return (T) oldValue;
+  }
 
-    public <T> T getProperty(final String key) {
-        if (key == null)
-            return null;
+  public <T> T getProperty(final String key) {
+    if (key == null)
+      return null;
 
-        if (key.equals("_class"))
-            return (T) rawElement.getSchemaClass().getName();
-        else if (key.equals("_version"))
-            return (T) new Integer(rawElement.getVersion());
-        else if (key.equals("_rid"))
-            return (T) rawElement.getIdentity().toString();
+    if (key.equals("_class"))
+      return (T) getRecord().getSchemaClass().getName();
+    else if (key.equals("_version"))
+      return (T) new Integer(getRecord().getVersion());
+    else if (key.equals("_rid"))
+      return (T) rawElement.getIdentity().toString();
 
-        return this.rawElement.field(key);
-    }
+    return getRecord().field(key);
+  }
 
-    public Set<String> getPropertyKeys() {
-        Set<String> result = new HashSet<String>();
+  /**
+   * Returns the Element Id assuring to save it if it's transient yet.
+   */
+  public Object getId() {
+    return getIdentity();
+  }
 
-        final String[] fields = this.rawElement.fieldNames();
-        for (String field : fields)
-            if (!field.equals(StringFactory.LABEL))
-                result.add(field);
+  /**
+   * Returns the class name of the record.
+   * 
+   * @return Label value
+   */
+  public String getLabel() {
+    return getRecord().getClassName();
+  }
 
-        return result;
-    }
+  protected void save() {
+    if (rawElement instanceof ODocument)
+      ((ODocument) rawElement).save();
+  }
 
-    /**
-     * Returns the Element Id assuring to save it if it's transient yet.
-     */
-    public Object getId() {
-        return getIdentity();
-    }
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((rawElement == null) ? 0 : rawElement.hashCode());
+    return result;
+  }
 
-    protected void save() {
-        this.rawElement.save();
-    }
+  @Override
+  public byte[] toStream() throws OSerializationException {
+    return rawElement.getIdentity().toString().getBytes();
+  }
 
-    public ODocument getRawElement() {
-        return rawElement;
-    }
+  @Override
+  public OSerializableStream fromStream(final byte[] iStream) throws OSerializationException {
+    final ODocument record = getRecord();
+    ((ORecordId) record.getIdentity()).fromString(new String(iStream));
+    record.setInternalStatus(STATUS.NOT_LOADED);
+    return this;
+  }
 
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.rawElement == null) ? 0 : this.rawElement.hashCode());
-        return result;
-    }
+  @Override
+  public ORID getIdentity() {
+    final ORID rid = rawElement.getIdentity();
+    if (!rid.isValid())
+      // SAVE THE RECORD TO OBTAIN A VALID RID
+      save();
+    return rid;
+  }
 
-    public void remove() {
-        if (this instanceof Vertex)
-            this.graph.removeVertex((Vertex) this);
-        else
-            this.graph.removeEdge((Edge) this);
-    }
+  @Override
+  public ODocument getRecord() {
+    if (rawElement instanceof ODocument)
+      return (ODocument) rawElement;
 
-    public boolean equals(final Object object) {
-        return ElementHelper.areEqual(this, object);
-    }
+    final ODocument doc = rawElement.getRecord();
+    if (doc == null)
+      throw new IllegalStateException("Graph element " + rawElement + " has been deleted");
 
-    @Override
-    public byte[] toStream() throws OSerializationException {
-        return rawElement.getIdentity().toString().getBytes();
-    }
+    // CHANGE THE RID -> DOCUMENT
+    rawElement = doc;
+    return doc;
+  }
 
-    @Override
-    public OSerializableStream fromStream(byte[] iStream) throws OSerializationException {
-        ((ORecordId) rawElement.getIdentity()).fromString(new String(iStream));
-        rawElement.setInternalStatus(STATUS.NOT_LOADED);
-        return this;
-    }
+  public boolean equals(final Object object) {
+    return ElementHelper.areEqual(this, object);
+  }
 
-    @Override
-    public ORID getIdentity() {
-        ORID rid = this.rawElement.getIdentity();
-        if (!rid.isValid())
-            this.save();
-        return rid;
-    }
+  public int compare(final OIdentifiable iFirst, final OIdentifiable iSecond) {
+    if (iFirst == null || iSecond == null)
+      return -1;
+    return iFirst.compareTo(iSecond);
+  }
 
-    @Override
-    public ORecord<?> getRecord() {
-        return this.rawElement;
-    }
+  public int compareTo(final OIdentifiable iOther) {
+    if (iOther == null)
+      return 1;
 
-    public int compare(final OIdentifiable iFirst, final OIdentifiable iSecond) {
-        if (iFirst == null || iSecond == null)
-            return -1;
-        return iFirst.compareTo(iSecond);
-    }
+    final ORID myRID = getIdentity();
+    final ORID otherRID = iOther.getIdentity();
 
-    public int compareTo(final OIdentifiable iOther) {
-        if (iOther == null)
-            return 1;
+    if (myRID == null && otherRID == null)
+      return 0;
 
-        final ORID myRID = getIdentity();
-        final ORID otherRID = iOther.getIdentity();
+    return myRID.compareTo(otherRID);
+  }
 
-        if (myRID == null && otherRID == null)
-            return 0;
+  protected void checkClass() {
+    // FORCE EARLY UNMARSHALLING
+    final ODocument doc = getRecord();
+    doc.deserializeFields();
 
-        return myRID.compareTo(otherRID);
-    }
+    if (!doc.getSchemaClass().isSubClassOf(getBaseClassName()))
+      throw new IllegalArgumentException("The document received is not a " + getElementType() + ". Found class '"
+          + doc.getSchemaClass() + "'");
+  }
+
+  protected static void setPropertyInternal(final Element element, final ODocument doc, final String key, final Object value) {
+    ElementHelper.validateProperty(element, key, value);
+    doc.field(key, value);
+  }
 }

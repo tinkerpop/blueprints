@@ -26,7 +26,6 @@ import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
@@ -35,468 +34,451 @@ import com.tinkerpop.blueprints.util.StringFactory;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
- *
+ * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGraphDatabase>, KeyIndexableGraph {
-    /**
-     *
-     */
-    private static final String CLASS_PREFIX = "class:";
+  public static final String                           CONNECTION_OUT      = "out";
+  public static final String                           CONNECTION_IN       = "in";
+  public static final String                           CLASS_PREFIX        = "class:";
 
-    protected final static String ADMIN = "admin";
+  protected final static String                        ADMIN               = "admin";
+  protected boolean                                    useDynamicEdges     = true;
+  protected boolean                                    useClassesForLabels = false;
 
-    private String url;
-    private String username;
-    private String password;
+  private String                                       url;
+  private String                                       username;
+  private String                                       password;
 
-    private static final ThreadLocal<OrientGraphContext> threadContext = new ThreadLocal<OrientGraphContext>();
-    private static final List<OrientGraphContext> contexts = new ArrayList<OrientGraphContext>();
+  private static final ThreadLocal<OrientGraphContext> threadContext       = new ThreadLocal<OrientGraphContext>();
+  private static final List<OrientGraphContext>        contexts            = new ArrayList<OrientGraphContext>();
 
-    /**
-     * Constructs a new object using an existent OGraphDatabase instance.
-     *
-     * @param iDatabase Underlying OGraphDatabase object to attach
-     */
-    public OrientBaseGraph(final OGraphDatabase iDatabase) {
-        reuse(iDatabase);
+  /**
+   * Constructs a new object using an existent OGraphDatabase instance.
+   * 
+   * @param iDatabase
+   *          Underlying OGraphDatabase object to attach
+   */
+  public OrientBaseGraph(final OGraphDatabase iDatabase) {
+    reuse(iDatabase);
+  }
+
+  public OrientBaseGraph(final String url) {
+    this(url, ADMIN, ADMIN);
+  }
+
+  public OrientBaseGraph(final String url, final String username, final String password) {
+    this.url = OFileUtils.getPath(url);
+    this.username = username;
+    this.password = password;
+    this.openOrCreate();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass,
+      final Parameter... indexParameters) {
+    final OrientGraphContext context = getContext(true);
+
+    if (getRawGraph().getTransaction().isActive())
+      // ASSURE PENDING TX IF ANY IS COMMITTED
+      this.commit();
+
+    synchronized (contexts) {
+      if (context.manualIndices.containsKey(indexName))
+        throw ExceptionFactory.indexAlreadyExists(indexName);
+
+      final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(this, indexName, indexClass, null);
+
+      // ADD THE INDEX IN ALL CURRENT CONTEXTS
+      for (OrientGraphContext ctx : contexts)
+        ctx.manualIndices.put(index.getIndexName(), index);
+
+      // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
+      saveIndexConfiguration();
+
+      return (Index<T>) index;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
+    final OrientGraphContext context = getContext(true);
+    Index<? extends Element> index = context.manualIndices.get(indexName);
+    if (null == index) {
+      return null;
     }
 
-    public OrientBaseGraph(final String url) {
-        this(url, ADMIN, ADMIN);
+    if (indexClass.isAssignableFrom(index.getIndexClass()))
+      return (Index<T>) index;
+    else
+      throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
+  }
+
+  public Iterable<Index<? extends Element>> getIndices() {
+    final OrientGraphContext context = getContext(true);
+    final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
+    for (Index<?> index : context.manualIndices.values()) {
+      list.add(index);
     }
+    return list;
+  }
 
-    public OrientBaseGraph(final String url, final String username, final String password) {
-        this.url = OFileUtils.getPath(url);
-        this.username = username;
-        this.password = password;
-        this.openOrCreate();
-    }
+  protected Iterable<OrientIndex<? extends OrientElement>> getManualIndices() {
+    return getContext(true).manualIndices.values();
+  }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        final OrientGraphContext context = getContext(true);
+  public void dropIndex(final String indexName) {
+    if (getRawGraph().getTransaction().isActive())
+      this.commit();
 
-        if (getRawGraph().getTransaction().isActive())
-            this.commit();
-
-        synchronized (contexts) {
-            if (context.manualIndices.containsKey(indexName))
-                throw ExceptionFactory.indexAlreadyExists(indexName);
-
-            final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(this, indexName, indexClass, null);
-
-            // ADD THE INDEX IN ALL CURRENT CONTEXTS
-            for (OrientGraphContext ctx : contexts)
-                ctx.manualIndices.put(index.getIndexName(), index);
-
-            // SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
-            saveIndexConfiguration();
-
-            return (Index<T>) index;
+    try {
+      synchronized (contexts) {
+        for (OrientGraphContext ctx : contexts) {
+          ctx.manualIndices.remove(indexName);
         }
+      }
+
+      getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
+      saveIndexConfiguration();
+    } catch (Exception e) {
+      this.rollback();
+      throw new RuntimeException(e.getMessage(), e);
     }
+  }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        final OrientGraphContext context = getContext(true);
-        Index<? extends Element> index = context.manualIndices.get(indexName);
-        if (null == index) {
-            return null;
-        }
+  public Vertex addVertex(final Object id) {
+    String className = null;
+    if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
+      // GET THE CLASS NAME
+      className = id.toString().substring(CLASS_PREFIX.length());
 
-        if (indexClass.isAssignableFrom(index.getIndexClass()))
-            return (Index<T>) index;
-        else
-            throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
-    }
+    final OGraphDatabase db = getRawGraph();
+    this.autoStartTransaction();
+    final OrientVertex vertex = new OrientVertex(this, db.createVertex(className));
+    vertex.save();
+    return vertex;
+  }
 
-    public Iterable<Index<? extends Element>> getIndices() {
-        final OrientGraphContext context = getContext(true);
-        final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-        for (Index<?> index : context.manualIndices.values()) {
-            list.add(index);
-        }
-        return list;
-    }
+  public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+    return outVertex.addEdge(label, inVertex);
+  }
 
-    protected Iterable<OrientIndex<? extends OrientElement>> getManualIndices() {
-        return getContext(true).manualIndices.values();
-    }
+  public Vertex getVertex(final Object id) {
+    if (null == id)
+      throw ExceptionFactory.vertexIdCanNotBeNull();
 
-    public void dropIndex(final String indexName) {
-        if (getRawGraph().getTransaction().isActive())
-            this.commit();
-
-        try {
-            synchronized (contexts) {
-                for (OrientGraphContext ctx : contexts) {
-                    ctx.manualIndices.remove(indexName);
-                }
-            }
-
-            getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
-            saveIndexConfiguration();
-        } catch (Exception e) {
-            this.rollback();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    public Vertex addVertex(final Object id) {
-        String className = null;
-        if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
-            // GET THE CLASS NAME
-            className = id.toString().substring(CLASS_PREFIX.length());
-
-        final OGraphDatabase db = getRawGraph();
-        this.autoStartTransaction();
-        final OrientVertex vertex = new OrientVertex(this, db.createVertex(className));
-        vertex.save();
-        return vertex;
-    }
-
-    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        String className = null;
-        if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
-            // GET THE CLASS NAME
-            className = id.toString().substring(CLASS_PREFIX.length());
-
-
-        final OGraphDatabase db = getRawGraph();
-        this.autoStartTransaction();
-        final ODocument edgeDoc = db.createEdge(((OrientVertex) outVertex).getRawElement(), ((OrientVertex) inVertex).getRawElement(), className);
-        final OrientEdge edge = new OrientEdge(this, edgeDoc, label);
-
-        // SAVE THE VERTICES TO ASSURE THEY ARE IN TX
-        db.save(((OrientVertex) outVertex).getRawElement());
-        db.save(((OrientVertex) inVertex).getRawElement());
-        edge.save();
-        return edge;
-    }
-
-    public Vertex getVertex(final Object id) {
-        if (null == id)
-            throw ExceptionFactory.vertexIdCanNotBeNull();
-
-        ORID rid;
-        if (id instanceof ORID)
-            rid = (ORID) id;
-        else {
-            try {
-                rid = new ORecordId(id.toString());
-            } catch (IllegalArgumentException iae) {
-                // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be: <cluster-id>:<cluster-position>
-                return null;
-            }
-        }
-
-        if (!rid.isValid())
-            return null;
-
-
-        final ODocument doc = getRawGraph().load(rid);
-        if (doc != null) {
-            return new OrientVertex(this, doc);
-        }
-
+    ORID rid;
+    if (id instanceof ORID)
+      rid = (ORID) id;
+    else {
+      try {
+        rid = new ORecordId(id.toString());
+      } catch (IllegalArgumentException iae) {
+        // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be:
+        // <cluster-id>:<cluster-position>
         return null;
+      }
     }
 
-    public void removeVertex(final Vertex vertex) {
-        final OrientVertex oVertex = (OrientVertex) vertex;
-        if (oVertex == null || oVertex.getRawElement() == null)
-            return;
+    if (!rid.isValid())
+      return null;
 
-        this.autoStartTransaction();
-        final Set<Edge> allEdges = new HashSet<Edge>();
-        for (Edge e : oVertex.getEdges(Direction.BOTH))
-            allEdges.add(e);
-
-        for (final Index<? extends Element> index : this.getManualIndices()) {
-            if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
-                @SuppressWarnings("unchecked")
-                OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;
-                idx.removeElement(oVertex);
-            }
-
-            if (Edge.class.isAssignableFrom(index.getIndexClass())) {
-                @SuppressWarnings("unchecked")
-                OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
-                for (Edge e : allEdges)
-                    idx.removeElement((OrientEdge) e);
-            }
-        }
-
-        getRawGraph().removeVertex(oVertex.rawElement);
+    final ODocument doc = getRawGraph().load(rid);
+    if (doc != null) {
+      return new OrientVertex(this, doc);
     }
 
-    public Iterable<Vertex> getVertices() {
-        return getVertices(true);
+    return null;
+  }
+
+  public void removeVertex(final Vertex vertex) {
+    vertex.remove();
+  }
+
+  public Iterable<Vertex> getVertices() {
+    return getVertices(true);
+  }
+
+  public Iterable<Vertex> getVertices(final String key, Object value) {
+    final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OrientVertex.CLASS_NAME + "." + key);
+    if (idx != null) {
+      if (value != null && !(value instanceof String))
+        value = value.toString();
+
+      Object indexValue = idx.get(value);
+      if (indexValue != null && !(indexValue instanceof Iterable<?>))
+        indexValue = Arrays.asList(indexValue);
+
+      return new OrientElementIterable<Vertex>(this, (Iterable<?>) indexValue);
     }
+    return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
+  }
 
-    public Iterable<Vertex> getVertices(final String key, Object value) {
-        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.VERTEX_CLASS_NAME + "." + key);
-        if (idx != null) {
-            if (value != null && !(value instanceof String))
-                value = value.toString();
+  private Iterable<Vertex> getVertices(final boolean polymorphic) {
+    getContext(true);
+    return new OrientElementScanIterable<Vertex>(this, Vertex.class, polymorphic);
+  }
 
-            Object indexValue = idx.get(value);
-            if( indexValue != null && !( indexValue instanceof Iterable<?> ) )
-              indexValue = Arrays.asList(indexValue);
-            
-            return new OrientElementIterable<Vertex>(this, (Iterable<?>) indexValue );
-        }
-        return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
+  public Iterable<Edge> getEdges() {
+    return getEdges(true);
+  }
+
+  public Iterable<Edge> getEdges(final String key, Object value) {
+    final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OrientEdge.CLASS_NAME + "." + key);
+    if (idx != null) {
+      if (value != null && !(value instanceof String))
+        value = value.toString();
+
+      Object indexValue = (Iterable<?>) idx.get(value);
+      if (indexValue != null && !(indexValue instanceof Iterable<?>))
+        indexValue = Arrays.asList(indexValue);
+
+      return new OrientElementIterable<Edge>(this, (Iterable<?>) indexValue);
     }
+    return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
+  }
 
-    private Iterable<Vertex> getVertices(final boolean polymorphic) {
-        getContext(true);
-        return new OrientElementScanIterable<Vertex>(this, Vertex.class, polymorphic);
-    }
+  private Iterable<Edge> getEdges(final boolean polymorphic) {
+    getContext(true);
+    return new OrientElementScanIterable<Edge>(this, Edge.class, polymorphic);
+  }
 
-    public Iterable<Edge> getEdges() {
-        return getEdges(true);
-    }
+  public Edge getEdge(final Object id) {
+    if (null == id)
+      throw ExceptionFactory.edgeIdCanNotBeNull();
 
-    public Iterable<Edge> getEdges(final String key, Object value) {
-        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OGraphDatabase.EDGE_CLASS_NAME + "." + key);
-        if (idx != null) {
-            if (value != null && !(value instanceof String))
-                value = value.toString();
+    final ORID rid;
+    if (id instanceof ORID)
+      rid = (ORID) id;
+    else {
+      final String str = id.toString();
 
-            Object indexValue = (Iterable<?>) idx.get(value);
-            if( indexValue != null && !( indexValue instanceof Iterable<?> ) )
-              indexValue = Arrays.asList(indexValue);
-            
-            return new OrientElementIterable<Edge>(this, (Iterable<?>) indexValue );            
-        }
-        return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
-    }
+      int pos = str.indexOf("->");
 
-    private Iterable<Edge> getEdges(final boolean polymorphic) {
-        getContext(true);
-        return new OrientElementScanIterable<Edge>(this, Edge.class, polymorphic);
-    }
+      if (pos > -1) {
+        // DUMMY EDGE: CREATE IT IN MEMORY
+        final String from = str.substring(0, pos);
+        final String to = str.substring(pos + 2);
+        return new OrientEdge(this, new ORecordId(from), new ORecordId(to));
+      }
 
-    public Edge getEdge(final Object id) {
-        if (null == id)
-            throw ExceptionFactory.edgeIdCanNotBeNull();
-
-        final ORID rid;
-        if (id instanceof ORID)
-            rid = (ORID) id;
-        else {
-            try {
-                rid = new ORecordId(id.toString());
-            } catch (IllegalArgumentException iae) {
-                // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be: <cluster-id>:<cluster-position>
-                return null;
-            }
-        }
-
-        final ODocument doc = getRawGraph().load(rid);
-        if (doc != null) {
-            return new OrientEdge(this, doc);
-        }
-
+      try {
+        rid = new ORecordId(str);
+      } catch (IllegalArgumentException iae) {
+        // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be:
+        // [#]<cluster-id>:<cluster-position>
         return null;
+      }
     }
 
-    public void removeEdge(final Edge edge) {
-        final OrientEdge oEdge = (OrientEdge) edge;
-        if (oEdge == null || oEdge.getRawElement() == null)
-            return;
+    final ODocument doc = getRawGraph().load(rid);
+    if (doc != null)
+      return new OrientEdge(this, doc);
 
-        this.autoStartTransaction();
-        for (final Index<? extends Element> index : this.getManualIndices()) {
-            if (Edge.class.isAssignableFrom(index.getIndexClass())) {
-                @SuppressWarnings("unchecked")
-                OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
-                idx.removeElement(oEdge);
-            }
-        }
+    return null;
+  }
 
-        getRawGraph().removeEdge(oEdge.rawElement);
+  public void removeEdge(final Edge edge) {
+    edge.remove();
+  }
+
+  /**
+   * Reuses the underlying database avoiding to create and open it every time.
+   * 
+   * @param iDatabase
+   *          Underlying OGraphDatabase object
+   */
+  public OrientBaseGraph reuse(final OGraphDatabase iDatabase) {
+    this.url = iDatabase.getURL();
+    this.username = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
+    synchronized (this) {
+      OrientGraphContext context = threadContext.get();
+      if (context == null || !context.rawGraph.getName().equals(iDatabase.getName())) {
+        removeContext();
+        context = new OrientGraphContext();
+        context.rawGraph = iDatabase;
+        iDatabase.checkForGraphSchema();
+        threadContext.set(context);
+      }
     }
+    return this;
+  }
 
-    /**
-     * Reuses the underlying database avoiding to create and open it every time.
-     *
-     * @param iDatabase Underlying OGraphDatabase object
-     */
-    public OrientBaseGraph reuse(final OGraphDatabase iDatabase) {
-        this.url = iDatabase.getURL();
-        this.username = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
-        synchronized (this) {
-            OrientGraphContext context = threadContext.get();
-            if (context == null || !context.rawGraph.getName().equals(iDatabase.getName())) {
-                removeContext();
-                context = new OrientGraphContext();
-                context.rawGraph = iDatabase;
-                iDatabase.checkForGraphSchema();
-                threadContext.set(context);
-            }
-        }
-        return this;
+  public void shutdown() {
+    removeContext();
+
+    url = null;
+    username = null;
+    password = null;
+  }
+
+  public String toString() {
+    return StringFactory.graphString(this, getRawGraph().getURL());
+  }
+
+  public OGraphDatabase getRawGraph() {
+    return getContext(true).rawGraph;
+  }
+
+  public void commit() {
+  }
+
+  public void rollback() {
+  }
+
+  protected void autoStartTransaction() {
+  }
+
+  protected void saveIndexConfiguration() {
+    getRawGraph().getMetadata().getIndexManager().getConfiguration().save();
+  }
+
+  protected OrientGraphContext getContext(final boolean create) {
+    OrientGraphContext context = threadContext.get();
+    if (context == null || !context.rawGraph.getURL().equals(url)) {
+      if (create)
+        context = openOrCreate();
     }
+    return context;
+  }
 
+  private OrientGraphContext openOrCreate() {
+    if (url == null)
+      throw new IllegalStateException("Database is closed");
 
-    public void shutdown() {
+    synchronized (this) {
+      OrientGraphContext context = threadContext.get();
+      if (context != null)
         removeContext();
 
-        url = null;
-        username = null;
-        password = null;
-    }
+      context = new OrientGraphContext();
+      threadContext.set(context);
 
-    public String toString() {
-        return StringFactory.graphString(this, getRawGraph().getURL());
-    }
+      synchronized (contexts) {
+        contexts.add(context);
+      }
 
-    public OGraphDatabase getRawGraph() {
-        return getContext(true).rawGraph;
-    }
+      context.rawGraph = new OGraphDatabase(url);
+      context.rawGraph.setUseCustomTypes(false);
 
-    public void commit() {}
+      if (url.startsWith("remote:") || context.rawGraph.exists()) {
+        context.rawGraph.open(username, password);
 
-    public void rollback() {}
+        // LOAD THE INDEX CONFIGURATION FROM INTO THE DICTIONARY
+        // final ODocument indexConfiguration = context.rawGraph.getMetadata().getIndexManager().getConfiguration();
 
-    protected void autoStartTransaction() {
-    }
-
-    protected void saveIndexConfiguration() {
-        getRawGraph().getMetadata().getIndexManager().getConfiguration().save();
-    }
-
-    protected OrientGraphContext getContext(final boolean create) {
-        OrientGraphContext context = threadContext.get();
-        if (context == null || !context.rawGraph.getURL().equals(url)) {
-            if (create)
-                context = openOrCreate();
+        for (OIndex<?> idx : context.rawGraph.getMetadata().getIndexManager().getIndexes()) {
+          if (idx.getConfiguration().field(OrientIndex.CONFIG_CLASSNAME) != null)
+            // LOAD THE INDEXES
+            loadIndex(idx);
         }
-        return context;
+
+      } else {
+        context.rawGraph.create();
+      }
+
+      return context;
     }
+  }
 
-    private OrientGraphContext openOrCreate() {
-        if (url == null)
-            throw new IllegalStateException("Database is closed");
+  @SuppressWarnings("rawtypes")
+  private OrientIndex<?> loadIndex(final OIndex rawIndex) {
+    final OrientIndex<?> index;
+    index = new OrientIndex(this, rawIndex);
 
-        synchronized (this) {
-            OrientGraphContext context = threadContext.get();
-            if (context != null)
-                removeContext();
+    // REGISTER THE INDEX
+    getContext(true).manualIndices.put(index.getIndexName(), index);
+    return index;
+  }
 
-            context = new OrientGraphContext();
-            threadContext.set(context);
+  private void removeContext() {
+    final OrientGraphContext context = getContext(false);
 
-            synchronized (contexts) {
-                contexts.add(context);
-            }
+    if (context != null) {
+      for (Index<? extends Element> idx : context.manualIndices.values())
+        ((OrientIndex<?>) idx).close();
+      context.manualIndices.clear();
 
-            context.rawGraph = new OGraphDatabase(url);
-            context.rawGraph.setUseCustomTypes(false);
+      context.rawGraph.commit();
+      context.rawGraph.close();
 
-            if (url.startsWith("remote:") || context.rawGraph.exists()) {
-                context.rawGraph.open(username, password);
+      synchronized (contexts) {
+        contexts.remove(context);
+      }
 
-                // LOAD THE INDEX CONFIGURATION FROM INTO THE DICTIONARY
-                // final ODocument indexConfiguration = context.rawGraph.getMetadata().getIndexManager().getConfiguration();
-
-                for (OIndex<?> idx : context.rawGraph.getMetadata().getIndexManager().getIndexes()) {
-                    if (idx.getConfiguration().field(OrientIndex.CONFIG_CLASSNAME) != null)
-                        // LOAD THE INDEXES
-                        loadIndex(idx);
-                }
-
-            } else {
-                context.rawGraph.create();
-            }
-
-            return context;
-        }
+      threadContext.set(null);
     }
+  }
 
-    @SuppressWarnings("rawtypes")
-    private OrientIndex<?> loadIndex(final OIndex rawIndex) {
-        final OrientIndex<?> index;
-        index = new OrientIndex(this, rawIndex);
+  public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
+    if (getRawGraph().getTransaction().isActive())
+      this.commit();
 
-        // REGISTER THE INDEX
-        getContext(true).manualIndices.put(index.getIndexName(), index);
-        return index;
+    final String className = getClassName(elementClass);
+    getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
+  }
+
+  public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
+    final String className = getClassName(elementClass);
+    final OGraphDatabase db = getRawGraph();
+
+    if (db.getTransaction().isActive())
+      this.commit();
+
+    final OClass cls = db.getMetadata().getSchema().getClass(className);
+
+    final OType indexType;
+    final OProperty property = cls.getProperty(key);
+    if (property == null)
+      indexType = OType.STRING;
+    else
+      indexType = property.getType();
+
+    db.getMetadata()
+        .getIndexManager()
+        .createIndex(className + "." + key, OClass.INDEX_TYPE.NOTUNIQUE.name(),
+            new OPropertyIndexDefinition(className, key, indexType), cls.getPolymorphicClusterIds(), null);
+  }
+
+  public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+    final String classPrefix = getClassName(elementClass) + ".";
+
+    Set<String> result = new HashSet<String>();
+    final Collection<? extends OIndex<?>> indexes = getRawGraph().getMetadata().getIndexManager().getIndexes();
+    for (OIndex<?> index : indexes) {
+      if (index.getName().startsWith(classPrefix))
+        result.add(index.getDefinition().getFields().get(0));
     }
+    return result;
+  }
 
-    private void removeContext() {
-        final OrientGraphContext context = getContext(false);
+  protected <T> String getClassName(final Class<T> elementClass) {
+    String className = null;
 
-        if (context != null) {
-            for (Index<? extends Element> idx : context.manualIndices.values())
-                ((OrientIndex<?>) idx).close();
-            context.manualIndices.clear();
+    if (elementClass.isAssignableFrom(Vertex.class))
+      className = OrientVertex.CLASS_NAME;
+    else if (elementClass.isAssignableFrom(Edge.class))
+      className = OrientEdge.CLASS_NAME;
+    return className;
+  }
 
-            context.rawGraph.commit();
-            context.rawGraph.close();
+  public GraphQuery query() {
+    return new DefaultGraphQuery(this);
+  }
 
-            synchronized (contexts) {
-                contexts.remove(context);
-            }
+  public boolean isUseDynamicEdges() {
+    return useDynamicEdges;
+  }
 
-            threadContext.set(null);
-        }
-    }
+  public void setUseDynamicEdges(boolean useDynamicEdges) {
+    this.useDynamicEdges = useDynamicEdges;
+  }
 
-    public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
-        if (getRawGraph().getTransaction().isActive())
-            this.commit();
+  public boolean isUseClassesForLabels() {
+    return useClassesForLabels;
+  }
 
-        final String className = getClassName(elementClass);
-        getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
-    }
-
-    public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
-        final String className = getClassName(elementClass);
-        final OGraphDatabase db = getRawGraph();
-
-        if (db.getTransaction().isActive())
-           this.commit();
-
-        final OClass cls = db.getMetadata().getSchema().getClass(className);
-
-        final OType indexType;
-        final OProperty property = cls.getProperty(key);
-        if (property == null)
-            indexType = OType.STRING;
-        else
-            indexType = property.getType();
-
-        db.getMetadata().getIndexManager()
-                .createIndex(className + "." + key, OClass.INDEX_TYPE.NOTUNIQUE.name(), new OPropertyIndexDefinition(className, key, indexType), cls.getPolymorphicClusterIds(), null);
-    }
-
-    public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
-        final String classPrefix = getClassName(elementClass) + ".";
-
-        Set<String> result = new HashSet<String>();
-        final Collection<? extends OIndex<?>> indexes = getRawGraph().getMetadata().getIndexManager().getIndexes();
-        for (OIndex<?> index : indexes) {
-            if (index.getName().startsWith(classPrefix))
-                result.add(index.getDefinition().getFields().get(0));
-        }
-        return result;
-    }
-
-    protected <T> String getClassName(Class<T> elementClass) {
-        String className = null;
-
-        if (elementClass.isAssignableFrom(Vertex.class))
-            className = OGraphDatabase.VERTEX_CLASS_NAME;
-        else if (elementClass.isAssignableFrom(Edge.class))
-            className = OGraphDatabase.EDGE_CLASS_NAME;
-        return className;
-    }
-
-    public GraphQuery query() {
-        return new DefaultGraphQuery(this);
-    }
+  public void setUseClassesForLabels(boolean useClassesForLabels) {
+    this.useClassesForLabels = useClassesForLabels;
+  }
 }
