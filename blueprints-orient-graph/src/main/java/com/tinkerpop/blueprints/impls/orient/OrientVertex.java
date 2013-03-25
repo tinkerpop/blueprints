@@ -3,11 +3,13 @@ package com.tinkerpop.blueprints.impls.orient;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import com.orientechnologies.common.collection.OLazyIterator;
 import com.orientechnologies.common.util.OPair;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
+import com.orientechnologies.orient.core.db.record.ORecordLazyMultiValue;
 import com.orientechnologies.orient.core.iterator.OLazyWrapperIterator;
 import com.orientechnologies.orient.core.iterator.OMultiCollectionIterator;
 import com.orientechnologies.orient.core.record.impl.ODocument;
@@ -30,14 +32,12 @@ public class OrientVertex extends OrientElement implements Vertex {
   public static final String CONNECTION_OUT_PREFIX = OrientBaseGraph.CONNECTION_OUT + "_";
   public static final String CONNECTION_IN_PREFIX  = OrientBaseGraph.CONNECTION_IN + "_";
 
-  public OrientVertex(final OrientBaseGraph graph, String className) {
-    super(graph, new ODocument(className == null ? className = CLASS_NAME : className));
-    checkClass();
+  public OrientVertex(final OrientBaseGraph graph, final String className) {
+    super(graph, new ODocument(className == null ? CLASS_NAME : className));
   }
 
-  public OrientVertex(final OrientBaseGraph graph, final OIdentifiable record) {
+  protected OrientVertex(final OrientBaseGraph graph, final OIdentifiable record) {
     super(graph, record);
-    checkClass();
   }
 
   @Override
@@ -174,6 +174,8 @@ public class OrientVertex extends OrientElement implements Vertex {
       final ODocument edgeDocument = new ODocument(OrientEdge.CLASS_NAME);
       if (graph.isUseClassesForLabels())
         edgeDocument.setClassName(label);
+      edgeDocument.fields(OrientBaseGraph.CONNECTION_OUT, rawElement, OrientBaseGraph.CONNECTION_IN, inVertex);
+
       edge = new OrientEdge(graph, edgeDocument, fields);
       from = (OIdentifiable) edge;
       to = (OIdentifiable) edge;
@@ -207,47 +209,67 @@ public class OrientVertex extends OrientElement implements Vertex {
       final Object fieldValue = doc.field(fieldName);
       if (fieldValue != null)
         if (fieldValue instanceof OIdentifiable) {
-          final ODocument fieldRecord = ((OIdentifiable) fieldValue).getRecord();
-          if (fieldRecord.getSchemaClass().isSubClassOf(CLASS_NAME)) {
-            // DIRECT VERTEX, CREATE A DUMMY EDGE BETWEEN VERTICES
-            if (connection.getKey() == Direction.OUT)
-              iterable.add(new OrientEdge(graph, doc, fieldRecord, connection.getValue()));
-            else
-              iterable.add(new OrientEdge(graph, fieldRecord, doc, connection.getValue()));
-
-          } else if (fieldRecord.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
-            // EDGE
-            iterable.add(new OrientEdge(graph, fieldRecord));
-          } else
-            throw new IllegalStateException("Invalid content found in " + fieldName + " field: " + fieldRecord);
+          addSingleItem(doc, iterable, fieldName, connection, fieldValue);
 
         } else if (fieldValue instanceof Collection<?>) {
-          // CREATE LAZY Iterable AGAINST COLLECTION FIELD
-          iterable.add(new OLazyWrapperIterator<OrientEdge>(((Collection<?>) fieldValue).iterator(), connection) {
-            @Override
-            public OrientEdge createWrapper(final Object iObject) {
-              if (iObject instanceof OrientEdge)
-                return (OrientEdge) iObject;
+          Collection<?> coll = (Collection<?>) fieldValue;
 
-              final ODocument value = ((OIdentifiable) iObject).getRecord();
-              if (value.getSchemaClass().isSubClassOf(CLASS_NAME)) {
-                // DIRECT VERTEX, CREATE DUMMY EDGE
-                final OPair<Direction, String> conn = (OPair<Direction, String>) additionalData;
-                if (conn.getKey() == Direction.OUT)
-                  return new OrientEdge(graph, doc, value, conn.getValue());
-                else
-                  return new OrientEdge(graph, value, doc, conn.getValue());
-              } else if (value.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
-                // EDGE
-                return new OrientEdge(graph, value);
-              } else
-                throw new IllegalStateException("Invalid content found between connections:" + value);
-            }
-          });
+          if (coll.size() == 1) {
+            // SINGLE ITEM: AVOID CALLING ITERATOR
+            if (coll instanceof ORecordLazyMultiValue)
+              addSingleItem(doc, iterable, fieldName, connection, ((ORecordLazyMultiValue) coll).rawIterator().next());
+            else if (coll instanceof List<?>)
+              addSingleItem(doc, iterable, fieldName, connection, ((List<?>) coll).get(0));
+            else
+              addSingleItem(doc, iterable, fieldName, connection, coll.iterator().next());
+          } else {
+            final Iterator<?> it = coll instanceof ORecordLazyMultiValue ? ((ORecordLazyMultiValue) coll).rawIterator() : coll
+                .iterator();
+
+            // CREATE LAZY Iterable AGAINST COLLECTION FIELD
+            iterable.add(new OLazyWrapperIterator<OrientEdge>(it, connection) {
+              @Override
+              public OrientEdge createWrapper(final Object iObject) {
+                if (iObject instanceof OrientEdge)
+                  return (OrientEdge) iObject;
+
+                final ODocument value = ((OIdentifiable) iObject).getRecord();
+                if (value.getSchemaClass().isSubClassOf(CLASS_NAME)) {
+                  // DIRECT VERTEX, CREATE DUMMY EDGE
+                  final OPair<Direction, String> conn = (OPair<Direction, String>) additionalData;
+                  if (conn.getKey() == Direction.OUT)
+                    return new OrientEdge(graph, doc, value, conn.getValue());
+                  else
+                    return new OrientEdge(graph, value, doc, conn.getValue());
+                } else if (value.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
+                  // EDGE
+                  return new OrientEdge(graph, value);
+                } else
+                  throw new IllegalStateException("Invalid content found between connections:" + value);
+              }
+            });
+          }
         }
     }
 
     return iterable;
+  }
+
+  private void addSingleItem(final ODocument doc, final OMultiCollectionIterator<Edge> iterable, String fieldName,
+      final OPair<Direction, String> connection, final Object fieldValue) {
+    final ODocument fieldRecord = ((OIdentifiable) fieldValue).getRecord();
+    if (fieldRecord.getSchemaClass().isSubClassOf(CLASS_NAME)) {
+      // DIRECT VERTEX, CREATE A DUMMY EDGE BETWEEN VERTICES
+      if (connection.getKey() == Direction.OUT)
+        iterable.add(new OrientEdge(graph, doc, fieldRecord, connection.getValue()));
+      else
+        iterable.add(new OrientEdge(graph, fieldRecord, doc, connection.getValue()));
+
+    } else if (fieldRecord.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
+      // EDGE
+      iterable.add(new OrientEdge(graph, fieldRecord));
+    } else
+      throw new IllegalStateException("Invalid content found in " + fieldName + " field: " + fieldRecord);
   }
 
   @Override
@@ -323,7 +345,7 @@ public class OrientVertex extends OrientElement implements Vertex {
       // CREATE ONLY ONE LINK
       out = iTo;
     else if (found instanceof OIdentifiable) {
-      if (found.equals(iTo))
+      if (!found.equals(iTo))
         // SAME LINK, SKIP IT
         return found;
 
@@ -333,12 +355,15 @@ public class OrientVertex extends OrientElement implements Vertex {
       ((OMVRBTreeRIDSet) out).add(iTo);
     } else if (found instanceof OMVRBTreeRIDSet) {
       // ADD THE LINK TO THE COLLECTION
-      out = found;
-      ((OMVRBTreeRIDSet) out).add(iTo);
+      out = null;
+      ((OMVRBTreeRIDSet) found).add(iTo);
     } else
       throw new IllegalStateException("Relationship content is invalid on field " + iFieldName + ". Found: " + found);
 
-    iFromVertex.field(iFieldName, out);
+    if (out != null)
+      // OVERWRITE IT
+      iFromVertex.field(iFieldName, out);
+
     return out;
   }
 
@@ -384,14 +409,14 @@ public class OrientVertex extends OrientElement implements Vertex {
       throw new IllegalArgumentException("Cannot find reverse connection name for field " + iFieldName);
   }
 
-  public static void removeEdges(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,
+  public static int removeEdges(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,
       final boolean iAlsoInverse) {
     if (iVertex == null)
-      return;
+      return 0;
 
     final Object fieldValue = iVertexToRemove != null ? iVertex.field(iFieldName) : iVertex.removeField(iFieldName);
     if (fieldValue == null)
-      return;
+      return 0;
 
     if (fieldValue instanceof OIdentifiable) {
       // SINGLE RECORD
@@ -400,7 +425,7 @@ public class OrientVertex extends OrientElement implements Vertex {
         if (!fieldValue.equals(iVertexToRemove)) {
           // OLogManager.instance().warn(null, "[OrientVertex.removeEdges] connections %s not found in field %s", iVertexToRemove,
           // iFieldName);
-          return;
+          return 0;
         }
         iVertex.removeField(iFieldName);
       }
@@ -412,27 +437,30 @@ public class OrientVertex extends OrientElement implements Vertex {
       // COLLECTION OF RECORDS: REMOVE THE ENTRY
 
       if (iVertexToRemove != null) {
-        for (OLazyIterator<OIdentifiable> it = ((OMVRBTreeRIDSet) fieldValue).iterator(false); it.hasNext();) {
-          final ODocument curr = it.next().getRecord();
+        if (!((OMVRBTreeRIDSet) fieldValue).remove(iVertexToRemove)) {
+          // SEARCH SEQUENTIALLY (SLOWER)
+          for (OLazyIterator<OIdentifiable> it = ((OMVRBTreeRIDSet) fieldValue).iterator(false); it.hasNext();) {
+            final ODocument curr = it.next().getRecord();
 
-          if (iVertexToRemove.equals(curr)) {
-            // FOUND AS VERTEX
-            it.remove();
-            if (iAlsoInverse)
-              removeInverseEdge(iVertex, iFieldName, iVertexToRemove, fieldValue);
-            break;
+            if (iVertexToRemove.equals(curr)) {
+              // FOUND AS VERTEX
+              it.remove();
+              if (iAlsoInverse)
+                removeInverseEdge(iVertex, iFieldName, iVertexToRemove, fieldValue);
+              break;
 
-          } else if (curr.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
-            // EDGE
-            if (curr.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
-              final Direction direction = getConnectionDirection(iFieldName);
+            } else if (curr.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
+              // EDGE
+              if (curr.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
+                final Direction direction = getConnectionDirection(iFieldName);
 
-              // EDGE, REMOVE THE EDGE
-              if (iVertexToRemove.equals(OrientEdge.getConnection(curr, direction.opposite()))) {
-                it.remove();
-                if (iAlsoInverse)
-                  removeInverseEdge(iVertex, iFieldName, iVertexToRemove, fieldValue);
-                break;
+                // EDGE, REMOVE THE EDGE
+                if (iVertexToRemove.equals(OrientEdge.getConnection(curr, direction.opposite()))) {
+                  it.remove();
+                  if (iAlsoInverse)
+                    removeInverseEdge(iVertex, iFieldName, iVertexToRemove, fieldValue);
+                  break;
+                }
               }
             }
           }
@@ -440,8 +468,10 @@ public class OrientVertex extends OrientElement implements Vertex {
 
         // OLogManager.instance().warn(null, "[OrientVertex.removeEdges] connections %s not found in field %s", iVertexToRemove,
         // iFieldName);
+        return ((OMVRBTreeRIDSet) fieldValue).size();
       }
     }
+    return 0;
   }
 
   private static void removeInverseEdge(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,

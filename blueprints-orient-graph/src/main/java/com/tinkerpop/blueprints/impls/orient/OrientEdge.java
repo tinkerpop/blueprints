@@ -20,6 +20,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
+@SuppressWarnings("unchecked")
 public class OrientEdge extends OrientElement implements Edge {
   private static final long  serialVersionUID = 1L;
 
@@ -140,7 +141,6 @@ public class OrientEdge extends OrientElement implements Edge {
     graph.autoStartTransaction();
     for (final Index<? extends Element> index : graph.getManualIndices()) {
       if (Edge.class.isAssignableFrom(index.getIndexClass())) {
-        @SuppressWarnings("unchecked")
         OrientIndex<OrientEdge> idx = (OrientIndex<OrientEdge>) index;
         idx.removeElement(this);
       }
@@ -231,7 +231,6 @@ public class OrientEdge extends OrientElement implements Edge {
     className = null;
   }
 
-  @SuppressWarnings("unchecked")
   protected void dropEdgeFromVertex(final OIdentifiable iEdge, final ODocument iVertex, final String iFieldName,
       final Object iFieldValue) {
     if (iFieldValue == null) {
