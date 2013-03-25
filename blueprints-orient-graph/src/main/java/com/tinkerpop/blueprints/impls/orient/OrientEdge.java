@@ -170,7 +170,7 @@ public class OrientEdge extends OrientElement implements Edge {
       super.remove();
   }
 
-  public String getBaseClassName() {
+  public final String getBaseClassName() {
     return CLASS_NAME;
   }
 

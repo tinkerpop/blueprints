@@ -7,6 +7,7 @@ import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
 import com.orientechnologies.orient.core.exception.OSerializationException;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.Element;
@@ -181,9 +182,10 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
     final ODocument doc = getRecord();
     doc.deserializeFields();
 
-    if (!doc.getSchemaClass().isSubClassOf(getBaseClassName()))
-      throw new IllegalArgumentException("The document received is not a " + getElementType() + ". Found class '"
-          + doc.getSchemaClass() + "'");
+    final OClass cls = doc.getSchemaClass();
+
+    if (cls == null || !cls.isSubClassOf(getBaseClassName()))
+      throw new IllegalArgumentException("The document received is not a " + getElementType() + ". Found class '" + cls + "'");
   }
 
   protected static void setPropertyInternal(final Element element, final ODocument doc, final String key, final Object value) {

@@ -1,7 +1,5 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
-import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -24,48 +22,49 @@ public class OrientBenchmarkTestSuite extends TestSuite {
     public OrientBenchmarkTestSuite(final GraphTest graphTest) {
         super(graphTest);
     }
-
-    public void testOrientRaw() throws Exception {
-        double totalTime = 0.0d;
-        OrientGraph graph = (OrientGraph) graphTest.generateGraph();
-        GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
-        graph.shutdown();
-
-        for (int i = 0; i < TOTAL_RUNS; i++) {
-            graph = (OrientGraph) graphTest.generateGraph();
-            OGraphDatabase db = graph.getRawGraph();
-            this.stopWatch();
-            int counter = 0;
-            for (final ODocument vertex : db.browseClass(OGraphDatabase.VERTEX_CLASS_NAME)) {
-                counter++;
-                for (final Object edge : db.getOutEdges(vertex)) {
-                    counter++;
-                    final ODocument vertex2 = db.getInVertex((ODocument) edge);
-                    counter++;
-                    for (final Object edge2 : db.getOutEdges(vertex2)) {
-                        counter++;
-                        final ODocument vertex3 = db.getInVertex((ODocument) edge2);
-                        counter++;
-                        for (final Object edge3 : db.getOutEdges(vertex3)) {
-                            counter++;
-                            db.getOutVertex((ODocument) edge3);
-                            counter++;
-                        }
-                    }
-                }
-            }
-            double currentTime = this.stopWatch();
-            totalTime = totalTime + currentTime;
-            BaseTest.printPerformance(db.toString(), counter, "Orient raw elements touched", currentTime);
-            graph.shutdown();
-        }
-        BaseTest.printPerformance("OrientRaw", 1, "OrientDB Raw experiment average", totalTime / (double) TOTAL_RUNS);
-    }
+//
+//    public void testOrientRaw() throws Exception {
+//        double totalTime = 0.0d;
+//        OrientGraph graph = (OrientGraph) graphTest.generateGraph();
+//        GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+//        graph.shutdown();
+//
+//        for (int i = 0; i < TOTAL_RUNS; i++) {
+//            graph = (OrientGraph) graphTest.generateGraph();
+//            OGraphDatabase db = new OGraphDatabase( (ODatabaseRecordTx) graph.getRawGraph().getUnderlying() );
+//            this.stopWatch();
+//            int counter = 0;
+//            for (final ODocument vertex : db.browseClass(OGraphDatabase.VERTEX_CLASS_NAME)) {
+//                counter++;
+//                for (final Object edge : db.getOutEdges(vertex)) {
+//                    counter++;
+//                    final ODocument vertex2 = db.getInVertex((ODocument) edge);
+//                    counter++;
+//                    for (final Object edge2 : db.getOutEdges(vertex2)) {
+//                        counter++;
+//                        final ODocument vertex3 = db.getInVertex((ODocument) edge2);
+//                        counter++;
+//                        for (final Object edge3 : db.getOutEdges(vertex3)) {
+//                            counter++;
+//                            db.getOutVertex((ODocument) edge3);
+//                            counter++;
+//                        }
+//                    }
+//                }
+//            }
+//            double currentTime = this.stopWatch();
+//            totalTime = totalTime + currentTime;
+//            BaseTest.printPerformance(db.toString(), counter, "Orient raw elements touched", currentTime);
+//            graph.shutdown();
+//        }
+//        BaseTest.printPerformance("OrientRaw", 1, "OrientDB Raw experiment average", totalTime / (double) TOTAL_RUNS);
+//    }
 
     public void testOrientGraph() throws Exception {
         double totalTime = 0.0d;
         Graph graph = graphTest.generateGraph();
         GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+        System.out.println( "V: "+ ((OrientGraph)graph).getRawGraph().countClass( "V" ) +" E: "+ ((OrientGraph)graph).getRawGraph().countClass( "E" ));
         graph.shutdown();
 
         for (int i = 0; i < TOTAL_RUNS; i++) {

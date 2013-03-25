@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.impls.orient;
 
 import java.util.Iterator;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.record.ODatabaseRecordAbstract;
 import com.orientechnologies.orient.core.iterator.ORecordIteratorClass;
 import com.orientechnologies.orient.core.record.ORecordInternal;
@@ -26,7 +26,7 @@ class OrientElementScanIterable<T extends Element> implements CloseableIterable<
 
   public Iterator<T> iterator() {
     final String className = elementClass.equals(Vertex.class) ? OrientVertex.CLASS_NAME : OrientEdge.CLASS_NAME;
-    final OGraphDatabase rawGraph = this.graph.getRawGraph();
+    final ODatabaseDocumentTx rawGraph = this.graph.getRawGraph();
     return new OrientElementIterator<T>(this.graph, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph,
         (ODatabaseRecordAbstract) rawGraph.getUnderlying(), className, polymorphic));
   }

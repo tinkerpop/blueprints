@@ -30,8 +30,8 @@ public class OrientVertex extends OrientElement implements Vertex {
   public static final String CONNECTION_OUT_PREFIX = OrientBaseGraph.CONNECTION_OUT + "_";
   public static final String CONNECTION_IN_PREFIX  = OrientBaseGraph.CONNECTION_IN + "_";
 
-  public OrientVertex(final OrientBaseGraph graph, final String className) {
-    super(graph, new ODocument(className));
+  public OrientVertex(final OrientBaseGraph graph, String className) {
+    super(graph, new ODocument(className == null ? className = CLASS_NAME : className));
     checkClass();
   }
 
