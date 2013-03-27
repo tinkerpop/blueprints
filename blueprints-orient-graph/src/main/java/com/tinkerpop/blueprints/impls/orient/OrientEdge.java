@@ -34,8 +34,9 @@ public class OrientEdge extends OrientElement implements Edge {
     super(rawGraph, rawEdge);
   }
 
-  public OrientEdge(final OrientBaseGraph rawGraph, final ODocument rawEdge, final Object... fields) {
-    super(rawGraph, rawEdge);
+  public OrientEdge(final OrientBaseGraph rawGraph, final String iClassName, final Object... fields) {
+    super(rawGraph, null);
+    rawElement = createDocument(iClassName);
     setProperties(fields);
   }
 
@@ -53,6 +54,7 @@ public class OrientEdge extends OrientElement implements Edge {
     this.className = className;
   }
 
+  @Override
   public Vertex getVertex(final Direction direction) {
     if (direction.equals(Direction.OUT))
       return new OrientVertex(graph, getOutVertex());
@@ -76,10 +78,19 @@ public class OrientEdge extends OrientElement implements Edge {
     return getRecord().rawField(OrientBaseGraph.CONNECTION_IN);
   }
 
+  @Override
   public String getLabel() {
     if (className != null)
       // LIGHTWEIGHT EDGE
       return className;
+    else if (rawElement != null) {
+      String label = ((ODocument) rawElement.getRecord()).field("label");
+      if (label != null)
+        return label;
+      label = ((ODocument) rawElement.getRecord()).getClassName();
+      if (label != null && !label.equals(CLASS_NAME))
+        return label;
+    }
     return super.getLabel();
   }
 
@@ -88,7 +99,7 @@ public class OrientEdge extends OrientElement implements Edge {
     if (rawElement == null) {
       // CREATE A TEMPORARY ID
       if (className != null)
-        return className + '@' + vOut.getIdentity() + "->" + vIn.getIdentity();
+        return vOut.getIdentity() + "-" + className + "->" + vIn.getIdentity();
 
       return vOut.getIdentity() + "->" + vIn.getIdentity();
     }
@@ -194,17 +205,12 @@ public class OrientEdge extends OrientElement implements Edge {
       // ALREADY CONVERTED
       return;
 
+    graph.autoStartTransaction();
+
     final ODocument vOutRecord = vOut.getRecord();
     final ODocument vInRecord = vIn.getRecord();
 
-    final ODocument doc = new ODocument(CLASS_NAME);
-    if (graph.isUseClassesForLabels()) {
-      if (!graph.getRawGraph().getMetadata().getSchema().existsClass(className))
-        // CREATE A NEW CLASS AT THE FLY
-        graph.getRawGraph().getMetadata().getSchema()
-            .createClass(className, graph.getRawGraph().getMetadata().getSchema().getClass(CLASS_NAME));
-      doc.setClassName(className);
-    }
+    final ODocument doc = createDocument(className);
 
     doc.field(OrientBaseGraph.CONNECTION_OUT, vOut);
     doc.field(OrientBaseGraph.CONNECTION_IN, vIn);
@@ -229,6 +235,18 @@ public class OrientEdge extends OrientElement implements Edge {
     vOut = null;
     vIn = null;
     className = null;
+  }
+
+  protected ODocument createDocument(final String iClassName) {
+    final ODocument doc;
+
+    if (iClassName != null) {
+      checkForClassInSchema(iClassName);
+      doc = new ODocument(iClassName);
+    } else
+      doc = new ODocument(CLASS_NAME);
+
+    return doc;
   }
 
   protected void dropEdgeFromVertex(final OIdentifiable iEdge, final ODocument iVertex, final String iFieldName,

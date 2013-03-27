@@ -10,7 +10,6 @@ import java.util.Set;
 import com.orientechnologies.common.io.OFileUtils;
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndex;
@@ -41,20 +40,20 @@ import com.tinkerpop.blueprints.util.StringFactory;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<ODatabaseDocumentTx>, KeyIndexableGraph {
-  public static final String                           CONNECTION_OUT      = "out";
-  public static final String                           CONNECTION_IN       = "in";
-  public static final String                           CLASS_PREFIX        = "class:";
+  public static final String                           CONNECTION_OUT  = "out";
+  public static final String                           CONNECTION_IN   = "in";
+  public static final String                           CLASS_PREFIX    = "class:";
 
-  protected final static String                        ADMIN               = "admin";
-  protected boolean                                    useDynamicEdges     = true;
-  protected boolean                                    useClassesForLabels = false;
+  protected final static String                        ADMIN           = "admin";
+  protected boolean                                    useDynamicEdges = true;
+  protected boolean                                    saveOriginalIds = false;
 
   private String                                       url;
   private String                                       username;
   private String                                       password;
 
-  private static final ThreadLocal<OrientGraphContext> threadContext       = new ThreadLocal<OrientGraphContext>();
-  private static final List<OrientGraphContext>        contexts            = new ArrayList<OrientGraphContext>();
+  private static final ThreadLocal<OrientGraphContext> threadContext   = new ThreadLocal<OrientGraphContext>();
+  private static final List<OrientGraphContext>        contexts        = new ArrayList<OrientGraphContext>();
 
   /**
    * Constructs a new object using an existent OGraphDatabase instance.
@@ -62,7 +61,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
    * @param iDatabase
    *          Underlying OGraphDatabase object to attach
    */
-  public OrientBaseGraph(final OGraphDatabase iDatabase) {
+  public OrientBaseGraph(final ODatabaseDocumentTx iDatabase) {
     reuse(iDatabase);
   }
 
@@ -157,13 +156,26 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
     this.autoStartTransaction();
 
-    final OrientVertex vertex = new OrientVertex(this, className);
+    // SAVE THE ID TOO?
+    final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.ORIGINAL_ID, id } : null;
+
+    final OrientVertex vertex = new OrientVertex(this, className, fields);
+
+    // SAVE IT
     vertex.save();
     return vertex;
   }
 
   public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-    return outVertex.addEdge(label, inVertex);
+    String className = null;
+    if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
+      // GET THE CLASS NAME
+      className = id.toString().substring(CLASS_PREFIX.length());
+
+    // SAVE THE ID TOO?
+    final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.ORIGINAL_ID, id } : null;
+
+    return ((OrientVertex) outVertex).addEdge(label, inVertex, className, fields);
   }
 
   public Vertex getVertex(final Object id) {
@@ -291,7 +303,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
    * @param iDatabase
    *          Underlying OGraphDatabase object
    */
-  public OrientBaseGraph reuse(final OGraphDatabase iDatabase) {
+  public OrientBaseGraph reuse(final ODatabaseDocumentTx iDatabase) {
     this.url = iDatabase.getURL();
     this.username = iDatabase.getUser() != null ? iDatabase.getUser().getName() : null;
     synchronized (this) {
@@ -487,7 +499,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
       } else
         context.rawGraph.create();
-      
+
       checkForGraphSchema(context.rawGraph);
 
       return context;
@@ -587,11 +599,11 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     this.useDynamicEdges = useDynamicEdges;
   }
 
-  public boolean isUseClassesForLabels() {
-    return useClassesForLabels;
+  public boolean isSaveOriginalIds() {
+    return saveOriginalIds;
   }
 
-  public void setUseClassesForLabels(boolean useClassesForLabels) {
-    this.useClassesForLabels = useClassesForLabels;
+  public void setSaveOriginalIds(boolean saveIds) {
+    this.saveOriginalIds = saveIds;
   }
 }

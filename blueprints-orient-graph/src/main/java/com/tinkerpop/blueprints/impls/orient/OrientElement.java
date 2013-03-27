@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.impls.orient;
 
 import java.util.Map;
 
+import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
 import com.orientechnologies.orient.core.exception.OSerializationException;
@@ -22,6 +23,8 @@ import com.tinkerpop.blueprints.util.ElementHelper;
 public abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
   private static final long       serialVersionUID = 1L;
 
+  public static final Object      ORIGINAL_ID      = "origId";
+
   // TODO: CAN REMOVE THIS REF IN FAVOR OF CONTEXT INSTANCE?
   protected final OrientBaseGraph graph;
   protected OIdentifiable         rawElement;
@@ -37,11 +40,12 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
 
   @Override
   public void remove() {
+    graph.autoStartTransaction();
     getRecord().delete();
   }
 
   public <T extends OrientElement> T setProperties(final Object... fields) {
-    if (fields != null) {
+    if (fields != null && fields.length > 0) {
       graph.autoStartTransaction();
       if (fields.length == 1) {
         Object f = fields[0];
@@ -134,9 +138,11 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
   @Override
   public ORID getIdentity() {
     final ORID rid = rawElement.getIdentity();
-    if (!rid.isValid())
+    if (!rid.isValid()) {
       // SAVE THE RECORD TO OBTAIN A VALID RID
+      graph.autoStartTransaction();
       save();
+    }
     return rid;
   }
 
@@ -186,6 +192,39 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
 
     if (cls == null || !cls.isSubClassOf(getBaseClassName()))
       throw new IllegalArgumentException("The document received is not a " + getElementType() + ". Found class '" + cls + "'");
+  }
+
+  /**
+   * Check if a class already exists, otherwise create it at the fly. If a transaction is running commit changes, create the class
+   * and begin a new transaction.
+   * 
+   * @param iClassName
+   *          Class's name
+   */
+  protected void checkForClassInSchema(final String iClassName) {
+    if (iClassName == null)
+      return;
+
+    if (!graph.getRawGraph().getMetadata().getSchema().existsClass(iClassName)) {
+      boolean txActive = graph.getRawGraph().getTransaction().isActive();
+
+      if (txActive) {
+        OLogManager
+            .instance()
+            .warn(
+                this,
+                "[OrientEdge] committing the active transaction to create the new Edge type '%s'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction",
+                iClassName);
+        graph.commit();
+      }
+
+      // CREATE A NEW CLASS AT THE FLY
+      graph.getRawGraph().getMetadata().getSchema()
+          .createClass(iClassName, graph.getRawGraph().getMetadata().getSchema().getClass(getBaseClassName()));
+
+      if (txActive)
+        graph.autoStartTransaction();
+    }
   }
 
   protected static void setPropertyInternal(final Element element, final ODocument doc, final String key, final Object value) {
