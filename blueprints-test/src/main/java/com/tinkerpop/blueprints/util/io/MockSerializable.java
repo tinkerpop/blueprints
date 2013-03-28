@@ -16,4 +16,14 @@ public class MockSerializable implements Serializable {
         this.testField = testField;
     }
 
+    @Override
+    public boolean equals(Object oth) {
+        if (this == oth) return true;
+        else if (oth == null) return false;
+        else if (!getClass().isInstance(oth)) return false;
+        MockSerializable m = (MockSerializable) oth;
+        if (testField == null) {
+            return (m.testField == null);
+        } else return testField.equals(m.testField);
+    }
 }

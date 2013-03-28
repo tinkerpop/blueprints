@@ -10,7 +10,11 @@ public interface GraphQuery extends Query {
     public GraphQuery has(final String key, final Object value);
 
     @Override
+    @Deprecated
     public <T extends Comparable<T>> GraphQuery has(final String key, final T value, final Compare compare);
+
+    @Override
+    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value);
 
     @Override
     public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue);

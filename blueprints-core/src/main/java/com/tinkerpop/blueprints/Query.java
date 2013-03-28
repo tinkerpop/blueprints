@@ -43,7 +43,18 @@ public interface Query {
      * @param compare the comparator to use for comparison
      * @return the modified query object
      */
+    @Deprecated
     public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare);
+
+    /**
+     * Filter out the edge if it does not have a property with a comparable value.
+     *
+     * @param key     the key of the property
+     * @param compare the comparator to use for comparison
+     * @param value   the value to check against
+     * @return the modified query object
+     */
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value);
 
     /**
      * Filter out the edge of its property value is not within the provided interval.
