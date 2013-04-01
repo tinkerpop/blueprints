@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.io.FileInputStream;
+
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -15,15 +18,16 @@ import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
  */
 public class OrientBenchmarkTestSuite extends TestSuite {
 
-  private static final int TOTAL_RUNS = 3;
+  private static final int TOTAL_RUNS = 1;
   private final boolean    print      = false;
-  private final boolean    export     = true;
+  private final boolean    export     = false;
 
   public OrientBenchmarkTestSuite() {
   }
 
   public OrientBenchmarkTestSuite(final GraphTest graphTest) {
     super(graphTest);
+    OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(true);
   }
 
   //
@@ -68,51 +72,15 @@ public class OrientBenchmarkTestSuite extends TestSuite {
     double totalTime = 0.0d;
     Graph graph = graphTest.generateGraph();
     // graph = new OrientBatchGraph((ODatabaseDocumentTx) ((OrientGraph) graph).getRawGraph());
-    GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+    //GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+    GraphMLReader.inputGraph(graph, new FileInputStream("/Users/luca/Downloads/graph-example-2.xml"));
     System.out.println("V: " + ((OrientBaseGraph) graph).getRawGraph().countClass("V") + " E: "
         + ((OrientBaseGraph) graph).getRawGraph().countClass("E"));
     graph.shutdown();
 
     for (int i = 0; i < TOTAL_RUNS; i++) {
       graph = graphTest.generateGraph();
-      this.stopWatch();
-      int counter = 0;
-      for (final Vertex vertex : graph.getVertices()) {
-        if (print)
-          System.out.println("V1 " + vertex + " out: " + count(vertex.getEdges(Direction.OUT)) + " in: "
-              + count(vertex.getEdges(Direction.IN)) + " -- " + counter);
-        counter++;
-        for (final Edge edge : vertex.getEdges(Direction.OUT)) {
-          if (print)
-            System.out.println("E1.out " + edge + " -- " + counter);
-          counter++;
-          final Vertex vertex2 = edge.getVertex(Direction.IN);
-          if (print)
-            System.out.println("V2 " + vertex2 + " out: " + count(vertex2.getEdges(Direction.OUT)) + " in: "
-                + count(vertex2.getEdges(Direction.IN)) + " -- " + counter);
-          counter++;
-          for (final Edge edge2 : vertex2.getEdges(Direction.OUT)) {
-            if (print)
-              System.out.println("E2.out " + edge2 + " -- " + counter);
-            counter++;
-            final Vertex vertex3 = edge2.getVertex(Direction.IN);
-            if (print)
-              System.out.println("V3 " + vertex3 + " out: " + count(vertex3.getEdges(Direction.OUT)) + " in: "
-                  + count(vertex3.getEdges(Direction.IN)) + " -- " + counter);
-            counter++;
-            for (final Edge edge3 : vertex3.getEdges(Direction.OUT)) {
-              if (print)
-                System.out.println("E3.out " + edge3 + " -- " + counter);
-              counter++;
-              final Vertex vertex4 = edge3.getVertex(Direction.OUT);
-              if (print)
-                System.out.println("V4 " + vertex4 + " out: " + count(vertex4.getEdges(Direction.OUT)) + " in: "
-                    + count(vertex4.getEdges(Direction.IN)) + " -- " + counter);
-              counter++;
-            }
-          }
-        }
-      }
+      int counter = execute(graph);
       double currentTime = this.stopWatch();
       totalTime = totalTime + currentTime;
       BaseTest.printPerformance(graph.toString(), counter, "OrientGraph elements touched", currentTime);
@@ -122,66 +90,81 @@ public class OrientBenchmarkTestSuite extends TestSuite {
     }
     BaseTest.printPerformance("OrientGraph", 1, "OrientGraph experiment average", totalTime / (double) TOTAL_RUNS);
   }
+//
+//  public void testOrientGraphNoDynaLinks() throws Exception {
+//    double totalTime = 0.0d;
+//    Graph graph = graphTest.generateGraph();
+//    // graph = new OrientBatchGraph((ODatabaseDocumentTx) ((OrientGraph) graph).getRawGraph());
+//    ((OrientBaseGraph) graph).setUseDynamicEdges(false);
+//    //GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+//    GraphMLReader.inputGraph(graph, new FileInputStream("/Users/luca/Downloads/graph-example-2.xml"));
+//    System.out.println("V: " + ((OrientBaseGraph) graph).getRawGraph().countClass("V") + " E: "
+//        + ((OrientBaseGraph) graph).getRawGraph().countClass("E"));
+//    graph.shutdown();
+//
+//    for (int i = 0; i < TOTAL_RUNS; i++) {
+//      graph = graphTest.generateGraph();
+//      int counter = execute(graph);
+//      double currentTime = this.stopWatch();
+//      totalTime = totalTime + currentTime;
+//      BaseTest.printPerformance(graph.toString(), counter, "OrientGraph elements touched", currentTime);
+//      if (export)
+//        GraphMLWriter.outputGraph(graph, "/temp/graph-example-2-testOrientGraphNoDynaLinks.xml");
+//      graph.shutdown();
+//    }
+//    BaseTest.printPerformance("OrientGraph", 1, "OrientGraph experiment average", totalTime / (double) TOTAL_RUNS);
+//  }
 
-  public void testOrientGraphNoDynaLinks() throws Exception {
-    double totalTime = 0.0d;
-    Graph graph = graphTest.generateGraph();
-    // graph = new OrientBatchGraph((ODatabaseDocumentTx) ((OrientGraph) graph).getRawGraph());
-    ((OrientBaseGraph) graph).setSaveOriginalIds(true);
-    ((OrientBaseGraph) graph).setUseDynamicEdges(false);
-    GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"), 10, null, null, null);
-    System.out.println("V: " + ((OrientBaseGraph) graph).getRawGraph().countClass("V") + " E: "
-        + ((OrientBaseGraph) graph).getRawGraph().countClass("E"));
-    graph.shutdown();
+  private int execute(Graph graph) {
+    this.stopWatch();
+    int counter = 0;
 
-    for (int i = 0; i < TOTAL_RUNS; i++) {
-      graph = graphTest.generateGraph();
-      this.stopWatch();
-      int counter = 0;
-      for (final Vertex vertex : graph.getVertices()) {
+    int counter0 = 0;
+    int counter1 = 0;
+    int counter2 = 0;
+    int counter3 = 0;
+    int counter4 = 0;
+    int counter5 = 0;
+    int counter6 = 0;
+
+    for (final Vertex vertex : graph.getVertices()) {
+      if (print)
+        System.out.println("V1 " + vertex + " out: " + count(vertex.getEdges(Direction.OUT)) + " in: "
+            + count(vertex.getEdges(Direction.IN)) + " -- " + counter);
+      counter++;
+      counter0++;
+      for (final Edge edge : vertex.getEdges(Direction.OUT)) {
         if (print)
-          System.out.println("V1 " + vertex + " out: " + count(vertex.getEdges(Direction.OUT)) + " in: "
-              + count(vertex.getEdges(Direction.IN)) + " -- " + counter);
+          System.out.println("E1.out " + edge + " -- " + counter);
         counter++;
-        for (final Edge edge : vertex.getEdges(Direction.OUT)) {
-          if (print)
-            System.out.println("E1.out " + edge + " -- " + counter);
+        counter1++;
+        final Vertex vertex2 = edge.getVertex(Direction.IN);
+        counter++;
+        counter2++;
+        for (final Edge edge2 : vertex2.getEdges(Direction.OUT)) {
           counter++;
-          final Vertex vertex2 = edge.getVertex(Direction.IN);
-          if (print)
-            System.out.println("V2 " + vertex2 + " out: " + count(vertex2.getEdges(Direction.OUT)) + " in: "
-                + count(vertex2.getEdges(Direction.IN)) + " -- " + counter);
+          counter3++;
+          final Vertex vertex3 = edge2.getVertex(Direction.IN);
           counter++;
-          for (final Edge edge2 : vertex2.getEdges(Direction.OUT)) {
-            if (print)
-              System.out.println("E2.out " + edge2 + " -- " + counter);
+          counter4++;
+          for (final Edge edge3 : vertex3.getEdges(Direction.OUT)) {
             counter++;
-            final Vertex vertex3 = edge2.getVertex(Direction.IN);
-            if (print)
-              System.out.println("V3 " + vertex3 + " out: " + count(vertex3.getEdges(Direction.OUT)) + " in: "
-                  + count(vertex3.getEdges(Direction.IN)) + " -- " + counter);
+            counter5++;
+            final Vertex vertex4 = edge3.getVertex(Direction.OUT);
             counter++;
-            for (final Edge edge3 : vertex3.getEdges(Direction.OUT)) {
-              if (print)
-                System.out.println("E3.out " + edge3 + " -- " + counter);
-              counter++;
-              final Vertex vertex4 = edge3.getVertex(Direction.OUT);
-              if (print)
-                System.out.println("V4 " + vertex4 + " out: " + count(vertex4.getEdges(Direction.OUT)) + " in: "
-                    + count(vertex4.getEdges(Direction.IN)) + " -- " + counter);
-              counter++;
-            }
+            counter6++;
           }
         }
       }
-      double currentTime = this.stopWatch();
-      totalTime = totalTime + currentTime;
-      BaseTest.printPerformance(graph.toString(), counter, "OrientGraph elements touched", currentTime);
-      if (export)
-        GraphMLWriter.outputGraph(graph, "/temp/graph-example-2-testOrientGraphNoDynaLinks.xml");
-      graph.shutdown();
     }
-    BaseTest.printPerformance("OrientGraph", 1, "OrientGraph experiment average", totalTime / (double) TOTAL_RUNS);
+    System.out.println("counter0 = " + counter0);
+    System.out.println("counter1 = " + counter1);
+    System.out.println("counter2 = " + counter2);
+    System.out.println("counter3 = " + counter3);
+    System.out.println("counter4 = " + counter4);
+    System.out.println("counter5 = " + counter5);
+    System.out.println("counter6 = " + counter6);
+    return counter;
   }
 
 }

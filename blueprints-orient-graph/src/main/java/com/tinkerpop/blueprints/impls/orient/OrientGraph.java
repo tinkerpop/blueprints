@@ -12,7 +12,7 @@ public class OrientGraph extends OrientTransactionalGraph {
   private static final Features FEATURES    = new Features();
 
   static {
-    FEATURES.supportsDuplicateEdges = false;
+    FEATURES.supportsDuplicateEdges = true;
     FEATURES.supportsSelfLoops = true;
     FEATURES.isPersistent = true;
     FEATURES.isRDFModel = false;

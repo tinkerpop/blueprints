@@ -40,20 +40,22 @@ import com.tinkerpop.blueprints.util.StringFactory;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<ODatabaseDocumentTx>, KeyIndexableGraph {
-  public static final String                           CONNECTION_OUT  = "out";
-  public static final String                           CONNECTION_IN   = "in";
-  public static final String                           CLASS_PREFIX    = "class:";
+  public static final String                           CONNECTION_OUT           = "out";
+  public static final String                           CONNECTION_IN            = "in";
+  public static final String                           CLASS_PREFIX             = "class:";
 
-  protected final static String                        ADMIN           = "admin";
-  protected boolean                                    useDynamicEdges = true;
-  protected boolean                                    saveOriginalIds = false;
+  protected final static String                        ADMIN                    = "admin";
+  protected boolean                                    useDynamicEdges          = true;
+  protected boolean                                    saveOriginalIds          = false;
+  protected boolean                                    useCustomClassesForEdges = false;
+  protected boolean                                    useReferences            = false;
 
   private String                                       url;
   private String                                       username;
   private String                                       password;
 
-  private static final ThreadLocal<OrientGraphContext> threadContext   = new ThreadLocal<OrientGraphContext>();
-  private static final List<OrientGraphContext>        contexts        = new ArrayList<OrientGraphContext>();
+  private static final ThreadLocal<OrientGraphContext> threadContext            = new ThreadLocal<OrientGraphContext>();
+  private static final List<OrientGraphContext>        contexts                 = new ArrayList<OrientGraphContext>();
 
   /**
    * Constructs a new object using an existent OGraphDatabase instance.
@@ -605,5 +607,37 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
   public void setSaveOriginalIds(boolean saveIds) {
     this.saveOriginalIds = saveIds;
+  }
+
+  public long countVertices() {
+    return getRawGraph().countClass(OrientVertex.CLASS_NAME);
+  }
+
+  public long countVertices(final String iClassName) {
+    return getRawGraph().countClass(iClassName);
+  }
+
+  public long countEdges() {
+    return getRawGraph().countClass(OrientEdge.CLASS_NAME);
+  }
+
+  public long countEdges(final String iClassName) {
+    return getRawGraph().countClass(iClassName);
+  }
+
+  public boolean isUseReferences() {
+    return useReferences;
+  }
+
+  public void setUseReferences(boolean useReferences) {
+    this.useReferences = useReferences;
+  }
+
+  public boolean isUseCustomClassesForEdges() {
+    return useCustomClassesForEdges;
+  }
+
+  public void setUseCustomClassesForEdges(final boolean useCustomClassesForEdges) {
+    this.useCustomClassesForEdges = useCustomClassesForEdges;
   }
 }

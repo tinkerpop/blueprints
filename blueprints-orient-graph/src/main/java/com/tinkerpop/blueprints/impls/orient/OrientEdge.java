@@ -41,10 +41,7 @@ public class OrientEdge extends OrientElement implements Edge {
   }
 
   public OrientEdge(final OrientBaseGraph rawGraph, final OIdentifiable out, final OIdentifiable in) {
-    super(rawGraph, null);
-    vOut = out;
-    vIn = in;
-    this.className = CLASS_NAME;
+    this(rawGraph, out, in, CLASS_NAME);
   }
 
   public OrientEdge(final OrientBaseGraph rawGraph, final OIdentifiable out, final OIdentifiable in, final String className) {
@@ -68,14 +65,22 @@ public class OrientEdge extends OrientElement implements Edge {
     if (vOut != null)
       // LIGHTWEIGHT EDGE
       return vOut;
-    return getRecord().rawField(OrientBaseGraph.CONNECTION_OUT);
+    if (graph.isUseReferences())
+      // AVOID LAZY RESOLVING+SETTING OF RECORD
+      return getRecord().rawField(OrientBaseGraph.CONNECTION_OUT);
+    else
+      return getRecord().field(OrientBaseGraph.CONNECTION_OUT);
   }
 
   public OIdentifiable getInVertex() {
     if (vIn != null)
       // LIGHTWEIGHT EDGE
       return vIn;
-    return getRecord().rawField(OrientBaseGraph.CONNECTION_IN);
+    if (graph.isUseReferences())
+      // AVOID LAZY RESOLVING+SETTING OF RECORD
+      return getRecord().rawField(OrientBaseGraph.CONNECTION_IN);
+    else
+      return getRecord().field(OrientBaseGraph.CONNECTION_IN);
   }
 
   @Override
@@ -240,7 +245,7 @@ public class OrientEdge extends OrientElement implements Edge {
   protected ODocument createDocument(final String iClassName) {
     final ODocument doc;
 
-    if (iClassName != null) {
+    if (iClassName != null && graph.isUseCustomClassesForEdges()) {
       checkForClassInSchema(iClassName);
       doc = new ODocument(iClassName);
     } else

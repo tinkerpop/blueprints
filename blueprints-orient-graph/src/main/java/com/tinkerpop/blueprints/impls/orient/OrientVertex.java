@@ -170,36 +170,83 @@ public class OrientVertex extends OrientElement implements Vertex {
     final ODocument inDocument = ((OrientVertex) inVertex).getRecord();
 
     final OrientEdge edge;
-    final OIdentifiable to;
-    final OIdentifiable from;
+    OIdentifiable to;
+    OIdentifiable from;
 
-    if (graph.isUseDynamicEdges() && (fields == null || fields.length == 0)) {
-      // CREATE A LIGHTWEIGHT EDGE
+    final String outFieldName = getConnectionFieldName(Direction.OUT, label);
+    final String inFieldName = getConnectionFieldName(Direction.IN, label);
+
+    if (canCreateDynamicEdge(outDocument, inDocument, outFieldName, inFieldName, fields)) {
+      // CREATE A LIGHTWEIGHT DYNAMIC EDGE
       from = rawElement;
       to = inDocument;
       edge = new OrientEdge(graph, from, to, label);
     } else {
+      if (!graph.isUseCustomClassesForEdges())
+        // USES THE LABEL FOR THE CLASS NAME
+        iClassName = null;
+
       // CREATE THE EDGE DOCUMENT TO STORE FIELDS TOO
       edge = new OrientEdge(graph, iClassName, fields);
-      edge.getRecord().fields(OrientBaseGraph.CONNECTION_OUT, rawElement, OrientBaseGraph.CONNECTION_IN, inDocument);
-      
+
+      if (graph.isUseReferences())
+        edge.getRecord().fields(OrientBaseGraph.CONNECTION_OUT, rawElement.getIdentity(), OrientBaseGraph.CONNECTION_IN,
+            inDocument.getIdentity());
+      else
+        edge.getRecord().fields(OrientBaseGraph.CONNECTION_OUT, rawElement, OrientBaseGraph.CONNECTION_IN, inDocument);
+
       from = (OIdentifiable) edge.getRecord();
       to = (OIdentifiable) edge.getRecord();
     }
 
+    if (graph.isUseReferences()) {
+      // USES REFERENCES INSTEAD OF DOCUMENTS
+      from = from.getIdentity();
+      to = to.getIdentity();
+    }
+
     // OUT-VERTEX ---> IN-VERTEX/EDGE
-    final String outFieldName = getConnectionFieldName(Direction.OUT, label);
     createLink(outDocument, to, outFieldName);
 
     // IN-VERTEX ---> OUT-VERTEX/EDGE
-    final String inFieldName = getConnectionFieldName(Direction.IN, label);
     createLink(inDocument, from, inFieldName);
 
+    edge.save();
     outDocument.save();
     inDocument.save();
-    edge.save();
 
     return edge;
+  }
+
+  private boolean canCreateDynamicEdge(final ODocument iFromVertex, final ODocument iToVertex, final String iOutFieldName,
+      final String iInFieldName, final Object[] fields) {
+    if (graph.isUseDynamicEdges() && (fields == null || fields.length == 0)) {
+      Object field = iFromVertex.field(iOutFieldName);
+      if (field != null)
+        if (field instanceof OIdentifiable) {
+          if (field.equals(iToVertex))
+            // ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+            return false;
+        } else if (field instanceof OMVRBTreeRIDSet)
+          if (((OMVRBTreeRIDSet) field).contains(iToVertex))
+            // ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+            return false;
+
+      field = iToVertex.field(iInFieldName);
+      if (field != null)
+        if (field instanceof OIdentifiable) {
+          if (field.equals(iFromVertex))
+            // ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+            return false;
+        } else if (field instanceof OMVRBTreeRIDSet)
+          if (((OMVRBTreeRIDSet) field).contains(iFromVertex))
+            // ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+            return false;
+
+      // CAN USE DYNAMIC EDGES
+      return true;
+    }
+    return false;
   }
 
   public Iterable<Edge> getEdges(final Direction iDirection, final String... iLabels) {
@@ -415,14 +462,14 @@ public class OrientVertex extends OrientElement implements Vertex {
       throw new IllegalArgumentException("Cannot find reverse connection name for field " + iFieldName);
   }
 
-  public static int removeEdges(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,
+  public static void removeEdges(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,
       final boolean iAlsoInverse) {
     if (iVertex == null)
-      return 0;
+      return;
 
     final Object fieldValue = iVertexToRemove != null ? iVertex.field(iFieldName) : iVertex.removeField(iFieldName);
     if (fieldValue == null)
-      return 0;
+      return;
 
     if (fieldValue instanceof OIdentifiable) {
       // SINGLE RECORD
@@ -431,7 +478,7 @@ public class OrientVertex extends OrientElement implements Vertex {
         if (!fieldValue.equals(iVertexToRemove)) {
           // OLogManager.instance().warn(null, "[OrientVertex.removeEdges] connections %s not found in field %s", iVertexToRemove,
           // iFieldName);
-          return 0;
+          return;
         }
         iVertex.removeField(iFieldName);
       }
@@ -453,7 +500,7 @@ public class OrientVertex extends OrientElement implements Vertex {
               // FOUND AS VERTEX
               it.remove();
               if (iAlsoInverse)
-                removeInverseEdge(iVertex, iFieldName, iVertexToRemove, fieldValue);
+                removeInverseEdge(iVertex, iFieldName, iVertexToRemove, curr);
               found = true;
               break;
 
@@ -466,7 +513,7 @@ public class OrientVertex extends OrientElement implements Vertex {
                 if (iVertexToRemove.equals(OrientEdge.getConnection(curr, direction.opposite()))) {
                   it.remove();
                   if (iAlsoInverse)
-                    removeInverseEdge(iVertex, iFieldName, iVertexToRemove, fieldValue);
+                    removeInverseEdge(iVertex, iFieldName, iVertexToRemove, curr);
                   found = true;
                   break;
                 }
@@ -478,11 +525,8 @@ public class OrientVertex extends OrientElement implements Vertex {
             OLogManager.instance().warn(null, "[OrientVertex.removeEdges] edge %s not found in field %s", iVertexToRemove,
                 iFieldName);
         }
-
-        return ((OMVRBTreeRIDSet) fieldValue).size();
       }
     }
-    return 0;
   }
 
   private static void removeInverseEdge(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,

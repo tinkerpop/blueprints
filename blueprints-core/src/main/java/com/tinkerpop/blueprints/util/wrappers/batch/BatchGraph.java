@@ -1,22 +1,23 @@
 package com.tinkerpop.blueprints.util.wrappers.batch;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.DefaultGraphQuery;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.VertexCache;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
-
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * BatchGraph is a wrapper that enables batch loading of a large number of edges and vertices by chunking the entire
@@ -333,6 +334,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     @Override
     public Vertex addVertex(final Object id) {
+      return addVertex(id, (Object[]) null);
+    }
+
+    public Vertex addVertex(final Object id, final Object...properties) {
         if (id == null) throw ExceptionFactory.vertexIdCanNotBeNull();
         if (retrieveFromCache(id)!=null) throw ExceptionFactory.vertexWithIdAlreadyExists(id);
         nextElement();
@@ -342,11 +347,19 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
             v.setProperty(vertexIdKey, id);
         }
         cache.set(v, id);
-        return new BatchVertex(id);
+        final BatchVertex newVertex = new BatchVertex(id);
+        
+        setProperties(newVertex, properties);
+        
+        return newVertex;
     }
 
     @Override
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+      return addEdge(id, outVertex, inVertex, label, (Object[]) null);
+    }
+
+    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label, final Object...properties) {
         if (!BatchVertex.class.isInstance(outVertex) || !BatchVertex.class.isInstance(inVertex))
             throw new IllegalArgumentException("Given element was not created in this baseGraph");
         nextElement();
@@ -362,8 +375,30 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         }
 
         currentEdge = new BatchEdge();
+        
+        setProperties(currentEdge, properties);
+        
         return currentEdge;
     }
+    
+    protected <E extends Element> E setProperties(final E element, final Object... properties) {
+      if (properties != null && properties.length > 0) {
+        if (properties.length == 1) {
+          final Object f = properties[0];
+          if (f instanceof Map<?, ?>) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) f).entrySet())
+              element.setProperty(entry.getKey().toString(), entry.getValue());
+          } else
+            throw new IllegalArgumentException(
+                "Invalid properties: expecting a pairs of fields as String,Object or a single Map<String,Object>, but found: " + f);
+        } else
+          // SET PROPERTIES ONE BY ONE
+          for (int i = 0; i < properties.length; i += 2)
+            element.setProperty(properties[i].toString(), properties[i + 1]);
+      }
+      return element;
+    }
+
 
     protected Edge addEdgeSupport(final Vertex outVertex, final Vertex inVertex, final String label) {
         return this.addEdge(null, outVertex, inVertex, label);
