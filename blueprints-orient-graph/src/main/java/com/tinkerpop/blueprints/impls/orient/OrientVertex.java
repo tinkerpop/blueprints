@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.orientechnologies.common.collection.OLazyIterator;
@@ -249,6 +250,30 @@ public class OrientVertex extends OrientElement implements Vertex {
     return false;
   }
 
+  public int countEdges(final Direction iDirection, final String... iLabels) {
+    final ODocument doc = getRecord();
+
+    int counter = 0;
+
+    for (String fieldName : doc.fieldNames()) {
+      final OPair<Direction, String> connection = getConnection(iDirection, fieldName, iLabels);
+      if (connection == null)
+        // SKIP THIS FIELD
+        continue;
+
+      final Object fieldValue = doc.field(fieldName);
+      if (fieldValue != null)
+        if (fieldValue instanceof Collection<?>)
+          counter += ((Collection<?>) fieldValue).size();
+        else if (fieldValue instanceof Map<?, ?>)
+          counter += ((Map<?, ?>) fieldValue).size();
+        else
+          counter += ((Collection<?>) fieldValue).size();
+    }
+
+    return counter;
+  }
+
   public Iterable<Edge> getEdges(final Direction iDirection, final String... iLabels) {
     final ODocument doc = getRecord();
 
@@ -306,23 +331,6 @@ public class OrientVertex extends OrientElement implements Vertex {
     }
 
     return iterable;
-  }
-
-  private void addSingleItem(final ODocument doc, final OMultiCollectionIterator<Edge> iterable, String fieldName,
-      final OPair<Direction, String> connection, final Object fieldValue) {
-    final ODocument fieldRecord = ((OIdentifiable) fieldValue).getRecord();
-    if (fieldRecord.getSchemaClass().isSubClassOf(CLASS_NAME)) {
-      // DIRECT VERTEX, CREATE A DUMMY EDGE BETWEEN VERTICES
-      if (connection.getKey() == Direction.OUT)
-        iterable.add(new OrientEdge(graph, doc, fieldRecord, connection.getValue()));
-      else
-        iterable.add(new OrientEdge(graph, fieldRecord, doc, connection.getValue()));
-
-    } else if (fieldRecord.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
-      // EDGE
-      iterable.add(new OrientEdge(graph, fieldRecord));
-    } else
-      throw new IllegalStateException("Invalid content found in " + fieldName + " field: " + fieldRecord);
   }
 
   @Override
@@ -550,5 +558,22 @@ public class OrientVertex extends OrientElement implements Vertex {
       } else
         throw new IllegalStateException("Invalid content found in " + iFieldName + " field");
     }
+  }
+
+  private void addSingleItem(final ODocument doc, final OMultiCollectionIterator<Edge> iterable, String fieldName,
+      final OPair<Direction, String> connection, final Object fieldValue) {
+    final ODocument fieldRecord = ((OIdentifiable) fieldValue).getRecord();
+    if (fieldRecord.getSchemaClass().isSubClassOf(CLASS_NAME)) {
+      // DIRECT VERTEX, CREATE A DUMMY EDGE BETWEEN VERTICES
+      if (connection.getKey() == Direction.OUT)
+        iterable.add(new OrientEdge(graph, doc, fieldRecord, connection.getValue()));
+      else
+        iterable.add(new OrientEdge(graph, fieldRecord, doc, connection.getValue()));
+
+    } else if (fieldRecord.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
+      // EDGE
+      iterable.add(new OrientEdge(graph, fieldRecord));
+    } else
+      throw new IllegalStateException("Invalid content found in " + fieldName + " field: " + fieldRecord);
   }
 }

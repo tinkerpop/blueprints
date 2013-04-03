@@ -19,7 +19,7 @@ import java.util.NoSuchElementException;
  */
 public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
-    private final Vertex vertex;
+    protected final Vertex vertex;
 
     public DefaultVertexQuery(final Vertex vertex) {
         this.vertex = vertex;

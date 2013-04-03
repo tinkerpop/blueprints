@@ -12,4 +12,9 @@ public class OrientVertexQuery extends DefaultVertexQuery {
   public OrientVertexQuery(final OrientVertex vertex) {
     super(vertex);
   }
+
+  @Override
+  public long count() {
+    return ((OrientVertex) vertex).countEdges(direction, labels);
+  }
 }
