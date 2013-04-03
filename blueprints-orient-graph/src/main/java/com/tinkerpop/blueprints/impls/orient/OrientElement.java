@@ -101,15 +101,6 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
     return getIdentity();
   }
 
-  /**
-   * Returns the class name of the record.
-   * 
-   * @return Label value
-   */
-  public String getLabel() {
-    return getRecord().getClassName();
-  }
-
   protected void save() {
     if (rawElement instanceof ODocument)
       ((ODocument) rawElement).save();

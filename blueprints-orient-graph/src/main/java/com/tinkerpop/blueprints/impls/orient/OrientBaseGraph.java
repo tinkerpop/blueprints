@@ -418,7 +418,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   public final OClass getEdgeType(final String iTypeName) {
     final OClass cls = getRawGraph().getMetadata().getSchema().getClass(iTypeName);
     if (cls != null)
-      checkVertexType(cls);
+      checkEdgeType(cls);
     return cls;
   }
 
@@ -639,11 +639,16 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     this.useVertexFieldsForEdgeLabels = useVertexFieldsForEdgeLabels;
   }
 
-  public static String encodeClassName(final String iClassName) {
+  public static String encodeClassName(String iClassName) {
+    if (Character.isDigit(iClassName.charAt(0)))
+      iClassName = "-" + iClassName;
     return iClassName.replace(' ', '-');
   }
 
-  public static String decodeClassName(final String iClassName) {
+  public static String decodeClassName(String iClassName) {
+    if (iClassName.charAt(0) == '-')
+      iClassName = iClassName.substring(1);
+
     return iClassName.replace('-', ' ');
   }
 

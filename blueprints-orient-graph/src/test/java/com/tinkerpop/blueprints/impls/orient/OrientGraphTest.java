@@ -28,11 +28,11 @@ public abstract class OrientGraphTest extends GraphTest {
 
   protected OrientGraph currentGraph;
 
-  public void testOrientBenchmarkTestSuite() throws Exception {
-    this.stopWatch();
-    doTestSuite(new OrientBenchmarkTestSuite(this));
-    printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
-  }
+//  public void testOrientBenchmarkTestSuite() throws Exception {
+//    this.stopWatch();
+//    doTestSuite(new OrientBenchmarkTestSuite(this));
+//    printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
+//  }
 
   public void testVertexTestSuite() throws Exception {
     this.stopWatch();

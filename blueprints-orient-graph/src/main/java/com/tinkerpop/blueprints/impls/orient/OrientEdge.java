@@ -97,18 +97,15 @@ public class OrientEdge extends OrientElement implements Edge {
       if (label != null && !label.equals(CLASS_NAME))
         return OrientBaseGraph.decodeClassName(label);
     }
-    return super.getLabel();
+    return null;
   }
 
   @Override
   public Object getId() {
-    if (rawElement == null) {
+    if (rawElement == null)
       // CREATE A TEMPORARY ID
-      if (className != null)
-        return vOut.getIdentity() + "-" + className + "->" + vIn.getIdentity();
-
       return vOut.getIdentity() + "->" + vIn.getIdentity();
-    }
+
     return super.getId();
   }
 
@@ -131,7 +128,7 @@ public class OrientEdge extends OrientElement implements Edge {
 
     for (String field : getRecord().fieldNames())
       if (!field.equals(OrientBaseGraph.CONNECTION_OUT) && !field.equals(OrientBaseGraph.CONNECTION_IN)
-          && (!graph.isUseCustomClassesForEdges() && !field.equals(LABEL_FIELD_NAME)))
+          && (graph.isUseCustomClassesForEdges() || !field.equals(LABEL_FIELD_NAME)))
         result.add(field);
 
     return result;
@@ -168,7 +165,7 @@ public class OrientEdge extends OrientElement implements Edge {
     final OIdentifiable inVertexEdge = vIn != null ? vIn : rawElement;
     final ODocument outVertex = getOutVertex().getRecord();
 
-    final String edgeClassName = getLabel();
+    final String edgeClassName = OrientBaseGraph.encodeClassName(getLabel());
 
     final boolean useVertexFieldsForEdgeLabels = graph.isUseVertexFieldsForEdgeLabels();
 
@@ -200,8 +197,10 @@ public class OrientEdge extends OrientElement implements Edge {
   }
 
   public String toString() {
-    if (rawElement == null)
-      return StringFactory.E + StringFactory.L_BRACKET + getId() + StringFactory.R_BRACKET;
+    if (getLabel() == null)
+      return StringFactory.E + StringFactory.L_BRACKET + getId() + StringFactory.R_BRACKET + StringFactory.L_BRACKET
+          + getVertex(Direction.OUT).getId() + StringFactory.ARROW + getVertex(Direction.IN).getId() + StringFactory.R_BRACKET;
+
     return StringFactory.edgeString(this);
   }
 
