@@ -206,23 +206,24 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 			}
 		} else {
 			throw new UnsupportedOperationException(
-							"unable to create an index on a graph that isn't a GraphDatabaseAPI (we depend upon neo4j  NodeManager for that");
+							"unable to create an index on a graph that isn't a GraphDatabaseAPI (we depend upon neo4j NodeManager for that)");
 		}
 	}
 
 	private <T extends Element> void dropInternalIndexKey(final String key, final Class<T> elementClass) {
 		final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-		final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getNodeManager().getGraphProperties();
-		try {
-			final String[] keys = (String[]) pc.getProperty(propertyName);
-			final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
-			temp.remove(key);
-			pc.setProperty(propertyName, temp.toArray(new String[temp.size()]));
-		} catch (Exception e) {
-			// no indexed_keys kernel data property
-			if (logger.isLoggable(Level.WARNING)) {
-				logger.log(Level.WARNING, "Unable to delete an index on a graph that isn't a GraphDatabaseAPI (we depend upon neo4j  NodeManager for that");
+		if(rawGraph instanceof GraphDatabaseAPI) {
+			final PropertyContainer pc = ((GraphDatabaseAPI) this.rawGraph).getNodeManager().getGraphProperties();
+			try {
+				final String[] keys = (String[]) pc.getProperty(propertyName);
+				final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
+				temp.remove(key);
+				pc.setProperty(propertyName, temp.toArray(new String[temp.size()]));
+			} catch (Exception e) {
+				// no indexed_keys kernel data property
 			}
+		} else {
+			logNotGraphDatabaseAPI();
 		}
 	}
 
@@ -234,14 +235,19 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 				final String[] keys = (String[]) pc.getProperty(propertyName);
 				return new HashSet<String>(Arrays.asList(keys));
 			} catch (Exception e) {
-
+				// no indexed_keys kernel data property
 			}
-		}
-		// no indexed_keys kernel data property
-		if (logger.isLoggable(Level.WARNING)) {
-			logger.log(Level.WARNING, "Unable to load an index on a graph that isn't a GraphDatabaseAPI (we depend upon neo4j  NodeManager for that");
+		} else {
+			logNotGraphDatabaseAPI();
 		}
 		return Collections.emptySet();
+	}
+
+	private void logNotGraphDatabaseAPI() {
+		if (logger.isLoggable(Level.WARNING)) {
+			logger.log(Level.WARNING, "Working on indices is impossible on a non GraphDatabaseAPI instance." +
+					" Current graph is a "+rawGraph.getClass().getName());
+		}
 	}
 
 	public synchronized <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
