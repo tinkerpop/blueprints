@@ -268,7 +268,7 @@ public class OrientVertex extends OrientElement implements Vertex {
         else if (fieldValue instanceof Map<?, ?>)
           counter += ((Map<?, ?>) fieldValue).size();
         else
-          counter += ((Collection<?>) fieldValue).size();
+          counter++;
     }
 
     return counter;
