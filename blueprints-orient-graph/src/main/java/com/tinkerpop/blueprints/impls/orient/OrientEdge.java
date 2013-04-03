@@ -101,6 +101,16 @@ public class OrientEdge extends OrientElement implements Edge {
   }
 
   @Override
+  public boolean equals(final Object object) {
+    if (rawElement == null && object instanceof OrientEdge) {
+      final OrientEdge other = (OrientEdge) object;
+      return vOut.equals(other.vOut) && vIn.equals(other.vIn)
+          && (className == null && other.className == null || className.equals(other.className));
+    }
+    return super.equals(object);
+  }
+
+  @Override
   public Object getId() {
     if (rawElement == null)
       // CREATE A TEMPORARY ID

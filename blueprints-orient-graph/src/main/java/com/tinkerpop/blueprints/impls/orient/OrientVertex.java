@@ -184,7 +184,7 @@ public class OrientVertex extends OrientElement implements Vertex {
       to = inDocument;
       edge = new OrientEdge(graph, from, to, label);
     } else {
-      if (graph.isUseCustomClassesForEdges())
+      if (label != null)
         // USES THE LABEL FOR THE CLASS NAME
         iClassName = label;
 

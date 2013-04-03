@@ -640,12 +640,18 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   }
 
   public static String encodeClassName(String iClassName) {
+    if (iClassName == null)
+      return null;
+
     if (Character.isDigit(iClassName.charAt(0)))
       iClassName = "-" + iClassName;
     return iClassName.replace(' ', '-');
   }
 
   public static String decodeClassName(String iClassName) {
+    if (iClassName == null)
+      return null;
+
     if (iClassName.charAt(0) == '-')
       iClassName = iClassName.substring(1);
 
