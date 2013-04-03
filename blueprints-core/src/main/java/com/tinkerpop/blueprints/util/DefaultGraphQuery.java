@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
-    private final Graph graph;
+    protected final Graph graph;
 
     public DefaultGraphQuery(final Graph graph) {
         this.graph = graph;

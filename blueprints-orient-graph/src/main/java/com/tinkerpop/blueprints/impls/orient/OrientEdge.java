@@ -25,6 +25,7 @@ public class OrientEdge extends OrientElement implements Edge {
   private static final long  serialVersionUID = 1L;
 
   public static final String CLASS_NAME       = "E";
+  public static final String LABEL_FIELD_NAME = "label";
 
   protected OIdentifiable    vOut;
   protected OIdentifiable    vIn;
@@ -65,7 +66,7 @@ public class OrientEdge extends OrientElement implements Edge {
     if (vOut != null)
       // LIGHTWEIGHT EDGE
       return vOut;
-    if (graph.isUseReferences())
+    if (graph.isKeepInMemoryReferences())
       // AVOID LAZY RESOLVING+SETTING OF RECORD
       return getRecord().rawField(OrientBaseGraph.CONNECTION_OUT);
     else
@@ -76,7 +77,7 @@ public class OrientEdge extends OrientElement implements Edge {
     if (vIn != null)
       // LIGHTWEIGHT EDGE
       return vIn;
-    if (graph.isUseReferences())
+    if (graph.isKeepInMemoryReferences())
       // AVOID LAZY RESOLVING+SETTING OF RECORD
       return getRecord().rawField(OrientBaseGraph.CONNECTION_IN);
     else
@@ -89,12 +90,12 @@ public class OrientEdge extends OrientElement implements Edge {
       // LIGHTWEIGHT EDGE
       return className;
     else if (rawElement != null) {
-      String label = ((ODocument) rawElement.getRecord()).field("label");
+      String label = ((ODocument) rawElement.getRecord()).field(LABEL_FIELD_NAME);
       if (label != null)
-        return label;
+        return OrientBaseGraph.decodeClassName(label);
       label = ((ODocument) rawElement.getRecord()).getClassName();
       if (label != null && !label.equals(CLASS_NAME))
-        return label;
+        return OrientBaseGraph.decodeClassName(label);
     }
     return super.getLabel();
   }
@@ -129,7 +130,8 @@ public class OrientEdge extends OrientElement implements Edge {
     final Set<String> result = new HashSet<String>();
 
     for (String field : getRecord().fieldNames())
-      if (!field.startsWith(OrientBaseGraph.CONNECTION_OUT) && !field.startsWith(OrientBaseGraph.CONNECTION_IN))
+      if (!field.equals(OrientBaseGraph.CONNECTION_OUT) && !field.equals(OrientBaseGraph.CONNECTION_IN)
+          && (!graph.isUseCustomClassesForEdges() && !field.equals(LABEL_FIELD_NAME)))
         result.add(field);
 
     return result;
@@ -168,14 +170,16 @@ public class OrientEdge extends OrientElement implements Edge {
 
     final String edgeClassName = getLabel();
 
-    final String outFieldName = OrientVertex.getConnectionFieldName(Direction.OUT, edgeClassName);
+    final boolean useVertexFieldsForEdgeLabels = graph.isUseVertexFieldsForEdgeLabels();
+
+    final String outFieldName = OrientVertex.getConnectionFieldName(Direction.OUT, edgeClassName, useVertexFieldsForEdgeLabels);
     dropEdgeFromVertex(inVertexEdge, outVertex, outFieldName, outVertex.field(outFieldName));
 
     // IN VERTEX
     final OIdentifiable outVertexEdge = vOut != null ? vOut : rawElement;
     final ODocument inVertex = getInVertex().getRecord();
 
-    final String inFieldName = OrientVertex.getConnectionFieldName(Direction.IN, edgeClassName);
+    final String inFieldName = OrientVertex.getConnectionFieldName(Direction.IN, edgeClassName, useVertexFieldsForEdgeLabels);
     dropEdgeFromVertex(outVertexEdge, inVertex, inFieldName, inVertex.field(inFieldName));
 
     outVertex.save();
@@ -205,6 +209,55 @@ public class OrientEdge extends OrientElement implements Edge {
     return iEdgeRecord.rawField(iDirection == Direction.OUT ? OrientBaseGraph.CONNECTION_OUT : OrientBaseGraph.CONNECTION_IN);
   }
 
+  /**
+   * Returns true if the edge is labeled with any of the passed strings.
+   * 
+   * @param iEdge
+   *          Edge
+   * @param iLabels
+   *          Labels as array of Strings
+   * @return
+   */
+  protected boolean isLabeled(final String[] iLabels) {
+    return isLabeled(getLabel(), iLabels);
+  }
+
+  /**
+   * Returns true if the edge is labeled with any of the passed strings.
+   * 
+   * @param iEdge
+   *          Edge
+   * @param iLabels
+   *          Labels as array of Strings
+   * @return
+   */
+  public static boolean isLabeled(final String iEdgeLabel, final String[] iLabels) {
+    if (iLabels != null && iLabels.length > 0) {
+      // FILTER LABEL
+      if (iEdgeLabel != null)
+        for (String l : iLabels)
+          if (l.equals(iEdgeLabel))
+            // FOUND
+            return true;
+
+      // NOT FOUND
+      return false;
+    }
+    // NO LABELS
+    return true;
+  }
+
+  public static String getRecordLabel(final OIdentifiable iEdge) {
+    if (iEdge == null)
+      return null;
+
+    final ODocument edge = iEdge.getRecord();
+    if (edge == null)
+      return null;
+
+    return edge.field(LABEL_FIELD_NAME);
+  }
+
   protected void convertToDocument() {
     if (rawElement != null)
       // ALREADY CONVERTED
@@ -217,15 +270,17 @@ public class OrientEdge extends OrientElement implements Edge {
 
     final ODocument doc = createDocument(className);
 
-    doc.field(OrientBaseGraph.CONNECTION_OUT, graph.isUseReferences() ? vOutRecord.getIdentity() : vOutRecord);
-    doc.field(OrientBaseGraph.CONNECTION_IN, graph.isUseReferences() ? vInRecord.getIdentity() : vInRecord);
+    doc.field(OrientBaseGraph.CONNECTION_OUT, graph.isKeepInMemoryReferences() ? vOutRecord.getIdentity() : vOutRecord);
+    doc.field(OrientBaseGraph.CONNECTION_IN, graph.isKeepInMemoryReferences() ? vInRecord.getIdentity() : vInRecord);
     rawElement = doc;
 
-    final String outFieldName = OrientVertex.getConnectionFieldName(Direction.OUT, className);
-    OrientVertex.removeEdges(vOutRecord, outFieldName, vInRecord, false);
+    final boolean useVertexFieldsForEdgeLabels = graph.isUseVertexFieldsForEdgeLabels();
 
-    final String inFieldName = OrientVertex.getConnectionFieldName(Direction.IN, className);
-    OrientVertex.removeEdges(vInRecord, inFieldName, vOutRecord, false);
+    final String outFieldName = OrientVertex.getConnectionFieldName(Direction.OUT, className, useVertexFieldsForEdgeLabels);
+    OrientVertex.removeEdges(vOutRecord, outFieldName, vInRecord, false, useVertexFieldsForEdgeLabels);
+
+    final String inFieldName = OrientVertex.getConnectionFieldName(Direction.IN, className, useVertexFieldsForEdgeLabels);
+    OrientVertex.removeEdges(vInRecord, inFieldName, vOutRecord, false, useVertexFieldsForEdgeLabels);
 
     // OUT-VERTEX ---> IN-VERTEX/EDGE
     OrientVertex.createLink(vOutRecord, doc, outFieldName);
@@ -248,8 +303,11 @@ public class OrientEdge extends OrientElement implements Edge {
     if (iClassName != null && graph.isUseCustomClassesForEdges()) {
       checkForClassInSchema(iClassName);
       doc = new ODocument(iClassName);
-    } else
+    } else {
       doc = new ODocument(CLASS_NAME);
+      if (iClassName != null)
+        doc.field(LABEL_FIELD_NAME, iClassName);
+    }
 
     return doc;
   }
@@ -287,5 +345,4 @@ public class OrientEdge extends OrientElement implements Edge {
     } else
       throw new IllegalStateException("Wrong type found in the field '" + iFieldName + "': " + iFieldValue.getClass());
   }
-
 }

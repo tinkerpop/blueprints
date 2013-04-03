@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.impls.orient;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
@@ -24,15 +24,15 @@ import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
  * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraphTest extends GraphTest {
+public abstract class OrientGraphTest extends GraphTest {
 
-  private OrientGraph currentGraph;
+  protected OrientGraph currentGraph;
 
-  // public void testOrientBenchmarkTestSuite() throws Exception {
-  // this.stopWatch();
-  // doTestSuite(new OrientBenchmarkTestSuite(this));
-  // printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
-  // }
+  public void testOrientBenchmarkTestSuite() throws Exception {
+    this.stopWatch();
+    doTestSuite(new OrientBenchmarkTestSuite(this));
+    printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
+  }
 
   public void testVertexTestSuite() throws Exception {
     this.stopWatch();
@@ -104,12 +104,6 @@ public class OrientGraphTest extends GraphTest {
     return generateGraph("graph");
   }
 
-  public Graph generateGraph(final String graphDirectoryName) {
-    String directory = getWorkingDirectory();
-    this.currentGraph = new OrientGraph("local:" + directory + "/" + graphDirectoryName);
-    return this.currentGraph;
-  }
-
   public void doTestSuite(final TestSuite testSuite) throws Exception {
     String directory = getWorkingDirectory();
     deleteDirectory(new File(directory));
@@ -125,7 +119,7 @@ public class OrientGraphTest extends GraphTest {
             this.currentGraph.shutdown();
         } catch (Exception e) {
         }
-        OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
+        final ODatabaseDocumentTx g = new ODatabaseDocumentTx("local:" + directory + "/graph");
         if (g.exists())
           g.open("admin", "admin").drop();
 
@@ -134,7 +128,7 @@ public class OrientGraphTest extends GraphTest {
     }
   }
 
-  private String getWorkingDirectory() {
+  protected String getWorkingDirectory() {
     return this.computeTestDataRoot().getAbsolutePath();
   }
 }

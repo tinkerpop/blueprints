@@ -29,7 +29,6 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -40,22 +39,23 @@ import com.tinkerpop.blueprints.util.StringFactory;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<ODatabaseDocumentTx>, KeyIndexableGraph {
-  public static final String                           CONNECTION_OUT           = "out";
-  public static final String                           CONNECTION_IN            = "in";
-  public static final String                           CLASS_PREFIX             = "class:";
+  public static final String                           CONNECTION_OUT               = "out";
+  public static final String                           CONNECTION_IN                = "in";
+  public static final String                           CLASS_PREFIX                 = "class:";
 
-  protected final static String                        ADMIN                    = "admin";
-  protected boolean                                    useDynamicEdges          = true;
-  protected boolean                                    saveOriginalIds          = false;
-  protected boolean                                    useCustomClassesForEdges = false;
-  protected boolean                                    useReferences            = false;
+  protected final static String                        ADMIN                        = "admin";
+  protected boolean                                    useLightweightEdges          = true;
+  protected boolean                                    saveOriginalIds              = false;
+  protected boolean                                    useCustomClassesForEdges     = false;
+  protected boolean                                    keepInMemoryReferences       = false;
+  protected boolean                                    useVertexFieldsForEdgeLabels = true;
 
   private String                                       url;
   private String                                       username;
   private String                                       password;
 
-  private static final ThreadLocal<OrientGraphContext> threadContext            = new ThreadLocal<OrientGraphContext>();
-  private static final List<OrientGraphContext>        contexts                 = new ArrayList<OrientGraphContext>();
+  private static final ThreadLocal<OrientGraphContext> threadContext                = new ThreadLocal<OrientGraphContext>();
+  private static final List<OrientGraphContext>        contexts                     = new ArrayList<OrientGraphContext>();
 
   /**
    * Constructs a new object using an existent OGraphDatabase instance.
@@ -159,7 +159,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     this.autoStartTransaction();
 
     // SAVE THE ID TOO?
-    final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.ORIGINAL_ID, id } : null;
+    final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.DEF_ORIGINAL_ID_FIELDNAME, id } : null;
 
     final OrientVertex vertex = new OrientVertex(this, className, fields);
 
@@ -175,7 +175,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
       className = id.toString().substring(CLASS_PREFIX.length());
 
     // SAVE THE ID TOO?
-    final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.ORIGINAL_ID, id } : null;
+    final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.DEF_ORIGINAL_ID_FIELDNAME, id } : null;
 
     return ((OrientVertex) outVertex).addEdge(label, inVertex, className, fields);
   }
@@ -579,26 +579,16 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return result;
   }
 
-  protected <T> String getClassName(final Class<T> elementClass) {
-    String className = null;
-
-    if (elementClass.isAssignableFrom(Vertex.class))
-      className = OrientVertex.CLASS_NAME;
-    else if (elementClass.isAssignableFrom(Edge.class))
-      className = OrientEdge.CLASS_NAME;
-    return className;
-  }
-
   public GraphQuery query() {
-    return new DefaultGraphQuery(this);
+    return new OrientGraphQuery(this);
   }
 
-  public boolean isUseDynamicEdges() {
-    return useDynamicEdges;
+  public boolean isUseLightweightEdges() {
+    return useLightweightEdges;
   }
 
-  public void setUseDynamicEdges(boolean useDynamicEdges) {
-    this.useDynamicEdges = useDynamicEdges;
+  public void setUseLightweightEdges(boolean useDynamicEdges) {
+    this.useLightweightEdges = useDynamicEdges;
   }
 
   public boolean isSaveOriginalIds() {
@@ -625,12 +615,12 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return getRawGraph().countClass(iClassName);
   }
 
-  public boolean isUseReferences() {
-    return useReferences;
+  public boolean isKeepInMemoryReferences() {
+    return keepInMemoryReferences;
   }
 
-  public void setUseReferences(boolean useReferences) {
-    this.useReferences = useReferences;
+  public void setKeepInMemoryReferences(boolean useReferences) {
+    this.keepInMemoryReferences = useReferences;
   }
 
   public boolean isUseCustomClassesForEdges() {
@@ -639,5 +629,31 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
   public void setUseCustomClassesForEdges(final boolean useCustomClassesForEdges) {
     this.useCustomClassesForEdges = useCustomClassesForEdges;
+  }
+
+  public boolean isUseVertexFieldsForEdgeLabels() {
+    return useVertexFieldsForEdgeLabels;
+  }
+
+  public void setUseVertexFieldsForEdgeLabels(boolean useVertexFieldsForEdgeLabels) {
+    this.useVertexFieldsForEdgeLabels = useVertexFieldsForEdgeLabels;
+  }
+
+  public static String encodeClassName(final String iClassName) {
+    return iClassName.replace(' ', '-');
+  }
+
+  public static String decodeClassName(final String iClassName) {
+    return iClassName.replace('-', ' ');
+  }
+
+  protected <T> String getClassName(final Class<T> elementClass) {
+    String className = null;
+
+    if (elementClass.isAssignableFrom(Vertex.class))
+      className = OrientVertex.CLASS_NAME;
+    else if (elementClass.isAssignableFrom(Edge.class))
+      className = OrientEdge.CLASS_NAME;
+    return className;
   }
 }

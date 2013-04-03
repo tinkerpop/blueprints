@@ -55,17 +55,17 @@ public class OrientGraphNonDynamic extends OrientTransactionalGraph {
    */
   public OrientGraphNonDynamic(final OGraphDatabase iDatabase) {
     super(iDatabase);
-    useDynamicEdges = false;
+    useLightweightEdges = false;
   }
 
   public OrientGraphNonDynamic(final String url) {
     super(url, ADMIN, ADMIN);
-    useDynamicEdges = false;
+    useLightweightEdges = false;
   }
 
   public OrientGraphNonDynamic(final String url, final String username, final String password) {
     super(url, username, password);
-    useDynamicEdges = false;
+    useLightweightEdges = false;
   }
 
   public Features getFeatures() {

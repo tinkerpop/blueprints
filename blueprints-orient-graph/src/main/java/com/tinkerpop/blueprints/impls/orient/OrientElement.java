@@ -21,9 +21,9 @@ import com.tinkerpop.blueprints.util.ElementHelper;
  */
 @SuppressWarnings("unchecked")
 public abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
-  private static final long       serialVersionUID = 1L;
+  private static final long       serialVersionUID          = 1L;
 
-  public static final Object      ORIGINAL_ID      = "origId";
+  public static final Object      DEF_ORIGINAL_ID_FIELDNAME = "origId";
 
   // TODO: CAN REMOVE THIS REF IN FAVOR OF CONTEXT INSTANCE?
   protected final OrientBaseGraph graph;
@@ -230,5 +230,9 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
   protected static void setPropertyInternal(final Element element, final ODocument doc, final String key, final Object value) {
     ElementHelper.validateProperty(element, key, value);
     doc.field(key, value);
+  }
+
+  public OrientBaseGraph getGraph() {
+    return graph;
   }
 }
