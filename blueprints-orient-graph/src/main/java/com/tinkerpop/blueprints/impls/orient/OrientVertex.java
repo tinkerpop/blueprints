@@ -250,10 +250,10 @@ public class OrientVertex extends OrientElement implements Vertex {
     return false;
   }
 
-  public int countEdges(final Direction iDirection, final String... iLabels) {
+  public long countEdges(final Direction iDirection, final String... iLabels) {
     final ODocument doc = getRecord();
 
-    int counter = 0;
+    long counter = 0;
 
     for (String fieldName : doc.fieldNames()) {
       final OPair<Direction, String> connection = getConnection(iDirection, fieldName, iLabels);

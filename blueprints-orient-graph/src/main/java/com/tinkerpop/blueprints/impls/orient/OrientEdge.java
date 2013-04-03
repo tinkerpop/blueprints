@@ -258,7 +258,7 @@ public class OrientEdge extends OrientElement implements Edge {
       final Object iFieldValue) {
     if (iFieldValue == null) {
       // NO EDGE? WARN
-      OLogManager.instance().warn(this, "Edge not found in vertex's property %s.%s while removing the edge %s",
+      OLogManager.instance().debug(this, "Edge not found in vertex's property %s.%s while removing the edge %s",
           iVertex.getIdentity(), iFieldName, iEdge.getIdentity());
 
     } else if (iFieldValue instanceof OIdentifiable) {
