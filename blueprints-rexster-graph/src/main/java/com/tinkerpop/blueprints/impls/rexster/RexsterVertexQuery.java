@@ -3,8 +3,8 @@ package com.tinkerpop.blueprints.impls.rexster;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexQuery;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -39,6 +39,10 @@ public class RexsterVertexQuery implements VertexQuery {
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
+        return this.has(key, compare, value);
+    }
+
+    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
         this.hasContainers.add(new HasContainer(key, value, compare));
         return this;
     }

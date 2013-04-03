@@ -44,7 +44,11 @@ public interface VertexQuery extends Query {
     public VertexQuery has(final String key, final Object value);
 
     @Override
+    @Deprecated
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare);
+
+    @Override
+    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value);
 
     @Override
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue);

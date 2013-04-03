@@ -2,8 +2,8 @@ package com.tinkerpop.blueprints.util.wrappers;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexQuery;
 
 /**
  * A WrapperQuery is useful for wrapping the construction and results of a Vertex.query().
@@ -25,7 +25,11 @@ public abstract class WrapperVertexQuery implements VertexQuery {
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
-        this.query = this.query.has(key, value, compare);
+        return this.has(key, compare, value);
+    }
+
+    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
+        this.query = this.query.has(key, compare, value);
         return this;
     }
 

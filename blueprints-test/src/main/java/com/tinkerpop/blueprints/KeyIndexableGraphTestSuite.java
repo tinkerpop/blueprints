@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -136,12 +135,9 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsVertexKeyIndex) {
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
-            if (!graph.getFeatures().isWrapper)
-                assertTrue(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
             assertEquals(count(graph.getVertices("name", "marko")), 1);
             assertEquals(graph.getVertices("name", "marko").iterator().next(), vertex);
             graph.createKeyIndex("name", Vertex.class);
-            assertFalse(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
             assertEquals(count(graph.getVertices("name", "marko")), 1);
             assertEquals(graph.getVertices("name", "marko").iterator().next(), vertex);
         }
@@ -149,12 +145,9 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeKeyIndex) {
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             edge.setProperty("date", 2012);
-            if (!graph.getFeatures().isWrapper)
-                assertTrue(graph.getEdges("date", 2012) instanceof PropertyFilteredIterable);
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
             graph.createKeyIndex("date", Edge.class);
-            assertFalse(graph.getEdges("date", 2012) instanceof PropertyFilteredIterable);
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
         }

@@ -3,8 +3,8 @@ package com.tinkerpop.blueprints.util;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexQuery;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +31,10 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
+        return this.has(key, compare, value);
+    }
+
+    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
         this.hasContainers.add(new HasContainer(key, value, compare));
         return this;
     }

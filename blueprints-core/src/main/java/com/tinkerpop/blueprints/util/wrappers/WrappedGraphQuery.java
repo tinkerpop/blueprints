@@ -21,7 +21,11 @@ public abstract class WrappedGraphQuery implements GraphQuery {
     }
 
     public <T extends Comparable<T>> GraphQuery has(final String key, final T value, final Compare compare) {
-        this.query = this.query.has(key, value, compare);
+        return this.has(key, compare, value);
+    }
+
+    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value) {
+        this.query = this.query.has(key, compare, value);
         return this;
     }
 
