@@ -85,6 +85,9 @@ public abstract class BaseTest extends TestCase {
             }
             directory.delete();
         }
+        if(directory.exists()) {
+        	throw new RuntimeException("unable to delete directory "+directory);
+        }
     }
 
     public File computeTestDataRoot() {
