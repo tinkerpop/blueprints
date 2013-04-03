@@ -356,7 +356,7 @@ public class OrientVertex extends OrientElement implements Vertex {
    * @return The found direction if any
    */
   protected OPair<Direction, String> getConnection(final Direction iDirection, final String iFieldName, final String... iClassNames) {
-    if ((iDirection == Direction.OUT || iDirection == Direction.BOTH) && iFieldName.startsWith(OrientBaseGraph.CONNECTION_OUT)) {
+    if ((iDirection == Direction.OUT || iDirection == Direction.BOTH) && iFieldName.startsWith(CONNECTION_OUT_PREFIX)) {
       if (iClassNames == null || iClassNames.length == 0)
         return new OPair<Direction, String>(Direction.OUT, getConnectionClass(Direction.OUT, iFieldName));
 
@@ -365,7 +365,7 @@ public class OrientVertex extends OrientElement implements Vertex {
         if (iFieldName.equals(CONNECTION_OUT_PREFIX + clsName))
           return new OPair<Direction, String>(Direction.OUT, clsName);
       }
-    } else if ((iDirection == Direction.IN || iDirection == Direction.BOTH) && iFieldName.startsWith(OrientBaseGraph.CONNECTION_IN)) {
+    } else if ((iDirection == Direction.IN || iDirection == Direction.BOTH) && iFieldName.startsWith(CONNECTION_IN_PREFIX)) {
       if (iClassNames == null || iClassNames.length == 0)
         return new OPair<Direction, String>(Direction.IN, getConnectionClass(Direction.IN, iFieldName));
 

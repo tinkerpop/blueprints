@@ -217,8 +217,8 @@ public class OrientEdge extends OrientElement implements Edge {
 
     final ODocument doc = createDocument(className);
 
-    doc.field(OrientBaseGraph.CONNECTION_OUT, vOut);
-    doc.field(OrientBaseGraph.CONNECTION_IN, vIn);
+    doc.field(OrientBaseGraph.CONNECTION_OUT, graph.isUseReferences() ? vOutRecord.getIdentity() : vOutRecord);
+    doc.field(OrientBaseGraph.CONNECTION_IN, graph.isUseReferences() ? vInRecord.getIdentity() : vInRecord);
     rawElement = doc;
 
     final String outFieldName = OrientVertex.getConnectionFieldName(Direction.OUT, className);
@@ -233,9 +233,9 @@ public class OrientEdge extends OrientElement implements Edge {
     // IN-VERTEX ---> OUT-VERTEX/EDGE
     OrientVertex.createLink(vInRecord, doc, inFieldName);
 
+    doc.save();
     vOutRecord.save();
     vInRecord.save();
-    doc.save();
 
     vOut = null;
     vIn = null;

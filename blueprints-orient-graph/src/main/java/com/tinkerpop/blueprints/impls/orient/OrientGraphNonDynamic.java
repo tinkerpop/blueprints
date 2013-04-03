@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.Features;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphNonDynamic extends OrientTransactionalGraph {
-  private static final Features FEATURES    = new Features();
+  private static final Features FEATURES = new Features();
 
   static {
     FEATURES.supportsDuplicateEdges = true;
@@ -46,8 +46,6 @@ public class OrientGraphNonDynamic extends OrientTransactionalGraph {
     FEATURES.supportsStringProperty = true;
     FEATURES.supportsThreadedTransactions = true;
   }
-
-  protected boolean             autoStartTx = true;
 
   /**
    * Constructs a new object using an existent OGraphDatabase instance.

@@ -47,8 +47,6 @@ public class OrientGraph extends OrientTransactionalGraph {
     FEATURES.supportsThreadedTransactions = true;
   }
 
-  protected boolean             autoStartTx = true;
-
   /**
    * Constructs a new object using an existent OGraphDatabase instance.
    * 
