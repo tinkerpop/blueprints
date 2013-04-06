@@ -1,9 +1,9 @@
 package com.tinkerpop.blueprints.impls.neo4j;
 
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.DefaultQuery;
+import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.neo4j.graphdb.Direction;
@@ -47,8 +47,8 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
         return this.graph.addEdge(null, this, vertex, label);
     }
 
-    public Query query() {
-        return new DefaultQuery(this);
+    public VertexQuery query() {
+        return new DefaultVertexQuery(this);
     }
 
     public boolean equals(final Object object) {

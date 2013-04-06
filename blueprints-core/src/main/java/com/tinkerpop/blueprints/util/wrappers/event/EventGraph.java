@@ -3,8 +3,10 @@ package com.tinkerpop.blueprints.util.wrappers.event;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgeAddedEvent;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgeRemovedEvent;
@@ -178,6 +180,21 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
         return new EventEdgeIterable(this.baseGraph.getEdges(key, value), this);
+    }
+
+    public GraphQuery query() {
+        final EventGraph eventGraph = this;
+        return new WrappedGraphQuery(this.baseGraph.query()) {
+            @Override
+            public Iterable<Edge> edges() {
+                return new EventEdgeIterable(this.query.edges(), eventGraph);
+            }
+
+            @Override
+            public Iterable<Vertex> vertices() {
+                return new EventVertexIterable(this.query.vertices(), eventGraph);
+            }
+        };
     }
 
     public void shutdown() {

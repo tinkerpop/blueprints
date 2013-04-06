@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.HashSet;
@@ -90,13 +89,13 @@ class DexElement implements Element {
       * @see com.tinkerpop.blueprints.Element#getProperty(java.lang.String)
       */
     @Override
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         graph.autoStartTransaction();
 
         int type = getObjectType();
         if (key.compareTo(StringFactory.LABEL) == 0) {
             com.sparsity.dex.gdb.Type tdata = graph.getRawGraph().getType(type);
-            return tdata.getName();
+            return (T) tdata.getName();
         }
         int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
         if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
@@ -129,7 +128,7 @@ class DexElement implements Element {
                     throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
             }
         }
-        return result;
+        return (T) result;
     }
 
     /*
@@ -160,15 +159,10 @@ class DexElement implements Element {
       */
     @Override
     public void setProperty(final String key, final Object value) {
-        graph.autoStartTransaction();
-
-        //System.out.println(this + "!!" + key + "!!" + value);
-        if (key.equals(StringFactory.ID))
-            throw ExceptionFactory.propertyKeyIdIsReserved();
+        ElementHelper.validateProperty(this, key, value);
         if (key.equals(StringFactory.LABEL))
-            throw new IllegalArgumentException("Property key is reserved for all nodes and edges: " + StringFactory.LABEL);
-        if (key.equals(StringFactory.EMPTY_STRING))
-            throw ExceptionFactory.elementKeyCanNotBeEmpty();
+            throw new IllegalArgumentException("Property key is reserved for all vertices and edges: " + StringFactory.LABEL);
+        graph.autoStartTransaction();
 
         int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
         com.sparsity.dex.gdb.DataType datatype = null;
@@ -252,7 +246,7 @@ class DexElement implements Element {
       * com.tinkerpop.blueprints.Element#removeProperty(java.lang.String)
       */
     @Override
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         graph.autoStartTransaction();
 
         try {
@@ -260,7 +254,7 @@ class DexElement implements Element {
             com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
             v.setNull();
             setProperty(key, v);
-            return ret;
+            return (T) ret;
         } catch (RuntimeException e) {
             return null;
         }

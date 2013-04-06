@@ -20,6 +20,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -27,6 +28,7 @@ import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph.Conclusion;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -76,7 +78,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         final OrientGraphContext context = getContext(true);
 
         if (getRawGraph().getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+            this.commit();
 
         synchronized (contexts) {
             if (context.manualIndices.containsKey(indexName))
@@ -124,7 +126,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
     public void dropIndex(final String indexName) {
         if (getRawGraph().getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+            this.commit();
 
         try {
             synchronized (contexts) {
@@ -136,7 +138,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
             getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
             saveIndexConfiguration();
         } catch (Exception e) {
-            this.stopTransaction(Conclusion.FAILURE);
+            this.rollback();
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -356,8 +358,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         return getContext(true).rawGraph;
     }
 
-    public void stopTransaction(final Conclusion conclusion) {
-    }
+    public void commit() {}
+
+    public void rollback() {}
 
     protected void autoStartTransaction() {
     }
@@ -445,7 +448,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
 
     public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
         if (getRawGraph().getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+            this.commit();
 
         final String className = getClassName(elementClass);
         getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
@@ -456,7 +459,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         final OGraphDatabase db = getRawGraph();
 
         if (db.getTransaction().isActive())
-            stopTransaction(Conclusion.SUCCESS);
+           this.commit();
 
         final OClass cls = db.getMetadata().getSchema().getClass(className);
 
@@ -491,5 +494,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OGrap
         else if (elementClass.isAssignableFrom(Edge.class))
             className = OGraphDatabase.EDGE_CLASS_NAME;
         return className;
+    }
+
+    public GraphQuery query() {
+        return new DefaultGraphQuery(this);
     }
 }

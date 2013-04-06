@@ -175,7 +175,7 @@ public class Features {
 
     /**
      * This method determines whether the full gamut of features have been set by the Graph implementation.
-     * This is useful for implementors to ensure that they did not miss specifying a feature.
+     * This is useful for implementers to ensure that they did not miss specifying a feature.
      *
      * @throws IllegalStateException thrown if a feature was not set
      */

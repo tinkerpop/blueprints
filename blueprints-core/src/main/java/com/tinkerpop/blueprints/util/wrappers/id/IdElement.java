@@ -16,13 +16,18 @@ public abstract class IdElement implements Element {
 
     protected final IdGraph idGraph;
 
-    protected IdElement(final Element baseElement, final IdGraph idGraph) {
+    protected final boolean propertyBased;
+
+    protected IdElement(final Element baseElement,
+                        final IdGraph idGraph,
+                        final boolean propertyBased) {
         this.baseElement = baseElement;
         this.idGraph = idGraph;
+        this.propertyBased = propertyBased;
     }
 
-    public Object getProperty(final String key) {
-        if (key.equals(IdGraph.ID)) {
+    public <T> T getProperty(final String key) {
+        if (propertyBased && key.equals(IdGraph.ID)) {
             return null;
         }
 
@@ -30,31 +35,41 @@ public abstract class IdElement implements Element {
     }
 
     public Set<String> getPropertyKeys() {
-        final Set<String> keys = baseElement.getPropertyKeys();
-        final Set<String> s = new HashSet<String>();
-        s.addAll(keys);
-        s.remove(IdGraph.ID);
-        return s;
+        if (propertyBased) {
+            final Set<String> keys = baseElement.getPropertyKeys();
+            final Set<String> s = new HashSet<String>();
+            s.addAll(keys);
+            s.remove(IdGraph.ID);
+            return s;
+        } else {
+            return baseElement.getPropertyKeys();
+        }
     }
 
     public void setProperty(final String key, final Object value) {
-        if (key.equals(IdGraph.ID)) {
-            throw new IllegalArgumentException("Unable to set value for reserved property " + IdGraph.ID);
+        if (propertyBased) {
+            if (key.equals(IdGraph.ID)) {
+                throw new IllegalArgumentException("Unable to set value for reserved property " + IdGraph.ID);
+            }
         }
 
         baseElement.setProperty(key, value);
     }
 
-    public Object removeProperty(final String key) {
-        if (key.equals(IdGraph.ID)) {
-            throw new IllegalArgumentException("Unable to remove value for reserved property " + IdGraph.ID);
+    public <T> T removeProperty(final String key) {
+        if (propertyBased) {
+            if (key.equals(IdGraph.ID)) {
+                throw new IllegalArgumentException("Unable to remove value for reserved property " + IdGraph.ID);
+            }
         }
 
         return baseElement.removeProperty(key);
     }
 
     public Object getId() {
-        return baseElement.getProperty(IdGraph.ID);
+        return propertyBased
+                ? baseElement.getProperty(IdGraph.ID)
+                : baseElement.getId();
     }
 
     public int hashCode() {

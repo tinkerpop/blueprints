@@ -20,6 +20,7 @@ public interface TransactionalGraph extends Graph {
     /**
      * Whether the transaction being stopped was successful (commit) or a failure (rollback).
      */
+    @Deprecated
     public enum Conclusion {
         SUCCESS, FAILURE
     }
@@ -42,8 +43,14 @@ public interface TransactionalGraph extends Graph {
      */
     public void shutdown();
 
+    /**
+     * Stop the current transaction and successfully apply mutations to the graph.
+     */
     public void commit();
 
+    /**
+     * Stop the current transaction and drop any mutations applied since the last transaction.
+     */
     public void rollback();
 
 }

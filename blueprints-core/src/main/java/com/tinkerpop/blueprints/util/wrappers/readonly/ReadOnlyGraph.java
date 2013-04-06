@@ -3,8 +3,10 @@ package com.tinkerpop.blueprints.util.wrappers.readonly;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 
 /**
@@ -98,6 +100,20 @@ public class ReadOnlyGraph<T extends Graph> implements Graph, WrapperGraph<T> {
     @Override
     public T getBaseGraph() {
         return this.baseGraph;
+    }
+
+    public GraphQuery query() {
+        return new WrappedGraphQuery(this.baseGraph.query()) {
+            @Override
+            public Iterable<Edge> edges() {
+                return new ReadOnlyEdgeIterable(this.query.edges());
+            }
+
+            @Override
+            public Iterable<Vertex> vertices() {
+                return new ReadOnlyVertexIterable(this.query.vertices());
+            }
+        };
     }
 
     public Features getFeatures() {

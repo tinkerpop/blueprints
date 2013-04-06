@@ -26,13 +26,13 @@ public abstract class PartitionElement implements Element {
             this.baseElement.setProperty(key, value);
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         if (key.equals(this.graph.getPartitionKey()))
             return null;
         return this.baseElement.getProperty(key);
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         if (key.equals(this.graph.getPartitionKey()))
             return null;
         return this.baseElement.removeProperty(key);

@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.util.wrappers.id;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
@@ -10,6 +11,7 @@ import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
+import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 
 import java.util.HashSet;
@@ -23,6 +25,9 @@ import java.util.UUID;
  * <p/>
  * The base Graph must be an instance of KeyIndexableGraph.
  * It *may* be an instance of IndexableGraph, in which case its indices will be wrapped appropriately.
+ * It *may* be an instance of TransactionalGraph, in which case transaction operations will be passed through.
+ * For those graphs which support vertex indices but not edge indices (or vice versa),
+ * you may configure IdGraph to use custom IDs only for vertices or only for edges.
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -33,78 +38,83 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     private final T baseGraph;
 
-    private final IdFactory vertexIdFactory;
-    private final IdFactory edgeIdFactory;
-
-    private final boolean vertexIndexing;
-    private final boolean edgeIndexing;
+    private IdFactory vertexIdFactory;
+    private IdFactory edgeIdFactory;
 
     private final Features features;
+
+    private final boolean supportVertexIds, supportEdgeIds;
 
     private boolean uniqueIds = true;
 
     /**
-     * Adds custom ID functionality to the given graph.
-     *
-     * @param baseGraph the base graph which does not permit custom element IDs
+     * Adds custom ID functionality to the given graph,
+     * supporting both custom vertex IDs and custom edge IDs.
+     * @param baseGraph the base graph which does not necessarily support custom IDs
      */
     public IdGraph(final T baseGraph) {
-        this(baseGraph, null);
+        this(baseGraph, true, true);
     }
 
-    /**
-     * Adds custom ID functionality to the given graph, also specifying a factory for new element IDs.
-     *
-     * @param baseGraph the base graph which may or may not permit custom element IDs
-     * @param idFactory a factory for new vertex and edge IDs.
-     *                  When vertices or edges are created using null IDs, the actual IDs are chosen based on this factory.
-     */
-    public IdGraph(final T baseGraph, final IdFactory idFactory) {
-        this(baseGraph, idFactory, idFactory);
-    }
 
     /**
-     * Adds custom ID functionality to the given graph, also specifying (separate) factories for new vertex and edge IDs.
-     *
-     * @param baseGraph       the base graph which may or may not permit custom element IDs
-     * @param vertexIdFactory a factory for new vertex IDs.
-     *                        When vertices are created using null IDs, the actual IDs are chosen based on this factory.
-     * @param edgeIdFactory   a factory for new edge IDs.
-     *                        When edges are created using null IDs, the actual IDs are chosen based on this factory.
+     * Adds custom ID functionality to the given graph,
+     * supporting either custom vertex IDs, custom edge IDs, or both.
+     * @param baseGraph the base graph which does not necessarily support custom IDs
+     * @param supportVertexIds whether to support custom vertex IDs
+     * @param supportEdgeIds whether to support custom edge IDs
      */
     public IdGraph(final T baseGraph,
-                   final IdFactory vertexIdFactory,
-                   final IdFactory edgeIdFactory) {
+                   final boolean supportVertexIds,
+                   final boolean supportEdgeIds) {
         this.baseGraph = baseGraph;
         this.features = this.baseGraph.getFeatures().copyFeatures();
         features.isWrapper = true;
         features.ignoresSuppliedIds = false;
 
-        this.vertexIdFactory = null == vertexIdFactory ? new DefaultIdFactory() : vertexIdFactory;
-        this.edgeIdFactory = null == edgeIdFactory ? new DefaultIdFactory() : edgeIdFactory;
+        this.supportVertexIds = supportVertexIds;
+        this.supportEdgeIds = supportEdgeIds;
 
-        vertexIndexing = baseGraph.getFeatures().supportsVertexIndex;
-        edgeIndexing = baseGraph.getFeatures().supportsEdgeIndex;
+        if (!supportVertexIds && !supportEdgeIds) {
+            throw new IllegalArgumentException("if neither custom vertex IDs nor custom edge IDs are supported, IdGraph can't help you!");
+        }
 
         createIndices();
+
+        vertexIdFactory = new DefaultIdFactory();
+        edgeIdFactory = new DefaultIdFactory();
     }
 
+    /**
+     * @param idFactory a factory for new vertex IDs.
+     *                  When vertices are created using null IDs, the actual IDs are chosen based on this factory.
+     */
+    public void setVertexIdFactory(final IdFactory idFactory) {
+        vertexIdFactory = idFactory;
+    }
+
+    /**
+     * @param idFactory a factory for new edge IDs.
+     *                  When edges are created using null IDs, the actual IDs are chosen based on this factory.
+     */
+    public void setEdgeIdFactory(final IdFactory idFactory) {
+        edgeIdFactory = idFactory;
+    }
+
+    /**
+     * @return the factory for new vertex IDs.
+     *         When vertices are created using null IDs, the actual IDs are chosen based on this factory.
+     */
     public IdFactory getVertexIdFactory() {
         return vertexIdFactory;
     }
 
+    /**
+     * return the factory for new edge IDs.
+     * When edges are created using null IDs, the actual IDs are chosen based on this factory.
+     */
     public IdFactory getEdgeIdFactory() {
         return edgeIdFactory;
-    }
-
-    private void createIndices() {
-        if (!baseGraph.getIndexedKeys(Vertex.class).contains(ID)) {
-            baseGraph.createKeyIndex(ID, Vertex.class);
-        }
-
-        if (!baseGraph.getIndexedKeys(Edge.class).contains(ID)) {
-            baseGraph.createKeyIndex(ID, Edge.class);
-        }
     }
 
     public Features getFeatures() {
@@ -113,17 +123,17 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     public Vertex addVertex(final Object id) {
         if (uniqueIds && null != id && null != getVertex(id)) {
-            throw new IllegalArgumentException("Vertex with given id already exists: '" + id + "'");
+            throw new IllegalArgumentException("vertex with given id already exists: '" + id + "'");
         }
 
         final Vertex base = baseGraph.addVertex(null);
 
-        Object v = null == id ? vertexIdFactory.createId() : id;
+        if (supportVertexIds) {
+            Object v = null == id ? vertexIdFactory.createId() : id;
 
-        if (null == v) {
-            base.removeProperty(ID);
-        } else {
-            base.setProperty(ID, v);
+            if (null != v) {
+                base.setProperty(ID, v);
+            }
         }
 
         return new IdVertex(base, this);
@@ -131,21 +141,26 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     public Vertex getVertex(final Object id) {
         if (null == id) {
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw new IllegalArgumentException("vertex identifier cannot be null");
         }
 
-        final Iterable<Vertex> i = baseGraph.getVertices(ID, id);
-        final Iterator<Vertex> iter = i.iterator();
-        if (!iter.hasNext()) {
-            return null;
-        } else {
-            Vertex e = iter.next();
+        if (supportVertexIds) {
+            final Iterable<Vertex> i = baseGraph.getVertices(ID, id);
+            final Iterator<Vertex> iter = i.iterator();
+            if (!iter.hasNext()) {
+                return null;
+            } else {
+                Vertex e = iter.next();
 
-            if (iter.hasNext()) {
-                throw new IllegalStateException("multiple vertices exist with id '" + id + "'");
+                if (iter.hasNext()) {
+                    throw new IllegalStateException("multiple vertices exist with id '" + id + "'");
+                }
+
+                return new IdVertex(e, this);
             }
-
-            return new IdVertex(e, this);
+        } else {
+            Vertex base = baseGraph.getVertex(id);
+            return null == base ? null : new IdVertex(base, this);
         }
     }
 
@@ -158,17 +173,21 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         return new IdVertexIterable(baseGraph.getVertices(), this);
     }
 
-    public Iterable<Vertex> getVertices(final String key, final Object value) {
-        if (key.equals(ID)) {
-            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
+    public Iterable<Vertex> getVertices(final String key,
+                                        final Object value) {
+        if (supportVertexIds && key.equals(ID)) {
+            throw new IllegalArgumentException("index key " + ID + " is reserved by IdGraph");
         } else {
             return new IdVertexIterable(baseGraph.getVertices(key, value), this);
         }
     }
 
-    public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+    public Edge addEdge(final Object id,
+                        final Vertex outVertex,
+                        final Vertex inVertex,
+                        final String label) {
         if (uniqueIds && null != id && null != getEdge(id)) {
-            throw new IllegalArgumentException("Edge with given id already exists: " + id);
+            throw new IllegalArgumentException("edge with given id already exists: " + id);
         }
 
         verifyNativeElement(outVertex);
@@ -176,12 +195,12 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
         Edge base = baseGraph.addEdge(null, ((IdVertex) outVertex).getBaseVertex(), ((IdVertex) inVertex).getBaseVertex(), label);
 
-        Object v = null == id ? edgeIdFactory.createId() : id;
+        if (supportEdgeIds) {
+            Object v = null == id ? edgeIdFactory.createId() : id;
 
-        if (null == v) {
-            base.removeProperty(ID);
-        } else {
-            base.setProperty(ID, v);
+            if (null != v) {
+                base.setProperty(ID, v);
+            }
         }
 
         return new IdEdge(base, this);
@@ -189,21 +208,26 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     public Edge getEdge(final Object id) {
         if (null == id) {
-            throw new IllegalArgumentException("Element identifier cannot be null");
+            throw new IllegalArgumentException("edge identifier cannot be null");
         }
 
-        Iterable<Edge> i = baseGraph.getEdges(ID, id);
-        Iterator<Edge> iter = i.iterator();
-        if (!iter.hasNext()) {
-            return null;
-        } else {
-            Edge e = iter.next();
+        if (supportEdgeIds) {
+            Iterable<Edge> i = baseGraph.getEdges(ID, id);
+            Iterator<Edge> iter = i.iterator();
+            if (!iter.hasNext()) {
+                return null;
+            } else {
+                Edge e = iter.next();
 
-            if (iter.hasNext()) {
-                throw new IllegalStateException("Multiple edges exist with id " + id);
+                if (iter.hasNext()) {
+                    throw new IllegalStateException("multiple edges exist with id " + id);
+                }
+
+                return new IdEdge(e, this);
             }
-
-            return new IdEdge(e, this);
+        } else {
+            Edge base = baseGraph.getEdge(id);
+            return null == base ? null : new IdEdge(base, this);
         }
     }
 
@@ -217,9 +241,10 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         return new IdEdgeIterable(baseGraph.getEdges(), this);
     }
 
-    public Iterable<Edge> getEdges(final String key, final Object value) {
-        if (key.equals(ID)) {
-            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
+    public Iterable<Edge> getEdges(final String key,
+                                   final Object value) {
+        if (supportEdgeIds && key.equals(ID)) {
+            throw new IllegalArgumentException("index key " + ID + " is reserved by IdGraph");
         } else {
             return new IdEdgeIterable(baseGraph.getEdges(key, value), this);
         }
@@ -234,13 +259,13 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     public void rollback() {
-        if (baseGraph instanceof TransactionalGraph) {
+        if (this.baseGraph instanceof TransactionalGraph) {
             ((TransactionalGraph) baseGraph).rollback();
         }
     }
 
     public void commit() {
-        if (baseGraph instanceof TransactionalGraph) {
+        if (this.baseGraph instanceof TransactionalGraph) {
             ((TransactionalGraph) baseGraph).commit();
         }
     }
@@ -249,38 +274,46 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         baseGraph.shutdown();
     }
 
-    private static void verifyNativeElement(final Element e) {
-        if (!(e instanceof IdElement)) {
-            throw new IllegalArgumentException("Given element was not created in this graph");
-        }
-    }
-
-    @Override
     public String toString() {
         return StringFactory.graphString(this, this.baseGraph.toString());
     }
 
     public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
-        if (key.equals(ID)) {
-            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
+        boolean v = isVertexClass(elementClass);
+        boolean supported = ((v && supportVertexIds) || (!v && supportEdgeIds));
+
+        if (supported && key.equals(ID)) {
+            throw new IllegalArgumentException("index key " + ID + " is reserved by IdGraph");
         } else {
             baseGraph.dropKeyIndex(key, elementClass);
         }
     }
 
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
-        if (key.equals(ID)) {
-            throw new IllegalArgumentException("Index key " + ID + " is reserved by IdGraph");
+    public <T extends Element> void createKeyIndex(final String key,
+                                                   final Class<T> elementClass,
+                                                   final Parameter... indexParameters) {
+        boolean v = isVertexClass(elementClass);
+        boolean supported = ((v && supportVertexIds) || (!v && supportEdgeIds));
+
+        if (supported && key.equals(ID)) {
+            throw new IllegalArgumentException("index key " + ID + " is reserved by IdGraph");
         } else {
             baseGraph.createKeyIndex(key, elementClass, indexParameters);
         }
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
-        final Set<String> keys = new HashSet<String>();
-        keys.addAll(baseGraph.getIndexedKeys(elementClass));
-        keys.remove(ID);
-        return keys;
+        boolean v = isVertexClass(elementClass);
+        boolean supported = ((v && supportVertexIds) || (!v && supportEdgeIds));
+
+        if (supported) {
+            Set<String> keys = new HashSet<String>();
+            keys.addAll(baseGraph.getIndexedKeys(elementClass));
+            keys.remove(ID);
+            return keys;
+        } else {
+            return baseGraph.getIndexedKeys(elementClass);
+        }
     }
 
     public T getBaseGraph() {
@@ -324,14 +357,27 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         ((IndexableGraph) baseGraph).dropIndex(indexName);
     }
 
-    private void verifyBaseGraphIsIndexableGraph() {
-        if (!(baseGraph instanceof IndexableGraph)) {
-            throw new IllegalStateException("base graph is not an indexable graph");
-        }
+    public GraphQuery query() {
+        final IdGraph idGraph = this;
+        return new WrappedGraphQuery(this.baseGraph.query()) {
+            @Override
+            public Iterable<Edge> edges() {
+                return new IdEdgeIterable(this.query.edges(), idGraph);
+            }
+
+            @Override
+            public Iterable<Vertex> vertices() {
+                return new IdVertexIterable(this.query.vertices(), idGraph);
+            }
+        };
     }
 
-    private boolean isVertexClass(final Class c) {
-        return Vertex.class.isAssignableFrom(c);
+    public boolean getSupportVertexIds() {
+        return supportVertexIds;
+    }
+
+    public boolean getSupportEdgeIds() {
+        return supportEdgeIds;
     }
 
     /**
@@ -344,6 +390,32 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     private static class DefaultIdFactory implements IdFactory {
         public Object createId() {
             return UUID.randomUUID().toString();
+        }
+    }
+
+    private void verifyBaseGraphIsIndexableGraph() {
+        if (!(baseGraph instanceof IndexableGraph)) {
+            throw new IllegalStateException("base graph is not an indexable graph");
+        }
+    }
+
+    private boolean isVertexClass(final Class c) {
+        return Vertex.class.isAssignableFrom(c);
+    }
+
+    private void createIndices() {
+        if (supportVertexIds && !baseGraph.getIndexedKeys(Vertex.class).contains(ID)) {
+            baseGraph.createKeyIndex(ID, Vertex.class);
+        }
+
+        if (supportEdgeIds && !baseGraph.getIndexedKeys(Edge.class).contains(ID)) {
+            baseGraph.createKeyIndex(ID, Edge.class);
+        }
+    }
+
+    private static void verifyNativeElement(final Element e) {
+        if (!(e instanceof IdElement)) {
+            throw new IllegalArgumentException("given element was not created in this graph");
         }
     }
 }

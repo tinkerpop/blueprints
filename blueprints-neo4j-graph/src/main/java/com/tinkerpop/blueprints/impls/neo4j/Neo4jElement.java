@@ -29,32 +29,26 @@ abstract class Neo4jElement implements Element {
         this.graph = graph;
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         if (this.rawElement.hasProperty(key))
-            return this.rawElement.getProperty(key);
+            return (T) this.rawElement.getProperty(key);
         else
             return null;
     }
 
     public void setProperty(final String key, final Object value) {
-        if (key.isEmpty())
-            throw ExceptionFactory.elementKeyCanNotBeEmpty();
-        if (key.equals(StringFactory.ID))
-            throw ExceptionFactory.propertyKeyIdIsReserved();
-        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
-            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
-
+        ElementHelper.validateProperty(this, key, value);
         this.graph.autoStartTransaction();
         // attempts to take a collection and convert it to an array so that Neo4j can consume it
         this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
         if (!this.rawElement.hasProperty(key))
             return null;
         else {
             this.graph.autoStartTransaction();
-            return this.rawElement.removeProperty(key);
+            return (T) this.rawElement.removeProperty(key);
         }
     }
 

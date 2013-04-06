@@ -63,7 +63,7 @@ abstract class RexsterElement implements Element {
             this.graph.removeEdge((Edge) this);
     }
 
-    public Object getProperty(final String key) {
+    public <T> T getProperty(final String key) {
         JSONObject rawElement;
         if (this instanceof Vertex)
             rawElement = RestHelper.getResultObject(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RexsterTokens.REXSTER_SHOW_TYPES_EQUALS_TRUE);
@@ -72,19 +72,13 @@ abstract class RexsterElement implements Element {
 
         JSONObject typedProperty = rawElement.optJSONObject(key);
         if (null != typedProperty)
-            return RestHelper.typeCast(typedProperty.optString(RexsterTokens.TYPE), typedProperty.opt(RexsterTokens.VALUE));
+            return (T) RestHelper.typeCast(typedProperty.optString(RexsterTokens.TYPE), typedProperty.opt(RexsterTokens.VALUE));
         else
             return null;
     }
 
     public void setProperty(final String key, final Object value) {
-        if (key.equals(StringFactory.ID))
-            throw ExceptionFactory.propertyKeyIdIsReserved();
-        if (key.equals(StringFactory.LABEL) && this instanceof Edge)
-            throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
-        if (key.equals(StringFactory.EMPTY_STRING))
-            throw ExceptionFactory.elementKeyCanNotBeEmpty();
-
+        ElementHelper.validateProperty(this, key, value);
         if (key.startsWith(RexsterTokens.UNDERSCORE))
             throw new RuntimeException("RexsterGraph does not support property keys that start with underscore");
 
@@ -103,7 +97,7 @@ abstract class RexsterElement implements Element {
         return this.getId().hashCode();
     }
 
-    public Object removeProperty(final String key) {
+    public <T> T removeProperty(final String key) {
 
         Object object = this.getProperty(key);
 
@@ -112,7 +106,7 @@ abstract class RexsterElement implements Element {
         else
             RestHelper.delete(this.graph.getGraphURI() + RexsterTokens.SLASH_EDGES_SLASH + RestHelper.encode(this.getId()) + RexsterTokens.QUESTION + RestHelper.encode(key));
 
-        return object;
+        return (T) object;
     }
 
     public boolean equals(final Object object) {

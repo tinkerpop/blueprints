@@ -5,27 +5,50 @@ h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
-h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
-
+h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>2.3.0-SNAPSHOT</version>
+  <version>2.3.2-SNAPSHOT</version>
 </dependency>
 ```
 
+* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type
+
+
+==<hr/>==
+
+h3. Version 2.3.0 (March 20, 2013)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>2.3.0</version>
+</dependency>
+```
+
+* Generalized @IdGraph@ to selectively enable custom vertex or edge IDs
+* Stricter testing of property keys/value to ensure legal Blueprints values (no id, label, empty string, null)
+* @Element.getProperty()@ API signature changed to support automatic typing to declared variable type
+* Moved @PropertyGraphSail@, which provides a dynamic RDF view of any Blueprints graph, from Tinkubator into @blueprints-graph-sail@
+* Bumped major versions of Ripple and SesameTools
+* @Neo4jBatchGraph@ project moved to @Neo4jGraph@ under @com.tinkerpop.blueprints.impls.neo4j.batch@
+* @OrientBatchGraph@ moved to @com.tinkerpop.blueprints.impls.orient.batch@
+* Added @GraphQuery@ in order to support intelligent indexing systems (@Vertex.query()@ and @Graph.query()@)
+* Refactoring of wrappers to ensure proper propagation of @Graph@ reference
 * Fixed a @ConcurrentModificationException@ in TinkerGraph
 * @Element@ API changed to support @Element.remove()@
-* @Vertex@ API changed to support @Vertex.addEdge(Vertex, String)@
-* Bumped to support Neo4j 1.9.M03
+* @Vertex@ API changed to support @Vertex.addEdge(String,Vertex)@
+* Bumped to support Neo4j 1.9.M05
 * Improved transaction concurrency in @DexGraph@
 * Deprecated @TransactionalGraph.stopTransaction()@ in favor of @commit()@ and @rollback()@
 * Renamed @ThreadedTransactionalGraph.startTransaction()@ to @ThreadedTransactionalGraph.newTransaction()@
 * Loosened restrictions on edge-indexing in @GraphSail@ (though for some types of queries, exception thrown)
 * @RestHelper@ in @RexsterGraph@ packages is no longer publicly available
-* Add @execute@ methods to @RexsterGraph@ to allow execution of raw Gremlin scripts to the Gremlin Extension in Rexster
+* Added @execute@ methods to @RexsterGraph@ to allow execution of raw Gremlin scripts to the Gremlin Extension in Rexster
 * Include the original property value in property changed/removed events generated from @EventGraph@
 * Add the option for graph-specific index parameters on @createKeyIndex@ method on @KeyIndexableGraph@
 * Fix bug in @GraphMLReader@ where the reader ignored data type casting when the @attr.name@ was different from the @id@ in the @key@ element
@@ -34,7 +57,6 @@ h3. Version 2.3.0 (NOT OFFICIALLY RELEASED YET)
 ==<hr/>==
 
 h3. Version 2.2.0 (December 19, 2012)
-
 
 ```xml
 <dependency>

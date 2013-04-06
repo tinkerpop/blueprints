@@ -4,16 +4,14 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.GraphQuery;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.LongIDVertexCache;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.ObjectIDVertexCache;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.StringIDVertexCache;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.URLCompression;
 import com.tinkerpop.blueprints.util.wrappers.batch.cache.VertexCache;
 import com.tinkerpop.blueprints.util.wrappers.id.IdGraph;
 
@@ -53,30 +51,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      */
     public static final long DEFAULT_BUFFER_SIZE = 100000;
 
-    /**
-     * Type of vertex ids expected by BatchGraph. The default is IdType.OBJECT.
-     * Use the IdType that best matches the used vertex id types in order to save memory.
-     */
-    public static enum IdType {
 
-        OBJECT, NUMBER, STRING, URL;
-
-        private VertexCache getVertexCache(Graph g) {
-            switch (this) {
-                case OBJECT:
-                    return new ObjectIDVertexCache(g);
-                case NUMBER:
-                    return new LongIDVertexCache(g);
-                case STRING:
-                    return new StringIDVertexCache(g);
-                case URL:
-                    return new StringIDVertexCache(g, new URLCompression());
-                default:
-                    throw new IllegalArgumentException("Unrecognized ID type: " + this);
-            }
-        }
-
-    }
 
     private final T baseGraph;
 
@@ -92,6 +67,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     private BatchEdge currentEdge = null;
     private Edge currentEdgeCached = null;
 
+    private Object previousOutVertexId = null;
+
     /**
      * Constructs a BatchGraph wrapping the provided baseGraph, using the specified buffer size and expecting vertex ids of
      * the specified IdType. Supplying vertex ids which do not match this type will throw exceptions.
@@ -100,7 +77,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * @param type       Type of vertex id expected. This information is used to optimize the vertex cache memory footprint.
      * @param bufferSize Defines the number of vertices and edges loaded before starting a new transaction. The larger this value, the more memory is required but the faster the loading process.
      */
-    public BatchGraph(final T graph, final IdType type, final long bufferSize) {
+    public BatchGraph(final T graph, final VertexIDType type, final long bufferSize) {
         if (graph == null) throw new IllegalArgumentException("Graph may not be null");
         if (type == null) throw new IllegalArgumentException("Type may not be null");
         if (bufferSize <= 0) throw new IllegalArgumentException("BufferSize must be positive");
@@ -110,7 +87,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         vertexIdKey = null;
         edgeIdKey = null;
 
-        cache = type.getVertexCache(this.baseGraph);
+        cache = type.getVertexCache();
 
         remainingBufferSize = this.bufferSize;
     }
@@ -121,7 +98,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * @param graph Graph to be wrapped
      */
     public BatchGraph(final T graph) {
-        this(graph, IdType.OBJECT, DEFAULT_BUFFER_SIZE);
+        this(graph, VertexIDType.OBJECT, DEFAULT_BUFFER_SIZE);
     }
 
     /**
@@ -146,8 +123,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     public static BatchGraph wrap(final Graph graph, final long buffer) {
         if (graph instanceof BatchGraph) return (BatchGraph) graph;
         else if (graph instanceof TransactionalGraph)
-            return new BatchGraph((TransactionalGraph) graph, IdType.OBJECT, buffer);
-        else return new BatchGraph(new WritethroughGraph(graph), IdType.OBJECT, buffer);
+            return new BatchGraph((TransactionalGraph) graph, VertexIDType.OBJECT, buffer);
+        else return new BatchGraph(new WritethroughGraph(graph), VertexIDType.OBJECT, buffer);
     }
 
     /**
@@ -158,8 +135,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * @param key Key to be used.
      */
     public void setVertexIdKey(final String key) {
-        if (!loadingFromScratch && key == null && baseGraph.getFeatures().ignoresSuppliedIds)
-            throw new IllegalStateException("Cannot set vertex id key to null when not loading from scratch while ids are ignored.");
+        if (!loadingFromScratch && key==null && baseGraph.getFeatures().ignoresSuppliedIds) throw new IllegalStateException("Cannot set vertex id key to null when not loading from scratch while ids are ignored.");
         this.vertexIdKey = key;
     }
 
@@ -168,7 +144,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * via {@link #setVertexIdKey(String)}
      *
      * @return The key used to set the id on the vertices or null if such has not been set
-     *         via {@link #setVertexIdKey(String)}
+     * via {@link #setVertexIdKey(String)}
      */
     public String getVertexIdKey() {
         return vertexIdKey;
@@ -190,7 +166,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * via {@link #setEdgeIdKey(String)}
      *
      * @return The key used to set the id on the edges or null if such has not been set
-     *         via {@link #setEdgeIdKey(String)}
+     * via {@link #setEdgeIdKey(String)}
      */
     public String getEdgeIdKey() {
         return edgeIdKey;
@@ -200,31 +176,30 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * Sets whether the graph loaded through this instance of {@link BatchGraph} is loaded from scratch
      * (i.e. the wrapped graph is initially empty) or whether graph is loaded incrementally into an
      * existing graph.
-     * <p/>
+     *
      * In the former case, BatchGraph does not need to check for the existence of vertices with the wrapped
      * graph but only needs to consult its own cache which can be significantly faster. In the latter case,
      * the cache is checked first but an additional check against the wrapped graph may be necessary if
      * the vertex does not exist.
-     * <p/>
+     *
      * By default, BatchGraph assumes that the data is loaded from scratch.
-     * <p/>
+     *
      * When setting loading from scratch to false, a vertex id key must be specified first using
      * {@link #setVertexIdKey(String)} - otherwise an exception is thrown.
      *
      * @param fromScratch
      */
     public void setLoadingFromScratch(boolean fromScratch) {
-        if (fromScratch == false && vertexIdKey == null && baseGraph.getFeatures().ignoresSuppliedIds)
-            throw new IllegalStateException("Vertex id key is required to query existing vertices in wrapped graph.");
-        loadingFromScratch = fromScratch;
+        if (fromScratch==false && vertexIdKey==null && baseGraph.getFeatures().ignoresSuppliedIds) throw new IllegalStateException("Vertex id key is required to query existing vertices in wrapped graph.");
+        loadingFromScratch=fromScratch;
     }
 
-    /**
-     * Whether this BatchGraph is loading data from scratch or incrementally into an existing graph.
-     * <p/>
+    /** Whether this BatchGraph is loading data from scratch or incrementally into an existing graph.
+     *
      * By default, this returns true.
      *
      * @return Whether this BatchGraph is loading data from scratch or incrementally into an existing graph.
+     *
      * @see #setLoadingFromScratch(boolean)
      */
     public boolean isLoadingFromScratch() {
@@ -235,12 +210,13 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         currentEdge = null;
         currentEdgeCached = null;
         if (remainingBufferSize <= 0) {
-            baseGraph.commit();
+            baseGraph.stopTransaction(Conclusion.SUCCESS);
             cache.newTransaction();
             remainingBufferSize = bufferSize;
         }
         remainingBufferSize--;
     }
+
 
     /**
      * Should only be invoked after loading is complete. Stopping the transaction before will cause the loading to fail.
@@ -256,6 +232,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
             rollback();
     }
 
+    /**
+     * Should only be invoked after loading is complete. Committing the transaction before will cause the loading to fail.
+     */
+    @Override
     public void commit() {
         currentEdge = null;
         currentEdgeCached = null;
@@ -263,6 +243,10 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         baseGraph.commit();
     }
 
+    /**
+     * Not supported for batch loading, since data may have already been partially persisted.
+     */
+    @Override
     public void rollback() {
         throw new IllegalStateException("Can not rollback during batch loading");
     }
@@ -297,7 +281,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
             return (Vertex) internal;
         } else if (internal != null) { //its an internal id
             Vertex v = baseGraph.getVertex(internal);
-            cache.set(v, externalID);
+            cache.set(v,externalID);
             return v;
         } else return null;
     }
@@ -308,33 +292,49 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         return v;
     }
 
+
+
+    /**
+     *
+     * If the input data are sorted, then out vertex will be repeated for several edges in a row.
+     * In this case, bypass cache and instead immediately return a new vertex using the known id.
+     * This gives a modest performance boost, especially when the cache is large or there are 
+     * on average many edges per vertex.
+     *
+     */
     @Override
     public Vertex getVertex(final Object id) {
-        Vertex v = retrieveFromCache(id);
-        if (v == null) {
-            if (loadingFromScratch) return null;
-            else {
-                if (baseGraph.getFeatures().ignoresSuppliedIds) {
-                    assert vertexIdKey != null;
-                    Iterator<Vertex> iter = baseGraph.getVertices(vertexIdKey, id).iterator();
-                    if (!iter.hasNext()) return null;
-                    v = iter.next();
-                    if (iter.hasNext())
-                        throw new IllegalArgumentException("There are multiple vertices with the provided id in the database: " + id);
-                } else {
-                    v = baseGraph.getVertex(id);
-                    if (v == null) return null;
-                }
-                cache.set(v, id);
-            }
+
+        if ( (previousOutVertexId != null) &&  (previousOutVertexId.equals(id))) {
+            return new BatchVertex(previousOutVertexId);
         }
-        return new BatchVertex(id);
+        else {
+
+            Vertex v = retrieveFromCache(id);
+            if (v == null) {
+                if (loadingFromScratch) return null;
+                else {
+                    if (baseGraph.getFeatures().ignoresSuppliedIds) {
+                        assert vertexIdKey!=null;
+                        Iterator<Vertex> iter = baseGraph.getVertices(vertexIdKey,id).iterator();
+                        if (!iter.hasNext()) return null;
+                        v = iter.next();
+                        if (iter.hasNext()) throw new IllegalArgumentException("There are multiple vertices with the provided id in the database: " + id);
+                    } else {
+                        v = baseGraph.getVertex(id);
+                        if (v==null) return null;
+                    }
+                    cache.set(v,id);
+                }
+            }
+            return new BatchVertex(id);
+        }
     }
 
     @Override
     public Vertex addVertex(final Object id) {
         if (id == null) throw ExceptionFactory.vertexIdCanNotBeNull();
-        if (retrieveFromCache(id) != null) throw ExceptionFactory.vertexWithIdAlreadyExists(id);
+        if (retrieveFromCache(id)!=null) throw ExceptionFactory.vertexWithIdAlreadyExists(id);
         nextElement();
 
         Vertex v = baseGraph.addVertex(id);
@@ -350,8 +350,12 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         if (!BatchVertex.class.isInstance(outVertex) || !BatchVertex.class.isInstance(inVertex))
             throw new IllegalArgumentException("Given element was not created in this baseGraph");
         nextElement();
+
         final Vertex ov = getCachedVertex(outVertex.getId());
         final Vertex iv = getCachedVertex(inVertex.getId());
+
+        previousOutVertexId = outVertex.getId();  //keep track of the previous out vertex id
+
         currentEdgeCached = baseGraph.addEdge(id, ov, iv, label);
         if (edgeIdKey != null && id != null) {
             currentEdgeCached.setProperty(edgeIdKey, id);
@@ -407,6 +411,11 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         throw retrievalNotSupported();
     }
 
+    @Override
+    public GraphQuery query() {
+        throw retrievalNotSupported();
+    }
+
     private class BatchVertex implements Vertex {
 
         private final Object externalID;
@@ -427,7 +436,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         }
 
         @Override
-        public Query query() {
+        public VertexQuery query() {
             throw retrievalNotSupported();
         }
 
@@ -466,7 +475,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
         @Override
         public String toString() {
-            return "v[" + externalID + "]";
+            return "v["+externalID+"]";
         }
     }
 

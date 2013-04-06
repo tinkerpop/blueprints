@@ -5,18 +5,16 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 * Implementations:
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
-**** "Neo4j High Availability":http://docs.neo4j.org/chunked/stable/ha-setup-tutorial.html support
-**** "Neo4j Batch Inserter":http://docs.neo4j.org/chunked/stable/indexing-batchinsert.html support
 ** "OrientDB":http://www.orientechnologies.com/ graph database
 ** "DEX":http://www.sparsity-technologies.com/dex graph database
-** "InfiniteGraph":http://www.infinitegraph.com/ (available "here":http://wiki.infinitegraph.com/2.1/w/index.php?title=InfiniteGraph_Tinkerpop_Blueprints_Implementation)
 ** "Titan":http://thinkaurelius.github.com/titan/ (available "here":http://thinkaurelius.github.com/titan/)
+** "InfiniteGraph":http://www.objectivity.com/products/infinitegraph/ (available "here":http://wiki.infinitegraph.com/2.1/w/index.php?title=InfiniteGraph_Tinkerpop_Blueprints_Implementation)
 ** "Rexster":http://rexster.tinkerpop.com graph server
-** "Sesame 2.0":http://www.openrdf.org compliant RDF stores
-**** "MemoryStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e705, "NativeStore":http://www.openrdf.org/doc/sesame2/users/ch08.html#d0e746, "LinkedDataSail":http://code.google.com/p/ripple/wiki/LinkedDataSail, "SPARQLRepository":http://www.openrdf.org/doc/sesame2/api/org/openrdf/repository/sparql/SPARQLRepository.html
+** "Sesame 2.x":http://www.openrdf.org compliant RDF stores
+** Many "third-party":https://github.com/tinkerpop/blueprints/wiki Blueprints implementations
 * Ouplementations:
 ** "Java Universal/Graph":http://jung.sourceforge.net/ interface
-** "Sesame 2.0":http://www.openrdf.org Sail interface
+** "Sesame 2.x":http://www.openrdf.org Sail interface
 * Supporting utilities:
 ** "GML":http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html Reader/Writer utility
 ** "GraphML":http://graphml.graphdrawing.org/ Reader/Writer utility

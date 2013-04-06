@@ -110,6 +110,13 @@ public interface Graph {
     public Iterable<Edge> getEdges(String key, Object value);
 
     /**
+     * Generate a query object that can be used to fine tune which edges/vertices are retrieved from the graph.
+     *
+     * @return a graph query object with methods for constraining which data is pulled from the underlying graph
+     */
+    public GraphQuery query();
+
+    /**
      * A shutdown function is required to properly close the graph.
      * This is important for implementations that utilize disk-based serializations.
      */

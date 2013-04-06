@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.IgnoreIdTinkerGraph;
@@ -33,40 +34,40 @@ public class BatchGraphTest extends TestCase {
     private static boolean ignoreIDs = false;
 
     public void testNumberIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.NUMBER, new NumberLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.NUMBER, new NumberLoadingFactory());
 
         assignKeys = true;
-        loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
-        loadingTest(50000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.NUMBER, new NumberLoadingFactory());
+        loadingTest(50000, 10000, VertexIDType.NUMBER, new NumberLoadingFactory());
         assignKeys = false;
 
         ignoreIDs = true;
-        loadingTest(5000, 100, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
-        loadingTest(50000, 10000, BatchGraph.IdType.NUMBER, new NumberLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.NUMBER, new NumberLoadingFactory());
+        loadingTest(50000, 10000, VertexIDType.NUMBER, new NumberLoadingFactory());
         ignoreIDs = false;
     }
 
     public void testObjectIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.OBJECT, new StringLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.OBJECT, new StringLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.OBJECT, new StringLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.OBJECT, new StringLoadingFactory());
     }
 
     public void testStringIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.STRING, new StringLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.STRING, new StringLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.STRING, new StringLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.STRING, new StringLoadingFactory());
     }
 
     public void testURLIdLoading() {
-        loadingTest(5000, 100, BatchGraph.IdType.URL, new URLLoadingFactory());
-        loadingTest(200000, 10000, BatchGraph.IdType.URL, new URLLoadingFactory());
+        loadingTest(5000, 100, VertexIDType.URL, new URLLoadingFactory());
+        loadingTest(200000, 10000, VertexIDType.URL, new URLLoadingFactory());
     }
 
     public void testQuadLoading() {
         int numEdges = 10000;
         String[][] quads = generateQuads(100, numEdges, new String[]{"knows", "friend"});
         TinkerGraph graph = new TinkerGraph();
-        BatchGraph bgraph = new BatchGraph(new WritethroughGraph(graph), BatchGraph.IdType.STRING, 1000);
+        BatchGraph bgraph = new BatchGraph(new WritethroughGraph(graph), VertexIDType.STRING, 1000);
         for (String[] quad : quads) {
             Vertex[] vertices = new Vertex[2];
             for (int i = 0; i < 2; i++) {
@@ -85,7 +86,7 @@ public class BatchGraphTest extends TestCase {
         int numEdges = 1000;
         String[][] quads = generateQuads(100, numEdges, new String[]{"knows", "friend"});
         TinkerGraph tg = new TinkerGraph();
-        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
+        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), VertexIDType.STRING, 100);
         bg.setLoadingFromScratch(false);
         Graph graph = null;
         int counter = 0;
@@ -111,7 +112,7 @@ public class BatchGraphTest extends TestCase {
         int numEdges = 1000;
         String[][] quads = generateQuads(100, numEdges, new String[]{"knows", "friend"});
         TinkerGraph tg = new IgnoreIdTinkerGraph();
-        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), BatchGraph.IdType.STRING, 100);
+        BatchGraph bg = new BatchGraph(new WritethroughGraph(tg), VertexIDType.STRING, 100);
         try {
             bg.setLoadingFromScratch(false);
             fail();
@@ -159,7 +160,7 @@ public class BatchGraphTest extends TestCase {
     }
 
 
-    public void loadingTest(int total, int bufferSize, BatchGraph.IdType type, LoadingFactory ids) {
+    public void loadingTest(int total, int bufferSize, VertexIDType type, LoadingFactory ids) {
         final VertexEdgeCounter counter = new VertexEdgeCounter();
 
         MockTransactionalGraph tgraph = null;
@@ -193,7 +194,7 @@ public class BatchGraphTest extends TestCase {
             previous = next;
         }
 
-        loader.commit();;
+        loader.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
         assertTrue(tgraph.allSuccessful());
 
         loader.shutdown();
@@ -235,8 +236,26 @@ public class BatchGraphTest extends TestCase {
         }
 
         @Override
+        public void commit() {
+            graph.commit();
+            verifyCounts();
+        }
+
+        @Override
+        public void rollback() {
+            graph.rollback();
+            verifyCounts();
+        }
+
+        @Override
         public void stopTransaction(Conclusion conclusion) {
-            graph.stopTransaction(conclusion);
+            if (Conclusion.SUCCESS == conclusion)
+                commit();
+            else
+                rollback();
+        }
+
+        private void verifyCounts() {
             //System.out.println("Committed (vertices/edges): " + counter.numVertices + " / " + counter.numEdges);
             assertEquals(counter.numVertices, BaseTest.count(graph.getVertices()) - (first ? 0 : keepLast));
             assertEquals(counter.numEdges, BaseTest.count(graph.getEdges()));
@@ -276,14 +295,6 @@ public class BatchGraphTest extends TestCase {
             counter.numEdges = 0;
             first = false;
             //System.out.println("------");
-        }
-
-        public void rollback() {
-            this.stopTransaction(Conclusion.FAILURE);
-        }
-
-        public void commit() {
-            this.stopTransaction(Conclusion.SUCCESS);
         }
 
         @Override
@@ -344,6 +355,11 @@ public class BatchGraphTest extends TestCase {
         @Override
         public void shutdown() {
             graph.shutdown();
+        }
+
+        @Override
+        public GraphQuery query() {
+            return graph.query();
         }
 
 

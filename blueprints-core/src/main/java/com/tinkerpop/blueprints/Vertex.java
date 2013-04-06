@@ -35,14 +35,14 @@ public interface Vertex extends Element {
      *
      * @return a vertex query object with methods for constraining which data is pulled from the underlying graph
      */
-    public Query query();
+    public VertexQuery query();
 
     /**
      * Add a new outgoing edge from this vertex to the parameter vertex with provided edge label.
      *
-     * @param label  the label of the edge
-     * @param vertex the vertex to connect to
+     * @param label    the label of the edge
+     * @param inVertex the vertex to connect to with an incoming edge
      * @return the newly created edge
      */
-    public Edge addEdge(String label, Vertex vertex);
+    public Edge addEdge(String label, Vertex inVertex);
 }

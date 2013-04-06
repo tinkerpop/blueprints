@@ -2,9 +2,9 @@ package com.tinkerpop.blueprints.util.wrappers.readonly;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.wrappers.WrapperQuery;
+import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -27,8 +27,8 @@ class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
         throw new UnsupportedOperationException(ReadOnlyTokens.MUTATE_ERROR_MESSAGE);
     }
 
-    public Query query() {
-        return new WrapperQuery(((Vertex) this.baseElement).query()) {
+    public VertexQuery query() {
+        return new WrapperVertexQuery(((Vertex) this.baseElement).query()) {
             @Override
             public Iterable<Vertex> vertices() {
                 return new ReadOnlyVertexIterable(this.query.vertices());
