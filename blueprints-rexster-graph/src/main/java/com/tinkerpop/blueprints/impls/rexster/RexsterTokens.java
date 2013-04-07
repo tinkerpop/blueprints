@@ -80,12 +80,6 @@ class RexsterTokens {
     public static final String REXSTER_OFFSET_START = "rexster.offset.start";
     public static final String REXSTER_SHOW_TYPES_EQUALS_TRUE = "rexster.showTypes=true";
 
-    public static final String FLOAT = "float";
-    public static final String INTEGER = "integer";
-    public static final String STRING = "string";
-    public static final String DOUBLE = "double";
-    public static final String LONG = "long";
-
     public static final String ACCEPT = "Accept";
     public static final String AUTHORIZATION = "Authorization";
     public static final String APPLICATION_REXSTER_TYPED_JSON = "application/vnd.rexster-typed-v1+json";

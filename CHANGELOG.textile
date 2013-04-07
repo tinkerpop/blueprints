@@ -15,7 +15,8 @@ h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type
+* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
+* @RexsteGraph@ properly supporting @boolean@ data types.
 
 
 ==<hr/>==
