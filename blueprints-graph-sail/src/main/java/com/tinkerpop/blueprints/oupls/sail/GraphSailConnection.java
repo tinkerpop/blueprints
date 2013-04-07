@@ -634,9 +634,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     private void fillStatement(final SimpleStatement s,
                                final Edge e) {
         s.subject = (Resource) toSesame(e.getVertex(Direction.OUT));
-        s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
+        s.predicate = store.valueFactory.createURI(e.getLabel());
         s.object = toSesame(e.getVertex(Direction.IN));
-        s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
+        // TODO: context property is currently not possible when edge indexing is disabled
+        String c = ((String) e.getProperty(GraphSail.CONTEXT_PROP));
+        s.context = null == c ? null : (Resource) toSesame(c);
     }
 
     private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
