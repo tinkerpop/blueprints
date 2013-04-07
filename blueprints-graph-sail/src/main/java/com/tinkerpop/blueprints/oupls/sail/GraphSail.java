@@ -387,7 +387,10 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
         String[] a = tripleIndexes.split(",");
         for (String s : a) {
-            u.add(s.trim());
+            String pattern = s.trim();
+            if (pattern.length() > 0) {
+                u.add(pattern);
+            }
         }
 
         if (!u.contains("p")) {
