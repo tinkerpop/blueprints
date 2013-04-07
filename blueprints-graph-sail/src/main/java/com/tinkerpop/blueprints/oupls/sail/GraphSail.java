@@ -333,7 +333,9 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         }
 
         public String valueToNative(final Value value) {
-            if (value instanceof Resource) {
+            if (null == value) {
+                return NULL_CONTEXT_NATIVE;
+            } else if (value instanceof Resource) {
                 return resourceToNative((Resource) value);
             } else if (value instanceof Literal) {
                 return literalToNative((Literal) value);
