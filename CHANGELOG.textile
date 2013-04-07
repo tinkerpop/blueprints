@@ -16,6 +16,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 ```
 
 * Configurable storage for @TinkerGraph@: GraphML, GraphSON and GML.
+* GraphChangedListener can mutate graph without concurrent modification exception.
 
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
