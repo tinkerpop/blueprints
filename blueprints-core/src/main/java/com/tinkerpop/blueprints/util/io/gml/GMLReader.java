@@ -146,7 +146,7 @@ public class GMLReader {
      * @throws IOException thrown if the data is not valid
      */
     public static void inputGraph(Graph graph, String filename) throws IOException {
-        inputGraph(graph, filename, DEFAULT_BUFFER_SIZE, DEFAULT_LABEL, null, null, null);
+        inputGraph(graph, filename, DEFAULT_BUFFER_SIZE, DEFAULT_LABEL, GMLTokens.BLUEPRINTS_ID, GMLTokens.BLUEPRINTS_ID, null);
     }
 
     /**
@@ -157,7 +157,7 @@ public class GMLReader {
      * @throws IOException thrown if the data is not valid
      */
     public static void inputGraph(Graph graph, InputStream inputStream) throws IOException {
-        inputGraph(graph, inputStream, DEFAULT_BUFFER_SIZE, DEFAULT_LABEL, null, null, null);
+        inputGraph(graph, inputStream, DEFAULT_BUFFER_SIZE, DEFAULT_LABEL, GMLTokens.BLUEPRINTS_ID, GMLTokens.BLUEPRINTS_ID, null);
     }
 
     /**
