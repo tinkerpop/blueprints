@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.impls.rexster;
 
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONTokens;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONTokener;
@@ -69,15 +70,17 @@ final class RestHelper {
     }
 
     static Object typeCast(final String type, final Object value) {
-        if (type.equals(RexsterTokens.STRING))
+        if (type.equals(GraphSONTokens.TYPE_STRING))
             return value.toString();
-        else if (type.equals(RexsterTokens.INTEGER))
+        else if (type.equals(GraphSONTokens.TYPE_BOOLEAN))
+            return Boolean.valueOf(value.toString());
+        else if (type.equals(GraphSONTokens.TYPE_INTEGER))
             return Integer.valueOf(value.toString());
-        else if (type.equals(RexsterTokens.LONG))
+        else if (type.equals(GraphSONTokens.TYPE_LONG))
             return Long.valueOf(value.toString());
-        else if (type.equals(RexsterTokens.DOUBLE))
+        else if (type.equals(GraphSONTokens.TYPE_DOUBLE))
             return Double.valueOf(value.toString());
-        else if (type.equals(RexsterTokens.FLOAT))
+        else if (type.equals(GraphSONTokens.TYPE_FLOAT))
             return Float.valueOf(value.toString());
         else
             return value;
@@ -86,16 +89,16 @@ final class RestHelper {
     static String uriCast(final Object value) {
         if (value == null)
             return "(null,\"\")";
-        if (value instanceof String)
-            return "(" + RexsterTokens.STRING + "," + value.toString() + ")";
+        if (value instanceof Boolean)
+            return "(" + GraphSONTokens.TYPE_BOOLEAN + "," + value + ")";
         else if (value instanceof Integer)
-            return "(" + RexsterTokens.INTEGER + "," + value + ")";
+            return "(" + GraphSONTokens.TYPE_INTEGER + "," + value + ")";
         else if (value instanceof Long)
-            return "(" + RexsterTokens.LONG + "," + value + ")";
+            return "(" + GraphSONTokens.TYPE_LONG + "," + value + ")";
         else if (value instanceof Float)
-            return "(" + RexsterTokens.FLOAT + "," + value + ")";
+            return "(" + GraphSONTokens.TYPE_FLOAT + "," + value + ")";
         else if (value instanceof Double)
-            return "(" + RexsterTokens.DOUBLE + "," + value + ")";
+            return "(" + GraphSONTokens.TYPE_DOUBLE + "," + value + ")";
         else
             return "(s," + value.toString() + ")";
 
