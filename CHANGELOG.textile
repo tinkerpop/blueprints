@@ -15,7 +15,6 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* A minor fix for a constantly varying @TinkerGraph@ edge set
 * Configurable storage for @TinkerGraph@: GraphML, GraphSON and GML
 * @GraphChangedListener@ can mutate graph without concurrent modification exception
 
