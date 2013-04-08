@@ -321,19 +321,11 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             final Set<Edge> edges = outVertex.outEdges.get(edge.getLabel());
             if (null != edges)
                 edges.remove(edge);
-
-            if (outVertex.outEdges.get((edge.getLabel())).size() == 0) {
-                outVertex.outEdges.remove(edge.getLabel());
-            }
         }
         if (null != inVertex && null != inVertex.inEdges) {
             final Set<Edge> edges = inVertex.inEdges.get(edge.getLabel());
             if (null != edges)
                 edges.remove(edge);
-
-            if (inVertex.inEdges.get((edge.getLabel())).size() == 0) {
-                inVertex.inEdges.remove(edge.getLabel());
-            }
         }
 
 
