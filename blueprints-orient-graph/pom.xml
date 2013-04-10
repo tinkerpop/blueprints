@@ -11,6 +11,10 @@
 	<artifactId>blueprints-orient-graph</artifactId>
 	<name>Blueprints-OrientGraph</name>
 	<description>Blueprints property graph implementation for the OrientDB graph database</description>
+	<properties>
+		<javac.src.version>1.6</javac.src.version>
+		<javac.target.version>1.6</javac.target.version>
+	</properties>
 	<repositories>
 		<repository>
 			<id>sonatype-nexus-releases</id>
