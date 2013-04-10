@@ -78,6 +78,13 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     this.openOrCreate();
   }
 
+  /**
+   * Drops the database
+   */
+  public void drop() {
+    getRawGraph().drop();
+  }
+
   @SuppressWarnings("unchecked")
   public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass,
       final Parameter... indexParameters) {
