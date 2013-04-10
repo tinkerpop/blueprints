@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
-
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
@@ -197,7 +196,6 @@ public class EventGraphTest extends GraphTest {
         assertEquals(0, counter);
     }
 
-
     public void testFireVertexAdded() {
         graph.addListener(graphChangedListener);
 
@@ -306,5 +304,23 @@ public class EventGraphTest extends GraphTest {
     private Vertex createVertex() {
         return graph.addVertex(null);
     }
-}
 
+    public void testMutateInListener() {
+        StubGraphChangedListener listener = new StubGraphChangedListener() {
+
+            @Override
+            public void vertexPropertyChanged(Vertex vertex, String key, Object oldValue, Object setValue) {
+                if (!"setInListener".equals(key)) {
+                    vertex.setProperty("setInListener", 12345);
+                }
+                super.vertexPropertyChanged(vertex, key, oldValue, setValue);
+            }
+        };
+        graph.addListener(listener);
+        Vertex vertex = createVertex();
+        vertex.setProperty("test", 123);
+        
+        assertEquals(12345, vertex.getProperty("setInListener"));
+        assertEquals(2, listener.vertexPropertyChangedEventRecorded());
+    }
+}

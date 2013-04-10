@@ -5,6 +5,19 @@ h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
+h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>2.4.0-SNAPSHOT</version>
+</dependency>
+```
+
+* Configurable storage for @TinkerGraph@: GraphML, GraphSON and GML
+* @GraphChangedListener@ can mutate graph without concurrent modification exception
+
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
@@ -15,7 +28,8 @@ h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type
+* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
+* @RexsteGraph@ properly supporting @boolean@ data types.
 
 
 ==<hr/>==

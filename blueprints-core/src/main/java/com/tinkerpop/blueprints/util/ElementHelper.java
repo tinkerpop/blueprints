@@ -198,5 +198,16 @@ public class ElementHelper {
         return a.getId().equals(((Element) b).getId());
     }
 
+    /**
+     * Simply tests if the element ids are equal().
+     *
+     * @param a the first element
+     * @param b the second element
+     * @return Whether the two elements have equal ids
+     */
+    public static boolean haveEqualIds(final Element a, final Element b) {
+        return a.getId().equals(b.getId());
+    }
+
 
 }

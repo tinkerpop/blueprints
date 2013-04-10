@@ -218,6 +218,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 m.indexStatement(edge, subject, predicate, object, c);
             }
 
+            // Hack to encode graph context even if the "c" index is disabled
+            if (null == edge.getProperty(GraphSail.CONTEXT_PROP)) {
+                edge.setProperty(GraphSail.CONTEXT_PROP, store.valueToNative(context));
+            }
+
             if (hasConnectionListeners()) {
                 Statement s = store.valueFactory.createStatement(subject, predicate, object, context);
                 notifyStatementAdded(s);
@@ -634,9 +639,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     private void fillStatement(final SimpleStatement s,
                                final Edge e) {
         s.subject = (Resource) toSesame(e.getVertex(Direction.OUT));
-        s.predicate = (URI) toSesame(((String) e.getProperty(GraphSail.PREDICATE_PROP)));
+        s.predicate = store.valueFactory.createURI(e.getLabel());
         s.object = toSesame(e.getVertex(Direction.IN));
-        s.context = (Resource) toSesame(((String) e.getProperty(GraphSail.CONTEXT_PROP)));
+        s.context = (Resource) toSesame((String) e.getProperty(GraphSail.CONTEXT_PROP));
     }
 
     private class VolatileStatementIteration implements CloseableIteration<Statement, SailException> {
