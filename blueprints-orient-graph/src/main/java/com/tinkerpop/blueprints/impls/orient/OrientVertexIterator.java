@@ -44,7 +44,6 @@ public class OrientVertexIterator extends OLazyWrapperIterator<Vertex> {
     return v;
   }
 
-  @Override
   public boolean filter(final Vertex iObject) {
     return true;
   }

@@ -52,7 +52,6 @@ public class OrientEdgeIterator extends OLazyWrapperIterator<OrientEdge> {
     return null;
   }
 
-  @Override
   public boolean filter(final OrientEdge iObject) {
     return this.vertex.graph.isUseVertexFieldsForEdgeLabels() || iObject.isLabeled(labels);
   }
