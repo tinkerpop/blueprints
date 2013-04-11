@@ -496,6 +496,9 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // are being mutated by multiple threads.  the test itself surfaced issues with OrientDB in such
         // an environment and remains relevant for any graph that might be exposed through rexster.
 
+        graphTest.dropGraph("first");
+        graphTest.dropGraph("second");
+
         final TransactionalGraph graph1 = (TransactionalGraph) graphTest.generateGraph("first");
         final TransactionalGraph graph2 = (TransactionalGraph) graphTest.generateGraph("second");
 
@@ -535,7 +538,10 @@ public class TransactionalGraphTestSuite extends TestSuite {
         }
 
         graph1.shutdown();
+        graphTest.dropGraph("first");
+        
         graph2.shutdown();
+        graphTest.dropGraph("second");
     }
 
     public void untestTransactionIsolationWithSeparateThreads() throws Exception {

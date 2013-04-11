@@ -28,11 +28,11 @@ public abstract class OrientGraphTest extends GraphTest {
 
   protected OrientGraph currentGraph;
 
-//  public void testOrientBenchmarkTestSuite() throws Exception {
-//    this.stopWatch();
-//    doTestSuite(new OrientBenchmarkTestSuite(this));
-//    printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
-//  }
+  // public void testOrientBenchmarkTestSuite() throws Exception {
+  // this.stopWatch();
+  // doTestSuite(new OrientBenchmarkTestSuite(this));
+  // printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
+  // }
 
   public void testVertexTestSuite() throws Exception {
     this.stopWatch();
@@ -104,6 +104,12 @@ public abstract class OrientGraphTest extends GraphTest {
     return generateGraph("graph");
   }
 
+  public Graph generateGraph(final String graphDirectoryName) {
+    final String dbPath = getWorkingDirectory() + "/" + graphDirectoryName;
+    this.currentGraph = new OrientGraph("local:" + dbPath);
+    return currentGraph;
+  }
+
   public void doTestSuite(final TestSuite testSuite) throws Exception {
     String directory = getWorkingDirectory();
     deleteDirectory(new File(directory));
@@ -111,21 +117,26 @@ public abstract class OrientGraphTest extends GraphTest {
       if (method.getName().startsWith("test")) {
         System.out.println("Testing " + method.getName() + "...");
         method.invoke(testSuite);
-
-        // this is necessary on windows systems: deleting the directory is not enough because it takes a
-        // while to unlock files
-        try {
-          if (this.currentGraph != null)
-            this.currentGraph.shutdown();
-        } catch (Exception e) {
-        }
-        final ODatabaseDocumentTx g = new ODatabaseDocumentTx("local:" + directory + "/graph");
-        if (g.exists())
-          g.open("admin", "admin").drop();
-
-        deleteDirectory(new File(directory));
+        dropGraph(directory + "/graph");
       }
     }
+  }
+
+  @Override
+  public void dropGraph(final String graphDirectoryName) {
+    // this is necessary on windows systems: deleting the directory is not enough because it takes a
+    // while to unlock files
+    try {
+      if (this.currentGraph != null)
+        this.currentGraph.shutdown();
+    } catch (Exception e) {
+    }
+
+    final ODatabaseDocumentTx g = new ODatabaseDocumentTx("local:" + graphDirectoryName);
+    if (g.exists())
+      g.open("admin", "admin").drop();
+
+    deleteDirectory(new File(graphDirectoryName));
   }
 
   protected String getWorkingDirectory() {

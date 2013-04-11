@@ -10,8 +10,7 @@ import com.tinkerpop.blueprints.Graph;
 public class OrientGraphClassicTest extends OrientGraphTest {
 
   public Graph generateGraph(final String graphDirectoryName) {
-    String directory = getWorkingDirectory();
-    this.currentGraph = new OrientGraph("local:" + directory + "/" + graphDirectoryName);
+    this.currentGraph = (OrientGraph) super.generateGraph(graphDirectoryName);
     this.currentGraph.setUseLightweightEdges(false);
     this.currentGraph.setUseVertexFieldsForEdgeLabels(false);
     return this.currentGraph;
