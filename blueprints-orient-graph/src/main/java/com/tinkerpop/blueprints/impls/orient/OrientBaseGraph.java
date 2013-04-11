@@ -1,5 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -652,7 +655,13 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
     if (Character.isDigit(iClassName.charAt(0)))
       iClassName = "-" + iClassName;
-    return iClassName.replace(' ', '-');
+
+    try {
+      return URLEncoder.encode(iClassName, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+      return iClassName;
+    }
   }
 
   public static String decodeClassName(String iClassName) {
@@ -662,7 +671,12 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     if (iClassName.charAt(0) == '-')
       iClassName = iClassName.substring(1);
 
-    return iClassName.replace('-', ' ');
+    try {
+      return URLDecoder.decode(iClassName, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+      return iClassName;
+    }
   }
 
   protected <T> String getClassName(final Class<T> elementClass) {
