@@ -375,6 +375,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
   }
 
+  public boolean isClosed() {
+    return getRawGraph().isClosed();
+  }
+
   public void shutdown() {
     removeContext();
 
