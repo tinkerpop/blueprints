@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.orientechnologies.common.io.OFileUtils;
 import com.orientechnologies.common.log.OLogManager;
+import com.orientechnologies.orient.core.command.traverse.OTraverse;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -595,6 +596,14 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
   public GraphQuery query() {
     return new OrientGraphQuery(this);
+  }
+
+  /**
+   * Returns a OTraverse object to start traversing the graph.
+   * 
+   */
+  public OTraverse traverse() {
+    return new OTraverse();
   }
 
   public boolean isUseLightweightEdges() {
