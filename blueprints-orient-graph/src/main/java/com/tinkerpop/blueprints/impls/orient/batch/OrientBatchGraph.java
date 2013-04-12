@@ -1,72 +1,28 @@
 package com.tinkerpop.blueprints.impls.orient.batch;
 
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.impls.orient.OrientBaseGraph;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.impls.orient.OrientElement;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
+import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
+import com.tinkerpop.blueprints.util.wrappers.batch.VertexIDType;
 
 /**
- * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
+ * A Blueprints implementation of the batch graph database OrientDB (http://www.orientechnologies.com)
  * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientBatchGraph extends OrientBaseGraph {
-  private static final Features FEATURES = new Features();
+public class OrientBatchGraph extends BatchGraph<OrientGraph> {
 
-  static {
-    FEATURES.supportsDuplicateEdges = true;
-    FEATURES.supportsSelfLoops = true;
-    FEATURES.isPersistent = true;
-    FEATURES.isRDFModel = false;
-    FEATURES.supportsVertexIteration = true;
-    FEATURES.supportsEdgeIteration = true;
-    FEATURES.supportsVertexIndex = true;
-    FEATURES.supportsEdgeIndex = true;
-    FEATURES.ignoresSuppliedIds = true;
-    FEATURES.supportsTransactions = false;
-    FEATURES.supportsEdgeKeyIndex = true;
-    FEATURES.supportsVertexKeyIndex = true;
-    FEATURES.supportsKeyIndices = true;
-    FEATURES.isWrapper = false;
-    FEATURES.supportsIndices = true;
-    FEATURES.supportsEdgeRetrieval = true;
-    FEATURES.supportsVertexProperties = true;
-    FEATURES.supportsEdgeProperties = true;
-
-    // For more information on supported types, please see:
-    // http://code.google.com/p/orient/wiki/Types
-    FEATURES.supportsSerializableObjectProperty = true;
-    FEATURES.supportsBooleanProperty = true;
-    FEATURES.supportsDoubleProperty = true;
-    FEATURES.supportsFloatProperty = true;
-    FEATURES.supportsIntegerProperty = true;
-    FEATURES.supportsPrimitiveArrayProperty = true;
-    FEATURES.supportsUniformListProperty = true;
-    FEATURES.supportsMixedListProperty = true;
-    FEATURES.supportsLongProperty = true;
-    FEATURES.supportsMapProperty = true;
-    FEATURES.supportsStringProperty = true;
-    FEATURES.supportsThreadedTransactions = false;
+  public OrientBatchGraph(final OrientGraph graph) {
+    super(graph);
   }
 
-  /**
-   * Constructs a new object using an existent OGraphDatabase instance.
-   * 
-   * @param iDatabase
-   *          Underlying OGraphDatabase object to attach
-   */
-  public OrientBatchGraph(final ODatabaseDocumentTx iDatabase) {
-    super(iDatabase);
+  public OrientBatchGraph(final OrientGraph graph, final VertexIDType type, final long bufferSize) {
+    super(graph, type, bufferSize);
   }
 
-  public OrientBatchGraph(final String url) {
-    super(url, ADMIN, ADMIN);
-  }
-
-  public OrientBatchGraph(final String url, final String username, final String password) {
-    super(url, username, password);
-  }
-
-  public Features getFeatures() {
-    return FEATURES;
+  protected <E extends Element> E setProperties(final E element, final Object... properties) {
+    ((OrientElement) element).setProperties(properties);
+    return element;
   }
 }
