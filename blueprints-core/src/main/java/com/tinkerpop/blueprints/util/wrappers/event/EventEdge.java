@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class EventEdge extends EventElement implements Edge {
 
-    protected EventEdge(final Edge rawEdge, final EventGraph eventGraph) {
+    public EventEdge(final Edge rawEdge, final EventGraph eventGraph) {
         super(rawEdge, eventGraph);
     }
 

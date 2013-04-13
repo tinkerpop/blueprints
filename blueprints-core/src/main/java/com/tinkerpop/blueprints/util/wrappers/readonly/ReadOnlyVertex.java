@@ -9,9 +9,9 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
+public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
 
-    protected ReadOnlyVertex(final Vertex baseVertex) {
+    public ReadOnlyVertex(final Vertex baseVertex) {
         super(baseVertex);
     }
 
