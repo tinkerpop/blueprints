@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.Vertex;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class StubGraphChangedListener implements GraphChangedListener {
     private int addEdgeEvent = 0;
@@ -50,7 +51,7 @@ public class StubGraphChangedListener implements GraphChangedListener {
         order.add("v-property-removed-" + vertex.getId() + "-" + s + ":" + o);
     }
 
-    public void vertexRemoved(Vertex vertex) {
+    public void vertexRemoved(Vertex vertex, Map<String, Object> props) {
         vertexRemovedEvent++;
         order.add("v-removed-" + vertex.getId());
     }
@@ -70,7 +71,7 @@ public class StubGraphChangedListener implements GraphChangedListener {
         order.add("e-property-removed-" + edge.getId() + "-" + s + ":" + o);
     }
 
-    public void edgeRemoved(Edge edge) {
+    public void edgeRemoved(Edge edge, Map<String, Object> props) {
         edgeRemovedEvent++;
         order.add("e-removed-" + edge.getId());
     }
