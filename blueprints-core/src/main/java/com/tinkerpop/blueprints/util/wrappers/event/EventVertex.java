@@ -13,7 +13,7 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
  * @author Stephen Mallette
  */
 public class EventVertex extends EventElement implements Vertex {
-    protected EventVertex(final Vertex rawVertex, final EventGraph eventGraph) {
+    public EventVertex(final Vertex rawVertex, final EventGraph eventGraph) {
         super(rawVertex, eventGraph);
     }
 

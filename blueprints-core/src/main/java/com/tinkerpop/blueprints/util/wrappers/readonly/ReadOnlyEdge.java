@@ -7,9 +7,9 @@ import com.tinkerpop.blueprints.Vertex;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class ReadOnlyEdge extends ReadOnlyElement implements Edge {
+public class ReadOnlyEdge extends ReadOnlyElement implements Edge {
 
-    protected ReadOnlyEdge(final Edge baseEdge) {
+    public ReadOnlyEdge(final Edge baseEdge) {
         super(baseEdge);
     }
 

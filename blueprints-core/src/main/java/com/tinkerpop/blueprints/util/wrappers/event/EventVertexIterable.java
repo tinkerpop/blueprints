@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Stephen Mallette
  */
-class EventVertexIterable implements CloseableIterable<Vertex> {
+public class EventVertexIterable implements CloseableIterable<Vertex> {
 
     private final Iterable<Vertex> iterable;
     private final EventGraph eventGraph;
