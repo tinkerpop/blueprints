@@ -3,6 +3,8 @@ package com.tinkerpop.blueprints.util.wrappers.event.listener;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
+import java.util.Map;
+
 /**
  * Interface for a listener to EventGraph change events.
  * <p/>
@@ -43,7 +45,7 @@ public interface GraphChangedListener {
      *
      * @param vertex the vertex that was removed
      */
-    public void vertexRemoved(final Vertex vertex);
+    public void vertexRemoved(final Vertex vertex, Map<String, Object> props);
 
     /**
      * Raised after a new edge is added.

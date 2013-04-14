@@ -5,6 +5,7 @@ import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
@@ -17,6 +18,7 @@ import com.tinkerpop.blueprints.util.wrappers.event.listener.VertexRemovedEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An EventGraph is a wrapper to existing Graph implementations and provides for graph events to be raised
@@ -74,8 +76,8 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         this.trigger.addEvent(new VertexAddedEvent(vertex));
     }
 
-    protected void onVertexRemoved(final Vertex vertex) {
-        this.trigger.addEvent(new VertexRemovedEvent(vertex));
+    protected void onVertexRemoved(final Vertex vertex, Map<String, Object> props) {
+        this.trigger.addEvent(new VertexRemovedEvent(vertex, props));
     }
 
     protected void onEdgeAdded(Edge edge) {
@@ -117,8 +119,9 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
             vertexToRemove = ((EventVertex) vertex).getBaseVertex();
         }
 
+        Map<String, Object> props = ElementHelper.getProperties(vertex);
         this.baseGraph.removeVertex(vertexToRemove);
-        this.onVertexRemoved(vertex);
+        this.onVertexRemoved(vertex, props);
     }
 
     public Iterable<Vertex> getVertices() {
