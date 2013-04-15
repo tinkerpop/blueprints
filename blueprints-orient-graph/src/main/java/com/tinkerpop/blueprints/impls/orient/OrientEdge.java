@@ -25,8 +25,7 @@ public class OrientEdge extends OrientElement implements Edge {
   private static final long  serialVersionUID = 1L;
 
   public static final String CLASS_NAME       = "E";
-  public static final String LABEL_FIELD_NAME = "label";
-
+  
   protected OIdentifiable    vOut;
   protected OIdentifiable    vIn;
   protected String           className;
@@ -90,7 +89,7 @@ public class OrientEdge extends OrientElement implements Edge {
       // LIGHTWEIGHT EDGE
       return className;
     else if (rawElement != null) {
-      String label = ((ODocument) rawElement.getRecord()).field(LABEL_FIELD_NAME);
+      String label = ((ODocument) rawElement.getRecord()).field(OrientElement.LABEL_FIELD_NAME);
       if (label != null)
         return OrientBaseGraph.decodeClassName(label);
       label = ((ODocument) rawElement.getRecord()).getClassName();
@@ -138,7 +137,7 @@ public class OrientEdge extends OrientElement implements Edge {
 
     for (String field : getRecord().fieldNames())
       if (!field.equals(OrientBaseGraph.CONNECTION_OUT) && !field.equals(OrientBaseGraph.CONNECTION_IN)
-          && (graph.isUseCustomClassesForEdges() || !field.equals(LABEL_FIELD_NAME)))
+          && (graph.isUseCustomClassesForEdges() || !field.equals(OrientElement.LABEL_FIELD_NAME)))
         result.add(field);
 
     return result;
@@ -264,7 +263,7 @@ public class OrientEdge extends OrientElement implements Edge {
     if (edge == null)
       return null;
 
-    return edge.field(LABEL_FIELD_NAME);
+    return edge.field(OrientElement.LABEL_FIELD_NAME);
   }
 
   protected void convertToDocument() {
@@ -315,7 +314,7 @@ public class OrientEdge extends OrientElement implements Edge {
     } else {
       doc = new ODocument(CLASS_NAME);
       if (iClassName != null)
-        doc.field(LABEL_FIELD_NAME, iClassName);
+        doc.field(OrientElement.LABEL_FIELD_NAME, iClassName);
     }
 
     return doc;

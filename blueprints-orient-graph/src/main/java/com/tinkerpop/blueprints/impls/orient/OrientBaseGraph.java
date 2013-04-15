@@ -51,6 +51,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   protected boolean                                    useLightweightEdges          = true;
   protected boolean                                    saveOriginalIds              = false;
   protected boolean                                    useCustomClassesForEdges     = false;
+  protected boolean                                    useCustomClassesForVertex    = true;
   protected boolean                                    keepInMemoryReferences       = false;
   protected boolean                                    useVertexFieldsForEdgeLabels = true;
 
@@ -700,5 +701,13 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     else if (elementClass.isAssignableFrom(Edge.class))
       className = OrientEdge.CLASS_NAME;
     return className;
+  }
+
+  public boolean isUseCustomClassesForVertex() {
+    return useCustomClassesForVertex;
+  }
+
+  public void setUseCustomClassesForVertex(boolean useCustomClassesForVertex) {
+    this.useCustomClassesForVertex = useCustomClassesForVertex;
   }
 }

@@ -23,6 +23,7 @@ import com.tinkerpop.blueprints.util.ElementHelper;
 public abstract class OrientElement implements Element, OSerializableStream, OIdentifiable {
   private static final long       serialVersionUID          = 1L;
 
+  public static final String      LABEL_FIELD_NAME          = "label";
   public static final Object      DEF_ORIGINAL_ID_FIELDNAME = "origId";
 
   // TODO: CAN REMOVE THIS REF IN FAVOR OF CONTEXT INSTANCE?

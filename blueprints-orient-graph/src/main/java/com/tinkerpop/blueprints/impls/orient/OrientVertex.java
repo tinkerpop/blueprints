@@ -331,6 +331,12 @@ public class OrientVertex extends OrientElement implements Vertex {
     return iterable;
   }
 
+  public String getLabel() {
+    if (graph.isUseCustomClassesForVertex())
+      return getRecord().getClassName();
+    return getRecord().field(OrientElement.LABEL_FIELD_NAME);
+  }
+
   @Override
   public String getBaseClassName() {
     return CLASS_NAME;

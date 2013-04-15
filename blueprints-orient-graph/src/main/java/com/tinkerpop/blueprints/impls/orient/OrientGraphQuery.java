@@ -6,6 +6,7 @@ import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 
@@ -18,6 +19,11 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
   public OrientGraphQuery(final Graph iGraph) {
     super(iGraph);
+  }
+
+  public Query labels(final String... labels) {
+    this.labels = labels;
+    return this;
   }
 
   @Override
