@@ -31,8 +31,22 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     final StringBuilder text = new StringBuilder();
 
     // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
-    text.append("select from V where 1=1");
+    text.append("select from ");
 
+    if (labels != null && labels.length > 0) {
+      // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
+      if (labels.length == 1)
+        // USE THE CLASS NAME
+        text.append(labels[0]);
+      else {
+        // MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
+        return super.vertices();
+      }
+    } else
+      text.append('V');
+
+    // APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
+    text.append(" where 1=1");
     manageFilters(text);
     manageLabels(text);
 
