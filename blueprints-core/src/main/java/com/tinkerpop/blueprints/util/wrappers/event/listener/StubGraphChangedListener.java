@@ -4,8 +4,10 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -14,32 +16,32 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Stephen Mallette
  */
 public class StubGraphChangedListener implements GraphChangedListener {
-    private AtomicLong addEdgeEvent = new AtomicLong(0);
-    private AtomicLong addVertexEvent = new AtomicLong(0);
-    private AtomicLong vertexPropertyChangedEvent = new AtomicLong(0);
-    private AtomicLong vertexPropertyRemovedEvent = new AtomicLong(0);
-    private AtomicLong vertexRemovedEvent = new AtomicLong(0);
-    private AtomicLong edgePropertyChangedEvent = new AtomicLong(0);
-    private AtomicLong edgePropertyRemovedEvent = new AtomicLong(0);
-    private AtomicLong edgeRemovedEvent = new AtomicLong(0);
+    private final AtomicLong addEdgeEvent = new AtomicLong(0);
+    private final AtomicLong addVertexEvent = new AtomicLong(0);
+    private final AtomicLong vertexPropertyChangedEvent = new AtomicLong(0);
+    private final AtomicLong vertexPropertyRemovedEvent = new AtomicLong(0);
+    private final AtomicLong vertexRemovedEvent = new AtomicLong(0);
+    private final AtomicLong edgePropertyChangedEvent = new AtomicLong(0);
+    private final AtomicLong edgePropertyRemovedEvent = new AtomicLong(0);
+    private final AtomicLong edgeRemovedEvent = new AtomicLong(0);
 
-    private final List<String> order = new ArrayList<String>();
+    private final ConcurrentLinkedQueue<String> order = new ConcurrentLinkedQueue<String>();
 
     public void reset() {
-        addEdgeEvent = new AtomicLong(0);
-        addVertexEvent = new AtomicLong(0);
-        vertexPropertyChangedEvent = new AtomicLong(0);
-        vertexPropertyRemovedEvent = new AtomicLong(0);
-        vertexRemovedEvent = new AtomicLong(0);
-        edgePropertyChangedEvent = new AtomicLong(0);
-        edgePropertyRemovedEvent = new AtomicLong(0);
-        edgeRemovedEvent = new AtomicLong(0);
+        addEdgeEvent.set(0);
+        addVertexEvent.set(0);
+        vertexPropertyChangedEvent.set(0);
+        vertexPropertyRemovedEvent.set(0);
+        vertexRemovedEvent.set(0);
+        edgePropertyChangedEvent.set(0);
+        edgePropertyRemovedEvent.set(0);
+        edgeRemovedEvent.set(0);
 
         order.clear();
     }
 
     public List<String> getOrder() {
-        return this.order;
+        return new ArrayList(this.order);
     }
 
     public void vertexAdded(final Vertex vertex) {
