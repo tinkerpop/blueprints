@@ -5,16 +5,21 @@ import com.tinkerpop.blueprints.Edge;
 
 import java.util.Iterator;
 
+/**
+ * Event fired when an edge is removed.
+ *
+ * @author Stephen Mallette
+ */
 public class EdgeRemovedEvent implements Event {
 
     private final Edge edge;
 
-    public EdgeRemovedEvent(Edge edge) {
+    public EdgeRemovedEvent(final Edge edge) {
         this.edge = edge;
     }
 
     @Override
-    public void fireEvent(Iterator<GraphChangedListener> eventListeners) {
+    public void fireEvent(final Iterator<GraphChangedListener> eventListeners) {
         while (eventListeners.hasNext()) {
             eventListeners.next().edgeRemoved(edge);
         }

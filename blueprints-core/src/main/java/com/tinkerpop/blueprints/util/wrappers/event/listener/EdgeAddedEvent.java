@@ -9,12 +9,12 @@ public class EdgeAddedEvent implements Event {
 
     private final Edge edge;
 
-    public EdgeAddedEvent(Edge edge) {
+    public EdgeAddedEvent(final Edge edge) {
         this.edge = edge;
     }
 
     @Override
-    public void fireEvent(Iterator<GraphChangedListener> eventListeners) {
+    public void fireEvent(final Iterator<GraphChangedListener> eventListeners) {
         while (eventListeners.hasNext()) {
             eventListeners.next().edgeAdded(edge);
         }
