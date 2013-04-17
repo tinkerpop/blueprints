@@ -77,7 +77,7 @@ public class StubGraphChangedListener implements GraphChangedListener {
         order.add("e-property-removed-" + edge.getId() + "-" + s + ":" + o);
     }
 
-    public void edgeRemoved(final Edge edge) {
+    public void edgeRemoved(final Edge edge, final Map<String, Object> props) {
         edgeRemovedEvent.incrementAndGet();
         order.add("e-removed-" + edge.getId());
     }

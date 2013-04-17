@@ -47,7 +47,7 @@ public class ConsoleGraphChangedListener implements GraphChangedListener {
         System.out.println("Edge [" + edge.toString() + "] property [" + key + "] with value of [" + removedValue + "] removed in graph [" + graph.toString() + "]");
     }
 
-    public void edgeRemoved(final Edge edge) {
+    public void edgeRemoved(final Edge edge, Map<String, Object> props) {
         System.out.println("Edge [" + edge.toString() + "] removed from graph [" + graph.toString() + "]");
     }
 }

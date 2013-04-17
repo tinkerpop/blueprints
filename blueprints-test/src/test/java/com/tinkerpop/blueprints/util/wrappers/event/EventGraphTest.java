@@ -290,7 +290,7 @@ public class EventGraphTest extends GraphTest {
             }
 
             @Override
-            public void edgeRemoved(Edge edge) {
+            public void edgeRemoved(Edge edge, Map<String, Object> props) {
                 //To change body of implemented methods use File | Settings | File Templates.
             }
         });

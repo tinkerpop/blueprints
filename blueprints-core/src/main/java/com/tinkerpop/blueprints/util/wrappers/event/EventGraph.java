@@ -84,8 +84,8 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         this.trigger.addEvent(new EdgeAddedEvent(edge));
     }
 
-    protected void onEdgeRemoved(final Edge edge) {
-        this.trigger.addEvent(new EdgeRemovedEvent(edge));
+    protected void onEdgeRemoved(final Edge edge, Map<String, Object> props) {
+        this.trigger.addEvent(new EdgeRemovedEvent(edge, props));
     }
 
     /**
@@ -119,7 +119,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
             vertexToRemove = ((EventVertex) vertex).getBaseVertex();
         }
 
-        final Map<String, Object> props = ElementHelper.getProperties(vertex);
+        Map<String, Object> props = ElementHelper.getProperties(vertex);
         this.baseGraph.removeVertex(vertexToRemove);
         this.onVertexRemoved(vertex, props);
     }
@@ -173,8 +173,9 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
             edgeToRemove = ((EventEdge) edge).getBaseEdge();
         }
 
+        Map<String, Object> props = ElementHelper.getProperties(edge);
         this.baseGraph.removeEdge(edgeToRemove);
-        this.onEdgeRemoved(edge);
+        this.onEdgeRemoved(edge, props);
     }
 
     public Iterable<Edge> getEdges() {
