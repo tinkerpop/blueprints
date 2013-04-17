@@ -85,6 +85,10 @@ public abstract class BaseTest extends TestCase {
             }
             directory.delete();
         }
+        // overkill code, simply allowing us to detect when data dir is in use
+//        if(directory.exists()) {
+//        	throw new RuntimeException("unable to delete directory "+directory.getAbsolutePath());
+//        }
     }
 
     public File computeTestDataRoot() {
