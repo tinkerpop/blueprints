@@ -119,7 +119,7 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
             vertexToRemove = ((EventVertex) vertex).getBaseVertex();
         }
 
-        Map<String, Object> props = ElementHelper.getProperties(vertex);
+        final Map<String, Object> props = ElementHelper.getProperties(vertex);
         this.baseGraph.removeVertex(vertexToRemove);
         this.onVertexRemoved(vertex, props);
     }
