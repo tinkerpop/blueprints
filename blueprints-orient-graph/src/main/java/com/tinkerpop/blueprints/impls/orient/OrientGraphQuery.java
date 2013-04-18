@@ -31,9 +31,6 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     if (limit == 0)
       return Collections.emptyList();
 
-    if (((OrientBaseGraph) graph).isUseLightweightEdges())
-      return super.vertices();
-
     final StringBuilder text = new StringBuilder();
 
     // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES

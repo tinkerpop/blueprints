@@ -354,7 +354,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
     if (vertexBaseClass != null) {
       if (!vertexBaseClass.getName().equals(OrientVertex.CLASS_NAME)) {
-        OLogManager.instance().warn(this, "Found Vertex class %s", MSG_SUFFIX, vertexBaseClass.getName());
+        OLogManager.instance().warn(this, "Found Vertex class %s" + MSG_SUFFIX, vertexBaseClass.getName());
         warn = true;
       }
 
