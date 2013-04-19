@@ -18,6 +18,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Configurable storage for @TinkerGraph@: GraphML, GraphSON and GML
 * @GraphChangedListener@ from @EventGraph@ can mutate graph without concurrent modification exception
 * Scope of @EventGraph@ base classes changed to @public@ for those wanting to extend up on them.
+* Deprecated @Query.has(key,value,compare)@ and added @Query.has(key,compare,value)@
 
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
