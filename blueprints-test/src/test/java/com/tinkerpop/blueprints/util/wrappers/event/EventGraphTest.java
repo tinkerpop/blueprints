@@ -21,8 +21,11 @@ import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListene
 import com.tinkerpop.blueprints.util.wrappers.event.listener.StubGraphChangedListener;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class EventGraphTest extends GraphTest {
@@ -244,6 +247,62 @@ public class EventGraphTest extends GraphTest {
         assertEquals(1, graphChangedListener.vertexRemovedEventRecorded());
     }
 
+    public void testFireVertexRemovedAndValidateProperties() {
+
+        final List<Boolean> fired = new ArrayList<Boolean>();
+        graph.addListener(new GraphChangedListener() {
+            @Override
+            public void vertexAdded(Vertex vertex) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void vertexPropertyChanged(Vertex vertex, String key, Object oldValue, Object setValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void vertexPropertyRemoved(Vertex vertex, String key, Object removedValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void vertexRemoved(Vertex vertex, Map<String, Object> props) {
+                assertTrue(props.containsKey("name"));
+                assertEquals("marko", props.get("name"));
+
+                fired.add(true);
+            }
+
+            @Override
+            public void edgeAdded(Edge edge) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void edgePropertyChanged(Edge edge, String key, Object oldValue, Object setValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void edgePropertyRemoved(Edge edge, String key, Object removedValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void edgeRemoved(Edge edge, Map<String, Object> props) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+        });
+
+        Vertex vertex = createVertex();
+        vertex.setProperty("name", "marko");
+        graph.removeVertex(vertex);
+
+        assertEquals(1, fired.size());
+        assertTrue(fired.get(0));
+    }
+
     public void testFireEdgeAdded() {
         graph.addListener(graphChangedListener);
 
@@ -295,6 +354,61 @@ public class EventGraphTest extends GraphTest {
         graph.removeEdge(edge);
 
         assertEquals(1, graphChangedListener.edgeRemovedEventRecorded());
+    }
+
+    public void testFireEdgeRemovedAndValidateProperties() {
+        final List<Boolean> fired = new ArrayList<Boolean>();
+        graph.addListener(new GraphChangedListener() {
+            @Override
+            public void vertexAdded(Vertex vertex) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void vertexPropertyChanged(Vertex vertex, String key, Object oldValue, Object setValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void vertexPropertyRemoved(Vertex vertex, String key, Object removedValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void vertexRemoved(Vertex vertex, Map<String, Object> props) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void edgeAdded(Edge edge) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void edgePropertyChanged(Edge edge, String key, Object oldValue, Object setValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void edgePropertyRemoved(Edge edge, String key, Object removedValue) {
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            public void edgeRemoved(Edge edge, Map<String, Object> props) {
+                assertTrue(props.containsKey("weight"));
+                assertEquals(0.5f, props.get("weight"));
+                fired.add(true);
+            }
+        });
+
+        final Edge e = createEdge();
+        e.setProperty("weight", 0.5f);
+
+        graph.removeEdge(e);
+
+        assertEquals(1, fired.size());
+        assertTrue(fired.get(0));
     }
 
     private Edge createEdge() {

@@ -14,7 +14,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
  *
  * @author Stephen Mallette
  */
-class EventIndex<T extends Element> implements Index<T> {
+public class EventIndex<T extends Element> implements Index<T> {
     protected final Index<T> rawIndex;
     private final EventGraph eventGraph;
 
