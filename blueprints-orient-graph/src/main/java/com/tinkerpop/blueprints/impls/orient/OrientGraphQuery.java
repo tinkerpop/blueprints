@@ -74,7 +74,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
     text.append("select from ");
 
-    if (((OrientBaseGraph) graph).isUseCustomClassesForEdges() && labels != null && labels.length > 0) {
+    if (((OrientBaseGraph) graph).isUseClassForEdgeLabel() && labels != null && labels.length > 0) {
       // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
       if (labels.length == 1)
         // USE THE CLASS NAME

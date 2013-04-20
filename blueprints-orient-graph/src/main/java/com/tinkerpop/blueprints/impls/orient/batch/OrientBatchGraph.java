@@ -23,6 +23,7 @@ public class OrientBatchGraph extends BatchGraph<OrientGraph> {
 
   protected <E extends Element> E setProperties(final E element, final Object... properties) {
     ((OrientElement) element).setProperties(properties);
+    ((OrientElement) element).save();
     return element;
   }
 }

@@ -25,30 +25,30 @@ public class OrientEdge extends OrientElement implements Edge {
   private static final long  serialVersionUID = 1L;
 
   public static final String CLASS_NAME       = "E";
-  
+
   protected OIdentifiable    vOut;
   protected OIdentifiable    vIn;
-  protected String           className;
+  protected String           label;
 
   public OrientEdge(final OrientBaseGraph rawGraph, final ODocument rawEdge) {
     super(rawGraph, rawEdge);
   }
 
-  public OrientEdge(final OrientBaseGraph rawGraph, final String iClassName, final Object... fields) {
+  public OrientEdge(final OrientBaseGraph rawGraph, final String iLabel, final Object... fields) {
     super(rawGraph, null);
-    rawElement = createDocument(iClassName);
+    rawElement = createDocument(iLabel);
     setProperties(fields);
   }
 
   public OrientEdge(final OrientBaseGraph rawGraph, final OIdentifiable out, final OIdentifiable in) {
-    this(rawGraph, out, in, CLASS_NAME);
+    this(rawGraph, out, in, null);
   }
 
-  public OrientEdge(final OrientBaseGraph rawGraph, final OIdentifiable out, final OIdentifiable in, final String className) {
+  public OrientEdge(final OrientBaseGraph rawGraph, final OIdentifiable out, final OIdentifiable in, final String iLabel) {
     super(rawGraph, null);
     vOut = out;
     vIn = in;
-    this.className = className;
+    label = iLabel;
   }
 
   @Override
@@ -85,15 +85,19 @@ public class OrientEdge extends OrientElement implements Edge {
 
   @Override
   public String getLabel() {
-    if (className != null)
+    if (label != null)
       // LIGHTWEIGHT EDGE
-      return className;
+      return label;
     else if (rawElement != null) {
-      String label = ((ODocument) rawElement.getRecord()).field(OrientElement.LABEL_FIELD_NAME);
+      if (graph.isUseClassForEdgeLabel()) {
+        final String clsName = getRecord().getClassName();
+        if (!CLASS_NAME.equals(clsName))
+          // RETURN THE CLASS NAME
+          return OrientBaseGraph.decodeClassName(clsName);
+      }
+
+      final String label = ((ODocument) rawElement.getRecord()).field(OrientElement.LABEL_FIELD_NAME);
       if (label != null)
-        return OrientBaseGraph.decodeClassName(label);
-      label = ((ODocument) rawElement.getRecord()).getClassName();
-      if (label != null && !label.equals(CLASS_NAME))
         return OrientBaseGraph.decodeClassName(label);
     }
     return null;
@@ -104,7 +108,7 @@ public class OrientEdge extends OrientElement implements Edge {
     if (rawElement == null && object instanceof OrientEdge) {
       final OrientEdge other = (OrientEdge) object;
       return vOut.equals(other.vOut) && vIn.equals(other.vIn)
-          && (className == null && other.className == null || className.equals(other.className));
+          && (label == null && other.label == null || label.equals(other.label));
     }
     return super.equals(object);
   }
@@ -137,7 +141,7 @@ public class OrientEdge extends OrientElement implements Edge {
 
     for (String field : getRecord().fieldNames())
       if (!field.equals(OrientBaseGraph.CONNECTION_OUT) && !field.equals(OrientBaseGraph.CONNECTION_IN)
-          && (graph.isUseCustomClassesForEdges() || !field.equals(OrientElement.LABEL_FIELD_NAME)))
+          && (graph.isUseClassForEdgeLabel() || !field.equals(OrientElement.LABEL_FIELD_NAME)))
         result.add(field);
 
     return result;
@@ -276,7 +280,7 @@ public class OrientEdge extends OrientElement implements Edge {
     final ODocument vOutRecord = vOut.getRecord();
     final ODocument vInRecord = vIn.getRecord();
 
-    final ODocument doc = createDocument(className);
+    final ODocument doc = createDocument(label);
 
     doc.field(OrientBaseGraph.CONNECTION_OUT, graph.isKeepInMemoryReferences() ? vOutRecord.getIdentity() : vOutRecord);
     doc.field(OrientBaseGraph.CONNECTION_IN, graph.isKeepInMemoryReferences() ? vInRecord.getIdentity() : vInRecord);
@@ -284,10 +288,10 @@ public class OrientEdge extends OrientElement implements Edge {
 
     final boolean useVertexFieldsForEdgeLabels = graph.isUseVertexFieldsForEdgeLabels();
 
-    final String outFieldName = OrientVertex.getConnectionFieldName(Direction.OUT, className, useVertexFieldsForEdgeLabels);
+    final String outFieldName = OrientVertex.getConnectionFieldName(Direction.OUT, label, useVertexFieldsForEdgeLabels);
     OrientVertex.removeEdges(vOutRecord, outFieldName, vInRecord, false, useVertexFieldsForEdgeLabels);
 
-    final String inFieldName = OrientVertex.getConnectionFieldName(Direction.IN, className, useVertexFieldsForEdgeLabels);
+    final String inFieldName = OrientVertex.getConnectionFieldName(Direction.IN, label, useVertexFieldsForEdgeLabels);
     OrientVertex.removeEdges(vInRecord, inFieldName, vOutRecord, false, useVertexFieldsForEdgeLabels);
 
     // OUT-VERTEX ---> IN-VERTEX/EDGE
@@ -302,22 +306,27 @@ public class OrientEdge extends OrientElement implements Edge {
 
     vOut = null;
     vIn = null;
-    className = null;
+    label = null;
   }
 
-  protected ODocument createDocument(final String iClassName) {
-    final ODocument doc;
+  protected ODocument createDocument(final String iLabel) {
+    final String className = getClassName(iLabel);
 
-    if (iClassName != null && graph.isUseCustomClassesForEdges()) {
-      checkForClassInSchema(iClassName);
-      doc = new ODocument(iClassName);
-    } else {
-      doc = new ODocument(CLASS_NAME);
-      if (iClassName != null)
-        doc.field(OrientElement.LABEL_FIELD_NAME, iClassName);
-    }
+    final ODocument doc = new ODocument(className);
+
+    if (iLabel != null && !graph.isUseClassForEdgeLabel())
+      // SET THE LABEL AS FIELD
+      doc.field(OrientElement.LABEL_FIELD_NAME, iLabel);
 
     return doc;
+  }
+
+  public String getClassName(final String iLabel) {
+    if (iLabel != null && graph.isUseClassForEdgeLabel())
+      // USE THE LABEL AS DOCUMENT CLASS
+      return checkForClassInSchema(iLabel);
+
+    return CLASS_NAME;
   }
 
   protected void dropEdgeFromVertex(final OIdentifiable iEdge, final ODocument iVertex, final String iFieldName,

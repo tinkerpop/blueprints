@@ -11,7 +11,7 @@ public class OrientGraphCustomEdgesTest extends OrientGraphTest {
 
   public Graph generateGraph(final String graphDirectoryName) {
     this.currentGraph = (OrientGraph) super.generateGraph(graphDirectoryName);
-    this.currentGraph.setUseCustomClassesForEdges(true);
+    this.currentGraph.setUseClassForEdgeLabel(true);
 
     if (currentGraph.getEdgeType("friend") == null)
       currentGraph.createEdgeType("friend");

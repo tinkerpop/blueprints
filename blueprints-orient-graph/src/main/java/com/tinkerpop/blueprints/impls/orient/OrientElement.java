@@ -5,10 +5,12 @@ import java.util.Map;
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
+import com.orientechnologies.orient.core.exception.OSchemaException;
 import com.orientechnologies.orient.core.exception.OSerializationException;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.Element;
@@ -46,7 +48,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
   }
 
   public <T extends OrientElement> T setProperties(final Object... fields) {
-    if (fields != null && fields.length > 0) {
+    if (fields != null && fields.length > 0 && fields[0] != null) {
       graph.autoStartTransaction();
       if (fields.length == 1) {
         Object f = fields[0];
@@ -61,8 +63,6 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
         // SET THE FIELDS
         for (int i = 0; i < fields.length; i += 2)
           setPropertyInternal(this, (ODocument) rawElement.getRecord(), fields[i].toString(), fields[i + 1]);
-
-      save();
     }
     return (T) this;
   }
@@ -102,9 +102,22 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
     return getIdentity();
   }
 
-  protected void save() {
+  public void save() {
+    save(null);
+  }
+
+  /**
+   * Saves the edge's document.
+   * 
+   * @param iClusterName
+   *          Cluster name or null to use the default "E"
+   */
+  public void save(final String iClusterName) {
     if (rawElement instanceof ODocument)
-      ((ODocument) rawElement).save();
+      if (iClusterName != null)
+        ((ODocument) rawElement).save(iClusterName);
+      else
+        ((ODocument) rawElement).save();
   }
 
   public int hashCode() {
@@ -193,30 +206,44 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
    * @param iClassName
    *          Class's name
    */
-  protected void checkForClassInSchema(final String iClassName) {
+  protected String checkForClassInSchema(final String iClassName) {
     if (iClassName == null)
-      return;
+      return null;
 
-    if (!graph.getRawGraph().getMetadata().getSchema().existsClass(iClassName)) {
-      boolean txActive = graph.getRawGraph().getTransaction().isActive();
+    final OSchema schema = graph.getRawGraph().getMetadata().getSchema();
 
-      if (txActive) {
-        OLogManager
-            .instance()
-            .warn(
-                this,
-                "[OrientEdge] committing the active transaction to create the new Edge type '%s'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction",
-                iClassName);
-        graph.commit();
-      }
-
+    if (!schema.existsClass(iClassName)) {
       // CREATE A NEW CLASS AT THE FLY
-      graph.getRawGraph().getMetadata().getSchema()
-          .createClass(iClassName, graph.getRawGraph().getMetadata().getSchema().getClass(getBaseClassName()));
+      boolean txActive = graph.getRawGraph().getTransaction().isActive();
+      try {
 
-      if (txActive)
-        graph.autoStartTransaction();
+        if (txActive) {
+          OLogManager
+              .instance()
+              .warn(
+                  this,
+                  "[OrientEdge] committing the active transaction to create the new Edge type '%s'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction",
+                  iClassName);
+          graph.commit();
+        }
+
+        schema.createClass(iClassName, schema.getClass(getBaseClassName()));
+
+      } catch (OSchemaException e) {
+        if (!schema.existsClass(iClassName))
+          throw e;
+      } finally {
+        if (txActive)
+          graph.autoStartTransaction();
+      }
+    } else {
+      // CHECK THE CLASS INHERITANCE
+      final OClass cls = schema.getClass(iClassName);
+      if (!cls.isSubClassOf(getBaseClassName()))
+        throw new IllegalArgumentException("Class '" + iClassName + "' is not an instance of " + getBaseClassName());
     }
+
+    return iClassName;
   }
 
   protected static void setPropertyInternal(final Element element, final ODocument doc, final String key, final Object value) {

@@ -24,7 +24,7 @@ public class OrientBenchmarkTestSuite extends TestSuite {
 
   public OrientBenchmarkTestSuite(final GraphTest graphTest) {
     super(graphTest);
-//    OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(true);
+    OGlobalConfiguration.STORAGE_KEEP_OPEN.setValue(true);
   }
 
   //
@@ -64,27 +64,27 @@ public class OrientBenchmarkTestSuite extends TestSuite {
   // }
   // BaseTest.printPerformance("OrientRaw", 1, "OrientDB Raw experiment average", totalTime / (double) TOTAL_RUNS);
   // }
-//
-//  public void testOrientGraph() throws Exception {
-//    double totalTime = 0.0d;
-//    Graph graph = graphTest.generateGraph();
-//    // graph = new OrientBatchGraph((ODatabaseDocumentTx) ((OrientGraph) graph).getRawGraph());
-//    // GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
-//    GraphMLReader.inputGraph(graph, new FileInputStream("/Users/luca/Downloads/graph-example-2.xml"));
-//    System.out.println("V: " + ((OrientBaseGraph) graph).getRawGraph().countClass("V") + " E: "
-//        + ((OrientBaseGraph) graph).getRawGraph().countClass("E"));
-//    graph.shutdown();
-//
-//    for (int i = 0; i < TOTAL_RUNS; i++) {
-//      graph = graphTest.generateGraph();
-//      int counter = execute(graph);
-//      double currentTime = this.stopWatch();
-//      totalTime = totalTime + currentTime;
-//      BaseTest.printPerformance(graph.toString(), counter, "OrientGraph elements touched", currentTime);
-//      graph.shutdown();
-//    }
-//    BaseTest.printPerformance("OrientGraph", 1, "OrientGraph experiment average", totalTime / (double) TOTAL_RUNS);
-//  }
+  //
+  public void testOrientGraph() throws Exception {
+    double totalTime = 0.0d;
+    Graph graph = graphTest.generateGraph();
+    // graph = new OrientBatchGraph((ODatabaseDocumentTx) ((OrientGraph) graph).getRawGraph());
+    // GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
+    GraphMLReader.inputGraph(graph, new FileInputStream("/Users/luca/Downloads/graph-example-2.xml"));
+    System.out.println("V: " + ((OrientBaseGraph) graph).getRawGraph().countClass("V") + " E: "
+        + ((OrientBaseGraph) graph).getRawGraph().countClass("E"));
+    graph.shutdown();
+
+    for (int i = 0; i < TOTAL_RUNS; i++) {
+      graph = graphTest.generateGraph();
+      int counter = execute(graph);
+      double currentTime = this.stopWatch();
+      totalTime = totalTime + currentTime;
+      BaseTest.printPerformance(graph.toString(), counter, "OrientGraph elements touched", currentTime);
+      graph.shutdown();
+    }
+    BaseTest.printPerformance("OrientGraph", 1, "OrientGraph experiment average", totalTime / (double) TOTAL_RUNS);
+  }
 
   private int execute(Graph graph) {
     this.stopWatch();

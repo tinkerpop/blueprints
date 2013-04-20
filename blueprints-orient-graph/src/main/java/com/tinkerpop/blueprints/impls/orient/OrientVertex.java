@@ -34,10 +34,11 @@ public class OrientVertex extends OrientElement implements Vertex {
   public static final String CONNECTION_OUT_PREFIX = OrientBaseGraph.CONNECTION_OUT + "_";
   public static final String CONNECTION_IN_PREFIX  = OrientBaseGraph.CONNECTION_IN + "_";
 
-  public OrientVertex(final OrientBaseGraph graph, final String className, final Object... fields) {
+  public OrientVertex(final OrientBaseGraph graph, String className, final Object... fields) {
     super(graph, null);
     if (className != null)
-      checkForClassInSchema(className);
+      className = checkForClassInSchema(OrientBaseGraph.encodeClassName(className));
+
     rawElement = new ODocument(className == null ? CLASS_NAME : className);
     setProperties(fields);
   }
@@ -161,14 +162,15 @@ public class OrientVertex extends OrientElement implements Vertex {
 
   @Override
   public Edge addEdge(final String label, final Vertex inVertex) {
-    return addEdge(label, inVertex, null, (Object[]) null);
+    return addEdge(label, inVertex, null, null, (Object[]) null);
   }
 
   public OrientEdge addEdge(final String label, final Vertex inVertex, final String iClassName) {
-    return addEdge(label, inVertex, iClassName, (Object[]) null);
+    return addEdge(label, inVertex, iClassName, null, (Object[]) null);
   }
 
-  public OrientEdge addEdge(String label, final Vertex inVertex, String iClassName, final Object... fields) {
+  public OrientEdge addEdge(String label, final Vertex inVertex, final String iClassName, final String iClusterName,
+      final Object... fields) {
     if (inVertex == null)
       throw new IllegalArgumentException("destination vertex is null");
 
@@ -193,12 +195,11 @@ public class OrientVertex extends OrientElement implements Vertex {
       to = inDocument;
       edge = new OrientEdge(graph, from, to, label);
     } else {
-      if (label != null)
-        // USES THE LABEL FOR THE CLASS NAME
-        iClassName = label;
-
       // CREATE THE EDGE DOCUMENT TO STORE FIELDS TOO
-      edge = new OrientEdge(graph, iClassName, fields);
+      if (label == null && iClassName != null)
+        label = OrientBaseGraph.encodeClassName(iClassName);
+
+      edge = new OrientEdge(graph, label, fields);
 
       if (graph.isKeepInMemoryReferences())
         edge.getRecord().fields(OrientBaseGraph.CONNECTION_OUT, rawElement.getIdentity(), OrientBaseGraph.CONNECTION_IN,
@@ -222,7 +223,7 @@ public class OrientVertex extends OrientElement implements Vertex {
     // IN-VERTEX ---> OUT-VERTEX/EDGE
     createLink(inDocument, from, inFieldName);
 
-    edge.save();
+    edge.save(iClusterName);
     outDocument.save();
     inDocument.save();
 
@@ -235,7 +236,7 @@ public class OrientVertex extends OrientElement implements Vertex {
     if (!graph.isUseVertexFieldsForEdgeLabels() && label != null)
       return false;
 
-    if (graph.isUseLightweightEdges() && (fields == null || fields.length == 0)) {
+    if (graph.isUseLightweightEdges() && (fields == null || fields.length == 0 || fields[0] == null)) {
       Object field = iFromVertex.field(iOutFieldName);
       if (field != null)
         if (field instanceof OIdentifiable) {
@@ -332,8 +333,12 @@ public class OrientVertex extends OrientElement implements Vertex {
   }
 
   public String getLabel() {
-    if (graph.isUseCustomClassesForVertex())
-      return getRecord().getClassName();
+    if (graph.isUseClassForVertexLabel()) {
+      final String clsName = getRecord().getClassName();
+      if (!CLASS_NAME.equals(clsName))
+        // RETURN THE CLASS NAME
+        return clsName;
+    }
     return getRecord().field(OrientElement.LABEL_FIELD_NAME);
   }
 

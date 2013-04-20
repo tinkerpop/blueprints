@@ -46,14 +46,15 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   public static final String                           CONNECTION_OUT               = "out";
   public static final String                           CONNECTION_IN                = "in";
   public static final String                           CLASS_PREFIX                 = "class:";
+  public static final String                           CLUSTER_PREFIX               = "cluster:";
 
   protected final static String                        ADMIN                        = "admin";
   protected boolean                                    useLightweightEdges          = true;
-  protected boolean                                    saveOriginalIds              = false;
-  protected boolean                                    useCustomClassesForEdges     = false;
-  protected boolean                                    useCustomClassesForVertex    = true;
+  protected boolean                                    useClassForEdgeLabel         = true;
+  protected boolean                                    useClassForVertexLabel       = true;
   protected boolean                                    keepInMemoryReferences       = false;
   protected boolean                                    useVertexFieldsForEdgeLabels = true;
+  protected boolean                                    saveOriginalIds              = false;
 
   private String                                       url;
   private String                                       username;
@@ -162,25 +163,56 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
   }
 
-  public Vertex addVertex(final Object id) {
+  public OrientVertex addVertex(final Object id) {
     String className = null;
-    if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
-      // GET THE CLASS NAME
-      className = id.toString().substring(CLASS_PREFIX.length());
+    String clusterName = null;
+    Object[] fields = null;
+
+    if (id != null) {
+      if (id instanceof String) {
+        // PARSE ARGUMENTS
+        final String[] args = ((String) id).split(",");
+        for (String s : args) {
+          if (s.startsWith(CLASS_PREFIX))
+            // GET THE CLASS NAME
+            className = s.substring(CLASS_PREFIX.length());
+          else if (s.startsWith(CLUSTER_PREFIX))
+            // GET THE CLASS NAME
+            clusterName = s.substring(CLUSTER_PREFIX.length());
+        }
+      }
+
+      if (saveOriginalIds)
+        // SAVE THE ID TOO
+        fields = new Object[] { OrientElement.DEF_ORIGINAL_ID_FIELDNAME, id };
+    }
 
     this.autoStartTransaction();
-
-    // SAVE THE ID TOO?
-    final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.DEF_ORIGINAL_ID_FIELDNAME, id } : null;
 
     final OrientVertex vertex = new OrientVertex(this, className, fields);
 
     // SAVE IT
-    vertex.save();
+    if (clusterName != null)
+      vertex.save(clusterName);
+    else
+      vertex.save();
     return vertex;
   }
 
-  public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+  public OrientVertex addVertex(final String iClassName, final String iClusterName) {
+    this.autoStartTransaction();
+
+    final OrientVertex vertex = new OrientVertex(this, iClassName);
+
+    // SAVE IT
+    if (iClusterName != null)
+      vertex.save(iClusterName);
+    else
+      vertex.save();
+    return vertex;
+  }
+
+  public OrientEdge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
     String className = null;
     if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
       // GET THE CLASS NAME
@@ -189,10 +221,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     // SAVE THE ID TOO?
     final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.DEF_ORIGINAL_ID_FIELDNAME, id } : null;
 
-    return ((OrientVertex) outVertex).addEdge(label, inVertex, className, fields);
+    return ((OrientVertex) outVertex).addEdge(label, inVertex, className, null, fields);
   }
 
-  public Vertex getVertex(final Object id) {
+  public OrientVertex getVertex(final Object id) {
     if (null == id)
       throw ExceptionFactory.vertexIdCanNotBeNull();
 
@@ -272,7 +304,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return new OrientElementScanIterable<Edge>(this, Edge.class, polymorphic);
   }
 
-  public Edge getEdge(final Object id) {
+  public OrientEdge getEdge(final Object id) {
     if (null == id)
       throw ExceptionFactory.edgeIdCanNotBeNull();
 
@@ -350,7 +382,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
     // @COMPATIBILITY < 1.4.0:
     boolean warn = false;
-    final String MSG_SUFFIX = ". Probably you are using a database created with a previous version of OrientDB. Run command 'migrate database' to convert old database to new ones";
+    final String MSG_SUFFIX = ". Probably you are using a database created with a previous version of OrientDB. Export in graphml format and reimport it";
 
     if (vertexBaseClass != null) {
       if (!vertexBaseClass.getName().equals(OrientVertex.CLASS_NAME)) {
@@ -647,12 +679,20 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     this.keepInMemoryReferences = useReferences;
   }
 
-  public boolean isUseCustomClassesForEdges() {
-    return useCustomClassesForEdges;
+  public boolean isUseClassForEdgeLabel() {
+    return useClassForEdgeLabel;
   }
 
-  public void setUseCustomClassesForEdges(final boolean useCustomClassesForEdges) {
-    this.useCustomClassesForEdges = useCustomClassesForEdges;
+  public void setUseClassForEdgeLabel(final boolean useCustomClassesForEdges) {
+    this.useClassForEdgeLabel = useCustomClassesForEdges;
+  }
+
+  public boolean isUseClassForVertexLabel() {
+    return useClassForVertexLabel;
+  }
+
+  public void setUseClassForVertexLabel(boolean useCustomClassesForVertex) {
+    this.useClassForVertexLabel = useCustomClassesForVertex;
   }
 
   public boolean isUseVertexFieldsForEdgeLabels() {
@@ -701,13 +741,5 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     else if (elementClass.isAssignableFrom(Edge.class))
       className = OrientEdge.CLASS_NAME;
     return className;
-  }
-
-  public boolean isUseCustomClassesForVertex() {
-    return useCustomClassesForVertex;
-  }
-
-  public void setUseCustomClassesForVertex(boolean useCustomClassesForVertex) {
-    this.useCustomClassesForVertex = useCustomClassesForVertex;
   }
 }
