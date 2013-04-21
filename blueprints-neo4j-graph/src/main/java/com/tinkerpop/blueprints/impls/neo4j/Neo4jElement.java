@@ -11,6 +11,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 
+import java.util.ArrayList;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,7 +32,8 @@ abstract class Neo4jElement implements Element {
 
     public <T> T getProperty(final String key) {
         if (this.rawElement.hasProperty(key))
-            return (T) this.rawElement.getProperty(key);
+            return (T) tryConvertCollectionToArrayList(this.rawElement.getProperty(key));
+	//return (T) this.rawElement.getProperty(key);
         else
             return null;
     }
@@ -106,6 +108,26 @@ abstract class Neo4jElement implements Element {
                 return array;
             } catch (final ArrayStoreException ase) {
                 // this fires off if the collection is not all of the same type
+                return value;
+            }
+        } else {
+            return value;
+        }
+    }
+
+    private Object tryConvertCollectionToArrayList(final Object value) {
+        if (value.getClass().isArray()) {
+            // convert primitive array to an ArrayList.  
+            try {
+		ArrayList<Object> list = new ArrayList<Object>();
+		int arrlength = Array.getLength(value);
+		for(int i = 0; i < arrlength; i++){
+		    Object object = Array.get(value, i);
+		    list.add(object);
+		}
+		return list;
+            } catch (final Exception e) {
+                // this fires off if the collection is not an array
                 return value;
             }
         } else {
