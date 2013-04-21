@@ -33,7 +33,6 @@ abstract class Neo4jElement implements Element {
     public <T> T getProperty(final String key) {
         if (this.rawElement.hasProperty(key))
             return (T) tryConvertCollectionToArrayList(this.rawElement.getProperty(key));
-	//return (T) this.rawElement.getProperty(key);
         else
             return null;
     }
