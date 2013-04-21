@@ -1,8 +1,6 @@
-package com.tinkerpop.blueprints.impls.orient.batch;
+package com.tinkerpop.blueprints.impls.orient;
 
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.impls.orient.OrientElement;
-import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
 import com.tinkerpop.blueprints.util.wrappers.batch.VertexIDType;
 

@@ -164,6 +164,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   }
 
   public OrientVertex addVertex(final Object id) {
+    return addVertex(id, (Object[]) null);
+  }
+
+  public OrientVertex addVertex(final Object id, final Object... prop) {
     String className = null;
     String clusterName = null;
     Object[] fields = null;
@@ -190,6 +194,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     this.autoStartTransaction();
 
     final OrientVertex vertex = new OrientVertex(this, className, fields);
+    vertex.setProperties(prop);
 
     // SAVE IT
     if (clusterName != null)

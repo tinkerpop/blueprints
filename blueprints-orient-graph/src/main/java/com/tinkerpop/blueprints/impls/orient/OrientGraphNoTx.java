@@ -1,8 +1,7 @@
-package com.tinkerpop.blueprints.impls.orient.batch;
+package com.tinkerpop.blueprints.impls.orient;
 
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.impls.orient.OrientBaseGraph;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)

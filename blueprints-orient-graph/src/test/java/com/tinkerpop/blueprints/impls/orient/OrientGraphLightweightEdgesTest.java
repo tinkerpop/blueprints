@@ -11,6 +11,8 @@ public class OrientGraphLightweightEdgesTest extends OrientGraphTest {
 
   public Graph generateGraph(final String graphDirectoryName) {
     this.currentGraph = (OrientGraph) super.generateGraph(graphDirectoryName);
+    this.currentGraph.setUseClassForEdgeLabel(false);
+    this.currentGraph.setUseClassForVertexLabel(false);
     return this.currentGraph;
   }
 
