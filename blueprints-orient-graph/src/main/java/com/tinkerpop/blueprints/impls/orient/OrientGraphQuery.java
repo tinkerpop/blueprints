@@ -40,7 +40,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
       // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
       if (labels.length == 1)
         // USE THE CLASS NAME
-        text.append(labels[0]);
+        text.append(OrientBaseGraph.encodeClassName(labels[0]));
       else {
         // MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
         return super.vertices();
@@ -78,7 +78,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
       // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
       if (labels.length == 1)
         // USE THE CLASS NAME
-        text.append(labels[0]);
+        text.append(OrientBaseGraph.encodeClassName(labels[0]));
       else {
         // MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
         return super.edges();
