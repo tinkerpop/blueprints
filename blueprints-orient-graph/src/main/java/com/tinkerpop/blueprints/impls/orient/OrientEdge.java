@@ -340,7 +340,7 @@ public class OrientEdge extends OrientElement implements Edge {
       // FOUND A SINGLE ITEM: JUST REMOVE IT
 
       if (iFieldValue.equals(iEdge))
-        iVertex.field(iFieldName, (OIdentifiable) null);
+        iVertex.removeField(iFieldName);
       else
         // NO EDGE? WARN
         OLogManager.instance().warn(this, "Edge not found in vertex's property %s.%s link while removing the edge %s",
@@ -351,6 +351,12 @@ public class OrientEdge extends OrientElement implements Edge {
       if (!((OMVRBTreeRIDSet) iFieldValue).remove(iEdge))
         OLogManager.instance().warn(this, "Edge not found in vertex's property %s.%s set while removing the edge %s",
             iVertex.getIdentity(), iFieldName, iEdge.getIdentity());
+
+      if (((OMVRBTreeRIDSet) iFieldValue).size() == 1)
+        iVertex.field(iFieldName, ((OMVRBTreeRIDSet) iFieldValue).iterator().next());
+      else if (((OMVRBTreeRIDSet) iFieldValue).size() == 0)
+        iVertex.removeField(iFieldName);
+
     } else if (iFieldValue instanceof Collection<?>) {
       // CONVERT COLLECTION IN TREE-SET AND REMOVE THE EDGE
       final OMVRBTreeRIDSet out = new OMVRBTreeRIDSet(iVertex, (Collection<OIdentifiable>) iFieldValue);
