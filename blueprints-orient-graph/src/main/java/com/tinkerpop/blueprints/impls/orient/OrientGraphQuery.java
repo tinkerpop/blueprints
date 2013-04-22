@@ -36,7 +36,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
     text.append("select from ");
 
-    if (labels != null && labels.length > 0) {
+    if (((OrientBaseGraph) graph).isUseClassForVertexLabel() && labels != null && labels.length > 0) {
       // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
       if (labels.length == 1)
         // USE THE CLASS NAME
@@ -51,7 +51,8 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     // APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
     text.append(" where 1=1");
     manageFilters(text);
-    manageLabels(text);
+    if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
+      manageLabels(text);
 
     final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
 
@@ -90,7 +91,8 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     text.append(" where 1=1");
 
     manageFilters(text);
-    manageLabels(text);
+    if (!((OrientBaseGraph) graph).isUseClassForEdgeLabel())
+      manageLabels(text);
 
     final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
 
