@@ -19,6 +19,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * @GraphChangedListener@ from @EventGraph@ can mutate graph without concurrent modification exception
 * Scope of @EventGraph@ base classes changed to @public@ for those wanting to extend up on them.
 * Deprecated @Query.has(key,value,compare)@ and added @Query.has(key,compare,value)@
+* Bumped Dex to 4.8.0
 
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
