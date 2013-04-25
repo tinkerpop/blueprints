@@ -12,6 +12,7 @@ import java.util.Set;
 
 import com.orientechnologies.common.io.OFileUtils;
 import com.orientechnologies.common.log.OLogManager;
+import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.command.traverse.OTraverse;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.id.ORID;
@@ -642,6 +643,16 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
    */
   public OTraverse traverse() {
     return new OTraverse();
+  }
+
+  /**
+   * Executes commands against the graph.
+   * 
+   * @param iCommand
+   *          Command request between SQL, GREMLIN and SCRIPT commands
+   */
+  public OCommandRequest command(final OCommandRequest iCommand) {
+    return getRawGraph().command(iCommand);
   }
 
   public boolean isUseLightweightEdges() {

@@ -91,7 +91,7 @@ public class OrientEdge extends OrientElement implements Edge {
     else if (rawElement != null) {
       if (graph.isUseClassForEdgeLabel()) {
         final String clsName = getRecord().getClassName();
-        if (!CLASS_NAME.equals(clsName))
+        if (!CLASS_NAME.equals(clsName) && !"OGraphEdge".equals(clsName))
           // RETURN THE CLASS NAME
           return OrientBaseGraph.decodeClassName(clsName);
       }

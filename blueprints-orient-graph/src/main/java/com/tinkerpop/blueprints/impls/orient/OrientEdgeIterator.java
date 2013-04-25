@@ -33,6 +33,10 @@ public class OrientEdgeIterator extends OLazyWrapperIterator<OrientEdge> {
       return (OrientEdge) iObject;
 
     final ODocument value = ((OIdentifiable) iObject).getRecord();
+
+    if (value == null)
+      return null;
+
     final OrientEdge edge;
     if (value.getSchemaClass().isSubClassOf(OrientVertex.CLASS_NAME)) {
       // DIRECT VERTEX, CREATE DUMMY EDGE

@@ -21,7 +21,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 /**
@@ -105,7 +104,7 @@ public class OrientVertex extends OrientElement implements Vertex {
   }
 
   @Override
-  public VertexQuery query() {
+  public OrientVertexQuery query() {
     return new OrientVertexQuery(this);
   }
 
@@ -497,7 +496,7 @@ public class OrientVertex extends OrientElement implements Vertex {
       if (iFieldName.length() > CONNECTION_IN_PREFIX.length())
         return iFieldName.substring(CONNECTION_IN_PREFIX.length());
     }
-    return CLASS_NAME;
+    return OrientEdge.CLASS_NAME;
   }
 
   public static String getInverseConnectionFieldName(final String iFieldName, final boolean useVertexFieldsForEdgeLabels) {
