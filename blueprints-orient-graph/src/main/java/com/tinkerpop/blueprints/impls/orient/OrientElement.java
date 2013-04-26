@@ -142,6 +142,9 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
 
   @Override
   public ORID getIdentity() {
+    if (rawElement == null)
+      return ORecordId.EMPTY_RECORD_ID;
+    
     final ORID rid = rawElement.getIdentity();
     if (!rid.isValid()) {
       // SAVE THE RECORD TO OBTAIN A VALID RID

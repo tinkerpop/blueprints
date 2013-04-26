@@ -259,6 +259,21 @@ public class OrientEdge extends OrientElement implements Edge {
     return true;
   }
 
+  @Override
+  public ODocument getRecord() {
+    if (rawElement == null) {
+      // CREATE AT THE FLY
+      final ODocument tmp = new ODocument(CLASS_NAME).setTrackingChanges(false);
+      tmp.field("in", vIn);
+      tmp.field("out", vOut);
+      if (label != null)
+        tmp.field("label", label);
+      return tmp;
+    }
+
+    return super.getRecord();
+  }
+
   public static String getRecordLabel(final OIdentifiable iEdge) {
     if (iEdge == null)
       return null;
