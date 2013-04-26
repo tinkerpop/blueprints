@@ -226,12 +226,22 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
             trySetProperty(edge, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
 
+
+            tryGetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
+            tryGetProperty(edge, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
+
+
             final ArrayList listB = new ArrayList();
             listB.add("try1");
             listB.add(2);
 
             trySetProperty(vertexA, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
             trySetProperty(edge, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
+
+            tryGetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsMixedListProperty);
+            tryGetProperty(edge, "keyListString", listA, graph.getFeatures().supportsMixedListProperty);
+
+
 
             trySetProperty(vertexA, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
             trySetProperty(edge, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
@@ -288,6 +298,14 @@ public class GraphTestSuite extends TestSuite {
             fail("setProperty threw an exception but the data type should have been accepted.");
         }
     }
+
+    private void tryGetProperty(final Element element, final String key, final Object value, final boolean allowDataType) {
+
+    	if (allowDataType) {
+	    assertEquals(element.getProperty(key), value);
+	}
+    }
+
 
     public void testSimpleRemovingVerticesEdges() {
         Graph graph = graphTest.generateGraph();
