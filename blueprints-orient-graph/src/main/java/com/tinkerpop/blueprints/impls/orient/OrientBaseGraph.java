@@ -15,6 +15,7 @@ import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.command.traverse.OTraverse;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.index.OIndex;
@@ -234,9 +235,12 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     if (null == id)
       throw ExceptionFactory.vertexIdCanNotBeNull();
 
+    if (id instanceof OrientVertex)
+      return (OrientVertex) id;
+
     ORID rid;
-    if (id instanceof ORID)
-      rid = (ORID) id;
+    if (id instanceof OIdentifiable)
+      rid = ((OIdentifiable) id).getIdentity();
     else {
       try {
         rid = new ORecordId(id.toString());
@@ -314,9 +318,12 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     if (null == id)
       throw ExceptionFactory.edgeIdCanNotBeNull();
 
+    if (id instanceof OrientEdge)
+      return (OrientEdge) id;
+
     final ORID rid;
-    if (id instanceof ORID)
-      rid = (ORID) id;
+    if (id instanceof OIdentifiable)
+      rid = ((OIdentifiable) id).getIdentity();
     else {
       final String str = id.toString();
 
