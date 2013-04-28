@@ -18,8 +18,8 @@ import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -453,6 +453,10 @@ public class GraphSONUtility {
                 propertyValue = node.get(GraphSONTokens.VALUE).booleanValue();
             } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_FLOAT)) {
                 propertyValue = Float.parseFloat(node.get(GraphSONTokens.VALUE).asText());
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_BYTE)) {
+                propertyValue = Byte.parseByte(node.get(GraphSONTokens.VALUE).asText());
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_SHORT)) {
+                propertyValue = Short.parseShort(node.get(GraphSONTokens.VALUE).asText());
             } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_DOUBLE)) {
                 propertyValue = node.get(GraphSONTokens.VALUE).doubleValue();
             } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_INTEGER)) {
@@ -558,6 +562,10 @@ public class GraphSONUtility {
             jsonList.add((Float) value);
         } else if (value instanceof Double) {
             jsonList.add((Double) value);
+        } else if (value instanceof Byte) {
+            jsonList.add((Byte) value);
+        } else if (value instanceof Short) {
+            jsonList.add((Short) value);
         } else if (value instanceof String) {
             jsonList.add((String) value);
         } else if (value instanceof ObjectNode) {
@@ -582,6 +590,10 @@ public class GraphSONUtility {
             jsonMap.put(key, (Float) value);
         } else if (value instanceof Double) {
             jsonMap.put(key, (Double) value);
+        } else if (value instanceof Short) {
+            jsonMap.put(key, (Short) value);
+        } else if (value instanceof Byte) {
+            jsonMap.put(key, (Byte) value);
         } else if (value instanceof String) {
             jsonMap.put(key, (String) value);
         } else if (value instanceof ObjectNode) {
@@ -707,38 +719,12 @@ public class GraphSONUtility {
     }
 
     private static List convertArrayToList(final Object value) {
-
-        // is there seriously no better way to do this...bah!
-        List list = new ArrayList();
-        if (value instanceof int[]) {
-            int[] arr = (int[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof double[]) {
-            double[] arr = (double[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof float[]) {
-            float[] arr = (float[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof long[]) {
-            long[] arr = (long[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof boolean[]) {
-            boolean[] arr = (boolean[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else {
-            list = Arrays.asList((Object[]) value);
+        final ArrayList<Object> list = new ArrayList<Object>();
+        int arrlength = Array.getLength(value);
+        for(int i = 0; i < arrlength; i++){
+            Object object = Array.get(value, i);
+            list.add(object);
         }
-
         return list;
     }
 
@@ -750,6 +736,10 @@ public class GraphSONUtility {
             type = GraphSONTokens.TYPE_DOUBLE;
         } else if (value instanceof Float) {
             type = GraphSONTokens.TYPE_FLOAT;
+        } else if (value instanceof Byte) {
+            type = GraphSONTokens.TYPE_BYTE;
+        } else if (value instanceof Short) {
+            type = GraphSONTokens.TYPE_SHORT;
         } else if (value instanceof Integer) {
             type = GraphSONTokens.TYPE_INTEGER;
         } else if (value instanceof Long) {
