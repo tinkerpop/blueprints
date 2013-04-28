@@ -21,6 +21,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Deprecated @Query.has(key,value,compare)@ and added @Query.has(key,compare,value)@
 * Bumped Dex to 4.8.0
 * Support both @byte@ and @short@ data types in GraphSON.
+* Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values.
 
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
