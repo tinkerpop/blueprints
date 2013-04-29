@@ -9,13 +9,13 @@ import com.tinkerpop.blueprints.util.wrappers.batch.VertexIDType;
  * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientBatchGraph extends BatchGraph<OrientGraph> {
+public class OrientBatchGraph extends BatchGraph<OrientTransactionalGraph> {
 
-  public OrientBatchGraph(final OrientGraph graph) {
+  public OrientBatchGraph(final OrientTransactionalGraph graph) {
     super(graph);
   }
 
-  public OrientBatchGraph(final OrientGraph graph, final VertexIDType type, final long bufferSize) {
+  public OrientBatchGraph(final OrientTransactionalGraph graph, final VertexIDType type, final long bufferSize) {
     super(graph, type, bufferSize);
   }
 
