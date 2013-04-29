@@ -188,6 +188,10 @@ public class OrientVertex extends OrientElement implements Vertex {
     final String outFieldName = getConnectionFieldName(Direction.OUT, label, useVertexFieldsForEdgeLabels);
     final String inFieldName = getConnectionFieldName(Direction.IN, label, useVertexFieldsForEdgeLabels);
 
+    if (label == null && iClassName != null)
+      // RETRO-COMPATIBILITY WITH THE SYNTAX CLASS:<CLASS-NAME>
+      label = OrientBaseGraph.encodeClassName(iClassName);
+
     if (canCreateDynamicEdge(outDocument, inDocument, outFieldName, inFieldName, fields, label)) {
       // CREATE A LIGHTWEIGHT DYNAMIC EDGE
       from = rawElement;
@@ -195,9 +199,6 @@ public class OrientVertex extends OrientElement implements Vertex {
       edge = new OrientEdge(graph, from, to, label);
     } else {
       // CREATE THE EDGE DOCUMENT TO STORE FIELDS TOO
-      if (label == null && iClassName != null)
-        label = OrientBaseGraph.encodeClassName(iClassName);
-
       edge = new OrientEdge(graph, label, fields);
 
       if (graph.isKeepInMemoryReferences())
