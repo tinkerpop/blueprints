@@ -30,6 +30,8 @@ public class GraphSONUtilityTest {
     private final String vertexJson1 = "{\"name\":\"marko\",\"age\":29,\"_id\":1,\"_type\":\"vertex\"}";
     private final String vertexJson2 = "{\"name\":\"vadas\",\"age\":27,\"_id\":2,\"_type\":\"vertex\"}";
 
+    private final String vertexJson3 = "{\"_id\":1,\"booleanValue\":{\"type\":\"boolean\",\"value\":true},\"shortValue\":{\"type\":\"short\",\"value\":10},\"byteValue\":{\"type\":\"byte\",\"value\":4},\"_type\":\"vertex\"}";
+
     private final String edgeJsonLight = "{\"weight\":0.5,\"_outV\":1,\"_inV\":2}";
     private final String edgeJson = "{\"weight\":0.5,\"_id\":7,\"_type\":\"edge\",\"_outV\":1,\"_inV\":2,\"_label\":\"knows\"}";
 
@@ -582,6 +584,8 @@ public class GraphSONUtilityTest {
         v.setProperty("keyFloat", 3.3f);
         v.setProperty("keyDouble", 4.4);
         v.setProperty("keyBoolean", true);
+        v.setProperty("keyByte", (byte) 10);
+        v.setProperty("keyShort", (short) 3);
 
         JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.EXTENDED);
 
@@ -624,6 +628,27 @@ public class GraphSONUtilityTest {
         Assert.assertEquals(GraphSONTokens.TYPE_DOUBLE, valueAsJson.optString(GraphSONTokens.TYPE));
         Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
         Assert.assertEquals(4.4, valueAsJson.optDouble(GraphSONTokens.VALUE), 0);
+
+        valueAsJson = json.optJSONObject("keyShort");
+        Assert.assertNotNull(valueAsJson);
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_SHORT, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertTrue(new Short("3").equals((short) valueAsJson.optInt(GraphSONTokens.VALUE)));
+
+        valueAsJson = json.optJSONObject("keyByte");
+        Assert.assertNotNull(valueAsJson);
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_BYTE, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertTrue(new Byte("10").equals((byte) valueAsJson.optInt(GraphSONTokens.VALUE)));
+
+        valueAsJson = json.optJSONObject("keyShort");
+        Assert.assertNotNull(valueAsJson);
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_SHORT, valueAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+        Assert.assertEquals(3, valueAsJson.optInt(GraphSONTokens.VALUE));
 
         valueAsJson = json.optJSONObject("keyBoolean");
         Assert.assertNotNull(valueAsJson);
@@ -960,6 +985,21 @@ public class GraphSONUtilityTest {
         Assert.assertEquals("1", v.getId());
         Assert.assertEquals("marko", v.getProperty("name"));
         Assert.assertEquals(29, v.getProperty("age"));
+    }
+
+    @Test
+    public void vertexFromJsonExtendedTypesValid() throws IOException, JSONException {
+        // need to test those data types that are not covered by the toy graphs
+        Graph g = new TinkerGraph();
+        ElementFactory factory = new GraphElementFactory(g);
+
+        Vertex v = GraphSONUtility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson3)), factory, GraphSONMode.EXTENDED, null);
+
+        Assert.assertSame(v, g.getVertex(1));
+
+        Assert.assertEquals((byte) 4, v.getProperty("byteValue"));
+        Assert.assertEquals(new Short("10"), v.getProperty("shortValue"));
+        Assert.assertEquals(true, v.getProperty("booleanValue"));
     }
 
     @Test
