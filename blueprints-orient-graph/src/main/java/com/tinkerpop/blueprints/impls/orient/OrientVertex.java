@@ -552,6 +552,8 @@ public class OrientVertex extends OrientElement implements Vertex {
       if (iAlsoInverse)
         removeInverseEdge(iVertex, iFieldName, iVertexToRemove, fieldValue, useVertexFieldsForEdgeLabels);
 
+      deleteEdgeIfAny((OIdentifiable) fieldValue);
+
     } else if (fieldValue instanceof OMVRBTreeRIDSet) {
       // COLLECTION OF RECORDS: REMOVE THE ENTRY
 
@@ -591,8 +593,24 @@ public class OrientVertex extends OrientElement implements Vertex {
             OLogManager.instance().warn(null, "[OrientVertex.removeEdges] edge %s not found in field %s", iVertexToRemove,
                 iFieldName);
         }
+
+        deleteEdgeIfAny(iVertexToRemove);
+
+      } else {
+
+        // DELETE ALL THE EDGES
+        for (OLazyIterator<OIdentifiable> it = ((OMVRBTreeRIDSet) fieldValue).iterator(false); it.hasNext();) {
+          deleteEdgeIfAny(iVertexToRemove);
+        }
       }
     }
+  }
+
+  private static void deleteEdgeIfAny(final OIdentifiable iRecord) {
+    final ODocument doc = iRecord.getRecord();
+    if (doc != null && doc.getSchemaClass() != null && doc.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME))
+      // DELETE THE EDGE RECORD TOO
+      doc.delete();
   }
 
   private static void removeInverseEdge(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,
