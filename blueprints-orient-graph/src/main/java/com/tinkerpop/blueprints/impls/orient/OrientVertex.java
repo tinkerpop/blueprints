@@ -183,14 +183,13 @@ public class OrientVertex extends OrientElement implements Vertex {
     OIdentifiable from;
 
     label = OrientBaseGraph.encodeClassName(label);
+    if (label == null && iClassName != null)
+      // RETRO-COMPATIBILITY WITH THE SYNTAX CLASS:<CLASS-NAME>
+      label = OrientBaseGraph.encodeClassName(iClassName);
 
     final boolean useVertexFieldsForEdgeLabels = graph.isUseVertexFieldsForEdgeLabels();
     final String outFieldName = getConnectionFieldName(Direction.OUT, label, useVertexFieldsForEdgeLabels);
     final String inFieldName = getConnectionFieldName(Direction.IN, label, useVertexFieldsForEdgeLabels);
-
-    if (label == null && iClassName != null)
-      // RETRO-COMPATIBILITY WITH THE SYNTAX CLASS:<CLASS-NAME>
-      label = OrientBaseGraph.encodeClassName(iClassName);
 
     if (canCreateDynamicEdge(outDocument, inDocument, outFieldName, inFieldName, fields, label)) {
       // CREATE A LIGHTWEIGHT DYNAMIC EDGE
