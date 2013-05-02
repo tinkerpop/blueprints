@@ -294,6 +294,10 @@ public class OrientVertex extends OrientElement implements Vertex {
   }
 
   public Iterable<Edge> getEdges(final Direction iDirection, final String... iLabels) {
+    return getEdges(null, iDirection, iLabels);
+  }
+
+  public Iterable<Edge> getEdges(final Vertex iDestination, final Direction iDirection, final String... iLabels) {
     final ODocument doc = getRecord();
 
     final OMultiCollectionIterator<Edge> iterable = new OMultiCollectionIterator<Edge>();
@@ -304,9 +308,11 @@ public class OrientVertex extends OrientElement implements Vertex {
         continue;
 
       final Object fieldValue = doc.field(fieldName);
-      if (fieldValue != null)
+      if (fieldValue != null) {
+        final OIdentifiable destinationVId = iDestination != null ? (OIdentifiable) iDestination.getId() : null;
+
         if (fieldValue instanceof OIdentifiable) {
-          addSingleEdge(doc, iterable, fieldName, connection, fieldValue, iLabels);
+          addSingleEdge(doc, iterable, fieldName, connection, fieldValue, destinationVId, iLabels);
 
         } else if (fieldValue instanceof Collection<?>) {
           Collection<?> coll = (Collection<?>) fieldValue;
@@ -314,11 +320,12 @@ public class OrientVertex extends OrientElement implements Vertex {
           if (coll.size() == 1) {
             // SINGLE ITEM: AVOID CALLING ITERATOR
             if (coll instanceof ORecordLazyMultiValue)
-              addSingleEdge(doc, iterable, fieldName, connection, ((ORecordLazyMultiValue) coll).rawIterator().next(), iLabels);
+              addSingleEdge(doc, iterable, fieldName, connection, ((ORecordLazyMultiValue) coll).rawIterator().next(),
+                  destinationVId, iLabels);
             else if (coll instanceof List<?>)
-              addSingleEdge(doc, iterable, fieldName, connection, ((List<?>) coll).get(0), iLabels);
+              addSingleEdge(doc, iterable, fieldName, connection, ((List<?>) coll).get(0), destinationVId, iLabels);
             else
-              addSingleEdge(doc, iterable, fieldName, connection, coll.iterator().next(), iLabels);
+              addSingleEdge(doc, iterable, fieldName, connection, coll.iterator().next(), destinationVId, iLabels);
           } else {
             final Iterator<?> it = coll instanceof ORecordLazyMultiValue ? ((ORecordLazyMultiValue) coll).rawIterator() : coll
                 .iterator();
@@ -326,6 +333,7 @@ public class OrientVertex extends OrientElement implements Vertex {
             iterable.add(new OrientEdgeIterator(this, it, connection, iLabels));
           }
         }
+      }
     }
 
     return iterable;
@@ -660,7 +668,10 @@ public class OrientVertex extends OrientElement implements Vertex {
   }
 
   private void addSingleEdge(final ODocument doc, final OMultiCollectionIterator<Edge> iterable, String fieldName,
-      final OPair<Direction, String> connection, final Object fieldValue, final String[] iLabels) {
+      final OPair<Direction, String> connection, final Object fieldValue, final OIdentifiable iTargetVertex, final String[] iLabels) {
+    if (iTargetVertex != null && !iTargetVertex.equals(fieldValue))
+      return;
+
     final OrientEdge toAdd;
 
     final ODocument fieldRecord = ((OIdentifiable) fieldValue).getRecord();
