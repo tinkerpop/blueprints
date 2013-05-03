@@ -31,8 +31,8 @@ import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
  */
 @SuppressWarnings("unchecked")
 public class OrientIndex<T extends OrientElement> implements Index<T> {
-  private static final String        VERTEX           = "Vertex";
-  private static final String        EDGE             = "Edge";
+  protected static final String      VERTEX           = "Vertex";
+  protected static final String      EDGE             = "Edge";
   protected static final String      CONFIG_CLASSNAME = "blueprintsIndexClass";
 
   protected static final String      SEPARATOR        = "!=!";
@@ -49,7 +49,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     create(indexName, this.indexClass, iType);
   }
 
-  protected OrientIndex(OrientBaseGraph orientGraph, OIndex<?> rawIndex) {
+  protected OrientIndex(final OrientBaseGraph orientGraph, final OIndex<?> rawIndex) {
     this.graph = orientGraph;
     this.underlying = rawIndex instanceof OIndexTxAwareMultiValue ? rawIndex : new OIndexTxAwareMultiValue(
         orientGraph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) rawIndex);

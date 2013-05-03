@@ -52,7 +52,7 @@ public class OrientEdge extends OrientElement implements Edge {
   }
 
   @Override
-  public Vertex getVertex(final Direction direction) {
+  public OrientVertex getVertex(final Direction direction) {
     if (direction.equals(Direction.OUT))
       return new OrientVertex(graph, getOutVertex());
     else if (direction.equals(Direction.IN))

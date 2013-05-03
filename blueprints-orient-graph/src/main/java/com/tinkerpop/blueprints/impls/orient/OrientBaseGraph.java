@@ -219,6 +219,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return vertex;
   }
 
+  @Override
   public OrientEdge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
     String className = null;
     if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
@@ -228,7 +229,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     // SAVE THE ID TOO?
     final Object[] fields = saveOriginalIds && id != null ? new Object[] { OrientElement.DEF_ORIGINAL_ID_FIELDNAME, id } : null;
 
-    return ((OrientVertex) outVertex).addEdge(label, inVertex, className, null, fields);
+    return ((OrientVertex) outVertex).addEdge(label, (OrientVertex) inVertex, className, null, fields);
   }
 
   public OrientVertex getVertex(final Object id) {
@@ -514,6 +515,47 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
           + "' and therefore cannot be considered an Edge");
   }
 
+  /**
+   * Returns a graph element, vertex or edge, starting from an ID.
+   * 
+   * @param id
+   *          element id
+   * @return OrientElement subclass such as OrientVertex or OrientEdge
+   */
+  public OrientElement getElement(final Object id) {
+    if (null == id)
+      throw ExceptionFactory.vertexIdCanNotBeNull();
+
+    if (id instanceof OrientElement)
+      return (OrientElement) id;
+
+    OIdentifiable rec;
+    if (id instanceof OIdentifiable)
+      rec = (OIdentifiable) id;
+    else
+      try {
+        rec = new ORecordId(id.toString());
+      } catch (IllegalArgumentException iae) {
+        // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be:
+        // <cluster-id>:<cluster-position>
+        return null;
+      }
+
+    final ODocument doc = rec.getRecord();
+    if (doc != null) {
+      final OClass schemaClass = doc.getSchemaClass();
+      if (schemaClass.isSubClassOf(OrientVertex.CLASS_NAME)) {
+        return new OrientVertex(this, doc);
+      } else if (schemaClass.isSubClassOf(OrientEdge.CLASS_NAME)) {
+        return new OrientEdge(this, doc);
+      } else
+        throw new IllegalArgumentException("Type error. The class " + schemaClass + " does not extend class neither '"
+            + OrientVertex.CLASS_NAME + "' nor '" + OrientEdge.CLASS_NAME + "'");
+    }
+
+    return null;
+  }
+
   protected void autoStartTransaction() {
   }
 
@@ -569,8 +611,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
   }
 
-  @SuppressWarnings("rawtypes")
-  private OrientIndex<?> loadIndex(final OIndex rawIndex) {
+  private OrientIndex<?> loadIndex(final OIndex<?> rawIndex) {
     final OrientIndex<?> index;
     index = new OrientIndex(this, rawIndex);
 
@@ -653,20 +694,20 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   }
 
   /**
-   * Executes commands against the graph.
+   * Executes commands against the graph. Commands are executed outside transaction.
    * 
    * @param iCommand
    *          Command request between SQL, GREMLIN and SCRIPT commands
    */
   public OCommandRequest command(final OCommandRequest iCommand) {
-    return getRawGraph().command(iCommand);
+    return new OrientGraphCommand(this, getRawGraph().command(iCommand));
   }
 
   public boolean isUseLightweightEdges() {
     return useLightweightEdges;
   }
 
-  public void setUseLightweightEdges(boolean useDynamicEdges) {
+  public void setUseLightweightEdges(final boolean useDynamicEdges) {
     this.useLightweightEdges = useDynamicEdges;
   }
 
@@ -674,7 +715,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return saveOriginalIds;
   }
 
-  public void setSaveOriginalIds(boolean saveIds) {
+  public void setSaveOriginalIds(final boolean saveIds) {
     this.saveOriginalIds = saveIds;
   }
 
@@ -714,7 +755,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return useClassForVertexLabel;
   }
 
-  public void setUseClassForVertexLabel(boolean useCustomClassesForVertex) {
+  public void setUseClassForVertexLabel(final boolean useCustomClassesForVertex) {
     this.useClassForVertexLabel = useCustomClassesForVertex;
   }
 
@@ -722,7 +763,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return useVertexFieldsForEdgeLabels;
   }
 
-  public void setUseVertexFieldsForEdgeLabels(boolean useVertexFieldsForEdgeLabels) {
+  public void setUseVertexFieldsForEdgeLabels(final boolean useVertexFieldsForEdgeLabels) {
     this.useVertexFieldsForEdgeLabels = useVertexFieldsForEdgeLabels;
   }
 

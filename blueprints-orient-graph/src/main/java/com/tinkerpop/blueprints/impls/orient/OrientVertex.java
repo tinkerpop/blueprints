@@ -33,7 +33,7 @@ public class OrientVertex extends OrientElement implements Vertex {
   public static final String CONNECTION_OUT_PREFIX = OrientBaseGraph.CONNECTION_OUT + "_";
   public static final String CONNECTION_IN_PREFIX  = OrientBaseGraph.CONNECTION_IN + "_";
 
-  public OrientVertex(final OrientBaseGraph graph, String className, final Object... fields) {
+  protected OrientVertex(final OrientBaseGraph graph, String className, final Object... fields) {
     super(graph, null);
     if (className != null)
       className = checkForClassInSchema(OrientBaseGraph.encodeClassName(className));
@@ -161,14 +161,14 @@ public class OrientVertex extends OrientElement implements Vertex {
 
   @Override
   public Edge addEdge(final String label, final Vertex inVertex) {
-    return addEdge(label, inVertex, null, null, (Object[]) null);
+    return addEdge(label, (OrientVertex) inVertex, null, null, (Object[]) null);
   }
 
-  public OrientEdge addEdge(final String label, final Vertex inVertex, final String iClassName) {
+  public OrientEdge addEdge(final String label, final OrientVertex inVertex, final String iClassName) {
     return addEdge(label, inVertex, iClassName, null, (Object[]) null);
   }
 
-  public OrientEdge addEdge(String label, final Vertex inVertex, final String iClassName, final String iClusterName,
+  public OrientEdge addEdge(String label, final OrientVertex inVertex, final String iClassName, final String iClusterName,
       final Object... fields) {
     if (inVertex == null)
       throw new IllegalArgumentException("destination vertex is null");
@@ -223,8 +223,8 @@ public class OrientVertex extends OrientElement implements Vertex {
     createLink(inDocument, from, inFieldName);
 
     edge.save(iClusterName);
-    outDocument.save();
     inDocument.save();
+    outDocument.save();
 
     return edge;
   }
@@ -607,17 +607,19 @@ public class OrientVertex extends OrientElement implements Vertex {
 
         // DELETE ALL THE EDGES
         for (OLazyIterator<OIdentifiable> it = ((OMVRBTreeRIDSet) fieldValue).iterator(false); it.hasNext();) {
-          deleteEdgeIfAny(iVertexToRemove);
+          deleteEdgeIfAny(it.next());
         }
       }
     }
   }
 
   private static void deleteEdgeIfAny(final OIdentifiable iRecord) {
-    final ODocument doc = iRecord.getRecord();
-    if (doc != null && doc.getSchemaClass() != null && doc.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME))
-      // DELETE THE EDGE RECORD TOO
-      doc.delete();
+    if (iRecord != null) {
+      final ODocument doc = iRecord.getRecord();
+      if (doc != null && doc.getSchemaClass() != null && doc.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME))
+        // DELETE THE EDGE RECORD TOO
+        doc.delete();
+    }
   }
 
   private static void removeInverseEdge(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,

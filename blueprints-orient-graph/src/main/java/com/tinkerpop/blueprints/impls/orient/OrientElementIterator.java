@@ -12,10 +12,10 @@ import com.tinkerpop.blueprints.Element;
  */
 class OrientElementIterator<T extends Element> implements Iterator<T> {
 
-  private final Iterator        itty;
+  private final Iterator<?>     itty;
   private final OrientBaseGraph graph;
 
-  public OrientElementIterator(final OrientBaseGraph graph, final Iterator itty) {
+  public OrientElementIterator(final OrientBaseGraph graph, final Iterator<?> itty) {
     this.itty = itty;
     this.graph = graph;
   }
