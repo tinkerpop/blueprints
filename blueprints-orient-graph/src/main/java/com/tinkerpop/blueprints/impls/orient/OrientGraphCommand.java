@@ -27,9 +27,9 @@ public class OrientGraphCommand implements OCommandRequest {
   public <RET> RET execute(final Object... iArgs) {
     Object result = underlying.execute(iArgs);
     if (OMultiValue.isMultiValue(result)) {
-      result = new OrientElementIterable<OrientElement>(graph, (Iterable<?>) result);
+      result = new OrientDynaElementIterable(graph, ((Iterable<?>) result).iterator());
     } else if (result instanceof Iterator<?>) {
-      result = new OrientElementIterator<OrientElement>(graph, (Iterator<?>) result);
+      result = new OrientDynaElementIterable(graph, (Iterator<?>) result);
     } else if (result instanceof OIdentifiable) {
       result = graph.getElement(result);
     }

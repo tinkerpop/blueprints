@@ -219,7 +219,23 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return vertex;
   }
 
-  @Override
+  /**
+   * Creates a temporary vertex. The vertex is not saved and the transaction is not started.
+   * 
+   * @param iClassName
+   *          Vertex's class name
+   * @param prop
+   *          Varargs of properties to set
+   * @return
+   */
+  public OrientVertex addTemporaryVertex(final String iClassName, final Object... prop) {
+    this.autoStartTransaction();
+
+    final OrientVertex vertex = new OrientVertex(this, iClassName);
+    vertex.setProperties(prop);
+    return vertex;
+  }
+
   public OrientEdge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
     String className = null;
     if (id != null && id instanceof String && id.toString().startsWith(CLASS_PREFIX))
