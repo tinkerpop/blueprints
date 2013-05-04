@@ -322,9 +322,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     if (id instanceof OrientEdge)
       return (OrientEdge) id;
 
-    final ORID rid;
+    final OIdentifiable rec;
     if (id instanceof OIdentifiable)
-      rid = ((OIdentifiable) id).getIdentity();
+      rec = (OIdentifiable) id;
     else {
       final String str = id.toString();
 
@@ -338,7 +338,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
       }
 
       try {
-        rid = new ORecordId(str);
+        rec = new ORecordId(str);
       } catch (IllegalArgumentException iae) {
         // orientdb throws IllegalArgumentException: Argument 'xxxx' is not a RecordId in form of string. Format must be:
         // [#]<cluster-id>:<cluster-position>
@@ -346,11 +346,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
       }
     }
 
-    final ODocument doc = getRawGraph().load(rid);
-    if (doc != null)
-      return new OrientEdge(this, doc);
-
-    return null;
+    return new OrientEdge(this, rec);
   }
 
   public void removeEdge(final Edge edge) {

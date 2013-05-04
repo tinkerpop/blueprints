@@ -13,7 +13,6 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
@@ -30,7 +29,7 @@ public class OrientEdge extends OrientElement implements Edge {
   protected OIdentifiable    vIn;
   protected String           label;
 
-  public OrientEdge(final OrientBaseGraph rawGraph, final ODocument rawEdge) {
+  public OrientEdge(final OrientBaseGraph rawGraph, final OIdentifiable rawEdge) {
     super(rawGraph, rawEdge);
   }
 
