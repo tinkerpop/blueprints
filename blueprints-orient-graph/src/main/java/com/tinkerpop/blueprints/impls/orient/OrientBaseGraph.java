@@ -659,6 +659,20 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
   }
 
+  /**
+   * Create an automatic indexing structure for indexing provided key for element class.
+   * 
+   * @param key
+   *          the key to create the index for
+   * @param elementClass
+   *          the element class that the index is for
+   * @param indexParameters
+   *          a collection of parameters for the underlying index implementation: "keytype" to use a key type different by
+   *          OType.STRING, "type" is the index type between the supported types (UNIQUE, NOTUNIQUE, FULLTEXT). The default type is
+   *          NOT_UNIQUE
+   * @param <T>
+   *          the element class specification
+   */
   public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
     final String className = getClassName(elementClass);
     final ODatabaseDocumentTx db = getRawGraph();
@@ -666,19 +680,27 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     if (db.getTransaction().isActive())
       this.commit();
 
+    OType keyType = OType.STRING;
+    String indexType = OClass.INDEX_TYPE.NOTUNIQUE.name();
+
+    // READ PARAMETERS
+    for (Parameter<?, ?> p : indexParameters) {
+      if (p.getKey().equals("keytype"))
+        keyType = OType.valueOf(p.getValue().toString().toUpperCase());
+      else if (p.getKey().equals("type"))
+        indexType = p.getValue().toString().toUpperCase();
+    }
+
     final OClass cls = db.getMetadata().getSchema().getClass(className);
 
-    final OType indexType;
     final OProperty property = cls.getProperty(key);
-    if (property == null)
-      indexType = OType.STRING;
-    else
-      indexType = property.getType();
+    if (property != null)
+      keyType = property.getType();
 
     db.getMetadata()
         .getIndexManager()
-        .createIndex(className + "." + key, OClass.INDEX_TYPE.NOTUNIQUE.name(),
-            new OPropertyIndexDefinition(className, key, indexType), cls.getPolymorphicClusterIds(), null);
+        .createIndex(className + "." + key, indexType, new OPropertyIndexDefinition(className, key, keyType),
+            cls.getPolymorphicClusterIds(), null);
   }
 
   public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
