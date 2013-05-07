@@ -14,6 +14,8 @@ import com.orientechnologies.common.io.OFileUtils;
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.command.traverse.OTraverse;
+import com.orientechnologies.orient.core.config.OStorageEntryConfiguration;
+import com.orientechnologies.orient.core.db.ODatabase.ATTRIBUTES;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.id.ORID;
@@ -73,6 +75,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
    */
   public OrientBaseGraph(final ODatabaseDocumentTx iDatabase) {
     reuse(iDatabase);
+    config();
   }
 
   public OrientBaseGraph(final String url) {
@@ -84,6 +87,22 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     this.username = username;
     this.password = password;
     this.openOrCreate();
+    config();
+  }
+
+  @SuppressWarnings("unchecked")
+  private void config() {
+    final List<OStorageEntryConfiguration> custom = (List<OStorageEntryConfiguration>) getRawGraph().get(ATTRIBUTES.CUSTOM);
+    for (OStorageEntryConfiguration c : custom) {
+      if (c.name.equals("useLightweightEdges"))
+        setUseLightweightEdges(Boolean.parseBoolean(c.value));
+      else if (c.name.equals("useClassForEdgeLabel"))
+        setUseClassForEdgeLabel(Boolean.parseBoolean(c.value));
+      else if (c.name.equals("useClassForVertexLabel"))
+        setUseClassForVertexLabel(Boolean.parseBoolean(c.value));
+      else if (c.name.equals("useVertexFieldsForEdgeLabels"))
+        setUseVertexFieldsForEdgeLabels(Boolean.parseBoolean(c.value));
+    }
   }
 
   /**
@@ -93,7 +112,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     getRawGraph().drop();
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass,
       final Parameter... indexParameters) {
     final OrientGraphContext context = getContext(true);
@@ -271,12 +290,11 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     if (!rid.isValid())
       return null;
 
-    final ODocument doc = getRawGraph().load(rid);
-    if (doc != null) {
-      return new OrientVertex(this, doc);
-    }
+    final ODocument doc = rid.getRecord();
+    if (doc == null)
+      return null;
 
-    return null;
+    return new OrientVertex(this, doc);
   }
 
   public void removeVertex(final Vertex vertex) {
@@ -361,6 +379,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         return null;
       }
     }
+
+    final ODocument doc = rec.getRecord();
+    if (doc == null)
+      return null;
 
     return new OrientEdge(this, rec);
   }
@@ -623,9 +645,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private OrientIndex<?> loadIndex(final OIndex<?> rawIndex) {
-    final OrientIndex<?> index;
-    index = new OrientIndex(this, rawIndex);
+    final OrientIndex<?> index = new OrientIndex(this, rawIndex);
 
     // REGISTER THE INDEX
     getContext(true).manualIndices.put(index.getIndexName(), index);
@@ -651,7 +673,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
   }
 
-  public <T extends Element> void dropKeyIndex(final String key, Class<T> elementClass) {
+  public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
     if (getRawGraph().getTransaction().isActive())
       this.commit();
 
@@ -673,6 +695,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
    * @param <T>
    *          the element class specification
    */
+  @SuppressWarnings({ "rawtypes" })
   public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
     final String className = getClassName(elementClass);
     final ODatabaseDocumentTx db = getRawGraph();
@@ -832,12 +855,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   }
 
   protected <T> String getClassName(final Class<T> elementClass) {
-    String className = null;
-
     if (elementClass.isAssignableFrom(Vertex.class))
-      className = OrientVertex.CLASS_NAME;
+      return OrientVertex.CLASS_NAME;
     else if (elementClass.isAssignableFrom(Edge.class))
-      className = OrientEdge.CLASS_NAME;
-    return className;
+      return OrientEdge.CLASS_NAME;
+    throw new IllegalArgumentException("Class '" + elementClass + "' is neither a Vertex, nor an Edge");
   }
 }

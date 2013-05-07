@@ -64,22 +64,32 @@ public class OrientEdge extends OrientElement implements Edge {
     if (vOut != null)
       // LIGHTWEIGHT EDGE
       return vOut;
+
+    final ODocument doc = getRecord();
+    if (doc == null)
+      return null;
+
     if (graph.isKeepInMemoryReferences())
       // AVOID LAZY RESOLVING+SETTING OF RECORD
-      return getRecord().rawField(OrientBaseGraph.CONNECTION_OUT);
+      return doc.rawField(OrientBaseGraph.CONNECTION_OUT);
     else
-      return getRecord().field(OrientBaseGraph.CONNECTION_OUT);
+      return doc.field(OrientBaseGraph.CONNECTION_OUT);
   }
 
   public OIdentifiable getInVertex() {
     if (vIn != null)
       // LIGHTWEIGHT EDGE
       return vIn;
+
+    final ODocument doc = getRecord();
+    if (doc == null)
+      return null;
+
     if (graph.isKeepInMemoryReferences())
       // AVOID LAZY RESOLVING+SETTING OF RECORD
-      return getRecord().rawField(OrientBaseGraph.CONNECTION_IN);
+      return doc.rawField(OrientBaseGraph.CONNECTION_IN);
     else
-      return getRecord().field(OrientBaseGraph.CONNECTION_IN);
+      return doc.field(OrientBaseGraph.CONNECTION_IN);
   }
 
   @Override
@@ -95,7 +105,11 @@ public class OrientEdge extends OrientElement implements Edge {
           return OrientBaseGraph.decodeClassName(clsName);
       }
 
-      final String label = ((ODocument) rawElement.getRecord()).field(OrientElement.LABEL_FIELD_NAME);
+      final ODocument doc = (ODocument) rawElement.getRecord();
+      if (doc == null)
+        return null;
+
+      final String label = doc.field(OrientElement.LABEL_FIELD_NAME);
       if (label != null)
         return OrientBaseGraph.decodeClassName(label);
     }

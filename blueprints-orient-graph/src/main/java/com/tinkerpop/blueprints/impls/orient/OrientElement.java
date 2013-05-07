@@ -161,7 +161,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
 
     final ODocument doc = rawElement.getRecord();
     if (doc == null)
-      throw new IllegalStateException("Graph element " + rawElement + " has been deleted");
+      return null;
 
     // CHANGE THE RID -> DOCUMENT
     rawElement = doc;

@@ -31,10 +31,7 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
     super(url, username, password);
   }
 
-  public boolean useLightweightEdges() {
-    return false;
-  }
-
+  @SuppressWarnings("deprecation")
   @Override
   public void stopTransaction(final Conclusion conclusion) {
     final OrientGraphContext context = getContext(false);

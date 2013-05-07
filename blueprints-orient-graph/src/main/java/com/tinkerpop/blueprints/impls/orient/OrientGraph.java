@@ -9,27 +9,54 @@ import com.tinkerpop.blueprints.Features;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraph extends OrientTransactionalGraph {
-  private static final Features FEATURES    = new Features();
+  protected final Features FEATURES = new Features();
 
-  static {
+  /**
+   * Constructs a new object using an existent OGraphDatabase instance.
+   * 
+   * @param iDatabase
+   *          Underlying OGraphDatabase object to attach
+   */
+  public OrientGraph(final OGraphDatabase iDatabase) {
+    super(iDatabase);
+    config();
+  }
+
+  public OrientGraph(final String url) {
+    super(url, ADMIN, ADMIN);
+    config();
+  }
+
+  public OrientGraph(final String url, final String username, final String password) {
+    super(url, username, password);
+    config();
+  }
+
+  public Features getFeatures() {
+    // DYNAMIC FEATURES BASED ON CONFIGURATION
+    FEATURES.supportsEdgeIndex = !useLightweightEdges;
+    FEATURES.supportsEdgeKeyIndex = !useLightweightEdges;
+    FEATURES.supportsEdgeIteration = !useLightweightEdges;
+    FEATURES.supportsEdgeRetrieval = !useLightweightEdges;
+    return FEATURES;
+  }
+
+  @SuppressWarnings("deprecation")
+  protected void config() {
     FEATURES.supportsDuplicateEdges = true;
     FEATURES.supportsSelfLoops = true;
     FEATURES.isPersistent = true;
     FEATURES.isRDFModel = false;
     FEATURES.supportsVertexIteration = true;
-    FEATURES.supportsEdgeIteration = false;
     FEATURES.supportsVertexIndex = true;
-    FEATURES.supportsEdgeIndex = false;
     FEATURES.ignoresSuppliedIds = true;
     FEATURES.supportsTransactions = true;
-    FEATURES.supportsEdgeKeyIndex = false;
     FEATURES.supportsVertexKeyIndex = true;
     FEATURES.supportsKeyIndices = true;
     FEATURES.isWrapper = false;
     FEATURES.supportsIndices = true;
-    FEATURES.supportsEdgeRetrieval = false;
     FEATURES.supportsVertexProperties = true;
-    FEATURES.supportsEdgeProperties = true; // ACTUALLY THIS IS DYNAMIC
+    FEATURES.supportsEdgeProperties = true;
 
     // For more information on supported types, please see:
     // http://code.google.com/p/orient/wiki/Types
@@ -45,27 +72,5 @@ public class OrientGraph extends OrientTransactionalGraph {
     FEATURES.supportsMapProperty = true;
     FEATURES.supportsStringProperty = true;
     FEATURES.supportsThreadedTransactions = true;
-  }
-
-  /**
-   * Constructs a new object using an existent OGraphDatabase instance.
-   * 
-   * @param iDatabase
-   *          Underlying OGraphDatabase object to attach
-   */
-  public OrientGraph(final OGraphDatabase iDatabase) {
-    super(iDatabase);
-  }
-
-  public OrientGraph(final String url) {
-    super(url, ADMIN, ADMIN);
-  }
-
-  public OrientGraph(final String url, final String username, final String password) {
-    super(url, username, password);
-  }
-
-  public Features getFeatures() {
-    return FEATURES;
   }
 }
