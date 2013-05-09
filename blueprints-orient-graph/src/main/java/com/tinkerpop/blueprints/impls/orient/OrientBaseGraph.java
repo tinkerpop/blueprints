@@ -689,29 +689,35 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
    * @param elementClass
    *          the element class that the index is for
    * @param indexParameters
-   *          a collection of parameters for the underlying index implementation: "keytype" to use a key type different by
-   *          OType.STRING, "type" is the index type between the supported types (UNIQUE, NOTUNIQUE, FULLTEXT). The default type is
-   *          NOT_UNIQUE
+   *          a collection of parameters for the underlying index implementation:
+   *          <ul>
+   *          <li>"type" is the index type between the supported types (UNIQUE, NOTUNIQUE, FULLTEXT). The default type is NOT_UNIQUE
+   *          <li>"class" is the class to index when it's a custom type derived by Vertex (V) or Edge (E)
+   *          <li>"keytype" to use a key type different by OType.STRING,</li>
+   *          </li>
+   *          </ul>
    * @param <T>
    *          the element class specification
    */
   @SuppressWarnings({ "rawtypes" })
   public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
-    final String className = getClassName(elementClass);
     final ODatabaseDocumentTx db = getRawGraph();
 
     if (db.getTransaction().isActive())
       this.commit();
 
-    OType keyType = OType.STRING;
     String indexType = OClass.INDEX_TYPE.NOTUNIQUE.name();
+    OType keyType = OType.STRING;
+    String className = getClassName(elementClass);
 
     // READ PARAMETERS
     for (Parameter<?, ?> p : indexParameters) {
-      if (p.getKey().equals("keytype"))
-        keyType = OType.valueOf(p.getValue().toString().toUpperCase());
-      else if (p.getKey().equals("type"))
+      if (p.getKey().equals("type"))
         indexType = p.getValue().toString().toUpperCase();
+      else if (p.getKey().equals("keytype"))
+        keyType = OType.valueOf(p.getValue().toString().toUpperCase());
+      else if (p.getKey().equals("class"))
+        className = p.getValue().toString();
     }
 
     final OClass cls = db.getMetadata().getSchema().getClass(className);
