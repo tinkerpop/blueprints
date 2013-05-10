@@ -32,7 +32,8 @@ public class OrientEdgeIterator extends OLazyWrapperIterator<OrientEdge> {
     if (iObject instanceof OrientEdge)
       return (OrientEdge) iObject;
 
-    final ODocument value = ((OIdentifiable) iObject).getRecord();
+    final OIdentifiable rec = (OIdentifiable) iObject;
+    final ODocument value = rec.getRecord();
 
     if (value == null)
       return null;
@@ -41,12 +42,12 @@ public class OrientEdgeIterator extends OLazyWrapperIterator<OrientEdge> {
     if (value.getSchemaClass().isSubClassOf(OrientVertex.CLASS_NAME)) {
       // DIRECT VERTEX, CREATE DUMMY EDGE
       if (connection.getKey() == Direction.OUT)
-        edge = new OrientEdge(this.vertex.graph, this.vertex.getRecord(), value, connection.getValue());
+        edge = new OrientEdge(this.vertex.graph, this.vertex.getIdentity(), rec.getIdentity(), connection.getValue());
       else
-        edge = new OrientEdge(this.vertex.graph, value, this.vertex.getRecord(), connection.getValue());
+        edge = new OrientEdge(this.vertex.graph, rec.getIdentity(), this.vertex.getIdentity(), connection.getValue());
     } else if (value.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
       // EDGE
-      edge = new OrientEdge(this.vertex.graph, value);
+      edge = new OrientEdge(this.vertex.graph, rec.getIdentity());
     } else
       throw new IllegalStateException("Invalid content found between connections:" + value);
 
