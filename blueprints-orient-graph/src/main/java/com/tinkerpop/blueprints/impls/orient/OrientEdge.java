@@ -276,10 +276,10 @@ public class OrientEdge extends OrientElement implements Edge {
   public ODocument getRecord() {
     if (rawElement == null) {
       // CREATE AT THE FLY
-      final ODocument tmp = new ODocument(CLASS_NAME).setTrackingChanges(false);
+      final ODocument tmp = new ODocument(getClassName(label)).setTrackingChanges(false);
       tmp.field("in", vIn);
       tmp.field("out", vOut);
-      if (label != null)
+      if (label != null && !graph.isUseClassForEdgeLabel())
         tmp.field("label", label);
       return tmp;
     }
