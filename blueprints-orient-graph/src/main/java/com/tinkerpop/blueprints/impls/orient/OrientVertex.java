@@ -300,7 +300,7 @@ public class OrientVertex extends OrientElement implements Vertex {
   public Iterable<Edge> getEdges(final Vertex iDestination, final Direction iDirection, final String... iLabels) {
     final ODocument doc = getRecord();
 
-    final OMultiCollectionIterator<Edge> iterable = new OMultiCollectionIterator<Edge>();
+    final OMultiCollectionIterator<Edge> iterable = new OMultiCollectionIterator<Edge>().setEmbedded(true);
     for (String fieldName : doc.fieldNames()) {
       final OPair<Direction, String> connection = getConnection(iDirection, fieldName, iLabels);
       if (connection == null)
