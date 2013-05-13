@@ -507,6 +507,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return getRawGraph().getMetadata().getSchema().createClass(iClassName, iSuperClass);
   }
 
+  public final void dropVertexType(final String iTypeName) {
+    getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
+  }
+
   public OClass getEdgeBaseType() {
     return getRawGraph().getMetadata().getSchema().getClass(OrientEdge.CLASS_NAME);
   }
@@ -529,6 +533,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
   public OClass createEdgeType(final String iClassName, final OClass iSuperClass) {
     checkEdgeType(iSuperClass);
     return getRawGraph().getMetadata().getSchema().createClass(iClassName, iSuperClass);
+  }
+
+  public final void dropEdgeType(final String iTypeName) {
+    getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
   }
 
   protected final void checkVertexType(final OClass iType) {
