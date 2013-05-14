@@ -23,6 +23,8 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Support both @byte@ and @short@ data types in GraphSON.
 * Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values.
 
+==<hr/>==
+
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
@@ -35,7 +37,6 @@ h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
 * Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
 * @RexsteGraph@ properly supporting @boolean@ data types.
-
 
 ==<hr/>==
 
