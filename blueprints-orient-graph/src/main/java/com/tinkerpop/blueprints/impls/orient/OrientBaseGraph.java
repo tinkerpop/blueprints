@@ -305,19 +305,30 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return getVertices(true);
   }
 
-  public Iterable<Vertex> getVertices(final String key, Object value) {
-    final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OrientVertex.CLASS_NAME + "." + key);
-    if (idx != null) {
-      if (value != null && !(value instanceof String))
-        value = value.toString();
+  public Iterable<Vertex> getVertices(final String iKey, Object iValue) {
+    final String indexName;
+    final String key;
+    int pos = iKey.indexOf('.');
+    if (pos > -1) {
+      indexName = iKey;
+      key = iKey.substring(iKey.indexOf('.') + 1);
+    } else {
+      indexName = OrientVertex.CLASS_NAME + "." + iKey;
+      key = iKey;
+    }
 
-      Object indexValue = idx.get(value);
+    final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);
+    if (idx != null) {
+      if (iValue != null && !(iValue instanceof String))
+        iValue = iValue.toString();
+
+      Object indexValue = idx.get(iValue);
       if (indexValue != null && !(indexValue instanceof Iterable<?>))
         indexValue = Arrays.asList(indexValue);
 
       return new OrientElementIterable<Vertex>(this, (Iterable<?>) indexValue);
     }
-    return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
+    return new PropertyFilteredIterable<Vertex>(key, iValue, this.getVertices());
   }
 
   private Iterable<Vertex> getVertices(final boolean polymorphic) {
@@ -329,19 +340,30 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     return getEdges(true);
   }
 
-  public Iterable<Edge> getEdges(final String key, Object value) {
-    final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OrientEdge.CLASS_NAME + "." + key);
-    if (idx != null) {
-      if (value != null && !(value instanceof String))
-        value = value.toString();
+  public Iterable<Edge> getEdges(final String iKey, Object iValue) {
+    final String indexName;
+    final String key;
+    int pos = iKey.indexOf('.');
+    if (pos > -1) {
+      indexName = iKey;
+      key = iKey.substring(iKey.indexOf('.') + 1);
+    } else {
+      indexName = OrientEdge.CLASS_NAME + "." + iKey;
+      key = iKey;
+    }
 
-      Object indexValue = (Iterable<?>) idx.get(value);
+    final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);
+    if (idx != null) {
+      if (iValue != null && !(iValue instanceof String))
+        iValue = iValue.toString();
+
+      Object indexValue = (Iterable<?>) idx.get(iValue);
       if (indexValue != null && !(indexValue instanceof Iterable<?>))
         indexValue = Arrays.asList(indexValue);
 
       return new OrientElementIterable<Edge>(this, (Iterable<?>) indexValue);
     }
-    return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
+    return new PropertyFilteredIterable<Edge>(key, iValue, this.getEdges());
   }
 
   private Iterable<Edge> getEdges(final boolean polymorphic) {
