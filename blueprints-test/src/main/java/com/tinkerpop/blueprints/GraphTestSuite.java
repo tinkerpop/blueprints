@@ -394,10 +394,14 @@ public class GraphTestSuite extends TestSuite {
         printPerformance(graph.toString(), vertexCount / 2, "edges added", this.stopWatch());
 
         this.stopWatch();
+        Random random = new Random();
         int counter = 0;
         for (Vertex v : vertices) {
             counter = counter + 1;
-            graph.removeVertex(v);
+            if (random.nextBoolean())
+                graph.removeVertex(v);
+            else
+                v.remove();
             if ((counter + 1) % 2 == 0) {
                 if (graph.getFeatures().supportsEdgeIteration) {
                     assertEquals(edges.size() - ((counter + 1) / 2), count(graph.getEdges()));

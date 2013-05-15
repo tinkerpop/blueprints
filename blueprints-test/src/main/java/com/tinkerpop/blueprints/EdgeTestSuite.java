@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -185,10 +186,14 @@ public class EdgeTestSuite extends TestSuite {
             assertEquals(edgeCount, count(graph.getEdges()));
             printPerformance(graph.toString(), edgeCount, "edges counted", this.stopWatch());
 
+            Random random = new Random();
             int i = edgeCount;
             this.stopWatch();
             for (Edge edge : edges) {
-                graph.removeEdge(edge);
+                if (random.nextBoolean())
+                    graph.removeEdge(edge);
+                else
+                    edge.remove();
                 i--;
                 assertEquals(i, count(graph.getEdges()));
                 if (graph.getFeatures().supportsVertexIteration) {
@@ -333,7 +338,7 @@ public class EdgeTestSuite extends TestSuite {
         assertEquals(0, count(v2.getEdges(Direction.IN)));
         assertEquals(2, count(v3.getEdges(Direction.IN)));
 
-        graph.removeEdge(e2);
+        e2.remove();
         assertEquals(0, count(v1.getEdges(Direction.OUT)));
         assertEquals(1, count(v2.getEdges(Direction.OUT)));
         assertEquals(0, count(v3.getEdges(Direction.OUT)));
