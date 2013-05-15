@@ -294,7 +294,7 @@ public class OrientEdge extends OrientElement implements Edge {
         return edge.field(OrientElement.LABEL_FIELD_NAME);
     }
 
-    protected void convertToDocument() {
+    public void convertToDocument() {
         if (rawElement != null)
             // ALREADY CONVERTED
             return;
