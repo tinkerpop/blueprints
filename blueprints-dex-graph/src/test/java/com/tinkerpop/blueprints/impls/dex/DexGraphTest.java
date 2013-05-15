@@ -90,8 +90,8 @@ public class DexGraphTest extends GraphTest {
     //
     public void testDexSpecificTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new DexSpecificTestSuite(this));
-        printTestPerformance("DexSpecificTestSuite", this.stopWatch());
+        doTestSuite(new DexGraphSpecificTestSuite(this));
+        printTestPerformance("DexGraphSpecificTestSuite", this.stopWatch());
     }
 
     public Graph generateGraph() {

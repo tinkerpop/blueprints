@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Vertex;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -98,8 +98,8 @@ public class GraphSONWriter {
      * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON. Utilizing
      * GraphSONMode.NORMAL.
      *
-     * @param graph            the graph to serialize to JSON
-     * @param filename         the JSON file to write the Graph data to
+     * @param graph    the graph to serialize to JSON
+     * @param filename the JSON file to write the Graph data to
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final String filename) throws IOException {
@@ -124,9 +124,9 @@ public class GraphSONWriter {
     /**
      * Write the data in a Graph to a JSON OutputStream. All keys are written to JSON.
      *
-     * @param graph            the graph to serialize to JSON
-     * @param filename         the JSON file to write the Graph data to
-     * @param mode             determines the format of the GraphSON
+     * @param graph    the graph to serialize to JSON
+     * @param filename the JSON file to write the Graph data to
+     * @param mode     determines the format of the GraphSON
      * @throws IOException thrown if there is an error generating the JSON data
      */
     public static void outputGraph(final Graph graph, final String filename,

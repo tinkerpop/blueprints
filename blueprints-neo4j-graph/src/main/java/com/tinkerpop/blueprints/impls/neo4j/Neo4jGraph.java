@@ -86,7 +86,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         FEATURES.supportsDuplicateEdges = true;
         FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = true;
-        FEATURES.isRDFModel = false;
         FEATURES.isWrapper = false;
         FEATURES.supportsVertexIteration = true;
         FEATURES.supportsEdgeIteration = true;

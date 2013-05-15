@@ -9,5 +9,6 @@ import java.io.IOException;
  */
 interface TinkerStorage {
     public TinkerGraph load(final String directory) throws IOException;
+
     public void save(final TinkerGraph graph, final String directory) throws IOException;
 }

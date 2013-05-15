@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.util.io.gml;
 
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
 
 import java.io.BufferedReader;
@@ -141,8 +140,8 @@ public class GMLReader {
     /**
      * Load the GML file into the Graph.
      *
-     * @param graph       to receive the data
-     * @param filename    GML file
+     * @param graph    to receive the data
+     * @param filename GML file
      * @throws IOException thrown if the data is not valid
      */
     public static void inputGraph(Graph graph, String filename) throws IOException {
@@ -179,6 +178,7 @@ public class GMLReader {
                 vertexIdKey, edgeIdKey, edgeLabelKey);
         fis.close();
     }
+
     /**
      * Load the GML file into the Graph.
      *
@@ -210,7 +210,8 @@ public class GMLReader {
 
             new GMLParser(graph, defaultEdgeLabel, vertexIdKey, edgeIdKey, edgeLabelKey).parse(st);
 
-            graph.commit();;
+            graph.commit();
+            ;
         } catch (IOException e) {
             throw new IOException("GML malformed line number " + st.lineno() + ": ", e);
         }

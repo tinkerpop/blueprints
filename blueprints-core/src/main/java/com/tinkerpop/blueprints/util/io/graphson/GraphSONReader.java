@@ -68,8 +68,8 @@ public class GraphSONReader {
      * Input the JSON stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
-     * @param filename        name of a file of JSON data
-     * @param bufferSize      the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param filename   name of a file of JSON data
+     * @param bufferSize the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public void inputGraph(final String filename, int bufferSize) throws IOException {
@@ -92,8 +92,8 @@ public class GraphSONReader {
      * Input the JSON stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
-     * @param graph           the graph to populate with the JSON data
-     * @param filename        name of a file of JSON data
+     * @param graph    the graph to populate with the JSON data
+     * @param filename name of a file of JSON data
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph graph, final String filename) throws IOException {
@@ -112,9 +112,9 @@ public class GraphSONReader {
      * Input the JSON stream data into the graph.
      * More control over how data is streamed is provided by this method.
      *
-     * @param inputGraph      the graph to populate with the JSON data
-     * @param filename        name of a file of JSON data
-     * @param bufferSize      the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param inputGraph the graph to populate with the JSON data
+     * @param filename   name of a file of JSON data
+     * @param bufferSize the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the JSON data is not correctly formatted
      */
     public static void inputGraph(final Graph inputGraph, final String filename, int bufferSize,
@@ -170,7 +170,8 @@ public class GraphSONReader {
 
         jp.close();
 
-        graph.commit();;
+        graph.commit();
+        ;
     }
 
 

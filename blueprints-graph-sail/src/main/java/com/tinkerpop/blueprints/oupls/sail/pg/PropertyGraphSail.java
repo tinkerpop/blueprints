@@ -88,7 +88,6 @@ public class PropertyGraphSail implements Sail {
     }
 
 
-
     static class PropertyGraphContext {
         public final Graph graph;
 

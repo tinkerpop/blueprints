@@ -6,11 +6,9 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgePropertyChangedEvent;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.EdgePropertyRemovedEvent;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.VertexPropertyChangedEvent;
 import com.tinkerpop.blueprints.util.wrappers.event.listener.VertexPropertyRemovedEvent;
 
-import java.util.List;
 import java.util.Set;
 
 /**

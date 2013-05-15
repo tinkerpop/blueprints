@@ -1,64 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.tinkerpop.blueprints</groupId>
-		<artifactId>blueprints</artifactId>
-		<version>2.4.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
-	<artifactId>blueprints-orient-graph</artifactId>
-	<name>Blueprints-OrientGraph</name>
-	<description>Blueprints property graph implementation for the OrientDB graph database</description>
-	<properties>
-		<javac.src.version>1.6</javac.src.version>
-		<javac.target.version>1.6</javac.target.version>
-	</properties>
-	<repositories>
-		<repository>
-			<id>sonatype-nexus-releases</id>
-			<name>Sonatype Nexus Releases</name>
-			<url>https://oss.sonatype.org/content/repositories/releases</url>
-		</repository>
-	</repositories>
-	<dependencies>
-		<dependency>
-			<groupId>com.tinkerpop.blueprints</groupId>
-			<artifactId>blueprints-core</artifactId>
-			<version>${blueprints.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.orientechnologies</groupId>
-			<artifactId>orientdb-core</artifactId>
-			<version>1.4.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.orientechnologies</groupId>
-			<artifactId>orient-commons</artifactId>
-			<version>1.4.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.tinkerpop.blueprints</groupId>
-			<artifactId>blueprints-test</artifactId>
-			<version>${blueprints.version}</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-	<build>
-		<directory>${basedir}/target</directory>
-		<finalName>${project.artifactId}-${project.version}</finalName>
-		<resources>
-			<resource>
-				<directory>${basedir}/src/main/resources
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tinkerpop.blueprints</groupId>
+        <artifactId>blueprints</artifactId>
+        <version>2.4.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>blueprints-orient-graph</artifactId>
+    <name>Blueprints-OrientGraph</name>
+    <description>Blueprints property graph implementation for the OrientDB graph database</description>
+    <properties>
+        <javac.src.version>1.6</javac.src.version>
+        <javac.target.version>1.6</javac.target.version>
+    </properties>
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-releases</id>
+            <name>Sonatype Nexus Releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-core</artifactId>
+            <version>${blueprints.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orientdb-core</artifactId>
+            <version>1.4.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.orientechnologies</groupId>
+            <artifactId>orient-commons</artifactId>
+            <version>1.4.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-test</artifactId>
+            <version>${blueprints.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <directory>${basedir}/target</directory>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources
                 </directory>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>${basedir}/src/test/resources
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/resources
                 </directory>
-			</testResource>
-		</testResources>
-	</build>
+            </testResource>
+        </testResources>
+    </build>
 </project>

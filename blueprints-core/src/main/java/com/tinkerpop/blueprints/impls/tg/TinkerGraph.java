@@ -16,20 +16,8 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-import com.tinkerpop.blueprints.util.io.gml.GMLReader;
-import com.tinkerpop.blueprints.util.io.gml.GMLWriter;
-import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
-import com.tinkerpop.blueprints.util.io.graphml.GraphMLWriter;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONReader;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONWriter;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,7 +66,6 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
         FEATURES.ignoresSuppliedIds = false;
         FEATURES.isPersistent = false;
-        FEATURES.isRDFModel = false;
         FEATURES.isWrapper = false;
 
         FEATURES.supportsIndices = true;

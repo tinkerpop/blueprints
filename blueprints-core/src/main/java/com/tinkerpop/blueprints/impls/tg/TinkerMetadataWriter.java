@@ -51,17 +51,14 @@ class TinkerMetadataWriter {
             writeIndices(writer, this.graph);
             writeVertexKeyIndices(writer, this.graph);
             writeEdgeKeyIndices(writer, this.graph);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Could not write metadata file");
-        }
-        finally {
+        } finally {
             try {
                 if (writer != null) {
                     writer.close();
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException("Could not write metadata file");
             }
         }
@@ -70,8 +67,8 @@ class TinkerMetadataWriter {
     /**
      * Write TinkerGraph metadata to an OutputStream.
      *
-     * @param graph               the TinkerGraph to pull the metadata from
-     * @param outputStream        the OutputStream to write the TinkerGraph metadata to
+     * @param graph        the TinkerGraph to pull the metadata from
+     * @param outputStream the OutputStream to write the TinkerGraph metadata to
      * @throws IOException thrown if there is an error writing the TinkerGraph metadata
      */
     public static void save(final TinkerGraph graph, final OutputStream outputStream) throws IOException {
@@ -82,8 +79,8 @@ class TinkerMetadataWriter {
     /**
      * Write TinkerGraph metadata to a file.
      *
-     * @param graph               the TinkerGraph to pull the data from
-     * @param filename            the name of the file to write the TinkerGraph metadata to
+     * @param graph    the TinkerGraph to pull the data from
+     * @param filename the name of the file to write the TinkerGraph metadata to
      * @throws IOException thrown if there is an error writing the TinkerGraph metadata
      */
     public static void save(final TinkerGraph graph, final String filename) throws IOException {

@@ -27,7 +27,7 @@ public class TinkerMetadataReaderTest {
     public void exampleMetadataGetsCorrectCurrentId() throws IOException {
         TinkerMetadataReader.load(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
 
-        Assert.assertEquals((long)this.graph.currentId, 0l);
+        Assert.assertEquals((long) this.graph.currentId, 0l);
     }
 
     @Test

@@ -19,8 +19,6 @@ import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.UUID;
@@ -331,5 +329,5 @@ public class TinkerGraphTest extends GraphTest {
         final Vertex v2 = e2.getVertex(direction);
 
         assertEquals(v1.getId(), v2.getId());
-   }
+    }
 }

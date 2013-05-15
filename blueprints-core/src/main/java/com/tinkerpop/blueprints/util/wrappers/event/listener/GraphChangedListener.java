@@ -44,7 +44,7 @@ public interface GraphChangedListener {
      * Raised after a vertex was removed from the graph.
      *
      * @param vertex the vertex that was removed
-     * @param props the properties of the removed vertex
+     * @param props  the properties of the removed vertex
      */
     public void vertexRemoved(final Vertex vertex, Map<String, Object> props);
 
@@ -76,7 +76,7 @@ public interface GraphChangedListener {
     /**
      * Raised after an edge was removed from the graph.
      *
-     * @param edge the edge that was removed.
+     * @param edge  the edge that was removed.
      * @param props the properties of the removed vertex
      */
     public void edgeRemoved(final Edge edge, Map<String, Object> props);

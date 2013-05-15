@@ -62,7 +62,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         FEATURES.supportsDuplicateEdges = false;
         FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = false;
-        FEATURES.isRDFModel = true;
         FEATURES.supportsVertexIteration = false;
         FEATURES.supportsEdgeIteration = true;
         FEATURES.supportsVertexIndex = false;

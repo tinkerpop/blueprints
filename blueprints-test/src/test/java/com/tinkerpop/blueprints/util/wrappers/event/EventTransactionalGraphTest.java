@@ -8,7 +8,6 @@ import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.IndexTestSuite;
 import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
@@ -416,7 +415,7 @@ public class EventTransactionalGraphTest extends GraphTest {
         return graph.addVertex(null);
     }
 
-    
+
     public void testMutateInListener() {
         StubGraphChangedListener listener = new StubGraphChangedListener() {
 

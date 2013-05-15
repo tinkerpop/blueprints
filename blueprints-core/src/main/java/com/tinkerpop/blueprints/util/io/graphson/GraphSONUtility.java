@@ -1,12 +1,12 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -721,7 +721,7 @@ public class GraphSONUtility {
     private static List convertArrayToList(final Object value) {
         final ArrayList<Object> list = new ArrayList<Object>();
         int arrlength = Array.getLength(value);
-        for(int i = 0; i < arrlength; i++){
+        for (int i = 0; i < arrlength; i++) {
             Object object = Array.get(value, i);
             list.add(object);
         }

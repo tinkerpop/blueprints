@@ -1,9 +1,9 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
+import com.tinkerpop.blueprints.util.wrappers.event.listener.Event;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
-
-import com.tinkerpop.blueprints.util.wrappers.event.listener.Event;
 
 public class EventTrigger {
 

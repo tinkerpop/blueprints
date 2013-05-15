@@ -18,14 +18,6 @@ public abstract class TestSuite extends BaseTest {
         this.graphTest = graphTest;
     }
 
-    protected String convertId(final Graph graph, final String id) {
-        if (graph.getFeatures().isRDFModel) {
-            return "blueprints:" + id;
-        } else {
-            return id;
-        }
-    }
-
     protected void vertexCount(final Graph graph, int expectedCount) {
         if (graph.getFeatures().supportsVertexIteration) assertEquals(count(graph.getVertices()), expectedCount);
     }

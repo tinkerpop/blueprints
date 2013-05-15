@@ -52,7 +52,7 @@ class DexIterable<T extends Element> implements CloseableIterable<T> {
     public void close() {
         close(true);
     }
-    
+
     void close(boolean unregister) {
         for (final DexIterator itty : iterators) {
             itty.close();

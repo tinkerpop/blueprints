@@ -9,7 +9,6 @@ import com.tinkerpop.blueprints.IndexableGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
-import com.tinkerpop.blueprints.impls.neo4j.batch.Neo4jBatchGraph;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;

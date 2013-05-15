@@ -107,6 +107,7 @@ public class GMLWriter {
         outputGraph(fos);
         fos.close();
     }
+
     /**
      * Write the data in a Graph to a GML OutputStream.
      *
@@ -304,8 +305,8 @@ public class GMLWriter {
     /**
      * Write the data in a Graph to a GML OutputStream.
      *
-     * @param graph               the Graph to pull the data from
-     * @param filename            the GML file to write the Graph data to
+     * @param graph    the Graph to pull the data from
+     * @param filename the GML file to write the Graph data to
      * @throws IOException thrown if there is an error generating the GML data
      */
     public static void outputGraph(final Graph graph, final String filename) throws IOException {

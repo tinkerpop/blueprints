@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
 import com.tinkerpop.blueprints.TransactionalGraph;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.util.GraphHelper;

@@ -5,14 +5,12 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
-import com.tinkerpop.blueprints.util.ExceptionFactory;
-import com.tinkerpop.blueprints.util.StringFactory;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 
-import java.util.ArrayList;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -118,13 +116,13 @@ abstract class Neo4jElement implements Element {
         if (value.getClass().isArray()) {
             // convert primitive array to an ArrayList.  
             try {
-		ArrayList<Object> list = new ArrayList<Object>();
-		int arrlength = Array.getLength(value);
-		for(int i = 0; i < arrlength; i++){
-		    Object object = Array.get(value, i);
-		    list.add(object);
-		}
-		return list;
+                ArrayList<Object> list = new ArrayList<Object>();
+                int arrlength = Array.getLength(value);
+                for (int i = 0; i < arrlength; i++) {
+                    Object object = Array.get(value, i);
+                    list.add(object);
+                }
+                return list;
             } catch (final Exception e) {
                 // this fires off if the collection is not an array
                 return value;

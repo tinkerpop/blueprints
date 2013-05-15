@@ -112,7 +112,6 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         FEATURES.supportsDuplicateEdges = true;
         FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = true;
-        FEATURES.isRDFModel = false;
         FEATURES.supportsVertexIteration = true;
         FEATURES.supportsEdgeIteration = true;
         FEATURES.supportsVertexIndex = false;

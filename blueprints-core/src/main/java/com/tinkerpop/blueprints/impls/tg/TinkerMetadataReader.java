@@ -53,17 +53,14 @@ class TinkerMetadataReader {
             readIndices(reader, this.graph);
             readVertexKeyIndices(reader, this.graph);
             readEdgeKeyIndices(reader, this.graph);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Could not read metadata file");
-        }
-        finally {
+        } finally {
             try {
                 if (reader != null) {
                     reader.close();
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException("Could not read metadata file");
             }
         }
@@ -72,8 +69,8 @@ class TinkerMetadataReader {
     /**
      * Read TinkerGraph metadata from an InputStream.
      *
-     * @param graph               the TinkerGraph to push the metadata to
-     * @param inputStream         the InputStream to read the TinkerGraph metadata from
+     * @param graph       the TinkerGraph to push the metadata to
+     * @param inputStream the InputStream to read the TinkerGraph metadata from
      * @throws IOException thrown if there is an error reading the TinkerGraph metadata
      */
     public static void load(final TinkerGraph graph, final InputStream inputStream) throws IOException {
@@ -84,8 +81,8 @@ class TinkerMetadataReader {
     /**
      * Read TinkerGraph metadata from a file.
      *
-     * @param graph               the TinkerGraph to push the data to
-     * @param filename            the name of the file to read the TinkerGraph metadata from
+     * @param graph    the TinkerGraph to push the data to
+     * @param filename the name of the file to read the TinkerGraph metadata from
      * @throws IOException thrown if there is an error reading the TinkerGraph metadata
      */
     public static void load(final TinkerGraph graph, final String filename) throws IOException {

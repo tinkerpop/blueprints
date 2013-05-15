@@ -43,7 +43,6 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         FEATURES.supportsSelfLoops = true;
         FEATURES.ignoresSuppliedIds = false;
         FEATURES.isPersistent = false;
-        FEATURES.isRDFModel = false;
         FEATURES.supportsVertexIteration = true;
         FEATURES.supportsEdgeIteration = true;
         FEATURES.supportsVertexIndex = true;
@@ -295,7 +294,7 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
     }
 
     public JSONArray execute(final String gremlinScript) {
-         return execute(gremlinScript, (JSONObject) null);
+        return execute(gremlinScript, (JSONObject) null);
     }
 
     public JSONArray execute(final String gremlinScript, final Map<String, Object> scriptParams) {
