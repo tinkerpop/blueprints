@@ -56,5 +56,8 @@ public interface VertexQuery extends Query {
     @Override
     public VertexQuery limit(final long max);
 
+    @Override
+    public VertexQuery limit(final long min, final long max);
+
 
 }

@@ -26,27 +26,32 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
     }
 
     public GraphQuery has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
+        super.has(key, value);
         return this;
     }
 
     public <T extends Comparable<T>> GraphQuery has(final String key, final T value, final Compare compare) {
-        return this.has(key, compare, value);
+        super.has(key, compare, value);
+        return this;
     }
 
     public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, value, compare));
+        super.has(key, compare, value);
         return this;
     }
 
     public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue) {
-        this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
-        this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
+        super.interval(key, startValue, endValue);
         return this;
     }
 
     public GraphQuery limit(final long max) {
-        this.limit = max;
+        super.limit(max);
+        return this;
+    }
+
+    public GraphQuery limit(final long min, final long max) {
+        super.limit(min, max);
         return this;
     }
 
@@ -99,7 +104,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
                 private boolean loadNext() {
                     this.nextElement = null;
-                    if (count >= limit) return false;
+                    if (this.count >= maximum) return false;
                     while (this.itty.hasNext()) {
                         final T element = this.itty.next();
                         boolean filter = false;
@@ -111,9 +116,8 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                             }
                         }
 
-                        if (!filter) {
+                        if (!filter && this.count++ >= minimum) {
                             this.nextElement = element;
-                            this.count++;
                             return true;
                         }
                     }

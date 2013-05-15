@@ -23,7 +23,8 @@ public class RexsterVertexQuery implements VertexQuery {
 
     public Direction direction = Direction.BOTH;
     public String[] labels = EMPTY_LABELS;
-    public long limit = Long.MAX_VALUE;
+    public long maximum = Long.MAX_VALUE;
+    public long minimum = 0l;
     public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
     public final String baseUri;
     public final RexsterGraph graph;
@@ -64,7 +65,13 @@ public class RexsterVertexQuery implements VertexQuery {
     }
 
     public VertexQuery limit(final long max) {
-        this.limit = max;
+        this.maximum = max;
+        return this;
+    }
+
+    public VertexQuery limit(final long min, final long max) {
+        this.maximum = max;
+        this.minimum = min;
         return this;
     }
 
@@ -134,7 +141,7 @@ public class RexsterVertexQuery implements VertexQuery {
         final StringBuilder sb = new StringBuilder(this.baseUri + directionReturnToken + RexsterTokens.QUESTION);
         sb.append(RexsterTokens._LIMIT);
         sb.append(RexsterTokens.EQUALS);
-        sb.append(this.limit);
+        sb.append(this.maximum);
 
         if (this.labels != null && this.labels.length > 0) {
             sb.append(RexsterTokens.AND);

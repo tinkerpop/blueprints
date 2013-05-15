@@ -15,6 +15,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* @QueryTestSuite@ broken up into @GraphQueryTestSuite@ and @VertexQueryTestSuite@
 * Deprecated @Feature.isRDFModel@ is now removed
 * Added ability for a @GraphTest@ to have a graph specific test suite
 * A complete refactor of the id model in TestSuites (see @GraphTest.convertId()@, @GraphTest.convertLabel()@)

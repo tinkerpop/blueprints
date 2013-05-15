@@ -26,22 +26,32 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
     }
 
     public VertexQuery has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
+        super.has(key, value);
         return this;
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
-        return this.has(key, compare, value);
+        super.has(key, compare, value);
+        return this;
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, value, compare));
+        super.has(key, compare, value);
         return this;
     }
 
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue) {
-        this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
-        this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
+        super.interval(key, startValue, endValue);
+        return this;
+    }
+
+    public VertexQuery limit(final long max) {
+        super.limit(max);
+        return this;
+    }
+
+    public VertexQuery limit(final long min, final long max) {
+        super.limit(min, max);
         return this;
     }
 
@@ -52,11 +62,6 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
     public VertexQuery labels(final String... labels) {
         this.labels = labels;
-        return this;
-    }
-
-    public VertexQuery limit(final long max) {
-        this.limit = max;
         return this;
     }
 
@@ -142,7 +147,8 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
                 private boolean loadNext() {
                     this.nextEdge = null;
-                    if (count >= limit) return false;
+                    if (count >= maximum) return false;
+
                     while (this.itty.hasNext()) {
                         final Edge edge = this.itty.next();
                         boolean filter = false;
@@ -152,9 +158,8 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
                                 break;
                             }
                         }
-                        if (!filter) {
+                        if (!filter && count++ >= minimum) {
                             this.nextEdge = edge;
-                            this.count++;
                             return true;
                         }
                     }

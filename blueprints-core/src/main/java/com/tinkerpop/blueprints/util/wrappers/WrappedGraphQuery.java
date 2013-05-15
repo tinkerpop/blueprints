@@ -39,6 +39,11 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         return this;
     }
 
+    public GraphQuery limit(final long min, final long max) {
+        this.query = this.query.limit(min, max);
+        return this;
+    }
+
     public abstract Iterable<Edge> edges();
 
     public abstract Iterable<Vertex> vertices();
