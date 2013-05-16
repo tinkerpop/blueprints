@@ -2,10 +2,11 @@ package com.tinkerpop.blueprints.impls.orient;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQueryTestSuite;
 import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
-import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.VertexQueryTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
@@ -23,10 +24,16 @@ public class OrientGraphNoTxTest extends GraphTest {
 
     // testing only those suites that are read-only
 
-    public void testQueryTestSuite() throws Exception {
+    public void testVertexQueryTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new QueryTestSuite(this));
-        printTestPerformance("QueryTestSuite", this.stopWatch());
+        doTestSuite(new VertexQueryTestSuite(this));
+        printTestPerformance("VertexQueryTestSuite", this.stopWatch());
+    }
+
+    public void testGraphQueryTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphQueryTestSuite(this));
+        printTestPerformance("GraphQueryTestSuite", this.stopWatch());
     }
 
     public void testIndexableGraphTestSuite() throws Exception {

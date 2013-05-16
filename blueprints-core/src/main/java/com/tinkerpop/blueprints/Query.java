@@ -1,7 +1,8 @@
 package com.tinkerpop.blueprints;
 
 /**
- * (c) Matthias Broecheler (me@matthiasb.com)
+ * @author Matthias Broecheler (me@matthiasb.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 
 public interface Query {
@@ -66,6 +67,22 @@ public interface Query {
      */
     public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue);
 
+    /**
+     * Filter out the edge if the max number of edges to retrieve has already been reached.
+     *
+     * @param max the max number of edges to return
+     * @return the modified query object
+     */
+    public Query limit(final long max);
+
+    /**
+     * Filter out elements not within the range specified by the min and max arguments.
+     *
+     * @param min the low end of the range to allow
+     * @param max the high end of the range to allow
+     * @return the modified query object
+     */
+    public Query limit(final long min, final long max);
 
     /**
      * Execute the query and return the matching edges.
@@ -80,15 +97,6 @@ public interface Query {
      * @return the unfiltered edge's vertices
      */
     public Iterable<Vertex> vertices();
-
-
-    /**
-     * Filter out the edge if the max number of edges to retrieve has already been reached.
-     *
-     * @param max the max number of edges to return
-     * @return the modified query object
-     */
-    public Query limit(final long max);
 
 
 }

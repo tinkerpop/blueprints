@@ -48,6 +48,11 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         return this;
     }
 
+    public VertexQuery limit(final long min, final long max) {
+        this.query = this.query.limit(min, max);
+        return this;
+    }
+
     public VertexQuery labels(final String... labels) {
         this.query = this.query.labels(labels);
         return this;

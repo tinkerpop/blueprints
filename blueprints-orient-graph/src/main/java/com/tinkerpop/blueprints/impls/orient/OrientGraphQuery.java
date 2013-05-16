@@ -28,7 +28,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
     @Override
     public Iterable<Vertex> vertices() {
-        if (limit == 0)
+        if (maximum == 0)
             return Collections.emptyList();
 
         final StringBuilder text = new StringBuilder();
@@ -56,15 +56,15 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
         final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
 
-        if (limit > 0 && limit < Long.MAX_VALUE)
-            query.setLimit((int) limit);
+        if (maximum > 0 && maximum < Long.MAX_VALUE)
+            query.setLimit((int) maximum);
 
         return new OrientElementIterable<Vertex>(((OrientBaseGraph) graph), ((OrientBaseGraph) graph).getRawGraph().query(query));
     }
 
     @Override
     public Iterable<Edge> edges() {
-        if (limit == 0)
+        if (maximum == 0)
             return Collections.emptyList();
 
         if (((OrientBaseGraph) graph).isUseLightweightEdges())
@@ -96,8 +96,8 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
         final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
 
-        if (limit > 0 && limit < Long.MAX_VALUE)
-            query.setLimit((int) limit);
+        if (maximum > 0 && maximum < Long.MAX_VALUE)
+            query.setLimit((int) maximum);
 
         return new OrientElementIterable<Edge>(((OrientBaseGraph) graph), ((OrientBaseGraph) graph).getRawGraph().query(query));
     }

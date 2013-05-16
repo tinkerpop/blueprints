@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints;
 
 /**
- * (c) Matthias Broecheler (me@matthiasb.com)
+ * @author Matthias Broecheler (me@matthiasb.com)
  */
 
 public interface GraphQuery extends Query {
@@ -21,5 +21,8 @@ public interface GraphQuery extends Query {
 
     @Override
     public GraphQuery limit(final long max);
+
+    @Override
+    public GraphQuery limit(final long min, final long max);
 
 }
