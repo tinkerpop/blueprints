@@ -235,8 +235,10 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(a.query().direction(OUT).limit(0, 0).count(), a.query().direction(OUT).limit(0).count());
             assertEquals(a.query().direction(OUT).limit(0, 1).count(), a.query().direction(OUT).limit(1).count());
             assertEquals(a.query().direction(OUT).limit(0, 2).count(), a.query().direction(OUT).limit(2).count());
-            assertEquals(a.query().direction(OUT).limit(1, 2).count(), a.query().direction(OUT).limit(1).count());
-            assertEquals(a.query().direction(OUT).limit(2, 2).count(), a.query().direction(OUT).limit(1).count());
+            assertEquals(a.query().direction(OUT).limit(1, 2).count(), 2);
+            assertEquals(a.query().direction(OUT).limit(2, 2).count(), 2);
+            assertEquals(a.query().direction(OUT).limit(2, 1).count(), 1);
+            assertEquals(a.query().direction(OUT).limit(3, 0).count(), 0);
         }
         graph.shutdown();
 

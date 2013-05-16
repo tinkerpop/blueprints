@@ -57,10 +57,10 @@ public class GraphQueryTestSuite extends TestSuite {
 
             assertEquals(count(graph.query().limit(0, 1).vertices()), 1);
             assertEquals(count(graph.query().limit(1, 1).vertices()), 1);
-            assertEquals(count(graph.query().limit(1, 2).vertices()), 1);
-            assertEquals(count(graph.query().limit(1, 3).vertices()), 2);
-            assertEquals(count(graph.query().limit(1, 4).vertices()), 2);
-            assertEquals(count(graph.query().limit(2, 3).vertices()), 1);
+            assertEquals(count(graph.query().limit(1, 2).vertices()), 2);
+            assertEquals(count(graph.query().limit(1, 3).vertices()), 3);
+            assertEquals(count(graph.query().limit(1, 4).vertices()), 3);
+            assertEquals(count(graph.query().limit(2, 3).vertices()), 2);
             assertEquals(count(graph.query().limit(4, 10).vertices()), 0);
 
             vertices = graph.query().has("name", "marko").vertices();
