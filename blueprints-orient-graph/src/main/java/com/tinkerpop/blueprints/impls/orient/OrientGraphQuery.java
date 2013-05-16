@@ -12,148 +12,174 @@ import java.util.Collections;
 
 /**
  * OrientDB implementation for Graph query.
- *
+ * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphQuery extends DefaultGraphQuery {
 
-    public OrientGraphQuery(final Graph iGraph) {
-        super(iGraph);
-    }
+	private static final char SPACE = ' ';
+	private static final String OPERATOR_DIFFERENT = "<>";
+	private static final String OPERATOR_IS_NOT = "is not";
+	private static final String OPERATOR_LET = "<=";
+	private static final char OPERATOR_LT = '<';
+	private static final String OPERATOR_GTE = ">=";
+	private static final char OPERATOR_GT = '>';
+	private static final String OPERATOR_EQUALS = "=";
+	private static final String OPERATOR_IS = "is";
 
-    public Query labels(final String... labels) {
-        this.labels = labels;
-        return this;
-    }
+	private static final String QUERY_FILTER_AND = " and ";
+	private static final char QUERY_STRING = '\'';
+	private static final char QUERY_SEPARATOR = ',';
+	private static final String QUERY_LABEL_BEGIN = " and label in [";
+	private static final String QUERY_LABEL_END = "]";
+	private static final String QUERY_WHERE = " where 1=1";
+	private static final String QUERY_SELECT_FROM = "select from ";
 
-    @Override
-    public Iterable<Vertex> vertices() {
-        if (limit == 0)
-            return Collections.emptyList();
+	public OrientGraphQuery(final Graph iGraph) {
+		super(iGraph);
+	}
 
-        final StringBuilder text = new StringBuilder();
+	public Query labels(final String... labels) {
+		this.labels = labels;
+		return this;
+	}
 
-        // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
-        text.append("select from ");
+	@Override
+	public Iterable<Vertex> vertices() {
+		if (limit == 0)
+			return Collections.emptyList();
 
-        if (((OrientBaseGraph) graph).isUseClassForVertexLabel() && labels != null && labels.length > 0) {
-            // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
-            if (labels.length == 1)
-                // USE THE CLASS NAME
-                text.append(OrientBaseGraph.encodeClassName(labels[0]));
-            else {
-                // MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
-                return super.vertices();
-            }
-        } else
-            text.append('V');
+		final StringBuilder text = new StringBuilder();
 
-        // APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
-        text.append(" where 1=1");
-        manageFilters(text);
-        if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
-            manageLabels(text);
+		// GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
+		text.append(QUERY_SELECT_FROM);
 
-        final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
+		if (((OrientBaseGraph) graph).isUseClassForVertexLabel()
+				&& labels != null && labels.length > 0) {
+			// FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
+			if (labels.length == 1)
+				// USE THE CLASS NAME
+				text.append(OrientBaseGraph.encodeClassName(labels[0]));
+			else {
+				// MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
+				return super.vertices();
+			}
+		} else
+			text.append(OrientVertex.CLASS_NAME);
 
-        if (limit > 0 && limit < Long.MAX_VALUE)
-            query.setLimit((int) limit);
+		// APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
+		text.append(QUERY_WHERE);
+		manageFilters(text);
+		if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
+			manageLabels(text);
 
-        return new OrientElementIterable<Vertex>(((OrientBaseGraph) graph), ((OrientBaseGraph) graph).getRawGraph().query(query));
-    }
+		final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
+				text.toString());
 
-    @Override
-    public Iterable<Edge> edges() {
-        if (limit == 0)
-            return Collections.emptyList();
+		if (limit > 0 && limit < Long.MAX_VALUE)
+			query.setLimit((int) limit);
 
-        if (((OrientBaseGraph) graph).isUseLightweightEdges())
-            return super.edges();
+		return new OrientElementIterable<Vertex>(((OrientBaseGraph) graph),
+				((OrientBaseGraph) graph).getRawGraph().query(query));
+	}
 
-        final StringBuilder text = new StringBuilder();
+	@Override
+	public Iterable<Edge> edges() {
+		if (limit == 0)
+			return Collections.emptyList();
 
-        // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
-        text.append("select from ");
+		if (((OrientBaseGraph) graph).isUseLightweightEdges())
+			return super.edges();
 
-        if (((OrientBaseGraph) graph).isUseClassForEdgeLabel() && labels != null && labels.length > 0) {
-            // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
-            if (labels.length == 1)
-                // USE THE CLASS NAME
-                text.append(OrientBaseGraph.encodeClassName(labels[0]));
-            else {
-                // MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
-                return super.edges();
-            }
-        } else
-            text.append('E');
+		final StringBuilder text = new StringBuilder();
 
-        // APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
-        text.append(" where 1=1");
+		// GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
+		text.append(QUERY_SELECT_FROM);
 
-        manageFilters(text);
-        if (!((OrientBaseGraph) graph).isUseClassForEdgeLabel())
-            manageLabels(text);
+		if (((OrientBaseGraph) graph).isUseClassForEdgeLabel()
+				&& labels != null && labels.length > 0) {
+			// FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
+			if (labels.length == 1)
+				// USE THE CLASS NAME
+				text.append(OrientBaseGraph.encodeClassName(labels[0]));
+			else {
+				// MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
+				return super.edges();
+			}
+		} else
+			text.append(OrientEdge.CLASS_NAME);
 
-        final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
+		// APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
+		text.append(QUERY_WHERE);
 
-        if (limit > 0 && limit < Long.MAX_VALUE)
-            query.setLimit((int) limit);
+		manageFilters(text);
+		if (!((OrientBaseGraph) graph).isUseClassForEdgeLabel())
+			manageLabels(text);
 
-        return new OrientElementIterable<Edge>(((OrientBaseGraph) graph), ((OrientBaseGraph) graph).getRawGraph().query(query));
-    }
+		final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
+				text.toString());
 
-    private void manageLabels(final StringBuilder text) {
-        if (labels != null && labels.length > 0) {
-            // APPEND LABELS
-            text.append(" and label in [");
-            for (int i = 0; i < labels.length; ++i) {
-                if (i > 0)
-                    text.append(',');
-                text.append('\'');
-                text.append(labels[i]);
-                text.append('\'');
-            }
-            text.append("]");
-        }
-    }
+		if (limit > 0 && limit < Long.MAX_VALUE)
+			query.setLimit((int) limit);
 
-    private void manageFilters(final StringBuilder text) {
-        for (HasContainer has : hasContainers) {
-            text.append(" and ");
+		return new OrientElementIterable<Edge>(((OrientBaseGraph) graph),
+				((OrientBaseGraph) graph).getRawGraph().query(query));
+	}
 
-            text.append(has.key);
-            switch (has.compare) {
-                case EQUAL:
-                    if (has.value == null)
-                        text.append(" is ");
-                    else
-                        text.append(" = ");
-                    break;
-                case GREATER_THAN:
-                    text.append(" > ");
-                    break;
-                case GREATER_THAN_EQUAL:
-                    text.append(" >= ");
-                    break;
-                case LESS_THAN:
-                    text.append(" < ");
-                    break;
-                case LESS_THAN_EQUAL:
-                    text.append(" <= ");
-                    break;
-                case NOT_EQUAL:
-                    if (has.value == null)
-                        text.append(" is not ");
-                    else
-                        text.append(" <> ");
-                    break;
-            }
+	private void manageLabels(final StringBuilder text) {
+		if (labels != null && labels.length > 0) {
+			// APPEND LABELS
+			text.append(QUERY_LABEL_BEGIN);
+			for (int i = 0; i < labels.length; ++i) {
+				if (i > 0)
+					text.append(QUERY_SEPARATOR);
+				text.append(QUERY_STRING);
+				text.append(labels[i]);
+				text.append(QUERY_STRING);
+			}
+			text.append(QUERY_LABEL_END);
+		}
+	}
 
-            if (has.value instanceof String)
-                text.append('\'');
-            text.append(has.value);
-            if (has.value instanceof String)
-                text.append('\'');
-        }
-    }
+	private void manageFilters(final StringBuilder text) {
+		for (HasContainer has : hasContainers) {
+			text.append(QUERY_FILTER_AND);
+
+			text.append(has.key);
+			text.append(SPACE);
+			switch (has.compare) {
+			case EQUAL:
+				if (has.value == null)
+					text.append(OPERATOR_IS);
+				else
+					text.append(OPERATOR_EQUALS);
+				break;
+			case GREATER_THAN:
+				text.append(OPERATOR_GT);
+				break;
+			case GREATER_THAN_EQUAL:
+				text.append(OPERATOR_GTE);
+				break;
+			case LESS_THAN:
+				text.append(OPERATOR_LT);
+				break;
+			case LESS_THAN_EQUAL:
+				text.append(OPERATOR_LET);
+				break;
+			case NOT_EQUAL:
+				if (has.value == null)
+					text.append(OPERATOR_IS_NOT);
+				else
+					text.append(OPERATOR_DIFFERENT);
+				break;
+			}
+			text.append(SPACE);
+
+			if (has.value instanceof String)
+				text.append(QUERY_STRING);
+			text.append(has.value);
+			if (has.value instanceof String)
+				text.append(QUERY_STRING);
+		}
+	}
 }
