@@ -21,7 +21,7 @@ public class OrientElementIterable<T extends Element> implements CloseableIterab
 
     public Iterator<T> iterator() {
         if( iterable == null )
-          return Collections.emptyIterator();
+          return Collections.EMPTY_LIST.iterator();
         
         return new OrientElementIterator<T>(this.graph, iterable.iterator());
     }
