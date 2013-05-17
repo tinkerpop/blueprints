@@ -34,7 +34,7 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
     @Override
     public void stopTransaction(final Conclusion conclusion) {
         final OrientGraphContext context = getContext(false);
-        if (context.rawGraph.isClosed() || context.rawGraph.getTransaction() instanceof OTransactionNoTx
+        if (context == null || context.rawGraph.isClosed() || context.rawGraph.getTransaction() instanceof OTransactionNoTx
                 || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN)
             return;
 
