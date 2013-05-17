@@ -34,6 +34,8 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
     @Override
     public void stopTransaction(final Conclusion conclusion) {
         final OrientGraphContext context = getContext(false);
+        if( context == null )
+        	return;
         if (context.rawGraph.isClosed() || context.rawGraph.getTransaction() instanceof OTransactionNoTx
                 || context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN)
             return;
@@ -45,11 +47,19 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph implement
     }
 
     public void commit() {
-        this.getRawGraph().commit();
+        final OrientGraphContext context = getContext(false);
+        if( context == null )
+        	return;
+        
+        context.rawGraph.commit();
     }
 
     public void rollback() {
-        this.getRawGraph().rollback();
+        final OrientGraphContext context = getContext(false);
+        if( context == null )
+        	return;
+
+        context.rawGraph.rollback();
     }
 
     @Override
