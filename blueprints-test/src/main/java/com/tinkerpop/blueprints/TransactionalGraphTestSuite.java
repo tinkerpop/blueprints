@@ -563,23 +563,21 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // across threads
         final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
 
-        if (!graph.getFeatures().isRDFModel) {
-            final AtomicReference<Vertex> v = new AtomicReference<Vertex>();
-            final Thread thread = new Thread() {
-                public void run() {
-                    final Vertex vertex = graph.addVertex(null);
-                    vertex.setProperty("name", "stephen");
-                    v.set(vertex);
-                }
-            };
+        final AtomicReference<Vertex> v = new AtomicReference<Vertex>();
+        final Thread thread = new Thread() {
+            public void run() {
+                final Vertex vertex = graph.addVertex(null);
+                vertex.setProperty("name", "stephen");
+                v.set(vertex);
+            }
+        };
 
-            thread.start();
-            thread.join();
+        thread.start();
+        thread.join();
 
-            Set<String> k = v.get().getPropertyKeys();
-            assertTrue(k.contains("name"));
-            assertEquals("stephen", v.get().getProperty("name"));
-        }
+        Set<String> k = v.get().getPropertyKeys();
+        assertTrue(k.contains("name"));
+        assertEquals("stephen", v.get().getProperty("name"));
     }
 
     public void untestTransactionIsolationWithSeparateThreads() throws Exception {
