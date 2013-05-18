@@ -7,9 +7,11 @@ import junit.framework.Assert;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -410,6 +412,22 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testVertexPropertiesOnPreTransactionCommit() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties) {
+            Vertex v1 = graph.addVertex(null);
+            v1.setProperty("name", "marko");
+
+            assertEquals(1, v1.getPropertyKeys().size());
+            assertTrue(v1.getPropertyKeys().contains("name"));
+            assertEquals("marko", v1.getProperty("name"));
+
+            graph.commit();
+
+            assertEquals("marko", v1.getProperty("name"));
+        }
+    }
+
     public void testBulkTransactionsOnEdges() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
         for (int i = 0; i < 5; i++) {
@@ -536,6 +554,30 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         graph1.shutdown();
         graph2.shutdown();
+    }
+
+    public void untestTransactionVertexPropertiesAcrossThreads() throws Exception {
+        // the purpose of this test is to ensure that properties of a element are available prior to commit()
+        // across threads
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        if (!graph.getFeatures().isRDFModel) {
+            final AtomicReference<Vertex> v = new AtomicReference<Vertex>();
+            final Thread thread = new Thread() {
+                public void run() {
+                    final Vertex vertex = graph.addVertex(null);
+                    vertex.setProperty("name", "stephen");
+                    v.set(vertex);
+                }
+            };
+
+            thread.start();
+            thread.join();
+
+            Set<String> k = v.get().getPropertyKeys();
+            assertTrue(k.contains("name"));
+            assertEquals("stephen", v.get().getProperty("name"));
+        }
     }
 
     public void untestTransactionIsolationWithSeparateThreads() throws Exception {
