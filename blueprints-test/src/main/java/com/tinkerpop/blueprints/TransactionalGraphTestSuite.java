@@ -558,6 +558,94 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graphTest.dropGraph("second");
     }
 
+    public void testTransactionIsolationCommitCheck() throws Exception {
+        // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
+        // the graph and a separate thread cannot affect the transaction of the first
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        final CountDownLatch latchCommittedInOtherThread = new CountDownLatch(1);
+        final CountDownLatch latchCommitInOtherThread = new CountDownLatch(1);
+
+        // this thread starts a transaction then waits while the second thread tries to commit it.
+        final Thread threadTxStarter = new Thread() {
+            public void run() {
+                final Vertex v = graph.addVertex(null);
+
+                // System.out.println("added vertex");
+
+                latchCommitInOtherThread.countDown();
+
+                try {
+                    latchCommittedInOtherThread.await();
+                } catch (InterruptedException ie) {
+                    throw new RuntimeException(ie);
+                }
+
+                graph.rollback();
+
+                // there should be no vertices here
+                // System.out.println("reading vertex before tx");
+                assertFalse(graph.getVertices().iterator().hasNext());
+                // System.out.println("read vertex before tx");
+            }
+        };
+
+        threadTxStarter.start();
+
+        // this thread tries to commit the transaction started in the first thread above.
+        final Thread threadTryCommitTx = new Thread() {
+            public void run() {
+                try {
+                    latchCommitInOtherThread.await();
+                } catch (InterruptedException ie) {
+                    throw new RuntimeException(ie);
+                }
+
+                // try to commit the other transaction
+                graph.commit();
+
+                latchCommittedInOtherThread.countDown();
+            }
+        };
+
+        threadTryCommitTx.start();
+
+        threadTxStarter.join();
+        threadTryCommitTx.join();
+        graph.shutdown();
+
+    }
+
+    public void testRemoveInTransaction() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        edgeCount(graph, 0);
+
+        Vertex v1 = graph.addVertex(null);
+        Object v1id = v1.getId();
+        Vertex v2 = graph.addVertex(null);
+        graph.addEdge(null, v1, v2, graphTest.convertLabel("test-edge"));
+        graph.commit();
+
+        edgeCount(graph, 1);
+        Edge e1 = getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT));
+        assertNotNull(e1);
+        graph.removeEdge(e1);
+        edgeCount(graph, 0);
+        assertNull(getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT)));
+        graph.rollback();
+
+        edgeCount(graph, 1);
+        e1 = getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT));
+        assertNotNull(e1);
+
+        graph.removeEdge(e1);
+        graph.commit();
+
+        edgeCount(graph, 0);
+        assertNull(getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT)));
+        graph.shutdown();
+    }
+
     public void untestTransactionVertexPropertiesAcrossThreads() throws Exception {
         // the purpose of this test is to ensure that properties of a element are available prior to commit()
         // across threads
@@ -651,93 +739,4 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
 
     }
-
-    public void testTransactionIsolationCommitCheck() throws Exception {
-        // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
-        // the graph and a separate thread cannot affect the transaction of the first
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
-
-        final CountDownLatch latchCommittedInOtherThread = new CountDownLatch(1);
-        final CountDownLatch latchCommitInOtherThread = new CountDownLatch(1);
-
-        // this thread starts a transaction then waits while the second thread tries to commit it.
-        final Thread threadTxStarter = new Thread() {
-            public void run() {
-                final Vertex v = graph.addVertex(null);
-
-                // System.out.println("added vertex");
-
-                latchCommitInOtherThread.countDown();
-
-                try {
-                    latchCommittedInOtherThread.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
-                }
-
-                graph.rollback();
-
-                // there should be no vertices here
-                // System.out.println("reading vertex before tx");
-                assertFalse(graph.getVertices().iterator().hasNext());
-                // System.out.println("read vertex before tx");
-            }
-        };
-
-        threadTxStarter.start();
-
-        // this thread tries to commit the transaction started in the first thread above.
-        final Thread threadTryCommitTx = new Thread() {
-            public void run() {
-                try {
-                    latchCommitInOtherThread.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
-                }
-
-                // try to commit the other transaction
-                graph.commit();
-
-                latchCommittedInOtherThread.countDown();
-            }
-        };
-
-        threadTryCommitTx.start();
-
-        threadTxStarter.join();
-        threadTryCommitTx.join();
-        graph.shutdown();
-
-    }
-
-    public void testRemoveInTransaction() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
-        edgeCount(graph, 0);
-
-        Vertex v1 = graph.addVertex(null);
-        Object v1id = v1.getId();
-        Vertex v2 = graph.addVertex(null);
-        graph.addEdge(null, v1, v2, graphTest.convertLabel("test-edge"));
-        graph.commit();
-
-        edgeCount(graph, 1);
-        Edge e1 = getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT));
-        assertNotNull(e1);
-        graph.removeEdge(e1);
-        edgeCount(graph, 0);
-        assertNull(getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT)));
-        graph.rollback();
-
-        edgeCount(graph, 1);
-        e1 = getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT));
-        assertNotNull(e1);
-
-        graph.removeEdge(e1);
-        graph.commit();
-
-        edgeCount(graph, 0);
-        assertNull(getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT)));
-        graph.shutdown();
-    }
-
 }
