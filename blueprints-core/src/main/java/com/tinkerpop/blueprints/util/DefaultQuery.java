@@ -21,7 +21,7 @@ public abstract class DefaultQuery implements Query {
     public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
 
     public Query has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
+        this.hasContainers.add(new HasContainer(key, Compare.EQUAL, value));
         return this;
     }
 
@@ -29,14 +29,14 @@ public abstract class DefaultQuery implements Query {
         return this.has(key, compare, value);
     }
 
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, value, compare));
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T... values) {
+        this.hasContainers.add(new HasContainer(key, compare, values));
         return this;
     }
 
     public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
-        this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
-        this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
+        this.hasContainers.add(new HasContainer(key, Compare.GREATER_THAN_EQUAL, startValue));
+        this.hasContainers.add(new HasContainer(key, Compare.LESS_THAN, endValue));
         return this;
     }
 
@@ -59,42 +59,88 @@ public abstract class DefaultQuery implements Query {
 
     protected class HasContainer {
         public String key;
-        public Object value;
+        public Object[] values;
         public Compare compare;
 
-        public HasContainer(final String key, final Object value, final Compare compare) {
+        public HasContainer(final String key, final Compare compare, final Object... values) {
             this.key = key;
-            this.value = value;
+            this.values = values;
             this.compare = compare;
+        }
+
+        public HasContainer(final String key, final Compare compare, final Object value) {
+            this(key, compare, new Object[]{value});
         }
 
         public boolean isLegal(final Element element) {
             final Object elementValue = element.getProperty(key);
             switch (compare) {
                 case EQUAL:
-                    if (null == elementValue)
-                        return value == null;
-                    return elementValue.equals(value);
+                    if (null == elementValue) {
+                        for (final Object value : values) {
+                            if (value == null)
+                                return true;
+                        }
+                    } else {
+                        for (final Object value : values) {
+                            if (elementValue.equals(value))
+                                return true;
+                        }
+                    }
+                    return false;
                 case NOT_EQUAL:
-                    if (null == elementValue)
-                        return value != null;
-                    return !elementValue.equals(value);
+                    if (null == elementValue) {
+                        for (final Object value : values) {
+                            if (value != null)
+                                return true;
+                        }
+                    } else {
+                        for (final Object value : values) {
+                            if (!elementValue.equals(value))
+                                return true;
+                        }
+                    }
+                    return false;
                 case GREATER_THAN:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 1;
+                    else {
+                        for (final Object value : values) {
+                            if (((Comparable) elementValue).compareTo((value)) >= 1)
+                                return true;
+                        }
+                    }
+                    return false;
                 case LESS_THAN:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) <= -1;
+                    else {
+                        for (final Object value : values) {
+                            if (((Comparable) elementValue).compareTo((value)) <= -1)
+                                return true;
+                        }
+                    }
+                    return false;
                 case GREATER_THAN_EQUAL:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 0;
+                    else {
+                        for (final Object value : values) {
+                            if (((Comparable) elementValue).compareTo((value)) >= 0)
+                                return true;
+                        }
+                    }
+                    return false;
                 case LESS_THAN_EQUAL:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) <= 0;
+                    else {
+                        for (final Object value : values) {
+                            if (((Comparable) elementValue).compareTo((value)) <= 0)
+                                return true;
+                        }
+                    }
+                    return false;
                 default:
                     throw new IllegalArgumentException("Invalid state as no valid filter was provided");
             }
