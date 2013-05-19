@@ -104,7 +104,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
                 private boolean loadNext() {
                     this.nextElement = null;
-                    if (this.count >= maximum) return false;
+                    if (this.count > maximum) return false;
                     while (this.itty.hasNext()) {
                         final T element = this.itty.next();
                         boolean filter = false;
@@ -116,10 +116,14 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                             }
                         }
 
-                        if (!filter && this.count++ >= minimum) {
-                            this.nextElement = element;
-                            return true;
+                        if (!filter) {
+                            this.count++;
+                            if (this.count >= minimum && this.count <= maximum) {
+                                this.nextElement = element;
+                                return true;
+                            }
                         }
+
                     }
                     return false;
                 }

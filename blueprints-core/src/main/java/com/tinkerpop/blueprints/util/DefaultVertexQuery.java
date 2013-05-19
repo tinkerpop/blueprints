@@ -147,7 +147,7 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
                 private boolean loadNext() {
                     this.nextEdge = null;
-                    if (count >= maximum) return false;
+                    if (this.count > maximum) return false;
 
                     while (this.itty.hasNext()) {
                         final Edge edge = this.itty.next();
@@ -158,10 +158,15 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
                                 break;
                             }
                         }
-                        if (!filter && count++ >= minimum) {
-                            this.nextEdge = edge;
-                            return true;
+
+                        if (!filter) {
+                            this.count++;
+                            if (this.count >= minimum && this.count <= maximum) {
+                                this.nextEdge = edge;
+                                return true;
+                            }
                         }
+
                     }
                     return false;
                 }

@@ -41,20 +41,16 @@ public abstract class DefaultQuery implements Query {
     }
 
     public Query limit(final long max) {
-        if (max < 0)
-            throw new IllegalArgumentException("The limit can not be less than 0");
         this.maximum = max;
         return this;
     }
 
     public Query limit(final long min, final long max) {
-        if (max < 0 || min < 0)
-            throw new IllegalArgumentException("Either range can not be less than 0");
-        if (min > max)
-            throw new IllegalArgumentException("The max value can not be less than the min value");
-
         this.minimum = min;
-        this.maximum = max;
+        if (min == 0)
+            this.maximum = max;
+        else
+            this.maximum = max + (min - 1);
         return this;
     }
 
