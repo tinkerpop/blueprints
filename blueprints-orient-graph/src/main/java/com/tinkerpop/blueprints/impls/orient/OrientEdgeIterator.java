@@ -34,7 +34,7 @@ public class OrientEdgeIterator extends OLazyWrapperIterator<OrientEdge> {
         final OIdentifiable rec = (OIdentifiable) iObject;
         final ODocument value = rec.getRecord();
 
-        if (value == null)
+        if (value == null || value.getSchemaClass() == null)
             return null;
 
         final OrientEdge edge;
