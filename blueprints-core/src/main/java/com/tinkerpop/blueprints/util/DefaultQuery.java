@@ -29,8 +29,8 @@ public abstract class DefaultQuery implements Query {
         return this.has(key, compare, value);
     }
 
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T... values) {
-        this.hasContainers.add(new HasContainer(key, compare, values));
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value) {
+        this.hasContainers.add(new HasContainer(key, compare, value));
         return this;
     }
 
@@ -47,10 +47,7 @@ public abstract class DefaultQuery implements Query {
 
     public Query limit(final long min, final long max) {
         this.minimum = min;
-        if (min == 0)
-            this.maximum = max;
-        else
-            this.maximum = max + (min - 1);
+        this.maximum = max + min;
         return this;
     }
 
@@ -59,17 +56,13 @@ public abstract class DefaultQuery implements Query {
 
     protected class HasContainer {
         public String key;
-        public Object[] values;
+        public Object value;
         public Compare compare;
 
-        public HasContainer(final String key, final Compare compare, final Object... values) {
-            this.key = key;
-            this.values = values;
-            this.compare = compare;
-        }
-
         public HasContainer(final String key, final Compare compare, final Object value) {
-            this(key, compare, new Object[]{value});
+            this.key = key;
+            this.value = value;
+            this.compare = compare;
         }
 
         public boolean isLegal(final Element element) {
@@ -77,68 +70,68 @@ public abstract class DefaultQuery implements Query {
             switch (compare) {
                 case EQUAL:
                     if (null == elementValue) {
-                        for (final Object value : values) {
-                            if (value == null)
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (value == null)
+                            return true;
+                        // }
                     } else {
-                        for (final Object value : values) {
-                            if (elementValue.equals(value))
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (elementValue.equals(value))
+                            return true;
+                        // }
                     }
                     return false;
                 case NOT_EQUAL:
                     if (null == elementValue) {
-                        for (final Object value : values) {
-                            if (value != null)
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (value != null)
+                            return true;
+                        //}
                     } else {
-                        for (final Object value : values) {
-                            if (!elementValue.equals(value))
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (!elementValue.equals(value))
+                            return true;
+                        //}
                     }
                     return false;
                 case GREATER_THAN:
                     if (null == elementValue)
                         return false;
                     else {
-                        for (final Object value : values) {
-                            if (((Comparable) elementValue).compareTo((value)) >= 1)
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) >= 1)
+                            return true;
+                        //}
                     }
                     return false;
                 case LESS_THAN:
                     if (null == elementValue)
                         return false;
                     else {
-                        for (final Object value : values) {
-                            if (((Comparable) elementValue).compareTo((value)) <= -1)
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) <= -1)
+                            return true;
+                        //}
                     }
                     return false;
                 case GREATER_THAN_EQUAL:
                     if (null == elementValue)
                         return false;
                     else {
-                        for (final Object value : values) {
-                            if (((Comparable) elementValue).compareTo((value)) >= 0)
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) >= 0)
+                            return true;
+                        //}
                     }
                     return false;
                 case LESS_THAN_EQUAL:
                     if (null == elementValue)
                         return false;
                     else {
-                        for (final Object value : values) {
-                            if (((Comparable) elementValue).compareTo((value)) <= 0)
-                                return true;
-                        }
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) <= 0)
+                            return true;
+                        //}
                     }
                     return false;
                 default:

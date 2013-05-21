@@ -50,17 +50,23 @@ public class GraphQueryTestSuite extends TestSuite {
             assertEquals(count(graph.query().limit(4).vertices()), 3);
 
             assertEquals(count(graph.query().limit(0).vertices()), count(graph.query().limit(0, 0).vertices()));
+            BaseTest.equalIterators(graph.query().limit(0).vertices().iterator(), graph.query().limit(0, 0).vertices().iterator());
             assertEquals(count(graph.query().limit(1).vertices()), count(graph.query().limit(0, 1).vertices()));
+            BaseTest.equalIterators(graph.query().limit(1).vertices().iterator(), graph.query().limit(0, 1).vertices().iterator());
             assertEquals(count(graph.query().limit(2).vertices()), count(graph.query().limit(0, 2).vertices()));
+            BaseTest.equalIterators(graph.query().limit(2).vertices().iterator(), graph.query().limit(0, 2).vertices().iterator());
             assertEquals(count(graph.query().limit(3).vertices()), count(graph.query().limit(0, 3).vertices()));
+            BaseTest.equalIterators(graph.query().limit(3).vertices().iterator(), graph.query().limit(0, 3).vertices().iterator());
             assertEquals(count(graph.query().limit(3).vertices()), count(graph.query().limit(0, 4).vertices()));
+            BaseTest.equalIterators(graph.query().limit(3).vertices().iterator(), graph.query().limit(0, 4).vertices().iterator());
 
             assertEquals(count(graph.query().limit(0, 1).vertices()), 1);
+            BaseTest.equalIterators(graph.query().limit(0, 1).vertices().iterator(), graph.query().limit(1).vertices().iterator());
             assertEquals(count(graph.query().limit(1, 1).vertices()), 1);
             assertEquals(count(graph.query().limit(1, 2).vertices()), 2);
-            assertEquals(count(graph.query().limit(1, 3).vertices()), 3);
-            assertEquals(count(graph.query().limit(1, 4).vertices()), 3);
-            assertEquals(count(graph.query().limit(2, 3).vertices()), 2);
+            assertEquals(count(graph.query().limit(1, 3).vertices()), 2);
+            assertEquals(count(graph.query().limit(1, 4).vertices()), 2);
+            assertEquals(count(graph.query().limit(2, 3).vertices()), 1);
             assertEquals(count(graph.query().limit(4, 10).vertices()), 0);
 
             vertices = graph.query().has("name", "marko").vertices();

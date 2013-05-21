@@ -233,10 +233,14 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).limit(0).count(), 0);
 
             assertEquals(a.query().direction(OUT).limit(0, 0).count(), a.query().direction(OUT).limit(0).count());
+            BaseTest.equalIterators(a.query().direction(OUT).limit(0, 0).vertices().iterator(), a.query().direction(OUT).limit(0).vertices().iterator());
             assertEquals(a.query().direction(OUT).limit(0, 1).count(), a.query().direction(OUT).limit(1).count());
+            BaseTest.equalIterators(a.query().direction(OUT).limit(0, 1).vertices().iterator(), a.query().direction(OUT).limit(1).vertices().iterator());
             assertEquals(a.query().direction(OUT).limit(0, 2).count(), a.query().direction(OUT).limit(2).count());
+            BaseTest.equalIterators(a.query().direction(OUT).limit(0, 2).vertices().iterator(), a.query().direction(OUT).limit(2).vertices().iterator());
+
             assertEquals(a.query().direction(OUT).limit(1, 2).count(), 2);
-            assertEquals(a.query().direction(OUT).limit(2, 2).count(), 2);
+            assertEquals(a.query().direction(OUT).limit(2, 2).count(), 1);
             assertEquals(a.query().direction(OUT).limit(2, 1).count(), 1);
             assertEquals(a.query().direction(OUT).limit(3, 0).count(), 0);
         }

@@ -161,7 +161,7 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
                         if (!filter) {
                             this.count++;
-                            if (this.count >= minimum && this.count <= maximum) {
+                            if (this.count > minimum && this.count <= maximum) {
                                 this.nextEdge = edge;
                                 return true;
                             }

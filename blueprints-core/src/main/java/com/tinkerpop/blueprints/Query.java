@@ -55,7 +55,7 @@ public interface Query {
      * @param values   the values to check against
      * @return the modified query object
      */
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T... values);
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T values);
 
     /**
      * Filter out the edge of its property value is not within the provided interval.

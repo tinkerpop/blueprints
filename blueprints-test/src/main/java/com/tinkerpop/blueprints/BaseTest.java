@@ -74,6 +74,15 @@ public abstract class BaseTest extends TestCase {
         System.out.println("*** TOTAL TIME [" + testName + "]: " + timeInMilliseconds + " ***");
     }
 
+    public static void equalIterators(final Iterator itty1, final Iterator itty2) {
+        assertEquals(itty1.hasNext(), itty2.hasNext());
+        while (itty1.hasNext()) {
+            assertEquals(itty1.hasNext(), itty2.hasNext());
+            assertEquals(itty1.next(), itty2.next());
+        }
+        assertEquals(itty1.hasNext(), itty2.hasNext());
+    }
+
     protected static void deleteDirectory(final File directory) {
         if (directory.exists()) {
             for (File file : directory.listFiles()) {

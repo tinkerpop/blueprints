@@ -118,7 +118,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
                         if (!filter) {
                             this.count++;
-                            if (this.count >= minimum && this.count <= maximum) {
+                            if (this.count > minimum && this.count <= maximum) {
                                 this.nextElement = element;
                                 return true;
                             }
