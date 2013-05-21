@@ -316,9 +316,6 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
       
         final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);        
         if (idx != null) {
-            if (iValue != null && !(iValue instanceof String))
-                iValue = iValue.toString();
-
             Object indexValue = idx.get(iValue);
             if (indexValue != null && !(indexValue instanceof Iterable<?>))
                 indexValue = Arrays.asList(indexValue);
@@ -351,9 +348,6 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
       
         final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);        
         if (idx != null) {
-            if (iValue != null && !(iValue instanceof String))
-                iValue = iValue.toString();
-
             Object indexValue = (Iterable<?>) idx.get(iValue);
             if (indexValue != null && !(indexValue instanceof Iterable<?>))
                 indexValue = Arrays.asList(indexValue);
