@@ -58,6 +58,10 @@ public class GraphTestSuite extends TestSuite {
 
     public void testStringRepresentationOfVertexId() {
         final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsTransactions) {
+            ((TransactionalGraph) graph).commit();
+        }
+
         final Vertex a = graph.addVertex(null);
         final Object id = a.getId();
         final Vertex b = graph.getVertex(id);
