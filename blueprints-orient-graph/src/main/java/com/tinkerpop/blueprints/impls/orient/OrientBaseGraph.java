@@ -316,6 +316,8 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
       
         final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);        
         if (idx != null) {
+			iValue = convertKey(idx, iValue);
+
             Object indexValue = idx.get(iValue);
             if (indexValue != null && !(indexValue instanceof Iterable<?>))
                 indexValue = Arrays.asList(indexValue);
@@ -348,6 +350,8 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
       
         final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);        
         if (idx != null) {
+			iValue = convertKey(idx, iValue);
+
             Object indexValue = (Iterable<?>) idx.get(iValue);
             if (indexValue != null && !(indexValue instanceof Iterable<?>))
                 indexValue = Arrays.asList(indexValue);
@@ -880,4 +884,15 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
             return OrientEdge.CLASS_NAME;
         throw new IllegalArgumentException("Class '" + elementClass + "' is neither a Vertex, nor an Edge");
     }
+
+	private Object convertKey(final OIndex<?> idx, Object iValue) {
+		if( iValue != null ) {
+			final OType[] types = idx.getKeyTypes();
+			if( types.length == 0 )
+				iValue = iValue.toString();
+			else
+				iValue = OType.convert(iValue, types[0].getDefaultJavaType());
+		}
+		return iValue;
+	}
 }
