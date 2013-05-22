@@ -302,19 +302,29 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         return getVertices(true);
     }
 
-    public Iterable<Vertex> getVertices(final String key, Object value) {
-        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OrientVertex.CLASS_NAME + "." + key);
+    public Iterable<Vertex> getVertices(final String iKey, Object iValue) {
+        final String indexName;
+        final String key;
+        int pos = iKey.indexOf('.');
+        if (pos > -1) {
+          indexName = iKey;
+          key = iKey.substring(iKey.indexOf('.') + 1);
+        } else {
+          indexName = OrientVertex.CLASS_NAME + "." + iKey;
+          key = iKey;
+        }
+      
+        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);        
         if (idx != null) {
-            if (value != null && !(value instanceof String))
-                value = value.toString();
+			iValue = convertKey(idx, iValue);
 
-            Object indexValue = idx.get(value);
+            Object indexValue = idx.get(iValue);
             if (indexValue != null && !(indexValue instanceof Iterable<?>))
                 indexValue = Arrays.asList(indexValue);
 
             return new OrientElementIterable<Vertex>(this, (Iterable<?>) indexValue);
         }
-        return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
+        return new PropertyFilteredIterable<Vertex>(key, iValue, this.getVertices());
     }
 
     private Iterable<Vertex> getVertices(final boolean polymorphic) {
@@ -326,19 +336,29 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         return getEdges(true);
     }
 
-    public Iterable<Edge> getEdges(final String key, Object value) {
-        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(OrientEdge.CLASS_NAME + "." + key);
+    public Iterable<Edge> getEdges(final String iKey, Object iValue) {
+        final String indexName;
+        final String key;
+        int pos = iKey.indexOf('.');
+        if (pos > -1) {
+          indexName = iKey;
+          key = iKey.substring(iKey.indexOf('.') + 1);
+        } else {
+          indexName = OrientEdge.CLASS_NAME + "." + iKey;
+          key = iKey;
+        }
+      
+        final OIndex<?> idx = getContext(true).rawGraph.getMetadata().getIndexManager().getIndex(indexName);        
         if (idx != null) {
-            if (value != null && !(value instanceof String))
-                value = value.toString();
+			iValue = convertKey(idx, iValue);
 
-            Object indexValue = (Iterable<?>) idx.get(value);
+            Object indexValue = (Iterable<?>) idx.get(iValue);
             if (indexValue != null && !(indexValue instanceof Iterable<?>))
                 indexValue = Arrays.asList(indexValue);
 
             return new OrientElementIterable<Edge>(this, (Iterable<?>) indexValue);
         }
-        return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
+        return new PropertyFilteredIterable<Edge>(key, iValue, this.getEdges());
     }
 
     private Iterable<Edge> getEdges(final boolean polymorphic) {
@@ -502,6 +522,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         checkVertexType(iSuperClass);
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, iSuperClass);
     }
+    
+    public final void dropVertexType(final String iTypeName) {
+        getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
+    }
 
     public OClass getEdgeBaseType() {
         return getRawGraph().getMetadata().getSchema().getClass(OrientEdge.CLASS_NAME);
@@ -525,6 +549,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     public OClass createEdgeType(final String iClassName, final OClass iSuperClass) {
         checkEdgeType(iSuperClass);
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, iSuperClass);
+    }
+    
+    public final void dropEdgeType(final String iTypeName) {
+        getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
     }
 
     protected final void checkVertexType(final OClass iType) {
@@ -856,4 +884,15 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
             return OrientEdge.CLASS_NAME;
         throw new IllegalArgumentException("Class '" + elementClass + "' is neither a Vertex, nor an Edge");
     }
+
+	private Object convertKey(final OIndex<?> idx, Object iValue) {
+		if( iValue != null ) {
+			final OType[] types = idx.getKeyTypes();
+			if( types.length == 0 )
+				iValue = iValue.toString();
+			else
+				iValue = OType.convert(iValue, types[0].getDefaultJavaType());
+		}
+		return iValue;
+	}
 }

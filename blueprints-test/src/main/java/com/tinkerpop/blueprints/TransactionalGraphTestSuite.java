@@ -5,8 +5,10 @@ import com.tinkerpop.blueprints.impls.GraphTest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -407,6 +409,22 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void testVertexPropertiesOnPreTransactionCommit() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsVertexProperties) {
+            Vertex v1 = graph.addVertex(null);
+            v1.setProperty("name", "marko");
+
+            assertEquals(1, v1.getPropertyKeys().size());
+            assertTrue(v1.getPropertyKeys().contains("name"));
+            assertEquals("marko", v1.getProperty("name"));
+
+            graph.commit();
+
+            assertEquals("marko", v1.getProperty("name"));
+        }
+    }
+
     public void testBulkTransactionsOnEdges() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
         for (int i = 0; i < 5; i++) {
@@ -540,78 +558,6 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graphTest.dropGraph("second");
     }
 
-    public void untestTransactionIsolationWithSeparateThreads() throws Exception {
-        // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
-        // the graph and a separate thread reads before the transaction is committed.  the expectation is that
-        // the changes in the transaction are isolated to the thread that made the change and the second thread
-        // should not see the change until commit() in the first thread.
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
-
-        final CountDownLatch latchCommit = new CountDownLatch(1);
-        final CountDownLatch latchFirstRead = new CountDownLatch(1);
-        final CountDownLatch latchSecondRead = new CountDownLatch(1);
-
-        final Thread threadMod = new Thread() {
-            public void run() {
-                final Vertex v = graph.addVertex(null);
-                //v.setProperty("name", "stephen");
-
-                // System.out.println("added vertex");
-
-                latchFirstRead.countDown();
-
-                try {
-                    latchCommit.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
-                }
-
-                graph.commit();
-
-                // System.out.println("committed vertex");
-
-                latchSecondRead.countDown();
-            }
-        };
-
-        threadMod.start();
-
-        final Thread threadRead = new Thread() {
-            public void run() {
-                try {
-                    latchFirstRead.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
-                }
-
-                // System.out.println("reading vertex before tx");
-                assertFalse(graph.getVertices().iterator().hasNext());
-                // System.out.println("read vertex before tx");
-
-                latchCommit.countDown();
-
-                try {
-                    latchSecondRead.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
-                }
-
-                // System.out.println("reading vertex after tx");
-                assertTrue(graph.getVertices().iterator().hasNext());
-                // System.out.println("read vertex after tx");
-            }
-        };
-
-        threadRead.start();
-
-        threadMod.join();
-        threadRead.join();
-
-
-        graph.shutdown();
-
-    }
-
     public void testTransactionIsolationCommitCheck() throws Exception {
         // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
         // the graph and a separate thread cannot affect the transaction of the first
@@ -700,4 +646,97 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void untestTransactionVertexPropertiesAcrossThreads() throws Exception {
+        // the purpose of this test is to ensure that properties of a element are available prior to commit()
+        // across threads
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        final AtomicReference<Vertex> v = new AtomicReference<Vertex>();
+        final Thread thread = new Thread() {
+            public void run() {
+                final Vertex vertex = graph.addVertex(null);
+                vertex.setProperty("name", "stephen");
+                v.set(vertex);
+            }
+        };
+
+        thread.start();
+        thread.join();
+
+        Set<String> k = v.get().getPropertyKeys();
+        assertTrue(k.contains("name"));
+        assertEquals("stephen", v.get().getProperty("name"));
+    }
+
+    public void untestTransactionIsolationWithSeparateThreads() throws Exception {
+        // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
+        // the graph and a separate thread reads before the transaction is committed.  the expectation is that
+        // the changes in the transaction are isolated to the thread that made the change and the second thread
+        // should not see the change until commit() in the first thread.
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        final CountDownLatch latchCommit = new CountDownLatch(1);
+        final CountDownLatch latchFirstRead = new CountDownLatch(1);
+        final CountDownLatch latchSecondRead = new CountDownLatch(1);
+
+        final Thread threadMod = new Thread() {
+            public void run() {
+                final Vertex v = graph.addVertex(null);
+                //v.setProperty("name", "stephen");
+
+                // System.out.println("added vertex");
+
+                latchFirstRead.countDown();
+
+                try {
+                    latchCommit.await();
+                } catch (InterruptedException ie) {
+                    throw new RuntimeException(ie);
+                }
+
+                graph.commit();
+
+                // System.out.println("committed vertex");
+
+                latchSecondRead.countDown();
+            }
+        };
+
+        threadMod.start();
+
+        final Thread threadRead = new Thread() {
+            public void run() {
+                try {
+                    latchFirstRead.await();
+                } catch (InterruptedException ie) {
+                    throw new RuntimeException(ie);
+                }
+
+                // System.out.println("reading vertex before tx");
+                assertFalse(graph.getVertices().iterator().hasNext());
+                // System.out.println("read vertex before tx");
+
+                latchCommit.countDown();
+
+                try {
+                    latchSecondRead.await();
+                } catch (InterruptedException ie) {
+                    throw new RuntimeException(ie);
+                }
+
+                // System.out.println("reading vertex after tx");
+                assertTrue(graph.getVertices().iterator().hasNext());
+                // System.out.println("read vertex after tx");
+            }
+        };
+
+        threadRead.start();
+
+        threadMod.join();
+        threadRead.join();
+
+
+        graph.shutdown();
+
+    }
 }

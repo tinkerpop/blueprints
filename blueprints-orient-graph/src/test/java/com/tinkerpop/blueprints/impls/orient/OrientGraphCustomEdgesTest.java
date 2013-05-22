@@ -31,6 +31,8 @@ public class OrientGraphCustomEdgesTest extends OrientGraphTest {
             currentGraph.createEdgeType("test-edge");
         if (currentGraph.getEdgeType("self") == null)
             currentGraph.createEdgeType("self");
+        if (currentGraph.getEdgeType("pets") == null)
+          currentGraph.createEdgeType("pets");
 
         return this.currentGraph;
     }
