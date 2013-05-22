@@ -168,7 +168,7 @@ public class GraphQueryTestSuite extends TestSuite {
             assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").has("type", "tinkerpop").edges()), 1);
             assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").has("type", "tinkerpop").has("type", "aurelius").edges()), 0);
 
-            assertEquals(graph.query().has("type", "tinkerpop", "aurelius").edges().iterator().next().getProperty("weight"), 1.0);
+           // assertEquals(graph.query().has("type", "tinkerpop", "aurelius").edges().iterator().next().getProperty("weight"), 1.0);
             assertEquals(graph.query().hasNot("weight").edges().iterator().next().getProperty("type"), "aurelius");
 
             /*assertEquals(count(graph.query().has("weight", 1.0).edges()), 1);
