@@ -423,6 +423,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
             assertEquals("marko", v1.getProperty("name"));
         }
+        graph.shutdown();
     }
 
     public void testBulkTransactionsOnEdges() {
