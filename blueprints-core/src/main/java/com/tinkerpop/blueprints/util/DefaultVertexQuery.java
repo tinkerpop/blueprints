@@ -25,8 +25,18 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         this.vertex = vertex;
     }
 
-    public VertexQuery has(final String key, final Object value) {
-        super.has(key, value);
+    public VertexQuery has(final String key) {
+        super.has(key);
+        return this;
+    }
+
+    public VertexQuery hasNot(final String key) {
+        super.hasNot(key);
+        return this;
+    }
+
+    public VertexQuery has(final String key, final Object... values) {
+        super.has(key, values);
         return this;
     }
 
@@ -35,8 +45,8 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         return this;
     }
 
-    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
-        super.has(key, compare, value);
+    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T... values) {
+        super.has(key, compare, values);
         return this;
     }
 
@@ -45,13 +55,13 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery limit(final long max) {
-        super.limit(max);
+    public VertexQuery limit(final long total) {
+        super.limit(total);
         return this;
     }
 
-    public VertexQuery limit(final long min, final long max) {
-        super.limit(min, max);
+    public VertexQuery limit(final long skip, final long total) {
+        super.limit(skip, total);
         return this;
     }
 
@@ -166,7 +176,6 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
                                 return true;
                             }
                         }
-
                     }
                     return false;
                 }

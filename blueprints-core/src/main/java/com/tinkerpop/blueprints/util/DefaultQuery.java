@@ -20,8 +20,21 @@ public abstract class DefaultQuery implements Query {
     public long minimum = 0l;
     public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
 
-    public Query has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, Compare.EQUAL, value));
+    public Query has(final String key) {
+        this.hasContainers.add(new HasContainer(key, Compare.NOT_EQUAL, new Object[]{null}));
+        return this;
+    }
+
+    public Query hasNot(final String key) {
+        this.hasContainers.add(new HasContainer(key, Compare.EQUAL, new Object[]{null}));
+        return this;
+    }
+
+    public Query has(final String key, final Object... values) {
+        if (null == values)
+            this.hasContainers.add(new HasContainer(key, Compare.EQUAL, new Object[]{null}));
+        else
+            this.hasContainers.add(new HasContainer(key, Compare.EQUAL, values));
         return this;
     }
 
@@ -29,8 +42,11 @@ public abstract class DefaultQuery implements Query {
         return this.has(key, compare, value);
     }
 
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, compare, value));
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T... values) {
+        if (null == values)
+            this.hasContainers.add(new HasContainer(key, compare, new Object[]{null}));
+        else
+            this.hasContainers.add(new HasContainer(key, compare, values));
         return this;
     }
 
@@ -40,14 +56,14 @@ public abstract class DefaultQuery implements Query {
         return this;
     }
 
-    public Query limit(final long max) {
-        this.maximum = max;
+    public Query limit(final long total) {
+        this.maximum = total;
         return this;
     }
 
-    public Query limit(final long min, final long max) {
-        this.minimum = min;
-        this.maximum = max + min;
+    public Query limit(final long skip, final long total) {
+        this.minimum = skip;
+        this.maximum = skip + total;
         return this;
     }
 
@@ -56,82 +72,82 @@ public abstract class DefaultQuery implements Query {
 
     protected class HasContainer {
         public String key;
-        public Object value;
+        public Object[] values;
         public Compare compare;
 
-        public HasContainer(final String key, final Compare compare, final Object value) {
+        public HasContainer(final String key, final Compare compare, final Object... values) {
             this.key = key;
-            this.value = value;
+            this.values = values;
             this.compare = compare;
         }
 
         public boolean isLegal(final Element element) {
-            final Object elementValue = element.getProperty(key);
+            final Object elementValue = element.getProperty(this.key);
             switch (compare) {
                 case EQUAL:
                     if (null == elementValue) {
-                        //for (final Object value : values) {
-                        if (value == null)
-                            return true;
-                        // }
+                        for (final Object value : this.values) {
+                            if (value == null)
+                                return true;
+                        }
                     } else {
-                        //for (final Object value : values) {
-                        if (elementValue.equals(value))
-                            return true;
-                        // }
+                        for (final Object value : this.values) {
+                            if (elementValue.equals(value))
+                                return true;
+                        }
                     }
                     return false;
                 case NOT_EQUAL:
                     if (null == elementValue) {
-                        //for (final Object value : values) {
-                        if (value != null)
-                            return true;
-                        //}
+                        for (final Object value : this.values) {
+                            if (value != null)
+                                return true;
+                        }
                     } else {
-                        //for (final Object value : values) {
-                        if (!elementValue.equals(value))
-                            return true;
-                        //}
+                        for (final Object value : this.values) {
+                            if (!elementValue.equals(value))
+                                return true;
+                        }
                     }
                     return false;
                 case GREATER_THAN:
                     if (null == elementValue)
                         return false;
                     else {
-                        //for (final Object value : values) {
-                        if (((Comparable) elementValue).compareTo((value)) >= 1)
-                            return true;
-                        //}
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) >= 1)
+                                return true;
+                        }
                     }
                     return false;
                 case LESS_THAN:
                     if (null == elementValue)
                         return false;
                     else {
-                        //for (final Object value : values) {
-                        if (((Comparable) elementValue).compareTo((value)) <= -1)
-                            return true;
-                        //}
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) <= -1)
+                                return true;
+                        }
                     }
                     return false;
                 case GREATER_THAN_EQUAL:
                     if (null == elementValue)
                         return false;
                     else {
-                        //for (final Object value : values) {
-                        if (((Comparable) elementValue).compareTo((value)) >= 0)
-                            return true;
-                        //}
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) >= 0)
+                                return true;
+                        }
                     }
                     return false;
                 case LESS_THAN_EQUAL:
                     if (null == elementValue)
                         return false;
                     else {
-                        //for (final Object value : values) {
-                        if (((Comparable) elementValue).compareTo((value)) <= 0)
-                            return true;
-                        //}
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) <= 0)
+                                return true;
+                        }
                     }
                     return false;
                 default:

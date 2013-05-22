@@ -39,25 +39,30 @@ public interface VertexQuery extends Query {
      */
     public Object vertexIds();
 
+    @Override
+    public VertexQuery has(final String key);
 
     @Override
-    public VertexQuery has(final String key, final Object value);
+    public VertexQuery hasNot(final String key);
+
+    @Override
+    public VertexQuery has(final String key, final Object... values);
 
     @Override
     @Deprecated
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare);
 
     @Override
-    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value);
+    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T... values);
 
     @Override
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue);
 
     @Override
-    public VertexQuery limit(final long max);
+    public VertexQuery limit(final long total);
 
     @Override
-    public VertexQuery limit(final long min, final long max);
+    public VertexQuery limit(final long skip, final long total);
 
 
 }

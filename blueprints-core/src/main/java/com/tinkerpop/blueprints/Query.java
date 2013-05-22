@@ -28,16 +28,33 @@ public interface Query {
     }
 
     /**
-     * Filter out the edge if it does not have a property with the specified value.
+     * Filter out the elements that do not have a property with specified key.
      *
-     * @param key   the key of the property
-     * @param value the value to check against
+     * @param key the key that the element must have
      * @return the modified query object
      */
-    public Query has(final String key, final Object value);
+    public Query has(final String key);
 
     /**
-     * Filter out the edge if it does not have a property with a comparable value.
+     * Filter out the elements that do have a property with specified key.
+     *
+     * @param key the key that the element must not have
+     * @return the modified query object
+     */
+    public Query hasNot(final String key);
+
+    /**
+     * Filter out the element if it does not have a property with the specified value.
+     * If multiple values are provided then at least one has to match the element value.
+     *
+     * @param key    the key of the property
+     * @param values the values to check against
+     * @return the modified query object
+     */
+    public Query has(final String key, final Object... values);
+
+    /**
+     * Filter out the element if it does not have a property with a comparable value.
      *
      * @param key     the key of the property
      * @param value   the value to check against
@@ -48,17 +65,17 @@ public interface Query {
     public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare);
 
     /**
-     * Filter out the edge if it does not have a property with a comparable value.
+     * Filter out the element if it does not have a property with a comparable value.
      *
      * @param key     the key of the property
      * @param compare the comparator to use for comparison
-     * @param values   the values to check against
+     * @param values  the values to check against
      * @return the modified query object
      */
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T values);
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T... values);
 
     /**
-     * Filter out the edge of its property value is not within the provided interval.
+     * Filter out the element of its property value is not within the provided interval.
      *
      * @param key        the key of the property
      * @param startValue the inclusive start value of the interval
@@ -68,33 +85,33 @@ public interface Query {
     public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue);
 
     /**
-     * Filter out the edge if the max number of edges to retrieve has already been reached.
+     * Filter out the element if the total number of incident/adjacent elements to retrieve has already been reached.
      *
-     * @param max the max number of edges to return
+     * @param total the total number of elements to return
      * @return the modified query object
      */
-    public Query limit(final long max);
+    public Query limit(final long total);
 
     /**
-     * Filter out elements not within the range specified by the min and max arguments.
+     * Filter out elements not within the skip/limit range specified.
      *
-     * @param min the low end of the range to allow
-     * @param max the high end of the range to allow
+     * @param skip  the number of elements to skip since the first element
+     * @param total the number of elements to return after the skip has been reached
      * @return the modified query object
      */
-    public Query limit(final long min, final long max);
+    public Query limit(final long skip, final long total);
 
     /**
      * Execute the query and return the matching edges.
      *
-     * @return the unfiltered edges
+     * @return the unfiltered incident edges
      */
     public Iterable<Edge> edges();
 
     /**
      * Execute the query and return the vertices on the other end of the matching edges.
      *
-     * @return the unfiltered edge's vertices
+     * @return the unfiltered adjacent vertices
      */
     public Iterable<Vertex> vertices();
 

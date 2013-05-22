@@ -2,9 +2,8 @@ package com.tinkerpop.blueprints.impls.rexster;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.VertexQuery;
+import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -17,7 +16,7 @@ import java.util.List;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public class RexsterVertexQuery implements VertexQuery {
+public class RexsterVertexQuery extends DefaultVertexQuery {
 
     private static final String[] EMPTY_LABELS = new String[]{};
 
@@ -30,49 +29,9 @@ public class RexsterVertexQuery implements VertexQuery {
     public final RexsterGraph graph;
 
     public RexsterVertexQuery(final String uri, final RexsterGraph graph) {
+        super(null);
         this.baseUri = uri;
         this.graph = graph;
-    }
-
-    public VertexQuery has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
-        return this;
-    }
-
-    public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
-        return this.has(key, compare, value);
-    }
-
-    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, value, compare));
-        return this;
-    }
-
-    public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue) {
-        this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
-        this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
-        return this;
-    }
-
-    public VertexQuery direction(final Direction direction) {
-        this.direction = direction;
-        return this;
-    }
-
-    public VertexQuery labels(final String... labels) {
-        this.labels = labels;
-        return this;
-    }
-
-    public VertexQuery limit(final long max) {
-        this.maximum = max;
-        return this;
-    }
-
-    public VertexQuery limit(final long min, final long max) {
-        this.maximum = max;
-        this.minimum = min;
-        return this;
     }
 
     public Iterable<Edge> edges() {
@@ -171,7 +130,8 @@ public class RexsterVertexQuery implements VertexQuery {
                 sb.append(getCompareString(hasContainer.compare));
                 sb.append(RexsterTokens.COMMA);
 
-                sb.append(RestHelper.uriCast(hasContainer.value));
+                // TODO: make it so its OR's the values
+                sb.append(RestHelper.uriCast(hasContainer.values[0]));
 
                 sb.append(RexsterTokens.RIGHT_SQUARE_BRACKET);
 
@@ -188,7 +148,7 @@ public class RexsterVertexQuery implements VertexQuery {
         return sb.toString();
     }
 
-    private static String getCompareString(Compare compare) {
+    private static String getCompareString(final Compare compare) {
         if (compare == Compare.EQUAL) {
             return "=";
         } else if (compare == Compare.GREATER_THAN) {
@@ -204,50 +164,6 @@ public class RexsterVertexQuery implements VertexQuery {
         }
 
         throw new RuntimeException("Invalid comparator");
-    }
-
-    private class HasContainer {
-        public String key;
-        public Object value;
-        public Compare compare;
-
-        public HasContainer(final String key, final Object value, final Compare compare) {
-            this.key = key;
-            this.value = value;
-            this.compare = compare;
-        }
-
-        public boolean isLegal(final Element element) {
-            final Object elementValue = element.getProperty(key);
-            switch (compare) {
-                case EQUAL:
-                    if (null == elementValue)
-                        return value == null;
-                    return elementValue.equals(value);
-                case NOT_EQUAL:
-                    if (null == elementValue)
-                        return value != null;
-                    return !elementValue.equals(value);
-                case GREATER_THAN:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 1;
-                case LESS_THAN:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) <= -1;
-                case GREATER_THAN_EQUAL:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 0;
-                case LESS_THAN_EQUAL:
-                    if (null == elementValue || value == null)
-                        return false;
-                    return ((Comparable) elementValue).compareTo(value) <= 0;
-                default:
-                    throw new IllegalArgumentException("Invalid state as no valid filter was provided");
-            }
-        }
     }
 }
 

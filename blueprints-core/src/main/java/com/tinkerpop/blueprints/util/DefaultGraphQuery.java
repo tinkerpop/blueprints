@@ -7,7 +7,9 @@ import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -25,8 +27,18 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         this.graph = graph;
     }
 
-    public GraphQuery has(final String key, final Object value) {
-        super.has(key, value);
+    public GraphQuery has(final String key) {
+        super.has(key);
+        return this;
+    }
+
+    public GraphQuery hasNot(final String key) {
+        super.hasNot(key);
+        return this;
+    }
+
+    public GraphQuery has(final String key, final Object... values) {
+        super.has(key, values);
         return this;
     }
 
@@ -35,8 +47,8 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value) {
-        super.has(key, compare, value);
+    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T... values) {
+        super.has(key, compare, values);
         return this;
     }
 
@@ -45,13 +57,13 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery limit(final long max) {
-        super.limit(max);
+    public GraphQuery limit(final long total) {
+        super.limit(total);
         return this;
     }
 
-    public GraphQuery limit(final long min, final long max) {
-        super.limit(min, max);
+    public GraphQuery limit(final long skip, final long total) {
+        super.limit(skip, total);
         return this;
     }
 
@@ -130,25 +142,33 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
             };
         }
 
-        private Iterable<?> getElementIterable(Class<? extends Element> elementClass) {
+        private Iterable<?> getElementIterable(final Class<? extends Element> elementClass) {
+
             if (graph instanceof KeyIndexableGraph) {
                 final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
-                for (HasContainer hasContainer : hasContainers) {
-                    if (hasContainer.compare.equals(Compare.EQUAL) && hasContainer.value != null && keys.contains(hasContainer.key)) {
-                        if (Vertex.class.isAssignableFrom(elementClass))
-                            return graph.getVertices(hasContainer.key, hasContainer.value);
-                        else
-                            return graph.getEdges(hasContainer.key, hasContainer.value);
+                HasContainer container = null;
+                for (final HasContainer hasContainer : hasContainers) {
+                    if (hasContainer.compare.equals(Compare.EQUAL) && keys.contains(hasContainer.key)) {
+                        boolean noNull = true;
+                        for (final Object value : hasContainer.values) {
+                            if (value == null)
+                                noNull = false;
+                        }
+                        if (noNull) {
+                            container = hasContainer;
+                            break;
+                        }
                     }
                 }
-            }
-
-            for (final HasContainer hasContainer : hasContainers) {
-                if (hasContainer.compare.equals(Compare.EQUAL)) {
-                    if (Vertex.class.isAssignableFrom(elementClass))
-                        return graph.getVertices(hasContainer.key, hasContainer.value);
-                    else
-                        return graph.getEdges(hasContainer.key, hasContainer.value);
+                if (container != null) {
+                    final List<Iterable<? extends Element>> iterables = new ArrayList<Iterable<? extends Element>>();
+                    for (final Object value : container.values) {
+                        if (Vertex.class.isAssignableFrom(elementClass))
+                            iterables.add(graph.getVertices(container.key, value));
+                        else
+                            iterables.add(graph.getEdges(container.key, value));
+                    }
+                    return new MultiIterable(iterables);
                 }
             }
 
@@ -157,17 +177,6 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
             else
                 return graph.getEdges();
         }
-
-        /*private boolean containsLabel(final String label, final String[] labels) {
-            if (labels.length == 0)
-                return true;
-
-            for (final String temp : labels) {
-                if (temp.equals(label))
-                    return true;
-            }
-            return false;
-        }*/
     }
 
 }

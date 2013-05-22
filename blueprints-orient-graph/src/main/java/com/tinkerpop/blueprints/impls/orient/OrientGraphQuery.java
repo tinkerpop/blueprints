@@ -150,6 +150,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 		}
 	}
 
+    // TODO: make this.values be the ORing of the values not just values[0]
 	private void manageFilters(final StringBuilder text) {
 		for (HasContainer has : hasContainers) {
 			text.append(QUERY_FILTER_AND);
@@ -158,7 +159,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 			text.append(SPACE);
 			switch (has.compare) {
 			case EQUAL:
-				if (has.value == null)
+				if (has.values[0] == null)
 					text.append(OPERATOR_IS);
 				else
 					text.append(OPERATOR_EQUALS);
@@ -176,7 +177,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 				text.append(OPERATOR_LET);
 				break;
 			case NOT_EQUAL:
-				if (has.value == null)
+				if (has.values[0] == null)
 					text.append(OPERATOR_IS_NOT);
 				else
 					text.append(OPERATOR_DIFFERENT);
@@ -184,10 +185,10 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 			}
 			text.append(SPACE);
 
-			if (has.value instanceof String)
+			if (has.values[0] instanceof String)
 				text.append(QUERY_STRING);
-			text.append(has.value);
-			if (has.value instanceof String)
+			text.append(has.values[0]);
+			if (has.values[0] instanceof String)
 				text.append(QUERY_STRING);
 		}
 	}
