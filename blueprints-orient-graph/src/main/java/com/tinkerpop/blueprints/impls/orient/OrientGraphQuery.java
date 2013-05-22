@@ -26,13 +26,16 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	private static final char OPERATOR_GT = '>';
 	private static final String OPERATOR_EQUALS = "=";
 	private static final String OPERATOR_IS = "is";
-  private static final String OPERATOR_IN = "in";
+  private static final String OPERATOR_IN = " in ";
 
 	private static final String QUERY_FILTER_AND = " and ";
+  private static final String QUERY_FILTER_OR = " or ";
 	private static final char QUERY_STRING = '\'';
 	private static final char QUERY_SEPARATOR = ',';
   private static final char COLLECTION_BEGIN = '[';
   private static final char COLLECTION_END = ']';
+  private static final char PARENTHESIS_BEGIN = '(';
+  private static final char PARENTHESIS_END = ')';
 	private static final String QUERY_LABEL_BEGIN = " and label in [";
 	private static final String QUERY_LABEL_END = "]";
 	private static final String QUERY_WHERE = " where 1=1";
@@ -157,55 +160,77 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	private void manageFilters(final StringBuilder text) {
 		for (HasContainer has : hasContainers) {
 			text.append(QUERY_FILTER_AND);
-
-			text.append(has.key);
-			text.append(SPACE);
-			switch (has.compare) {
-			case EQUAL:
-				if (has.values.length > 1)
-					text.append(OPERATOR_IN);
-				else if (has.values[0] == null)
-					text.append(OPERATOR_IS);
-				else
-					text.append(OPERATOR_EQUALS);
-				break;
-			case GREATER_THAN:
-				text.append(OPERATOR_GT);
-				break;
-			case GREATER_THAN_EQUAL:
-				text.append(OPERATOR_GTE);
-				break;
-			case LESS_THAN:
-				text.append(OPERATOR_LT);
-				break;
-			case LESS_THAN_EQUAL:
-				text.append(OPERATOR_LET);
-				break;
-			case NOT_EQUAL:
-				if (has.values[0] == null)
-					text.append(OPERATOR_IS_NOT);
-				else
-					text.append(OPERATOR_DIFFERENT);
-				break;
-			}
-			text.append(SPACE);
-
-			if( has.values.length > 1 )
-				text.append(COLLECTION_BEGIN);
-
-			for( int i = 0; i < has.values.length; ++i ) {
-			  if( i > 0 )
-				  text.append(QUERY_SEPARATOR);
-			    
-  				if (has.values[i] instanceof String)
-  					text.append(QUERY_STRING);
-  				text.append(has.values[i]);
-  				if (has.values[i] instanceof String)
-  					text.append(QUERY_STRING);
-			}
 			
-			if( has.values.length > 1 )
-				text.append(COLLECTION_END);
+		  if( has.compare == Compare.EQUAL && has.values.length > 1) {
+        // IN
+        text.append(has.key);
+        text.append(OPERATOR_IN);
+        text.append(COLLECTION_BEGIN);
+
+        for( int i = 0; i < has.values.length; ++i ) {
+          if( i > 0 )
+            text.append(QUERY_SEPARATOR);
+          generateFilterValue(text, has.values[i]);
+        }
+        
+        text.append(COLLECTION_END);          
+      } else {
+        // ANY OTHER OPERATORS
+        if( has.values.length > 1 )
+          text.append(PARENTHESIS_BEGIN);
+  
+  			for( int i = 0; i < has.values.length; ++i ) {
+  			  if( i > 0 ) {
+            text.append(SPACE);
+  				  text.append(QUERY_FILTER_OR);
+  			  }
+  			  
+    			text.append(has.key);
+    			text.append(SPACE);
+    			
+    			switch (has.compare) {
+    			case EQUAL:
+    				if (has.values[0] == null)
+    				  // IS
+    					text.append(OPERATOR_IS);
+    				else
+    				  // EQUALS
+    					text.append(OPERATOR_EQUALS);
+    				break;
+    			case GREATER_THAN:
+    				text.append(OPERATOR_GT);
+    				break;
+    			case GREATER_THAN_EQUAL:
+    				text.append(OPERATOR_GTE);
+    				break;
+    			case LESS_THAN:
+    				text.append(OPERATOR_LT);
+    				break;
+    			case LESS_THAN_EQUAL:
+    				text.append(OPERATOR_LET);
+    				break;
+    			case NOT_EQUAL:
+    				if (has.values[0] == null)
+    					text.append(OPERATOR_IS_NOT);
+    				else
+    					text.append(OPERATOR_DIFFERENT);
+    				break;
+    			}
+    			text.append(SPACE);
+          generateFilterValue(text, has.values[i]);
+        }
+  			
+  	    if( has.values.length > 1 )
+  	      text.append(PARENTHESIS_END);
+      }
 		}
+	}
+	
+	protected void generateFilterValue(final StringBuilder text, final Object iValue){
+    if (iValue instanceof String)
+      text.append(QUERY_STRING);
+    text.append(iValue);
+    if (iValue instanceof String)
+      text.append(QUERY_STRING);
 	}
 }
