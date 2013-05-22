@@ -54,10 +54,19 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
             manageLabels(text);
 
-        final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
+        if (maximum > 0 && maximum < Long.MAX_VALUE) {
+        	if( minimum > 0 && maximum < Long.MAX_VALUE ) {
+	            text.append(" SKIP ");
+	            text.append(minimum);
+	            text.append(" LIMIT ");
+	            text.append(maximum - minimum );
+        	} else {
+	            text.append(" LIMIT ");
+	            text.append(maximum);
+        	}
+        }
 
-        if (maximum > 0 && maximum < Long.MAX_VALUE)
-            query.setLimit((int) maximum);
+        final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(text.toString());
 
         return new OrientElementIterable<Vertex>(((OrientBaseGraph) graph), ((OrientBaseGraph) graph).getRawGraph().query(query));
     }
