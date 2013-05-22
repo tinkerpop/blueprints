@@ -52,10 +52,10 @@ public interface Query {
      *
      * @param key     the key of the property
      * @param compare the comparator to use for comparison
-     * @param value   the value to check against
+     * @param values   the values to check against
      * @return the modified query object
      */
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value);
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T values);
 
     /**
      * Filter out the edge of its property value is not within the provided interval.

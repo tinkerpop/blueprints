@@ -21,7 +21,7 @@ public abstract class DefaultQuery implements Query {
     public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
 
     public Query has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
+        this.hasContainers.add(new HasContainer(key, Compare.EQUAL, value));
         return this;
     }
 
@@ -30,13 +30,13 @@ public abstract class DefaultQuery implements Query {
     }
 
     public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, value, compare));
+        this.hasContainers.add(new HasContainer(key, compare, value));
         return this;
     }
 
     public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
-        this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
-        this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
+        this.hasContainers.add(new HasContainer(key, Compare.GREATER_THAN_EQUAL, startValue));
+        this.hasContainers.add(new HasContainer(key, Compare.LESS_THAN, endValue));
         return this;
     }
 
@@ -47,10 +47,7 @@ public abstract class DefaultQuery implements Query {
 
     public Query limit(final long min, final long max) {
         this.minimum = min;
-        if (min == 0)
-            this.maximum = max;
-        else
-            this.maximum = max + (min - 1);
+        this.maximum = max + min;
         return this;
     }
 
@@ -62,7 +59,7 @@ public abstract class DefaultQuery implements Query {
         public Object value;
         public Compare compare;
 
-        public HasContainer(final String key, final Object value, final Compare compare) {
+        public HasContainer(final String key, final Compare compare, final Object value) {
             this.key = key;
             this.value = value;
             this.compare = compare;
@@ -72,29 +69,71 @@ public abstract class DefaultQuery implements Query {
             final Object elementValue = element.getProperty(key);
             switch (compare) {
                 case EQUAL:
-                    if (null == elementValue)
-                        return value == null;
-                    return elementValue.equals(value);
+                    if (null == elementValue) {
+                        //for (final Object value : values) {
+                        if (value == null)
+                            return true;
+                        // }
+                    } else {
+                        //for (final Object value : values) {
+                        if (elementValue.equals(value))
+                            return true;
+                        // }
+                    }
+                    return false;
                 case NOT_EQUAL:
-                    if (null == elementValue)
-                        return value != null;
-                    return !elementValue.equals(value);
+                    if (null == elementValue) {
+                        //for (final Object value : values) {
+                        if (value != null)
+                            return true;
+                        //}
+                    } else {
+                        //for (final Object value : values) {
+                        if (!elementValue.equals(value))
+                            return true;
+                        //}
+                    }
+                    return false;
                 case GREATER_THAN:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 1;
+                    else {
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) >= 1)
+                            return true;
+                        //}
+                    }
+                    return false;
                 case LESS_THAN:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) <= -1;
+                    else {
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) <= -1)
+                            return true;
+                        //}
+                    }
+                    return false;
                 case GREATER_THAN_EQUAL:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 0;
+                    else {
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) >= 0)
+                            return true;
+                        //}
+                    }
+                    return false;
                 case LESS_THAN_EQUAL:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) <= 0;
+                    else {
+                        //for (final Object value : values) {
+                        if (((Comparable) elementValue).compareTo((value)) <= 0)
+                            return true;
+                        //}
+                    }
+                    return false;
                 default:
                     throw new IllegalArgumentException("Invalid state as no valid filter was provided");
             }
