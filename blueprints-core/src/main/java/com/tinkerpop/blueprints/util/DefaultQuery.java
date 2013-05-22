@@ -20,19 +20,17 @@ public abstract class DefaultQuery implements Query {
     public long minimum = 0l;
     public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
 
-    public Query has(final String key) {
-        this.hasContainers.add(new HasContainer(key, Compare.NOT_EQUAL, new Object[]{null}));
-        return this;
-    }
-
-    public Query hasNot(final String key) {
-        this.hasContainers.add(new HasContainer(key, Compare.EQUAL, new Object[]{null}));
+    public Query hasNot(final String key, final Object... values) {
+        if (null == values || values.length == 0)
+            this.hasContainers.add(new HasContainer(key, Compare.EQUAL, new Object[]{null}));
+        else
+            this.hasContainers.add(new HasContainer(key, Compare.NOT_EQUAL, values));
         return this;
     }
 
     public Query has(final String key, final Object... values) {
-        if (null == values)
-            this.hasContainers.add(new HasContainer(key, Compare.EQUAL, new Object[]{null}));
+        if (null == values || values.length == 0)
+            this.hasContainers.add(new HasContainer(key, Compare.NOT_EQUAL, new Object[]{null}));
         else
             this.hasContainers.add(new HasContainer(key, Compare.EQUAL, values));
         return this;

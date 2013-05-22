@@ -15,18 +15,13 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         this.query = query;
     }
 
-    public GraphQuery has(final String key) {
-        this.query = this.query.has(key);
-        return this;
-    }
-
-    public GraphQuery hasNot(final String key) {
-        this.query = this.query.hasNot(key);
-        return this;
-    }
-
     public GraphQuery has(final String key, final Object... values) {
         this.query = this.query.has(key, values);
+        return this;
+    }
+
+    public GraphQuery hasNot(final String key, final Object... values) {
+        this.query = this.query.hasNot(key, values);
         return this;
     }
 

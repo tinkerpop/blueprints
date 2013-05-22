@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.util.wrappers;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexQuery;
 
@@ -20,19 +19,13 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         this.query = query;
     }
 
-
-    public VertexQuery has(final String key) {
-        this.query = this.query.has(key);
-        return this;
-    }
-
-    public VertexQuery hasNot(final String key) {
-        this.query = this.query.hasNot(key);
-        return this;
-    }
-
     public VertexQuery has(final String key, final Object... values) {
         this.query = this.query.has(key, values);
+        return this;
+    }
+
+    public VertexQuery hasNot(final String key, final Object... values) {
+        this.query = this.query.hasNot(key, values);
         return this;
     }
 

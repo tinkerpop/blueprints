@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints;
 /**
  * @author Matthias Broecheler (me@matthiasb.com)
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Luca Garulli (http://www.orientechnologies.com)
  */
 
 public interface Query {
@@ -28,30 +29,26 @@ public interface Query {
     }
 
     /**
-     * Filter out the elements that do not have a property with specified key.
-     *
-     * @param key the key that the element must have
-     * @return the modified query object
-     */
-    public Query has(final String key);
-
-    /**
-     * Filter out the elements that do have a property with specified key.
-     *
-     * @param key the key that the element must not have
-     * @return the modified query object
-     */
-    public Query hasNot(final String key);
-
-    /**
      * Filter out the element if it does not have a property with the specified value.
      * If multiple values are provided then at least one has to match the element value.
+     * If no values are provided then only allow the element if it has that property (wildcard).
      *
      * @param key    the key of the property
      * @param values the values to check against
      * @return the modified query object
      */
     public Query has(final String key, final Object... values);
+
+    /**
+     * Filter out the element if it does have a property with the specified value.
+     * If multiple values are provided then none of them can match the element value.
+     * If no values are provided then only allow the element if it does not have that property (wildcard).
+     *
+     * @param key    the key of the property
+     * @param values the values to check against
+     * @return the modified query object
+     */
+    public Query hasNot(final String key, final Object... values);
 
     /**
      * Filter out the element if it does not have a property with a comparable value.
@@ -69,7 +66,7 @@ public interface Query {
      *
      * @param key     the key of the property
      * @param compare the comparator to use for comparison
-     * @param value  the value to check against
+     * @param value   the value to check against
      * @return the modified query object
      */
     public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value);
@@ -95,7 +92,7 @@ public interface Query {
     /**
      * Filter out elements not within the skip/take range specified.
      *
-     * @param skip  the number of elements to skip since the first element
+     * @param skip the number of elements to skip since the first element
      * @param take the number of elements to return after the skip has been reached
      * @return the modified query object
      */

@@ -25,18 +25,13 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         this.vertex = vertex;
     }
 
-    public VertexQuery has(final String key) {
-        super.has(key);
-        return this;
-    }
-
-    public VertexQuery hasNot(final String key) {
-        super.hasNot(key);
-        return this;
-    }
-
     public VertexQuery has(final String key, final Object... values) {
         super.has(key, values);
+        return this;
+    }
+
+    public VertexQuery hasNot(final String key, final Object... values) {
+        super.hasNot(key, values);
         return this;
     }
 

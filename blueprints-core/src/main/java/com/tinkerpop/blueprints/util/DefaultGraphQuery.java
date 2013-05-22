@@ -27,18 +27,13 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         this.graph = graph;
     }
 
-    public GraphQuery has(final String key) {
-        super.has(key);
-        return this;
-    }
-
-    public GraphQuery hasNot(final String key) {
-        super.hasNot(key);
-        return this;
-    }
-
     public GraphQuery has(final String key, final Object... values) {
         super.has(key, values);
+        return this;
+    }
+
+    public GraphQuery hasNot(final String key, final Object... values) {
+        super.hasNot(key,values);
         return this;
     }
 

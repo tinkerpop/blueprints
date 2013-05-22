@@ -5,6 +5,7 @@ package com.tinkerpop.blueprints;
  *
  * @author Matthias Brocheler (http://matthiasb.com)
  * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public interface VertexQuery extends Query {
 
@@ -40,13 +41,10 @@ public interface VertexQuery extends Query {
     public Object vertexIds();
 
     @Override
-    public VertexQuery has(final String key);
-
-    @Override
-    public VertexQuery hasNot(final String key);
-
-    @Override
     public VertexQuery has(final String key, final Object... values);
+
+    @Override
+    public VertexQuery hasNot(final String key, final Object... values);
 
     @Override
     @Deprecated
