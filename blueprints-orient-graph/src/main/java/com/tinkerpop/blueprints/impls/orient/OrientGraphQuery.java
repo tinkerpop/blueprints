@@ -26,16 +26,19 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	private static final char OPERATOR_GT = '>';
 	private static final String OPERATOR_EQUALS = "=";
 	private static final String OPERATOR_IS = "is";
+  private static final String OPERATOR_IN = "in";
 
 	private static final String QUERY_FILTER_AND = " and ";
 	private static final char QUERY_STRING = '\'';
 	private static final char QUERY_SEPARATOR = ',';
+  private static final char COLLECTION_BEGIN = '[';
+  private static final char COLLECTION_END = ']';
 	private static final String QUERY_LABEL_BEGIN = " and label in [";
 	private static final String QUERY_LABEL_END = "]";
 	private static final String QUERY_WHERE = " where 1=1";
 	private static final String QUERY_SELECT_FROM = "select from ";
-    private static final String LIMIT = " LIMIT ";
-    private static final String SKIP = " SKIP ";
+  private static final String LIMIT = " LIMIT ";
+  private static final String SKIP = " SKIP ";
 
 	public OrientGraphQuery(final Graph iGraph) {
 		super(iGraph);
@@ -159,7 +162,9 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 			text.append(SPACE);
 			switch (has.compare) {
 			case EQUAL:
-				if (has.values[0] == null)
+				if (has.values.length > 1)
+					text.append(OPERATOR_IN);
+				else if (has.values[0] == null)
 					text.append(OPERATOR_IS);
 				else
 					text.append(OPERATOR_EQUALS);
@@ -185,11 +190,22 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 			}
 			text.append(SPACE);
 
-			if (has.values[0] instanceof String)
-				text.append(QUERY_STRING);
-			text.append(has.values[0]);
-			if (has.values[0] instanceof String)
-				text.append(QUERY_STRING);
+			if( has.values.length > 1 )
+				text.append(COLLECTION_BEGIN);
+
+			for( int i = 0; i < has.values.length; ++i ) {
+			  if( i > 0 )
+				  text.append(QUERY_SEPARATOR);
+			    
+  				if (has.values[i] instanceof String)
+  					text.append(QUERY_STRING);
+  				text.append(has.values[i]);
+  				if (has.values[i] instanceof String)
+  					text.append(QUERY_STRING);
+			}
+			
+			if( has.values.length > 1 )
+				text.append(COLLECTION_END);
 		}
 	}
 }
