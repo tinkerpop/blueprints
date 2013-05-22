@@ -47,8 +47,8 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T... values) {
-        super.has(key, compare, values);
+    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value) {
+        super.has(key, compare, value);
         return this;
     }
 
@@ -57,13 +57,13 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery limit(final long total) {
-        super.limit(total);
+    public GraphQuery limit(final long take) {
+        super.limit(take);
         return this;
     }
 
-    public GraphQuery limit(final long skip, final long total) {
-        super.limit(skip, total);
+    public GraphQuery limit(final long skip, final long take) {
+        super.limit(skip, take);
         return this;
     }
 

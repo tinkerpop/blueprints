@@ -71,9 +71,7 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
         }
 
         final JSONObject jsonObject = RestHelper.get(buildUri(directionReturnToken));
-        final long count = jsonObject.optLong(RexsterTokens.TOTAL_SIZE);
-
-        return count;
+        return jsonObject.optLong(RexsterTokens.TOTAL_SIZE);
     }
 
     public Object vertexIds() {

@@ -53,16 +53,16 @@ public interface VertexQuery extends Query {
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare);
 
     @Override
-    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T... values);
+    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value);
 
     @Override
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue);
 
     @Override
-    public VertexQuery limit(final long total);
+    public VertexQuery limit(final long take);
 
     @Override
-    public VertexQuery limit(final long skip, final long total);
+    public VertexQuery limit(final long skip, final long take);
 
 
 }

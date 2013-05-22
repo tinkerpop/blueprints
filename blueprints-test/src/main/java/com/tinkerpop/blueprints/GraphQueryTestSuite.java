@@ -194,22 +194,6 @@ public class GraphQueryTestSuite extends TestSuite {
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
             assertTrue(result.contains(matthias));
-
-            result = asList(graph.query().has("name", Query.Compare.GREATER_THAN, "a", "b", "c").vertices());
-            assertEquals(result.size(), 3);
-            assertTrue(result.contains(marko));
-            assertTrue(result.contains(stephen));
-            assertTrue(result.contains(matthias));
-
-            result = asList(graph.query().has("name", Query.Compare.GREATER_THAN_EQUAL, "s", "z").vertices());
-            assertEquals(result.size(), 1);
-            assertTrue(result.contains(stephen));
-
-            result = asList(graph.query().has("name", Query.Compare.LESS_THAN, "z", "a").vertices());
-            assertEquals(result.size(), 3);
-            assertTrue(result.contains(marko));
-            assertTrue(result.contains(stephen));
-            assertTrue(result.contains(matthias));
         }
         graph.shutdown();
     }

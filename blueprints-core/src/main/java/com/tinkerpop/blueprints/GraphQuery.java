@@ -21,15 +21,15 @@ public interface GraphQuery extends Query {
     public <T extends Comparable<T>> GraphQuery has(final String key, final T value, final Compare compare);
 
     @Override
-    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T... values);
+    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value);
 
     @Override
     public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue);
 
     @Override
-    public GraphQuery limit(final long total);
+    public GraphQuery limit(final long take);
 
     @Override
-    public GraphQuery limit(final long skip, final long total);
+    public GraphQuery limit(final long skip, final long take);
 
 }

@@ -42,11 +42,8 @@ public abstract class DefaultQuery implements Query {
         return this.has(key, compare, value);
     }
 
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T... values) {
-        if (null == values)
-            this.hasContainers.add(new HasContainer(key, compare, new Object[]{null}));
-        else
-            this.hasContainers.add(new HasContainer(key, compare, values));
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value) {
+        this.hasContainers.add(new HasContainer(key, compare, value));
         return this;
     }
 
@@ -56,14 +53,14 @@ public abstract class DefaultQuery implements Query {
         return this;
     }
 
-    public Query limit(final long total) {
-        this.maximum = total;
+    public Query limit(final long take) {
+        this.maximum = take;
         return this;
     }
 
-    public Query limit(final long skip, final long total) {
+    public Query limit(final long skip, final long take) {
         this.minimum = skip;
-        this.maximum = skip + total;
+        this.maximum = skip + take;
         return this;
     }
 

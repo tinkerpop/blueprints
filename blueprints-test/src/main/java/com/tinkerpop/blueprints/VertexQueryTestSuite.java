@@ -212,21 +212,6 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(result.size(), 3);
             assertTrue(result.contains(b));
             assertTrue(result.contains(c));
-
-            // OTHER COMPARATORS
-
-            result = asList(a.query().direction(OUT).has("amount", Query.Compare.LESS_THAN, 1.0, 0.5).edges());
-            assertEquals(result.size(), 1);
-            assertTrue(result.contains(aFriendC));
-
-            result = asList(a.query().direction(OUT).has("amount", Query.Compare.LESS_THAN_EQUAL, 1.0, 0.5).edges());
-            assertEquals(result.size(), 3);
-            assertTrue(result.contains(aFriendB));
-            assertTrue(result.contains(aFriendC));
-            assertTrue(result.contains(aHateC));
-
-            // TODO: Check more comparators
-
         }
         graph.shutdown();
     }

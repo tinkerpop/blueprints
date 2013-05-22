@@ -69,10 +69,10 @@ public interface Query {
      *
      * @param key     the key of the property
      * @param compare the comparator to use for comparison
-     * @param values  the values to check against
+     * @param value  the value to check against
      * @return the modified query object
      */
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T... values);
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value);
 
     /**
      * Filter out the element of its property value is not within the provided interval.
@@ -85,21 +85,21 @@ public interface Query {
     public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue);
 
     /**
-     * Filter out the element if the total number of incident/adjacent elements to retrieve has already been reached.
+     * Filter out the element if the take number of incident/adjacent elements to retrieve has already been reached.
      *
-     * @param total the total number of elements to return
+     * @param take the take number of elements to return
      * @return the modified query object
      */
-    public Query limit(final long total);
+    public Query limit(final long take);
 
     /**
-     * Filter out elements not within the skip/limit range specified.
+     * Filter out elements not within the skip/take range specified.
      *
      * @param skip  the number of elements to skip since the first element
-     * @param total the number of elements to return after the skip has been reached
+     * @param take the number of elements to return after the skip has been reached
      * @return the modified query object
      */
-    public Query limit(final long skip, final long total);
+    public Query limit(final long skip, final long take);
 
     /**
      * Execute the query and return the matching edges.
