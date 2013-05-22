@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints;
 import com.tinkerpop.blueprints.impls.GraphTest;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -167,18 +168,48 @@ public class GraphQueryTestSuite extends TestSuite {
             assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").edges()), 2);
             assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").has("type", "tinkerpop").edges()), 1);
             assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").has("type", "tinkerpop").has("type", "aurelius").edges()), 0);
-
-           // assertEquals(graph.query().has("type", "tinkerpop", "aurelius").edges().iterator().next().getProperty("weight"), 1.0);
+            assertEquals(graph.query().has("weight").edges().iterator().next().getProperty("type"), "tinkerpop");
+            assertEquals(graph.query().has("weight").edges().iterator().next().getProperty("weight"), 1.0);
             assertEquals(graph.query().hasNot("weight").edges().iterator().next().getProperty("type"), "aurelius");
+            assertNull(graph.query().hasNot("weight").edges().iterator().next().getProperty("weight"));
 
-            /*assertEquals(count(graph.query().has("weight", 1.0).edges()), 1);
-            assertEquals(graph.query().has("weight", 1.0).edges().iterator().next().getProperty("type"), "tinkerpop");
-            assertEquals(count(graph.query().has("weight", 1.0).has("type", "tinkerpop").edges()), 1);
-            assertEquals(graph.query().has("weight", 1.0).has("type", "tinkerpop").edges().iterator().next().getProperty("type"), "tinkerpop");
-            assertEquals(count(graph.query().has("weight", 1.0).has("type", "aurelius").edges()), 0);
+            List result = asList(graph.query().has("name", "marko", "stephen").vertices());
+            assertEquals(result.size(), 2);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            result = asList(graph.query().has("name", "marko", "stephen", "matthias", "josh", "peter").vertices());
+            assertEquals(result.size(), 3);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            assertTrue(result.contains(matthias));
+            result = asList(graph.query().has("name").vertices());
+            assertEquals(result.size(), 3);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            assertTrue(result.contains(matthias));
+            result = asList(graph.query().hasNot("name").vertices());
+            assertEquals(result.size(), 0);
+            result = asList(graph.query().hasNot("blah").vertices());
+            assertEquals(result.size(), 3);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            assertTrue(result.contains(matthias));
 
-            assertEquals(graph.query().interval("weight", 0.0, 1.1).edges().iterator().next().getProperty("type"), "tinkerpop");
-            assertEquals(count(graph.query().interval("weight", 0.0, 1.0).edges()), 0);*/
+            result = asList(graph.query().has("name", Query.Compare.GREATER_THAN, "a", "b", "c").vertices());
+            assertEquals(result.size(), 3);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            assertTrue(result.contains(matthias));
+
+            result = asList(graph.query().has("name", Query.Compare.GREATER_THAN_EQUAL, "s", "z").vertices());
+            assertEquals(result.size(), 1);
+            assertTrue(result.contains(stephen));
+
+            result = asList(graph.query().has("name", Query.Compare.LESS_THAN, "z", "a").vertices());
+            assertEquals(result.size(), 3);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            assertTrue(result.contains(matthias));
         }
         graph.shutdown();
     }
