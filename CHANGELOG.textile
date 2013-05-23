@@ -28,6 +28,8 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Support both @byte@ and @short@ data types in GraphSON.
 * Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values.
 * Bumped Neo4j to 1.9
+* Added support for @has(key,values...)@ and @hasNot(key,values...)@ in @Query@ API
+* Added support for @limit(skip,take)@ in the @Query@ API
 
 ==<hr/>==
 
