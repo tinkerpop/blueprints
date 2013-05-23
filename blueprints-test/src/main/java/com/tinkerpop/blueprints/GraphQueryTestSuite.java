@@ -98,8 +98,8 @@ public class GraphQueryTestSuite extends TestSuite {
             assertEquals(count(graph.query().has("age", 28).has("name", "matthias").vertices()), 1);
             assertEquals(count(graph.query().has("age", 28).has("name", "matthias").has("name", "matthias").vertices()), 1);
             assertEquals(count(graph.query().interval("age", 28, 32).has("name", "marko").vertices()), 0);
-            graph.shutdown();
         }
+        graph.shutdown();
     }
 
     public void testGraphQueryForEdges() {
@@ -190,6 +190,16 @@ public class GraphQueryTestSuite extends TestSuite {
             result = asList(graph.query().hasNot("name").vertices());
             assertEquals(result.size(), 0);
             result = asList(graph.query().hasNot("blah").vertices());
+            assertEquals(result.size(), 3);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            assertTrue(result.contains(matthias));
+            result = asList(graph.query().hasNot("name", "bill", "sam").vertices());
+            assertEquals(result.size(), 3);
+            assertTrue(result.contains(marko));
+            assertTrue(result.contains(stephen));
+            assertTrue(result.contains(matthias));
+            result = asList(graph.query().hasNot("name", "bill", "matthias", "stephen", "marko").vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));

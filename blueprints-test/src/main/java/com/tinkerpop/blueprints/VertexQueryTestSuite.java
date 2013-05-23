@@ -180,6 +180,29 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
             assertEquals(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN_EQUAL, 1.0).count(), 1);
+
+            results = asList(a.query().direction(OUT).has("amount").edges());
+            assertEquals(results.size(), 3);
+            assertTrue(results.contains(aFriendB));
+            assertTrue(results.contains(aFriendC));
+            assertTrue(results.contains(aHateC));
+
+            results = asList(a.query().direction(OUT).hasNot("amount").vertices());
+            assertEquals(results.size(), 0);
+            results = asList(a.query().direction(OUT).hasNot("date").edges());
+            assertEquals(results.size(), 2);
+            assertTrue(results.contains(aFriendC));
+            assertTrue(results.contains(aHateC));
+            results = asList(a.query().direction(OUT).hasNot("date").vertices());
+            assertEquals(results.size(), 2);
+            assertEquals(results.get(0), c);
+            assertEquals(results.get(0), c);
+
+            results = asList(a.query().direction(OUT).hasNot("amount", 2.3, 5.6, 234).edges());
+            assertEquals(results.size(), 3);
+            assertTrue(results.contains(aFriendB));
+            assertTrue(results.contains(aFriendC));
+            assertTrue(results.contains(aHateC));
         }
         graph.shutdown();
     }
