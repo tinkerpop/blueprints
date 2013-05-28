@@ -752,13 +752,20 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
-        final String classPrefix = getClassName(elementClass) + ".";
+        final OSchema schema = getRawGraph().getMetadata().getSchema();
+        final String elementOClassName = getClassName(elementClass);
 
         Set<String> result = new HashSet<String>();
         final Collection<? extends OIndex<?>> indexes = getRawGraph().getMetadata().getIndexManager().getIndexes();
         for (OIndex<?> index : indexes) {
-            if (index.getName().startsWith(classPrefix))
-                result.add(index.getDefinition().getFields().get(0));
+        	String indexName = index.getName();
+        	int point = indexName.indexOf(".");
+        	if (point > 0) {
+        		String oClassName = indexName.substring(0, point);
+        		OClass oClass = schema.getClass(oClassName);
+        		if (oClass.isSubClassOf(elementOClassName))
+        			result.add(index.getDefinition().getFields().get(0));
+        	}
         }
         return result;
     }
