@@ -400,7 +400,12 @@ public class GraphSONUtility {
             final Map.Entry<String, JsonNode> entry = iterator.next();
 
             if (!ignoreReservedKeys || !isReservedKey(entry.getKey())) {
-                map.put(entry.getKey(), readProperty(entry.getValue(), hasEmbeddedTypes));
+                // it generally shouldn't be as such but graphson containing null values can't be shoved into
+                // element property keys or it will result in error
+                final Object o = readProperty(entry.getValue(), hasEmbeddedTypes);
+                if (o != null) {
+                    map.put(entry.getKey(), o);
+                }
             }
         }
 
@@ -731,7 +736,7 @@ public class GraphSONUtility {
     private static String determineType(final Object value) {
         String type = GraphSONTokens.TYPE_STRING;
         if (value == null) {
-            type = "unknown";
+            type = GraphSONTokens.TYPE_UNKNOWN;
         } else if (value instanceof Double) {
             type = GraphSONTokens.TYPE_DOUBLE;
         } else if (value instanceof Float) {
