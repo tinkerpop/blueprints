@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.HashSet;
@@ -646,5 +647,26 @@ public class EdgeTestSuite extends TestSuite {
             }
         }
         graph.shutdown();
+    }
+
+    public void testSetEdgeLabelNullShouldThrowIllegalArgumentException() {
+        Graph graph = graphTest.generateGraph();
+        Vertex v1 = graph.addVertex(null);
+        Vertex v2 = graph.addVertex(null);
+
+        try {
+            v2.addEdge(null, v1);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertTrue(true);
+        }
+
+        try {
+            graph.addEdge(null, v1, v2, null);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertTrue(true);
+        }
+
     }
 }

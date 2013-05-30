@@ -37,6 +37,7 @@ public class GraphSONUtility {
 
     private static final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
     private static final JsonFactory jsonFactory = new MappingJsonFactory();
+    private static final String EMPTY_STRING = "";
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -168,7 +169,11 @@ public class GraphSONUtility {
 
         final Object edgeId = getTypedValueFromJsonNode(json.get(GraphSONTokens._ID));
         final JsonNode nodeLabel = json.get(GraphSONTokens._LABEL);
-        final String label = nodeLabel == null ? null : nodeLabel.textValue();
+
+        // assigned an empty string edge label in cases where one does not exist.  this gets around the requirement
+        // that blueprints graphs have a non-null label while ensuring that GraphSON can stay flexible in parsing
+        // partial bits from the JSON.  Not sure if there is any gotchas developing out of this.
+        final String label = nodeLabel == null ? EMPTY_STRING : nodeLabel.textValue();
 
         final Edge e = factory.createEdge(edgeId, out, in, label);
 

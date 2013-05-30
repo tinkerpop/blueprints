@@ -14,6 +14,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.Collection;
@@ -189,6 +190,11 @@ public class OrientVertex extends OrientElement implements Vertex {
         final boolean useVertexFieldsForEdgeLabels = graph.isUseVertexFieldsForEdgeLabels();
         final String outFieldName = getConnectionFieldName(Direction.OUT, label, useVertexFieldsForEdgeLabels);
         final String inFieldName = getConnectionFieldName(Direction.IN, label, useVertexFieldsForEdgeLabels);
+
+        // since the label for the edge can potentially get re-assigned before being pushed into the OrientEdge, the
+        // null check has to go here.
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
 
         if (canCreateDynamicEdge(outDocument, inDocument, outFieldName, inFieldName, fields, label)) {
             // CREATE A LIGHTWEIGHT DYNAMIC EDGE

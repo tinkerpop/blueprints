@@ -299,6 +299,9 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
      * @return the newly created vertex
      */
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
+
         final Map<String, Object> finalProperties;
         if (id == null || !(id instanceof Map))
             finalProperties = new HashMap<String, Object>();

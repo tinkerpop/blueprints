@@ -31,6 +31,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Added support for @has(key,values...)@ and @hasNot(key,values...)@ in @Query@ API
 * Added support for @limit(skip,take)@ in the @Query@ API
 * Ignore nulls property values in loading of GraphSON as graphs do not accept such values for element properties.
+* Adding an edge with a @null@ value results in @IllegalArgumentException@.
 
 ==<hr/>==
 
