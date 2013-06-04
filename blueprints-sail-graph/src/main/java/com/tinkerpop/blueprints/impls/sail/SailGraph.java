@@ -231,6 +231,9 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
+
         Value outVertexValue = ((SailVertex) outVertex).getRawVertex();
         Value inVertexValue = ((SailVertex) inVertex).getRawVertex();
 

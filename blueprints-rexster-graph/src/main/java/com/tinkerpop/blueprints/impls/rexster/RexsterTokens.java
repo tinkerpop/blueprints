@@ -14,7 +14,8 @@ class RexsterTokens {
     public static final String _INE = "_inE";
     public static final String _OUTV = "_outV";
     public static final String _INV = "_inV";
-    public static final String _LIMIT = "_limit";
+    public static final String _SKIP = "_skip";
+    public static final String _TAKE = "_take";
     public static final String _PROPERTIES = "_properties";
     public static final String UNDERSCORE = "_";
     public static final String NULL = "null";

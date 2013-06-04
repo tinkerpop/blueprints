@@ -56,6 +56,10 @@ public class ExceptionFactory {
         return new IllegalArgumentException("Property value can not be null");
     }
 
+    public static IllegalArgumentException edgeLabelCanNotBeNull() {
+        return new IllegalArgumentException("Edge label can not be null");
+    }
+
     // IndexableGraph related exceptions
 
     public static IllegalArgumentException indexAlreadyExists(final String indexName) {

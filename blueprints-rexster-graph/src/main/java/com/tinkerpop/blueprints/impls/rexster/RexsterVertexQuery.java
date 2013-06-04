@@ -18,13 +18,6 @@ import java.util.List;
  */
 public class RexsterVertexQuery extends DefaultVertexQuery {
 
-    private static final String[] EMPTY_LABELS = new String[]{};
-
-    public Direction direction = Direction.BOTH;
-    public String[] labels = EMPTY_LABELS;
-    public long maximum = Long.MAX_VALUE;
-    public long minimum = 0l;
-    public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
     public final String baseUri;
     public final RexsterGraph graph;
 
@@ -96,9 +89,15 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
 
     private String buildUri(final String directionReturnToken) {
         final StringBuilder sb = new StringBuilder(this.baseUri + directionReturnToken + RexsterTokens.QUESTION);
-        sb.append(RexsterTokens._LIMIT);
+        sb.append(RexsterTokens._TAKE);
         sb.append(RexsterTokens.EQUALS);
         sb.append(this.maximum);
+
+        sb.append(RexsterTokens.AND);
+
+        sb.append(RexsterTokens._SKIP);
+        sb.append(RexsterTokens.EQUALS);
+        sb.append(this.minimum);
 
         if (this.labels != null && this.labels.length > 0) {
             sb.append(RexsterTokens.AND);
@@ -125,11 +124,15 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
                 sb.append(hasContainer.key);
 
                 sb.append(RexsterTokens.COMMA);
-                sb.append(getCompareString(hasContainer.compare));
+                sb.append(hasContainer.compare.asString());
                 sb.append(RexsterTokens.COMMA);
 
-                // TODO: make it so its OR's the values
-                sb.append(RestHelper.uriCast(hasContainer.values[0]));
+                for (Object v : hasContainer.values) {
+                    sb.append(RestHelper.uriCast(v));
+                    sb.append(" ");
+                }
+
+                sb.trimToSize();
 
                 sb.append(RexsterTokens.RIGHT_SQUARE_BRACKET);
 
@@ -146,22 +149,5 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
         return sb.toString();
     }
 
-    private static String getCompareString(final Compare compare) {
-        if (compare == Compare.EQUAL) {
-            return "=";
-        } else if (compare == Compare.GREATER_THAN) {
-            return ">";
-        } else if (compare == Compare.GREATER_THAN_EQUAL) {
-            return ">=";
-        } else if (compare == Compare.LESS_THAN_EQUAL) {
-            return "<=";
-        } else if (compare == Compare.LESS_THAN) {
-            return "<";
-        } else if (compare == Compare.NOT_EQUAL) {
-            return "<>";
-        }
-
-        throw new RuntimeException("Invalid comparator");
-    }
 }
 

@@ -23,10 +23,51 @@ public interface Query {
                 return LESS_THAN;
             else if (this.equals(LESS_THAN))
                 return GREATER_THAN_EQUAL;
-            else
+            else if (this.equals(LESS_THAN_EQUAL))
                 return GREATER_THAN;
+            else
+                throw new RuntimeException("Comparator does not have an opposite.");
         }
 
+        /**
+         * Constructs the string representation of the Compare.
+         */
+        public String asString() {
+            if (this.equals(EQUAL))
+                return "=";
+            else if (this.equals(GREATER_THAN))
+                return ">";
+            else if (this.equals(GREATER_THAN_EQUAL))
+                return ">=";
+            else if (this.equals(LESS_THAN_EQUAL))
+                return "<=";
+            else if (this.equals(Query.Compare.LESS_THAN))
+                return "<";
+            else if (this.equals(NOT_EQUAL))
+                return "<>";
+            else
+                throw new RuntimeException("Comparator does not have a string representation.");
+        }
+
+        /**
+         * Constructs a Compare from its string representation.
+         */
+        public static Compare fromString(final String c) {
+            if (c.equals("="))
+                return Query.Compare.EQUAL;
+            else if (c.equals("<>"))
+                return Query.Compare.NOT_EQUAL;
+            else if (c.equals(">"))
+                return Query.Compare.GREATER_THAN;
+            else if (c.equals(">="))
+                return Query.Compare.GREATER_THAN_EQUAL;
+            else if (c.equals("<"))
+                return Query.Compare.LESS_THAN;
+            else if (c.equals("<="))
+                return Query.Compare.LESS_THAN_EQUAL;
+            else
+                throw new IllegalArgumentException("Argument does not match any comparator.");
+        }
     }
 
     /**

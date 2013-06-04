@@ -180,6 +180,9 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
+
         final Map<String, Object> data = new HashMap<String, Object>();
         data.put(RexsterTokens._OUTV, outVertex.getId());
         data.put(RexsterTokens._INV, inVertex.getId());

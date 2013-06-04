@@ -273,6 +273,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
+
         String idString = null;
         Edge edge;
         if (null != id) {

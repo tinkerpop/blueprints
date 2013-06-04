@@ -452,6 +452,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
+
         this.autoStartTransaction();
         return new Neo4jEdge(((Neo4jVertex) outVertex).getRawVertex().createRelationshipTo(((Neo4jVertex) inVertex).getRawVertex(),
                 DynamicRelationshipType.withName(label)), this);
