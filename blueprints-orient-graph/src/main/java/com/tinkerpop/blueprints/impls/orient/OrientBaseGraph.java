@@ -270,6 +270,8 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
         if (id instanceof OrientVertex)
             return (OrientVertex) id;
+        else if (id instanceof ODocument)
+          return new OrientVertex(this, (OIdentifiable) id);
 
         ORID rid;
         if (id instanceof OIdentifiable)
@@ -372,6 +374,8 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
         if (id instanceof OrientEdge)
             return (OrientEdge) id;
+        else if (id instanceof ODocument)
+          return new OrientEdge(this, (OIdentifiable) id);
 
         final OIdentifiable rec;
         if (id instanceof OIdentifiable)
