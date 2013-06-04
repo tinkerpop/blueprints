@@ -624,9 +624,12 @@ public class OrientVertex extends OrientElement implements Vertex {
 
     private static void removeInverseEdge(final ODocument iVertex, final String iFieldName, final OIdentifiable iVertexToRemove,
                                           final Object iFieldValue, final boolean useVertexFieldsForEdgeLabels) {
-        final String inverseFieldName = getInverseConnectionFieldName(iFieldName, useVertexFieldsForEdgeLabels);
-
         final ODocument r = ((OIdentifiable) iFieldValue).getRecord();
+        
+        if( r == null )
+        	return;
+        
+        final String inverseFieldName = getInverseConnectionFieldName(iFieldName, useVertexFieldsForEdgeLabels);
         if (r.getSchemaClass().isSubClassOf(CLASS_NAME)) {
             // DIRECT VERTEX
             removeEdges(r, inverseFieldName, iVertex, false, useVertexFieldsForEdgeLabels);
