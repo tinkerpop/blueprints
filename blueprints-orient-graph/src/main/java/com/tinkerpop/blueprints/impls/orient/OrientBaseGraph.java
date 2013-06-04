@@ -729,6 +729,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         String indexType = OClass.INDEX_TYPE.NOTUNIQUE.name();
         OType keyType = OType.STRING;
         String className = null;
+        
         final String elementClassName = getClassName(elementClass);
 
         // READ PARAMETERS
@@ -744,7 +745,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         if (className == null)
         	className = elementClassName;
 
-        final OClass cls = db.getMetadata().getSchema().getOrCreateClass(className, schema.getClass(elementClass));
+        final OClass cls = db.getMetadata().getSchema().getOrCreateClass(className, schema.getClass(elementClassName));
         final OProperty property = cls.getProperty(key);
         if (property != null)
             keyType = property.getType();
