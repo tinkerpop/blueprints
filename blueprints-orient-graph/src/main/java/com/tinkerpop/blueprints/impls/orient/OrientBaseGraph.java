@@ -749,7 +749,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         if (className == null)
         	className = ancestorClassName;
 
-        final OClass cls = db.getMetadata().getSchema().getOrCreateClass(className, schema.getClass(ancestorClassName));
+        final OClass cls = schema.getOrCreateClass(className, schema.getClass(ancestorClassName));
         final OProperty property = cls.getProperty(key);
         if (property != null)
             keyType = property.getType();
