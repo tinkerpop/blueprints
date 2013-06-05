@@ -17,31 +17,33 @@ import java.util.Collections;
  */
 public class OrientGraphQuery extends DefaultGraphQuery {
 
-    private static final char SPACE = ' ';
-    private static final String OPERATOR_DIFFERENT = "<>";
-    private static final String OPERATOR_IS_NOT = "is not";
-    private static final String OPERATOR_LET = "<=";
-    private static final char OPERATOR_LT = '<';
-    private static final String OPERATOR_GTE = ">=";
-    private static final char OPERATOR_GT = '>';
-    private static final String OPERATOR_EQUALS = "=";
-    private static final String OPERATOR_IS = "is";
-    private static final String OPERATOR_IN = " in ";
+    protected static final char SPACE = ' ';
+    protected static final String OPERATOR_DIFFERENT = "<>";
+    protected static final String OPERATOR_IS_NOT = "is not";
+    protected static final String OPERATOR_LET = "<=";
+    protected static final char OPERATOR_LT = '<';
+    protected static final String OPERATOR_GTE = ">=";
+    protected static final char OPERATOR_GT = '>';
+    protected static final String OPERATOR_EQUALS = "=";
+    protected static final String OPERATOR_IS = "is";
+    protected static final String OPERATOR_IN = " in ";
 
-    private static final String QUERY_FILTER_AND = " and ";
-    private static final String QUERY_FILTER_OR = " or ";
-    private static final char QUERY_STRING = '\'';
-    private static final char QUERY_SEPARATOR = ',';
-    private static final char COLLECTION_BEGIN = '[';
-    private static final char COLLECTION_END = ']';
-    private static final char PARENTHESIS_BEGIN = '(';
-    private static final char PARENTHESIS_END = ')';
-    private static final String QUERY_LABEL_BEGIN = " and label in [";
-    private static final String QUERY_LABEL_END = "]";
-    private static final String QUERY_WHERE = " where 1=1";
-    private static final String QUERY_SELECT_FROM = "select from ";
-    private static final String LIMIT = " LIMIT ";
-    private static final String SKIP = " SKIP ";
+    protected static final String QUERY_FILTER_AND = " and ";
+    protected static final String QUERY_FILTER_OR = " or ";
+    protected static final char QUERY_STRING = '\'';
+    protected static final char QUERY_SEPARATOR = ',';
+    protected static final char COLLECTION_BEGIN = '[';
+    protected static final char COLLECTION_END = ']';
+    protected static final char PARENTHESIS_BEGIN = '(';
+    protected static final char PARENTHESIS_END = ')';
+    protected static final String QUERY_LABEL_BEGIN = " and label in [";
+    protected static final String QUERY_LABEL_END = "]";
+    protected static final String QUERY_WHERE = " where 1=1";
+    protected static final String QUERY_SELECT_FROM = "select from ";
+    protected static final String LIMIT = " LIMIT ";
+    protected static final String SKIP = " SKIP ";
+    
+    protected String fetchPlan;
 
     public OrientGraphQuery(final Graph iGraph) {
         super(iGraph);
@@ -94,6 +96,10 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         }
         final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
                 text.toString());
+        
+        if( fetchPlan != null )
+        	query.setFetchPlan(fetchPlan);
+        
         return new OrientElementIterable<Vertex>(((OrientBaseGraph) graph),
                 ((OrientBaseGraph) graph).getRawGraph().query(query));
     }
@@ -134,6 +140,9 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
                 text.toString());
 
+        if( fetchPlan != null )
+        	query.setFetchPlan(fetchPlan);
+        
         if (maximum > 0 && maximum < Long.MAX_VALUE)
             query.setLimit((int) maximum);
 
@@ -141,7 +150,15 @@ public class OrientGraphQuery extends DefaultGraphQuery {
                 ((OrientBaseGraph) graph).getRawGraph().query(query));
     }
 
-    private void manageLabels(final StringBuilder text) {
+	public String getFetchPlan() {
+		return fetchPlan;
+	}
+
+	public void setFetchPlan(final String fetchPlan) {
+		this.fetchPlan = fetchPlan;
+	}
+	
+    protected void manageLabels(final StringBuilder text) {
         if (labels != null && labels.length > 0) {
             // APPEND LABELS
             text.append(QUERY_LABEL_BEGIN);
@@ -156,7 +173,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         }
     }
 
-    private void manageFilters(final StringBuilder text) {
+    protected void manageFilters(final StringBuilder text) {
         for (HasContainer has : hasContainers) {
             text.append(QUERY_FILTER_AND);
 
