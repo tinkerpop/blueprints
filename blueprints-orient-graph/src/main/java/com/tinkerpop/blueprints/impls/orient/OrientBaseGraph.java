@@ -725,13 +725,16 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     @SuppressWarnings({"rawtypes"})
     public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
         final ODatabaseDocumentTx db = getRawGraph();
+        final OSchema schema = db.getMetadata().getSchema();
 
         if (db.getTransaction().isActive())
             this.commit();
 
         String indexType = OClass.INDEX_TYPE.NOTUNIQUE.name();
         OType keyType = OType.STRING;
-        String className = getClassName(elementClass);
+        String className = null;
+        
+        final String ancestorClassName = getClassName(elementClass);
 
         // READ PARAMETERS
         for (Parameter<?, ?> p : indexParameters) {
@@ -742,9 +745,11 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
             else if (p.getKey().equals("class"))
                 className = p.getValue().toString();
         }
+        
+        if (className == null)
+        	className = ancestorClassName;
 
-        final OClass cls = db.getMetadata().getSchema().getClass(className);
-
+        final OClass cls = schema.getOrCreateClass(className, schema.getClass(ancestorClassName));
         final OProperty property = cls.getProperty(key);
         if (property != null)
             keyType = property.getType();
