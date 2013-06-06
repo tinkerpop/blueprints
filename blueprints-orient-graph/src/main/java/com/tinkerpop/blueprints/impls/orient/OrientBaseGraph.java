@@ -1,5 +1,15 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import com.orientechnologies.common.io.OFileUtils;
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.command.OCommandRequest;
@@ -30,16 +40,6 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
@@ -301,10 +301,26 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
 
     public Iterable<Vertex> getVertices() {
-        return getVertices(true);
+        return getVerticesOfClass(OrientVertex.CLASS_NAME, true);
+    }
+    
+    public Iterable<Vertex> getVertices(final boolean iPolymorphic) {
+        return getVerticesOfClass(OrientVertex.CLASS_NAME, iPolymorphic);
+    }
+
+    public Iterable<Vertex> getVerticesOfClass(final String iClassName) {
+        return getVerticesOfClass(iClassName, true);
+    }
+
+    public Iterable<Vertex> getVerticesOfClass(final String iClassName, final boolean iPolymorphic) {
+        getContext(true);
+        return new OrientElementScanIterable<Vertex>(this, iClassName, iPolymorphic);
     }
 
     public Iterable<Vertex> getVertices(final String iKey, Object iValue) {
+    	if( iKey.equals( "@class" ))
+    		return getVerticesOfClass(iValue.toString());
+    	
         final String indexName;
         final String key;
         int pos = iKey.indexOf('.');
@@ -329,16 +345,27 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         return new PropertyFilteredIterable<Vertex>(key, iValue, this.getVertices());
     }
 
-    private Iterable<Vertex> getVertices(final boolean polymorphic) {
-        getContext(true);
-        return new OrientElementScanIterable<Vertex>(this, Vertex.class, polymorphic);
+    public Iterable<Edge> getEdges() {
+        return getEdgesOfClass(OrientEdge.CLASS_NAME, true);
     }
 
-    public Iterable<Edge> getEdges() {
-        return getEdges(true);
+    public Iterable<Edge> getEdges(final boolean iPolymorphic) {
+        return getEdgesOfClass(OrientEdge.CLASS_NAME, iPolymorphic);
+    }
+    
+    public Iterable<Edge> getEdgesOfClass(final String iClassName) {
+        return getEdgesOfClass(iClassName, true);
+    }
+
+    public Iterable<Edge> getEdgesOfClass(final String iClassName, final boolean iPolymorphic) {
+        getContext(true);
+        return new OrientElementScanIterable<Edge>(this, iClassName, iPolymorphic);
     }
 
     public Iterable<Edge> getEdges(final String iKey, Object iValue) {
+    	if( iKey.equals( "@class" ))
+    		return getEdgesOfClass(iValue.toString());
+    	
         final String indexName;
         final String key;
         int pos = iKey.indexOf('.');
@@ -362,12 +389,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         }
         return new PropertyFilteredIterable<Edge>(key, iValue, this.getEdges());
     }
-
-    private Iterable<Edge> getEdges(final boolean polymorphic) {
-        getContext(true);
-        return new OrientElementScanIterable<Edge>(this, Edge.class, polymorphic);
-    }
-
+    
     public OrientEdge getEdge(final Object id) {
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();

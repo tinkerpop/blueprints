@@ -14,21 +14,20 @@ import java.util.Iterator;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 class OrientElementScanIterable<T extends Element> implements CloseableIterable<T> {
-    private final Class<T> elementClass;
+    private final String elementClass;
     private final OrientBaseGraph graph;
     private final boolean polymorphic;
 
-    public OrientElementScanIterable(final OrientBaseGraph graph, Class<T> elementClass, final boolean polymorphic) {
+    public OrientElementScanIterable(final OrientBaseGraph graph, final String elementClass, final boolean polymorphic) {
         this.graph = graph;
         this.elementClass = elementClass;
         this.polymorphic = polymorphic;
     }
 
     public Iterator<T> iterator() {
-        final String className = elementClass.equals(Vertex.class) ? OrientVertex.CLASS_NAME : OrientEdge.CLASS_NAME;
         final ODatabaseDocumentTx rawGraph = this.graph.getRawGraph();
         return new OrientElementIterator<T>(this.graph, new ORecordIteratorClass<ORecordInternal<?>>(rawGraph,
-                (ODatabaseRecordAbstract) rawGraph.getUnderlying(), className, polymorphic));
+                (ODatabaseRecordAbstract) rawGraph.getUnderlying(), elementClass, polymorphic));
     }
 
     public void close() {
