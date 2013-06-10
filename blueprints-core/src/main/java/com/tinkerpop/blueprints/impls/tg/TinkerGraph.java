@@ -18,10 +18,6 @@ import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +35,7 @@ import java.util.Set;
  */
 public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializable {
 
-    private Long currentId = 0l;
+    protected Long currentId = 0l;
     protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();
     protected Map<String, Edge> edges = new HashMap<String, Edge>();
     protected Map<String, TinkerIndex> indices = new HashMap<String, TinkerIndex>();
@@ -48,7 +44,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     protected TinkerKeyIndex<TinkerEdge> edgeKeyIndex = new TinkerKeyIndex<TinkerEdge>(TinkerEdge.class, this);
 
     private final String directory;
-    private static final String GRAPH_FILE = "/tinkergraph.dat";
+    private final FileType fileType;
 
     private static final Features FEATURES = new Features();
     private static final Features PERSISTENT_FEATURES;
@@ -70,7 +66,6 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
         FEATURES.ignoresSuppliedIds = false;
         FEATURES.isPersistent = false;
-        FEATURES.isRDFModel = false;
         FEATURES.isWrapper = false;
 
         FEATURES.supportsIndices = true;
@@ -91,8 +86,17 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         PERSISTENT_FEATURES.isPersistent = true;
     }
 
-    public TinkerGraph(final String directory) {
+    public enum FileType {
+        JAVA,
+        GML,
+        GRAPHML,
+        GRAPHSON
+    }
+
+    public TinkerGraph(final String directory, final FileType fileType) {
         this.directory = directory;
+        this.fileType = fileType;
+
         try {
             final File file = new File(directory);
             if (!file.exists()) {
@@ -100,23 +104,28 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
                     throw new RuntimeException("Could not create directory");
                 }
             } else {
-                ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory + GRAPH_FILE));
-                TinkerGraph temp = (TinkerGraph) input.readObject();
-                input.close();
-                this.currentId = temp.currentId;
-                this.vertices = temp.vertices;
-                this.edges = temp.edges;
-                this.indices = temp.indices;
-                this.vertexKeyIndex = temp.vertexKeyIndex;
-                this.edgeKeyIndex = temp.edgeKeyIndex;
+                final TinkerStorage tinkerStorage = TinkerStorageFactory.getInstance().getTinkerStorage(fileType);
+                final TinkerGraph graph = tinkerStorage.load(directory);
+
+                this.vertices = graph.vertices;
+                this.edges = graph.edges;
+                this.currentId = graph.currentId;
+                this.indices = graph.indices;
+                this.vertexKeyIndex = graph.vertexKeyIndex;
+                this.edgeKeyIndex = graph.edgeKeyIndex;
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
+    public TinkerGraph(final String directory) {
+        this(directory, FileType.JAVA);
+    }
+
     public TinkerGraph() {
         this.directory = null;
+        this.fileType = FileType.JAVA;
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
@@ -264,6 +273,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
+
         String idString = null;
         Edge edge;
         if (null != id) {
@@ -342,13 +354,8 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     public void shutdown() {
         if (null != this.directory) {
             try {
-                final File file = new File(this.directory + GRAPH_FILE);
-                if (file.exists()) {
-                    file.delete();
-                }
-                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(this.directory + GRAPH_FILE));
-                out.writeObject(this);
-                out.close();
+                final TinkerStorage tinkerStorage = TinkerStorageFactory.getInstance().getTinkerStorage(this.fileType);
+                tinkerStorage.save(this, this.directory);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }

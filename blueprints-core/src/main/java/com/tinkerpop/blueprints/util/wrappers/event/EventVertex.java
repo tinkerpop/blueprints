@@ -2,8 +2,8 @@ package com.tinkerpop.blueprints.util.wrappers.event;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
 
 /**
@@ -13,7 +13,7 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
  * @author Stephen Mallette
  */
 public class EventVertex extends EventElement implements Vertex {
-    protected EventVertex(final Vertex rawVertex, final EventGraph eventGraph) {
+    public EventVertex(final Vertex rawVertex, final EventGraph eventGraph) {
         super(rawVertex, eventGraph);
     }
 

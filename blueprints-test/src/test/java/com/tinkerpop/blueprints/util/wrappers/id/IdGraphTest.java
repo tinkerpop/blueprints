@@ -129,6 +129,7 @@ public class IdGraphTest extends GraphTest {
     public void testCustomIdFactory() throws Exception {
         IdGraph.IdFactory f = new IdGraph.IdFactory() {
             private int count = 0;
+
             public Object createId() {
                 return "vertex" + ++count;
             }
@@ -147,6 +148,7 @@ public class IdGraphTest extends GraphTest {
 
         IdGraph.IdFactory vFactory = new IdGraph.IdFactory() {
             private int count = 0;
+
             public Object createId() {
                 return "vertex" + ++count;
             }
@@ -154,6 +156,7 @@ public class IdGraphTest extends GraphTest {
 
         IdGraph.IdFactory eFactory = new IdGraph.IdFactory() {
             private int count = 0;
+
             public Object createId() {
                 return "vertex" + ++count;
             }

@@ -19,8 +19,13 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         this.query = query;
     }
 
-    public VertexQuery has(final String key, final Object value) {
-        this.query = this.query.has(key, value);
+    public VertexQuery has(final String key, final Object... values) {
+        this.query = this.query.has(key, values);
+        return this;
+    }
+
+    public VertexQuery hasNot(final String key, final Object... values) {
+        this.query = this.query.hasNot(key, values);
         return this;
     }
 
@@ -43,8 +48,13 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery limit(final long limit) {
-        this.query = this.query.limit(limit);
+    public VertexQuery limit(final long take) {
+        this.query = this.query.limit(take);
+        return this;
+    }
+
+    public VertexQuery limit(final long skip, final long take) {
+        this.query = this.query.limit(skip, take);
         return this;
     }
 

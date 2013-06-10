@@ -55,7 +55,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     public void commitInternal() throws SailException {
         if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).commit();;
+            ((TransactionalGraph) store.graph).commit();
         }
 
         if (statementsAdded || statementsRemoved) {

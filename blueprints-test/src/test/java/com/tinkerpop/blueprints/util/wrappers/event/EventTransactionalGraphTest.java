@@ -8,7 +8,6 @@ import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.IndexTestSuite;
 import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
@@ -416,6 +415,25 @@ public class EventTransactionalGraphTest extends GraphTest {
         return graph.addVertex(null);
     }
 
+
+    public void testMutateInListener() {
+        StubGraphChangedListener listener = new StubGraphChangedListener() {
+
+            @Override
+            public void vertexPropertyChanged(Vertex vertex, String key, Object oldValue, Object setValue) {
+                if (!"setInListener".equals(key)) {
+                    vertex.setProperty("setInListener", 12345);
+                }
+                super.vertexPropertyChanged(vertex, key, oldValue, setValue);
+            }
+        };
+        graph.addListener(listener);
+        Vertex vertex = createVertex();
+        vertex.setProperty("test", 123);
+        graph.commit();
+        assertEquals(12345, vertex.getProperty("setInListener"));
+        assertEquals(2, listener.vertexPropertyChangedEventRecorded());
+    }
 
 }
 

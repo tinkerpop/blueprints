@@ -12,10 +12,10 @@ import java.util.NoSuchElementException;
  */
 class OrientElementIterator<T extends Element> implements Iterator<T> {
 
-    private final Iterator itty;
+    private final Iterator<?> itty;
     private final OrientBaseGraph graph;
 
-    public OrientElementIterator(final OrientBaseGraph graph, final Iterator itty) {
+    public OrientElementIterator(final OrientBaseGraph graph, final Iterator<?> itty) {
         this.itty = itty;
         this.graph = graph;
     }
@@ -45,7 +45,11 @@ class OrientElementIterator<T extends Element> implements Iterator<T> {
             if (currentDocument.getInternalStatus() == ODocument.STATUS.NOT_LOADED)
                 currentDocument.load();
 
-            if (currentDocument.getSchemaClass().isSubClassOf(graph.getRawGraph().getEdgeBaseClass()))
+            if (currentDocument.getSchemaClass() == null)
+                throw new IllegalArgumentException(
+                        "Cannot determine the graph element type because the document class is null. Probably this is a projection, use the EXPAND() function");
+
+            if (currentDocument.getSchemaClass().isSubClassOf(graph.getEdgeBaseType()))
                 currentElement = new OrientEdge(graph, currentDocument);
             else
                 currentElement = new OrientVertex(graph, currentDocument);

@@ -1,34 +1,58 @@
-package com.tinkerpop.blueprints.impls.orient.batch;
+package com.tinkerpop.blueprints.impls.orient;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.impls.orient.OrientBaseGraph;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientBatchGraph extends OrientBaseGraph {
-    private static final Features FEATURES = new Features();
+public class OrientGraphNoTx extends OrientBaseGraph {
+    private final Features FEATURES = new Features();
 
-    static {
+    /**
+     * Constructs a new object using an existent OGraphDatabase instance.
+     *
+     * @param iDatabase Underlying OGraphDatabase object to attach
+     */
+    public OrientGraphNoTx(final ODatabaseDocumentTx iDatabase) {
+        super(iDatabase);
+        config();
+    }
+
+    public OrientGraphNoTx(final String url) {
+        super(url, ADMIN, ADMIN);
+        config();
+    }
+
+    public OrientGraphNoTx(final String url, final String username, final String password) {
+        super(url, username, password);
+        config();
+    }
+
+    public Features getFeatures() {
+        // DYNAMIC FEATURES BASED ON CONFIGURATION
+        FEATURES.supportsEdgeIndex = !useLightweightEdges;
+        FEATURES.supportsEdgeKeyIndex = !useLightweightEdges;
+        FEATURES.supportsEdgeIteration = !useLightweightEdges;
+        FEATURES.supportsEdgeRetrieval = !useLightweightEdges;
+        return FEATURES;
+    }
+
+    @SuppressWarnings("deprecation")
+    protected void config() {
         FEATURES.supportsDuplicateEdges = true;
         FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = true;
-        FEATURES.isRDFModel = false;
         FEATURES.supportsVertexIteration = true;
-        FEATURES.supportsEdgeIteration = true;
         FEATURES.supportsVertexIndex = true;
-        FEATURES.supportsEdgeIndex = true;
         FEATURES.ignoresSuppliedIds = true;
         FEATURES.supportsTransactions = false;
-        FEATURES.supportsEdgeKeyIndex = true;
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsKeyIndices = true;
         FEATURES.isWrapper = false;
         FEATURES.supportsIndices = true;
-        FEATURES.supportsEdgeRetrieval = true;
         FEATURES.supportsVertexProperties = true;
         FEATURES.supportsEdgeProperties = true;
 
@@ -46,26 +70,5 @@ public class OrientBatchGraph extends OrientBaseGraph {
         FEATURES.supportsMapProperty = true;
         FEATURES.supportsStringProperty = true;
         FEATURES.supportsThreadedTransactions = false;
-    }
-
-    /**
-     * Constructs a new object using an existent OGraphDatabase instance.
-     *
-     * @param iDatabase Underlying OGraphDatabase object to attach
-     */
-    public OrientBatchGraph(final OGraphDatabase iDatabase) {
-        super(iDatabase);
-    }
-
-    public OrientBatchGraph(final String url) {
-        super(url, ADMIN, ADMIN);
-    }
-
-    public OrientBatchGraph(final String url, final String username, final String password) {
-        super(url, username, password);
-    }
-
-    public Features getFeatures() {
-        return FEATURES;
     }
 }

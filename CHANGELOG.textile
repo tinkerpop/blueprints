@@ -5,6 +5,36 @@ h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
+h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-core</artifactId>
+  <version>2.4.0-SNAPSHOT</version>
+</dependency>
+```
+
+* @QueryTestSuite@ broken up into @GraphQueryTestSuite@ and @VertexQueryTestSuite@
+* Deprecated @Feature.isRDFModel@ is now removed
+* Added ability for a @GraphTest@ to have a graph specific test suite
+* A complete refactor of the id model in TestSuites (see @GraphTest.convertId()@, @GraphTest.convertLabel()@)
+* Moved @SailTokens@ out of blueprints-core and into blueprints-sail (@SailGraphTest@ refactor)
+* Configurable storage for @TinkerGraph@: GraphML, GraphSON and GML
+* @GraphChangedListener@ from @EventGraph@ can mutate graph without concurrent modification exception
+* Scope of @EventGraph@ base classes changed to @public@ for those wanting to extend up on them.
+* Deprecated @Query.has(key,value,compare)@ and added @Query.has(key,compare,value)@
+* Bumped Dex to 4.8.0
+* Support both @byte@ and @short@ data types in GraphSON.
+* Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values.
+* Bumped Neo4j to 1.9
+* Added support for @has(key,values...)@ and @hasNot(key,values...)@ in @Query@ API
+* Added support for @limit(skip,take)@ in the @Query@ API
+* Ignore nulls property values in loading of GraphSON as graphs do not accept such values for element properties.
+* Adding an edge with a @null@ value results in @IllegalArgumentException@.
+
+==<hr/>==
+
 h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 
 ```xml
@@ -15,8 +45,8 @@ h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type
-
+* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
+* @RexsteGraph@ properly supporting @boolean@ data types.
 
 ==<hr/>==
 

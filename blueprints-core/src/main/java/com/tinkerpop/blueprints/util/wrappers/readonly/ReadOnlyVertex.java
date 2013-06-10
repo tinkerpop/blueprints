@@ -2,16 +2,16 @@ package com.tinkerpop.blueprints.util.wrappers.readonly;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperVertexQuery;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
+public class ReadOnlyVertex extends ReadOnlyElement implements Vertex {
 
-    protected ReadOnlyVertex(final Vertex baseVertex) {
+    public ReadOnlyVertex(final Vertex baseVertex) {
         super(baseVertex);
     }
 

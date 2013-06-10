@@ -31,8 +31,8 @@ import java.util.Iterator;
  */
 @SuppressWarnings("unchecked")
 public class OrientIndex<T extends OrientElement> implements Index<T> {
-    private static final String VERTEX = "Vertex";
-    private static final String EDGE = "Edge";
+    protected static final String VERTEX = "Vertex";
+    protected static final String EDGE = "Edge";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
 
     protected static final String SEPARATOR = "!=!";
@@ -42,13 +42,14 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected Class<? extends Element> indexClass;
 
-    protected OrientIndex(final OrientBaseGraph graph, final String indexName, final Class<? extends Element> indexClass, final OType iType) {
+    protected OrientIndex(final OrientBaseGraph graph, final String indexName, final Class<? extends Element> indexClass,
+                          final OType iType) {
         this.graph = graph;
         this.indexClass = indexClass;
         create(indexName, this.indexClass, iType);
     }
 
-    protected OrientIndex(OrientBaseGraph orientGraph, OIndex<?> rawIndex) {
+    protected OrientIndex(final OrientBaseGraph orientGraph, final OIndex<?> rawIndex) {
         this.graph = orientGraph;
         this.underlying = rawIndex instanceof OIndexTxAwareMultiValue ? rawIndex : new OIndexTxAwareMultiValue(
                 orientGraph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) rawIndex);
@@ -70,7 +71,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     public void put(final String key, final Object value, final T element) {
         final String keyTemp = key + SEPARATOR + value;
 
-        final ODocument doc = element.getRawElement();
+        final ODocument doc = element.getRecord();
         if (!doc.getIdentity().isValid())
             doc.save();
 
@@ -163,14 +164,14 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         final String keyTemp = key + SEPARATOR + value;
         graph.autoStartTransaction();
         try {
-            underlying.remove(keyTemp, element.getRawElement());
+            underlying.remove(keyTemp, element.getRecord());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
     protected void putBasic(final String key, final T element) {
-        underlying.put(key, element.getRawElement());
+        underlying.put(key, element.getRecord());
     }
 
     public String toString() {
@@ -179,7 +180,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     protected void removeElement(final T vertex) {
         graph.autoStartTransaction();
-        final ORecord<?> vertexDoc = vertex.getRawElement();
+        final ORecord<?> vertexDoc = vertex.getRecord();
         underlying.remove(vertexDoc);
     }
 

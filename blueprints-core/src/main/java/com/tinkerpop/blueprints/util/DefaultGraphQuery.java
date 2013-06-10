@@ -7,7 +7,9 @@ import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -19,34 +21,44 @@ import java.util.Set;
  */
 public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
-    private final Graph graph;
+    protected final Graph graph;
 
     public DefaultGraphQuery(final Graph graph) {
         this.graph = graph;
     }
 
-    public GraphQuery has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
+    public GraphQuery has(final String key, final Object... values) {
+        super.has(key, values);
+        return this;
+    }
+
+    public GraphQuery hasNot(final String key, final Object... values) {
+        super.hasNot(key,values);
         return this;
     }
 
     public <T extends Comparable<T>> GraphQuery has(final String key, final T value, final Compare compare) {
-        return this.has(key, compare, value);
+        super.has(key, compare, value);
+        return this;
     }
 
     public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, value, compare));
+        super.has(key, compare, value);
         return this;
     }
 
     public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue) {
-        this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
-        this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
+        super.interval(key, startValue, endValue);
         return this;
     }
 
-    public GraphQuery limit(final long max) {
-        this.limit = max;
+    public GraphQuery limit(final long take) {
+        super.limit(take);
+        return this;
+    }
+
+    public GraphQuery limit(final long skip, final long take) {
+        super.limit(skip, take);
         return this;
     }
 
@@ -99,7 +111,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
                 private boolean loadNext() {
                     this.nextElement = null;
-                    if (count >= limit) return false;
+                    if (this.count > maximum) return false;
                     while (this.itty.hasNext()) {
                         final T element = this.itty.next();
                         boolean filter = false;
@@ -112,35 +124,46 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                         }
 
                         if (!filter) {
-                            this.nextElement = element;
                             this.count++;
-                            return true;
+                            if (this.count > minimum && this.count <= maximum) {
+                                this.nextElement = element;
+                                return true;
+                            }
                         }
+
                     }
                     return false;
                 }
             };
         }
 
-        private Iterable<?> getElementIterable(Class<? extends Element> elementClass) {
+        private Iterable<?> getElementIterable(final Class<? extends Element> elementClass) {
+
             if (graph instanceof KeyIndexableGraph) {
                 final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
-                for (HasContainer hasContainer : hasContainers) {
-                    if (hasContainer.compare.equals(Compare.EQUAL) && hasContainer.value != null && keys.contains(hasContainer.key)) {
-                        if (Vertex.class.isAssignableFrom(elementClass))
-                            return graph.getVertices(hasContainer.key, hasContainer.value);
-                        else
-                            return graph.getEdges(hasContainer.key, hasContainer.value);
+                HasContainer container = null;
+                for (final HasContainer hasContainer : hasContainers) {
+                    if (hasContainer.compare.equals(Compare.EQUAL) && keys.contains(hasContainer.key)) {
+                        boolean noNull = true;
+                        for (final Object value : hasContainer.values) {
+                            if (value == null)
+                                noNull = false;
+                        }
+                        if (noNull) {
+                            container = hasContainer;
+                            break;
+                        }
                     }
                 }
-            }
-
-            for (final HasContainer hasContainer : hasContainers) {
-                if (hasContainer.compare.equals(Compare.EQUAL)) {
-                    if (Vertex.class.isAssignableFrom(elementClass))
-                        return graph.getVertices(hasContainer.key, hasContainer.value);
-                    else
-                        return graph.getEdges(hasContainer.key, hasContainer.value);
+                if (container != null) {
+                    final List<Iterable<? extends Element>> iterables = new ArrayList<Iterable<? extends Element>>();
+                    for (final Object value : container.values) {
+                        if (Vertex.class.isAssignableFrom(elementClass))
+                            iterables.add(graph.getVertices(container.key, value));
+                        else
+                            iterables.add(graph.getEdges(container.key, value));
+                    }
+                    return new MultiIterable(iterables);
                 }
             }
 
@@ -149,17 +172,6 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
             else
                 return graph.getEdges();
         }
-
-        /*private boolean containsLabel(final String label, final String[] labels) {
-            if (labels.length == 0)
-                return true;
-
-            for (final String temp : labels) {
-                if (temp.equals(label))
-                    return true;
-            }
-            return false;
-        }*/
     }
 
 }

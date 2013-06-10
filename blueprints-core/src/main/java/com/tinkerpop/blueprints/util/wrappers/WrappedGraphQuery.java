@@ -15,8 +15,13 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         this.query = query;
     }
 
-    public GraphQuery has(final String key, final Object value) {
-        this.query = this.query.has(key, value);
+    public GraphQuery has(final String key, final Object... values) {
+        this.query = this.query.has(key, values);
+        return this;
+    }
+
+    public GraphQuery hasNot(final String key, final Object... values) {
+        this.query = this.query.hasNot(key, values);
         return this;
     }
 
@@ -34,8 +39,13 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery limit(final long max) {
-        this.query = this.query.limit(max);
+    public GraphQuery limit(final long take) {
+        this.query = this.query.limit(take);
+        return this;
+    }
+
+    public GraphQuery limit(final long skip, final long take) {
+        this.query = this.query.limit(skip, take);
         return this;
     }
 

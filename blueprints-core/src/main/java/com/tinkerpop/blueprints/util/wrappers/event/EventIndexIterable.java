@@ -2,10 +2,8 @@ package com.tinkerpop.blueprints.util.wrappers.event;
 
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.util.wrappers.event.listener.GraphChangedListener;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * A sequence of indices that applies the list of listeners into each element.

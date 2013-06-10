@@ -1,13 +1,19 @@
 package com.tinkerpop.blueprints;
 
 /**
- * (c) Matthias Broecheler (me@matthiasb.com)
+ * @author Matthias Broecheler (me@matthiasb.com)
+ * @author Marko A. Rodriguez (http://markorodriguez.com)
+ * @author Luca Garulli (http://www.orientechnologies.com)
+ * @author Daniel Kuppitz (daniel.kuppitz@shoproach.com)
  */
 
 public interface GraphQuery extends Query {
 
     @Override
-    public GraphQuery has(final String key, final Object value);
+    public GraphQuery has(final String key, final Object... values);
+
+    @Override
+    public GraphQuery hasNot(final String key, final Object... values);
 
     @Override
     @Deprecated
@@ -20,6 +26,9 @@ public interface GraphQuery extends Query {
     public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue);
 
     @Override
-    public GraphQuery limit(final long max);
+    public GraphQuery limit(final long take);
+
+    @Override
+    public GraphQuery limit(final long skip, final long take);
 
 }

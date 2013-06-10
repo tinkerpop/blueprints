@@ -19,29 +19,44 @@ import java.util.NoSuchElementException;
  */
 public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
-    private final Vertex vertex;
+    protected final Vertex vertex;
 
     public DefaultVertexQuery(final Vertex vertex) {
         this.vertex = vertex;
     }
 
-    public VertexQuery has(final String key, final Object value) {
-        this.hasContainers.add(new HasContainer(key, value, Compare.EQUAL));
+    public VertexQuery has(final String key, final Object... values) {
+        super.has(key, values);
+        return this;
+    }
+
+    public VertexQuery hasNot(final String key, final Object... values) {
+        super.hasNot(key, values);
         return this;
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
-        return this.has(key, compare, value);
+        super.has(key, compare, value);
+        return this;
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
-        this.hasContainers.add(new HasContainer(key, value, compare));
+        super.has(key, compare, value);
         return this;
     }
 
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue) {
-        this.hasContainers.add(new HasContainer(key, startValue, Compare.GREATER_THAN_EQUAL));
-        this.hasContainers.add(new HasContainer(key, endValue, Compare.LESS_THAN));
+        super.interval(key, startValue, endValue);
+        return this;
+    }
+
+    public VertexQuery limit(final long take) {
+        super.limit(take);
+        return this;
+    }
+
+    public VertexQuery limit(final long skip, final long take) {
+        super.limit(skip, take);
         return this;
     }
 
@@ -52,11 +67,6 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
     public VertexQuery labels(final String... labels) {
         this.labels = labels;
-        return this;
-    }
-
-    public VertexQuery limit(final long max) {
-        this.limit = max;
         return this;
     }
 
@@ -142,7 +152,8 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
                 private boolean loadNext() {
                     this.nextEdge = null;
-                    if (count >= limit) return false;
+                    if (this.count > maximum) return false;
+
                     while (this.itty.hasNext()) {
                         final Edge edge = this.itty.next();
                         boolean filter = false;
@@ -152,10 +163,13 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
                                 break;
                             }
                         }
+
                         if (!filter) {
-                            this.nextEdge = edge;
                             this.count++;
-                            return true;
+                            if (this.count > minimum && this.count <= maximum) {
+                                this.nextEdge = edge;
+                                return true;
+                            }
                         }
                     }
                     return false;

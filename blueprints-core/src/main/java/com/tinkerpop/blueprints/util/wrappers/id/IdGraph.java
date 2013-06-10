@@ -50,6 +50,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     /**
      * Adds custom ID functionality to the given graph,
      * supporting both custom vertex IDs and custom edge IDs.
+     *
      * @param baseGraph the base graph which does not necessarily support custom IDs
      */
     public IdGraph(final T baseGraph) {
@@ -60,9 +61,10 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     /**
      * Adds custom ID functionality to the given graph,
      * supporting either custom vertex IDs, custom edge IDs, or both.
-     * @param baseGraph the base graph which does not necessarily support custom IDs
+     *
+     * @param baseGraph        the base graph which does not necessarily support custom IDs
      * @param supportVertexIds whether to support custom vertex IDs
-     * @param supportEdgeIds whether to support custom edge IDs
+     * @param supportEdgeIds   whether to support custom edge IDs
      */
     public IdGraph(final T baseGraph,
                    final boolean supportVertexIds,

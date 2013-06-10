@@ -1,12 +1,12 @@
 package com.tinkerpop.blueprints.util.io.graphson;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -18,8 +18,8 @@ import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +37,7 @@ public class GraphSONUtility {
 
     private static final JsonNodeFactory jsonNodeFactory = JsonNodeFactory.instance;
     private static final JsonFactory jsonFactory = new MappingJsonFactory();
+    private static final String EMPTY_STRING = "";
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -168,7 +169,11 @@ public class GraphSONUtility {
 
         final Object edgeId = getTypedValueFromJsonNode(json.get(GraphSONTokens._ID));
         final JsonNode nodeLabel = json.get(GraphSONTokens._LABEL);
-        final String label = nodeLabel == null ? null : nodeLabel.textValue();
+
+        // assigned an empty string edge label in cases where one does not exist.  this gets around the requirement
+        // that blueprints graphs have a non-null label while ensuring that GraphSON can stay flexible in parsing
+        // partial bits from the JSON.  Not sure if there is any gotchas developing out of this.
+        final String label = nodeLabel == null ? EMPTY_STRING : nodeLabel.textValue();
 
         final Edge e = factory.createEdge(edgeId, out, in, label);
 
@@ -400,7 +405,12 @@ public class GraphSONUtility {
             final Map.Entry<String, JsonNode> entry = iterator.next();
 
             if (!ignoreReservedKeys || !isReservedKey(entry.getKey())) {
-                map.put(entry.getKey(), readProperty(entry.getValue(), hasEmbeddedTypes));
+                // it generally shouldn't be as such but graphson containing null values can't be shoved into
+                // element property keys or it will result in error
+                final Object o = readProperty(entry.getValue(), hasEmbeddedTypes);
+                if (o != null) {
+                    map.put(entry.getKey(), o);
+                }
             }
         }
 
@@ -453,6 +463,10 @@ public class GraphSONUtility {
                 propertyValue = node.get(GraphSONTokens.VALUE).booleanValue();
             } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_FLOAT)) {
                 propertyValue = Float.parseFloat(node.get(GraphSONTokens.VALUE).asText());
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_BYTE)) {
+                propertyValue = Byte.parseByte(node.get(GraphSONTokens.VALUE).asText());
+            } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_SHORT)) {
+                propertyValue = Short.parseShort(node.get(GraphSONTokens.VALUE).asText());
             } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_DOUBLE)) {
                 propertyValue = node.get(GraphSONTokens.VALUE).doubleValue();
             } else if (node.get(GraphSONTokens.TYPE).textValue().equals(GraphSONTokens.TYPE_INTEGER)) {
@@ -558,6 +572,10 @@ public class GraphSONUtility {
             jsonList.add((Float) value);
         } else if (value instanceof Double) {
             jsonList.add((Double) value);
+        } else if (value instanceof Byte) {
+            jsonList.add((Byte) value);
+        } else if (value instanceof Short) {
+            jsonList.add((Short) value);
         } else if (value instanceof String) {
             jsonList.add((String) value);
         } else if (value instanceof ObjectNode) {
@@ -582,6 +600,10 @@ public class GraphSONUtility {
             jsonMap.put(key, (Float) value);
         } else if (value instanceof Double) {
             jsonMap.put(key, (Double) value);
+        } else if (value instanceof Short) {
+            jsonMap.put(key, (Short) value);
+        } else if (value instanceof Byte) {
+            jsonMap.put(key, (Byte) value);
         } else if (value instanceof String) {
             jsonMap.put(key, (String) value);
         } else if (value instanceof ObjectNode) {
@@ -707,49 +729,27 @@ public class GraphSONUtility {
     }
 
     private static List convertArrayToList(final Object value) {
-
-        // is there seriously no better way to do this...bah!
-        List list = new ArrayList();
-        if (value instanceof int[]) {
-            int[] arr = (int[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof double[]) {
-            double[] arr = (double[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof float[]) {
-            float[] arr = (float[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof long[]) {
-            long[] arr = (long[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else if (value instanceof boolean[]) {
-            boolean[] arr = (boolean[]) value;
-            for (int ix = 0; ix < arr.length; ix++) {
-                list.add(arr[ix]);
-            }
-        } else {
-            list = Arrays.asList((Object[]) value);
+        final ArrayList<Object> list = new ArrayList<Object>();
+        int arrlength = Array.getLength(value);
+        for (int i = 0; i < arrlength; i++) {
+            Object object = Array.get(value, i);
+            list.add(object);
         }
-
         return list;
     }
 
     private static String determineType(final Object value) {
         String type = GraphSONTokens.TYPE_STRING;
         if (value == null) {
-            type = "unknown";
+            type = GraphSONTokens.TYPE_UNKNOWN;
         } else if (value instanceof Double) {
             type = GraphSONTokens.TYPE_DOUBLE;
         } else if (value instanceof Float) {
             type = GraphSONTokens.TYPE_FLOAT;
+        } else if (value instanceof Byte) {
+            type = GraphSONTokens.TYPE_BYTE;
+        } else if (value instanceof Short) {
+            type = GraphSONTokens.TYPE_SHORT;
         } else if (value instanceof Integer) {
             type = GraphSONTokens.TYPE_INTEGER;
         } else if (value instanceof Long) {

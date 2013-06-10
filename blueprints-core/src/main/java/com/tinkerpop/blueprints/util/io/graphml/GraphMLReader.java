@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.util.io.graphml;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.batch.BatchGraph;
 
@@ -97,8 +96,8 @@ public class GraphMLReader {
      * Input the GraphML stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
-     * @param filename name of a file containing GraphML data
-     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param filename   name of a file containing GraphML data
+     * @param bufferSize the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
      * @throws IOException thrown when the GraphML data is not correctly formatted
      */
     public void inputGraph(final String filename, int bufferSize) throws IOException {
@@ -121,8 +120,8 @@ public class GraphMLReader {
      * Input the GraphML stream data into the graph.
      * In practice, usually the provided graph is empty.
      *
-     * @param inputGraph         the graph to populate with the GraphML data
-     * @param filename name of a file containing GraphML data
+     * @param inputGraph the graph to populate with the GraphML data
+     * @param filename   name of a file containing GraphML data
      * @throws IOException thrown when the GraphML data is not correctly formatted
      */
     public static void inputGraph(final Graph inputGraph, final String filename) throws IOException {
@@ -133,12 +132,12 @@ public class GraphMLReader {
      * Input the GraphML stream data into the graph.
      * More control over how data is streamed is provided by this method.
      *
-     * @param inputGraph         the graph to populate with the GraphML data
-     * @param filename name of a file containing GraphML data
-     * @param bufferSize         the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
-     * @param vertexIdKey        if the id of a vertex is a &lt;data/&gt; property, fetch it from the data property.
-     * @param edgeIdKey          if the id of an edge is a &lt;data/&gt; property, fetch it from the data property.
-     * @param edgeLabelKey       if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @param inputGraph   the graph to populate with the GraphML data
+     * @param filename     name of a file containing GraphML data
+     * @param bufferSize   the amount of elements to hold in memory before committing a transactions (only valid for TransactionalGraphs)
+     * @param vertexIdKey  if the id of a vertex is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeIdKey    if the id of an edge is a &lt;data/&gt; property, fetch it from the data property.
+     * @param edgeLabelKey if the label of an edge is a &lt;data/&gt; property, fetch it from the data property.
      * @throws IOException thrown when the GraphML data is not correctly formatted
      */
     public static void inputGraph(final Graph inputGraph, final String filename, int bufferSize, String vertexIdKey, String edgeIdKey, String edgeLabelKey) throws IOException {
@@ -297,7 +296,8 @@ public class GraphMLReader {
 
             reader.close();
 
-            graph.commit();;
+            graph.commit();
+            ;
         } catch (XMLStreamException xse) {
             throw new IOException(xse);
         }

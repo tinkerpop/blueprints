@@ -14,7 +14,8 @@ class RexsterTokens {
     public static final String _INE = "_inE";
     public static final String _OUTV = "_outV";
     public static final String _INV = "_inV";
-    public static final String _LIMIT = "_limit";
+    public static final String _SKIP = "_skip";
+    public static final String _TAKE = "_take";
     public static final String _PROPERTIES = "_properties";
     public static final String UNDERSCORE = "_";
     public static final String NULL = "null";
@@ -79,12 +80,6 @@ class RexsterTokens {
     public static final String REXSTER_OFFSET_END = "rexster.offset.end";
     public static final String REXSTER_OFFSET_START = "rexster.offset.start";
     public static final String REXSTER_SHOW_TYPES_EQUALS_TRUE = "rexster.showTypes=true";
-
-    public static final String FLOAT = "float";
-    public static final String INTEGER = "integer";
-    public static final String STRING = "string";
-    public static final String DOUBLE = "double";
-    public static final String LONG = "long";
 
     public static final String ACCEPT = "Accept";
     public static final String AUTHORIZATION = "Authorization";

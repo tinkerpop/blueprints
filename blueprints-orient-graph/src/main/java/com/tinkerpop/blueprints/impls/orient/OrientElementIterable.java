@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.orient;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
 
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -19,7 +20,10 @@ public class OrientElementIterable<T extends Element> implements CloseableIterab
     }
 
     public Iterator<T> iterator() {
-        return new OrientElementIterator<T>(this.graph, this.iterable.iterator());
+        if( iterable == null )
+          return Collections.EMPTY_LIST.iterator();
+        
+        return new OrientElementIterator<T>(this.graph, iterable.iterator());
     }
 
     public void close() {

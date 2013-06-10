@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.impls.sail.SailTokens;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 import java.util.HashSet;
@@ -27,15 +26,16 @@ public class VertexTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
 
         if (!graph.getFeatures().ignoresSuppliedIds) {
-            Vertex v = graph.addVertex(convertId(graph, "1"));
-            Vertex u = graph.getVertex(convertId(graph, "1"));
+            Vertex v = graph.addVertex(graphTest.convertId("1"));
+            Vertex u = graph.getVertex(graphTest.convertId("1"));
             assertEquals(v, u);
         }
 
         this.stopWatch();
         Vertex v = graph.addVertex(null);
-        assertFalse(v.equals(null));
+        assertNotNull(v);
         Vertex u = graph.getVertex(v.getId());
+        assertNotNull(u);
         assertEquals(v, u);
         printPerformance(graph.toString(), 1, "vertex added and retrieved", this.stopWatch());
 
@@ -50,15 +50,15 @@ public class VertexTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (!graph.getFeatures().ignoresSuppliedIds) {
 
-            Vertex v = graph.addVertex(convertId(graph, "1"));
-            Vertex u = graph.getVertex(convertId(graph, "1"));
+            Vertex v = graph.addVertex(graphTest.convertId("1"));
+            Vertex u = graph.getVertex(graphTest.convertId("1"));
             Set<Vertex> set = new HashSet<Vertex>();
             set.add(v);
             set.add(v);
             set.add(u);
             set.add(u);
-            set.add(graph.getVertex(convertId(graph, "1")));
-            set.add(graph.getVertex(convertId(graph, "1")));
+            set.add(graph.getVertex(graphTest.convertId("1")));
+            set.add(graph.getVertex(graphTest.convertId("1")));
             if (graph.getFeatures().supportsVertexIndex)
                 set.add(graph.getVertices().iterator().next());
             assertEquals(1, set.size());
@@ -70,22 +70,11 @@ public class VertexTestSuite extends TestSuite {
     public void testBasicAddVertex() {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexIteration) {
-            graph.addVertex(convertId(graph, "1"));
-            graph.addVertex(convertId(graph, "2"));
+            graph.addVertex(graphTest.convertId("1"));
+            graph.addVertex(graphTest.convertId("2"));
             assertEquals(2, count(graph.getVertices()));
-            graph.addVertex(convertId(graph, "3"));
+            graph.addVertex(graphTest.convertId("3"));
             assertEquals(3, count(graph.getVertices()));
-        }
-
-        if (graph.getFeatures().isRDFModel) {
-            Vertex v1 = graph.addVertex("http://tinkerpop.com#marko");
-            assertEquals("http://tinkerpop.com#marko", v1.getId());
-            Vertex v2 = graph.addVertex("\"1\"^^<datatype:int>");
-            assertEquals("\"1\"^^<datatype:int>", v2.getId());
-            Vertex v3 = graph.addVertex("_:ABLANKNODE");
-            assertEquals(v3.getId(), "_:ABLANKNODE");
-            Vertex v4 = graph.addVertex("\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>");
-            assertEquals("\"2.24\"^^<http://www.w3.org/2001/XMLSchema#double>", v4.getId());
         }
         graph.shutdown();
     }
@@ -104,9 +93,9 @@ public class VertexTestSuite extends TestSuite {
     public void testRemoveVertex() {
         Graph graph = graphTest.generateGraph();
 
-        Vertex v1 = graph.addVertex(convertId(graph, "1"));
+        Vertex v1 = graph.addVertex(graphTest.convertId("1"));
         if (!graph.getFeatures().ignoresSuppliedIds)
-            assertEquals(graph.getVertex(convertId(graph, "1")), v1);
+            assertEquals(graph.getVertex(graphTest.convertId("1")), v1);
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(1, count(graph.getVertices()));
@@ -142,9 +131,9 @@ public class VertexTestSuite extends TestSuite {
 
     public void testRemoveVertexWithEdges() {
         Graph graph = graphTest.generateGraph();
-        Vertex v1 = graph.addVertex(convertId(graph, "1"));
-        Vertex v2 = graph.addVertex(convertId(graph, "2"));
-        graph.addEdge(null, v1, v2, convertId(graph, "knows"));
+        Vertex v1 = graph.addVertex(graphTest.convertId("1"));
+        Vertex v2 = graph.addVertex(graphTest.convertId("2"));
+        graph.addEdge(null, v1, v2, graphTest.convertLabel("knows"));
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(2, count(graph.getVertices()));
         if (graph.getFeatures().supportsEdgeIteration)
@@ -226,9 +215,9 @@ public class VertexTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         Vertex v1 = graph.addVertex(null);
         for (int i = 0; i < 10; i++) {
-            graph.addEdge(null, v1, graph.addVertex(null), convertId(graph, "knows"));
+            graph.addEdge(null, v1, graph.addVertex(null), graphTest.convertLabel("knows"));
         }
-        Iterable<Edge> edges = v1.getEdges(Direction.OUT, convertId(graph, "knows"));
+        Iterable<Edge> edges = v1.getEdges(Direction.OUT, graphTest.convertLabel("knows"));
         assertEquals(count(edges), 10);
         assertEquals(count(edges), 10);
         assertEquals(count(edges), 10);
@@ -238,8 +227,8 @@ public class VertexTestSuite extends TestSuite {
     public void testAddVertexProperties() {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexProperties) {
-            Vertex v1 = graph.addVertex(convertId(graph, "1"));
-            Vertex v2 = graph.addVertex(convertId(graph, "2"));
+            Vertex v1 = graph.addVertex(graphTest.convertId("1"));
+            Vertex v2 = graph.addVertex(graphTest.convertId("2"));
 
             if (graph.getFeatures().supportsStringProperty) {
                 v1.setProperty("key1", "value1");
@@ -254,18 +243,6 @@ public class VertexTestSuite extends TestSuite {
                 assertEquals(20, v2.getProperty("key2"));
             }
 
-        } else if (graph.getFeatures().isRDFModel) {
-            Vertex v1 = graph.addVertex("\"1\"^^<http://www.w3.org/2001/XMLSchema#int>");
-            assertEquals("http://www.w3.org/2001/XMLSchema#int", v1.getProperty(SailTokens.DATATYPE));
-            assertEquals(1, v1.getProperty(SailTokens.VALUE));
-            assertNull(v1.getProperty(SailTokens.LANGUAGE));
-            assertNull(v1.getProperty("random something"));
-
-            Vertex v2 = graph.addVertex("\"hello\"@en");
-            assertEquals("en", v2.getProperty(SailTokens.LANGUAGE));
-            assertEquals("hello", v2.getProperty(SailTokens.VALUE));
-            assertNull(v2.getProperty(SailTokens.DATATYPE));
-            assertNull(v2.getProperty("random something"));
         }
         graph.shutdown();
     }
@@ -289,28 +266,6 @@ public class VertexTestSuite extends TestSuite {
             assertEquals(50, vertices.size());
             for (Vertex vertex : vertices) {
                 assertEquals(15, vertex.getPropertyKeys().size());
-            }
-        } else if (graph.getFeatures().isRDFModel) {
-            Set<Vertex> vertices = new HashSet<Vertex>();
-            this.stopWatch();
-            for (int i = 0; i < 50; i++) {
-                Vertex vertex = graph.addVertex("\"" + UUID.randomUUID().toString() + "\"");
-                for (int j = 0; j < 15; j++) {
-                    vertex.setProperty(SailTokens.DATATYPE, "http://www.w3.org/2001/XMLSchema#anyURI");
-                }
-                vertices.add(vertex);
-            }
-            printPerformance(graph.toString(), 15 * 50, "vertex properties added (with vertices being added too)", this.stopWatch());
-            if (graph.getFeatures().supportsVertexIteration)
-                assertEquals(count(graph.getVertices()), 50);
-            assertEquals(vertices.size(), 50);
-            for (Vertex vertex : vertices) {
-                assertEquals(3, vertex.getPropertyKeys().size());
-                assertTrue(vertex.getPropertyKeys().contains(SailTokens.DATATYPE));
-                assertEquals("http://www.w3.org/2001/XMLSchema#anyURI", vertex.getProperty(SailTokens.DATATYPE));
-                assertTrue(vertex.getPropertyKeys().contains(SailTokens.VALUE));
-                assertEquals("literal", vertex.getProperty(SailTokens.KIND));
-
             }
         }
         graph.shutdown();
@@ -390,18 +345,6 @@ public class VertexTestSuite extends TestSuite {
                 assertNull(v1.removeProperty("key2"));
                 assertNull(v2.removeProperty("key2"));
             }
-        } else if (graph.getFeatures().isRDFModel) {
-            Vertex v1 = graph.addVertex("\"1\"^^<http://www.w3.org/2001/XMLSchema#int>");
-            assertEquals("http://www.w3.org/2001/XMLSchema#int", v1.removeProperty("type"));
-            assertEquals("1", v1.getProperty("value"));
-            assertNull(v1.getProperty("lang"));
-            assertNull(v1.getProperty("random something"));
-
-            Vertex v2 = graph.addVertex("\"hello\"@en");
-            assertEquals("en", v2.removeProperty("lang"));
-            assertEquals("hello", v2.getProperty("value"));
-            assertNull(v2.getProperty("type"));
-            assertNull(v2.getProperty("random something"));
         }
         graph.shutdown();
     }
@@ -442,21 +385,21 @@ public class VertexTestSuite extends TestSuite {
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
         Vertex c = graph.addVertex(null);
-        Edge w = graph.addEdge(null, a, b, convertId(graph, "knows"));
-        Edge x = graph.addEdge(null, b, c, convertId(graph, "knows"));
-        Edge y = graph.addEdge(null, a, c, convertId(graph, "hates"));
-        Edge z = graph.addEdge(null, a, b, convertId(graph, "hates"));
-        Edge zz = graph.addEdge(null, c, c, convertId(graph, "hates"));
+        Edge w = graph.addEdge(null, a, b, graphTest.convertLabel("knows"));
+        Edge x = graph.addEdge(null, b, c, graphTest.convertLabel("knows"));
+        Edge y = graph.addEdge(null, a, c, graphTest.convertLabel("hates"));
+        Edge z = graph.addEdge(null, a, b, graphTest.convertLabel("hates"));
+        Edge zz = graph.addEdge(null, c, c, graphTest.convertLabel("hates"));
 
         assertEquals(count(a.getEdges(OUT)), 3);
-        assertEquals(count(a.getEdges(OUT, convertId(graph, "hates"))), 2);
-        assertEquals(count(a.getEdges(OUT, convertId(graph, "knows"))), 1);
+        assertEquals(count(a.getEdges(OUT, graphTest.convertLabel("hates"))), 2);
+        assertEquals(count(a.getEdges(OUT, graphTest.convertLabel("knows"))), 1);
         assertEquals(count(a.getVertices(OUT)), 3);
-        assertEquals(count(a.getVertices(OUT, convertId(graph, "hates"))), 2);
-        assertEquals(count(a.getVertices(OUT, convertId(graph, "knows"))), 1);
+        assertEquals(count(a.getVertices(OUT, graphTest.convertLabel("hates"))), 2);
+        assertEquals(count(a.getVertices(OUT, graphTest.convertLabel("knows"))), 1);
         assertEquals(count(a.getVertices(BOTH)), 3);
-        assertEquals(count(a.getVertices(BOTH, convertId(graph, "hates"))), 2);
-        assertEquals(count(a.getVertices(BOTH, convertId(graph, "knows"))), 1);
+        assertEquals(count(a.getVertices(BOTH, graphTest.convertLabel("hates"))), 2);
+        assertEquals(count(a.getVertices(BOTH, graphTest.convertLabel("knows"))), 1);
 
         assertTrue(asList(a.getEdges(OUT)).contains(w));
         assertTrue(asList(a.getEdges(OUT)).contains(y));
@@ -464,41 +407,41 @@ public class VertexTestSuite extends TestSuite {
         assertTrue(asList(a.getVertices(OUT)).contains(b));
         assertTrue(asList(a.getVertices(OUT)).contains(c));
 
-        assertTrue(asList(a.getEdges(OUT, convertId(graph, "knows"))).contains(w));
-        assertFalse(asList(a.getEdges(OUT, convertId(graph, "knows"))).contains(y));
-        assertFalse(asList(a.getEdges(OUT, convertId(graph, "knows"))).contains(z));
-        assertTrue(asList(a.getVertices(OUT, convertId(graph, "knows"))).contains(b));
-        assertFalse(asList(a.getVertices(OUT, convertId(graph, "knows"))).contains(c));
+        assertTrue(asList(a.getEdges(OUT, graphTest.convertLabel("knows"))).contains(w));
+        assertFalse(asList(a.getEdges(OUT, graphTest.convertLabel("knows"))).contains(y));
+        assertFalse(asList(a.getEdges(OUT, graphTest.convertLabel("knows"))).contains(z));
+        assertTrue(asList(a.getVertices(OUT, graphTest.convertLabel("knows"))).contains(b));
+        assertFalse(asList(a.getVertices(OUT, graphTest.convertLabel("knows"))).contains(c));
 
-        assertFalse(asList(a.getEdges(OUT, convertId(graph, "hates"))).contains(w));
-        assertTrue(asList(a.getEdges(OUT, convertId(graph, "hates"))).contains(y));
-        assertTrue(asList(a.getEdges(OUT, convertId(graph, "hates"))).contains(z));
-        assertTrue(asList(a.getVertices(OUT, convertId(graph, "hates"))).contains(b));
-        assertTrue(asList(a.getVertices(OUT, convertId(graph, "hates"))).contains(c));
+        assertFalse(asList(a.getEdges(OUT, graphTest.convertLabel("hates"))).contains(w));
+        assertTrue(asList(a.getEdges(OUT, graphTest.convertLabel("hates"))).contains(y));
+        assertTrue(asList(a.getEdges(OUT, graphTest.convertLabel("hates"))).contains(z));
+        assertTrue(asList(a.getVertices(OUT, graphTest.convertLabel("hates"))).contains(b));
+        assertTrue(asList(a.getVertices(OUT, graphTest.convertLabel("hates"))).contains(c));
 
         assertEquals(count(a.getVertices(IN)), 0);
-        assertEquals(count(a.getVertices(IN, convertId(graph, "knows"))), 0);
-        assertEquals(count(a.getVertices(IN, convertId(graph, "hates"))), 0);
+        assertEquals(count(a.getVertices(IN, graphTest.convertLabel("knows"))), 0);
+        assertEquals(count(a.getVertices(IN, graphTest.convertLabel("hates"))), 0);
         assertTrue(asList(a.getEdges(OUT)).contains(w));
         assertTrue(asList(a.getEdges(OUT)).contains(y));
         assertTrue(asList(a.getEdges(OUT)).contains(z));
 
         assertEquals(count(b.getEdges(BOTH)), 3);
-        assertEquals(count(b.getEdges(BOTH, convertId(graph, "knows"))), 2);
-        assertTrue(asList(b.getEdges(BOTH, convertId(graph, "knows"))).contains(x));
-        assertTrue(asList(b.getEdges(BOTH, convertId(graph, "knows"))).contains(w));
-        assertTrue(asList(b.getVertices(BOTH, convertId(graph, "knows"))).contains(a));
-        assertTrue(asList(b.getVertices(BOTH, convertId(graph, "knows"))).contains(c));
+        assertEquals(count(b.getEdges(BOTH, graphTest.convertLabel("knows"))), 2);
+        assertTrue(asList(b.getEdges(BOTH, graphTest.convertLabel("knows"))).contains(x));
+        assertTrue(asList(b.getEdges(BOTH, graphTest.convertLabel("knows"))).contains(w));
+        assertTrue(asList(b.getVertices(BOTH, graphTest.convertLabel("knows"))).contains(a));
+        assertTrue(asList(b.getVertices(BOTH, graphTest.convertLabel("knows"))).contains(c));
 
-        assertEquals(count(c.getEdges(BOTH, convertId(graph, "hates"))), 3);
-        assertEquals(count(c.getVertices(BOTH, convertId(graph, "hates"))), 3);
-        assertEquals(count(c.getEdges(BOTH, convertId(graph, "knows"))), 1);
-        assertTrue(asList(c.getEdges(BOTH, convertId(graph, "hates"))).contains(y));
-        assertTrue(asList(c.getEdges(BOTH, convertId(graph, "hates"))).contains(zz));
-        assertTrue(asList(c.getVertices(BOTH, convertId(graph, "hates"))).contains(a));
-        assertTrue(asList(c.getVertices(BOTH, convertId(graph, "hates"))).contains(c));
-        assertEquals(count(c.getEdges(IN, convertId(graph, "hates"))), 2);
-        assertEquals(count(c.getEdges(OUT, convertId(graph, "hates"))), 1);
+        assertEquals(count(c.getEdges(BOTH, graphTest.convertLabel("hates"))), 3);
+        assertEquals(count(c.getVertices(BOTH, graphTest.convertLabel("hates"))), 3);
+        assertEquals(count(c.getEdges(BOTH, graphTest.convertLabel("knows"))), 1);
+        assertTrue(asList(c.getEdges(BOTH, graphTest.convertLabel("hates"))).contains(y));
+        assertTrue(asList(c.getEdges(BOTH, graphTest.convertLabel("hates"))).contains(zz));
+        assertTrue(asList(c.getVertices(BOTH, graphTest.convertLabel("hates"))).contains(a));
+        assertTrue(asList(c.getVertices(BOTH, graphTest.convertLabel("hates"))).contains(c));
+        assertEquals(count(c.getEdges(IN, graphTest.convertLabel("hates"))), 2);
+        assertEquals(count(c.getEdges(OUT, graphTest.convertLabel("hates"))), 1);
 
         try {
             x.getVertex(BOTH);
@@ -534,20 +477,20 @@ public class VertexTestSuite extends TestSuite {
         final Vertex a = graph.addVertex(null);
         final Vertex b = graph.addVertex(null);
 
-        v.addEdge(convertId(graph, "knows"), a);
-        v.addEdge(convertId(graph, "knows"), b);
+        v.addEdge(graphTest.convertLabel("knows"), a);
+        v.addEdge(graphTest.convertLabel("knows"), b);
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 3);
         if (graph.getFeatures().supportsEdgeIteration)
             assertEquals(count(graph.getEdges()), 2);
 
-        assertEquals(count(v.getEdges(OUT, convertId(graph, "knows"))), 2);
-        assertEquals(count(a.getEdges(OUT, convertId(graph, "knows"))), 0);
-        assertEquals(count(a.getEdges(IN, convertId(graph, "knows"))), 1);
+        assertEquals(count(v.getEdges(OUT, graphTest.convertLabel("knows"))), 2);
+        assertEquals(count(a.getEdges(OUT, graphTest.convertLabel("knows"))), 0);
+        assertEquals(count(a.getEdges(IN, graphTest.convertLabel("knows"))), 1);
 
-        assertEquals(count(b.getEdges(OUT, convertId(graph, "knows"))), 0);
-        assertEquals(count(b.getEdges(IN, convertId(graph, "knows"))), 1);
+        assertEquals(count(b.getEdges(OUT, graphTest.convertLabel("knows"))), 0);
+        assertEquals(count(b.getEdges(IN, graphTest.convertLabel("knows"))), 1);
 
         graph.shutdown();
     }
@@ -596,27 +539,27 @@ public class VertexTestSuite extends TestSuite {
         if (graph.getFeatures().supportsVertexProperties) {
             Vertex v = graph.addVertex(null);
             try {
-                v.setProperty(null,-1);
+                v.setProperty(null, -1);
                 assertFalse(true);
-            } catch(RuntimeException e) {
+            } catch (RuntimeException e) {
                 assertTrue(true);
             }
             try {
-                v.setProperty("",-1);
+                v.setProperty("", -1);
                 assertFalse(true);
-            } catch(RuntimeException e) {
+            } catch (RuntimeException e) {
                 assertTrue(true);
             }
             try {
-                v.setProperty(StringFactory.ID,-1);
+                v.setProperty(StringFactory.ID, -1);
                 assertFalse(true);
-            } catch(RuntimeException e) {
+            } catch (RuntimeException e) {
                 assertTrue(true);
             }
             try {
-                v.setProperty(convertId(graph,"good"),null);
+                v.setProperty("good", null);
                 assertFalse(true);
-            } catch(RuntimeException e) {
+            } catch (RuntimeException e) {
                 assertTrue(true);
             }
         }

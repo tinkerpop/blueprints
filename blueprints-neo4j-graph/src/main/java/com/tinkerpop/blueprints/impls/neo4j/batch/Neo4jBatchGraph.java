@@ -10,7 +10,6 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -23,7 +22,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseSetting;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
@@ -78,7 +77,6 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         FEATURES.supportsDuplicateEdges = true;
         FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = true;
-        FEATURES.isRDFModel = false;
         FEATURES.isWrapper = false;
         FEATURES.supportsVertexIteration = false;
         FEATURES.supportsEdgeIteration = false;
@@ -175,7 +173,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         final Set<String> properties = rawAutoIndexer.getAutoIndexedProperties();
         Transaction tx = rawGraphDB.beginTx();
 
-        final PropertyContainer kernel = ((InternalAbstractGraphDatabase) rawGraphDB).getNodeManager().getGraphProperties();
+        final PropertyContainer kernel = ((GraphDatabaseAPI) rawGraphDB).getNodeManager().getGraphProperties();
         kernel.setProperty(elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX, properties.toArray(new String[properties.size()]));
 
         int count = 0;
@@ -301,6 +299,9 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
      * @return the newly created vertex
      */
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
+        if (label == null)
+            throw ExceptionFactory.edgeLabelCanNotBeNull();
+
         final Map<String, Object> finalProperties;
         if (id == null || !(id instanceof Map))
             finalProperties = new HashMap<String, Object>();

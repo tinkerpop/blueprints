@@ -321,8 +321,8 @@ public class GraphMLWriter {
     /**
      * Write the data in a Graph to a GraphML file.
      *
-     * @param graph               the Graph to pull the data from
-     * @param filename            the name of the file write the Graph data (as GraphML) to
+     * @param graph    the Graph to pull the data from
+     * @param filename the name of the file write the Graph data (as GraphML) to
      * @throws IOException thrown if there is an error generating the GraphML data
      */
     public static void outputGraph(final Graph graph, final String filename) throws IOException {
@@ -333,10 +333,10 @@ public class GraphMLWriter {
     /**
      * Write the data in a Graph to a GraphML file.
      *
-     * @param graph               the Graph to pull the data from
-     * @param filename            the name of the file write the Graph data (as GraphML) to
-     * @param vertexKeyTypes      a Map of the data types of the vertex keys
-     * @param edgeKeyTypes        a Map of the data types of the edge keys
+     * @param graph          the Graph to pull the data from
+     * @param filename       the name of the file write the Graph data (as GraphML) to
+     * @param vertexKeyTypes a Map of the data types of the vertex keys
+     * @param edgeKeyTypes   a Map of the data types of the edge keys
      * @throws IOException thrown if there is an error generating the GraphML data
      */
     public static void outputGraph(final Graph graph, final String filename,

@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.util.wrappers.batch.cache;
 import cern.colt.function.LongObjectProcedure;
 import cern.colt.map.AbstractLongObjectMap;
 import cern.colt.map.OpenLongObjectHashMap;
-import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 
 /**
@@ -34,7 +33,7 @@ public class LongIDVertexCache implements VertexCache {
 
     @Override
     public void set(Vertex vertex, Object externalId) {
-        setId(vertex,externalId);
+        setId(vertex, externalId);
     }
 
     @Override

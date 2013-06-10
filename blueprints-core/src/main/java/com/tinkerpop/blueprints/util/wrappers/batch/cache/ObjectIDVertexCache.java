@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.util.wrappers.batch.cache;
 
-import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 
 import java.util.HashMap;
@@ -28,7 +27,7 @@ public class ObjectIDVertexCache implements VertexCache {
 
     @Override
     public void set(Vertex vertex, Object externalId) {
-        setId(vertex,externalId);
+        setId(vertex, externalId);
     }
 
     @Override

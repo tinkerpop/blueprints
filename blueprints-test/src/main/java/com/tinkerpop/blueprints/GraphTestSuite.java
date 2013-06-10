@@ -58,6 +58,10 @@ public class GraphTestSuite extends TestSuite {
 
     public void testStringRepresentationOfVertexId() {
         final Graph graph = graphTest.generateGraph();
+        if (graph.getFeatures().supportsTransactions) {
+            ((TransactionalGraph) graph).commit();
+        }
+
         final Vertex a = graph.addVertex(null);
         final Object id = a.getId();
         final Vertex b = graph.getVertex(id);
@@ -71,7 +75,7 @@ public class GraphTestSuite extends TestSuite {
     public void testSemanticallyCorrectIterables() {
         Graph graph = graphTest.generateGraph();
         for (int i = 0; i < 15; i++) {
-            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+            graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
         }
         if (graph.getFeatures().supportsVertexIteration) {
             Iterable<Vertex> vertices = graph.getVertices();
@@ -124,10 +128,10 @@ public class GraphTestSuite extends TestSuite {
         }
 
         if (graph.getFeatures().supportsEdgeProperties) {
-            Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+            Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
             e1.setProperty("name", "marko");
             e1.setProperty("location", "everywhere");
-            Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "knows"));
+            Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
             e2.setProperty("name", "stephen");
             e2.setProperty("location", "everywhere");
 
@@ -146,7 +150,7 @@ public class GraphTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
-        Edge edge = graph.addEdge(null, a, b, convertId(graph, "knows"));
+        Edge edge = graph.addEdge(null, a, b, graphTest.convertLabel("knows"));
         if (graph.getFeatures().supportsEdgeIteration) {
             assertEquals(1, count(graph.getEdges()));
         }
@@ -182,8 +186,8 @@ public class GraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeProperties) {
             Vertex a = graph.addVertex(null);
             Vertex b = graph.addVertex(null);
-            graph.addEdge(null, a, b, convertId(graph, "knows"));
-            graph.addEdge(null, a, b, convertId(graph, "knows"));
+            graph.addEdge(null, a, b, graphTest.convertLabel("knows"));
+            graph.addEdge(null, a, b, graphTest.convertLabel("knows"));
             for (Edge edge : b.getEdges(Direction.IN)) {
                 edge.setProperty("key", "value");
             }
@@ -196,7 +200,7 @@ public class GraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsElementProperties() && !graph.getFeatures().isWrapper) {
             final Vertex vertexA = graph.addVertex(null);
             final Vertex vertexB = graph.addVertex(null);
-            final Edge edge = graph.addEdge(null, vertexA, vertexB, convertId(graph, "knows"));
+            final Edge edge = graph.addEdge(null, vertexA, vertexB, graphTest.convertLabel("knows"));
 
             trySetProperty(vertexA, "keyString", "value", graph.getFeatures().supportsStringProperty);
             trySetProperty(edge, "keyString", "value", graph.getFeatures().supportsStringProperty);
@@ -226,12 +230,21 @@ public class GraphTestSuite extends TestSuite {
             trySetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
             trySetProperty(edge, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
 
+
+            tryGetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
+            tryGetProperty(edge, "keyListString", listA, graph.getFeatures().supportsUniformListProperty);
+
+
             final ArrayList listB = new ArrayList();
             listB.add("try1");
             listB.add(2);
 
             trySetProperty(vertexA, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
             trySetProperty(edge, "keyListMixed", listB, graph.getFeatures().supportsMixedListProperty);
+
+            tryGetProperty(vertexA, "keyListString", listA, graph.getFeatures().supportsMixedListProperty);
+            tryGetProperty(edge, "keyListString", listA, graph.getFeatures().supportsMixedListProperty);
+
 
             trySetProperty(vertexA, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
             trySetProperty(edge, "keyArrayString", new String[]{"try1", "try2"}, graph.getFeatures().supportsPrimitiveArrayProperty);
@@ -289,12 +302,20 @@ public class GraphTestSuite extends TestSuite {
         }
     }
 
+    private void tryGetProperty(final Element element, final String key, final Object value, final boolean allowDataType) {
+
+        if (allowDataType) {
+            assertEquals(element.getProperty(key), value);
+        }
+    }
+
+
     public void testSimpleRemovingVerticesEdges() {
         Graph graph = graphTest.generateGraph();
 
         Vertex v = graph.addVertex(null);
         Vertex u = graph.addVertex(null);
-        Edge e = graph.addEdge(null, v, u, convertId(graph, "knows"));
+        Edge e = graph.addEdge(null, v, u, graphTest.convertLabel("knows"));
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 2);
@@ -334,7 +355,7 @@ public class GraphTestSuite extends TestSuite {
             Vertex a = vertices.get(random.nextInt(vertices.size()));
             Vertex b = vertices.get(random.nextInt(vertices.size()));
             if (a != b) {
-                edges.add(graph.addEdge(null, a, b, convertId(graph, "a" + UUID.randomUUID())));
+                edges.add(graph.addEdge(null, a, b, graphTest.convertLabel("a" + UUID.randomUUID())));
             }
         }
         printPerformance(graph.toString(), edgeCount, "edges added", this.stopWatch());
@@ -371,16 +392,20 @@ public class GraphTestSuite extends TestSuite {
         for (int i = 0; i < vertexCount; i = i + 2) {
             Vertex a = vertices.get(i);
             Vertex b = vertices.get(i + 1);
-            edges.add(graph.addEdge(null, a, b, convertId(graph, "a" + UUID.randomUUID())));
+            edges.add(graph.addEdge(null, a, b, graphTest.convertLabel("a" + UUID.randomUUID())));
 
         }
         printPerformance(graph.toString(), vertexCount / 2, "edges added", this.stopWatch());
 
         this.stopWatch();
+        Random random = new Random();
         int counter = 0;
         for (Vertex v : vertices) {
             counter = counter + 1;
-            graph.removeVertex(v);
+            if (random.nextBoolean())
+                graph.removeVertex(v);
+            else
+                v.remove();
             if ((counter + 1) % 2 == 0) {
                 if (graph.getFeatures().supportsEdgeIteration) {
                     assertEquals(edges.size() - ((counter + 1) / 2), count(graph.getEdges()));
@@ -398,18 +423,18 @@ public class GraphTestSuite extends TestSuite {
     public void testConnectivityPatterns() {
         Graph graph = graphTest.generateGraph();
 
-        Vertex a = graph.addVertex(convertId(graph, "1"));
-        Vertex b = graph.addVertex(convertId(graph, "2"));
-        Vertex c = graph.addVertex(convertId(graph, "3"));
-        Vertex d = graph.addVertex(convertId(graph, "4"));
+        Vertex a = graph.addVertex(graphTest.convertId("1"));
+        Vertex b = graph.addVertex(graphTest.convertId("2"));
+        Vertex c = graph.addVertex(graphTest.convertId("3"));
+        Vertex d = graph.addVertex(graphTest.convertId("4"));
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(4, count(graph.getVertices()));
 
-        Edge e = graph.addEdge(null, a, b, convertId(graph, "knows"));
-        Edge f = graph.addEdge(null, b, c, convertId(graph, "knows"));
-        Edge g = graph.addEdge(null, c, d, convertId(graph, "knows"));
-        Edge h = graph.addEdge(null, d, a, convertId(graph, "knows"));
+        Edge e = graph.addEdge(null, a, b, graphTest.convertLabel("knows"));
+        Edge f = graph.addEdge(null, b, c, graphTest.convertLabel("knows"));
+        Edge g = graph.addEdge(null, c, d, graphTest.convertLabel("knows"));
+        Edge h = graph.addEdge(null, d, a, graphTest.convertLabel("knows"));
 
         if (graph.getFeatures().supportsEdgeIteration)
             assertEquals(4, count(graph.getEdges()));
@@ -423,14 +448,14 @@ public class GraphTestSuite extends TestSuite {
 
         if (graph.getFeatures().supportsEdgeIteration) {
             for (Edge x : graph.getEdges()) {
-                assertEquals(convertId(graph, "knows"), x.getLabel());
+                assertEquals(graphTest.convertId("knows"), x.getLabel());
             }
         }
         if (!graph.getFeatures().ignoresSuppliedIds) {
-            a = graph.getVertex(convertId(graph, "1"));
-            b = graph.getVertex(convertId(graph, "2"));
-            c = graph.getVertex(convertId(graph, "3"));
-            d = graph.getVertex(convertId(graph, "4"));
+            a = graph.getVertex(graphTest.convertId("1"));
+            b = graph.getVertex(graphTest.convertId("2"));
+            c = graph.getVertex(graphTest.convertId("3"));
+            d = graph.getVertex(graphTest.convertId("4"));
 
             assertEquals(1, count(a.getEdges(Direction.IN)));
             assertEquals(1, count(a.getEdges(Direction.OUT)));
@@ -441,7 +466,7 @@ public class GraphTestSuite extends TestSuite {
             assertEquals(1, count(d.getEdges(Direction.IN)));
             assertEquals(1, count(d.getEdges(Direction.OUT)));
 
-            Edge i = graph.addEdge(null, a, b, convertId(graph, "hates"));
+            Edge i = graph.addEdge(null, a, b, graphTest.convertLabel("hates"));
 
             assertEquals(1, count(a.getEdges(Direction.IN)));
             assertEquals(2, count(a.getEdges(Direction.OUT)));
@@ -455,11 +480,11 @@ public class GraphTestSuite extends TestSuite {
             assertEquals(1, count(a.getEdges(Direction.IN)));
             assertEquals(2, count(a.getEdges(Direction.OUT)));
             for (Edge x : a.getEdges(Direction.OUT)) {
-                assertTrue(x.getLabel().equals(convertId(graph, "knows")) || x.getLabel().equals(convertId(graph, "hates")));
+                assertTrue(x.getLabel().equals(graphTest.convertId("knows")) || x.getLabel().equals(graphTest.convertId("hates")));
             }
-            assertEquals(convertId(graph, "hates"), i.getLabel());
-            assertEquals(i.getVertex(Direction.IN).getId().toString(), convertId(graph, "2"));
-            assertEquals(i.getVertex(Direction.OUT).getId().toString(), convertId(graph, "1"));
+            assertEquals(graphTest.convertId("hates"), i.getLabel());
+            assertEquals(i.getVertex(Direction.IN).getId().toString(), graphTest.convertId("2"));
+            assertEquals(i.getVertex(Direction.OUT).getId().toString(), graphTest.convertId("1"));
         }
 
         Set<Object> vertexIds = new HashSet<Object>();
@@ -481,11 +506,11 @@ public class GraphTestSuite extends TestSuite {
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
         Vertex c = graph.addVertex(null);
-        Edge aFriendB = graph.addEdge(null, a, b, convertId(graph, "friend"));
-        Edge aFriendC = graph.addEdge(null, a, c, convertId(graph, "friend"));
-        Edge aHateC = graph.addEdge(null, a, c, convertId(graph, "hate"));
-        Edge cHateA = graph.addEdge(null, c, a, convertId(graph, "hate"));
-        Edge cHateB = graph.addEdge(null, c, b, convertId(graph, "hate"));
+        Edge aFriendB = graph.addEdge(null, a, b, graphTest.convertLabel("friend"));
+        Edge aFriendC = graph.addEdge(null, a, c, graphTest.convertLabel("friend"));
+        Edge aHateC = graph.addEdge(null, a, c, graphTest.convertLabel("hate"));
+        Edge cHateA = graph.addEdge(null, c, a, graphTest.convertLabel("hate"));
+        Edge cHateB = graph.addEdge(null, c, b, graphTest.convertLabel("hate"));
 
         List<Edge> results = asList(a.getEdges(Direction.OUT));
         assertEquals(results.size(), 3);
@@ -493,27 +518,27 @@ public class GraphTestSuite extends TestSuite {
         assertTrue(results.contains(aFriendC));
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.OUT, convertId(graph, "friend")));
+        results = asList(a.getEdges(Direction.OUT, graphTest.convertLabel("friend")));
         assertEquals(results.size(), 2);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(aFriendC));
 
-        results = asList(a.getEdges(Direction.OUT, convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.OUT, graphTest.convertLabel("hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.IN, convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.IN, graphTest.convertLabel("hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateA));
 
-        results = asList(a.getEdges(Direction.IN, convertId(graph, "friend")));
+        results = asList(a.getEdges(Direction.IN, graphTest.convertLabel("friend")));
         assertEquals(results.size(), 0);
 
-        results = asList(b.getEdges(Direction.IN, convertId(graph, "hate")));
+        results = asList(b.getEdges(Direction.IN, graphTest.convertLabel("hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateB));
 
-        results = asList(b.getEdges(Direction.IN, convertId(graph, "friend")));
+        results = asList(b.getEdges(Direction.IN, graphTest.convertLabel("friend")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(aFriendB));
 
@@ -526,29 +551,29 @@ public class GraphTestSuite extends TestSuite {
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
         Vertex c = graph.addVertex(null);
-        Edge aFriendB = graph.addEdge(null, a, b, convertId(graph, "friend"));
-        Edge aFriendC = graph.addEdge(null, a, c, convertId(graph, "friend"));
-        Edge aHateC = graph.addEdge(null, a, c, convertId(graph, "hate"));
-        Edge cHateA = graph.addEdge(null, c, a, convertId(graph, "hate"));
-        Edge cHateB = graph.addEdge(null, c, b, convertId(graph, "hate"));
+        Edge aFriendB = graph.addEdge(null, a, b, graphTest.convertLabel("friend"));
+        Edge aFriendC = graph.addEdge(null, a, c, graphTest.convertLabel("friend"));
+        Edge aHateC = graph.addEdge(null, a, c, graphTest.convertLabel("hate"));
+        Edge cHateA = graph.addEdge(null, c, a, graphTest.convertLabel("hate"));
+        Edge cHateB = graph.addEdge(null, c, b, graphTest.convertLabel("hate"));
 
 
-        List<Edge> results = asList(a.getEdges(Direction.OUT, convertId(graph, "friend"), convertId(graph, "hate")));
+        List<Edge> results = asList(a.getEdges(Direction.OUT, graphTest.convertLabel("friend"), graphTest.convertLabel("hate")));
         assertEquals(results.size(), 3);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(aFriendC));
         assertTrue(results.contains(aHateC));
 
-        results = asList(a.getEdges(Direction.IN, convertId(graph, "friend"), convertId(graph, "hate")));
+        results = asList(a.getEdges(Direction.IN, graphTest.convertLabel("friend"), graphTest.convertLabel("hate")));
         assertEquals(results.size(), 1);
         assertTrue(results.contains(cHateA));
 
-        results = asList(b.getEdges(Direction.IN, convertId(graph, "friend"), convertId(graph, "hate")));
+        results = asList(b.getEdges(Direction.IN, graphTest.convertLabel("friend"), graphTest.convertLabel("hate")));
         assertEquals(results.size(), 2);
         assertTrue(results.contains(aFriendB));
         assertTrue(results.contains(cHateB));
 
-        results = asList(b.getEdges(Direction.IN, convertId(graph, "blah"), convertId(graph, "blah2"), convertId(graph, "blah3")));
+        results = asList(b.getEdges(Direction.IN, graphTest.convertLabel("blah"), graphTest.convertLabel("blah2"), graphTest.convertLabel("blah3")));
         assertEquals(results.size(), 0);
 
         graph.shutdown();
@@ -562,13 +587,13 @@ public class GraphTestSuite extends TestSuite {
         Vertex start = graph.addVertex(null);
         for (int i = 0; i < branchSize; i++) {
             Vertex a = graph.addVertex(null);
-            graph.addEdge(null, start, a, convertId(graph, "test1"));
+            graph.addEdge(null, start, a, graphTest.convertLabel("test1"));
             for (int j = 0; j < branchSize; j++) {
                 Vertex b = graph.addVertex(null);
-                graph.addEdge(null, a, b, convertId(graph, "test2"));
+                graph.addEdge(null, a, b, graphTest.convertLabel("test2"));
                 for (int k = 0; k < branchSize; k++) {
                     Vertex c = graph.addVertex(null);
-                    graph.addEdge(null, b, c, convertId(graph, "test3"));
+                    graph.addEdge(null, b, c, graphTest.convertLabel("test3"));
                 }
             }
         }
@@ -576,15 +601,15 @@ public class GraphTestSuite extends TestSuite {
         assertEquals(0, count(start.getEdges(Direction.IN)));
         assertEquals(branchSize, count(start.getEdges(Direction.OUT)));
         for (Edge e : start.getEdges(Direction.OUT)) {
-            assertEquals(convertId(graph, "test1"), e.getLabel());
+            assertEquals(graphTest.convertId("test1"), e.getLabel());
             assertEquals(branchSize, count(e.getVertex(Direction.IN).getEdges(Direction.OUT)));
             assertEquals(1, count(e.getVertex(Direction.IN).getEdges(Direction.IN)));
             for (Edge f : e.getVertex(Direction.IN).getEdges(Direction.OUT)) {
-                assertEquals(convertId(graph, "test2"), f.getLabel());
+                assertEquals(graphTest.convertId("test2"), f.getLabel());
                 assertEquals(branchSize, count(f.getVertex(Direction.IN).getEdges(Direction.OUT)));
                 assertEquals(1, count(f.getVertex(Direction.IN).getEdges(Direction.IN)));
                 for (Edge g : f.getVertex(Direction.IN).getEdges(Direction.OUT)) {
-                    assertEquals(convertId(graph, "test3"), g.getLabel());
+                    assertEquals(graphTest.convertId("test3"), g.getLabel());
                     assertEquals(0, count(g.getVertex(Direction.IN).getEdges(Direction.OUT)));
                     assertEquals(1, count(g.getVertex(Direction.IN).getEdges(Direction.IN)));
                 }
@@ -627,8 +652,8 @@ public class GraphTestSuite extends TestSuite {
         graph.addVertex(null);
         if (graph.getFeatures().supportsVertexIteration) {
             for (Vertex vertex : graph.getVertices()) {
-                graph.addEdge(null, vertex, a, convertId(graph, "x"));
-                graph.addEdge(null, vertex, a, convertId(graph, "y"));
+                graph.addEdge(null, vertex, a, graphTest.convertLabel("x"));
+                graph.addEdge(null, vertex, a, graphTest.convertLabel("y"));
             }
             for (Vertex vertex : graph.getVertices()) {
                 assertEquals(BaseTest.count(vertex.getEdges(Direction.OUT)), 2);
@@ -641,7 +666,7 @@ public class GraphTestSuite extends TestSuite {
             }
         } else if (graph.getFeatures().supportsEdgeIteration) {
             for (int i = 0; i < 10; i++) {
-                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), convertId(graph, "test"));
+                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("test"));
             }
             for (Edge edge : graph.getEdges()) {
                 graph.removeEdge(edge);
@@ -661,7 +686,7 @@ public class GraphTestSuite extends TestSuite {
                 v.setProperty("name", "marko");
                 u.setProperty("name", "pavel");
             }
-            Edge e = graph.addEdge(null, v, u, convertId(graph, "collaborator"));
+            Edge e = graph.addEdge(null, v, u, graphTest.convertLabel("collaborator"));
             if (graph.getFeatures().supportsEdgeProperties)
                 e.setProperty("location", "internet");
 
@@ -688,7 +713,7 @@ public class GraphTestSuite extends TestSuite {
             if (graph.getFeatures().supportsEdgeIteration) {
                 assertEquals(count(graph.getEdges()), 1);
                 for (Edge edge : graph.getEdges()) {
-                    assertEquals(edge.getLabel(), convertId(graph, "collaborator"));
+                    assertEquals(edge.getLabel(), graphTest.convertId("collaborator"));
                     if (graph.getFeatures().supportsEdgeProperties)
                         assertEquals(edge.getProperty("location"), "internet");
                 }
@@ -702,38 +727,38 @@ public class GraphTestSuite extends TestSuite {
         final Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexProperties) {
             Vertex v = graph.addVertex(null);
-            v.setProperty(convertId(graph,"string"), "marko");
-            v.setProperty(convertId(graph,"integer"), 33);
-            v.setProperty(convertId(graph,"boolean"), true);
+            v.setProperty("string", "marko");
+            v.setProperty("integer", 33);
+            v.setProperty("boolean", true);
 
-            String name = v.getProperty(convertId(graph,"string"));
+            String name = v.getProperty("string");
             assertEquals(name, "marko");
-            Integer age = v.getProperty(convertId(graph,"integer"));
+            Integer age = v.getProperty("integer");
             assertEquals(age, Integer.valueOf(33));
-            Boolean best = v.getProperty(convertId(graph,"boolean"));
+            Boolean best = v.getProperty("boolean");
             assertTrue(best);
 
-            name = v.removeProperty(convertId(graph,"string"));
+            name = v.removeProperty("string");
             assertEquals(name, "marko");
-            age = v.removeProperty(convertId(graph,"integer"));
+            age = v.removeProperty("integer");
             assertEquals(age, Integer.valueOf(33));
-            best = v.removeProperty(convertId(graph,"boolean"));
+            best = v.removeProperty("boolean");
             assertTrue(best);
         }
 
         if (graph.getFeatures().supportsEdgeProperties) {
             Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
-            e.setProperty(convertId(graph,"string"), "friend");
-            e.setProperty(convertId(graph,"double"), 1.0d);
+            e.setProperty("string", "friend");
+            e.setProperty("double", 1.0d);
 
-            String type = e.getProperty(convertId(graph,"string"));
+            String type = e.getProperty("string");
             assertEquals(type, "friend");
-            Double weight = e.getProperty(convertId(graph,"double"));
+            Double weight = e.getProperty("double");
             assertEquals(weight, 1.0d);
 
-            type = e.removeProperty(convertId(graph,"string"));
+            type = e.removeProperty("string");
             assertEquals(type, "friend");
-            weight = e.removeProperty(convertId(graph,"double"));
+            weight = e.removeProperty("double");
             assertEquals(weight, 1.0d);
         }
         graph.shutdown();

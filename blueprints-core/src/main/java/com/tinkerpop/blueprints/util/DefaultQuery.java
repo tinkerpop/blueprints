@@ -16,47 +16,135 @@ public abstract class DefaultQuery implements Query {
 
     public Direction direction = Direction.BOTH;
     public String[] labels = EMPTY_LABELS;
-    public long limit = Long.MAX_VALUE;
+    public long maximum = Long.MAX_VALUE;
+    public long minimum = 0l;
     public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
+
+    public Query hasNot(final String key, final Object... values) {
+        if (null == values || values.length == 0)
+            this.hasContainers.add(new HasContainer(key, Compare.EQUAL, new Object[]{null}));
+        else
+            this.hasContainers.add(new HasContainer(key, Compare.NOT_EQUAL, values));
+        return this;
+    }
+
+    public Query has(final String key, final Object... values) {
+        if (null == values || values.length == 0)
+            this.hasContainers.add(new HasContainer(key, Compare.NOT_EQUAL, new Object[]{null}));
+        else
+            this.hasContainers.add(new HasContainer(key, Compare.EQUAL, values));
+        return this;
+    }
+
+    public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare) {
+        return this.has(key, compare, value);
+    }
+
+    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value) {
+        this.hasContainers.add(new HasContainer(key, compare, value));
+        return this;
+    }
+
+    public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
+        this.hasContainers.add(new HasContainer(key, Compare.GREATER_THAN_EQUAL, startValue));
+        this.hasContainers.add(new HasContainer(key, Compare.LESS_THAN, endValue));
+        return this;
+    }
+
+    public Query limit(final long take) {
+        this.maximum = take;
+        return this;
+    }
+
+    public Query limit(final long skip, final long take) {
+        this.minimum = skip;
+        this.maximum = skip + take;
+        return this;
+    }
+
+    ////////////////////
+
 
     protected class HasContainer {
         public String key;
-        public Object value;
+        public Object[] values;
         public Compare compare;
 
-        public HasContainer(final String key, final Object value, final Compare compare) {
+        public HasContainer(final String key, final Compare compare, final Object... values) {
             this.key = key;
-            this.value = value;
+            this.values = values;
             this.compare = compare;
         }
 
         public boolean isLegal(final Element element) {
-            final Object elementValue = element.getProperty(key);
+            final Object elementValue = element.getProperty(this.key);
             switch (compare) {
                 case EQUAL:
-                    if (null == elementValue)
-                        return value == null;
-                    return elementValue.equals(value);
+                    if (null == elementValue) {
+                        for (final Object value : this.values) {
+                            if (value == null)
+                                return true;
+                        }
+                    } else {
+                        for (final Object value : this.values) {
+                            if (elementValue.equals(value))
+                                return true;
+                        }
+                    }
+                    return false;
                 case NOT_EQUAL:
-                    if (null == elementValue)
-                        return value != null;
-                    return !elementValue.equals(value);
+                    if (null == elementValue) {
+                        for (final Object value : this.values) {
+                            if (value != null)
+                                return true;
+                        }
+                    } else {
+                        for (final Object value : this.values) {
+                            if (!elementValue.equals(value))
+                                return true;
+                        }
+                    }
+                    return false;
                 case GREATER_THAN:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 1;
+                    else {
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) >= 1)
+                                return true;
+                        }
+                    }
+                    return false;
                 case LESS_THAN:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) <= -1;
+                    else {
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) <= -1)
+                                return true;
+                        }
+                    }
+                    return false;
                 case GREATER_THAN_EQUAL:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) >= 0;
+                    else {
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) >= 0)
+                                return true;
+                        }
+                    }
+                    return false;
                 case LESS_THAN_EQUAL:
-                    if (null == elementValue || value == null)
+                    if (null == elementValue)
                         return false;
-                    return ((Comparable) elementValue).compareTo(value) <= 0;
+                    else {
+                        for (final Object value : this.values) {
+                            if (((Comparable) elementValue).compareTo((value)) <= 0)
+                                return true;
+                        }
+                    }
+                    return false;
                 default:
                     throw new IllegalArgumentException("Invalid state as no valid filter was provided");
             }

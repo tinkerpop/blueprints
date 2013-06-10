@@ -1,15 +1,16 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.GraphQueryTestSuite;
 import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.IndexTestSuite;
 import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
-import com.tinkerpop.blueprints.QueryTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.TransactionalGraphTestSuite;
+import com.tinkerpop.blueprints.VertexQueryTestSuite;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
@@ -24,15 +25,15 @@ import java.lang.reflect.Method;
  *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public class OrientGraphTest extends GraphTest {
+public abstract class OrientGraphTest extends GraphTest {
 
-    private OrientGraph currentGraph;
+    protected OrientGraph currentGraph;
 
-    /*public void testOrientBenchmarkTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new OrientBenchmarkTestSuite(this));
-        printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
-    }*/
+    // public void testOrientBenchmarkTestSuite() throws Exception {
+    // this.stopWatch();
+    // doTestSuite(new OrientBenchmarkTestSuite(this));
+    // printTestPerformance("OrientBenchmarkTestSuite", this.stopWatch());
+    // }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
@@ -52,10 +53,16 @@ public class OrientGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testQueryTestSuite() throws Exception {
+    public void testVertexQueryTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new QueryTestSuite(this));
-        printTestPerformance("QueryTestSuite", this.stopWatch());
+        doTestSuite(new VertexQueryTestSuite(this));
+        printTestPerformance("VertexQueryTestSuite", this.stopWatch());
+    }
+
+    public void testGraphQueryTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphQueryTestSuite(this));
+        printTestPerformance("GraphQueryTestSuite", this.stopWatch());
     }
 
     public void testIndexableGraphTestSuite() throws Exception {
@@ -105,9 +112,9 @@ public class OrientGraphTest extends GraphTest {
     }
 
     public Graph generateGraph(final String graphDirectoryName) {
-        String directory = getWorkingDirectory();
-        this.currentGraph = new OrientGraph("local:" + directory + "/" + graphDirectoryName);
-        return this.currentGraph;
+        final String dbPath = getWorkingDirectory() + "/" + graphDirectoryName;
+        this.currentGraph = new OrientGraph("local:" + dbPath);
+        return currentGraph;
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {
@@ -117,24 +124,29 @@ public class OrientGraphTest extends GraphTest {
             if (method.getName().startsWith("test")) {
                 System.out.println("Testing " + method.getName() + "...");
                 method.invoke(testSuite);
-
-                // this is necessary on windows systems: deleting the directory is not enough because it takes a
-                // while to unlock files
-                try {
-                    if (this.currentGraph != null)
-                        this.currentGraph.shutdown();
-                } catch (Exception e) {
-                }
-                OGraphDatabase g = new OGraphDatabase("local:" + directory + "/graph");
-                if (g.exists())
-                    g.open("admin", "admin").drop();
-
-                deleteDirectory(new File(directory));
+                dropGraph(directory + "/graph");
             }
         }
     }
 
-    private String getWorkingDirectory() {
+    @Override
+    public void dropGraph(final String graphDirectoryName) {
+        // this is necessary on windows systems: deleting the directory is not enough because it takes a
+        // while to unlock files
+        try {
+            if (this.currentGraph != null)
+                this.currentGraph.shutdown();
+        } catch (Exception e) {
+        }
+
+        final ODatabaseDocumentTx g = new ODatabaseDocumentTx("local:" + graphDirectoryName);
+        if (g.exists())
+            g.open("admin", "admin").drop();
+
+        deleteDirectory(new File(graphDirectoryName));
+    }
+
+    protected String getWorkingDirectory() {
         return this.computeTestDataRoot().getAbsolutePath();
     }
 }

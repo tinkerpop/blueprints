@@ -1,7 +1,10 @@
 package com.tinkerpop.blueprints.util.wrappers.batch;
 
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.util.wrappers.batch.cache.*;
+import com.tinkerpop.blueprints.util.wrappers.batch.cache.LongIDVertexCache;
+import com.tinkerpop.blueprints.util.wrappers.batch.cache.ObjectIDVertexCache;
+import com.tinkerpop.blueprints.util.wrappers.batch.cache.StringIDVertexCache;
+import com.tinkerpop.blueprints.util.wrappers.batch.cache.URLCompression;
+import com.tinkerpop.blueprints.util.wrappers.batch.cache.VertexCache;
 
 /**
  * Type of vertex ids expected by BatchGraph. The default is IdType.OBJECT.

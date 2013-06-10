@@ -23,7 +23,12 @@ public class OrientGraphSailTest extends GraphSailTest {
         if (db.exists())
             db.open("admin", "admin").drop();
 
-        return new OrientGraph("local:" + directory + "/graph");
+        OrientGraph graph = new OrientGraph("local:" + directory + "/graph");
+
+        // THIS IS NECESSARY TO AVOID HAVING INVALID FIELD NAMES BECAUSE / AND : (SINCE ORIENTDB 1.4.0)
+        graph.setUseVertexFieldsForEdgeLabels(false);
+
+        return graph;
     }
 
     private String getWorkingDirectory() {

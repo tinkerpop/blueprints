@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,5 +12,5 @@ import java.util.Map;
  */
 class OrientGraphContext {
     public Map<String, OrientIndex<? extends OrientElement>> manualIndices = new HashMap<String, OrientIndex<? extends OrientElement>>();
-    public OGraphDatabase rawGraph;
+    public ODatabaseDocumentTx rawGraph;
 }

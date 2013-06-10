@@ -31,6 +31,6 @@ public class IdEdge extends IdElement implements Edge {
     }
 
     public String toString() {
-       return StringFactory.edgeString(this);
+        return StringFactory.edgeString(this);
     }
 }

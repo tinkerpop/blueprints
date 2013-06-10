@@ -77,12 +77,6 @@ public class Features {
      */
     public Boolean isPersistent = null;
     /**
-     * Is the graph an RDF framework?
-     *
-     * @deprecated thus far, isRDFModel describes a collection of features. Use actual features to describe your data model.
-     */
-    public Boolean isRDFModel = null;
-    /**
      * Does the graph implement WrapperGraph?
      */
     public Boolean isWrapper = null;
