@@ -9,10 +9,15 @@ import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Resource;
+import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import org.openrdf.rio.RDFHandler;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.Rio;
 import org.openrdf.sail.NotifyingSailConnection;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.NotifyingSailBase;
@@ -102,6 +107,18 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
      */
     public GraphSail(final T graph) {
         this(graph, "p,c,pc");
+
+        RDFParser p = Rio.createParser(org.openrdf.rio.RDFFormat.NTRIPLES);
+        p.setRDFHandler(new RDFHandler() {
+            public void startRDF() throws RDFHandlerException {}
+            public void endRDF() throws RDFHandlerException {}
+            public void handleNamespace(String s, String s1) throws RDFHandlerException {}
+            public void handleStatement(Statement s) throws RDFHandlerException {
+
+            }
+            public void handleComment(String s) throws RDFHandlerException {}
+        });
+
         //this(graph, "s,p,o,c,sp,so,sc,po,pc,oc,spo,spc,soc,poc,spoc");
     }
 

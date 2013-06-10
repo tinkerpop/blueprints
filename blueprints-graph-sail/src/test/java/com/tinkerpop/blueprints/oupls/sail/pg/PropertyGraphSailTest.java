@@ -340,6 +340,11 @@ public class PropertyGraphSailTest {
     }
 
     @Test
+    public void testxxx() throws Exception {
+        assertEquals(60, get(null, null, null).size());
+    }
+
+    @Test
     public void testSxx() throws Exception {
         assertExpected(get(ripple, null, null),
                 vf.createStatement(ripple, id, vf.createLiteral("5")),

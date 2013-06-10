@@ -32,6 +32,8 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
+ * Connection to a PropertyGraphSail
+ *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 class PropertyGraphSailConnection implements SailConnection {

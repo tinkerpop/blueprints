@@ -16,6 +16,7 @@ import java.io.File;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class PropertyGraphSail implements Sail {
+
     public static final String PROPERTY_NS = "http://tinkerpop.com/pgm/property/";
     public static final String VERTEX_NS = "http://tinkerpop.com/pgm/vertex/";
     public static final String EDGE_NS = "http://tinkerpop.com/pgm/edge/";
@@ -29,11 +30,6 @@ public class PropertyGraphSail implements Sail {
             HEAD = new URIImpl(ONTOLOGY_NS + "head"),
             TAIL = new URIImpl(ONTOLOGY_NS + "tail");
 
-    public enum Properties {
-        sharability,
-        weight,
-    }
-
     private final PropertyGraphContext context;
 
     /**
@@ -43,20 +39,6 @@ public class PropertyGraphSail implements Sail {
      */
     public PropertyGraphSail(final Graph graph) {
         context = new PropertyGraphContext(graph, new PropertyGraphValueFactory());
-
-        //graph.getIndex("", Vertex.class);
-    }
-
-    public void setVertexPropertyIndex(final String label,
-                                       final String indexName) {
-        /*
-        Index<Vertex> i = context.graph.getIndex(indexName, Vertex.class);
-        if (null == i) {
-            throw new IllegalArgumentException("no such vertex index: " + indexName);
-        }
-
-        context.indices.put(label, i);
-        */
     }
 
     public void setDataDir(File file) {
@@ -86,8 +68,6 @@ public class PropertyGraphSail implements Sail {
     public ValueFactory getValueFactory() {
         return context.valueFactory;
     }
-
-
 
     static class PropertyGraphContext {
         public final Graph graph;
