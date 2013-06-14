@@ -342,7 +342,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
             return new OrientElementIterable<Vertex>(this, (Iterable<?>) indexValue);
         }
-        return new PropertyFilteredIterable<Vertex>(key, iValue, this.getVertices());
+        
+        // NO INDEX: EXECUTE A QUERY
+        return query().has(key, iValue).vertices();
     }
 
     public Iterable<Edge> getEdges() {
@@ -387,7 +389,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
             return new OrientElementIterable<Edge>(this, (Iterable<?>) indexValue);
         }
-        return new PropertyFilteredIterable<Edge>(key, iValue, this.getEdges());
+        
+        // NO INDEX: EXECUTE A QUERY
+        return query().has(key, iValue).edges();
     }
     
     public OrientEdge getEdge(final Object id) {
