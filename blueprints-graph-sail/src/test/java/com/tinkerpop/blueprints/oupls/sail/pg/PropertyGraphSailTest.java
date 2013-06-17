@@ -26,7 +26,6 @@ import org.openrdf.repository.sail.SailRepository;
 import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
-import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
@@ -43,11 +42,12 @@ import static org.junit.Assert.fail;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class PropertyGraphSailTest {
-    private final Sail sail;
+    private final PropertyGraphSail sail;
     private final ValueFactory vf;
 
     private final URI edge, head, id, label, tail, vertex;
     private final URI age, josh, lang, lop, marko, name, peter, ripple, vadas, weight;
+    private final URI created, knows;
 
     private final URI markoKnowsVadas, markoKnowsJosh, markoCreatedLop, joshCreatedRipple, joshCreatedLop, peterCreatedLop;
 
@@ -88,6 +88,9 @@ public class PropertyGraphSailTest {
         joshCreatedRipple = vf.createURI(PropertyGraphSail.EDGE_NS + "10");
         joshCreatedLop = vf.createURI(PropertyGraphSail.EDGE_NS + "11");
         peterCreatedLop = vf.createURI(PropertyGraphSail.EDGE_NS + "12");
+
+        created = vf.createURI(PropertyGraphSail.RELATION_NS + "created");
+        knows = vf.createURI(PropertyGraphSail.RELATION_NS + "knows");
     }
 
     @Before
@@ -409,6 +412,67 @@ public class PropertyGraphSailTest {
         assertEquals(2, count);
     }
 
+    @Test
+    public void testSimpleEdges() throws Exception {
+        sail.setFirstClassEdges(false);
+        sc.close();
+        sc = sail.getConnection();
+
+        for (Statement st : get(null, null, null)) {
+            System.out.println("st: " + st);
+        }
+
+        assertEquals(30, sc.size());
+        assertEquals(30, count(null, null, null));
+
+        assertEquals(6, count(null, RDF.TYPE, vertex));
+        assertEquals(0, count(null, RDF.TYPE, edge));
+
+        assertEquals(0, count(null, label, null));
+        assertEquals(0, count(null, head, null));
+        assertEquals(0, count(null, tail, null));
+
+        // ... absence of other patterns could be tested, as well
+
+        // s ? ?
+        assertExpected(get(marko, null, null),
+                vf.createStatement(marko, id, vf.createLiteral("1")),
+                vf.createStatement(marko, RDF.TYPE, vertex),
+                vf.createStatement(marko, age, vf.createLiteral(29)),
+                vf.createStatement(marko, name, vf.createLiteral("marko")),
+                vf.createStatement(marko, knows, vadas),
+                vf.createStatement(marko, created, lop),
+                vf.createStatement(marko, knows, josh));
+
+        // s p ?
+        assertExpected(get(marko, knows, null),
+                vf.createStatement(marko, knows, vadas),
+                vf.createStatement(marko, knows, josh));
+
+        // s ? o
+        assertExpected(get(marko, null, josh),
+                vf.createStatement(marko, knows, josh));
+
+        // s p o
+        assertExpected(get(marko, knows, josh),
+                vf.createStatement(marko, knows, josh));
+        assertExpected(get(marko, name, vf.createLiteral("marko")),
+                vf.createStatement(marko, name, vf.createLiteral("marko")));
+
+        // ? ? o
+        assertExpected(get(null, null, josh),
+                vf.createStatement(marko, knows, josh));
+
+        // ? p o
+        assertExpected(get(null, knows, josh),
+                vf.createStatement(marko, knows, josh));
+
+        // ? p ?
+        assertExpected(get(null, knows, null),
+                vf.createStatement(marko, knows, vadas),
+                vf.createStatement(marko, knows, josh));
+    }
+
     private long count(final CloseableIteration iter) throws Exception {
         long count = 0;
         try {
@@ -449,6 +513,12 @@ public class PropertyGraphSailTest {
                                       final URI predicate,
                                       final Value object) throws SailException {
         return toCollection(sc.getStatements(subject, predicate, object, false));
+    }
+
+    private int count(final Resource subject,
+                                      final URI predicate,
+                                      final Value object) throws SailException {
+        return toCollection(sc.getStatements(subject, predicate, object, false)).size();
     }
 
     private Collection<Statement> toCollection(final CloseableIteration<? extends Statement, SailException> i) throws SailException {
