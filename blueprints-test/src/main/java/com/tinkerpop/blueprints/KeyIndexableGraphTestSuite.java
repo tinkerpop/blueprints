@@ -191,4 +191,37 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
 
         graph.shutdown();
     }
+
+    public void testUpdateValuesInIndexKeys() throws Exception {
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+
+        graph.createKeyIndex("name", Vertex.class);
+        if (graph instanceof TransactionalGraph)
+            ((TransactionalGraph) graph).commit();
+
+        Vertex v1 = graph.addVertex(null);
+        v1.setProperty("name", "marko");
+        assertEquals(v1.getProperty("name"), "marko");
+        vertexCount(graph, 1);
+        if (graph instanceof TransactionalGraph)
+            ((TransactionalGraph) graph).commit();
+
+        v1 = graph.getVertices("name", "marko").iterator().next();
+        assertEquals(v1.getProperty("name"), "marko");
+        v1.setProperty("name", "marko a. rodriguez");
+        assertEquals(v1.getProperty("name"), "marko a. rodriguez");
+        vertexCount(graph, 1);
+        if (graph instanceof TransactionalGraph)
+            ((TransactionalGraph) graph).commit();
+
+
+        assertFalse(graph.getVertices("name", "marko").iterator().hasNext());
+        v1 = graph.getVertices("name", "marko a. rodriguez").iterator().next();
+        assertEquals(v1.getProperty("name"), "marko a. rodriguez");
+        vertexCount(graph, 1);
+        if (graph instanceof TransactionalGraph)
+            ((TransactionalGraph) graph).commit();
+
+        graph.shutdown();
+    }
 }
