@@ -32,12 +32,14 @@ import org.openrdf.rio.RDFFormat;
 import org.openrdf.rio.RDFHandler;
 import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParser;
+import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -336,6 +338,39 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
                 p.setRDFHandler(h);
                 p.parse(input, baseURI);
                 c.commit();
+            } finally {
+                c.close();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Save RDF data from the SailGraph.
+     * Supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig.
+     *
+     * @param output    the OutputStream to which to write RDF data
+     * @param format    supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
+     */
+    public void saveRDF(final OutputStream output, final String format) {
+        try {
+            this.commit();
+            final SailConnection c = this.rawGraph.getConnection();
+            try {
+                RDFWriter w = Rio.createWriter(getFormat(format), output);
+                w.startRDF();
+
+                CloseableIteration<? extends Statement, SailException> iter = c.getStatements(null, null, null, false);
+                try {
+                    while (iter.hasNext()) {
+                        w.handleStatement(iter.next());
+                    }
+                } finally {
+                    iter.close();
+                }
+
+                w.endRDF();
             } finally {
                 c.close();
             }
