@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Map;
+
 import com.orientechnologies.common.log.OLogManager;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
@@ -13,8 +15,6 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.util.ElementHelper;
-
-import java.util.Map;
 
 /**
  * Base Graph Element where OrientVertex and OrientEdge classes extends from. Labels are managed as OrientDB classes.
@@ -223,8 +223,8 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
                             .instance()
                             .warn(
                                     this,
-                                    "[OrientEdge] committing the active transaction to create the new Edge type '%s'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction",
-                                    iClassName);
+                                    "Committing the active transaction to create the new type '%s' as subclass of '%s'. The transaction will be reopen right after that. To avoid this behavior create the classes outside the transaction",
+                                    iClassName, getBaseClassName());
                     graph.commit();
                 }
 
