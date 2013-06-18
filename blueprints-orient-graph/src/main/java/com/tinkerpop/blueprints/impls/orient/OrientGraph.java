@@ -40,7 +40,6 @@ public class OrientGraph extends OrientTransactionalGraph {
         return FEATURES;
     }
 
-    @SuppressWarnings("deprecation")
     protected void config() {
         FEATURES.supportsDuplicateEdges = true;
         FEATURES.supportsSelfLoops = true;
