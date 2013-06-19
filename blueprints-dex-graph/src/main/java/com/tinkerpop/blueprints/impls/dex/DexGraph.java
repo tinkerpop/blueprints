@@ -17,6 +17,7 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
+import org.apache.commons.configuration.Configuration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -237,6 +238,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    public DexGraph(final Configuration configuration) {
+        this(configuration.getString("blueprints.dex.directory", null), configuration.getString("blueprints.dex.config", null));
     }
 
     /**

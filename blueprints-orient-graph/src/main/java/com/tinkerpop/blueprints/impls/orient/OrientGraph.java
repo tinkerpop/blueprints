@@ -2,6 +2,8 @@ package com.tinkerpop.blueprints.impls.orient;
 
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.Features;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)
@@ -29,6 +31,12 @@ public class OrientGraph extends OrientTransactionalGraph {
     public OrientGraph(final String url, final String username, final String password) {
         super(url, username, password);
         config();
+    }
+
+    public OrientGraph(final Configuration configuration) {
+        this(configuration.getString("blueprints.orientdb.url", null),
+             configuration.getString("blueprints.orientdb.username", null),
+             configuration.getString("blueprints.orientdb.password", null));
     }
 
     public Features getFeatures() {

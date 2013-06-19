@@ -16,6 +16,8 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -162,6 +164,11 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
                 this.rawGraph.shutdown();
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    public Neo4jGraph(final Configuration configuration) {
+        this(configuration.getString("blueprints.neo4j.directory", null),
+                ConfigurationConverter.getMap(configuration.subset("blueprints.neo4j.conf")));
     }
 
     private void loadKeyIndices() {

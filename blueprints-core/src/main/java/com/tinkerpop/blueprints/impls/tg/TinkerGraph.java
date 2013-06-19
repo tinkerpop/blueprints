@@ -16,6 +16,7 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
+import org.apache.commons.configuration.Configuration;
 
 import java.io.File;
 import java.io.Serializable;
@@ -93,10 +94,35 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         GRAPHSON
     }
 
+    public TinkerGraph(final Configuration configuration) {
+        if (configuration == null) {
+            throw new IllegalArgumentException("configuration cannot be null");
+        }
+
+        this.directory = configuration.getString("blueprints.tg.directory", null);
+        this.fileType = FileType.valueOf(configuration.getString("blueprints.tg.file-type", "JAVA"));
+
+        if (directory != null) {
+            this.init();
+        }
+    }
+
     public TinkerGraph(final String directory, final FileType fileType) {
         this.directory = directory;
         this.fileType = fileType;
+        this.init();
+    }
 
+    public TinkerGraph(final String directory) {
+        this(directory, FileType.JAVA);
+    }
+
+    public TinkerGraph() {
+        this.directory = null;
+        this.fileType = FileType.JAVA;
+    }
+
+    private void init() {
         try {
             final File file = new File(directory);
             if (!file.exists()) {
@@ -117,15 +143,6 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    public TinkerGraph(final String directory) {
-        this(directory, FileType.JAVA);
-    }
-
-    public TinkerGraph() {
-        this.directory = null;
-        this.fileType = FileType.JAVA;
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
