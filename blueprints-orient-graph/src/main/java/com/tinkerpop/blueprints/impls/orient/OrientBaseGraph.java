@@ -38,7 +38,6 @@ import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 /**
@@ -116,9 +115,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
                                                     final Parameter... indexParameters) {
         final OrientGraphContext context = getContext(true);
 
-        if (getRawGraph().getTransaction().isActive())
-            // ASSURE PENDING TX IF ANY IS COMMITTED
-            this.commit();
+        commitAnyActiveTx("create index '"+indexName+"'");
 
         synchronized (contexts) {
             if (context.manualIndices.containsKey(indexName))
@@ -165,8 +162,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
 
     public void dropIndex(final String indexName) {
-        if (getRawGraph().getTransaction().isActive())
-            this.commit();
+        commitAnyActiveTx("drop index");
 
         try {
             synchronized (contexts) {
@@ -342,7 +338,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
             return new OrientElementIterable<Vertex>(this, (Iterable<?>) indexValue);
         }
-        return new PropertyFilteredIterable<Vertex>(key, iValue, this.getVertices());
+        
+        // NO INDEX: EXECUTE A QUERY
+        return query().has(key, iValue).vertices();
     }
 
     public Iterable<Edge> getEdges() {
@@ -387,7 +385,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
 
             return new OrientElementIterable<Edge>(this, (Iterable<?>) indexValue);
         }
-        return new PropertyFilteredIterable<Edge>(key, iValue, this.getEdges());
+        
+        // NO INDEX: EXECUTE A QUERY
+        return query().has(key, iValue).edges();
     }
     
     public OrientEdge getEdge(final Object id) {
@@ -537,19 +537,23 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
 
     public OClass createVertexType(final String iClassName) {
+        commitAnyActiveTx("create vertex type '"+iClassName+"'");
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, getVertexBaseType());
     }
 
     public OClass createVertexType(final String iClassName, final String iSuperClassName) {
+        commitAnyActiveTx("create vertex type '"+iClassName+"' as subclass of '"+iSuperClassName+"'");
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, getVertexType(iSuperClassName));
     }
 
     public OClass createVertexType(final String iClassName, final OClass iSuperClass) {
         checkVertexType(iSuperClass);
+        commitAnyActiveTx("create vertex type '"+iClassName+"' as subclass of '"+iSuperClass.getName()+"'");
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, iSuperClass);
     }
     
     public final void dropVertexType(final String iTypeName) {
+        commitAnyActiveTx("drop vertex type '"+iTypeName+"'");
         getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
     }
 
@@ -565,19 +569,23 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
 
     public OClass createEdgeType(final String iClassName) {
+        commitAnyActiveTx("create edge type '"+iClassName+"'");
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, getEdgeBaseType());
     }
 
     public OClass createEdgeType(final String iClassName, final String iSuperClassName) {
+        commitAnyActiveTx("create edge type '"+iClassName+"' as subclass of '"+iSuperClassName+"'");
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, getEdgeType(iSuperClassName));
     }
 
     public OClass createEdgeType(final String iClassName, final OClass iSuperClass) {
         checkEdgeType(iSuperClass);
+        commitAnyActiveTx("create edge type '"+iClassName+"' as subclass of '"+iSuperClass.getName()+"'");
         return getRawGraph().getMetadata().getSchema().createClass(iClassName, iSuperClass);
     }
     
     public final void dropEdgeType(final String iTypeName) {
+        commitAnyActiveTx("drop edge type '"+iTypeName+"'");
         getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
     }
 
@@ -723,8 +731,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
 
     public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
-        if (getRawGraph().getTransaction().isActive())
-            this.commit();
+        commitAnyActiveTx("drop key index");
 
         final String className = getClassName(elementClass);
         getRawGraph().getMetadata().getIndexManager().dropIndex(className + "." + key);
@@ -746,11 +753,7 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
      */
     @SuppressWarnings({"rawtypes"})
     public <T extends Element> void createKeyIndex(final String key, Class<T> elementClass, final Parameter... indexParameters) {
-        final ODatabaseDocumentTx db = getRawGraph();
-        final OSchema schema = db.getMetadata().getSchema();
-
-        if (db.getTransaction().isActive())
-            this.commit();
+        commitAnyActiveTx("create key index");
 
         String indexType = OClass.INDEX_TYPE.NOTUNIQUE.name();
         OType keyType = OType.STRING;
@@ -770,6 +773,9 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         
         if (className == null)
         	className = ancestorClassName;
+
+        final ODatabaseDocumentTx db = getRawGraph();
+        final OSchema schema = db.getMetadata().getSchema();
 
         final OClass cls = schema.getOrCreateClass(className, schema.getClass(ancestorClassName));
         final OProperty property = cls.getProperty(key);
@@ -923,7 +929,17 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
         throw new IllegalArgumentException("Class '" + elementClass + "' is neither a Vertex, nor an Edge");
     }
 
-	private Object convertKey(final OIndex<?> idx, Object iValue) {
+	protected void commitAnyActiveTx(final String iOperation) {
+		if (getRawGraph().getTransaction().isActive()){
+            // ASSURE PENDING TX IF ANY IS COMMITTED
+			OLogManager.instance().warn(this,
+                      "Committing the active transaction to %s. To avoid this behavior do it outside the transaction",
+                      iOperation);
+            this.commit();
+		}
+	}
+
+	protected Object convertKey(final OIndex<?> idx, Object iValue) {
 		if( iValue != null ) {
 			final OType[] types = idx.getKeyTypes();
 			if( types.length == 0 )

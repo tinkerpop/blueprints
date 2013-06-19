@@ -15,6 +15,8 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Added a saveRDF method to @SailGraph@
+* Added new edges-as-statements view style to @PropertyGraphSail@
 * @QueryTestSuite@ broken up into @GraphQueryTestSuite@ and @VertexQueryTestSuite@
 * Deprecated @Feature.isRDFModel@ is now removed
 * Added ability for a @GraphTest@ to have a graph specific test suite

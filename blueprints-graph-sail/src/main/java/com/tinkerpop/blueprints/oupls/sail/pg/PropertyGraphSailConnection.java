@@ -51,60 +51,84 @@ class PropertyGraphSailConnection implements SailConnection {
 
     private boolean open = true;
 
-    private final VertexGenerator allVertexStatements;
-    private final VertexGenerator vertexIds;
-    private final VertexGenerator vertexProps;
-    private final VertexGenerator vertexTypes;
-    private final EdgeGenerator allEdgeStatements;
-    private final EdgeGenerator labels;
-    private final EdgeGenerator heads;
-    private final EdgeGenerator tails;
-    private final EdgeGenerator edgeTypes;
-    private final EdgeGenerator edgeIds;
-    private final EdgeGenerator edgeProps;
+    private final ElementGenerator<Vertex> allVertexStatements;
+    private final ElementGenerator<Vertex> vertexIds;
+    private final ElementGenerator<Vertex> vertexProps;
+    private final ElementGenerator<Vertex> vertexTypes;
+    private final ElementGenerator<Edge> allEdgeStatements;
+    // TODO: generator for predicate-specific statements
+    private final FirstClassEdgeGenerator labels;
+    private final FirstClassEdgeGenerator heads;
+    private final FirstClassEdgeGenerator tails;
+    private final FirstClassEdgeGenerator edgeTypes;
+    private final FirstClassEdgeGenerator edgeIds;
+    private final FirstClassEdgeGenerator edgeProps;
+    private final RelationGenerator allInRelations;
+    private final RelationGenerator allOutRelations;
 
-    public PropertyGraphSailConnection(final PropertyGraphSail.PropertyGraphContext context) {
+    private final boolean firstClassEdges;
+
+    public PropertyGraphSailConnection(final PropertyGraphSail.PropertyGraphContext context,
+                                       final boolean firstClassEdges) {
         this.context = context;
+        this.firstClassEdges = firstClassEdges;
 
         allVertexStatements = new VertexGenerator();
         allVertexStatements.setDoId(true);
         allVertexStatements.setDoProperties(true);
         allVertexStatements.setDoType(true);
 
-        allEdgeStatements = new EdgeGenerator();
-        allEdgeStatements.setDoId(true);
-        allEdgeStatements.setDoProperties(true);
-        allEdgeStatements.setDoType(true);
-        allEdgeStatements.setDoHead(true);
-        allEdgeStatements.setDoTail(true);
-        allEdgeStatements.setDoLabel(true);
+        if (firstClassEdges) {
+            allEdgeStatements = new FirstClassEdgeGenerator();
+            allEdgeStatements.setDoId(true);
+            allEdgeStatements.setDoProperties(true);
+            allEdgeStatements.setDoType(true);
+            ((FirstClassEdgeGenerator) allEdgeStatements).setDoHead(true);
+            ((FirstClassEdgeGenerator) allEdgeStatements).setDoTail(true);
+            ((FirstClassEdgeGenerator) allEdgeStatements).setDoLabel(true);
+            allInRelations = null;
+            allOutRelations = null;
+        } else {
+            allEdgeStatements = new SimpleEdgeGenerator(null);
+            allInRelations = new RelationGenerator(null, true);
+            allOutRelations = new RelationGenerator(null, false);
+        }
 
         vertexTypes = new VertexGenerator();
         vertexTypes.setDoType(true);
 
-        edgeTypes = new EdgeGenerator();
-        edgeTypes.setDoType(true);
-
-        labels = new EdgeGenerator();
-        labels.setDoLabel(true);
-
-        heads = new EdgeGenerator();
-        heads.setDoHead(true);
-
-        tails = new EdgeGenerator();
-        tails.setDoTail(true);
-
         vertexIds = new VertexGenerator();
         vertexIds.setDoId(true);
-
-        edgeIds = new EdgeGenerator();
-        edgeIds.setDoId(true);
 
         vertexProps = new VertexGenerator();
         vertexProps.setDoProperties(true);
 
-        edgeProps = new EdgeGenerator();
-        edgeProps.setDoProperties(true);
+        if (firstClassEdges) {
+            edgeTypes = new FirstClassEdgeGenerator();
+            edgeTypes.setDoType(true);
+
+            labels = new FirstClassEdgeGenerator();
+            labels.setDoLabel(true);
+
+            heads = new FirstClassEdgeGenerator();
+            heads.setDoHead(true);
+
+            tails = new FirstClassEdgeGenerator();
+            tails.setDoTail(true);
+
+            edgeIds = new FirstClassEdgeGenerator();
+            edgeIds.setDoId(true);
+
+            edgeProps = new FirstClassEdgeGenerator();
+            edgeProps.setDoProperties(true);
+        } else {
+            edgeTypes = null;
+            labels = null;
+            heads = null;
+            tails = null;
+            edgeIds = null;
+            edgeProps = null;
+        }
     }
 
     private static void addNamespace(final String prefix,
@@ -211,6 +235,10 @@ class PropertyGraphSailConnection implements SailConnection {
         if (subject instanceof URI) {
             Vertex v = vertexForURI((URI) subject);
             if (null == v) {
+                if (!firstClassEdges) {
+                    return new StatementIteration();
+                }
+
                 Edge e = edgeForURI((URI) subject);
                 if (null == e) {
                     return new StatementIteration();
@@ -220,7 +248,12 @@ class PropertyGraphSailConnection implements SailConnection {
                 }
             } else {
                 Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), allVertexStatements);
-                return new StatementIteration(s);
+                if (firstClassEdges) {
+                    return new StatementIteration(s);
+                } else {
+                    Source<Vertex> s2 = new Source<Vertex>(new SingleItemIterator<Vertex>(v), allOutRelations);
+                    return new StatementIteration(s, s2);
+                }
             }
         } else {
             return new StatementIteration();
@@ -233,6 +266,10 @@ class PropertyGraphSailConnection implements SailConnection {
             if (predicate.equals(RDF.TYPE)) {
                 Vertex v = vertexForURI((URI) subject);
                 if (null == v) {
+                    if (!firstClassEdges) {
+                        return new StatementIteration();
+                    }
+
                     Edge e = edgeForURI((URI) subject);
                     if (null == e) {
                         return new StatementIteration();
@@ -244,10 +281,13 @@ class PropertyGraphSailConnection implements SailConnection {
                     Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), vertexTypes);
                     return new StatementIteration(s);
                 }
-            }
-            if (predicate.equals(PropertyGraphSail.ID)) {
+            } else if (predicate.equals(PropertyGraphSail.ID)) {
                 Vertex v = vertexForURI((URI) subject);
                 if (null == v) {
+                    if (!firstClassEdges) {
+                        return new StatementIteration();
+                    }
+
                     Edge e = edgeForURI((URI) subject);
                     if (null == e) {
                         return new StatementIteration();
@@ -260,6 +300,10 @@ class PropertyGraphSailConnection implements SailConnection {
                     return new StatementIteration(s);
                 }
             } else if (predicate.equals(PropertyGraphSail.LABEL)) {
+                if (!firstClassEdges) {
+                    return new StatementIteration();
+                }
+
                 Edge e = edgeForURI((URI) subject);
                 if (null == e) {
                     return new StatementIteration();
@@ -268,6 +312,10 @@ class PropertyGraphSailConnection implements SailConnection {
                     return new StatementIteration(s);
                 }
             } else if (predicate.equals(PropertyGraphSail.HEAD)) {
+                if (!firstClassEdges) {
+                    return new StatementIteration();
+                }
+
                 Edge e = edgeForURI((URI) subject);
                 if (null == e) {
                     return new StatementIteration();
@@ -276,6 +324,10 @@ class PropertyGraphSailConnection implements SailConnection {
                     return new StatementIteration(s);
                 }
             } else if (predicate.equals(PropertyGraphSail.TAIL)) {
+                if (!firstClassEdges) {
+                    return new StatementIteration();
+                }
+
                 Edge e = edgeForURI((URI) subject);
                 if (null == e) {
                     return new StatementIteration();
@@ -287,6 +339,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 String key = keyFromPredicate(predicate);
                 Vertex v = vertexForURI((URI) subject);
                 if (null == v) {
+                    if (!firstClassEdges) {
+                        return new StatementIteration();
+                    }
+
                     Edge e = edgeForURI((URI) subject);
                     if (null == e) {
                         return new StatementIteration();
@@ -297,6 +353,15 @@ class PropertyGraphSailConnection implements SailConnection {
                 } else {
                     Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), vertexPropertiesWithKey(key, predicate));
                     return new StatementIteration(s);
+                }
+            } else if (isRelationPredicate(predicate)) {
+                Vertex v = vertexForURI((URI) subject);
+                if (null != v) {
+                    String label = labelForRelationPredicate(predicate);
+                    Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), new RelationGenerator(label, false));
+                    return new StatementIteration(s);
+                } else {
+                    return new StatementIteration();
                 }
             } else {
                 return new StatementIteration();
@@ -316,67 +381,81 @@ class PropertyGraphSailConnection implements SailConnection {
             Object val = literalToObject(object);
             Vertex vObj = object instanceof URI ? vertexForURI((URI) object) : null;
 
-            // id
-            if (null != val) {
-                if (null == v) {
-                    if (null != e) {
-                        if (e.getId().equals(val)) {
-                            Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), edgeIds);
-                            sources.add(s);
-                        }
-                    }
-                } else {
-                    if (v.getId().equals(val)) {
-                        Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), vertexIds);
-                        sources.add(s);
-                    }
-                }
-            }
-
-            // label
-            if (null != val && (val instanceof String)) {
-                if (null != e && e.getLabel().equals(val)) {
-                    Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), labels);
+            // vertex id
+            if (null != val && null != v) {
+                if (v.getId().equals(val)) {
+                    Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), vertexIds);
                     sources.add(s);
                 }
             }
 
-            // head
-            if (null != e && null != vObj && e.getVertex(Direction.IN).equals(vObj)) {
-                Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), heads);
-                sources.add(s);
-            }
-
-            // tail
-            if (null != e && null != vObj && e.getVertex(Direction.OUT).equals(vObj)) {
-                Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), tails);
-                sources.add(s);
-            }
-
-            // type
+            // vertex type
             if (null != v && object instanceof URI && ((URI) object).equals(PropertyGraphSail.VERTEX)) {
                 Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), vertexTypes);
                 sources.add(s);
             }
-            if (null != e && object instanceof URI && ((URI) object).equals(PropertyGraphSail.VERTEX)) {
-                Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), edgeTypes);
-                sources.add(s);
+
+            // vertex properties
+            if (null != val && null != v) {
+                Source<Vertex> vertices = new Source<Vertex>(
+                        new SingleItemIterator<Vertex>(v),
+                        vertexPropertiesWithValue(val, (Literal) object));
+                sources.add(vertices);
             }
 
-            // properties
-            if (null != val) {
-                if (null != v) {
-                    Source<Vertex> vertices = new Source<Vertex>(
-                            new SingleItemIterator<Vertex>(v),
-                            vertexPropertiesWithValue(val, (Literal) object));
-                    sources.add(vertices);
+            if (firstClassEdges) {
+                // edge id
+                if (null != val && null != e) {
+                    if (e.getId().equals(val)) {
+                        Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), edgeIds);
+                        sources.add(s);
+                    }
                 }
 
-                if (null != e) {
+                // label
+                if (null != val && (val instanceof String)) {
+                    if (null != e && e.getLabel().equals(val)) {
+                        Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), labels);
+                        sources.add(s);
+                    }
+                }
+
+                // head
+                if (null != e && null != vObj && e.getVertex(Direction.IN).equals(vObj)) {
+                    Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), heads);
+                    sources.add(s);
+                }
+
+                // tail
+                if (null != e && null != vObj && e.getVertex(Direction.OUT).equals(vObj)) {
+                    Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), tails);
+                    sources.add(s);
+                }
+
+                // edge type
+                if (null != e && object instanceof URI && ((URI) object).equals(PropertyGraphSail.VERTEX)) {
+                    Source<Edge> s = new Source<Edge>(new SingleItemIterator<Edge>(e), edgeTypes);
+                    sources.add(s);
+                }
+
+                // edge properties
+                if (null != val && null != e) {
                     Source<Edge> edges = new Source<Edge>(
                             new SingleItemIterator<Edge>(e),
                             edgePropertiesWithValue(val, (Literal) object));
                     sources.add(edges);
+                }
+            } else {
+                if (null != v && null != vObj) {
+                    Collection<Edge> edges = new LinkedList<Edge>();
+                    for (Edge ev : v.getEdges(Direction.OUT)) {
+                        if (ev.getVertex(Direction.IN).equals(vObj)) {
+                            edges.add(ev);
+                        }
+                    }
+                    if (edges.size() > 0) {
+                        sources.add(new Source<Edge>(edges.iterator(), allEdgeStatements));
+                    }
                 }
             }
 
@@ -399,6 +478,10 @@ class PropertyGraphSailConnection implements SailConnection {
             if (subject instanceof URI) {
                 Vertex v = vertexForURI((URI) subject);
                 if (null == v) {
+                    if (!firstClassEdges) {
+                        return new StatementIteration();
+                    }
+
                     Edge e = edgeForURI((URI) subject);
                     if (null == e) {
                         return new StatementIteration();
@@ -428,6 +511,10 @@ class PropertyGraphSailConnection implements SailConnection {
             } else {
                 Vertex v = vertexForURI((URI) subject);
                 if (null == v) {
+                    if (!firstClassEdges) {
+                        return new StatementIteration();
+                    }
+
                     Edge e = edgeForURI((URI) subject);
                     if (null == e) {
                         return new StatementIteration();
@@ -449,6 +536,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 }
             }
         } else if (predicate.equals(PropertyGraphSail.LABEL)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             Object label = literalToObject(object);
             if (null == label || !(label instanceof String) || !(subject instanceof URI)) {
                 return new StatementIteration();
@@ -462,6 +553,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 }
             }
         } else if (predicate.equals(PropertyGraphSail.HEAD)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             if (!(subject instanceof URI) || !(object instanceof URI)) {
                 return new StatementIteration();
             } else {
@@ -475,6 +570,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 }
             }
         } else if (predicate.equals(PropertyGraphSail.TAIL)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             if (!(subject instanceof URI) || !(object instanceof URI)) {
                 return new StatementIteration();
             } else {
@@ -495,6 +594,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 String key = keyFromPredicate(predicate);
                 Vertex v = vertexForURI((URI) subject);
                 if (null == v) {
+                    if (!firstClassEdges) {
+                        return new StatementIteration();
+                    }
+
                     Edge e = edgeForURI((URI) subject);
                     if (null == e) {
                         return new StatementIteration();
@@ -511,6 +614,32 @@ class PropertyGraphSailConnection implements SailConnection {
                     return new StatementIteration(vertices);
                 }
             }
+        } else if (isRelationPredicate(predicate)) {
+            if (!(subject instanceof URI) || !(object instanceof URI)) {
+                return new StatementIteration();
+            } else {
+                String label = labelForRelationPredicate(predicate);
+
+                Vertex vSubj = vertexForURI((URI) subject);
+                Vertex vObj = vertexForURI((URI) object);
+
+                if (null != vSubj && null != vObj) {
+
+                    Collection<Edge> edges = new LinkedList<Edge>();
+                    for (Edge ev : vSubj.getEdges(Direction.OUT, label)) {
+                        if (ev.getVertex(Direction.IN).equals(vObj)) {
+                            edges.add(ev);
+                        }
+                    }
+                    if (edges.size() > 0) {
+                        return new StatementIteration(new Source<Edge>(edges.iterator(), allEdgeStatements));
+                    } else {
+                        return new StatementIteration();
+                    }
+                } else {
+                    return new StatementIteration();
+                }
+            }
         } else {
             return new StatementIteration();
         }
@@ -523,16 +652,21 @@ class PropertyGraphSailConnection implements SailConnection {
                 if (object.equals(PropertyGraphSail.VERTEX)) {
                     Source<Vertex> vertices = new Source<Vertex>(context.graph.getVertices().iterator(), vertexTypes);
                     return new StatementIteration(vertices);
-                } else if (object.equals(PropertyGraphSail.EDGE)) {
+                } else if (object.equals(PropertyGraphSail.EDGE) && firstClassEdges) {
                     Source<Edge> edges = new Source<Edge>(context.graph.getEdges().iterator(), edgeTypes);
                     return new StatementIteration(edges);
                 } else {
                     return new StatementIteration();
                 }
             } else {
-                Source<Edge> ins = new Source<Edge>(v.getEdges(Direction.IN).iterator(), heads);
-                Source<Edge> outs = new Source<Edge>(v.getEdges(Direction.OUT).iterator(), tails);
-                return new StatementIteration(ins, outs);
+                if (firstClassEdges) {
+                    Source<Edge> ins = new Source<Edge>(v.getEdges(Direction.IN).iterator(), heads);
+                    Source<Edge> outs = new Source<Edge>(v.getEdges(Direction.OUT).iterator(), tails);
+                    return new StatementIteration(ins, outs);
+                } else {
+                    Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(v), allInRelations);
+                    return new StatementIteration(s);
+                }
             }
         } else {
             Object val = literalToObject(object);
@@ -544,17 +678,19 @@ class PropertyGraphSailConnection implements SailConnection {
                 // id
                 {
                     Vertex v = context.graph.getVertex(val);
-                    Edge e = context.graph.getEdge(val);
                     if (null != v) {
                         sources.add(new Source<Vertex>(new SingleItemIterator<Vertex>(v), vertexIds));
                     }
-                    if (null != e) {
-                        sources.add(new Source<Edge>(new SingleItemIterator<Edge>(e), edgeIds));
+                    if (firstClassEdges) {
+                        Edge e = context.graph.getEdge(val);
+                        if (null != e) {
+                            sources.add(new Source<Edge>(new SingleItemIterator<Edge>(e), edgeIds));
+                        }
                     }
                 }
 
                 // label
-                {
+                if (firstClassEdges) {
                     // TODO: find matching edges faster using indices
                     if (val instanceof String) {
                         Source<Edge> s = new Source<Edge>(
@@ -567,14 +703,16 @@ class PropertyGraphSailConnection implements SailConnection {
                 // properties
                 {
                     // TODO: find matching vertices and edges faster using indices
-                    Source<Edge> edges = new Source<Edge>(
-                            context.graph.getEdges().iterator(),
-                            edgePropertiesWithValue(val, (Literal) object));
                     Source<Vertex> vertices = new Source<Vertex>(
                             context.graph.getVertices().iterator(),
                             vertexPropertiesWithValue(val, (Literal) object));
-                    sources.add(edges);
                     sources.add(vertices);
+                    if (firstClassEdges) {
+                        Source<Edge> edges = new Source<Edge>(
+                                context.graph.getEdges().iterator(),
+                                edgePropertiesWithValue(val, (Literal) object));
+                        sources.add(edges);
+                    }
                 }
 
                 if (sources.size() > 0) {
@@ -594,20 +732,19 @@ class PropertyGraphSailConnection implements SailConnection {
             if (object.equals(PropertyGraphSail.VERTEX)) {
                 Source<Vertex> s = new Source<Vertex>(context.graph.getVertices().iterator(), vertexTypes);
                 return new StatementIteration(s);
-            } else if (object.equals(PropertyGraphSail.EDGE)) {
+            } else if (object.equals(PropertyGraphSail.EDGE) && firstClassEdges) {
                 Source<Edge> s = new Source<Edge>(context.graph.getEdges().iterator(), edgeTypes);
                 return new StatementIteration(s);
             } else {
                 return new StatementIteration();
             }
-        }
-        if (predicate.equals(PropertyGraphSail.ID)) {
+        } else if (predicate.equals(PropertyGraphSail.ID)) {
             Object id = literalToObject(object);
             if (null == id) {
                 return new StatementIteration();
             } else {
                 Vertex v = context.graph.getVertex(id);
-                Edge e = context.graph.getEdge(id);
+                Edge e = firstClassEdges ? context.graph.getEdge(id) : null;
                 if (null == v && null == e) {
                     return new StatementIteration();
                 } else {
@@ -622,6 +759,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 }
             }
         } else if (predicate.equals(PropertyGraphSail.LABEL)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             // TODO: find edges faster using indices
             Object label = literalToObject(object);
             if (null == label || !(label instanceof String)) {
@@ -633,6 +774,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 return new StatementIteration(edges);
             }
         } else if (predicate.equals(PropertyGraphSail.HEAD)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             Vertex v = object instanceof URI
                     ? vertexForURI((URI) object)
                     : null;
@@ -644,6 +789,10 @@ class PropertyGraphSailConnection implements SailConnection {
                 return new StatementIteration(edges);
             }
         } else if (predicate.equals(PropertyGraphSail.TAIL)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             Vertex v = object instanceof URI
                     ? vertexForURI((URI) object)
                     : null;
@@ -661,13 +810,31 @@ class PropertyGraphSailConnection implements SailConnection {
             } else {
                 // TODO: lookup matching vertices and edges faster using indices
                 String key = keyFromPredicate(predicate);
-                Source<Edge> edges = new Source<Edge>(
-                        context.graph.getEdges().iterator(),
-                        edgePropertiesWithKeyAndValue(key, predicate, value, (Literal) object));
                 Source<Vertex> vertices = new Source<Vertex>(
                         context.graph.getVertices().iterator(),
                         vertexPropertiesWithKeyAndValue(key, predicate, value, (Literal) object));
-                return new StatementIteration(vertices, edges);
+                if (firstClassEdges) {
+                    Source<Edge> edges = new Source<Edge>(
+                            context.graph.getEdges().iterator(),
+                            edgePropertiesWithKeyAndValue(key, predicate, value, (Literal) object));
+                    return new StatementIteration(vertices, edges);
+                } else {
+                    return new StatementIteration(vertices);
+                }
+            }
+        } else if (isRelationPredicate(predicate)) {
+            if (!(object instanceof URI)) {
+                return new StatementIteration();
+            } else {
+                String label = labelForRelationPredicate(predicate);
+                Vertex vObj = vertexForURI((URI) object);
+
+                if (null != vObj) {
+                    Source<Vertex> s = new Source<Vertex>(new SingleItemIterator<Vertex>(vObj), new RelationGenerator(label, true));
+                    return new StatementIteration(s);
+                } else {
+                    return new StatementIteration();
+                }
             }
         } else {
             return new StatementIteration();
@@ -676,35 +843,64 @@ class PropertyGraphSailConnection implements SailConnection {
 
     private CloseableIteration<Statement, SailException> getStatements_xPx(final URI predicate) throws SailException {
         if (predicate.equals(RDF.TYPE)) {
-            Source<Edge> edges = new Source<Edge>(context.graph.getEdges().iterator(), edgeTypes);
             Source<Vertex> vertices = new Source<Vertex>(context.graph.getVertices().iterator(), vertexTypes);
-            return new StatementIteration(vertices, edges);
+            if (firstClassEdges) {
+                Source<Edge> edges = new Source<Edge>(context.graph.getEdges().iterator(), edgeTypes);
+                return new StatementIteration(vertices, edges);
+            } else {
+                return new StatementIteration(vertices);
+            }
         } else if (predicate.equals(PropertyGraphSail.ID)) {
-            Source<Edge> edges = new Source<Edge>(context.graph.getEdges().iterator(), edgeIds);
             Source<Vertex> vertices = new Source<Vertex>(context.graph.getVertices().iterator(), vertexIds);
-            return new StatementIteration(vertices, edges);
+            if (firstClassEdges) {
+                Source<Edge> edges = new Source<Edge>(context.graph.getEdges().iterator(), edgeIds);
+                return new StatementIteration(vertices, edges);
+            } else {
+                return new StatementIteration(vertices);
+            }
         } else if (predicate.equals(PropertyGraphSail.LABEL)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             Iterator<Edge> edgeIterator = context.graph.getEdges().iterator();
             Source<Edge> edges = new Source<Edge>(edgeIterator, labels);
             return new StatementIteration(edges);
         } else if (predicate.equals(PropertyGraphSail.HEAD)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             Iterator<Edge> edgeIterator = context.graph.getEdges().iterator();
             Source<Edge> edges = new Source<Edge>(edgeIterator, heads);
             return new StatementIteration(edges);
         } else if (predicate.equals(PropertyGraphSail.TAIL)) {
+            if (!firstClassEdges) {
+                return new StatementIteration();
+            }
+
             Iterator<Edge> edgeIterator = context.graph.getEdges().iterator();
             Source<Edge> edges = new Source<Edge>(edgeIterator, tails);
             return new StatementIteration(edges);
         } else if (isPropertyPredicate(predicate)) {
             // TODO: find elements faster using indices
             String key = keyFromPredicate(predicate);
-            Source<Edge> edges = new Source<Edge>(
-                    context.graph.getEdges().iterator(),
-                    edgePropertiesWithKey(key, predicate));
             Source<Vertex> vertices = new Source<Vertex>(
                     context.graph.getVertices().iterator(),
                     vertexPropertiesWithKey(key, predicate));
-            return new StatementIteration(vertices, edges);
+            if (firstClassEdges) {
+                Source<Edge> edges = new Source<Edge>(
+                        context.graph.getEdges().iterator(),
+                        edgePropertiesWithKey(key, predicate));
+                return new StatementIteration(vertices, edges);
+            } else {
+                return new StatementIteration(vertices);
+            }
+        } else if (isRelationPredicate(predicate)) {
+            String label = labelForRelationPredicate(predicate);
+            Iterator<Edge> edgeIterator = context.graph.getEdges().iterator();
+            Source<Edge> edges = new Source<Edge>(edgeIterator, new SimpleEdgeGenerator(label));
+            return new StatementIteration(edges);
         } else {
             return new StatementIteration();
         }
@@ -712,6 +908,14 @@ class PropertyGraphSailConnection implements SailConnection {
 
     private boolean isPropertyPredicate(final URI predicate) {
         return predicate.stringValue().startsWith(PropertyGraphSail.PROPERTY_NS);
+    }
+
+    private boolean isRelationPredicate(final URI predicate) {
+        return predicate.stringValue().startsWith(PropertyGraphSail.RELATION_NS);
+    }
+
+    private String labelForRelationPredicate(final URI predicate) {
+        return predicate.stringValue().substring(PropertyGraphSail.RELATION_NS.length());
     }
 
     private String keyFromPredicate(final URI predicate) {
@@ -726,8 +930,12 @@ class PropertyGraphSailConnection implements SailConnection {
         long count = 0;
 
         for (Edge e : context.graph.getEdges()) {
-            count += 5  // type, id, label, head, tail
-                    + e.getPropertyKeys().size();
+            if (firstClassEdges) {
+                count += 5  // type, id, label, head, tail
+                        + e.getPropertyKeys().size();
+            } else {
+                count++;
+            }
         }
 
         for (Vertex v : context.graph.getVertices()) {
@@ -810,11 +1018,15 @@ class PropertyGraphSailConnection implements SailConnection {
     }
 
     private Edge edgeForURI(final URI uri) {
-        String s = uri.stringValue();
+        if (firstClassEdges) {
+            String s = uri.stringValue();
 
-        return s.startsWith(PropertyGraphSail.EDGE_NS)
-                ? context.graph.getEdge(idFromString(s.substring(PropertyGraphSail.EDGE_NS.length())))
-                : null;
+            return s.startsWith(PropertyGraphSail.EDGE_NS)
+                    ? context.graph.getEdge(idFromString(s.substring(PropertyGraphSail.EDGE_NS.length())))
+                    : null;
+        } else {
+            return null;
+        }
     }
 
     private Object literalToObject(final Value v) {
@@ -923,7 +1135,8 @@ class PropertyGraphSailConnection implements SailConnection {
         }
     }
 
-    private class EdgeGenerator extends ElementGenerator<Edge> {
+
+    private class FirstClassEdgeGenerator extends ElementGenerator<Edge> {
         protected boolean doLabel;
         protected boolean doHead;
         protected boolean doTail;
@@ -963,6 +1176,66 @@ class PropertyGraphSailConnection implements SailConnection {
                 generateTailStatement(uri, tailUri, results);
             }
         }
+    }
+
+    private class SimpleEdgeGenerator extends ElementGenerator<Edge> {
+        private final String label;
+
+        private SimpleEdgeGenerator(final String label) {
+            this.label = label;
+        }
+
+        public void generate(final Edge source,
+                             final Collection<Statement> results) {
+            if (null == label || source.getLabel().equals(label)) {
+                createEdgeStatement(source, results);
+            }
+        }
+    }
+
+    private class RelationGenerator extends ElementGenerator<Vertex> {
+        private final String label;
+        private final boolean inVsOut;
+
+        private RelationGenerator(final String label,
+                                  final boolean inVsOut) {
+            this.label = label;
+            this.inVsOut = inVsOut;
+        }
+
+        public void generate(final Vertex source,
+                             final Collection<Statement> results) {
+            if (inVsOut) {
+                if (null == label) {
+                    for (Edge e : source.getEdges(Direction.IN)) {
+                        createEdgeStatement(e, results);
+                    }
+                } else {
+                    for (Edge e : source.getEdges(Direction.IN, label)) {
+                        createEdgeStatement(e, results);
+                    }
+                }
+            } else {
+                if (null == label) {
+                    for (Edge e : source.getEdges(Direction.OUT)) {
+                        createEdgeStatement(e, results);
+                    }
+                } else {
+                    for (Edge e : source.getEdges(Direction.OUT, label)) {
+                        createEdgeStatement(e, results);
+                    }
+                }
+            }
+        }
+    }
+
+    private void createEdgeStatement(final Edge source,
+                                     final Collection<Statement> results) {
+        URI headUri = uriForVertex(source.getVertex(Direction.IN));
+        URI tailUri = uriForVertex(source.getVertex(Direction.OUT));
+        URI predicate = context.valueFactory.createURI(PropertyGraphSail.RELATION_NS + source.getLabel());
+
+        results.add(context.valueFactory.createStatement(tailUri, predicate, headUri));
     }
 
     private StatementGenerator<Edge> matchingLabels(final String label,

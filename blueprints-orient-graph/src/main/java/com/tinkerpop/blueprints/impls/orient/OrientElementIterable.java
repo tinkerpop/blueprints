@@ -19,7 +19,8 @@ public class OrientElementIterable<T extends Element> implements CloseableIterab
         this.iterable = iterable;
     }
 
-    public Iterator<T> iterator() {
+    @SuppressWarnings("unchecked")
+	public Iterator<T> iterator() {
         if( iterable == null )
           return Collections.EMPTY_LIST.iterator();
         
