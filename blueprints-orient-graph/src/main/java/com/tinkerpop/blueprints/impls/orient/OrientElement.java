@@ -120,10 +120,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
     }
 
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((rawElement == null) ? 0 : rawElement.hashCode());
-        return result;
+        return ((rawElement == null) ? 0 : rawElement.hashCode());
     }
 
     @Override
