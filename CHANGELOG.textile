@@ -33,7 +33,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Bumped Neo4j to 1.9
 * Added @has(key)@ and @hasNot(key)@ in @Query@ API
 * Added @has(key,value)@ and @hasNot(key,value)@ in @Query@ API
-* Added @has(key,CompareRelation,value)@ in @Query@ API
+* Added @has(key,predicate,value)@ in @Query@ API
 * Deprecated @Query.has(key,value,compare)@ in @Query@ API
 * Added @CompareRelation@ interface to support future compare-type operations
 * Ignore nulls property values in loading of GraphSON as graphs do not accept such values for element properties

@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers;
 
-import com.tinkerpop.blueprints.CompareRelation;
+import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.Vertex;
@@ -36,7 +36,7 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery has(final String key, final CompareRelation compare, final Object value) {
+    public GraphQuery has(final String key, final Predicate compare, final Object value) {
         this.query = this.query.has(key, compare, value);
         return this;
     }

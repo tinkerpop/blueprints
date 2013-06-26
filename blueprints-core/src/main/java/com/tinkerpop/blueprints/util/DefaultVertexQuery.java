@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
-import com.tinkerpop.blueprints.CompareRelation;
+import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -46,8 +46,8 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery has(final String key, final CompareRelation compare, final Object value) {
-        super.has(key, compare, value);
+    public VertexQuery has(final String key, final Predicate predicate, final Object value) {
+        super.has(key, predicate, value);
         return this;
     }
 

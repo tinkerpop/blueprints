@@ -22,7 +22,7 @@ public interface GraphQuery extends Query {
     public GraphQuery hasNot(final String key, final Object value);
 
     @Override
-    public GraphQuery has(final String key, final CompareRelation compare, final Object value);
+    public GraphQuery has(final String key, final Predicate predicate, final Object value);
 
     @Override
     @Deprecated

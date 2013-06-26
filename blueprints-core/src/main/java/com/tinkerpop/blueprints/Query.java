@@ -10,7 +10,7 @@ package com.tinkerpop.blueprints;
 public interface Query {
 
     @Deprecated
-    public enum Compare implements CompareRelation {
+    public enum Compare implements Predicate {
         EQUAL, NOT_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL;
 
         public Compare opposite() {
@@ -100,11 +100,11 @@ public interface Query {
      * Filter out the element if it does not have a property with a comparable value.
      *
      * @param key     the key of the property
-     * @param compare the comparator to use for comparison
+     * @param predicate the comparator to use for comparison
      * @param value  the value to check against
      * @return the modified query object
      */
-    public Query has(final String key, final CompareRelation compare, final Object value);
+    public Query has(final String key, final Predicate predicate, final Object value);
 
     /**
      * Filter out the element if it does not have a property with a comparable value.

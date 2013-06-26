@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
-import com.tinkerpop.blueprints.CompareRelation;
+import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
@@ -46,8 +46,8 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery has(final String key, final CompareRelation compare, final Object value) {
-        super.has(key, compare, value);
+    public GraphQuery has(final String key, final Predicate predicate, final Object value) {
+        super.has(key, predicate, value);
         return this;
     }
 
@@ -145,7 +145,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                 final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
                 HasContainer container = null;
                 for (final HasContainer hasContainer : hasContainers) {
-                    if (hasContainer.compare.equals(com.tinkerpop.blueprints.Compare.EQUAL) && keys.contains(hasContainer.key)) {
+                    if (hasContainer.predicate.equals(com.tinkerpop.blueprints.Compare.EQUAL) && keys.contains(hasContainer.key)) {
                         container = hasContainer;
                         break;
                     }

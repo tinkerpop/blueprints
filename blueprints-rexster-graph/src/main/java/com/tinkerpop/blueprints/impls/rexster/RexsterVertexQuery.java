@@ -124,7 +124,7 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
                 sb.append(hasContainer.key);
 
                 sb.append(RexsterTokens.COMMA);
-                sb.append(hasContainer.compare.toString());
+                sb.append(hasContainer.predicate.toString());
                 sb.append(RexsterTokens.COMMA);
 
                 // for (Object v : hasContainer.values) {

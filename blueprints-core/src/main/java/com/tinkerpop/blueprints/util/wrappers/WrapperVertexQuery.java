@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers;
 
-import com.tinkerpop.blueprints.CompareRelation;
+import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
@@ -40,7 +40,7 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery has(final String key, final CompareRelation compare, final Object value) {
+    public VertexQuery has(final String key, final Predicate compare, final Object value) {
         this.query = this.query.has(key, compare, value);
         return this;
     }

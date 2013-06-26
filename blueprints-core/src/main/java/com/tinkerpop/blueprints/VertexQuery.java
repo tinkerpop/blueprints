@@ -53,7 +53,7 @@ public interface VertexQuery extends Query {
     public VertexQuery hasNot(final String key, final Object value);
 
     @Override
-    public VertexQuery has(final String key, final CompareRelation compare, final Object value);
+    public VertexQuery has(final String key, final Predicate predicate, final Object value);
 
     @Override
     @Deprecated

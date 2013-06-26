@@ -6,7 +6,7 @@ import java.util.Collection;
  * @author Pierre De Wilde
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public enum Contains implements CompareRelation {
+public enum Contains implements Predicate {
 
     IN, NOT_IN;
 
