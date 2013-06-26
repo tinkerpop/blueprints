@@ -31,12 +31,12 @@ public abstract class DefaultQuery implements Query {
     }
 
     public Query hasNot(final String key) {
-        this.hasContainers.add(new HasContainer(key, com.tinkerpop.blueprints.Compare.EQUAL, new Object[]{null}));
+        this.hasContainers.add(new HasContainer(key, com.tinkerpop.blueprints.Compare.EQUAL, null));
         return this;
     }
 
     public Query has(final String key) {
-        this.hasContainers.add(new HasContainer(key, com.tinkerpop.blueprints.Compare.NOT_EQUAL, new Object[]{null}));
+        this.hasContainers.add(new HasContainer(key, com.tinkerpop.blueprints.Compare.NOT_EQUAL, null));
         return this;
     }
 
@@ -44,8 +44,8 @@ public abstract class DefaultQuery implements Query {
         return this.has(key, compare, value);
     }
 
-    public Query has(final String key, final CompareRelation compare, final Object... values) {
-        this.hasContainers.add(new HasContainer(key, compare, values));
+    public Query has(final String key, final CompareRelation compare, final Object value) {
+        this.hasContainers.add(new HasContainer(key, compare, value));
         return this;
     }
 
@@ -55,7 +55,7 @@ public abstract class DefaultQuery implements Query {
         return this;
     }
 
-    public Query limit(final long count) {
+    public Query limit(final int count) {
         this.limit = count;
         return this;
     }
@@ -65,89 +65,17 @@ public abstract class DefaultQuery implements Query {
 
     protected class HasContainer {
         public String key;
-        public Object[] values;
-        public com.tinkerpop.blueprints.Compare compare;
+        public Object value;
+        public CompareRelation compare;
 
-        public HasContainer(final String key, final CompareRelation compare, final Object... values) {
+        public HasContainer(final String key, final CompareRelation compare, final Object value) {
             this.key = key;
-            this.values = values;
-            if (!(compare instanceof com.tinkerpop.blueprints.Compare))
-                throw new IllegalArgumentException("The provided CompareRelation is not supported by DefaultQuery: " + compare.getClass());
-            this.compare = (com.tinkerpop.blueprints.Compare) compare;
+            this.value = value;
+            this.compare = compare;
         }
 
         public boolean isLegal(final Element element) {
-            final Object elementValue = element.getProperty(this.key);
-            switch (compare) {
-                case EQUAL:
-                    if (null == elementValue) {
-                        for (final Object value : this.values) {
-                            if (value == null)
-                                return true;
-                        }
-                    } else {
-                        for (final Object value : this.values) {
-                            if (elementValue.equals(value))
-                                return true;
-                        }
-                    }
-                    return false;
-                case NOT_EQUAL:
-                    if (null == elementValue) {
-                        for (final Object value : this.values) {
-                            if (value != null)
-                                return true;
-                        }
-                    } else {
-                        for (final Object value : this.values) {
-                            if (!elementValue.equals(value))
-                                return true;
-                        }
-                    }
-                    return false;
-                case GREATER_THAN:
-                    if (null == elementValue)
-                        return false;
-                    else {
-                        for (final Object value : this.values) {
-                            if (((Comparable) elementValue).compareTo((value)) >= 1)
-                                return true;
-                        }
-                    }
-                    return false;
-                case LESS_THAN:
-                    if (null == elementValue)
-                        return false;
-                    else {
-                        for (final Object value : this.values) {
-                            if (((Comparable) elementValue).compareTo((value)) <= -1)
-                                return true;
-                        }
-                    }
-                    return false;
-                case GREATER_THAN_EQUAL:
-                    if (null == elementValue)
-                        return false;
-                    else {
-                        for (final Object value : this.values) {
-                            if (((Comparable) elementValue).compareTo((value)) >= 0)
-                                return true;
-                        }
-                    }
-                    return false;
-                case LESS_THAN_EQUAL:
-                    if (null == elementValue)
-                        return false;
-                    else {
-                        for (final Object value : this.values) {
-                            if (((Comparable) elementValue).compareTo((value)) <= 0)
-                                return true;
-                        }
-                    }
-                    return false;
-                default:
-                    throw new IllegalArgumentException("Invalid state as no valid filter was provided");
-            }
+            return this.compare.compare(element.getProperty(this.key), this.value);
         }
     }
 }

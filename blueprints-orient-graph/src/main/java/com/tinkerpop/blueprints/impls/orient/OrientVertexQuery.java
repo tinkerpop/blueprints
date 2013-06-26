@@ -18,7 +18,7 @@ public class OrientVertexQuery extends DefaultVertexQuery {
         if (hasContainers.isEmpty()) {
             // NO CONDITIONS: USE THE FAST COUNT
             long counter = ((OrientVertex) vertex).countEdges(direction, labels);
-            if (limit != Long.MAX_VALUE && counter > limit)
+            if (limit != Integer.MAX_VALUE && counter > limit)
                 return limit;
             return counter;
         }

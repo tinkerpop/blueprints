@@ -22,7 +22,7 @@ public interface GraphQuery extends Query {
     public GraphQuery hasNot(final String key, final Object value);
 
     @Override
-    public GraphQuery has(final String key, final CompareRelation compare, final Object... values);
+    public GraphQuery has(final String key, final CompareRelation compare, final Object value);
 
     @Override
     @Deprecated
@@ -32,5 +32,5 @@ public interface GraphQuery extends Query {
     public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue);
 
     @Override
-    public GraphQuery limit(final long take);
+    public GraphQuery limit(final int limit);
 }

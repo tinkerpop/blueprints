@@ -29,6 +29,37 @@ public interface Query {
             else
                 throw new RuntimeException("Comparator does not have an opposite.");
         }
+
+        public boolean compare(final Object first, final Object second) {
+            switch (this) {
+                case EQUAL:
+                    if (null == first)
+                        return second == null;
+                    return first.equals(second);
+                case NOT_EQUAL:
+                    if (null == first)
+                        return second != null;
+                    return !first.equals(second);
+                case GREATER_THAN:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) >= 1;
+                case LESS_THAN:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) <= -1;
+                case GREATER_THAN_EQUAL:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) >= 0;
+                case LESS_THAN_EQUAL:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) <= 0;
+                default:
+                    throw new IllegalArgumentException("Invalid state as no valid filter was provided");
+            }
+        }
     }
 
     /**
@@ -70,10 +101,10 @@ public interface Query {
      *
      * @param key     the key of the property
      * @param compare the comparator to use for comparison
-     * @param values  the value to check against
+     * @param value  the value to check against
      * @return the modified query object
      */
-    public Query has(final String key, final CompareRelation compare, final Object... values);
+    public Query has(final String key, final CompareRelation compare, final Object value);
 
     /**
      * Filter out the element if it does not have a property with a comparable value.
@@ -102,7 +133,7 @@ public interface Query {
      * @param take the take number of elements to return
      * @return the modified query object
      */
-    public Query limit(final long take);
+    public Query limit(final int take);
 
     /**
      * Execute the query and return the matching edges.

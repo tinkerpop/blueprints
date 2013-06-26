@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -145,19 +146,19 @@ public class GraphQueryTestSuite extends TestSuite {
             edge = marko.addEdge("knows", matthias);
             edge.setProperty("type", "aurelius");
 
-            assertEquals(count(graph.query().has("type", Compare.EQUAL, "tinkerpop", "aurelius").edges()), 2);
-            assertEquals(count(graph.query().has("type", Compare.EQUAL, "tinkerpop", "aurelius").has("type", "tinkerpop").edges()), 1);
-            assertEquals(count(graph.query().has("type", Compare.EQUAL, "tinkerpop", "aurelius").has("type", "tinkerpop").has("type", "aurelius").edges()), 0);
+            assertEquals(count(graph.query().has("type", Contains.IN, Arrays.asList("tinkerpop", "aurelius")).edges()), 2);
+            assertEquals(count(graph.query().has("type", Contains.IN, Arrays.asList("tinkerpop", "aurelius")).has("type", "tinkerpop").edges()), 1);
+            assertEquals(count(graph.query().has("type", Contains.IN, Arrays.asList("tinkerpop", "aurelius")).has("type", "tinkerpop").has("type", "aurelius").edges()), 0);
             assertEquals(graph.query().has("weight").edges().iterator().next().getProperty("type"), "tinkerpop");
             assertEquals(graph.query().has("weight").edges().iterator().next().getProperty("weight"), 1.0);
             assertEquals(graph.query().hasNot("weight").edges().iterator().next().getProperty("type"), "aurelius");
             assertNull(graph.query().hasNot("weight").edges().iterator().next().getProperty("weight"));
 
-            List result = asList(graph.query().has("name", Compare.EQUAL, "marko", "stephen").vertices());
+            List result = asList(graph.query().has("name", Contains.IN, Arrays.asList("marko", "stephen")).vertices());
             assertEquals(result.size(), 2);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
-            result = asList(graph.query().has("name", Compare.EQUAL, "marko", "stephen", "matthias", "josh", "peter").vertices());
+            result = asList(graph.query().has("name", Contains.IN, Arrays.asList("marko", "stephen", "matthias", "josh", "peter")).vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
@@ -174,12 +175,12 @@ public class GraphQueryTestSuite extends TestSuite {
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
             assertTrue(result.contains(matthias));
-            result = asList(graph.query().has("name", Compare.NOT_EQUAL, "bill", "sam").vertices());
+            result = asList(graph.query().has("name", Contains.NOT_IN, Arrays.asList("bill", "sam")).vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
             assertTrue(result.contains(matthias));
-            result = asList(graph.query().has("name", Compare.NOT_EQUAL, "bill", "matthias", "stephen", "marko").vertices());
+            result = asList(graph.query().has("name", Contains.IN, Arrays.asList("bill", "matthias", "stephen", "marko")).vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));

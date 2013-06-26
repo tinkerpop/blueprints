@@ -53,7 +53,7 @@ public interface VertexQuery extends Query {
     public VertexQuery hasNot(final String key, final Object value);
 
     @Override
-    public VertexQuery has(final String key, final CompareRelation compare, final Object... values);
+    public VertexQuery has(final String key, final CompareRelation compare, final Object value);
 
     @Override
     @Deprecated
@@ -63,6 +63,6 @@ public interface VertexQuery extends Query {
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue);
 
     @Override
-    public VertexQuery limit(final long take);
+    public VertexQuery limit(final int limit);
 
 }

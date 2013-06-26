@@ -7,6 +7,37 @@ public enum Compare implements CompareRelation {
 
     EQUAL, NOT_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL;
 
+    public boolean compare(final Object first, final Object second) {
+        switch (this) {
+            case EQUAL:
+                if (null == first)
+                    return second == null;
+                return first.equals(second);
+            case NOT_EQUAL:
+                if (null == first)
+                    return second != null;
+                return !first.equals(second);
+            case GREATER_THAN:
+                if (null == first || second == null)
+                    return false;
+                return ((Comparable) first).compareTo(second) >= 1;
+            case LESS_THAN:
+                if (null == first || second == null)
+                    return false;
+                return ((Comparable) first).compareTo(second) <= -1;
+            case GREATER_THAN_EQUAL:
+                if (null == first || second == null)
+                    return false;
+                return ((Comparable) first).compareTo(second) >= 0;
+            case LESS_THAN_EQUAL:
+                if (null == first || second == null)
+                    return false;
+                return ((Comparable) first).compareTo(second) <= 0;
+            default:
+                throw new IllegalArgumentException("Invalid state as no valid filter was provided");
+        }
+    }
+
     public Compare opposite() {
         if (this.equals(EQUAL))
             return NOT_EQUAL;

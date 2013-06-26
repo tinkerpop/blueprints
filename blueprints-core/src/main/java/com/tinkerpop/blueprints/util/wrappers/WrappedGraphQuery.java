@@ -36,8 +36,8 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery has(final String key, final CompareRelation compare, final Object... values) {
-        this.query = this.query.has(key, compare, values);
+    public GraphQuery has(final String key, final CompareRelation compare, final Object value) {
+        this.query = this.query.has(key, compare, value);
         return this;
     }
 
@@ -50,7 +50,7 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery limit(final long limit) {
+    public GraphQuery limit(final int limit) {
         this.query = this.query.limit(limit);
         return this;
     }

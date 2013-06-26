@@ -46,8 +46,8 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery has(final String key, final CompareRelation compare, final Object... values) {
-        super.has(key, compare, values);
+    public VertexQuery has(final String key, final CompareRelation compare, final Object value) {
+        super.has(key, compare, value);
         return this;
     }
 
@@ -61,7 +61,7 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery limit(final long limit) {
+    public VertexQuery limit(final int limit) {
         super.limit(limit);
         return this;
     }
@@ -171,8 +171,7 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
                         }
 
                         if (!filter) {
-                            this.count++;
-                            if (this.count <= limit) {
+                            if (++this.count <= limit) {
                                 this.nextEdge = edge;
                                 return true;
                             }

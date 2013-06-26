@@ -40,8 +40,8 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery has(final String key, final CompareRelation compare, final Object... values) {
-        this.query = this.query.has(key, compare, values);
+    public VertexQuery has(final String key, final CompareRelation compare, final Object value) {
+        this.query = this.query.has(key, compare, value);
         return this;
     }
 
@@ -59,7 +59,7 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery limit(final long limit) {
+    public VertexQuery limit(final int limit) {
         this.query = this.query.limit(limit);
         return this;
     }

@@ -1,14 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import com.orientechnologies.orient.core.db.record.OIdentifiable;
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Query;
-import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
-
-import java.util.Collections;
 
 /**
  * OrientDB implementation for Graph query.
@@ -42,7 +36,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     protected static final String QUERY_SELECT_FROM = "select from ";
     protected static final String LIMIT = " LIMIT ";
     //protected static final String SKIP = " SKIP ";
-    
+
     protected String fetchPlan;
 
     public OrientGraphQuery(final Graph iGraph) {
@@ -54,7 +48,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         return this;
     }
 
-    @Override
+    /*@Override
     public Iterable<Vertex> vertices() {
         if (limit == 0)
             return Collections.emptyList();
@@ -168,7 +162,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         }
     }
 
-    protected void manageFilters(final StringBuilder text) {
+    /*protected void manageFilters(final StringBuilder text) {
         for (HasContainer has : hasContainers) {
             text.append(QUERY_FILTER_AND);
 
@@ -243,5 +237,5 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         text.append(iValue);
         if (iValue instanceof String)
             text.append(QUERY_STRING);
-    }
+    } */
 }

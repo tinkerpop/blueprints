@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.tinkerpop.blueprints.Direction.*;
@@ -198,7 +199,7 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(results.get(0), c);
             assertEquals(results.get(0), c);
 
-            results = asList(a.query().direction(OUT).has("amount", Compare.NOT_EQUAL, 2.3, 5.6, 234).edges());
+            results = asList(a.query().direction(OUT).has("amount", Contains.NOT_IN, Arrays.asList(2.3, 5.6, 234)).edges());
             assertEquals(results.size(), 3);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
@@ -219,19 +220,19 @@ public class VertexQueryTestSuite extends TestSuite {
             assertTrue(result.contains(aFriendB));
             assertTrue(result.contains(aHateC));
 
-            result = asList(a.query().direction(OUT).has("amount", Compare.EQUAL, 1.0, 0.5).edges());
+            result = asList(a.query().direction(OUT).has("amount", Contains.IN, Arrays.asList(1.0, 0.5)).edges());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(aFriendB));
             assertTrue(result.contains(aFriendC));
             assertTrue(result.contains(aHateC));
 
-            result = asList(a.query().direction(OUT).has("amount", Compare.EQUAL, 1.0, 0.5, "marko", 13, 'a', 32.13d).edges());
+            result = asList(a.query().direction(OUT).has("amount", Contains.IN, Arrays.asList(1.0, 0.5, "marko", 13, 'a', 32.13d)).edges());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(aFriendB));
             assertTrue(result.contains(aFriendC));
             assertTrue(result.contains(aHateC));
 
-            result = asList(a.query().direction(OUT).has("amount", Compare.EQUAL, 1.0, 0.5, "marko", 13, 'a', 32.13d).vertices());
+            result = asList(a.query().direction(OUT).has("amount", Contains.IN, Arrays.asList(1.0, 0.5, "marko", 13, 'a', 32.13d)).vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(b));
             assertTrue(result.contains(c));
