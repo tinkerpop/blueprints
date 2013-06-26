@@ -50,37 +50,17 @@ public class GraphQueryTestSuite extends TestSuite {
             assertEquals(count(graph.query().limit(3).vertices()), 3);
             assertEquals(count(graph.query().limit(4).vertices()), 3);
 
-            assertEquals(count(graph.query().limit(0).vertices()), count(graph.query().limit(0, 0).vertices()));
-            BaseTest.equalIterators(graph.query().limit(0).vertices().iterator(), graph.query().limit(0, 0).vertices().iterator());
-            assertEquals(count(graph.query().limit(1).vertices()), count(graph.query().limit(0, 1).vertices()));
-            BaseTest.equalIterators(graph.query().limit(1).vertices().iterator(), graph.query().limit(0, 1).vertices().iterator());
-            assertEquals(count(graph.query().limit(2).vertices()), count(graph.query().limit(0, 2).vertices()));
-            BaseTest.equalIterators(graph.query().limit(2).vertices().iterator(), graph.query().limit(0, 2).vertices().iterator());
-            assertEquals(count(graph.query().limit(3).vertices()), count(graph.query().limit(0, 3).vertices()));
-            BaseTest.equalIterators(graph.query().limit(3).vertices().iterator(), graph.query().limit(0, 3).vertices().iterator());
-            assertEquals(count(graph.query().limit(3).vertices()), count(graph.query().limit(0, 4).vertices()));
-            BaseTest.equalIterators(graph.query().limit(3).vertices().iterator(), graph.query().limit(0, 4).vertices().iterator());
-
-            assertEquals(count(graph.query().limit(0, 1).vertices()), 1);
-            BaseTest.equalIterators(graph.query().limit(0, 1).vertices().iterator(), graph.query().limit(1).vertices().iterator());
-            assertEquals(count(graph.query().limit(1, 1).vertices()), 1);
-            assertEquals(count(graph.query().limit(1, 2).vertices()), 2);
-            assertEquals(count(graph.query().limit(1, 3).vertices()), 2);
-            assertEquals(count(graph.query().limit(1, 4).vertices()), 2);
-            assertEquals(count(graph.query().limit(2, 3).vertices()), 1);
-            assertEquals(count(graph.query().limit(4, 10).vertices()), 0);
-
             vertices = graph.query().has("name", "marko").vertices();
             assertEquals(count(vertices), 1);
             // TODO: Neo4j's global iterators are inconsistent with its transactions
             // assertEquals(vertices.iterator().next().getProperty("name"), "marko");
 
-            vertices = graph.query().has("age", Query.Compare.GREATER_THAN_EQUAL, 29).vertices();
+            vertices = graph.query().has("age", Compare.GREATER_THAN_EQUAL, 29).vertices();
             assertEquals(count(vertices), 1);
             assertEquals(vertices.iterator().next().getProperty("name"), "marko");
             assertEquals(vertices.iterator().next().getProperty("age"), 33);
 
-            vertices = graph.query().has("age", Query.Compare.GREATER_THAN_EQUAL, 28).vertices();
+            vertices = graph.query().has("age", Compare.GREATER_THAN_EQUAL, 28).vertices();
             assertEquals(count(vertices), 2);
             names = new HashSet<String>();
             for (Vertex v : vertices) {
@@ -165,19 +145,19 @@ public class GraphQueryTestSuite extends TestSuite {
             edge = marko.addEdge("knows", matthias);
             edge.setProperty("type", "aurelius");
 
-            assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").edges()), 2);
-            assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").has("type", "tinkerpop").edges()), 1);
-            assertEquals(count(graph.query().has("type", "tinkerpop", "aurelius").has("type", "tinkerpop").has("type", "aurelius").edges()), 0);
+            assertEquals(count(graph.query().has("type", Compare.EQUAL, "tinkerpop", "aurelius").edges()), 2);
+            assertEquals(count(graph.query().has("type", Compare.EQUAL, "tinkerpop", "aurelius").has("type", "tinkerpop").edges()), 1);
+            assertEquals(count(graph.query().has("type", Compare.EQUAL, "tinkerpop", "aurelius").has("type", "tinkerpop").has("type", "aurelius").edges()), 0);
             assertEquals(graph.query().has("weight").edges().iterator().next().getProperty("type"), "tinkerpop");
             assertEquals(graph.query().has("weight").edges().iterator().next().getProperty("weight"), 1.0);
             assertEquals(graph.query().hasNot("weight").edges().iterator().next().getProperty("type"), "aurelius");
             assertNull(graph.query().hasNot("weight").edges().iterator().next().getProperty("weight"));
 
-            List result = asList(graph.query().has("name", "marko", "stephen").vertices());
+            List result = asList(graph.query().has("name", Compare.EQUAL, "marko", "stephen").vertices());
             assertEquals(result.size(), 2);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
-            result = asList(graph.query().has("name", "marko", "stephen", "matthias", "josh", "peter").vertices());
+            result = asList(graph.query().has("name", Compare.EQUAL, "marko", "stephen", "matthias", "josh", "peter").vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
@@ -194,12 +174,12 @@ public class GraphQueryTestSuite extends TestSuite {
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
             assertTrue(result.contains(matthias));
-            result = asList(graph.query().hasNot("name", "bill", "sam").vertices());
+            result = asList(graph.query().has("name", Compare.NOT_EQUAL, "bill", "sam").vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));
             assertTrue(result.contains(matthias));
-            result = asList(graph.query().hasNot("name", "bill", "matthias", "stephen", "marko").vertices());
+            result = asList(graph.query().has("name", Compare.NOT_EQUAL, "bill", "matthias", "stephen", "marko").vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(marko));
             assertTrue(result.contains(stephen));

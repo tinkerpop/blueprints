@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
+import com.tinkerpop.blueprints.CompareRelation;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
@@ -27,22 +28,32 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         this.graph = graph;
     }
 
-    public GraphQuery has(final String key, final Object... values) {
-        super.has(key, values);
+    public GraphQuery has(final String key) {
+        super.has(key);
         return this;
     }
 
-    public GraphQuery hasNot(final String key, final Object... values) {
-        super.hasNot(key,values);
+    public GraphQuery hasNot(final String key) {
+        super.hasNot(key);
+        return this;
+    }
+
+    public GraphQuery has(final String key, final Object value) {
+        super.has(key, value);
+        return this;
+    }
+
+    public GraphQuery hasNot(final String key, final Object value) {
+        super.hasNot(key, value);
+        return this;
+    }
+
+    public GraphQuery has(final String key, final CompareRelation compare, final Object... values) {
+        super.has(key, compare, values);
         return this;
     }
 
     public <T extends Comparable<T>> GraphQuery has(final String key, final T value, final Compare compare) {
-        super.has(key, compare, value);
-        return this;
-    }
-
-    public <T extends Comparable<T>> GraphQuery has(final String key, final Compare compare, final T value) {
         super.has(key, compare, value);
         return this;
     }
@@ -52,13 +63,8 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public GraphQuery limit(final long take) {
-        super.limit(take);
-        return this;
-    }
-
-    public GraphQuery limit(final long skip, final long take) {
-        super.limit(skip, take);
+    public GraphQuery limit(final long limit) {
+        super.limit(limit);
         return this;
     }
 
@@ -111,7 +117,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
                 private boolean loadNext() {
                     this.nextElement = null;
-                    if (this.count > maximum) return false;
+                    if (this.count > limit) return false;
                     while (this.itty.hasNext()) {
                         final T element = this.itty.next();
                         boolean filter = false;
@@ -124,8 +130,8 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                         }
 
                         if (!filter) {
-                            this.count++;
-                            if (this.count > minimum && this.count <= maximum) {
+                            //this.count++;
+                            if (++this.count <= limit) {
                                 this.nextElement = element;
                                 return true;
                             }
@@ -143,7 +149,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                 final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
                 HasContainer container = null;
                 for (final HasContainer hasContainer : hasContainers) {
-                    if (hasContainer.compare.equals(Compare.EQUAL) && keys.contains(hasContainer.key)) {
+                    if (hasContainer.compare.equals(com.tinkerpop.blueprints.Compare.EQUAL) && keys.contains(hasContainer.key)) {
                         boolean noNull = true;
                         for (final Object value : hasContainer.values) {
                             if (value == null)

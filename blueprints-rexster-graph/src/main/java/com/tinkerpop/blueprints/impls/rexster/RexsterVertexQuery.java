@@ -91,13 +91,13 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
         final StringBuilder sb = new StringBuilder(this.baseUri + directionReturnToken + RexsterTokens.QUESTION);
         sb.append(RexsterTokens._TAKE);
         sb.append(RexsterTokens.EQUALS);
-        sb.append(this.maximum);
+        sb.append(this.limit);
 
-        sb.append(RexsterTokens.AND);
+        /*sb.append(RexsterTokens.AND);
 
         sb.append(RexsterTokens._SKIP);
         sb.append(RexsterTokens.EQUALS);
-        sb.append(this.minimum);
+        sb.append(this.minimum);*/
 
         if (this.labels != null && this.labels.length > 0) {
             sb.append(RexsterTokens.AND);

@@ -41,7 +41,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
     protected static final String QUERY_WHERE = " where 1=1";
     protected static final String QUERY_SELECT_FROM = "select from ";
     protected static final String LIMIT = " LIMIT ";
-    protected static final String SKIP = " SKIP ";
+    //protected static final String SKIP = " SKIP ";
     
     protected String fetchPlan;
 
@@ -56,7 +56,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
     @Override
     public Iterable<Vertex> vertices() {
-        if (maximum == 0)
+        if (limit == 0)
             return Collections.emptyList();
 
         final StringBuilder text = new StringBuilder();
@@ -83,16 +83,11 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
             manageLabels(text);
 
-        if (maximum > 0 && maximum < Long.MAX_VALUE) {
-            if (minimum > 0 && maximum < Long.MAX_VALUE) {
-                text.append(SKIP);
-                text.append(minimum);
+        if (limit > 0 && limit < Long.MAX_VALUE) {
+
                 text.append(LIMIT);
-                text.append(maximum - minimum);
-            } else {
-                text.append(LIMIT);
-                text.append(maximum);
-            }
+                text.append(limit);
+
         }
         final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
                 text.toString());
@@ -106,7 +101,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
     @Override
     public Iterable<Edge> edges() {
-        if (maximum == 0)
+        if (limit == 0)
             return Collections.emptyList();
 
         if (((OrientBaseGraph) graph).isUseLightweightEdges())
@@ -143,8 +138,8 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         if( fetchPlan != null )
         	query.setFetchPlan(fetchPlan);
         
-        if (maximum > 0 && maximum < Long.MAX_VALUE)
-            query.setLimit((int) maximum);
+        if (limit > 0 && limit < Long.MAX_VALUE)
+            query.setLimit((int) limit);
 
         return new OrientElementIterable<Edge>(((OrientBaseGraph) graph),
                 ((OrientBaseGraph) graph).getRawGraph().query(query));
@@ -177,7 +172,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         for (HasContainer has : hasContainers) {
             text.append(QUERY_FILTER_AND);
 
-            if (has.compare == Compare.EQUAL && has.values.length > 1) {
+            if (has.compare == com.tinkerpop.blueprints.Compare.EQUAL && has.values.length > 1) {
                 // IN
                 text.append(has.key);
                 text.append(OPERATOR_IN);

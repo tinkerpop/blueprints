@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers;
 
+import com.tinkerpop.blueprints.CompareRelation;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
@@ -19,23 +20,33 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         this.query = query;
     }
 
-    public VertexQuery has(final String key, final Object... values) {
-        this.query = this.query.has(key, values);
+    public VertexQuery has(final String key) {
+        this.query = this.query.has(key);
         return this;
     }
 
-    public VertexQuery hasNot(final String key, final Object... values) {
-        this.query = this.query.hasNot(key, values);
+    public VertexQuery hasNot(final String key) {
+        this.query = this.query.hasNot(key);
+        return this;
+    }
+
+    public VertexQuery has(final String key, final Object value) {
+        this.query = this.query.has(key, value);
+        return this;
+    }
+
+    public VertexQuery hasNot(final String key, final Object value) {
+        this.query = this.query.hasNot(key, value);
+        return this;
+    }
+
+    public VertexQuery has(final String key, final CompareRelation compare, final Object... values) {
+        this.query = this.query.has(key, compare, values);
         return this;
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
         return this.has(key, compare, value);
-    }
-
-    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
-        this.query = this.query.has(key, compare, value);
-        return this;
     }
 
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue) {
@@ -48,13 +59,8 @@ public abstract class WrapperVertexQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery limit(final long take) {
-        this.query = this.query.limit(take);
-        return this;
-    }
-
-    public VertexQuery limit(final long skip, final long take) {
-        this.query = this.query.limit(skip, take);
+    public VertexQuery limit(final long limit) {
+        this.query = this.query.limit(limit);
         return this;
     }
 
