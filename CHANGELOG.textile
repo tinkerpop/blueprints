@@ -15,7 +15,9 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
-* Added a saveRDF method to @SailGraph@
+* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
+* @RexsteGraph@ properly supporting @boolean@ data types.
+* Added a @saveRDF()@ method to @SailGraph@
 * Added new edges-as-statements view style to @PropertyGraphSail@
 * @QueryTestSuite@ broken up into @GraphQueryTestSuite@ and @VertexQueryTestSuite@
 * Deprecated @Feature.isRDFModel@ is now removed
@@ -26,7 +28,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * @GraphChangedListener@ from @EventGraph@ can mutate graph without concurrent modification exception
 * Scope of @EventGraph@ base classes changed to @public@ for those wanting to extend up on them.
 * Deprecated @Query.has(key,value,compare)@ and added @Query.has(key,compare,value)@
-* Bumped Dex to 4.8.0
+* Bumped Dex to 4.8.1
 * Support both @byte@ and @short@ data types in GraphSON.
 * Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values
 * Bumped Neo4j to 1.9
@@ -34,24 +36,8 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Added support for @has(key,value)@ and @hasNot(key,value)@ in @Query@ API
 * Added support for @has(key,CompareRelation,values...)@ in @Query@ API
 * Added @CompareRelation@ interface to support future compare-type operations
-* Added support for @limit(skip,take)@ in the @Query@ API
 * Ignore nulls property values in loading of GraphSON as graphs do not accept such values for element properties
 * Adding an edge with a @null@ value results in @IllegalArgumentException@
-
-==<hr/>==
-
-h3. Version 2.3.2 (NOT OFFICIALLY RELEASED YET)
-
-```xml
-<dependency>
-  <groupId>com.tinkerpop.blueprints</groupId>
-  <artifactId>blueprints-core</artifactId>
-  <version>2.3.2-SNAPSHOT</version>
-</dependency>
-```
-
-* Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
-* @RexsteGraph@ properly supporting @boolean@ data types.
 
 ==<hr/>==
 
