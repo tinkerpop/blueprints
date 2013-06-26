@@ -130,10 +130,10 @@ public interface Query {
     /**
      * Filter out the element if the take number of incident/adjacent elements to retrieve has already been reached.
      *
-     * @param take the take number of elements to return
+     * @param limit the take number of elements to return
      * @return the modified query object
      */
-    public Query limit(final int take);
+    public Query limit(final int limit);
 
     /**
      * Execute the query and return the matching edges.
