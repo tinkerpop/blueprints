@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static com.tinkerpop.blueprints.Direction.*;
@@ -126,31 +127,31 @@ public class VertexQueryTestSuite extends TestSuite {
             assertTrue(results.contains(b));
             assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", 1.0).count(), 1);
 
-            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.NOT_EQUAL, 1.0).edges());
+            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", Compare.NOT_EQUAL, 1.0).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.NOT_EQUAL, 1.0).vertices());
+            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", Compare.NOT_EQUAL, 1.0).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.NOT_EQUAL, 1.0).count(), 1);
+            assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", Compare.NOT_EQUAL, 1.0).count(), 1);
 
-            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.LESS_THAN_EQUAL, 1.0).edges());
+            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", Compare.LESS_THAN_EQUAL, 1.0).edges());
             assertEquals(results.size(), 2);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.LESS_THAN_EQUAL, 1.0).vertices());
+            results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", Compare.LESS_THAN_EQUAL, 1.0).vertices());
             assertEquals(results.size(), 2);
             assertTrue(results.contains(b));
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.LESS_THAN_EQUAL, 1.0).count(), 2);
+            assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", Compare.LESS_THAN_EQUAL, 1.0).count(), 2);
 
-            results = asList(a.query().direction(OUT).has("amount", VertexQuery.Compare.LESS_THAN, 1.0).edges());
+            results = asList(a.query().direction(OUT).has("amount", Compare.LESS_THAN, 1.0).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(aFriendC));
-            results = asList(a.query().direction(OUT).has("amount", VertexQuery.Compare.LESS_THAN, 1.0).vertices());
+            results = asList(a.query().direction(OUT).has("amount", Compare.LESS_THAN, 1.0).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(OUT).has("amount", VertexQuery.Compare.LESS_THAN, 1.0).count(), 1);
+            assertEquals(a.query().direction(OUT).has("amount", Compare.LESS_THAN, 1.0).count(), 1);
 
             results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).has("amount", 0.5).edges());
             assertEquals(results.size(), 1);
@@ -159,27 +160,27 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
 
-            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate"), graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.GREATER_THAN, 0.5).edges());
+            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate"), graphTest.convertLabel("friend")).has("amount", Compare.GREATER_THAN, 0.5).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(cHateA));
-            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate"), graphTest.convertLabel("friend")).has("amount", VertexQuery.Compare.GREATER_THAN, 0.5).vertices());
+            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate"), graphTest.convertLabel("friend")).has("amount", Compare.GREATER_THAN, 0.5).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(IN).labels(graphTest.convertLabel("friend"), graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN, 0.5).count(), 1);
+            assertEquals(a.query().direction(IN).labels(graphTest.convertLabel("friend"), graphTest.convertLabel("hate")).has("amount", Compare.GREATER_THAN, 0.5).count(), 1);
 
-            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN, 1.0).edges());
+            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", Compare.GREATER_THAN, 1.0).edges());
             assertEquals(results.size(), 0);
-            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN, 1.0).vertices());
+            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", Compare.GREATER_THAN, 1.0).vertices());
             assertEquals(results.size(), 0);
-            assertEquals(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN, 1.0).count(), 0);
+            assertEquals(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", Compare.GREATER_THAN, 1.0).count(), 0);
 
-            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN_EQUAL, 1.0).edges());
+            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", Compare.GREATER_THAN_EQUAL, 1.0).edges());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(cHateA));
-            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN_EQUAL, 1.0).vertices());
+            results = asList(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", Compare.GREATER_THAN_EQUAL, 1.0).vertices());
             assertEquals(results.size(), 1);
             assertTrue(results.contains(c));
-            assertEquals(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", VertexQuery.Compare.GREATER_THAN_EQUAL, 1.0).count(), 1);
+            assertEquals(a.query().direction(IN).labels(graphTest.convertLabel("hate")).has("amount", Compare.GREATER_THAN_EQUAL, 1.0).count(), 1);
 
             results = asList(a.query().direction(OUT).has("amount").edges());
             assertEquals(results.size(), 3);
@@ -198,7 +199,7 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(results.get(0), c);
             assertEquals(results.get(0), c);
 
-            results = asList(a.query().direction(OUT).hasNot("amount", 2.3, 5.6, 234).edges());
+            results = asList(a.query().direction(OUT).has("amount", Contains.NOT_IN, Arrays.asList(2.3, 5.6, 234)).edges());
             assertEquals(results.size(), 3);
             assertTrue(results.contains(aFriendB));
             assertTrue(results.contains(aFriendC));
@@ -219,19 +220,19 @@ public class VertexQueryTestSuite extends TestSuite {
             assertTrue(result.contains(aFriendB));
             assertTrue(result.contains(aHateC));
 
-            result = asList(a.query().direction(OUT).has("amount", 1.0, 0.5).edges());
+            result = asList(a.query().direction(OUT).has("amount", Contains.IN, Arrays.asList(1.0, 0.5)).edges());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(aFriendB));
             assertTrue(result.contains(aFriendC));
             assertTrue(result.contains(aHateC));
 
-            result = asList(a.query().direction(OUT).has("amount", 1.0, 0.5, "marko", 13, 'a', 32.13d).edges());
+            result = asList(a.query().direction(OUT).has("amount", Contains.IN, Arrays.asList(1.0, 0.5, "marko", 13, 'a', 32.13d)).edges());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(aFriendB));
             assertTrue(result.contains(aFriendC));
             assertTrue(result.contains(aHateC));
 
-            result = asList(a.query().direction(OUT).has("amount", 1.0, 0.5, "marko", 13, 'a', 32.13d).vertices());
+            result = asList(a.query().direction(OUT).has("amount", Contains.IN, Arrays.asList(1.0, 0.5, "marko", 13, 'a', 32.13d)).vertices());
             assertEquals(result.size(), 3);
             assertTrue(result.contains(b));
             assertTrue(result.contains(c));
@@ -287,17 +288,6 @@ public class VertexQueryTestSuite extends TestSuite {
             assertEquals(results.size(), 0);
             assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).limit(0).count(), 0);
 
-            assertEquals(a.query().direction(OUT).limit(0, 0).count(), a.query().direction(OUT).limit(0).count());
-            BaseTest.equalIterators(a.query().direction(OUT).limit(0, 0).vertices().iterator(), a.query().direction(OUT).limit(0).vertices().iterator());
-            assertEquals(a.query().direction(OUT).limit(0, 1).count(), a.query().direction(OUT).limit(1).count());
-            BaseTest.equalIterators(a.query().direction(OUT).limit(0, 1).vertices().iterator(), a.query().direction(OUT).limit(1).vertices().iterator());
-            assertEquals(a.query().direction(OUT).limit(0, 2).count(), a.query().direction(OUT).limit(2).count());
-            BaseTest.equalIterators(a.query().direction(OUT).limit(0, 2).vertices().iterator(), a.query().direction(OUT).limit(2).vertices().iterator());
-
-            assertEquals(a.query().direction(OUT).limit(1, 2).count(), 2);
-            assertEquals(a.query().direction(OUT).limit(2, 2).count(), 1);
-            assertEquals(a.query().direction(OUT).limit(2, 1).count(), 1);
-            assertEquals(a.query().direction(OUT).limit(3, 0).count(), 0);
         }
         graph.shutdown();
 

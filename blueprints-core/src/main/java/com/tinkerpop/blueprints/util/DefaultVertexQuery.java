@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util;
 
+import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -25,22 +26,32 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         this.vertex = vertex;
     }
 
-    public VertexQuery has(final String key, final Object... values) {
-        super.has(key, values);
+    public VertexQuery has(final String key) {
+        super.has(key);
         return this;
     }
 
-    public VertexQuery hasNot(final String key, final Object... values) {
-        super.hasNot(key, values);
+    public VertexQuery hasNot(final String key) {
+        super.hasNot(key);
+        return this;
+    }
+
+    public VertexQuery has(final String key, final Object value) {
+        super.has(key, value);
+        return this;
+    }
+
+    public VertexQuery hasNot(final String key, final Object value) {
+        super.hasNot(key, value);
+        return this;
+    }
+
+    public VertexQuery has(final String key, final Predicate predicate, final Object value) {
+        super.has(key, predicate, value);
         return this;
     }
 
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare) {
-        super.has(key, compare, value);
-        return this;
-    }
-
-    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value) {
         super.has(key, compare, value);
         return this;
     }
@@ -50,13 +61,8 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         return this;
     }
 
-    public VertexQuery limit(final long take) {
-        super.limit(take);
-        return this;
-    }
-
-    public VertexQuery limit(final long skip, final long take) {
-        super.limit(skip, take);
+    public VertexQuery limit(final int limit) {
+        super.limit(limit);
         return this;
     }
 
@@ -152,7 +158,7 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
 
                 private boolean loadNext() {
                     this.nextEdge = null;
-                    if (this.count > maximum) return false;
+                    if (this.count > limit) return false;
 
                     while (this.itty.hasNext()) {
                         final Edge edge = this.itty.next();
@@ -165,8 +171,7 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
                         }
 
                         if (!filter) {
-                            this.count++;
-                            if (this.count > minimum && this.count <= maximum) {
+                            if (++this.count <= limit) {
                                 this.nextEdge = edge;
                                 return true;
                             }

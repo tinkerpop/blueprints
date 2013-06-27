@@ -91,13 +91,13 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
         final StringBuilder sb = new StringBuilder(this.baseUri + directionReturnToken + RexsterTokens.QUESTION);
         sb.append(RexsterTokens._TAKE);
         sb.append(RexsterTokens.EQUALS);
-        sb.append(this.maximum);
+        sb.append(this.limit);
 
-        sb.append(RexsterTokens.AND);
+        /*sb.append(RexsterTokens.AND);
 
         sb.append(RexsterTokens._SKIP);
         sb.append(RexsterTokens.EQUALS);
-        sb.append(this.minimum);
+        sb.append(this.minimum);*/
 
         if (this.labels != null && this.labels.length > 0) {
             sb.append(RexsterTokens.AND);
@@ -124,13 +124,13 @@ public class RexsterVertexQuery extends DefaultVertexQuery {
                 sb.append(hasContainer.key);
 
                 sb.append(RexsterTokens.COMMA);
-                sb.append(hasContainer.compare.asString());
+                sb.append(hasContainer.predicate.toString());
                 sb.append(RexsterTokens.COMMA);
 
-                for (Object v : hasContainer.values) {
-                    sb.append(RestHelper.uriCast(v));
-                    sb.append(" ");
-                }
+                // for (Object v : hasContainer.values) {
+                sb.append(RestHelper.uriCast(hasContainer.value)); // TODO BRO.
+                sb.append(" ");
+                //}
 
                 sb.trimToSize();
 

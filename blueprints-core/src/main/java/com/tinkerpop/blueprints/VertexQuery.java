@@ -10,7 +10,6 @@ package com.tinkerpop.blueprints;
  */
 public interface VertexQuery extends Query {
 
-
     /**
      * The direction of the edges to retrieve.
      *
@@ -42,26 +41,28 @@ public interface VertexQuery extends Query {
     public Object vertexIds();
 
     @Override
-    public VertexQuery has(final String key, final Object... values);
+    public VertexQuery has(final String key);
 
     @Override
-    public VertexQuery hasNot(final String key, final Object... values);
+    public VertexQuery hasNot(final String key);
+
+    @Override
+    public VertexQuery has(final String key, final Object value);
+
+    @Override
+    public VertexQuery hasNot(final String key, final Object value);
+
+    @Override
+    public VertexQuery has(final String key, final Predicate predicate, final Object value);
 
     @Override
     @Deprecated
     public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare);
 
     @Override
-    public <T extends Comparable<T>> VertexQuery has(final String key, final Compare compare, final T value);
-
-    @Override
     public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue);
 
     @Override
-    public VertexQuery limit(final long take);
-
-    @Override
-    public VertexQuery limit(final long skip, final long take);
-
+    public VertexQuery limit(final int limit);
 
 }

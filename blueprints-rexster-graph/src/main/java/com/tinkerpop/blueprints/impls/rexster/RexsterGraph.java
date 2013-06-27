@@ -13,6 +13,8 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -93,6 +95,13 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
      */
     public RexsterGraph(final String graphURI, final int bufferSize) {
         this(graphURI, bufferSize, null, null);
+    }
+
+    public RexsterGraph(final Configuration configuration) {
+        this(configuration.getString("blueprints.rexster.url", null),
+             configuration.getInt("blueprints.rexster.buffer-size", DEFAULT_BUFFER_SIZE),
+             configuration.getString("blueprints.rexster.username", null),
+             configuration.getString("blueprints.rexster.password", null));
     }
 
     /**

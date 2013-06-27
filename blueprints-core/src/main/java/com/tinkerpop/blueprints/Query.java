@@ -9,7 +9,8 @@ package com.tinkerpop.blueprints;
 
 public interface Query {
 
-    public enum Compare {
+    @Deprecated
+    public enum Compare implements Predicate {
         EQUAL, NOT_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL;
 
         public Compare opposite() {
@@ -29,68 +30,81 @@ public interface Query {
                 throw new RuntimeException("Comparator does not have an opposite.");
         }
 
-        /**
-         * Constructs the string representation of the Compare.
-         */
-        public String asString() {
-            if (this.equals(EQUAL))
-                return "=";
-            else if (this.equals(GREATER_THAN))
-                return ">";
-            else if (this.equals(GREATER_THAN_EQUAL))
-                return ">=";
-            else if (this.equals(LESS_THAN_EQUAL))
-                return "<=";
-            else if (this.equals(Query.Compare.LESS_THAN))
-                return "<";
-            else if (this.equals(NOT_EQUAL))
-                return "<>";
-            else
-                throw new RuntimeException("Comparator does not have a string representation.");
-        }
-
-        /**
-         * Constructs a Compare from its string representation.
-         */
-        public static Compare fromString(final String c) {
-            if (c.equals("="))
-                return Query.Compare.EQUAL;
-            else if (c.equals("<>"))
-                return Query.Compare.NOT_EQUAL;
-            else if (c.equals(">"))
-                return Query.Compare.GREATER_THAN;
-            else if (c.equals(">="))
-                return Query.Compare.GREATER_THAN_EQUAL;
-            else if (c.equals("<"))
-                return Query.Compare.LESS_THAN;
-            else if (c.equals("<="))
-                return Query.Compare.LESS_THAN_EQUAL;
-            else
-                throw new IllegalArgumentException("Argument does not match any comparator.");
+        public boolean compare(final Object first, final Object second) {
+            switch (this) {
+                case EQUAL:
+                    if (null == first)
+                        return second == null;
+                    return first.equals(second);
+                case NOT_EQUAL:
+                    if (null == first)
+                        return second != null;
+                    return !first.equals(second);
+                case GREATER_THAN:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) >= 1;
+                case LESS_THAN:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) <= -1;
+                case GREATER_THAN_EQUAL:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) >= 0;
+                case LESS_THAN_EQUAL:
+                    if (null == first || second == null)
+                        return false;
+                    return ((Comparable) first).compareTo(second) <= 0;
+                default:
+                    throw new IllegalArgumentException("Invalid state as no valid filter was provided");
+            }
         }
     }
 
     /**
-     * Filter out the element if it does not have a property with the specified value.
-     * If multiple values are provided then at least one has to match the element value.
-     * If no values are provided then only allow the element if it has that property (wildcard).
+     * Filter out elements that do not have a property with provided key.
      *
-     * @param key    the key of the property
-     * @param values the values to check against
+     * @param key the key of the property
      * @return the modified query object
      */
-    public Query has(final String key, final Object... values);
+    public Query has(final String key);
 
     /**
-     * Filter out the element if it does have a property with the specified value.
-     * If multiple values are provided then none of them can match the element value.
-     * If no values are provided then only allow the element if it does not have that property (wildcard).
+     * Filter out elements that have a property with provided key.
      *
-     * @param key    the key of the property
-     * @param values the values to check against
+     * @param key the key of the property
      * @return the modified query object
      */
-    public Query hasNot(final String key, final Object... values);
+    public Query hasNot(final String key);
+
+    /**
+     * Filter out elements that do not have a property value equal to provided value.
+     *
+     * @param key   the key of the property
+     * @param value the value to check against
+     * @return the modified query object
+     */
+    public Query has(final String key, final Object value);
+
+    /**
+     * Filter out elements that have a property value equal to provided value.
+     *
+     * @param key   the key of the property
+     * @param value the value to check against
+     * @return the modified query object
+     */
+    public Query hasNot(final String key, final Object value);
+
+    /**
+     * Filter out the element if it does not have a property with a comparable value.
+     *
+     * @param key     the key of the property
+     * @param predicate the comparator to use for comparison
+     * @param value  the value to check against
+     * @return the modified query object
+     */
+    public Query has(final String key, final Predicate predicate, final Object value);
 
     /**
      * Filter out the element if it does not have a property with a comparable value.
@@ -102,16 +116,6 @@ public interface Query {
      */
     @Deprecated
     public <T extends Comparable<T>> Query has(final String key, final T value, final Compare compare);
-
-    /**
-     * Filter out the element if it does not have a property with a comparable value.
-     *
-     * @param key     the key of the property
-     * @param compare the comparator to use for comparison
-     * @param value   the value to check against
-     * @return the modified query object
-     */
-    public <T extends Comparable<T>> Query has(final String key, final Compare compare, final T value);
 
     /**
      * Filter out the element of its property value is not within the provided interval.
@@ -126,19 +130,10 @@ public interface Query {
     /**
      * Filter out the element if the take number of incident/adjacent elements to retrieve has already been reached.
      *
-     * @param take the take number of elements to return
+     * @param limit the take number of elements to return
      * @return the modified query object
      */
-    public Query limit(final long take);
-
-    /**
-     * Filter out elements not within the skip/take range specified.
-     *
-     * @param skip the number of elements to skip since the first element
-     * @param take the number of elements to return after the skip has been reached
-     * @return the modified query object
-     */
-    public Query limit(final long skip, final long take);
+    public Query limit(final int limit);
 
     /**
      * Execute the query and return the matching edges.

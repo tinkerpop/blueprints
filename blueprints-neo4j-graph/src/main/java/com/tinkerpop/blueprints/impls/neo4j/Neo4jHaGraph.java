@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.impls.neo4j;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 
@@ -22,5 +24,10 @@ public class Neo4jHaGraph extends Neo4jGraph {
 
     public Neo4jHaGraph(final HighlyAvailableGraphDatabase rawGraph) {
         super(rawGraph);
+    }
+
+    public Neo4jHaGraph(final Configuration configuration) {
+        this(configuration.getString("blueprints.neo4jha.directory", null),
+                ConfigurationConverter.getMap(configuration.subset("blueprints.neo4jha.conf")));
     }
 }
