@@ -719,8 +719,10 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
                 ((OrientIndex<?>) idx).close();
             context.manualIndices.clear();
 
-            context.rawGraph.commit();
-            context.rawGraph.close();
+            if( !context.rawGraph.isClosed() ){
+	            context.rawGraph.commit();
+	            context.rawGraph.close();
+            }
 
             synchronized (contexts) {
                 contexts.remove(context);
