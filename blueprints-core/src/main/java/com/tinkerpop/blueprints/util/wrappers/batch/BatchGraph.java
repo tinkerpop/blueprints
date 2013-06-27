@@ -212,7 +212,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
         currentEdge = null;
         currentEdgeCached = null;
         if (remainingBufferSize <= 0) {
-            baseGraph.stopTransaction(Conclusion.SUCCESS);
+            baseGraph.commit();
             cache.newTransaction();
             remainingBufferSize = bufferSize;
         }

@@ -10,27 +10,27 @@ package com.tinkerpop.blueprints;
 public interface GraphQuery extends Query {
 
     @Override
-    public GraphQuery has(final String key);
+    public GraphQuery has(String key);
 
     @Override
-    public GraphQuery hasNot(final String key);
+    public GraphQuery hasNot(String key);
 
     @Override
-    public GraphQuery has(final String key, final Object value);
+    public GraphQuery has(String key, Object value);
 
     @Override
-    public GraphQuery hasNot(final String key, final Object value);
+    public GraphQuery hasNot(String key, Object value);
 
     @Override
-    public GraphQuery has(final String key, final Predicate predicate, final Object value);
+    public GraphQuery has(String key, Predicate predicate, Object value);
 
     @Override
     @Deprecated
-    public <T extends Comparable<T>> GraphQuery has(final String key, final T value, final Compare compare);
+    public <T extends Comparable<T>> GraphQuery has(String key, T value, Compare compare);
 
     @Override
-    public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue);
+    public <T extends Comparable<T>> GraphQuery interval(String key, T startValue, T endValue);
 
     @Override
-    public GraphQuery limit(final int limit);
+    public GraphQuery limit(int limit);
 }

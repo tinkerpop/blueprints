@@ -3,6 +3,13 @@ package com.tinkerpop.blueprints;
 import java.util.Collection;
 
 /**
+ * Contains is a predicate that evaluates whether the first object is contained within (or not within) the second collection object.
+ * For example:
+ *
+ *   gremlin IN [gremlin, blueprints, furnace] == true
+ *   gremlin NOT_IN [gremlin, rexster] == false
+ *   rexster NOT_IN [gremlin, blueprints, furnace] == true
+ *
  * @author Pierre De Wilde
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
@@ -10,14 +17,11 @@ public enum Contains implements Predicate {
 
     IN, NOT_IN;
 
-    public boolean compare(final Object first, final Object second) {
+    public boolean evaluate(final Object first, final Object second) {
         if (second instanceof Collection) {
             return this.equals(IN) ? ((Collection) second).contains(first) : !((Collection) second).contains(first);
         } else {
-            if (null == first)
-                return this.equals(IN) ? null == second : null != second;
-            else
-                return this.equals(IN) ? first.equals(second) : !first.equals(second);
+            throw new IllegalArgumentException("The second argument must be a collection");
         }
     }
 

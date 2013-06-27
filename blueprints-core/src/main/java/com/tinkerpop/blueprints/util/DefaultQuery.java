@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints.util;
 
-import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Query;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public abstract class DefaultQuery implements Query {
 
     public Direction direction = Direction.BOTH;
     public String[] labels = EMPTY_LABELS;
-    public long limit = Long.MAX_VALUE;
+    public int limit = Integer.MAX_VALUE;
     public List<HasContainer> hasContainers = new ArrayList<HasContainer>();
 
     public Query has(final String key, final Object value) {
@@ -75,7 +75,7 @@ public abstract class DefaultQuery implements Query {
         }
 
         public boolean isLegal(final Element element) {
-            return this.predicate.compare(element.getProperty(this.key), this.value);
+            return this.predicate.evaluate(element.getProperty(this.key), this.value);
         }
     }
 }

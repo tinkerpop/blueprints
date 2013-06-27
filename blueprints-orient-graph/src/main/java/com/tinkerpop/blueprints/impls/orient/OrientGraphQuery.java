@@ -166,7 +166,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
         for (HasContainer has : hasContainers) {
             text.append(QUERY_FILTER_AND);
 
-            if (has.compare == com.tinkerpop.blueprints.Compare.EQUAL && has.values.length > 1) {
+            if (has.evaluate == com.tinkerpop.blueprints.Compare.EQUAL && has.values.length > 1) {
                 // IN
                 text.append(has.key);
                 text.append(OPERATOR_IN);
@@ -193,7 +193,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
                     text.append(has.key);
                     text.append(SPACE);
 
-                    switch (has.compare) {
+                    switch (has.evaluate) {
                         case EQUAL:
                             if (has.values[0] == null)
                                 // IS

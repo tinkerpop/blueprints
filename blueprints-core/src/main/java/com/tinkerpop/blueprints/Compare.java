@@ -1,13 +1,15 @@
 package com.tinkerpop.blueprints;
 
 /**
+ * Compare is a predicate that determines whether the first argument is ==, !=, >, >=, <, <= to the second argument.
+ *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public enum Compare implements Predicate {
 
     EQUAL, NOT_EQUAL, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL;
 
-    public boolean compare(final Object first, final Object second) {
+    public boolean evaluate(final Object first, final Object second) {
         switch (this) {
             case EQUAL:
                 if (null == first)

@@ -16,7 +16,7 @@ public interface VertexQuery extends Query {
      * @param direction whether to retrieve the incoming, outgoing, or both directions
      * @return the modified query object
      */
-    public VertexQuery direction(final Direction direction);
+    public VertexQuery direction(Direction direction);
 
     /**
      * Filter out the edge if its label is not in set of provided labels.
@@ -24,7 +24,7 @@ public interface VertexQuery extends Query {
      * @param labels the labels to check against
      * @return the modified query object
      */
-    public VertexQuery labels(final String... labels);
+    public VertexQuery labels(String... labels);
 
     /**
      * Execute the query and return the number of edges that are unfiltered.
@@ -41,28 +41,28 @@ public interface VertexQuery extends Query {
     public Object vertexIds();
 
     @Override
-    public VertexQuery has(final String key);
+    public VertexQuery has(String key);
 
     @Override
-    public VertexQuery hasNot(final String key);
+    public VertexQuery hasNot(String key);
 
     @Override
-    public VertexQuery has(final String key, final Object value);
+    public VertexQuery has(String key, Object value);
 
     @Override
-    public VertexQuery hasNot(final String key, final Object value);
+    public VertexQuery hasNot(String key, Object value);
 
     @Override
-    public VertexQuery has(final String key, final Predicate predicate, final Object value);
+    public VertexQuery has(String key, Predicate predicate, Object value);
 
     @Override
     @Deprecated
-    public <T extends Comparable<T>> VertexQuery has(final String key, final T value, final Compare compare);
+    public <T extends Comparable<T>> VertexQuery has(String key, T value, Compare compare);
 
     @Override
-    public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue);
+    public <T extends Comparable<T>> VertexQuery interval(String key, T startValue, T endValue);
 
     @Override
-    public VertexQuery limit(final int limit);
+    public VertexQuery limit(int limit);
 
 }

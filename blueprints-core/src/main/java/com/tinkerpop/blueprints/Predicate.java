@@ -9,11 +9,11 @@ package com.tinkerpop.blueprints;
 public interface Predicate {
 
     /**
-     * If the underlying graph does not support the push down predicate, then an in-memory comparison can be done.
+     * If the underlying graph does not support the push-down predicate, then an in-memory evaluation can be done.
      *
      * @param first  the left hand side of the predicate
      * @param second the right hand side of the predicate
-     * @return whether the first compares with the second given the semantics of the predicate
+     * @return the truth of the predicate given the two arguments
      */
-    public boolean compare(final Object first, final Object second);
+    public boolean evaluate(final Object first, final Object second);
 }
