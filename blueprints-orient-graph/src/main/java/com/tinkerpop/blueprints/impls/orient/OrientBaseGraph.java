@@ -854,10 +854,16 @@ public abstract class OrientBaseGraph implements IndexableGraph, MetaGraph<OData
     }
 
     public long countEdges() {
+    	if( useLightweightEdges )
+    		throw new UnsupportedOperationException("Graph set to use Lightweight Edges, count against edges is not supported");
+    	
         return getRawGraph().countClass(OrientEdge.CLASS_NAME);
     }
 
     public long countEdges(final String iClassName) {
+    	if( useLightweightEdges )
+    		throw new UnsupportedOperationException("Graph set to use Lightweight Edges, count against edges is not supported");
+    	
         return getRawGraph().countClass(iClassName);
     }
 
