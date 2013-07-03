@@ -46,4 +46,12 @@ public class EdgeHelper {
             graph.removeEdge(oldEdge);
         }
     }
+
+    public static Vertex getOther(final Edge edge, final Vertex vertex) {
+        final Vertex temp = edge.getVertex(Direction.IN);
+        if (temp.equals(vertex))
+            return edge.getVertex(Direction.OUT);
+        else
+            return temp;
+    }
 }
