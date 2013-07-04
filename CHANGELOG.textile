@@ -15,6 +15,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Disabled the unique-statements policy in @GraphSail@ by default, improving performance
 * Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
 * @RexsteGraph@ properly supporting @boolean@ data types.
 * Added a @saveRDF()@ method to @SailGraph@
