@@ -51,7 +51,7 @@ public class GraphTestSuite extends TestSuite {
             assertTrue(graph.toString().startsWith(graph.getClass().getSimpleName().toLowerCase()));
             printPerformance(graph.toString(), 1, "graph string representation generated", this.stopWatch());
         } catch (Exception e) {
-            fail("Unexcepted exception testing graph string representation: "
+            fail("Unexpected exception testing graph string representation: "
                     + e.getMessage());
         }
         graph.shutdown();
