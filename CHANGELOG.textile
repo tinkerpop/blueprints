@@ -39,6 +39,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Adding an edge with a @null@ value results in @IllegalArgumentException@
 * Added @GraphFactory@ support to allow for the creation of graphs via Apache @Configuration@
 * Added @EdgeHelper.getOther()@ utility method
+* Added informative messages for some failure conditions in the test suite
 
 ==<hr/>==
 

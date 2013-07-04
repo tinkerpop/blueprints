@@ -51,7 +51,8 @@ public class GraphTestSuite extends TestSuite {
             assertTrue(graph.toString().startsWith(graph.getClass().getSimpleName().toLowerCase()));
             printPerformance(graph.toString(), 1, "graph string representation generated", this.stopWatch());
         } catch (Exception e) {
-            assertFalse(true);
+            fail("Unexcepted exception testing graph string representation: "
+                    + e.getMessage());
         }
         graph.shutdown();
     }
@@ -293,7 +294,8 @@ public class GraphTestSuite extends TestSuite {
             if (!allowDataType) {
                 assertTrue(t instanceof IllegalArgumentException);
             } else {
-                fail("setProperty should not have thrown an exception as this data type is accepted according to the GraphTest settings.");
+                fail("setProperty should not have thrown an exception as this data type is accepted according to the GraphTest settings.\n\n" +
+                        "Exception was " + t);
             }
         }
 
