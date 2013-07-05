@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints;
 
-import com.tinkerpop.blueprints.impls.GraphTest;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.tinkerpop.blueprints.impls.GraphTest;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -132,7 +132,7 @@ public class GraphQueryTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeIndex && graph instanceof KeyIndexableGraph) {
             ((KeyIndexableGraph) graph).createKeyIndex("type", Edge.class);
         }
-        if (graph.getFeatures().supportsEdgeProperties && graph.getFeatures().supportsVertexProperties) {
+        if (graph.getFeatures().supportsEdgeIteration  && graph.getFeatures().supportsEdgeProperties && graph.getFeatures().supportsVertexProperties) {
             Vertex marko = graph.addVertex(null);
             marko.setProperty("name", "marko");
             Vertex matthias = graph.addVertex(null);

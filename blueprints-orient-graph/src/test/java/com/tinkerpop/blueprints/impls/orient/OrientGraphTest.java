@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import com.orientechnologies.orient.core.Orient;
+import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -134,14 +136,20 @@ public abstract class OrientGraphTest extends GraphTest {
         // this is necessary on windows systems: deleting the directory is not enough because it takes a
         // while to unlock files
         try {
-            if (this.currentGraph != null)
+            if (this.currentGraph != null){
                 this.currentGraph.shutdown();
+            }
         } catch (Exception e) {
         }
 
         final ODatabaseDocumentTx g = new ODatabaseDocumentTx("local:" + graphDirectoryName);
         if (g.exists())
             g.open("admin", "admin").drop();
+        
+        g.close();
+        
+    	Orient.instance().unregisterStorageByName(graphDirectoryName);
+    	ODatabaseRecordThreadLocal.INSTANCE.remove();
 
         deleteDirectory(new File(graphDirectoryName));
     }

@@ -1,143 +1,168 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Collection;
+import java.util.Collections;
+
+import com.orientechnologies.orient.core.db.record.OIdentifiable;
+import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
+import com.tinkerpop.blueprints.Contains;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Query;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 
 /**
  * OrientDB implementation for Graph query.
- *
+ * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientGraphQuery extends DefaultGraphQuery {
 
-    protected static final char SPACE = ' ';
-    protected static final String OPERATOR_DIFFERENT = "<>";
-    protected static final String OPERATOR_IS_NOT = "is not";
-    protected static final String OPERATOR_LET = "<=";
-    protected static final char OPERATOR_LT = '<';
-    protected static final String OPERATOR_GTE = ">=";
-    protected static final char OPERATOR_GT = '>';
-    protected static final String OPERATOR_EQUALS = "=";
-    protected static final String OPERATOR_IS = "is";
-    protected static final String OPERATOR_IN = " in ";
+	protected static final char SPACE = ' ';
+	protected static final String OPERATOR_DIFFERENT = "<>";
+	protected static final String OPERATOR_NOT = "not ";
+	protected static final String OPERATOR_IS_NOT = "is not";
+	protected static final String OPERATOR_LET = "<=";
+	protected static final char OPERATOR_LT = '<';
+	protected static final String OPERATOR_GTE = ">=";
+	protected static final char OPERATOR_GT = '>';
+	protected static final String OPERATOR_EQUALS = "=";
+	protected static final String OPERATOR_IS = "is";
+	protected static final String OPERATOR_IN = " in ";
 
-    protected static final String QUERY_FILTER_AND = " and ";
-    protected static final String QUERY_FILTER_OR = " or ";
-    protected static final char QUERY_STRING = '\'';
-    protected static final char QUERY_SEPARATOR = ',';
-    protected static final char COLLECTION_BEGIN = '[';
-    protected static final char COLLECTION_END = ']';
-    protected static final char PARENTHESIS_BEGIN = '(';
-    protected static final char PARENTHESIS_END = ')';
-    protected static final String QUERY_LABEL_BEGIN = " and label in [";
-    protected static final String QUERY_LABEL_END = "]";
-    protected static final String QUERY_WHERE = " where 1=1";
-    protected static final String QUERY_SELECT_FROM = "select from ";
-    protected static final String LIMIT = " LIMIT ";
-    //protected static final String SKIP = " SKIP ";
+	protected static final String QUERY_FILTER_AND = " and ";
+	protected static final String QUERY_FILTER_OR = " or ";
+	protected static final char QUERY_STRING = '\'';
+	protected static final char QUERY_SEPARATOR = ',';
+	protected static final char COLLECTION_BEGIN = '[';
+	protected static final char COLLECTION_END = ']';
+	protected static final char PARENTHESIS_BEGIN = '(';
+	protected static final char PARENTHESIS_END = ')';
+	protected static final String QUERY_LABEL_BEGIN = " and label in [";
+	protected static final String QUERY_LABEL_END = "]";
+	protected static final String QUERY_WHERE = " where ";
+	protected static final String QUERY_SELECT_FROM = "select from ";
+	protected static final String LIMIT = " LIMIT ";
 
-    protected String fetchPlan;
+	protected String fetchPlan;
+	protected boolean explain = false;
 
-    public OrientGraphQuery(final Graph iGraph) {
-        super(iGraph);
-    }
+	public OrientGraphQuery(final Graph iGraph) {
+		super(iGraph);
+	}
 
-    public Query labels(final String... labels) {
-        this.labels = labels;
-        return this;
-    }
+	public Query labels(final String... labels) {
+		this.labels = labels;
+		return this;
+	}
 
-    /*@Override
-    public Iterable<Vertex> vertices() {
-        if (limit == 0)
-            return Collections.emptyList();
+	public boolean isExplain() {
+		return explain;
+	}
 
-        final StringBuilder text = new StringBuilder();
+	public void setExplain(final boolean explain) {
+		this.explain = explain;
+	}
 
-        // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
-        text.append(QUERY_SELECT_FROM);
+	@Override
+	public Iterable<Vertex> vertices() {
+		if (limit == 0)
+			return Collections.emptyList();
+		
+		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive() )
+			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL SUPPORTED USED THE BASIC IMPL
+			return super.vertices();
 
-        if (((OrientBaseGraph) graph).isUseClassForVertexLabel()
-                && labels != null && labels.length > 0) {
-            // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
-            if (labels.length == 1)
-                // USE THE CLASS NAME
-                text.append(OrientBaseGraph.encodeClassName(labels[0]));
-            else {
-                // MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
-                return super.vertices();
-            }
-        } else
-            text.append(OrientVertex.CLASS_NAME);
+		final StringBuilder text = new StringBuilder();
 
-        // APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
-        text.append(QUERY_WHERE);
-        manageFilters(text);
-        if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
-            manageLabels(text);
+		// GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
+		text.append(QUERY_SELECT_FROM);
 
-        if (limit > 0 && limit < Long.MAX_VALUE) {
+		if (((OrientBaseGraph) graph).isUseClassForVertexLabel()
+				&& labels != null && labels.length > 0) {
+			// FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
+			if (labels.length == 1)
+				// USE THE CLASS NAME
+				text.append(OrientBaseGraph.encodeClassName(labels[0]));
+			else {
+				// MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
+				return super.vertices();
+			}
+		} else
+			text.append(OrientVertex.CLASS_NAME);
 
-                text.append(LIMIT);
-                text.append(limit);
+		// APPEND ALWAYS WHERE
+		text.append(QUERY_WHERE);
+		manageFilters(text);
+		if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
+			manageLabels(text);
 
-        }
-        final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
-                text.toString());
-        
-        if( fetchPlan != null )
-        	query.setFetchPlan(fetchPlan);
-        
-        return new OrientElementIterable<Vertex>(((OrientBaseGraph) graph),
-                ((OrientBaseGraph) graph).getRawGraph().query(query));
-    }
+		if (limit > 0 && limit < Long.MAX_VALUE) {
 
-    @Override
-    public Iterable<Edge> edges() {
-        if (limit == 0)
-            return Collections.emptyList();
+			text.append(LIMIT);
+			text.append(limit);
 
-        if (((OrientBaseGraph) graph).isUseLightweightEdges())
-            return super.edges();
+		}
+		final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
+				text.toString());
 
-        final StringBuilder text = new StringBuilder();
+		if (fetchPlan != null)
+			query.setFetchPlan(fetchPlan);
 
-        // GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
-        text.append(QUERY_SELECT_FROM);
+		return new OrientElementIterable<Vertex>(((OrientBaseGraph) graph),
+				((OrientBaseGraph) graph).getRawGraph().query(query));
+	}
 
-        if (((OrientBaseGraph) graph).isUseClassForEdgeLabel()
-                && labels != null && labels.length > 0) {
-            // FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
-            if (labels.length == 1)
-                // USE THE CLASS NAME
-                text.append(OrientBaseGraph.encodeClassName(labels[0]));
-            else {
-                // MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
-                return super.edges();
-            }
-        } else
-            text.append(OrientEdge.CLASS_NAME);
+	@Override
+	public Iterable<Edge> edges() {
+		if (limit == 0)
+			return Collections.emptyList();
 
-        // APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
-        text.append(QUERY_WHERE);
+		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive() )
+			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL SUPPORTED USED THE BASIC IMPL
+			return super.edges();
 
-        manageFilters(text);
-        if (!((OrientBaseGraph) graph).isUseClassForEdgeLabel())
-            manageLabels(text);
+		if (((OrientBaseGraph) graph).isUseLightweightEdges())
+			return super.edges();
 
-        final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
-                text.toString());
+		final StringBuilder text = new StringBuilder();
 
-        if( fetchPlan != null )
-        	query.setFetchPlan(fetchPlan);
-        
-        if (limit > 0 && limit < Long.MAX_VALUE)
-            query.setLimit((int) limit);
+		// GO DIRECTLY AGAINST E CLASS AND SUB-CLASSES
+		text.append(QUERY_SELECT_FROM);
 
-        return new OrientElementIterable<Edge>(((OrientBaseGraph) graph),
-                ((OrientBaseGraph) graph).getRawGraph().query(query));
-    }
+		if (((OrientBaseGraph) graph).isUseClassForEdgeLabel()
+				&& labels != null && labels.length > 0) {
+			// FILTER PER CLASS SAVING CHECKING OF LABEL PROPERTY
+			if (labels.length == 1)
+				// USE THE CLASS NAME
+				text.append(OrientBaseGraph.encodeClassName(labels[0]));
+			else {
+				// MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
+				return super.edges();
+			}
+		} else
+			text.append(OrientEdge.CLASS_NAME);
+
+		// APPEND ALWAYS WHERE 1=1 TO MAKE CONCATENATING EASIER
+		text.append(QUERY_WHERE);
+
+		manageFilters(text);
+		if (!((OrientBaseGraph) graph).isUseClassForEdgeLabel())
+			manageLabels(text);
+
+		final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
+				text.toString());
+
+		if (fetchPlan != null)
+			query.setFetchPlan(fetchPlan);
+
+		if (limit > 0 && limit < Long.MAX_VALUE)
+			query.setLimit((int) limit);
+
+		return new OrientElementIterable<Edge>(((OrientBaseGraph) graph),
+				((OrientBaseGraph) graph).getRawGraph().query(query));
+	}
 
 	public String getFetchPlan() {
 		return fetchPlan;
@@ -146,96 +171,106 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	public void setFetchPlan(final String fetchPlan) {
 		this.fetchPlan = fetchPlan;
 	}
-	
-    protected void manageLabels(final StringBuilder text) {
-        if (labels != null && labels.length > 0) {
-            // APPEND LABELS
-            text.append(QUERY_LABEL_BEGIN);
-            for (int i = 0; i < labels.length; ++i) {
-                if (i > 0)
-                    text.append(QUERY_SEPARATOR);
-                text.append(QUERY_STRING);
-                text.append(labels[i]);
-                text.append(QUERY_STRING);
-            }
-            text.append(QUERY_LABEL_END);
-        }
-    }
 
-    /*protected void manageFilters(final StringBuilder text) {
-        for (HasContainer has : hasContainers) {
-            text.append(QUERY_FILTER_AND);
+	protected void manageLabels(final StringBuilder text) {
+		if (labels != null && labels.length > 0) {
+			// APPEND LABELS
+			text.append(QUERY_LABEL_BEGIN);
+			for (int i = 0; i < labels.length; ++i) {
+				if (i > 0)
+					text.append(QUERY_SEPARATOR);
+				text.append(QUERY_STRING);
+				text.append(labels[i]);
+				text.append(QUERY_STRING);
+			}
+			text.append(QUERY_LABEL_END);
+		}
+	}
 
-            if (has.evaluate == com.tinkerpop.blueprints.Compare.EQUAL && has.values.length > 1) {
-                // IN
-                text.append(has.key);
-                text.append(OPERATOR_IN);
-                text.append(COLLECTION_BEGIN);
+	@SuppressWarnings("unchecked")
+	protected void manageFilters(final StringBuilder text) {
+		boolean firstPredicate = true;
+		for (HasContainer has : hasContainers) {
+			if (!firstPredicate)
+				text.append(QUERY_FILTER_AND);
+			else
+				firstPredicate = false;
 
-                for (int i = 0; i < has.values.length; ++i) {
-                    if (i > 0)
-                        text.append(QUERY_SEPARATOR);
-                    generateFilterValue(text, has.values[i]);
-                }
+			if (has.predicate instanceof Contains) {
+				// IN AND NOT_IN
+				if (has.predicate == Contains.NOT_IN) {
+					text.append(OPERATOR_NOT);
+					text.append(PARENTHESIS_BEGIN);
+				}
+				
+				text.append(has.key);
+				text.append(OPERATOR_IN);
+				text.append(COLLECTION_BEGIN);
 
-                text.append(COLLECTION_END);
-            } else {
-                // ANY OTHER OPERATORS
-                if (has.values.length > 1)
-                    text.append(PARENTHESIS_BEGIN);
+				boolean firstItem = true;
+				for (Object o : (Collection<Object>) has.value) {
+					if (!firstItem)
+						text.append(QUERY_SEPARATOR);
+					else
+						firstItem = false;
+					generateFilterValue(text, o);
+				}
 
-                for (int i = 0; i < has.values.length; ++i) {
-                    if (i > 0) {
-                        text.append(SPACE);
-                        text.append(QUERY_FILTER_OR);
-                    }
+				text.append(COLLECTION_END);
 
-                    text.append(has.key);
-                    text.append(SPACE);
+				if (has.predicate == Contains.NOT_IN)
+					text.append(PARENTHESIS_END);
+			} else {
+				// ANY OTHER OPERATORS
+				text.append(has.key);
+				text.append(SPACE);
 
-                    switch (has.evaluate) {
-                        case EQUAL:
-                            if (has.values[0] == null)
-                                // IS
-                                text.append(OPERATOR_IS);
-                            else
-                                // EQUALS
-                                text.append(OPERATOR_EQUALS);
-                            break;
-                        case GREATER_THAN:
-                            text.append(OPERATOR_GT);
-                            break;
-                        case GREATER_THAN_EQUAL:
-                            text.append(OPERATOR_GTE);
-                            break;
-                        case LESS_THAN:
-                            text.append(OPERATOR_LT);
-                            break;
-                        case LESS_THAN_EQUAL:
-                            text.append(OPERATOR_LET);
-                            break;
-                        case NOT_EQUAL:
-                            if (has.values[0] == null)
-                                text.append(OPERATOR_IS_NOT);
-                            else
-                                text.append(OPERATOR_DIFFERENT);
-                            break;
-                    }
-                    text.append(SPACE);
-                    generateFilterValue(text, has.values[i]);
-                }
+				if (has.predicate instanceof com.tinkerpop.blueprints.Compare) {
+					final com.tinkerpop.blueprints.Compare compare = (com.tinkerpop.blueprints.Compare) has.predicate;
+					switch (compare) {
+					case EQUAL:
+						if (has.value == null)
+							// IS
+							text.append(OPERATOR_IS);
+						else
+							// EQUALS
+							text.append(OPERATOR_EQUALS);
+						break;
+					case GREATER_THAN:
+						text.append(OPERATOR_GT);
+						break;
+					case GREATER_THAN_EQUAL:
+						text.append(OPERATOR_GTE);
+						break;
+					case LESS_THAN:
+						text.append(OPERATOR_LT);
+						break;
+					case LESS_THAN_EQUAL:
+						text.append(OPERATOR_LET);
+						break;
+					case NOT_EQUAL:
+						if (has.value == null)
+							text.append(OPERATOR_IS_NOT);
+						else
+							text.append(OPERATOR_DIFFERENT);
+						break;
+					}
+					text.append(SPACE);
+					generateFilterValue(text, has.value);
+				}
 
-                if (has.values.length > 1)
-                    text.append(PARENTHESIS_END);
-            }
-        }
-    }
+				if (has.value instanceof Collection<?>)
+					text.append(PARENTHESIS_END);
+			}
+		}
+	}
 
-    protected void generateFilterValue(final StringBuilder text, final Object iValue) {
-        if (iValue instanceof String)
-            text.append(QUERY_STRING);
-        text.append(iValue);
-        if (iValue instanceof String)
-            text.append(QUERY_STRING);
-    } */
+	protected void generateFilterValue(final StringBuilder text,
+			final Object iValue) {
+		if (iValue instanceof String)
+			text.append(QUERY_STRING);
+		text.append(iValue);
+		if (iValue instanceof String)
+			text.append(QUERY_STRING);
+	}
 }
