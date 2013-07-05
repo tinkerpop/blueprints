@@ -445,9 +445,11 @@ public class VertexTestSuite extends TestSuite {
 
         try {
             x.getVertex(BOTH);
-            assertTrue(false);
+            fail("Getting edge vertex with direction BOTH should fail");
         } catch (IllegalArgumentException e) {
-            assertTrue(true);
+        } catch (Exception e) {
+            fail("Getting edge vertex with direction BOTH should should throw " +
+                    IllegalArgumentException.class.getSimpleName());
         }
 
         graph.shutdown();
@@ -462,9 +464,8 @@ public class VertexTestSuite extends TestSuite {
             final Vertex v = graph.addVertex(null);
             try {
                 v.setProperty("", "value");
-                fail();
+                fail("Setting a vertex property with an empty string key should fail");
             } catch (IllegalArgumentException e) {
-                assertTrue(true);
             }
         }
         graph.shutdown();

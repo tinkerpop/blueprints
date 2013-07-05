@@ -213,11 +213,12 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
     }
 
     /**
-     * Enables or disables enforcement of a unique statements policy,
+     * Enables or disables enforcement of a unique statements policy (disabled by default),
      * which ensures that no new statement will be added which is identical
      * (in all of its subject, predicate, object and context) to an existing statement.
      * If enabled, this policy will first remove any existing statements identical to the to-be-added statement,
      * before adding the latter statement.
+     * This comes at the cost of significant querying overhead.
      *
      * @param flag whether this policy should be enforced
      */
@@ -249,7 +250,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
         public boolean manualTransactions;
         public boolean volatileStatements = false;
-        public boolean uniqueStatements = true;
+        public boolean uniqueStatements = false;
 
         public Vertex namespaces;
 

@@ -15,6 +15,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Disabled the unique-statements policy in @GraphSail@ by default, improving performance
 * Updated @KeyIndexableGraph@ test suite to ensure no requirement on returned @Iterable@ type.
 * @RexsteGraph@ properly supporting @boolean@ data types.
 * Added a @saveRDF()@ method to @SailGraph@
@@ -38,6 +39,8 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Ignore nulls property values in loading of GraphSON as graphs do not accept such values for element properties
 * Adding an edge with a @null@ value results in @IllegalArgumentException@
 * Added @GraphFactory@ support to allow for the creation of graphs via Apache @Configuration@
+* Added @EdgeHelper.getOther()@ utility method
+* Added informative messages for some failure conditions in the test suite
 
 ==<hr/>==
 
