@@ -148,7 +148,7 @@ public abstract class OrientGraphTest extends GraphTest {
         
         g.close();
         
-    	Orient.instance().unregisterStorageByName(graphDirectoryName);
+    	// TODO: Orient.instance().unregisterStorageByName(graphDirectoryName);
     	ODatabaseRecordThreadLocal.INSTANCE.remove();
 
         deleteDirectory(new File(graphDirectoryName));

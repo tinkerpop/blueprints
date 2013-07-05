@@ -200,7 +200,7 @@ public class OrientVertex extends OrientElement implements Vertex {
 		graph.autoStartTransaction();
 
 		// TEMPORARY STATIC LOCK TO AVOID MT PROBLEMS AGAINST OMVRBTreeRID
-		OMVRBTreeRID.getLock().acquireExclusiveLock();
+		// TODO: OMVRBTreeRID.getLock().acquireExclusiveLock();
 		try {
 
 			final ODocument outDocument = getRecord();
@@ -271,7 +271,7 @@ public class OrientVertex extends OrientElement implements Vertex {
 			return edge;
 
 		} finally {
-			OMVRBTreeRID.getLock().releaseExclusiveLock();
+			// TODO OMVRBTreeRID.getLock().releaseExclusiveLock();
 		}
 	}
 
@@ -633,7 +633,7 @@ public class OrientVertex extends OrientElement implements Vertex {
 		if (iVertex == null)
 			return;
 
-		OMVRBTreeRID.getLock().acquireExclusiveLock();
+		// TODO OMVRBTreeRID.getLock().acquireExclusiveLock();
 		try {
 
 			final Object fieldValue = iVertexToRemove != null ? iVertex
@@ -729,7 +729,7 @@ public class OrientVertex extends OrientElement implements Vertex {
 			}
 
 		} finally {
-			OMVRBTreeRID.getLock().releaseExclusiveLock();
+			// TODO OMVRBTreeRID.getLock().releaseExclusiveLock();
 		}
 	}
 
