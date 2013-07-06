@@ -46,7 +46,6 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	protected static final String LIMIT = " LIMIT ";
 
 	protected String fetchPlan;
-	protected boolean explain = false;
 
 	public OrientGraphQuery(final Graph iGraph) {
 		super(iGraph);
@@ -55,14 +54,6 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	public Query labels(final String... labels) {
 		this.labels = labels;
 		return this;
-	}
-
-	public boolean isExplain() {
-		return explain;
-	}
-
-	public void setExplain(final boolean explain) {
-		this.explain = explain;
 	}
 
 	@Override
