@@ -25,7 +25,8 @@ public abstract class TestSuite extends BaseTest {
     protected void containsVertices(final Graph graph, final Collection<Vertex> vertices) {
         for (Vertex v : vertices) {
             Vertex vp = graph.getVertex(v.getId());
-            if (vp == null || !vp.getId().equals(v.getId())) fail();
+            if (vp == null || !vp.getId().equals(v.getId()))
+                fail("Graph does not contain vertex: '" + v + "'");
         }
     }
 

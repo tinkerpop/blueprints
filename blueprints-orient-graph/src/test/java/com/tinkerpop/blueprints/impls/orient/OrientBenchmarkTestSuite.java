@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.io.FileInputStream;
+
 import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.Direction;
@@ -9,8 +11,6 @@ import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
-
-import java.io.FileInputStream;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -68,6 +68,7 @@ public class OrientBenchmarkTestSuite extends TestSuite {
     public void testOrientGraph() throws Exception {
         double totalTime = 0.0d;
         Graph graph = graphTest.generateGraph();
+        
         // graph = new OrientBatchGraph((ODatabaseDocumentTx) ((OrientGraph) graph).getRawGraph());
         // GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
         GraphMLReader.inputGraph(graph, new FileInputStream("/Users/luca/Downloads/graph-example-2.xml"));

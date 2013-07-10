@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 
 import java.util.Arrays;
@@ -81,5 +82,14 @@ public class EdgeHelperTest extends BaseTest {
         }
         assertEquals(counter, 1);
         assertEquals(counter2, 1);
+    }
+
+    public void testGetOther() {
+        Graph graph = TinkerGraphFactory.createTinkerGraph();
+        for (Vertex vertex : graph.getVertices()) {
+            for (Edge edge : vertex.getEdges(Direction.BOTH)) {
+                assertNotSame(vertex, EdgeHelper.getOther(edge, vertex));
+            }
+        }
     }
 }

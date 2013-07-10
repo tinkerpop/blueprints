@@ -537,12 +537,12 @@ public class EdgeTestSuite extends TestSuite {
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             try {
                 edge.setProperty("id", "123");
-                fail();
+                fail("Setting edge property with reserved key 'id' should fail");
             } catch (RuntimeException e) {
             }
             try {
                 edge.setProperty("label", "hates");
-                fail();
+                fail("Setting edge property with reserved key 'label' should fail");
             } catch (RuntimeException e) {
             }
 
@@ -578,9 +578,8 @@ public class EdgeTestSuite extends TestSuite {
             final Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "friend");
             try {
                 e.setProperty("", "value");
-                fail();
+                fail("Setting an edge property with an empty string key should fail");
             } catch (IllegalArgumentException e1) {
-                assertTrue(true);
             }
         }
         graph.shutdown();
@@ -617,33 +616,30 @@ public class EdgeTestSuite extends TestSuite {
             Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
             try {
                 edge.setProperty(null, -1);
-                assertFalse(true);
+                fail("Setting property with a null key should throw an error");
             } catch (RuntimeException e) {
-                assertTrue(true);
             }
             try {
                 edge.setProperty("", -1);
-                assertFalse(true);
+                fail("Setting edge property with a empty key should throw an error");
             } catch (RuntimeException e) {
-                assertTrue(true);
             }
             try {
                 edge.setProperty(StringFactory.ID, -1);
-                assertFalse(true);
+                fail("Setting edge property with a key of '" + StringFactory.ID +
+                        "' should throw an error");
             } catch (RuntimeException e) {
-                assertTrue(true);
             }
             try {
                 edge.setProperty(StringFactory.LABEL, "friend");
-                assertFalse(true);
+                fail("Setting edge property with a key of '" + StringFactory.LABEL +
+                        "' should throw an error");
             } catch (RuntimeException e) {
-                assertTrue(true);
             }
             try {
                 edge.setProperty("good", null);
-                assertFalse(true);
+                fail("Setting edge property with a null value should throw an error");
             } catch (RuntimeException e) {
-                assertTrue(true);
             }
         }
         graph.shutdown();
@@ -656,17 +652,14 @@ public class EdgeTestSuite extends TestSuite {
 
         try {
             v2.addEdge(null, v1);
-            fail();
+            fail("Adding edge to vertex with a null label should throw an error");
         } catch (IllegalArgumentException iae) {
-            assertTrue(true);
         }
 
         try {
             graph.addEdge(null, v1, v2, null);
-            fail();
+            fail("Adding edge to graph with a null label should throw an error");
         } catch (IllegalArgumentException iae) {
-            assertTrue(true);
         }
-
     }
 }
