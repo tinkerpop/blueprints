@@ -136,6 +136,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 	@Override
 	public void remove() {
+    	checkClass();
+    	
 		final ODocument doc = getRecord();
 		if (doc == null)
 			return;

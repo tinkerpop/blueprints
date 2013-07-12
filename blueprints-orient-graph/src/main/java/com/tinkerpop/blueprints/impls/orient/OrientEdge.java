@@ -179,6 +179,8 @@ public class OrientEdge extends OrientElement implements Edge {
 
     @Override
     public void remove() {
+    	checkClass();
+    	
         graph.autoStartTransaction();
         for (final Index<? extends Element> index : graph.getManualIndices()) {
             if (Edge.class.isAssignableFrom(index.getIndexClass())) {
