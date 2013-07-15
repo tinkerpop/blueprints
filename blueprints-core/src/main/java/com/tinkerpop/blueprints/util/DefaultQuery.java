@@ -49,7 +49,7 @@ public abstract class DefaultQuery implements Query {
         return this;
     }
 
-    public <T extends Comparable<T>> Query interval(final String key, final T startValue, final T endValue) {
+    public <T extends Comparable<?>> Query interval(final String key, final T startValue, final T endValue) {
         this.hasContainers.add(new HasContainer(key, com.tinkerpop.blueprints.Compare.GREATER_THAN_EQUAL, startValue));
         this.hasContainers.add(new HasContainer(key, com.tinkerpop.blueprints.Compare.LESS_THAN, endValue));
         return this;

@@ -60,7 +60,7 @@ public interface VertexQuery extends Query {
     public <T extends Comparable<T>> VertexQuery has(String key, T value, Compare compare);
 
     @Override
-    public <T extends Comparable<T>> VertexQuery interval(String key, T startValue, T endValue);
+    public <T extends Comparable<?>> VertexQuery interval(String key, T startValue, T endValue);
 
     @Override
     public VertexQuery limit(int limit);

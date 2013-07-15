@@ -72,7 +72,7 @@ public interface Query {
      * @param endValue   the exclusive end value of the interval
      * @return the modified query object
      */
-    public <T extends Comparable<T>> Query interval(String key, T startValue, T endValue);
+    public <T extends Comparable<?>> Query interval(String key, T startValue, T endValue);
 
     /**
      * Filter out the element if the take number of incident/adjacent elements to retrieve has already been reached.

@@ -208,7 +208,7 @@ public class VertexQueryTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void testHasORVertexQuery() {
+    public void testContainsQueries() {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsEdgeProperties) {
             createGraph(graph);
@@ -287,7 +287,6 @@ public class VertexQueryTestSuite extends TestSuite {
             results = asList(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).limit(0).vertices());
             assertEquals(results.size(), 0);
             assertEquals(a.query().direction(OUT).labels(graphTest.convertLabel("friend")).limit(0).count(), 0);
-
         }
         graph.shutdown();
 
