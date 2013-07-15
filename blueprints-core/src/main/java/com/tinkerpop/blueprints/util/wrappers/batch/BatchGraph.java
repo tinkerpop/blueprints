@@ -91,6 +91,16 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
         remainingBufferSize = this.bufferSize;
     }
+    
+    /**
+     * Constructs a BatchGraph wrapping the provided baseGraph.
+     *
+     * @param graph Graph to be wrapped
+     * @param bufferSize Defines the number of vertices and edges loaded before starting a new transaction. The larger this value, the more memory is required but the faster the loading process.
+     */
+    public BatchGraph(final T graph, final long bufferSize) {
+        this(graph, VertexIDType.OBJECT, bufferSize);
+    }
 
     /**
      * Constructs a BatchGraph wrapping the provided baseGraph.
