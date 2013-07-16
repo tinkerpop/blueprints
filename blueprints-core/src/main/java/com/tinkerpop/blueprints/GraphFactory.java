@@ -36,7 +36,12 @@ public class GraphFactory {
 
         Graph g;
         try {
-            g = (Graph) graphClass.getDeclaredConstructor(Configuration.class).newInstance(configuration);
+            // directly instantiate if it is a Graph class otherwise try to use a factory
+            if (Graph.class.isAssignableFrom(graphClass)) {
+                g = (Graph) graphClass.getConstructor(Configuration.class).newInstance(configuration);
+            } else {
+                g = (Graph) graphClass.getMethod("open", Configuration.class).invoke(null, configuration);
+            }
         } catch (NoSuchMethodException nsme) {
             throw new RuntimeException(String.format("GraphFactory can only instantiate Graph implementations that have a constructor with a single Apache Commons Configuration argument. [%s] does not seem to have one.", clazz));
         } catch (Exception ex) {
