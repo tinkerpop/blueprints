@@ -28,7 +28,7 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Configurable storage for @TinkerGraph@: GraphML, GraphSON and GML
 * @GraphChangedListener@ from @EventGraph@ can mutate graph without concurrent modification exception
 * Scope of @EventGraph@ base classes changed to @public@ for those wanting to extend up on them.
-* Bumped Dex to 4.8.1
+* Bumped Dex to 4.8.2
 * Support both @byte@ and @short@ data types in GraphSON.
 * Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values
 * Bumped Neo4j to 1.9.1
