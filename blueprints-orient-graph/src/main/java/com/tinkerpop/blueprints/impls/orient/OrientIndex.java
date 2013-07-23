@@ -226,7 +226,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
     public void close() {
         if (underlying != null) {
-            underlying.lazySave();
+            underlying.flush();
             underlying = null;
         }
         graph = null;
