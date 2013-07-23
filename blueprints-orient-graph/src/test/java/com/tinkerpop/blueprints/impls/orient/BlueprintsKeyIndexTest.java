@@ -38,7 +38,7 @@ public class BlueprintsKeyIndexTest {
 												// java.lang.AssertionError:
 												// expected:<1> but was:<0>
 		} finally {
-			graph.shutdown();
+			graph.drop();
 		}
 	}
 
@@ -63,7 +63,7 @@ public class BlueprintsKeyIndexTest {
 					KEY_NAME, ROOT_NODE_NAME));
 			assertEquals(1, rootNodes.size()); // ########## no problem
 		} finally {
-			graph.shutdown();
+			graph.drop();
 		}
 	}
 
