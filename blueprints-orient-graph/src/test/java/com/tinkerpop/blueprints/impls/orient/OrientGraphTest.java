@@ -1,7 +1,8 @@
 package com.tinkerpop.blueprints.impls.orient;
 
-import com.orientechnologies.orient.core.Orient;
-import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
+import java.io.File;
+import java.lang.reflect.Method;
+
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -18,9 +19,6 @@ import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
-
-import java.io.File;
-import java.lang.reflect.Method;
 
 /**
  * Test suite for OrientDB graph implementation.
@@ -147,9 +145,7 @@ public abstract class OrientGraphTest extends GraphTest {
             g.open("admin", "admin").drop();
         
         g.close();
-        
-    	ODatabaseRecordThreadLocal.INSTANCE.remove();
-
+       
         deleteDirectory(new File(graphDirectoryName));
     }
 
