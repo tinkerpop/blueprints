@@ -1,9 +1,9 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import org.apache.commons.configuration.Configuration;
+
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.Features;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
 
 /**
  * A Blueprints implementation of the graph database OrientDB (http://www.orientechnologies.com)

@@ -67,6 +67,9 @@ public class OrientBenchmarkTestSuite extends TestSuite {
     //
     public void testOrientGraph() throws Exception {
         double totalTime = 0.0d;
+        if( graphTest == null )
+        	return;
+        
         Graph graph = graphTest.generateGraph();
         
         // graph = new OrientBatchGraph((ODatabaseDocumentTx) ((OrientGraph) graph).getRawGraph());
