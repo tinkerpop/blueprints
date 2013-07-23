@@ -14,6 +14,8 @@ import com.orientechnologies.common.util.OPair;
 import com.orientechnologies.orient.core.command.traverse.OTraverse;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordLazyMultiValue;
+import com.orientechnologies.orient.core.metadata.schema.OClass;
+import com.orientechnologies.orient.core.metadata.schema.OProperty;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.type.tree.OMVRBTreeRID;
 import com.orientechnologies.orient.core.type.tree.OMVRBTreeRIDSet;
@@ -136,8 +138,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 	@Override
 	public void remove() {
-    	checkClass();
-    	
+		checkClass();
+
 		final ODocument doc = getRecord();
 		if (doc == null)
 			return;
@@ -289,29 +291,47 @@ public class OrientVertex extends OrientElement implements Vertex {
 			Object field = iFromVertex.field(iOutFieldName);
 			if (field != null)
 				if (field instanceof OIdentifiable) {
-					if (field.equals(iToVertex))
+					if (field.equals(iToVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
 						return false;
+					}
 				} else if (field instanceof OMVRBTreeRIDSet)
-					if (((OMVRBTreeRIDSet) field).contains(iToVertex))
+					if (((OMVRBTreeRIDSet) field).contains(iToVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
 						return false;
+					}
 
 			field = iToVertex.field(iInFieldName);
 			if (field != null)
 				if (field instanceof OIdentifiable) {
-					if (field.equals(iFromVertex))
+					if (field.equals(iFromVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
 						return false;
+					}
 				} else if (field instanceof OMVRBTreeRIDSet)
-					if (((OMVRBTreeRIDSet) field).contains(iFromVertex))
+					if (((OMVRBTreeRIDSet) field).contains(iFromVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
+						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
 						return false;
+					}
 
+			if( graph.isUseClassForEdgeLabel() ){
+				// CHECK IF THE EDGE CLASS HAS SPECIAL CONSTRAINTS
+				final OClass cls = graph.getEdgeType( label );
+				if( cls != null )
+					for( OProperty p : cls.properties() ){
+						if( p.isMandatory() || p.isNotNull() )
+							return false;
+					}
+			}
+			
 			// CAN USE DYNAMIC EDGES
 			return true;
 		}
@@ -796,10 +816,24 @@ public class OrientVertex extends OrientElement implements Vertex {
 			// EDGE
 			if (graph.isUseVertexFieldsForEdgeLabels()
 					|| OrientEdge.isLabeled(
-							OrientEdge.getRecordLabel(fieldRecord), iLabels))
-				toAdd = new OrientVertex(graph, OrientEdge.getConnection(
-						fieldRecord, connection.getKey().opposite()));
-			else
+							OrientEdge.getRecordLabel(fieldRecord), iLabels)) {
+				final OIdentifiable vertexDoc = OrientEdge.getConnection(
+						fieldRecord, connection.getKey().opposite());
+				if (vertexDoc == null) {
+					fieldRecord.reload();
+					if (vertexDoc == null) {
+						OLogManager.instance().warn(
+								this,
+								"Cannot load edge " + fieldRecord
+										+ " to get the "
+										+ connection.getKey().opposite()
+										+ " vertex");
+						return;
+					}
+				}
+
+				toAdd = new OrientVertex(graph, vertexDoc);
+			} else
 				toAdd = null;
 		} else
 			throw new IllegalStateException("Invalid content found in "
