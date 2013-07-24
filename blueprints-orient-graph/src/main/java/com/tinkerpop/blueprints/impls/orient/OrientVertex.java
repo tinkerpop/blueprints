@@ -112,11 +112,16 @@ public class OrientVertex extends OrientElement implements Vertex {
 							addSingleVertex(doc, iterable, fieldName,
 									connection, coll.iterator().next(), iLabels);
 					} else {
-						final Iterator<?> it = coll instanceof ORecordLazyMultiValue ? ((ORecordLazyMultiValue) coll)
-								.rawIterator() : coll.iterator();
 						// CREATE LAZY Iterable AGAINST COLLECTION FIELD
-						iterable.add(new OrientVertexIterator(this, it,
-								connection, iLabels));
+						if (coll instanceof ORecordLazyMultiValue)
+							iterable.add(new OrientVertexIterator(this,
+									((ORecordLazyMultiValue) coll)
+											.rawIterator(), connection,
+									iLabels, ((ORecordLazyMultiValue) coll)
+											.size()));
+						else
+							iterable.add(new OrientVertexIterator(this, coll
+									.iterator(), connection, iLabels, -1));
 					}
 				}
 		}
@@ -294,14 +299,16 @@ public class OrientVertex extends OrientElement implements Vertex {
 					if (field.equals(iToVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
-						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
+						new OrientEdge(graph, iFromVertex, iToVertex, label)
+								.convertToDocument();
 						return false;
 					}
 				} else if (field instanceof OMVRBTreeRIDSet)
 					if (((OMVRBTreeRIDSet) field).contains(iToVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
-						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
+						new OrientEdge(graph, iFromVertex, iToVertex, label)
+								.convertToDocument();
 						return false;
 					}
 
@@ -311,27 +318,29 @@ public class OrientVertex extends OrientElement implements Vertex {
 					if (field.equals(iFromVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
-						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
+						new OrientEdge(graph, iFromVertex, iToVertex, label)
+								.convertToDocument();
 						return false;
 					}
 				} else if (field instanceof OMVRBTreeRIDSet)
 					if (((OMVRBTreeRIDSet) field).contains(iFromVertex)) {
 						// ALREADY EXISTS, FORCE THE EDGE-DOCUMENT TO AVOID
 						// MULTIPLE DYN-EDGES AGAINST THE SAME VERTICES
-						new OrientEdge(graph, iFromVertex, iToVertex, label).convertToDocument();
+						new OrientEdge(graph, iFromVertex, iToVertex, label)
+								.convertToDocument();
 						return false;
 					}
 
-			if( graph.isUseClassForEdgeLabel() ){
+			if (graph.isUseClassForEdgeLabel()) {
 				// CHECK IF THE EDGE CLASS HAS SPECIAL CONSTRAINTS
-				final OClass cls = graph.getEdgeType( label );
-				if( cls != null )
-					for( OProperty p : cls.properties() ){
-						if( p.isMandatory() || p.isNotNull() )
+				final OClass cls = graph.getEdgeType(label);
+				if (cls != null)
+					for (OProperty p : cls.properties()) {
+						if (p.isMandatory() || p.isNotNull())
 							return false;
 					}
 			}
-			
+
 			// CAN USE DYNAMIC EDGES
 			return true;
 		}
@@ -415,11 +424,16 @@ public class OrientVertex extends OrientElement implements Vertex {
 									coll.iterator().next(), destinationVId,
 									iLabels);
 					} else {
-						final Iterator<?> it = coll instanceof ORecordLazyMultiValue ? ((ORecordLazyMultiValue) coll)
-								.rawIterator() : coll.iterator();
 						// CREATE LAZY Iterable AGAINST COLLECTION FIELD
-						iterable.add(new OrientEdgeIterator(this, it,
-								connection, iLabels));
+						if (coll instanceof ORecordLazyMultiValue) {
+							iterable.add(new OrientEdgeIterator(this,
+									((ORecordLazyMultiValue) coll)
+											.rawIterator(), connection,
+									iLabels, ((ORecordLazyMultiValue) coll)
+											.size()));
+						} else
+							iterable.add(new OrientEdgeIterator(this, coll
+									.iterator(), connection, iLabels, -1));
 					}
 				}
 			}

@@ -19,8 +19,8 @@ public class OrientEdgeIterator extends OLazyWrapperIterator<OrientEdge> {
     private final String[] labels;
 
     public OrientEdgeIterator(final OrientVertex iVertex, final Iterator<?> iterator, final OPair<Direction, String> connection,
-                              final String[] iLabels) {
-        super(iterator);
+                              final String[] iLabels, final int iSize) {
+        super(iterator, iSize);
         this.vertex = iVertex;
         this.connection = connection;
         this.labels = iLabels;

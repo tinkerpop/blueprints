@@ -15,8 +15,8 @@ public class OrientVertexIterator extends OLazyWrapperIterator<Vertex> {
     private final OPair<Direction, String> connection;
 
     public OrientVertexIterator(final OrientVertex orientVertex, final Iterator<?> iterator,
-                                final OPair<Direction, String> connection, final String[] iLabels) {
-        super(iterator);
+                                final OPair<Direction, String> connection, final String[] iLabels, final int iSize) {
+        super(iterator, iSize);
         this.vertex = orientVertex;
         this.connection = connection;
         this.iLabels = iLabels;
