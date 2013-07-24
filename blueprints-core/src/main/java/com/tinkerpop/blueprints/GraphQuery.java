@@ -29,7 +29,7 @@ public interface GraphQuery extends Query {
     public <T extends Comparable<T>> GraphQuery has(String key, T value, Compare compare);
 
     @Override
-    public <T extends Comparable<T>> GraphQuery interval(String key, T startValue, T endValue);
+    public <T extends Comparable<?>> GraphQuery interval(String key, T startValue, T endValue);
 
     @Override
     public GraphQuery limit(int limit);

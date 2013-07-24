@@ -661,5 +661,6 @@ public class EdgeTestSuite extends TestSuite {
             fail("Adding edge to graph with a null label should throw an error");
         } catch (IllegalArgumentException iae) {
         }
+        graph.shutdown();
     }
 }

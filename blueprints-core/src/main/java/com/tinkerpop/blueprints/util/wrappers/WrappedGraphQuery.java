@@ -45,7 +45,7 @@ public abstract class WrappedGraphQuery implements GraphQuery {
         return this.has(key, compare, value);
     }
 
-    public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue) {
+    public <T extends Comparable<?>> GraphQuery interval(final String key, final T startValue, final T endValue) {
         this.query = this.query.interval(key, startValue, endValue);
         return this;
     }

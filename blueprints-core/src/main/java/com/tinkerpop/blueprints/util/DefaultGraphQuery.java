@@ -56,7 +56,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return this;
     }
 
-    public <T extends Comparable<T>> GraphQuery interval(final String key, final T startValue, final T endValue) {
+    public <T extends Comparable<?>> GraphQuery interval(final String key, final T startValue, final T endValue) {
         super.interval(key, startValue, endValue);
         return this;
     }

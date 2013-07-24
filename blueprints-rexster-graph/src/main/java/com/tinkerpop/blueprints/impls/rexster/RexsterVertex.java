@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexQuery;
+import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.VerticesFromEdgesIterable;
@@ -72,7 +73,7 @@ public class RexsterVertex extends RexsterElement implements Vertex {
     }
 
     public VertexQuery query() {
-        return new RexsterVertexQuery(this.graph.getGraphURI() + RexsterTokens.SLASH_VERTICES_SLASH + RestHelper.encode(this.getId()), graph);
+        return new DefaultVertexQuery(this);
     }
 
     public String toString() {

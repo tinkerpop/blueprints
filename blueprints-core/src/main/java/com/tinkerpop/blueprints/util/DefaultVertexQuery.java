@@ -56,7 +56,7 @@ public class DefaultVertexQuery extends DefaultQuery implements VertexQuery {
         return this;
     }
 
-    public <T extends Comparable<T>> VertexQuery interval(final String key, final T startValue, final T endValue) {
+    public <T extends Comparable<?>> VertexQuery interval(final String key, final T startValue, final T endValue) {
         super.interval(key, startValue, endValue);
         return this;
     }
