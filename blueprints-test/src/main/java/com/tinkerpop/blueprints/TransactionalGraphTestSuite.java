@@ -1,12 +1,19 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -644,6 +651,103 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         edgeCount(graph, 0);
         assertNull(getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT)));
+        graph.shutdown();
+    }
+
+    public void untestSimulateRexsterIntegrationTests() throws Exception {
+        // this test simulates the flow of rexster integration test.  integration tests requests are generally not made
+        // in parallel, but it is expected each request they may be processed by different threads from a thread pool
+        // for each request.
+        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsKeyIndices) {
+            final String id = "_ID";
+            ((KeyIndexableGraph) graph).createKeyIndex(id, Vertex.class);
+
+            final int numberOfVerticesToCreate = 100;
+            final Random rand = new Random(12356);
+            final List<String> graphAssignedIds = new ArrayList<String>();
+
+            final ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+            for (int ix = 0; ix < numberOfVerticesToCreate; ix++) {
+                final int id1 = ix;
+                final int id2 = ix + numberOfVerticesToCreate + rand.nextInt();
+
+                // add a vertex and block for the thread to complete
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        final Vertex v = graph.addVertex(null);
+                        v.setProperty(id, id1);
+                        graph.commit();
+
+                        graphAssignedIds.add(v.getId().toString());
+                    }
+                }).get();
+
+                if (ix > 0) {
+                    // add a vertex and block for the thread to complete
+                    executorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            final Vertex v = graph.addVertex(null);
+                            v.setProperty(id, id2);
+                            graph.commit();
+
+                            graphAssignedIds.add(v.getId().toString());
+                        }
+                    }).get();
+
+                    // add an edge to two randomly selected vertices and block for the thread to complete. integration
+                    // tests tend to fail here, so the code is replicated pretty closely to what is in rexster
+                    // (i.e. serialization to JSON) even though that may have nothing to do with failures.
+                    executorService.submit(new Runnable() {
+                        @Override
+                        public void run() {
+                            final Vertex vActual1 = graph.getVertex(graphAssignedIds.get(rand.nextInt(graphAssignedIds.size())));
+                            final Vertex vActual2 = graph.getVertex(graphAssignedIds.get(rand.nextInt(graphAssignedIds.size())));
+                            final Edge e = graph.addEdge(null, vActual1, vActual2, "knows");
+                            e.setProperty("weight", rand.nextFloat());
+
+                            try {
+                                // just replicating rexster
+                                final JSONObject elementJson = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL);
+
+                                graph.commit();
+
+                                if (elementJson != null) {
+                                    // just replicating rexster
+                                    elementJson.put("_ID", e.getId());
+                                }
+                            } catch (Exception ex) {
+                                fail(ex.getMessage());
+                            }
+                        }
+                    }).get();
+                }
+            }
+
+            final Set<String> ids = new HashSet<String>();
+            for (final Vertex v : graph.getVertices()) {
+                ids.add(v.getId().toString());
+            }
+
+            for (final String idToRemove : ids) {
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        final Vertex toRemove = graph.getVertex(idToRemove);
+                        graph.removeVertex(toRemove);
+
+                        graph.commit();
+                    }
+                });
+            }
+
+            executorService.shutdown();
+            executorService.awaitTermination(10, TimeUnit.SECONDS);
+        }
+
         graph.shutdown();
     }
 

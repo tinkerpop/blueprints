@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
 import com.orientechnologies.orient.core.Orient;
+import com.orientechnologies.orient.core.config.OGlobalConfiguration;
 import com.orientechnologies.orient.core.db.ODatabaseRecordThreadLocal;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.EdgeTestSuite;
@@ -116,6 +117,9 @@ public abstract class OrientGraphTest extends GraphTest {
     public Graph generateGraph(final String graphDirectoryName) {
         final String dbPath = getWorkingDirectory() + "/" + graphDirectoryName;
         this.currentGraph = new OrientGraph("local:" + dbPath);
+
+        //OGlobalConfiguration.CACHE_LEVEL1_ENABLED.setValue(false);
+
         return currentGraph;
     }
 
