@@ -160,7 +160,7 @@ public abstract class OrientElement implements Element, OSerializableStream, OId
             return null;
 
         // CHANGE THE RID -> DOCUMENT
-        //rawElement = doc;
+        rawElement = doc;
         return doc;
     }
 
