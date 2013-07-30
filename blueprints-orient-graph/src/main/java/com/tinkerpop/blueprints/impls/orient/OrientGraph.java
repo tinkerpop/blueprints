@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.impls.orient;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
+import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.tinkerpop.blueprints.Features;
 
 /**
@@ -18,7 +18,7 @@ public class OrientGraph extends OrientTransactionalGraph {
      *
      * @param iDatabase Underlying OGraphDatabase object to attach
      */
-    public OrientGraph(final OGraphDatabase iDatabase) {
+    public OrientGraph(final ODatabaseDocumentTx iDatabase) {
         super(iDatabase);
         config();
     }

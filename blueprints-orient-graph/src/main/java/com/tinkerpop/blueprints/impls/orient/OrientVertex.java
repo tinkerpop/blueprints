@@ -58,6 +58,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 	@Override
 	public Set<String> getPropertyKeys() {
+		graph.setCurrentGraphInThreadLocal();
+
 		final ODocument doc = getRecord();
 
 		final Set<String> result = new HashSet<String>();
@@ -79,6 +81,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 	@Override
 	public Iterable<Vertex> getVertices(final Direction iDirection,
 			final String... iLabels) {
+		graph.setCurrentGraphInThreadLocal();
+
 		final ODocument doc = getRecord();
 
 		final OMultiCollectionIterator<Vertex> iterable = new OMultiCollectionIterator<Vertex>();
@@ -131,6 +135,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 	@Override
 	public OrientVertexQuery query() {
+		graph.setCurrentGraphInThreadLocal();
+
 		return new OrientVertexQuery(this);
 	}
 
@@ -138,6 +144,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 	 * Returns a OTraverse object to start traversing from the current vertex.
 	 */
 	public OTraverse traverse() {
+		graph.setCurrentGraphInThreadLocal();
+
 		return new OTraverse().target(getRecord());
 	}
 
@@ -145,11 +153,11 @@ public class OrientVertex extends OrientElement implements Vertex {
 	public void remove() {
 		checkClass();
 
+		graph.autoStartTransaction();
+
 		final ODocument doc = getRecord();
 		if (doc == null)
 			return;
-
-		graph.autoStartTransaction();
 
 		final Iterator<OrientIndex<? extends OrientElement>> it = graph
 				.getManualIndices().iterator();
@@ -385,6 +393,9 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 	public Iterable<Edge> getEdges(final Vertex iDestination,
 			final Direction iDirection, final String... iLabels) {
+
+		graph.setCurrentGraphInThreadLocal();
+
 		final ODocument doc = getRecord();
 
 		final OMultiCollectionIterator<Edge> iterable = new OMultiCollectionIterator<Edge>()
@@ -443,6 +454,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 	}
 
 	public String getLabel() {
+		graph.setCurrentGraphInThreadLocal();
+
 		if (graph.isUseClassForVertexLabel()) {
 			final String clsName = getRecord().getClassName();
 			if (!CLASS_NAME.equals(clsName))
@@ -463,6 +476,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 	}
 
 	public String toString() {
+		graph.setCurrentGraphInThreadLocal();
+
 		final String clsName = getRecord().getClassName();
 
 		if (clsName.equals(CLASS_NAME))
