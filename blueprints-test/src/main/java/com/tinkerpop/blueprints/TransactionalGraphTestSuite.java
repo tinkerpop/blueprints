@@ -1,10 +1,5 @@
 package com.tinkerpop.blueprints;
 
-import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
-import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
-import org.codehaus.jettison.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,10 +12,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.codehaus.jettison.json.JSONObject;
+
+import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
+
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class TransactionalGraphTestSuite extends TestSuite {
+
+    protected static final int MAX_RETRIES = 10;
 
     public TransactionalGraphTestSuite() {
     }
@@ -654,7 +657,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void untestSimulateRexsterIntegrationTests() throws Exception {
+    public void testSimulateRexsterIntegrationTests() throws Exception {
         // this test simulates the flow of rexster integration test.  integration tests requests are generally not made
         // in parallel, but it is expected each request they may be processed by different threads from a thread pool
         // for each request.
@@ -704,29 +707,32 @@ public class TransactionalGraphTestSuite extends TestSuite {
                     executorService.submit(new Runnable() {
                         @Override
                         public void run() {
-                            final Vertex vActual1 = graph.getVertex(graphAssignedIds.get(rand.nextInt(graphAssignedIds.size())));
-                            final Vertex vActual2 = graph.getVertex(graphAssignedIds.get(rand.nextInt(graphAssignedIds.size())));
-                            final Edge e = graph.addEdge(null, vActual1, vActual2, "knows");
-                            e.setProperty("weight", rand.nextFloat());
 
-                            JSONObject elementJson = null;
+                          int v1 = rand.nextInt(graphAssignedIds.size());
+                          int v2 = rand.nextInt(graphAssignedIds.size());
+
+                          for (int retry = 0; retry < MAX_RETRIES; ++retry) {
                             try {
+                              final Vertex vActual1 = graph.getVertex(graphAssignedIds.get(v1));
+                              final Vertex vActual2 = graph.getVertex(graphAssignedIds.get(v2));
+                              final Edge e = graph.addEdge(null, vActual1, vActual2, "knows");
+                              e.setProperty("weight", rand.nextFloat());
+
+                              // just replicating rexster
+                              final JSONObject elementJson = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL);
+
+                              graph.commit();
+
+                              if (elementJson != null) {
                                 // just replicating rexster
-                                elementJson = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL);
+                                elementJson.put("_ID", e.getId());
+                              }
+                              break;
                             } catch (Exception ex) {
-                                fail();
+                              if (!ex.getClass().getSimpleName().equals("OConcurrentModificationException"))
+                                fail(ex.getMessage());
                             }
-
-                            graph.commit();
-
-                            try {
-                                if (elementJson != null) {
-                                    // just replicating rexster
-                                    elementJson.put("_ID", e.getId());
-                                }
-                            } catch (Exception ex) {
-                                fail();
-                            }
+                          }
                         }
                     }).get();
                 }
@@ -756,7 +762,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void untestTransactionVertexPropertiesAcrossThreads() throws Exception {
+    public void testTransactionVertexPropertiesAcrossThreads() throws Exception {
         // the purpose of this test is to ensure that properties of a element are available prior to commit()
         // across threads
         final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
@@ -778,7 +784,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         assertEquals("stephen", v.get().getProperty("name"));
     }
 
-    public void untestTransactionIsolationWithSeparateThreads() throws Exception {
+    public void testTransactionIsolationWithSeparateThreads() throws Exception {
         // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
         // the graph and a separate thread reads before the transaction is committed.  the expectation is that
         // the changes in the transaction are isolated to the thread that made the change and the second thread
