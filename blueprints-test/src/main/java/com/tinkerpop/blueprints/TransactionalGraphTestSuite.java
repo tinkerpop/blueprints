@@ -709,18 +709,23 @@ public class TransactionalGraphTestSuite extends TestSuite {
                             final Edge e = graph.addEdge(null, vActual1, vActual2, "knows");
                             e.setProperty("weight", rand.nextFloat());
 
+                            JSONObject elementJson = null;
                             try {
                                 // just replicating rexster
-                                final JSONObject elementJson = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL);
+                                elementJson = GraphSONUtility.jsonFromElement(e, null, GraphSONMode.NORMAL);
+                            } catch (Exception ex) {
+                                fail();
+                            }
 
-                                graph.commit();
+                            graph.commit();
 
+                            try {
                                 if (elementJson != null) {
                                     // just replicating rexster
                                     elementJson.put("_ID", e.getId());
                                 }
                             } catch (Exception ex) {
-                                fail(ex.getMessage());
+                                fail();
                             }
                         }
                     }).get();
