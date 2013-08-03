@@ -23,15 +23,18 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph
 	 */
 	public OrientTransactionalGraph(final ODatabaseDocumentTx iDatabase) {
 		super(iDatabase);
+		autoStartTransaction();
 	}
 
 	public OrientTransactionalGraph(final String url) {
 		super(url, ADMIN, ADMIN);
+		autoStartTransaction();
 	}
 
 	public OrientTransactionalGraph(final String url, final String username,
 			final String password) {
 		super(url, username, password);
+		autoStartTransaction();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -57,6 +60,7 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph
 			return;
 
 		context.rawGraph.commit();
+		autoStartTransaction();
 	}
 
 	public void rollback() {
@@ -65,12 +69,13 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph
 			return;
 
 		context.rawGraph.rollback();
+		autoStartTransaction();
 	}
 
 	@Override
 	protected void autoStartTransaction() {
 		super.autoStartTransaction();
-		
+
 		if (!autoStartTx)
 			return;
 

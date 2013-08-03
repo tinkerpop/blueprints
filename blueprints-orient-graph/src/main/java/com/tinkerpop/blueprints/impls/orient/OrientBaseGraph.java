@@ -10,8 +10,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.orientechnologies.common.exception.OException;
 import com.orientechnologies.common.io.OFileUtils;
 import com.orientechnologies.common.log.OLogManager;
+import com.orientechnologies.common.util.OCallable;
 import com.orientechnologies.orient.core.command.OCommandRequest;
 import com.orientechnologies.orient.core.command.traverse.OTraverse;
 import com.orientechnologies.orient.core.config.OStorageEntryConfiguration;
@@ -127,24 +129,26 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 			final Class<T> indexClass, final Parameter... indexParameters) {
 		final OrientGraphContext context = getContext(true);
 
-		commitAnyActiveTx("create index '" + indexName + "'");
+		return executeOutsideTx(new OCallable<Index<T>, OrientBaseGraph>() {
+			public Index<T> call(final OrientBaseGraph g) {
+				synchronized (contexts) {
+					if (context.manualIndices.containsKey(indexName))
+						throw ExceptionFactory.indexAlreadyExists(indexName);
 
-		synchronized (contexts) {
-			if (context.manualIndices.containsKey(indexName))
-				throw ExceptionFactory.indexAlreadyExists(indexName);
+					final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(
+							g, indexName, indexClass, null);
 
-			final OrientIndex<? extends OrientElement> index = new OrientIndex<OrientElement>(
-					this, indexName, indexClass, null);
+					// ADD THE INDEX IN ALL CURRENT CONTEXTS
+					for (OrientGraphContext ctx : contexts)
+						ctx.manualIndices.put(index.getIndexName(), index);
 
-			// ADD THE INDEX IN ALL CURRENT CONTEXTS
-			for (OrientGraphContext ctx : contexts)
-				ctx.manualIndices.put(index.getIndexName(), index);
+					// SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
+					saveIndexConfiguration();
 
-			// SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
-			saveIndexConfiguration();
-
-			return (Index<T>) index;
-		}
+					return (Index<T>) index;
+				}
+			};
+		}, "create index '", indexName, "'");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -177,21 +181,26 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	}
 
 	public void dropIndex(final String indexName) {
-		commitAnyActiveTx("drop index");
+		executeOutsideTx(new OCallable<Object, OrientBaseGraph>() {
+			@Override
+			public Object call(OrientBaseGraph g) {
+				try {
+					synchronized (contexts) {
+						for (OrientGraphContext ctx : contexts) {
+							ctx.manualIndices.remove(indexName);
+						}
+					}
 
-		try {
-			synchronized (contexts) {
-				for (OrientGraphContext ctx : contexts) {
-					ctx.manualIndices.remove(indexName);
+					getRawGraph().getMetadata().getIndexManager()
+							.dropIndex(indexName);
+					saveIndexConfiguration();
+					return null;
+				} catch (Exception e) {
+					g.rollback();
+					throw new RuntimeException(e.getMessage(), e);
 				}
 			}
-
-			getRawGraph().getMetadata().getIndexManager().dropIndex(indexName);
-			saveIndexConfiguration();
-		} catch (Exception e) {
-			this.rollback();
-			throw new RuntimeException(e.getMessage(), e);
-		}
+		}, "drop index '", indexName, "'");
 	}
 
 	public OrientVertex addVertex(final Object id) {
@@ -588,31 +597,39 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	}
 
 	public OClass createVertexType(final String iClassName) {
-		commitAnyActiveTx("create vertex type '" + iClassName + "'");
-		return getRawGraph().getMetadata().getSchema()
-				.createClass(iClassName, getVertexBaseType());
+		return createVertexType(iClassName, (String) null);
 	}
 
 	public OClass createVertexType(final String iClassName,
 			final String iSuperClassName) {
-		commitAnyActiveTx("create vertex type '" + iClassName
-				+ "' as subclass of '" + iSuperClassName + "'");
-		return getRawGraph().getMetadata().getSchema()
-				.createClass(iClassName, getVertexType(iSuperClassName));
+		return createVertexType(iClassName,
+				iSuperClassName == null ? getVertexBaseType()
+						: getVertexType(iSuperClassName));
 	}
 
 	public OClass createVertexType(final String iClassName,
 			final OClass iSuperClass) {
 		checkVertexType(iSuperClass);
-		commitAnyActiveTx("create vertex type '" + iClassName
-				+ "' as subclass of '" + iSuperClass.getName() + "'");
-		return getRawGraph().getMetadata().getSchema()
-				.createClass(iClassName, iSuperClass);
+
+		return executeOutsideTx(
+				new OCallable<OClass, OrientBaseGraph>() {
+					@Override
+					public OClass call(final OrientBaseGraph g) {
+						return getRawGraph().getMetadata().getSchema()
+								.createClass(iClassName, iSuperClass);
+					}
+				}, "create vertex type '", iClassName, "' as subclass of '",
+				iSuperClass.getName(), "'");
 	}
 
 	public final void dropVertexType(final String iTypeName) {
-		commitAnyActiveTx("drop vertex type '" + iTypeName + "'");
-		getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
+		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
+			@Override
+			public OClass call(final OrientBaseGraph g) {
+				getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
+				return null;
+			}
+		}, "drop vertex type '", iTypeName, "'");
 	}
 
 	public OClass getEdgeBaseType() {
@@ -629,31 +646,38 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	}
 
 	public OClass createEdgeType(final String iClassName) {
-		commitAnyActiveTx("create edge type '" + iClassName + "'");
-		return getRawGraph().getMetadata().getSchema()
-				.createClass(iClassName, getEdgeBaseType());
+		return createEdgeType(iClassName, (String) null);
 	}
 
 	public OClass createEdgeType(final String iClassName,
 			final String iSuperClassName) {
-		commitAnyActiveTx("create edge type '" + iClassName
-				+ "' as subclass of '" + iSuperClassName + "'");
-		return getRawGraph().getMetadata().getSchema()
-				.createClass(iClassName, getEdgeType(iSuperClassName));
+		return createEdgeType(iClassName,
+				iSuperClassName == null ? getEdgeBaseType()
+						: getEdgeType(iSuperClassName));
 	}
 
 	public OClass createEdgeType(final String iClassName,
 			final OClass iSuperClass) {
 		checkEdgeType(iSuperClass);
-		commitAnyActiveTx("create edge type '" + iClassName
-				+ "' as subclass of '" + iSuperClass.getName() + "'");
-		return getRawGraph().getMetadata().getSchema()
-				.createClass(iClassName, iSuperClass);
+		return executeOutsideTx(
+				new OCallable<OClass, OrientBaseGraph>() {
+					@Override
+					public OClass call(final OrientBaseGraph g) {
+						return getRawGraph().getMetadata().getSchema()
+								.createClass(iClassName, iSuperClass);
+					}
+				}, "create edge type '", iClassName, "' as subclass of '",
+				iSuperClass.getName(), "'");
 	}
 
 	public final void dropEdgeType(final String iTypeName) {
-		commitAnyActiveTx("drop edge type '" + iTypeName + "'");
-		getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
+		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
+			@Override
+			public OClass call(final OrientBaseGraph g) {
+				getRawGraph().getMetadata().getSchema().dropClass(iTypeName);
+				return null;
+			}
+		}, "drop edge type '", iTypeName, "'");
 	}
 
 	protected final void checkVertexType(final OClass iType) {
@@ -811,11 +835,16 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	public <T extends Element> void dropKeyIndex(final String key,
 			final Class<T> elementClass) {
-		commitAnyActiveTx("drop key index");
+		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
+			@Override
+			public OClass call(final OrientBaseGraph g) {
+				final String className = getClassName(elementClass);
+				getRawGraph().getMetadata().getIndexManager()
+						.dropIndex(className + "." + key);
+				return null;
+			}
+		}, "drop key index '", elementClass.getSimpleName(), ".", key, "'");
 
-		final String className = getClassName(elementClass);
-		getRawGraph().getMetadata().getIndexManager()
-				.dropIndex(className + "." + key);
 	}
 
 	/**
@@ -842,42 +871,52 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	 */
 	@SuppressWarnings({ "rawtypes" })
 	public <T extends Element> void createKeyIndex(final String key,
-			Class<T> elementClass, final Parameter... indexParameters) {
-		commitAnyActiveTx("create key index");
+			final Class<T> elementClass, final Parameter... indexParameters) {
+		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
+			@Override
+			public OClass call(final OrientBaseGraph g) {
 
-		String indexType = OClass.INDEX_TYPE.NOTUNIQUE.name();
-		OType keyType = OType.STRING;
-		String className = null;
+				String indexType = OClass.INDEX_TYPE.NOTUNIQUE.name();
+				OType keyType = OType.STRING;
+				String className = null;
 
-		final String ancestorClassName = getClassName(elementClass);
+				final String ancestorClassName = getClassName(elementClass);
 
-		// READ PARAMETERS
-		for (Parameter<?, ?> p : indexParameters) {
-			if (p.getKey().equals("type"))
-				indexType = p.getValue().toString().toUpperCase();
-			else if (p.getKey().equals("keytype"))
-				keyType = OType.valueOf(p.getValue().toString().toUpperCase());
-			else if (p.getKey().equals("class"))
-				className = p.getValue().toString();
-		}
+				// READ PARAMETERS
+				for (Parameter<?, ?> p : indexParameters) {
+					if (p.getKey().equals("type"))
+						indexType = p.getValue().toString().toUpperCase();
+					else if (p.getKey().equals("keytype"))
+						keyType = OType.valueOf(p.getValue().toString()
+								.toUpperCase());
+					else if (p.getKey().equals("class"))
+						className = p.getValue().toString();
+				}
 
-		if (className == null)
-			className = ancestorClassName;
+				if (className == null)
+					className = ancestorClassName;
 
-		final ODatabaseDocumentTx db = getRawGraph();
-		final OSchema schema = db.getMetadata().getSchema();
+				final ODatabaseDocumentTx db = getRawGraph();
+				final OSchema schema = db.getMetadata().getSchema();
 
-		final OClass cls = schema.getOrCreateClass(className,
-				schema.getClass(ancestorClassName));
-		final OProperty property = cls.getProperty(key);
-		if (property != null)
-			keyType = property.getType();
+				final OClass cls = schema.getOrCreateClass(className,
+						schema.getClass(ancestorClassName));
+				final OProperty property = cls.getProperty(key);
+				if (property != null)
+					keyType = property.getType();
 
-		db.getMetadata()
-				.getIndexManager()
-				.createIndex(className + "." + key, indexType,
-						new OPropertyIndexDefinition(className, key, keyType),
-						cls.getPolymorphicClusterIds(), null);
+				db.getMetadata()
+						.getIndexManager()
+						.createIndex(
+								className + "." + key,
+								indexType,
+								new OPropertyIndexDefinition(className, key,
+										keyType),
+								cls.getPolymorphicClusterIds(), null);
+				return null;
+
+			}
+		}, "create key index on '", elementClass.getSimpleName(), ".", key, "'");
 	}
 
 	public <T extends Element> Set<String> getIndexedKeys(
@@ -1036,15 +1075,40 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 				+ "' is neither a Vertex, nor an Edge");
 	}
 
-	protected void commitAnyActiveTx(final String iOperation) {
-		if (getRawGraph().getTransaction().isActive()) {
-			// ASSURE PENDING TX IF ANY IS COMMITTED
-			OLogManager
-					.instance()
-					.warn(this,
-							"Committing the active transaction to %s. To avoid this behavior do it outside the transaction",
-							iOperation);
-			this.commit();
+	protected <RET> RET executeOutsideTx(
+			final OCallable<RET, OrientBaseGraph> iCallable,
+			final String... iOperationStrings) {
+		final boolean committed;
+		final ODatabaseDocumentTx raw = getRawGraph();
+		if (raw.getTransaction().isActive()) {
+			if (OLogManager.instance().isWarnEnabled()) {
+				// COMPOSE THE MESSAGE
+				final StringBuilder msg = new StringBuilder();
+				for (String s : iOperationStrings)
+					msg.append(s);
+
+				// ASSURE PENDING TX IF ANY IS COMMITTED
+				OLogManager
+						.instance()
+						.warn(this,
+								"Committing the active transaction to %s. To avoid this behavior do it outside the transaction",
+								msg.toString());
+			}
+			raw.commit();
+			committed = true;
+		} else
+			committed = false;
+
+		try {
+			return iCallable.call(this);
+		} catch (Exception e) {
+			if (e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			else
+				throw new OException(e);
+		} finally {
+			if (committed)
+				autoStartTransaction();
 		}
 	}
 
