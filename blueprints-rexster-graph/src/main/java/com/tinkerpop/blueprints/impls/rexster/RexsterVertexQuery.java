@@ -16,7 +16,6 @@ import java.util.List;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-@Deprecated
 public class RexsterVertexQuery extends DefaultVertexQuery {
 
     public final String baseUri;

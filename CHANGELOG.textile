@@ -31,7 +31,8 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Bumped Dex to 4.8.2
 * Support both @byte@ and @short@ data types in GraphSON.
 * Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values
-* Bumped Neo4j to 1.9.1
+* Bumped Neo4j to 1.9.2
+* Bumped OrientDB to 1.5.0
 * Added @has(key)@ and @hasNot(key)@ in @Query@ API
 * Added @has(key,predicate,value)@ in @Query@ API
 * Deprecated @Query.has(key,value,compare)@ in @Query@ API
