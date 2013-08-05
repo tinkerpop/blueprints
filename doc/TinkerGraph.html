@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href="css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src="css/jquery.js"></script>
+  <script type="text/javascript" src="css/gollum.js"></script>
+  <script type="text/javascript" src="css/gollum.dialog.js"></script>
+  <script type="text/javascript" src="css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src="css/editor/gollum.editor.js"></script>
+  <title>TinkerGraph</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.4.0</a> - <a href="Home.html">Blueprints</a></h3>
+  <h1>TinkerGraph</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/TinkerGraph"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/TinkerGraph"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="images/tinkerpop-logo-small.jpg" alt="" /></p>
+<pre><code>&lt;dependency&gt;
+   &lt;groupId&gt;com.tinkerpop.blueprints&lt;/groupId&gt;
+   &lt;artifactId&gt;blueprints-core&lt;/artifactId&gt;
+   &lt;version&gt;??&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<p>TinkerGraph is a lightweight, <a href="http://en.wikipedia.org/wiki/Plain_Old_Java_Object"><span class="caps">POJO</span></a> based, in-memory property graph that serves as the reference implementation for the <a class="internal present" href="Property-Graph-Model.html">property graph model</a>. If you have a small graph that can be loaded and saved using the <a class="internal present" href="GraphML-Reader-and-Writer-Library.html">GraphML reader and writer library</a>, then TinkerGraph can be handy to use.  It is also great for use in writing unit tests in place of other implementations that require greater resources. TinkerGraph packaged with the core Blueprints distribution.</p>
+<pre><code>// in-memory
+Graph graph = new TinkerGraph();
+
+// on graph.shutdown() the graph is serialized to disk with Java serialization
+Graph graph = new TinkerGraph("/tmp/tinkergraph"); </code></pre>
+<p>There is a hardcoded representation of the graph diagrammed in <a class="internal present" href="Property-Graph-Model.html">Property Graph Model</a>. This is useful as a small, play dataset to get acquainted with the Blueprints <span class="caps">API</span>.</p>
+<pre><code>Graph graph = TinkerGraphFactory.createTinkerGraph();</code></pre>
+<h2>Configurable Storage</h2>
+<p>By default, TinkerGraph uses standard Java serialization for persisting its contents to disk, but there are other more portable options as well using the Blueprints IO functions: <a class="internal present" href="GML-Reader-and-Writer-Library.html">GML</a>, <a class="internal present" href="GraphML-Reader-and-Writer-Library.html">GraphML</a> and <a class="internal present" href="GraphSON-Reader-and-Writer-Library.html">GraphSON</a>.</p>
+<pre><code>Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.GML); 
+Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.GRAPHML); 
+Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.GRAPHSON); 
+
+// the following is the same as the constructor that simply specifies the directory
+Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.JAVA); </code></pre>
+<p>In the case of <span class="caps">GML</span>, GraphML and GraphSON, TinkerGraph will write two files to the specified directory.  One will contain the data for the graph which will be obviously prefixed with an appropriate <code>.gml</code>, <code>.xml</code> or <code>.json</code> extension depending on the option selected.  The other file will be a binary metadata file.</p>
+<p>Note that TinkerGraph can store any Java object within its properties, however the storage type chosen will limit the property types that can be persisted on <code>shutdown()</code>.</p>
+<h2>GraphFactory Settings</h2>
+<p>If using <a href="https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory">GraphFactory</a> to instantiate a <code>TinkerGraph</code>, the following properties will apply:</p>
+<table><tr><th>key </th>
+		<th>description </th>
+	</tr><tr><td> <code>blueprints.graph</code> </td>
+		<td> <code>com.tinkerpop.blueprints.impls.tg.TinkerGraph</code> </td>
+	</tr><tr><td> <code>blueprints.tg.directory</code> </td>
+		<td> When absent the <code>GraphFactory</code> assumes that an in-memory <code>TinkerGraph</code> will be used, otherwise this property should be the directory in which to store the <code>TinkerGraph</code>. </td>
+	</tr><tr><td> <code>blueprints.tg.file-type</code> </td>
+		<td> If the <code>blueprints.tg.directory</code> is set then this property specifies the storage type for the data and must match one of the available <code>TinkerGraph.FileType</code> enum: <code>JAVA</code>, <code>GRAPHML</code>, <code>GRAPHSON</code>, or <code>GML</code>. If not specified, this setting defaults to <code>JAVA</code>. </td>
+	</tr></table><h2>TinkerGraph Feature List</h2>
+<pre><code>supportsDuplicateEdges: true
+supportsSelfLoops: true
+supportsSerializableObjectProperty: true
+supportsBooleanProperty: true
+supportsDoubleProperty: true
+supportsFloatProperty: true
+supportsIntegerProperty: true
+supportsPrimitiveArrayProperty: true
+supportsUniformListProperty: true
+supportsMixedListProperty: true
+supportsLongProperty: true
+supportsMapProperty: true
+supportsStringProperty: true
+ignoresSuppliedIds: false
+isPersistent: true
+isRDFModel: false
+isWrapper: false
+supportsIndices: true
+supportsVertexIndex: true
+supportsEdgeIndex: true
+supportsKeyIndices: true
+supportsVertexKeyIndex: true
+supportsEdgeKeyIndex: true
+supportsEdgeIteration: true
+supportsVertexIteration: true
+supportsTransactions: false
+supportsThreadedTransactions: false</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>stephen mallette</b>, 2013-08-03 13:19:14</p>
+</div>
+</div>
+
+<script type="text/javascript" src="css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

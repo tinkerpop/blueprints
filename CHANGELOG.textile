@@ -5,13 +5,13 @@ h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
-h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
+h3. Version 2.4.0 (August 4, 2013)
 
 ```xml
 <dependency>
   <groupId>com.tinkerpop.blueprints</groupId>
   <artifactId>blueprints-core</artifactId>
-  <version>2.4.0-SNAPSHOT</version>
+  <version>2.4.0</version>
 </dependency>
 ```
 
@@ -28,10 +28,11 @@ h3. Version 2.4.0 (NOT OFFICIALLY RELEASED YET)
 * Configurable storage for @TinkerGraph@: GraphML, GraphSON and GML
 * @GraphChangedListener@ from @EventGraph@ can mutate graph without concurrent modification exception
 * Scope of @EventGraph@ base classes changed to @public@ for those wanting to extend up on them.
-* Bumped Dex to 4.8.1
+* Bumped Dex to 4.8.2
 * Support both @byte@ and @short@ data types in GraphSON.
 * Convert @Array@ to @ArrayList@ in @Neo4jGraph@ when retrieving such property values
-* Bumped Neo4j to 1.9.1
+* Bumped Neo4j to 1.9.2
+* Bumped OrientDB to 1.5.0
 * Added @has(key)@ and @hasNot(key)@ in @Query@ API
 * Added @has(key,predicate,value)@ in @Query@ API
 * Deprecated @Query.has(key,value,compare)@ in @Query@ API

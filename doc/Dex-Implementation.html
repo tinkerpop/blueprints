@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href="css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src="css/jquery.js"></script>
+  <script type="text/javascript" src="css/gollum.js"></script>
+  <script type="text/javascript" src="css/gollum.dialog.js"></script>
+  <script type="text/javascript" src="css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src="css/editor/gollum.editor.js"></script>
+  <title>Dex Implementation</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.4.0</a> - <a href="Home.html">Blueprints</a></h3>
+  <h1>Dex Implementation</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Dex-Implementation"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Dex-Implementation"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><img src="http://www.sparsity-technologies.com/images/sparsity_logo_web.png" /></p>
+<pre><code>&lt;dependency&gt;
+   &lt;groupId&gt;com.tinkerpop.blueprints&lt;/groupId&gt;
+   &lt;artifactId&gt;blueprints-dex-graph&lt;/artifactId&gt;
+   &lt;version&gt;??&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<pre><code>Graph graph = new DexGraph("/tmp/graph.dex");</code></pre>
+<p><a href="http://www.sparsity-technologies.com/dex">Dex</a> is a graph database developed by <a href="http://www.sparsity-technologies.com/">Sparsity Technologies</a>. For a fine summary of the Dex graph database, please review the following <a href="http://www.sparsity-technologies.com/dex_tutorials">presentations</a>. The software can be downloaded from <a href="http://www.sparsity-technologies.com/dex_downloads">here</a> and be used with the default evaluation license (which restricts the amount of information Dex can deal with).</p>
+<p>Note that while Dex does implement <code>TransactionalGraph</code> it does not conform to its semantics.  Transactions in <code>DexGraph</code> translate to the Dex concept of a session and aid with the release of resources used by the graph when the session is complete.</p>
+<h2>Vertex label</h2>
+<p>As edges, Dex vertices have a label too. Thus, when adding a vertex to the database, its label can be set as follows:</p>
+<pre><code>((DexGraph)graph).label.set("people");
+Vertex v = graph.addVertex(null)
+assertTrue(v.getProperty(StringFactory.LABEL).equals("people"));</code></pre>
+<p>The <code>DexGraph#label</code> property is also relevant for other methods. Go to the javadoc of each of the following methods to see how:</p>
+<ul><li><code>DexGraph#addVertex</code></li>
+	<li><code>DexGraph#createKeyIndex(String, Class&lt;T&gt;)</code></li>
+	<li><code>DexGraph#getEdges(String, Object)</code></li>
+	<li><code>DexGraph#getVertices(String, Object)</code></li>
+</ul><h2>Memory Configuration</h2>
+<p>Dex memory is not managed by the <span class="caps">JVM</span> heap, so an specific memory configuration must be set for Dex in order to set the maximum amount of memory to be used by a Dex application.</p>
+<p>Specifically, users should set <code>dex.io.cache.maxsize</code> as is explained <a href="http://www.sparsity-technologies.com/downloads/javadoc-java/com/sparsity/dex/gdb/DexConfig.html">here</a>.</p>
+<h2>Managment of <code>Iterable</code> collections</h2>
+<p>As before, since Dex resources are not managed by the <span class="caps">JVM</span> heap, Dex-based blueprints applications should take into account the management of <code>Iterable</code> collections and explicitly close them in order to free native resources.</p>
+<p>For example, if we execute a long traversal like this:</p>
+<pre><code>for (final Vertex vertex : graph.getVertices()) {
+    for (final Edge edge : vertex.getOutEdges()) {
+        final Vertex vertex2 = edge.getInVertex();
+        for (final Edge edge2 : vertex2.getOutEdges()) {
+            ...
+        }
+    }
+}</code></pre>
+<p>all retrieved collections won&#x2019;t be closed until the graph database is stopped. Of course, keep active this amount of resources will have a negative impact in the performance.</p>
+<p>To avoid this, all retrieved collections from methods in the Dex implementation implement <code>CloseableIterable</code>. Thus, we could implement the previous traversal as follows:</p>
+<pre><code>CloseableIterable&lt;Vertex&gt; vv = (CloseableIterable&lt;Vertex&gt;)graph.getVertices();
+for (final Vertex vertex : vv) {
+    CloseableIterable&lt;Edge&gt; ee = (CloseableIterable&lt;Edge&gt;)vertex.getOutEdges();
+    for (final Edge edge : ee) {
+        final Vertex vertex2 = edge.getInVertex();
+        CloseableIterable&lt;Edge&gt; ee2 = (CloseableIterable&lt;Edge&gt;)vertex2.getOutEdges();
+        for (final Edge edge2 : ee2) {
+            ...
+        }
+        ee2.close();
+    }
+    ee.close();
+}
+vv.close();</code></pre>
+<h2>GraphFactory Settings</h2>
+<p>If using <a href="https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory">GraphFactory</a> to instantiate a <code>DexGraph</code>, the following properties will apply:</p>
+<table><tr><th>key </th>
+		<th>description </th>
+	</tr><tr><td> <code>blueprints.graph</code> </td>
+		<td> <code>com.tinkerpop.blueprints.impls.dex.DexGraph</code> </td>
+	</tr><tr><td> <code>blueprints.dex.directory</code> </td>
+		<td> The directory of the <code>DexGraph</code> instance. </td>
+	</tr><tr><td> <code>blueprints.dex.config</code> </td>
+		<td> Location of the Dex configuration file. </td>
+	</tr></table><h2>DexGraph Feature List</h2>
+<pre><code>supportsDuplicateEdges = true;
+supportsSelfLoops = true;
+isPersistent = true;
+isRDFModel = false;
+supportsVertexIteration = true;
+supportsEdgeIteration = true;
+supportsVertexIndex = false;
+supportsEdgeIndex = false;
+ignoresSuppliedIds = true;
+supportsTransactions = false;
+supportsIndices = false;
+
+supportsSerializableObjectProperty = false;
+supportsBooleanProperty = true;
+supportsDoubleProperty = true;
+supportsFloatProperty = true;
+supportsIntegerProperty = true;
+supportsPrimitiveArrayProperty = false;
+supportsUniformListProperty = false;
+supportsMixedListProperty = false;
+supportsLongProperty = true;
+supportsMapProperty = false;
+supportsStringProperty = true;
+
+isWrapper = false;
+supportsKeyIndices = true;
+supportsVertexKeyIndex = true;
+supportsEdgeKeyIndex = true;
+supportsThreadedTransactions = false;</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>stephen mallette</b>, 2013-08-03 13:19:14</p>
+</div>
+</div>
+
+<script type="text/javascript" src="css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="css/gollum.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/editor.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/dialog.css" media="all">
+  <link rel="stylesheet" type="text/css" href="css/template.css" media="all">
+  
+  <!--[if IE 7]>
+  <link rel="stylesheet" type="text/css" href="css/ie7.css" media="all">
+  <![endif]-->
+  
+  <script type="text/javascript" src="css/jquery.js"></script>
+  <script type="text/javascript" src="css/gollum.js"></script>
+  <script type="text/javascript" src="css/gollum.dialog.js"></script>
+  <script type="text/javascript" src="css/gollum.placeholder.js"></script>
+  
+  <script type="text/javascript" 
+    src="css/editor/gollum.editor.js"></script>
+  <title>Sail Implementation</title>
+</head>
+<body>
+
+<div id="wiki-wrapper" class="page">
+<div id="head"><h3><a href="../../index.html">TinkerPop 2.4.0</a> - <a href="Home.html">Blueprints</a></h3>
+  <h1>Sail Implementation</h1>
+  <ul class="actions">
+    <li class="minibutton"><a href="/pages"
+      class="action-all-pages">All Pages</a></li>
+    <li class="minibutton" class="jaws">
+      <a href="#" id="minibutton-new-page">New Page</a></li>
+    <li class="minibutton"><a href="/edit/Sail-Implementation"
+       class="action-edit-page">Edit Page</a></li>
+    <li class="minibutton"><a href="/history/Sail-Implementation"
+       class="action-page-history">Page History</a></li>
+  </ul>
+  <div id="searchbar">
+    <form action="/search" method="get" id="search-form">
+    <div id="searchbar-fauxtext">
+      <input type="text" name="q" id="search-query" value="Search&hellip;" autocomplete="off">
+      <a href="#" id="search-submit" title="Search this wiki">
+        <span>Search</span>
+      </a>
+    </div>
+    </form>
+  </div></div>
+<div id="wiki-content">
+  <div class="wrap">
+  <div id="wiki-body" class="gollum-textile-content">
+    <div id="template">
+      <p><a href="http://www.openrdf.org"><img src="images/openrdf-logo.png" alt="" /></a></p>
+<p><a href="http://www.openrdf.org">OpenRDF</a> is the creator of the <a href="http://www.openrdf.org/doc/sesame2/2.3.0/users/ch08.html">Sail</a> interface (Storage and Inference Layer). Any triple or quad-store developer can implement the Sail interfaces in order to allow third-party developer to work with different stores without having to change their code. This is very handy as different <span class="caps">RDF</span>-store implementations are optimized for different types of use cases. In analogy, Sail is like the <a href="http://java.sun.com/javase/technologies/database/"><span class="caps">JDBC</span></a> of the <span class="caps">RDF</span> database world.</p>
+<blockquote>
+<p>The Storage And Inference Layer (Sail) <span class="caps">API</span> is a low level System <span class="caps">API</span> (<span class="caps">SPI</span>) for <span class="caps">RDF</span> stores and inferencers. Its purpose is to abstract from the storage and inference details, allowing various types of storage and inference to be used. The Sail <span class="caps">API</span> is mainly of interest for those who are developing Sail implementations, for all others it suffices to know how to create and configure one. There are several implementations of the Sail <span class="caps">API</span>, for example the MemoryStore which stores <span class="caps">RDF</span> data in main memory, and the NativeStore which uses dedicated on-disk data structures for storage. (source <a href="http://www.openrdf.org/doc/sesame2/2.3.0/users/index.html">OpenRDF Sesame Users Guide</a>)</p>
+</blockquote>
+<p>Many triple and quad-store developers have implemented the Sail interface. Supported implementations are provided below.</p>
+<pre><code>&lt;dependency&gt;
+   &lt;groupId&gt;com.tinkerpop.blueprints&lt;/groupId&gt;
+   &lt;artifactId&gt;blueprints-sail-graph&lt;/artifactId&gt;
+   &lt;version&gt;??&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+<ul><li><a href="http://www.openrdf.org">OpenRDF</a> (<a href="http://www.openrdf.org/doc/sesame2/2.3.0/users/ch08.html#d0e705">MemoryStore</a>, <a href="http://www.openrdf.org/doc/sesame2/2.3.0/users/ch08.html#d0e746">NativeStore</a>)</li>
+</ul><pre><code>Graph graph = new MemoryStoreSailGraph();
+Graph graph = new NativeStoreSailGraph("/tmp/nativestore");</code></pre>
+<ul><li><a href="https://github.com/joshsh/ripple/wiki/LinkedDataSail">Linked Data Sail</a></li>
+</ul><pre><code>Graph graph = new LinkedDataSailGraph(new MemoryStoreSailGraph());
+Vertex v = graph.getVertex("http://dbpedia.org/resource/Graph_Database");</code></pre>
+<ul><li><a href="http://www.openrdf.org/doc/sesame2/api/org/openrdf/repository/sparql/SPARQLRepository.html"><span class="caps">SPARQL</span> Repository</a></li>
+</ul><pre><code>Graph graph = new SparqlRepositorySailGraph("http://dbpedia.org/sparql");</code></pre>
+<p>Any of these stores can be manipulated with Blueprints through their Sail interfaces. Here is a list of aspects of <span class="caps">RDF</span> that should be understood when dealing with Blueprints over an <span class="caps">RDF</span> store.</p>
+<ol><li><strong>No duplicate edges</strong>: <span class="caps">RDF</span> considers two edges the same if they share the same subject, predicate, object, and graph. Thus, edges with these in common are, in fact, the same edge.</li>
+	<li><strong>No indices</strong>: There are no indices as no elements have properties that can not be accessed simply by using referencing their id (i.e. their <span class="caps">URI</span>, blank node, or literal string).</li>
+	<li><strong>Infinite vertices</strong>: <span class="caps">RDF</span> is edge based and as such, every possible vertex exists. It is only when finding outgoing or incoming edges to some vertex do you recognize it within a larger graph structure. For this reason, you can not iterate over all vertices in the graph.</li>
+</ol><hr /><p><a href="http://www.w3.org/RDF/"><img src="images/rdf-logo.gif" alt="" /></a></p>
+<p>The <a href="http://www.w3.org/RDF/">Resource Description Framework</a> can be modeled as a property graph. Moreover, it is possible to model <a href="http://www.w3.org/2004/03/trix/"><span class="caps">RDF</span> quads</a> (triples within a named graph) as a property graph. This page articulates the mapping between <span class="caps">RDF</span> quads and the property graph model.</p>
+<h2>Mapping <span class="caps">RDF</span> to a Property Graph</h2>
+<p>An <span class="caps">RDF</span> quad statement is denoted by a subject, a predicate, an object, and a named graph (the &#x201C;spog&#x201D; model for short). The set of subjects is the set of all Uniform Resource Identifiers (URIs) and blank nodes. The set of predicates is the set of all URIs. The set of objects is the set of all URIs, blank nodes, and literals. Finally, the set of named graphs is the set of all URIs and blank nodes. The following diagram demonstrates how <span class="caps">RDF</span> is modeled using the <a class="internal present" href="Property-Graph-Model.html">property graph model</a>.</p>
+<p><img src="images/rdf-graph-model.jpg" alt="" /></p>
+<p>The identifier (<code>id</code>) of a vertex is the string representation of the <span class="caps">RDF</span> value that it is modeling/representing. A few examples are provided below:</p>
+<ol><li><span class="caps">URI</span>
+	<ul><li><code>http://markorodriguez.com</code></li>
+		<li><code>http://tinkerpop.com#ripple</code></li>
+		<li><code>urn:uuid:aa9d07d7-8ccf-454a-b08a-5e5a8c560154</code></li>
+	</ul></li>
+	<li>Blank Node
+	<ul><li><code>_:A12345</code></li>
+		<li><code>_:anonymous-node</code></li>
+	</ul></li>
+	<li>Literal
+	<ul><li><code>"hello"</code></li>
+		<li><code>"hello"</code> <code>@en</code></li>
+		<li><code>"hello"^^&lt;http://www.w3.org/2001/XMLSchema#string&gt;</code></li>
+	</ul></li>
+</ol><p>All vertices have a <strong>kind</strong> property (<code>kind</code>) that is either <code>uri</code>, <code>literal</code>, or <code>bnode</code>. Only literal-based vertices have three other vertex properties. Only two of which can be set. These properties are the <strong>language</strong> (<code>lang</code>), the <strong>datatype</strong> (<code>type</code>), and the <strong>typecasted value</strong> (<code>value</code>) of the literal label. Note that in <span class="caps">RDF</span>, a literal can have either a language, a datatype, or neither. Never can a literal have both a language and a datatype. The typecasted value is the object created by the casting of the label of the literal by its datatype. In other words the <code>value</code> of <code>"6"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt;</code> is the integer 6.</p>
+<p>Finally, an edge in the <a class="internal present" href="Property-Graph-Model.html">property graph model</a> represents an <span class="caps">RDF</span> statement. The identifier of an edge is the string representation of the <span class="caps">RDF</span> statement. Two examples are provided below. One where the <span class="caps">RDF</span> statement is a triple and the other where the statement is a quad.</p>
+<ol><li>Statement
+	<ul><li><code>(http://tinkerpop.com#marko, http://someontology.com#age, "30"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt;)</code></li>
+		<li><code>(http://tinkerpop.com#marko, http://www.w3.org/2002/07/owl#sameAs, http://markorodrigue.com#marko) [http://tinkerpop.com#graph]</code></li>
+	</ul></li>
+</ol><p>Statements can only have a single property. Namely, the named graph property (<code>ng</code>).</p>
+<p>The graph diagrammed in <a class="internal present" href="GraphML-Reader-and-Writer-Library.html">GraphML Reader and Writer Library</a> would be represented in an <span class="caps">RDF</span> property graph as the following.</p>
+<p><img src="https://github.com/tinkerpop/gremlin/raw/master/doc/images/graph-example-1-rdf.jpg" alt="" /></p>
+<h2>SailGraph Feature List</h2>
+<pre><code>supportsDuplicateEdges: false
+supportsSelfLoops: true
+supportsSerializableObjectProperty: false
+supportsBooleanProperty: false
+supportsDoubleProperty: false
+supportsFloatProperty: false
+supportsIntegerProperty: false
+supportsPrimitiveArrayProperty: false
+supportsUniformListProperty: false
+supportsMixedListProperty: false
+supportsLongProperty: false
+supportsMapProperty: false
+supportsStringProperty: false
+ignoresSuppliedIds: false
+isPersistent: false
+isRDFModel: true
+isWrapper: false
+supportsIndices: false
+supportsVertexIndex: false
+supportsEdgeIndex: false
+supportsKeyIndices: false
+supportsVertexKeyIndex: false
+supportsEdgeKeyIndex: false
+supportsEdgeIteration: true
+supportsVertexIteration: false
+supportsTransactions: true
+supportsThreadedTransactions: false</code></pre>
+    </div>
+  </div>
+  </div>
+
+</div>
+<div id="footer">
+  <p id="last-edit">Last edited by <b>stephen mallette</b>, 2013-08-03 13:19:14</p>
+</div>
+</div>
+
+<script type="text/javascript" src="css/MathJax/MathJax.js"></script>
+
+
+</body>
+</html>
