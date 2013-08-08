@@ -30,6 +30,10 @@ public class ExceptionFactory {
         return new IllegalArgumentException("A direction of BOTH is not supported");
     }
 
+    public static IllegalStateException vertexWithIdDoesNotExist(final Object id) {
+        return new IllegalStateException("Vertex with id does not exist: " + id);
+    }
+
     // Element related exceptions
 
     public static IllegalArgumentException propertyKeyIsReserved(final String key) {

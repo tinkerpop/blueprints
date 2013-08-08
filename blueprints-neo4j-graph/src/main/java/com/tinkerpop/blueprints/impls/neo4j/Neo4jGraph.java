@@ -451,11 +451,19 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public void removeVertex(final Vertex vertex) {
         this.autoStartTransaction();
-        final Node node = ((Neo4jVertex) vertex).getRawVertex();
-        for (final Relationship relationship : node.getRelationships(org.neo4j.graphdb.Direction.BOTH)) {
-            relationship.delete();
+
+        try {
+            final Node node = ((Neo4jVertex) vertex).getRawVertex();
+            for (final Relationship relationship : node.getRelationships(org.neo4j.graphdb.Direction.BOTH)) {
+                relationship.delete();
+            }
+            node.delete();
+        } catch (NotFoundException nfe) {
+            throw ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
+        } catch (IllegalStateException ise) {
+            // wrap the neo4j exception so that the message is consistent in blueprints.
+            throw ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
         }
-        node.delete();
     }
 
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {

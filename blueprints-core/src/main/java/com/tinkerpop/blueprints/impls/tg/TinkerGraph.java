@@ -274,6 +274,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public void removeVertex(final Vertex vertex) {
+        if (!this.vertices.containsKey(vertex.getId().toString()))
+            ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
+
         for (Edge edge : vertex.getEdges(Direction.BOTH)) {
             this.removeEdge(edge);
         }

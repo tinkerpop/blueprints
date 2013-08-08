@@ -312,8 +312,16 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public void removeVertex(final Vertex vertex) {
         autoStartTransaction();
 
+        if (getVertex(vertex.getId()) == null)
+            throw ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
+
         assert vertex instanceof DexVertex;
-        getRawGraph().drop((Long) vertex.getId());
+
+        try {
+            getRawGraph().drop((Long) vertex.getId());
+        } catch (RuntimeException re) {
+            ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
+        }
     }
 
     /*
