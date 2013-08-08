@@ -107,6 +107,15 @@ public abstract class OrientGraphTest extends GraphTest {
         printTestPerformance("GMLReaderTestSuite", this.stopWatch());
     }
 
+    //
+    // orientdb specific test
+    //
+    public void untestOrientGraphSpecificTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new OrientGraphSpecificTestSuite(this));
+        printTestPerformance("OrientGraphSpecificTestSuite", this.stopWatch());
+    }
+
     public Graph generateGraph() {
         return generateGraph("graph");
     }
