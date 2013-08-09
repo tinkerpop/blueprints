@@ -110,7 +110,7 @@ public abstract class OrientGraphTest extends GraphTest {
     //
     // orientdb specific test
     //
-    public void untestOrientGraphSpecificTestSuite() throws Exception {
+    public void testOrientGraphSpecificTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new OrientGraphSpecificTestSuite(this));
         printTestPerformance("OrientGraphSpecificTestSuite", this.stopWatch());
