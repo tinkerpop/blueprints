@@ -228,7 +228,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
             }
             this.sailConnection.get().removeStatements(null, null, vertexValue);
         } catch (SailException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
         }
     }
 
