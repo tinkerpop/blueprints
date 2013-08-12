@@ -5,6 +5,8 @@ import java.util.Map;
 import com.orientechnologies.common.util.OCallable;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.db.record.ORecordElement.STATUS;
+import com.orientechnologies.orient.core.db.record.ORecordOperation;
+import com.orientechnologies.orient.core.exception.ORecordNotFoundException;
 import com.orientechnologies.orient.core.exception.OSchemaException;
 import com.orientechnologies.orient.core.exception.OSerializationException;
 import com.orientechnologies.orient.core.id.ORID;
@@ -47,6 +49,17 @@ public abstract class OrientElement implements Element, OSerializableStream,
 	@Override
 	public void remove() {
 		graph.autoStartTransaction();
+		
+		final ORecordOperation oper = graph.getRawGraph().getTransaction().getRecordEntry(getIdentity());
+		if( oper != null && oper.type == ORecordOperation.DELETED )
+			throw new IllegalStateException("The elements "+getIdentity()+" has already been deleted");
+		
+		try {
+		  getRecord().load();
+		} catch( ORecordNotFoundException e ) {
+			throw new IllegalStateException("The elements "+getIdentity()+" has already been deleted");
+		}
+		
 		getRecord().delete();
 	}
 
