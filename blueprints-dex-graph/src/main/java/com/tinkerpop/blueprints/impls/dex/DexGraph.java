@@ -667,6 +667,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     @Override
     public <T extends Element> void dropKeyIndex(String key,
                                                  Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         throw new UnsupportedOperationException();
     }
 
@@ -686,6 +689,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      */
     @Override
     public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         autoStartTransaction();
 
         String label = this.label.get();
@@ -744,6 +750,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
     @Override
     public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         autoStartTransaction();
 
         com.sparsity.dex.gdb.TypeList tlist = null;

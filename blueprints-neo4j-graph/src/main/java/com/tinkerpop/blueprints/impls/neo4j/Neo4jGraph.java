@@ -395,6 +395,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         this.autoStartTransaction();
         if (Vertex.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())
@@ -411,6 +414,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         this.autoStartTransaction();
         if (Vertex.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())
@@ -436,6 +442,9 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         if (Vertex.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())
                 return Collections.emptySet();

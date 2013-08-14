@@ -14,6 +14,39 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         super(graphTest);
     }
 
+    public void testGetIndexedKeysCannotAcceptNullArgumentForClass() {
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        try {
+            graph.getIndexedKeys(null);
+        } catch (IllegalArgumentException iae) {
+            return;
+        }
+
+        fail();
+    }
+
+    public void testCreateKeyIndexCannotAcceptNullArgumentForClass() {
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        try {
+            graph.createKeyIndex("test", null);
+        } catch (IllegalArgumentException iae) {
+            return;
+        }
+
+        fail();
+    }
+
+    public void testRemoveKeyIndexCannotAcceptNullArgumentForClass() {
+        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        try {
+            graph.dropKeyIndex("test", null);
+        } catch (IllegalArgumentException iae) {
+            return;
+        }
+
+        fail();
+    }
+
     public void testAutoIndexKeyManagementWithPersistence() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexKeyIndex) {

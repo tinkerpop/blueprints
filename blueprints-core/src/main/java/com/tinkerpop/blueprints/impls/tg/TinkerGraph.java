@@ -162,6 +162,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         if (Vertex.class.isAssignableFrom(elementClass)) {
             this.vertexKeyIndex.createKeyIndex(key);
         } else if (Edge.class.isAssignableFrom(elementClass)) {
@@ -172,6 +175,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         if (Vertex.class.isAssignableFrom(elementClass)) {
             this.vertexKeyIndex.dropKeyIndex(key);
         } else if (Edge.class.isAssignableFrom(elementClass)) {
@@ -182,6 +188,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         if (Vertex.class.isAssignableFrom(elementClass)) {
             return this.vertexKeyIndex.getIndexedKeys();
         } else if (Edge.class.isAssignableFrom(elementClass)) {

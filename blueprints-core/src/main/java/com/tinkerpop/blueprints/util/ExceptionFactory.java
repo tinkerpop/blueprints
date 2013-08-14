@@ -80,6 +80,10 @@ public class ExceptionFactory {
         return new IllegalArgumentException("Class is not indexable: " + clazz);
     }
 
+    public static IllegalArgumentException classForElementCannotBeNull() {
+        return new IllegalArgumentException("elementClass argument cannot be null.");
+    }
+
     // TransactionalGraph related exceptions
 
     public static IllegalStateException transactionAlreadyStarted() {
