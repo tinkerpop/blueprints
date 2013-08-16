@@ -835,6 +835,9 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	public <T extends Element> void dropKeyIndex(final String key,
 			final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
 		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
 			@Override
 			public OClass call(final OrientBaseGraph g) {
@@ -872,6 +875,9 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	@SuppressWarnings({ "rawtypes" })
 	public <T extends Element> void createKeyIndex(final String key,
 			final Class<T> elementClass, final Parameter... indexParameters) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
 		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
 			@Override
 			public OClass call(final OrientBaseGraph g) {
@@ -921,6 +927,9 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	public <T extends Element> Set<String> getIndexedKeys(
 			final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
 		final OSchema schema = getRawGraph().getMetadata().getSchema();
 		final String elementOClassName = getClassName(elementClass);
 

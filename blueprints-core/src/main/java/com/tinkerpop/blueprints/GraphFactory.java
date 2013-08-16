@@ -2,9 +2,11 @@ package com.tinkerpop.blueprints;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.MapConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.io.File;
+import java.util.Map;
 
 /**
  * Factory to construct new Graph instances from a Configuration object or properties file.
@@ -14,7 +16,7 @@ import java.io.File;
 public class GraphFactory {
 
     /**
-     * Open a graph.  See each Graph instance for it's configuration options.
+     * Open a graph.  See each Graph instance for its configuration options.
      *
      * @param configuration A configuration object that specifies the minimally required properties for a Graph instance.
      *                      This minimum is determined by the Graph instance itself.
@@ -52,7 +54,7 @@ public class GraphFactory {
     }
 
     /**
-     * Open a graph.  See each Graph instance for it's configuration options.
+     * Open a graph.  See each Graph instance for its configuration options.
      *
      * @param configurationFile The location of a configuration file that specifies the minimally required properties
      *                          for a Graph instance. This minimum is determined by the Graph instance itself.
@@ -60,6 +62,18 @@ public class GraphFactory {
      */
     public static Graph open(final String configurationFile) {
         return open(getConfiguration(new File(configurationFile)));
+    }
+
+    /**
+     * Open a graph. See each Graph instance for its configuration options.
+     *
+     * @param configuration A Map based configuration that will be converted to an Apache configuration object
+     *                      via MapConfiguration and passed to the appropriate overload.
+     *
+     * @return A Graph instance.
+     */
+    public static Graph open(final Map configuration) {
+        return open(new MapConfiguration(configuration));
     }
 
     private static final Configuration getConfiguration(final File dirOrFile) {

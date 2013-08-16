@@ -329,8 +329,9 @@ public class GraphTestSuite extends TestSuite {
         assertEquals(v.getEdges(Direction.OUT).iterator().next(), e);
         assertEquals(u.getEdges(Direction.IN).iterator().next(), e);
         graph.removeVertex(v);
-//TODO: DEX
-//assertFalse(v.getEdges(Direction.OUT).iterator().hasNext());
+
+        //TODO: DEX
+        //assertFalse(v.getEdges(Direction.OUT).iterator().hasNext());
 
         if (graph.getFeatures().supportsVertexIteration)
             assertEquals(count(graph.getVertices()), 1);
@@ -339,55 +340,57 @@ public class GraphTestSuite extends TestSuite {
 
         graph.shutdown();
     }
-    
-    public void testRemoveNonExistentVertexCausesException() {
-      Graph g = graphTest.generateGraph();
 
-      Vertex v = g.addVertex(null);
-      if (g.getFeatures().supportsTransactions) {
-          ((TransactionalGraph) g).commit();
-      }
+    public void testRemoveNonExistentVertexCausesException() throws Exception{
+        Graph g = graphTest.generateGraph();
 
-      boolean exceptionTossed = false;
-      g.removeVertex(v);
-      try {
-          // second call to an already removed vertex should throw an exception
-          g.removeVertex(v);
-      } catch (IllegalStateException re) {
-          exceptionTossed = true;
+        if (!g.getFeatures().isWrapper && !g.getClass().getSimpleName().equals("SailGraph")) {
+            Vertex v = g.addVertex(null);
+            if (g.getFeatures().supportsTransactions) {
+                ((TransactionalGraph) g).commit();
+            }
 
-          // rollback the change so the delete can be tried below
-          if (g.getFeatures().supportsTransactions) {
-              ((TransactionalGraph) g).commit();
-          }
-      }
+            boolean exceptionTossed = false;
+            g.removeVertex(v);
+            try {
+                // second call to an already removed vertex should throw an exception
+                g.removeVertex(v);
+            } catch (IllegalStateException re) {
+                exceptionTossed = true;
 
-      assertTrue(exceptionTossed);
+                // rollback the change so the delete can be tried below
+                if (g.getFeatures().supportsTransactions) {
+                    ((TransactionalGraph) g).rollback();
+                }
+            }
 
-      v = g.addVertex(null);
-      if (g.getFeatures().supportsTransactions) {
-          ((TransactionalGraph) g).commit();
-      }
-      exceptionTossed = false;
+            assertTrue(exceptionTossed);
 
-      // this time commit the tx and then try to remove.  both should show illegal state.
-      g.removeVertex(v);
-      if (g.getFeatures().supportsTransactions) {
-          ((TransactionalGraph) g).commit();
-      }
+            v = g.addVertex(null);
+            if (g.getFeatures().supportsTransactions) {
+                ((TransactionalGraph) g).commit();
+            }
+            exceptionTossed = false;
 
-      try {
-          // second call to an already removed vertex should throw an exception
-          g.removeVertex(v);
-      } catch (IllegalStateException re) {
-          exceptionTossed = true;
-      }
+            // this time commit the tx and then try to remove.  both should show illegal state.
+            g.removeVertex(v);
+            if (g.getFeatures().supportsTransactions) {
+                ((TransactionalGraph) g).commit();
+            }
 
-      assertTrue(exceptionTossed);
+            try {
+                // second call to an already removed vertex should throw an exception
+                g.removeVertex(v);
+            } catch (IllegalStateException re) {
+                exceptionTossed = true;
+            }
 
-      g.shutdown();
+            assertTrue(exceptionTossed);
+        }
 
-  }
+        g.shutdown();
+
+    }
 
     public void testRemovingEdges() {
         Graph graph = graphTest.generateGraph();

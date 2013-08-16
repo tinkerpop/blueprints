@@ -10,6 +10,7 @@ import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
@@ -281,6 +282,9 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         boolean v = isVertexClass(elementClass);
         boolean supported = ((v && supportVertexIds) || (!v && supportEdgeIds));
 
@@ -294,6 +298,9 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     public <T extends Element> void createKeyIndex(final String key,
                                                    final Class<T> elementClass,
                                                    final Parameter... indexParameters) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         boolean v = isVertexClass(elementClass);
         boolean supported = ((v && supportVertexIds) || (!v && supportEdgeIds));
 
@@ -305,6 +312,9 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     public <T extends Element> Set<String> getIndexedKeys(final Class<T> elementClass) {
+        if (elementClass == null)
+            throw ExceptionFactory.classForElementCannotBeNull();
+
         boolean v = isVertexClass(elementClass);
         boolean supported = ((v && supportVertexIds) || (!v && supportEdgeIds));
 

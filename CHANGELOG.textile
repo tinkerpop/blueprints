@@ -15,6 +15,10 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Blueprints API now requires an @IllegalStateException@ to be thrown if @removeVertex@ on the @Graph@ interface is called on vertex that is already removed.
+* Add overload to @GraphFactory.open@ that takes a @Map@ for configuration.
+* The @elementClass@ argument on the @KeyIndexableGraph@ methods cannot be null and must throw @IllegalArgumentException@ if it is.
+
 ==<hr/>==
 
 h3. Version 2.4.0 (August 4, 2013)
