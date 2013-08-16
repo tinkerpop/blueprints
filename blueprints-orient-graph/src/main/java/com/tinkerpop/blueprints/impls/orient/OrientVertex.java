@@ -391,7 +391,7 @@ public class OrientVertex extends OrientElement implements Vertex {
 		return getEdges(null, iDirection, iLabels);
 	}
 
-	public Iterable<Edge> getEdges(final Vertex iDestination,
+	public Iterable<Edge> getEdges(final OrientVertex iDestination,
 			final Direction iDirection, final String... iLabels) {
 
 		graph.setCurrentGraphInThreadLocal();
@@ -438,13 +438,15 @@ public class OrientVertex extends OrientElement implements Vertex {
 						// CREATE LAZY Iterable AGAINST COLLECTION FIELD
 						if (coll instanceof ORecordLazyMultiValue) {
 							iterable.add(new OrientEdgeIterator(this,
+									iDestination,
 									((ORecordLazyMultiValue) coll)
 											.rawIterator(), connection,
 									iLabels, ((ORecordLazyMultiValue) coll)
 											.size()));
 						} else
-							iterable.add(new OrientEdgeIterator(this, coll
-									.iterator(), connection, iLabels, -1));
+							iterable.add(new OrientEdgeIterator(this,
+									iDestination, coll.iterator(), connection,
+									iLabels, -1));
 					}
 				}
 			}
