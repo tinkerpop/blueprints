@@ -157,7 +157,7 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 		final ODocument doc = getRecord();
 		if (doc == null)
-			return;
+			throw ExceptionFactory.vertexWithIdDoesNotExist(this.getId());
 
 		final Iterator<OrientIndex<? extends OrientElement>> it = graph
 				.getManualIndices().iterator();
