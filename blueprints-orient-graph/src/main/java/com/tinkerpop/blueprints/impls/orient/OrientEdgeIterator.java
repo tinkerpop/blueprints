@@ -1,62 +1,78 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Iterator;
+
 import com.orientechnologies.common.util.OPair;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.iterator.OLazyWrapperIterator;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.tinkerpop.blueprints.Direction;
 
-import java.util.Iterator;
-
 /**
  * Lazy iterator of edges.
- *
+ * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public class OrientEdgeIterator extends OLazyWrapperIterator<OrientEdge> {
-    private final OrientVertex vertex;
-    private final OPair<Direction, String> connection;
-    private final String[] labels;
+	private final OrientVertex sourceVertex;
+	private final OrientVertex targetVertex;
+	private final OPair<Direction, String> connection;
+	private final String[] labels;
 
-    public OrientEdgeIterator(final OrientVertex iVertex, final Iterator<?> iterator, final OPair<Direction, String> connection,
-                              final String[] iLabels, final int iSize) {
-        super(iterator, iSize);
-        this.vertex = iVertex;
-        this.connection = connection;
-        this.labels = iLabels;
-    }
+	public OrientEdgeIterator(final OrientVertex iSourceVertex,
+			final OrientVertex iTargetVertex, final Iterator<?> iterator,
+			final OPair<Direction, String> connection, final String[] iLabels,
+			final int iSize) {
+		super(iterator, iSize);
+		this.sourceVertex = iSourceVertex;
+		this.targetVertex = iTargetVertex;
+		this.connection = connection;
+		this.labels = iLabels;
+	}
 
-    @Override
-    public OrientEdge createWrapper(final Object iObject) {
-        if (iObject instanceof OrientEdge)
-            return (OrientEdge) iObject;
+	@Override
+	public OrientEdge createWrapper(final Object iObject) {
+		if (iObject instanceof OrientEdge)
+			return (OrientEdge) iObject;
 
-        final OIdentifiable rec = (OIdentifiable) iObject;
-        final ODocument value = rec.getRecord();
+		final OIdentifiable rec = (OIdentifiable) iObject;
+		final ODocument value = rec.getRecord();
 
-        if (value == null || value.getSchemaClass() == null)
-            return null;
+		if (value == null || value.getSchemaClass() == null)
+			return null;
 
-        final OrientEdge edge;
-        if (value.getSchemaClass().isSubClassOf(OrientVertex.CLASS_NAME)) {
-            // DIRECT VERTEX, CREATE DUMMY EDGE
-            if (connection.getKey() == Direction.OUT)
-                edge = new OrientEdge(this.vertex.graph, this.vertex.getIdentity(), rec.getIdentity(), connection.getValue());
-            else
-                edge = new OrientEdge(this.vertex.graph, rec.getIdentity(), this.vertex.getIdentity(), connection.getValue());
-        } else if (value.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
-            // EDGE
-            edge = new OrientEdge(this.vertex.graph, rec.getIdentity());
-        } else
-            throw new IllegalStateException("Invalid content found between connections:" + value);
+		final OrientEdge edge;
+		if (value.getSchemaClass().isSubClassOf(OrientVertex.CLASS_NAME)) {
+			// DIRECT VERTEX, CREATE DUMMY EDGE
+			if (connection.getKey() == Direction.OUT)
+				edge = new OrientEdge(this.sourceVertex.graph,
+						this.sourceVertex.getIdentity(), rec.getIdentity(),
+						connection.getValue());
+			else
+				edge = new OrientEdge(this.sourceVertex.graph,
+						rec.getIdentity(), this.sourceVertex.getIdentity(),
+						connection.getValue());
+		} else if (value.getSchemaClass().isSubClassOf(OrientEdge.CLASS_NAME)) {
+			// EDGE
+			edge = new OrientEdge(this.sourceVertex.graph, rec.getIdentity());
+		} else
+			throw new IllegalStateException(
+					"Invalid content found between connections:" + value);
 
-        if (this.vertex.graph.isUseVertexFieldsForEdgeLabels() || edge.isLabeled(labels))
-            return edge;
+		if (this.sourceVertex.graph.isUseVertexFieldsForEdgeLabels()
+				|| edge.isLabeled(labels))
+			return edge;
 
-        return null;
-    }
+		return null;
+	}
 
-    public boolean filter(final OrientEdge iObject) {
-        return this.vertex.graph.isUseVertexFieldsForEdgeLabels() || iObject.isLabeled(labels);
-    }
+	public boolean filter(final OrientEdge iObject) {
+		if (targetVertex != null
+				&& !targetVertex.equals(iObject.getVertex(connection.getKey()
+						.opposite())))
+			return false;
+
+		return this.sourceVertex.graph.isUseVertexFieldsForEdgeLabels()
+				|| iObject.isLabeled(labels);
+	}
 }
