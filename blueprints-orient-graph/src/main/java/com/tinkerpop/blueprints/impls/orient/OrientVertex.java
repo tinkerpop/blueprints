@@ -879,13 +879,13 @@ public class OrientVertex extends OrientElement implements Vertex {
 			final OMultiCollectionIterator<Edge> iterable, String fieldName,
 			final OPair<Direction, String> connection, final Object fieldValue,
 			final OIdentifiable iTargetVertex, final String[] iLabels) {
-		if (iTargetVertex != null && !iTargetVertex.equals(fieldValue))
-			return;
-
 		final OrientEdge toAdd;
 
 		final ODocument fieldRecord = ((OIdentifiable) fieldValue).getRecord();
 		if (fieldRecord.getSchemaClass().isSubClassOf(CLASS_NAME)) {
+			if (iTargetVertex != null && !iTargetVertex.equals(fieldValue))
+				return;
+
 			// DIRECT VERTEX, CREATE A DUMMY EDGE BETWEEN VERTICES
 			if (connection.getKey() == Direction.OUT)
 				toAdd = new OrientEdge(graph, doc, fieldRecord,
@@ -897,6 +897,14 @@ public class OrientVertex extends OrientElement implements Vertex {
 		} else if (fieldRecord.getSchemaClass().isSubClassOf(
 				OrientEdge.CLASS_NAME)) {
 			// EDGE
+			if (iTargetVertex != null) {
+				Object targetVertex = OrientEdge.getConnection(fieldRecord,
+						connection.getKey().opposite());
+
+				if (!iTargetVertex.equals(targetVertex))
+					return;
+			}
+
 			toAdd = new OrientEdge(graph, fieldRecord);
 		} else
 			throw new IllegalStateException("Invalid content found in "
