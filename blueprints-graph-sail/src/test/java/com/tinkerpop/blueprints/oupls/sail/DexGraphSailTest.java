@@ -1,6 +1,6 @@
 package com.tinkerpop.blueprints.oupls.sail;
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.dex.DexGraph;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ public class DexGraphSailTest {//extends GraphSailTest {
         assertTrue(true);
     }
 
-    protected KeyIndexableGraph createGraph() throws IOException {
+    protected Graph createGraph() throws IOException {
         /*
         boolean create = true;
         String db = this.computeTestDataRoot() + "/blueprints_test.dex";

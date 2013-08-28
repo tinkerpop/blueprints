@@ -22,7 +22,6 @@ import com.orientechnologies.orient.core.type.tree.OMVRBTreeRIDSet;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -168,7 +167,7 @@ public class OrientVertex extends OrientElement implements Vertex {
 				allEdges.add(e);
 
 			while (it.hasNext()) {
-				final Index<? extends Element> index = it.next();
+				final OrientIndex<? extends Element> index = it.next();
 
 				if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
 					OrientIndex<OrientVertex> idx = (OrientIndex<OrientVertex>) index;

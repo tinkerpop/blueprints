@@ -20,7 +20,7 @@ public class BlueprintsKeyIndexTest {
 		final OrientGraph graph = new OrientGraph("memory:temp");
 		try {
 			/* create key index */
-			graph.createKeyIndex(KEY_NAME, Vertex.class);
+			graph.createIndex(KEY_NAME, Vertex.class);
 
 			/* create the root vertex */{
 				final Vertex v = graph.addVertex(null);

@@ -5,8 +5,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
-import com.tinkerpop.blueprints.IndexTestSuite;
-import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
@@ -43,18 +41,6 @@ public class PartitionGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
@@ -78,7 +64,7 @@ public class PartitionGraphTest extends GraphTest {
     }
 
     public Graph generateGraph(final String graphDirectoryName) {
-        return new PartitionIndexableGraph<TinkerGraph>(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph")));
+        return new PartitionGraph<TinkerGraph>(new TinkerGraph(), "_writeGraph", "writeGraph", new HashSet<String>(Arrays.asList("writeGraph")));
     }
 
 
@@ -93,7 +79,7 @@ public class PartitionGraphTest extends GraphTest {
 
     public void testSpecificBehavior() {
         TinkerGraph rawGraph = new TinkerGraph();
-        PartitionIndexableGraph graph = new PartitionIndexableGraph(rawGraph, "_writeGraph", "a");
+        PartitionGraph graph = new PartitionGraph(rawGraph, "_writeGraph", "a");
         assertEquals(graph.getReadPartitions().size(), 1);
         assertTrue(graph.getReadPartitions().contains("a"));
         assertEquals(graph.getWritePartition(), "a");

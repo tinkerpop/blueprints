@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.oupls.sail;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import info.aduna.iteration.CloseableIteration;
@@ -32,16 +31,16 @@ import static junit.framework.Assert.assertTrue;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public abstract class GraphSailTest extends SailTest {
-    protected abstract KeyIndexableGraph createGraph() throws Exception;
+    protected abstract Graph createGraph() throws Exception;
 
-    protected KeyIndexableGraph graph;
+    protected Graph graph;
 
     protected Sail createSail() throws Exception {
         // Flip this flag in order to disable "unique statements" behavior
         uniqueStatements = true;
 
         graph = createGraph();
-        GraphSail<KeyIndexableGraph> g = new GraphSail<KeyIndexableGraph>(graph);
+        GraphSail g = new GraphSail(graph);
         g.enforceUniqueStatements(uniqueStatements);
 
         return g;

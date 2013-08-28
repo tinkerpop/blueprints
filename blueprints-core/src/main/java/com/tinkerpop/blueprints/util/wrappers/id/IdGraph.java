@@ -3,12 +3,9 @@ package com.tinkerpop.blueprints.util.wrappers.id;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -32,7 +29,7 @@ import java.util.UUID;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, WrapperGraph<T>, IndexableGraph, TransactionalGraph {
+public class IdGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     // Note: using "__id" instead of "_id" avoids collision with Rexster's "_id"
     public static final String ID = "__id";
@@ -253,24 +250,16 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         }
     }
 
-    // Note: this is a no-op if the base graph is not an instance of TransactionalGraph
-    public void stopTransaction(Conclusion conclusion) {
-        if (Conclusion.SUCCESS == conclusion)
-            commit();
-        else
-            rollback();
+    public void commit() {
+        this.baseGraph.commit();
     }
 
     public void rollback() {
-        if (this.baseGraph instanceof TransactionalGraph) {
-            ((TransactionalGraph) baseGraph).rollback();
-        }
+        this.baseGraph.rollback();
     }
 
-    public void commit() {
-        if (this.baseGraph instanceof TransactionalGraph) {
-            ((TransactionalGraph) baseGraph).commit();
-        }
+    public Graph newTransaction() {
+        return this.baseGraph.newTransaction();
     }
 
     public void shutdown() {
@@ -281,7 +270,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         return StringFactory.graphString(this, this.baseGraph.toString());
     }
 
-    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+    public <T extends Element> void dropIndex(final String key, final Class<T> elementClass) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -291,13 +280,13 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         if (supported && key.equals(ID)) {
             throw new IllegalArgumentException("index key " + ID + " is reserved by IdGraph");
         } else {
-            baseGraph.dropKeyIndex(key, elementClass);
+            baseGraph.dropIndex(key, elementClass);
         }
     }
 
-    public <T extends Element> void createKeyIndex(final String key,
-                                                   final Class<T> elementClass,
-                                                   final Parameter... indexParameters) {
+    public <T extends Element> void createIndex(final String key,
+                                                final Class<T> elementClass,
+                                                final Parameter... indexParameters) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -307,7 +296,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         if (supported && key.equals(ID)) {
             throw new IllegalArgumentException("index key " + ID + " is reserved by IdGraph");
         } else {
-            baseGraph.createKeyIndex(key, elementClass, indexParameters);
+            baseGraph.createIndex(key, elementClass, indexParameters);
         }
     }
 
@@ -336,38 +325,6 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         this.uniqueIds = enforceUniqueIds;
     }
 
-    public <T extends Element> Index<T> createIndex(final String indexName,
-                                                    final Class<T> indexClass,
-                                                    final Parameter... indexParameters) {
-        verifyBaseGraphIsIndexableGraph();
-
-        return isVertexClass(indexClass)
-                ? (Index<T>) new IdVertexIndex((Index<Vertex>) ((IndexableGraph) baseGraph).createIndex(indexName, indexClass, indexParameters), this)
-                : (Index<T>) new IdEdgeIndex((Index<Edge>) ((IndexableGraph) baseGraph).createIndex(indexName, indexClass, indexParameters), this);
-    }
-
-    public <T extends Element> Index<T> getIndex(final String indexName,
-                                                 final Class<T> indexClass) {
-        verifyBaseGraphIsIndexableGraph();
-
-        if (isVertexClass(indexClass)) {
-            Index<Vertex> baseIndex = (Index<Vertex>) ((IndexableGraph) baseGraph).getIndex(indexName, indexClass);
-            return null == baseIndex ? null : (Index<T>) new IdVertexIndex(baseIndex, this);
-        } else {
-            Index<Edge> baseIndex = (Index<Edge>) ((IndexableGraph) baseGraph).getIndex(indexName, indexClass);
-            return null == baseIndex ? null : (Index<T>) new IdEdgeIndex(baseIndex, this);
-        }
-    }
-
-    public Iterable<Index<? extends Element>> getIndices() {
-        throw new UnsupportedOperationException("sorry, you currently can't get a list of indexes through IdGraph");
-    }
-
-    public void dropIndex(final String indexName) {
-        verifyBaseGraphIsIndexableGraph();
-
-        ((IndexableGraph) baseGraph).dropIndex(indexName);
-    }
 
     public GraphQuery query() {
         final IdGraph idGraph = this;
@@ -405,23 +362,17 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         }
     }
 
-    private void verifyBaseGraphIsIndexableGraph() {
-        if (!(baseGraph instanceof IndexableGraph)) {
-            throw new IllegalStateException("base graph is not an indexable graph");
-        }
-    }
-
     private boolean isVertexClass(final Class c) {
         return Vertex.class.isAssignableFrom(c);
     }
 
     private void createIndices() {
         if (supportVertexIds && !baseGraph.getIndexedKeys(Vertex.class).contains(ID)) {
-            baseGraph.createKeyIndex(ID, Vertex.class);
+            baseGraph.createIndex(ID, Vertex.class);
         }
 
         if (supportEdgeIds && !baseGraph.getIndexedKeys(Edge.class).contains(ID)) {
-            baseGraph.createKeyIndex(ID, Edge.class);
+            baseGraph.createIndex(ID, Edge.class);
         }
     }
 

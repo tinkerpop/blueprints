@@ -2,8 +2,12 @@ package com.tinkerpop.blueprints.util;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -68,5 +72,57 @@ public class GraphHelper {
             final Edge toEdge = to.addEdge(fromEdge.getId(), outVertex, inVertex, fromEdge.getLabel());
             ElementHelper.copyProperties(fromEdge, toEdge);
         }
+    }
+
+
+    /**
+     * Add a vertex to a graph only if no other vertex in the provided Index is indexed by the property key/value pair.
+     * If a vertex already exists with that key/value pair, return the pre-existing vertex.
+     *
+     * @param graph       the graph to add the vertex to
+     * @param id          the id of the vertex to create (can be null)
+     * @param uniqueKey   the key to check on for uniqueness of the vertex
+     * @param uniqueValue the value to check on for uniqueness of the vertex
+     * @return the newly created vertex or the vertex that satisfies the uniqueness criteria
+     */
+    public static Vertex addUniqueVertex(final Graph graph, final Object id, final String uniqueKey, final Object uniqueValue) {
+        final Iterator<Vertex> results = graph.getVertices(uniqueKey, uniqueValue).iterator();
+        if (results.hasNext()) {
+            return results.next();
+        } else {
+            final Vertex vertex = graph.addVertex(id);
+            vertex.setProperty(uniqueKey, uniqueValue);
+            return vertex;
+        }
+    }
+
+    /**
+     * For those graphs that do no support automatic reindexing of elements when a key is provided for indexing, this method can be used to simulate that behavior.
+     * The elements in the graph are iterated and their properties (for the provided keys) are removed and then added.
+     * Be sure that the key indices have been created prior to calling this method so that they can pick up the property mutations calls.
+     * Finally, if the graph is a TransactionalGraph, then a 1000 mutation buffer is used for each commit.
+     *
+     * @param graph    the graph containing the provided elements
+     * @param elements the elements to index into the key indices
+     * @param keys     the keys of the key indices
+     * @return the number of element properties that were indexed
+     */
+    public static long reIndexElements(final Graph graph, final Iterable<? extends Element> elements, final Set<String> keys) {
+        final boolean isTransactional = graph.getFeatures().supportsTransactions;
+        long counter = 0;
+        for (final Element element : elements) {
+            for (final String key : keys) {
+                final Object value = element.removeProperty(key);
+                if (null != value) {
+                    counter++;
+                    element.setProperty(key, value);
+
+                    if (isTransactional && (counter % 1000 == 0)) {
+                        graph.commit();
+                    }
+                }
+            }
+        }
+        return counter;
     }
 }

@@ -3,10 +3,8 @@ package com.tinkerpop.blueprints.impls.neo4j.batch;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
@@ -44,7 +42,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaGraph<BatchInserter> {
+public class Neo4jBatchGraph implements MetaGraph<BatchInserter> {
 
     private final BatchInserter rawGraph;
     private final BatchInserterIndexProvider indexProvider;
@@ -118,6 +116,18 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         this.indexProvider.shutdown();
         this.rawGraph.shutdown();
         removeReferenceNodeAndFinalizeKeyIndices();
+    }
+
+    public void commit() {
+        throw ExceptionFactory.graphDoesNotSupportTransactions();
+    }
+
+    public void rollback() {
+        throw ExceptionFactory.graphDoesNotSupportTransactions();
+    }
+
+    public Graph newTransaction() {
+        throw ExceptionFactory.graphDoesNotSupportThreadedTransactions();
     }
 
     /**
@@ -340,31 +350,6 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
-    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        return (Index<T>) this.indices.get(indexName);
-    }
-
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        final Neo4jBatchIndex<T> index;
-
-        final Map<String, String> map = generateParameterMap(indexParameters);
-        if (indexParameters.length == 0) {
-            map.put(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT);
-        }
-
-        if (Vertex.class.isAssignableFrom(indexClass)) {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.nodeIndex(indexName, map), indexName, indexClass);
-        } else {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.relationshipIndex(indexName, map), indexName, indexClass);
-        }
-        this.indices.put(indexName, index);
-        return index;
-    }
-
-    public Iterable<Index<? extends Element>> getIndices() {
-        return (Iterable) this.indices.values();
-    }
-
     /**
      * @throws UnsupportedOperationException
      */
@@ -382,7 +367,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         return properties;
     }
 
-    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+    public <T extends Element> void dropIndex(final String key, final Class<T> elementClass) {
         if (Vertex.class.isAssignableFrom(elementClass)) {
             this.vertexIndexKeys.remove(key);
         } else {
@@ -390,7 +375,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         }
     }
 
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
+    public <T extends Element> void createIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
         if (Vertex.class.isAssignableFrom(elementClass)) {
             this.vertexIndexKeys.add(key);
         } else {

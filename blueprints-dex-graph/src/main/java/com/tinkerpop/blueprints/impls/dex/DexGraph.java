@@ -6,11 +6,10 @@ import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
@@ -39,24 +38,21 @@ import java.util.Set;
  * Also, the label of a vertex (or even an element) can be retrieved through the
  * {@link StringFactory#LABEL} property.
  * <p/>
- * DexGraph implements {@link KeyIndexableGraph} with some particularities on
+ * DexGraph implements key indices with some particularities on
  * the way it can be used. As both vertices and edges are labeled when working
  * with Dex, the use of some APIs may require previously setting the label (by
- * means of {@link DexGraph#label}). Those APIs are:
- * {@link #getVertices(String, Object)}, {@link #getEdges(String, Object)}, and
- * {@link #createKeyIndex(String, Class)}.
+ * means of {@link DexGraph#label}).
  * <p/>
  * When working with DexGraph, all methods having as a result a collection
  * actually return a {@link CloseableIterable} collection. Thus users can
  * {@link CloseableIterable#close()} the collection to free resources.
  * Otherwise, all those collections will automatically be closed when the
- * transaction is stopped ({@link #stopTransaction(com.tinkerpop.blueprints.TransactionalGraph.Conclusion)}
- * or if the database is stopped ( {@link #shutdown()}).
+ * transaction is stopped or if the database is stopped ( {@link #shutdown()}).
  *
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndexableGraph, TransactionalGraph {
+public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph> {
 
     /**
      * Default Vertex label.
@@ -74,7 +70,6 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * Moreover, this value will also be used for the KeyIndex-related methods.
      *
      * @see #addVertex(Object)
-     * @see #createKeyIndex(String, Class)
      * @see #getVertices(String, Object)
      * @see #getEdges(String, Object)
      */
@@ -665,8 +660,8 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     @Override
-    public <T extends Element> void dropKeyIndex(String key,
-                                                 Class<T> elementClass) {
+    public <T extends Element> void dropIndex(String key,
+                                              Class<T> elementClass) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -688,7 +683,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * attribute, could this be set somehow?
      */
     @Override
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+    public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -806,12 +801,8 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         throw new UnsupportedOperationException("Rollback is not supported");
     }
 
-    @Override
-    public void stopTransaction(Conclusion conclusion) {
-        if (Conclusion.SUCCESS == conclusion)
-            commit();
-        else
-            rollback();
+    public Graph newTransaction() {
+        throw ExceptionFactory.graphDoesNotSupportThreadedTransactions();
     }
 
     public GraphQuery query() {

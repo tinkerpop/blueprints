@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.impls.tg;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 
@@ -17,7 +16,7 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class TinkerIndex<T extends Element> implements Index<T>, Serializable {
+class TinkerIndex<T extends Element> implements Serializable {
 
     protected Map<String, Map<Object, Set<T>>> index = new HashMap<String, Map<Object, Set<T>>>();
     protected final String indexName;
@@ -102,9 +101,5 @@ class TinkerIndex<T extends Element> implements Index<T>, Serializable {
                 }
             }
         }
-    }
-
-    public String toString() {
-        return StringFactory.indexString(this);
     }
 }

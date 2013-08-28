@@ -1,13 +1,17 @@
 package com.tinkerpop.blueprints.util.wrappers.wrapped;
 
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.wrappers.WrappedGraphQuery;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
+
+import java.util.Set;
 
 /**
  * WrappedGraph serves as a template for writing a wrapper graph.
@@ -76,6 +80,30 @@ public class WrappedGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     public void removeVertex(final Vertex vertex) {
         this.baseGraph.removeVertex(((WrappedVertex) vertex).getBaseVertex());
+    }
+
+    public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+        this.baseGraph.createIndex(key, elementClass, indexParameters);
+    }
+
+    public <T extends Element> void dropIndex(String key, Class<T> elementClass) {
+        this.baseGraph.dropIndex(key, elementClass);
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return this.baseGraph.getIndexedKeys(elementClass);
+    }
+
+    public void commit() {
+        this.baseGraph.commit();
+    }
+
+    public void rollback() {
+        this.baseGraph.rollback();
+    }
+
+    public Graph newTransaction() {
+        return this.baseGraph.newTransaction();
     }
 
     @Override

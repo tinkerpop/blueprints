@@ -1,9 +1,11 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An EventGraph is a wrapper to existing Graph implementations and provides for graph events to be raised
@@ -211,6 +214,59 @@ public class EventGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         } catch (Exception re) {
 
         }
+    }
+
+    /**
+     * A commit only fires the event queue on successful operation.  If the commit operation to the underlying
+     * graph fails, the event queue will not fire and the queue will not be reset.
+     */
+    public void commit() {
+        boolean transactionFailure = false;
+        try {
+            this.baseGraph.commit();
+        } catch (RuntimeException re) {
+            transactionFailure = true;
+            throw re;
+        } finally {
+            if (!transactionFailure) {
+                trigger.fireEventQueue();
+                trigger.resetEventQueue();
+            }
+        }
+    }
+
+    /**
+     * A rollback only resets the event queue on successful operation.  If the rollback operation to the underlying
+     * graph fails, the event queue will not be reset.
+     */
+    public void rollback() {
+        boolean transactionFailure = false;
+        try {
+            this.baseGraph.rollback();
+        } catch (RuntimeException re) {
+            transactionFailure = true;
+            throw re;
+        } finally {
+            if (!transactionFailure) {
+                trigger.resetEventQueue();
+            }
+        }
+    }
+
+    public Graph newTransaction() {
+        return this.baseGraph.newTransaction();
+    }
+
+    public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+        this.baseGraph.createIndex(key, elementClass, indexParameters);
+    }
+
+    public <T extends Element> void dropIndex(String key, Class<T> elementClass) {
+        this.baseGraph.dropIndex(key, elementClass);
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return this.baseGraph.getIndexedKeys(elementClass);
     }
 
     public String toString() {

@@ -1,11 +1,10 @@
 package com.tinkerpop.blueprints.util;
 
-import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Vertex;
 
 import java.util.Iterator;
@@ -141,22 +140,22 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         }
 
         private Iterable<?> getElementIterable(final Class<? extends Element> elementClass) {
-            if (graph instanceof KeyIndexableGraph) {
-                final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
-                HasContainer container = null;
-                for (final HasContainer hasContainer : hasContainers) {
-                    if (hasContainer.predicate.equals(com.tinkerpop.blueprints.Compare.EQUAL) && keys.contains(hasContainer.key)) {
-                        container = hasContainer;
-                        break;
-                    }
-                }
-                if (container != null) {
-                    if (Vertex.class.isAssignableFrom(elementClass))
-                        return graph.getVertices(container.key, container.value);
-                    else
-                        return graph.getEdges(container.key, container.value);
+
+            final Set<String> keys = graph.getIndexedKeys(elementClass);
+            HasContainer container = null;
+            for (final HasContainer hasContainer : hasContainers) {
+                if (hasContainer.predicate.equals(com.tinkerpop.blueprints.Compare.EQUAL) && keys.contains(hasContainer.key)) {
+                    container = hasContainer;
+                    break;
                 }
             }
+            if (container != null) {
+                if (Vertex.class.isAssignableFrom(elementClass))
+                    return graph.getVertices(container.key, container.value);
+                else
+                    return graph.getEdges(container.key, container.value);
+            }
+
 
             if (Vertex.class.isAssignableFrom(elementClass))
                 return graph.getVertices();

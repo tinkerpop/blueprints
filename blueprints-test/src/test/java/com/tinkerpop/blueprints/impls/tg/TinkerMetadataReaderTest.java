@@ -1,9 +1,5 @@
 package com.tinkerpop.blueprints.impls.tg;
 
-import com.tinkerpop.blueprints.CloseableIterable;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.Vertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,23 +24,6 @@ public class TinkerMetadataReaderTest {
         TinkerMetadataReader.load(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
 
         Assert.assertEquals((long) this.graph.currentId, 0l);
-    }
-
-    @Test
-    public void exampleMetadataGetsCorrectIndices() throws IOException {
-        TinkerMetadataReader.load(this.graph, TinkerMetadataReaderTest.class.getResourceAsStream("example-tinkergraph-metadata.dat"));
-
-        Assert.assertEquals(2, this.graph.indices.size());
-
-        Index idxAge = this.graph.getIndex("age", Vertex.class);
-        CloseableIterable<Vertex> vertices = idxAge.get("age", 27);
-        Assert.assertEquals(1, getIterableCount(vertices));
-        vertices.close();
-
-        Index idxWeight = this.graph.getIndex("weight", Edge.class);
-        CloseableIterable<Edge> edges = idxWeight.get("weight", 0.5f);
-        Assert.assertEquals(1, getIterableCount(edges));
-        edges.close();
     }
 
     @Test

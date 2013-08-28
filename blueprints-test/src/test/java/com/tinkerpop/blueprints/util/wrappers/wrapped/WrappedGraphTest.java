@@ -3,8 +3,6 @@ package com.tinkerpop.blueprints.util.wrappers.wrapped;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
-import com.tinkerpop.blueprints.IndexTestSuite;
-import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
@@ -38,18 +36,6 @@ public class WrappedGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
@@ -73,7 +59,7 @@ public class WrappedGraphTest extends GraphTest {
     }
 
     public Graph generateGraph(final String graphDirectoryName) {
-        return new WrappedIndexableGraph<TinkerGraph>(new TinkerGraph());
+        return new WrappedGraph<TinkerGraph>(new TinkerGraph());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {

@@ -3,17 +3,14 @@ package com.tinkerpop.blueprints.impls.neo4j;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
+import com.tinkerpop.blueprints.util.GraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.apache.commons.configuration.Configuration;
@@ -51,7 +48,7 @@ import java.util.logging.Logger;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexableGraph, MetaGraph<GraphDatabaseService> {
+public class Neo4jGraph implements MetaGraph<GraphDatabaseService> {
     private static final Logger logger = Logger.getLogger(Neo4jGraph.class.getName());
 
     private GraphDatabaseService rawGraph;
@@ -173,10 +170,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     private void loadKeyIndices() {
         for (final String key : this.getInternalIndexKeys(Vertex.class)) {
-            this.createKeyIndex(key, Vertex.class);
+            this.createIndex(key, Vertex.class);
         }
         for (final String key : this.getInternalIndexKeys(Edge.class)) {
-            this.createKeyIndex(key, Edge.class);
+            this.createIndex(key, Edge.class);
         }
         this.commit();
     }
@@ -252,36 +249,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         }
     }
 
-    public synchronized <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
-            throw ExceptionFactory.indexAlreadyExists(indexName);
-        }
-        this.autoStartTransaction();
-        return new Neo4jIndex(indexName, indexClass, this, indexParameters);
-    }
-
-    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        if (Vertex.class.isAssignableFrom(indexClass)) {
-            if (this.rawGraph.index().existsForNodes(indexName)) {
-                return new Neo4jIndex(indexName, indexClass, this);
-            } else if (this.rawGraph.index().existsForRelationships(indexName)) {
-                throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
-            } else {
-                return null;
-            }
-        } else if (Edge.class.isAssignableFrom(indexClass)) {
-            if (this.rawGraph.index().existsForRelationships(indexName)) {
-                return new Neo4jIndex(indexName, indexClass, this);
-            } else if (this.rawGraph.index().existsForNodes(indexName)) {
-                throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
     /**
      * {@inheritDoc}
      * <p/>
@@ -305,19 +272,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             }
         }
         this.commit();
-    }
-
-    public Iterable<Index<? extends Element>> getIndices() {
-        final List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
-        for (final String name : this.rawGraph.index().nodeIndexNames()) {
-            if (!name.equals(Neo4jTokens.NODE_AUTO_INDEX))
-                indices.add(new Neo4jIndex(name, Vertex.class, this));
-        }
-        for (final String name : this.rawGraph.index().relationshipIndexNames()) {
-            if (!name.equals(Neo4jTokens.RELATIONSHIP_AUTO_INDEX))
-                indices.add(new Neo4jIndex(name, Edge.class, this));
-        }
-        return indices;
     }
 
     public Vertex addVertex(final Object id) {
@@ -394,7 +348,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
             return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
 
-    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+    public <T extends Element> void dropIndex(final String key, final Class<T> elementClass) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -413,7 +367,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         this.dropInternalIndexKey(key, elementClass);
     }
 
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
+    public <T extends Element> void createIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -424,7 +378,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
             this.rawGraph.index().getNodeAutoIndexer().startAutoIndexingProperty(key);
             if (!this.getInternalIndexKeys(Vertex.class).contains(key)) {
-                KeyIndexableGraphHelper.reIndexElements(this, this.getVertices(), new HashSet<String>(Arrays.asList(key)));
+                GraphHelper.reIndexElements(this, this.getVertices(), new HashSet<String>(Arrays.asList(key)));
                 this.createInternalIndexKey(key, elementClass);
             }
         } else if (Edge.class.isAssignableFrom(elementClass)) {
@@ -433,7 +387,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
             this.rawGraph.index().getRelationshipAutoIndexer().startAutoIndexingProperty(key);
             if (!this.getInternalIndexKeys(Edge.class).contains(key)) {
-                KeyIndexableGraphHelper.reIndexElements(this, this.getEdges(), new HashSet<String>(Arrays.asList(key)));
+                GraphHelper.reIndexElements(this, this.getEdges(), new HashSet<String>(Arrays.asList(key)));
                 this.createInternalIndexKey(key, elementClass);
             }
         } else {
@@ -507,13 +461,6 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         ((Relationship) ((Neo4jEdge) edge).getRawElement()).delete();
     }
 
-    public void stopTransaction(Conclusion conclusion) {
-        if (Conclusion.SUCCESS == conclusion)
-            commit();
-        else
-            rollback();
-    }
-
     public void commit() {
         if (null == tx.get()) {
             return;
@@ -564,6 +511,10 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
 
     public GraphDatabaseService getRawGraph() {
         return this.rawGraph;
+    }
+
+    public Graph newTransaction() {
+        throw ExceptionFactory.graphDoesNotSupportThreadedTransactions();
     }
 
     public Features getFeatures() {

@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.impls.orient;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
-import com.tinkerpop.blueprints.TransactionalGraph;
 
 /**
  * A Blueprints implementation of the graph database OrientDB
@@ -11,8 +10,7 @@ import com.tinkerpop.blueprints.TransactionalGraph;
  * 
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
-public abstract class OrientTransactionalGraph extends OrientBaseGraph
-		implements TransactionalGraph {
+public abstract class OrientTransactionalGraph extends OrientBaseGraph {
 	protected boolean autoStartTx = true;
 
 	/**
@@ -35,23 +33,6 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph
 			final String password) {
 		super(url, username, password);
 		autoStartTransaction();
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public void stopTransaction(final Conclusion conclusion) {
-		final OrientGraphContext context = getContext(false);
-		if (context == null)
-			return;
-		if (context.rawGraph.isClosed()
-				|| context.rawGraph.getTransaction() instanceof OTransactionNoTx
-				|| context.rawGraph.getTransaction().getStatus() != TXSTATUS.BEGUN)
-			return;
-
-		if (Conclusion.SUCCESS == conclusion)
-			commit();
-		else
-			rollback();
 	}
 
 	public void commit() {

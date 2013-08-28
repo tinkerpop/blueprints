@@ -5,7 +5,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
@@ -57,8 +56,8 @@ public class IdGraphTest extends GraphTest {
 
 
     public void testIdIndicesExist() throws Exception {
-        KeyIndexableGraph graph = (KeyIndexableGraph) generateGraph();
-        graph = (KeyIndexableGraph) ((WrapperGraph) graph).getBaseGraph();
+        Graph graph = generateGraph();
+        graph = ((WrapperGraph) graph).getBaseGraph();
         assertTrue(graph.getIndexedKeys(Vertex.class).contains(IdGraph.ID));
         assertTrue(graph.getIndexedKeys(Edge.class).contains(IdGraph.ID));
         graph.shutdown();

@@ -15,7 +15,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testGetIndexedKeysCannotAcceptNullArgumentForClass() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         try {
             graph.getIndexedKeys(null);
         } catch (IllegalArgumentException iae) {
@@ -26,9 +26,9 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testCreateKeyIndexCannotAcceptNullArgumentForClass() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         try {
-            graph.createKeyIndex("test", null);
+            graph.createIndex("test", null);
         } catch (IllegalArgumentException iae) {
             return;
         }
@@ -37,9 +37,9 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testRemoveKeyIndexCannotAcceptNullArgumentForClass() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         try {
-            graph.dropKeyIndex("test", null);
+            graph.dropIndex("test", null);
         } catch (IllegalArgumentException iae) {
             return;
         }
@@ -48,12 +48,12 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testAutoIndexKeyManagementWithPersistence() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexKeyIndex) {
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 0);
             this.stopWatch();
-            graph.createKeyIndex("name", Vertex.class);
-            graph.createKeyIndex("location", Vertex.class);
+            graph.createIndex("name", Vertex.class);
+            graph.createIndex("location", Vertex.class);
             printPerformance(graph.toString(), 2, "automatic index keys added", this.stopWatch());
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
             assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
@@ -62,8 +62,8 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeKeyIndex) {
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 0);
             this.stopWatch();
-            graph.createKeyIndex("weight", Edge.class);
-            graph.createKeyIndex("since", Edge.class);
+            graph.createIndex("weight", Edge.class);
+            graph.createIndex("since", Edge.class);
             printPerformance(graph.toString(), 2, "automatic index keys added", this.stopWatch());
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 2);
             assertTrue(graph.getIndexedKeys(Edge.class).contains("weight"));
@@ -72,7 +72,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         graph.shutdown();
 
         if (graph.getFeatures().isPersistent) {
-            graph = (KeyIndexableGraph) graphTest.generateGraph();
+            graph = graphTest.generateGraph();
             if (graph.getFeatures().supportsVertexKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Vertex.class).size(), 2);
                 assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
@@ -89,29 +89,29 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
 
     public void testAutoIndexKeyDroppingWithPersistence() {
         testAutoIndexKeyManagementWithPersistence();
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().isPersistent) {
             if (graph.getFeatures().supportsVertexKeyIndex) {
-                graph.dropKeyIndex("name", Vertex.class);
+                graph.dropIndex("name", Vertex.class);
             }
             if (graph.getFeatures().supportsEdgeKeyIndex) {
-                graph.dropKeyIndex("weight", Edge.class);
+                graph.dropIndex("weight", Edge.class);
             }
             graph.shutdown();
 
-            graph = (KeyIndexableGraph) graphTest.generateGraph();
+            graph = graphTest.generateGraph();
             if (graph.getFeatures().supportsVertexKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
                 assertTrue(graph.getIndexedKeys(Vertex.class).contains("location"));
-                graph.dropKeyIndex("location", Vertex.class);
+                graph.dropIndex("location", Vertex.class);
             }
             if (graph.getFeatures().supportsEdgeKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
                 assertTrue(graph.getIndexedKeys(Edge.class).contains("since"));
-                graph.dropKeyIndex("since", Edge.class);
+                graph.dropIndex("since", Edge.class);
             }
             graph.shutdown();
-            graph = (KeyIndexableGraph) graphTest.generateGraph();
+            graph = graphTest.generateGraph();
             if (graph.getFeatures().supportsVertexKeyIndex) {
                 assertEquals(graph.getIndexedKeys(Vertex.class).size(), 0);
             }
@@ -123,9 +123,9 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testGettingVerticesAndEdgesWithKeyValue() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexIteration && graph.getFeatures().supportsVertexKeyIndex) {
-            graph.createKeyIndex("name", Vertex.class);
+            graph.createIndex("name", Vertex.class);
             assertEquals(graph.getIndexedKeys(Vertex.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
             Vertex v1 = graph.addVertex(null);
@@ -143,7 +143,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         }
 
         if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeKeyIndex) {
-            graph.createKeyIndex("place", Edge.class);
+            graph.createIndex("place", Edge.class);
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Edge.class).contains("place"));
 
@@ -164,13 +164,13 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testReIndexingOfElements() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexKeyIndex) {
             Vertex vertex = graph.addVertex(null);
             vertex.setProperty("name", "marko");
             assertEquals(count(graph.getVertices("name", "marko")), 1);
             assertEquals(graph.getVertices("name", "marko").iterator().next(), vertex);
-            graph.createKeyIndex("name", Vertex.class);
+            graph.createIndex("name", Vertex.class);
             assertEquals(count(graph.getVertices("name", "marko")), 1);
             assertEquals(graph.getVertices("name", "marko").iterator().next(), vertex);
         }
@@ -180,7 +180,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             edge.setProperty("date", 2012);
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
-            graph.createKeyIndex("date", Edge.class);
+            graph.createIndex("date", Edge.class);
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
         }
@@ -188,9 +188,9 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testNoConcurrentModificationException() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsEdgeKeyIndex) {
-            graph.createKeyIndex("key", Edge.class);
+            graph.createIndex("key", Edge.class);
             for (int i = 0; i < 25; i++) {
                 graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");
             }
@@ -210,9 +210,9 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testKeyIndicesConsistentWithElementRemoval() throws Exception {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
 
-        graph.createKeyIndex("foo", Vertex.class);
+        graph.createIndex("foo", Vertex.class);
 
         Vertex v1 = graph.addVertex(null);
         v1.setProperty("foo", 42);
@@ -226,34 +226,34 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
     }
 
     public void testUpdateValuesInIndexKeys() throws Exception {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
 
-        graph.createKeyIndex("name", Vertex.class);
-        if (graph instanceof TransactionalGraph)
-            ((TransactionalGraph) graph).commit();
+        graph.createIndex("name", Vertex.class);
+        if (graph.getFeatures().supportsTransactions)
+            graph.commit();
 
         Vertex v1 = graph.addVertex(null);
         v1.setProperty("name", "marko");
         assertEquals(v1.getProperty("name"), "marko");
         vertexCount(graph, 1);
-        if (graph instanceof TransactionalGraph)
-            ((TransactionalGraph) graph).commit();
+        if (graph.getFeatures().supportsTransactions)
+            graph.commit();
 
         v1 = graph.getVertices("name", "marko").iterator().next();
         assertEquals(v1.getProperty("name"), "marko");
         v1.setProperty("name", "marko a. rodriguez");
         assertEquals(v1.getProperty("name"), "marko a. rodriguez");
         vertexCount(graph, 1);
-        if (graph instanceof TransactionalGraph)
-            ((TransactionalGraph) graph).commit();
+        if (graph.getFeatures().supportsTransactions)
+            graph.commit();
 
 
         assertFalse(graph.getVertices("name", "marko").iterator().hasNext());
         v1 = graph.getVertices("name", "marko a. rodriguez").iterator().next();
         assertEquals(v1.getProperty("name"), "marko a. rodriguez");
         vertexCount(graph, 1);
-        if (graph instanceof TransactionalGraph)
-            ((TransactionalGraph) graph).commit();
+        if (graph.getFeatures().supportsTransactions)
+            graph.commit();
 
         graph.shutdown();
     }

@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.util;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
 
 
@@ -36,9 +35,5 @@ public class StringFactory {
 
     public static String graphString(final Graph graph, final String internalString) {
         return graph.getClass().getSimpleName().toLowerCase() + L_BRACKET + internalString + R_BRACKET;
-    }
-
-    public static String indexString(final Index index) {
-        return "index" + L_BRACKET + index.getIndexName() + COLON + index.getIndexClass().getSimpleName() + R_BRACKET;
     }
 }

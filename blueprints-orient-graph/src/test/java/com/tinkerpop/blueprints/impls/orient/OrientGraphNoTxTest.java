@@ -3,7 +3,6 @@ package com.tinkerpop.blueprints.impls.orient;
 import com.orientechnologies.orient.core.db.graph.OGraphDatabase;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQueryTestSuite;
-import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.VertexQueryTestSuite;
@@ -34,12 +33,6 @@ public class OrientGraphNoTxTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new GraphQueryTestSuite(this));
         printTestPerformance("GraphQueryTestSuite", this.stopWatch());
-    }
-
-    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
     }
 
     public void testKeyIndexableGraphTestSuite() throws Exception {

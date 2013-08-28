@@ -3,9 +3,7 @@ package com.tinkerpop.blueprints.impls.dex;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.StringFactory;
@@ -56,14 +54,14 @@ public class DexGraphSpecificTestSuite extends TestSuite {
     }
 
     public void testKeyIndex() {
-        KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         this.stopWatch();
 
         ((DexGraph) graph).label.set("people");
-        graph.createKeyIndex("name", Vertex.class);
+        graph.createIndex("name", Vertex.class);
 
         ((DexGraph) graph).label.set("thing");
-        graph.createKeyIndex("name", Vertex.class);
+        graph.createIndex("name", Vertex.class);
 
         assertTrue(graph.getIndexedKeys(Edge.class).isEmpty());
         assertTrue(graph.getIndexedKeys(Vertex.class).size() == 1);
@@ -111,7 +109,7 @@ public class DexGraphSpecificTestSuite extends TestSuite {
     }
 
     public void testTx() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         this.stopWatch();
 
         graph.commit();
@@ -137,12 +135,12 @@ public class DexGraphSpecificTestSuite extends TestSuite {
     }
 
     private static class SessionThread extends Thread {
-        private TransactionalGraph tg = null;
+        private Graph tg = null;
         public volatile boolean stop = false;
         public volatile boolean finished = false;
         public int counter = 0;
 
-        public SessionThread(TransactionalGraph g) {
+        public SessionThread(Graph g) {
             tg = g;
         }
 
@@ -161,7 +159,7 @@ public class DexGraphSpecificTestSuite extends TestSuite {
     }
 
     public void testMultipleSessions() throws InterruptedException, IOException {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         this.stopWatch();
 
         // This test requires a multiple sessions license, 

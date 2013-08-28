@@ -3,10 +3,8 @@ package com.tinkerpop.blueprints.impls.rexster;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
@@ -14,15 +12,12 @@ import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,7 +26,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGraph<JSONObject> {
+public class RexsterGraph implements MetaGraph<JSONObject> {
 
     public static final int DEFAULT_BUFFER_SIZE = 100;
     private final String graphURI;
@@ -99,9 +94,9 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
 
     public RexsterGraph(final Configuration configuration) {
         this(configuration.getString("blueprints.rexster.url", null),
-             configuration.getInt("blueprints.rexster.buffer-size", DEFAULT_BUFFER_SIZE),
-             configuration.getString("blueprints.rexster.username", null),
-             configuration.getString("blueprints.rexster.password", null));
+                configuration.getInt("blueprints.rexster.buffer-size", DEFAULT_BUFFER_SIZE),
+                configuration.getString("blueprints.rexster.username", null),
+                configuration.getString("blueprints.rexster.password", null));
     }
 
     /**
@@ -216,54 +211,6 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         RestHelper.delete(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName));
     }
 
-    public Iterable<Index<? extends Element>> getIndices() {
-        List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
-        JSONArray json = RestHelper.getResultArray(this.graphURI + RexsterTokens.SLASH_INDICES);
-
-        for (int ix = 0; ix < json.length(); ix++) {
-            JSONObject index = json.optJSONObject(ix);
-            Class c;
-            String clazz = index.optString(RexsterTokens.CLASS);
-            if (clazz.toLowerCase().contains(RexsterTokens.VERTEX))
-                c = Vertex.class;
-            else if (clazz.toLowerCase().contains(RexsterTokens.EDGE))
-                c = Edge.class;
-            else
-                throw new RuntimeException("Can not determine whether " + clazz + " is a vertex or edge class");
-
-            indices.add(new RexsterIndex(this, index.optString(RexsterTokens.NAME), c));
-
-        }
-
-        return indices;
-    }
-
-    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        for (Index index : getIndices()) {
-            if (index.getIndexName().equals(indexName)) {
-                if (!index.getIndexClass().isAssignableFrom(indexClass))
-                    throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
-                return index;
-            }
-        }
-        return null;
-    }
-
-
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        final String c = getKeyIndexClass(indexClass);
-
-        final Map<String, Object> data = new HashMap<String, Object>();
-        data.put(RexsterTokens.CLASS, c);
-        final JSONObject json = new JSONObject(data);
-
-        final JSONObject index = RestHelper.postResultObject(this.graphURI + RexsterTokens.SLASH_INDICES_SLASH + RestHelper.encode(indexName), json);
-        if (!index.opt(RexsterTokens.NAME).equals(indexName))
-            throw new RuntimeException("Could not create index: " + index.optString(RexsterTokens.MESSAGE));
-
-        return new RexsterIndex<T>(this, indexName, indexClass);
-    }
-
     public String toString() {
         final String graphName = RestHelper.get(graphURI).optString(RexsterTokens.GRAPH);
         return StringFactory.graphString(this, this.graphURI + "[" + graphName + "]");
@@ -283,12 +230,12 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
         return FEATURES;
     }
 
-    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+    public <T extends Element> void dropIndex(String key, Class<T> elementClass) {
         final String c = getKeyIndexClass(elementClass);
         RestHelper.delete(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c + RexsterTokens.SLASH + key);
     }
 
-    public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+    public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
         final String c = getKeyIndexClass(elementClass);
         RestHelper.post(this.graphURI + RexsterTokens.SLASH_KEY_INDICES_SLASH + c + RexsterTokens.SLASH + key);
     }
@@ -344,6 +291,18 @@ public class RexsterGraph implements IndexableGraph, KeyIndexableGraph, MetaGrap
 
     public GraphQuery query() {
         return new DefaultGraphQuery(this);
+    }
+
+    public void commit() {
+        throw ExceptionFactory.graphDoesNotSupportTransactions();
+    }
+
+    public void rollback() {
+        throw ExceptionFactory.graphDoesNotSupportTransactions();
+    }
+
+    public Graph newTransaction() {
+        throw ExceptionFactory.graphDoesNotSupportThreadedTransactions();
     }
 
 }

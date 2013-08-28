@@ -5,11 +5,6 @@ import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQueryTestSuite;
 import com.tinkerpop.blueprints.GraphTestSuite;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexTestSuite;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.IndexableGraphTestSuite;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
@@ -66,17 +61,6 @@ public class RexsterGraphTest extends GraphTest {
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
 
     /*
     TODO: Create a respective test case that doesn't require underscore prefixed properties
@@ -116,8 +100,7 @@ public class RexsterGraphTest extends GraphTest {
     }
 
     protected void resetGraph() {
-        final KeyIndexableGraph graph = (KeyIndexableGraph) this.generateGraph();
-        final IndexableGraph idxGraph = (IndexableGraph) graph;
+        final Graph graph = this.generateGraph();
 
         // since we don't have graph.clear() anymore we manually reset the graph.
         Iterator<Vertex> vertexItty = graph.getVertices().iterator();
@@ -131,15 +114,11 @@ public class RexsterGraphTest extends GraphTest {
         }
 
         for (String key : graph.getIndexedKeys(Vertex.class)) {
-            graph.dropKeyIndex(key, Vertex.class);
+            graph.dropIndex(key, Vertex.class);
         }
 
         for (String key : graph.getIndexedKeys(Edge.class)) {
-            graph.dropKeyIndex(key, Edge.class);
-        }
-
-        for (Index idx : idxGraph.getIndices()) {
-            idxGraph.dropIndex(idx.getIndexName());
+            graph.dropIndex(key, Edge.class);
         }
     }
 

@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints;
 
+import com.tinkerpop.blueprints.impls.GraphTest;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.tinkerpop.blueprints.impls.GraphTest;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -21,8 +21,8 @@ public class GraphQueryTestSuite extends TestSuite {
 
     public void testGraphQueryForVertices() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIndex && graph instanceof KeyIndexableGraph) {
-            ((KeyIndexableGraph) graph).createKeyIndex("name", Vertex.class);
+        if (graph.getFeatures().supportsVertexIndex) {
+            graph.createIndex("name", Vertex.class);
         }
         if (graph.getFeatures().supportsVertexProperties) {
             Vertex vertex = graph.addVertex(null);
@@ -85,8 +85,8 @@ public class GraphQueryTestSuite extends TestSuite {
 
     public void testGraphQueryForEdges() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().supportsEdgeIndex && graph instanceof KeyIndexableGraph) {
-            ((KeyIndexableGraph) graph).createKeyIndex("type", Edge.class);
+        if (graph.getFeatures().supportsEdgeIndex) {
+            graph.createIndex("type", Edge.class);
         }
         if (graph.getFeatures().supportsEdgeProperties && graph.getFeatures().supportsVertexProperties) {
             Vertex marko = graph.addVertex(null);
@@ -129,10 +129,10 @@ public class GraphQueryTestSuite extends TestSuite {
 
     public void testGraphQueryForHasOR() {
         Graph graph = graphTest.generateGraph();
-        if (graph.getFeatures().supportsEdgeIndex && graph instanceof KeyIndexableGraph) {
-            ((KeyIndexableGraph) graph).createKeyIndex("type", Edge.class);
+        if (graph.getFeatures().supportsEdgeIndex) {
+            graph.createIndex("type", Edge.class);
         }
-        if (graph.getFeatures().supportsEdgeIteration  && graph.getFeatures().supportsEdgeProperties && graph.getFeatures().supportsVertexProperties) {
+        if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsEdgeProperties && graph.getFeatures().supportsVertexProperties) {
             Vertex marko = graph.addVertex(null);
             marko.setProperty("name", "marko");
             Vertex matthias = graph.addVertex(null);

@@ -2,7 +2,6 @@ package com.tinkerpop.blueprints.oupls.sail;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
@@ -55,7 +54,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     public void commitInternal() throws SailException {
         if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).commit();
+            store.graph.commit();
         }
 
         if (statementsAdded || statementsRemoved) {
@@ -68,14 +67,14 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     public void rollbackInternal() throws SailException {
         if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            store.graph.rollback();
         }
     }
 
     public void closeInternal() throws SailException {
         // Roll back any uncommitted operations.
         if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+            store.graph.rollback();
         }
     }
 

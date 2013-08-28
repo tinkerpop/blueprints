@@ -281,19 +281,19 @@ public class Neo4jGraphUsingANonInternalAbstractGraphClassFail {
      * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4jGraph#getInternalIndexKeys}
      * won't load any index, with an additional {@link ClassCastException}
      */
-    @Test
+    /*@Test
     public void loadingANeo4jGraphFromAnyGraphDatabaseClassShouldWork() throws ClassCastException {
         Neo4jGraph tested = new Neo4jGraph(new LazyLoadedGraphDatabase());
         assertThat(tested, IsNull.notNullValue());
         // this one isn't a GraphDatabaseAPI. As a consequence, the indexing features are disgraded.
         assertThat(tested.getIndices().iterator().hasNext(), Is.is(false));
-    }
+    }*/
 
     /**
      * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4jGraph#getInternalIndexKeys}
      * won't load any index, with an additional {@link ClassCastException}
      */
-    @Test
+    /*@Test
     public void loadingANeo4jGraphFromAnyGraphAPIClassShouldWork() throws ClassCastException {
         String METHOD_NAME = "#loadingANeo4jGraphFromAnyGraphAPIClassShouldWork";
         Neo4jGraph tested = new Neo4jGraph(new LazyLoadableGraphAPI());
@@ -304,5 +304,5 @@ public class Neo4jGraphUsingANonInternalAbstractGraphClassFail {
         tested.createIndex(METHOD_NAME, Vertex.class);
         // and now this index exist
         assertThat(tested.getIndices().iterator().hasNext(), Is.is(true));
-    }
+    }*/
 }

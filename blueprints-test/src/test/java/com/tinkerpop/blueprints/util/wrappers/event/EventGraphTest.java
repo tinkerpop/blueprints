@@ -5,8 +5,6 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphTestSuite;
-import com.tinkerpop.blueprints.IndexTestSuite;
-import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
@@ -51,18 +49,6 @@ public class EventGraphTest extends GraphTest {
         printTestPerformance("GraphTestSuite", this.stopWatch());
     }
 
-    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
-    }
-
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new GraphMLReaderTestSuite(this));
@@ -86,7 +72,7 @@ public class EventGraphTest extends GraphTest {
     }
 
     public Graph generateGraph(final String graphDirectoryName) {
-        return new EventIndexableGraph<TinkerGraph>(new TinkerGraph());
+        return new EventGraph<TinkerGraph>(new TinkerGraph());
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {

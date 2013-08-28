@@ -103,4 +103,35 @@ public class GraphHelperTest extends BaseTest {
         assertEquals(counter, 5);
     }
 
+    public void testReIndexElements() {
+        TinkerGraph graph = TinkerGraphFactory.createTinkerGraph();
+        assertTrue(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
+        assertEquals(count(graph.getVertices("name", "marko")), 1);
+        assertEquals(graph.getVertices("name", "marko").iterator().next(), graph.getVertex(1));
+        graph.createIndex("name", Vertex.class);
+        //KeyIndexableGraphHelper.reIndexElements(graph, graph.getVertices(), new HashSet<String>(Arrays.asList("name")));
+        assertFalse(graph.getVertices("name", "marko") instanceof PropertyFilteredIterable);
+        assertEquals(count(graph.getVertices("name", "marko")), 1);
+        assertEquals(graph.getVertices("name", "marko").iterator().next(), graph.getVertex(1));
+    }
+
+   /*TODO
+   public void testAddUniqueVertex() {
+        Graph graph = new TinkerGraph();
+        Vertex marko = graph.addVertex(0);
+        marko.setProperty("name", "marko");
+        Index<Vertex> index = graph.createIndex("txIdx", Vertex.class);
+        index.put("name", "marko", marko);
+        Vertex vertex = IndexableGraphHelper.addUniqueVertex(graph, null, index, "name", "marko");
+        assertEquals(vertex.getProperty("name"), "marko");
+        assertEquals(vertex, graph.getVertex(0));
+        assertEquals(count(graph.getVertices()), 1);
+        assertEquals(count(graph.getEdges()), 0);
+
+        vertex = IndexableGraphHelper.addUniqueVertex(graph, null, index, "name", "darrick");
+        assertEquals(vertex.getProperty("name"), "darrick");
+        assertEquals(count(graph.getVertices()), 2);
+        assertEquals(vertex.getId(), "1");
+    }    */
+
 }

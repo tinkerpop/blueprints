@@ -89,4 +89,12 @@ public class ExceptionFactory {
     public static IllegalStateException transactionAlreadyStarted() {
         return new IllegalStateException("Stop the current transaction before starting another");
     }
+
+    public static UnsupportedOperationException graphDoesNotSupportTransactions() {
+        return new UnsupportedOperationException("The graph does not support transactions");
+    }
+
+    public static UnsupportedOperationException graphDoesNotSupportThreadedTransactions() {
+        return new UnsupportedOperationException("The graph does not support threaded transactions");
+    }
 }

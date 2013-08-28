@@ -1,11 +1,23 @@
 package com.tinkerpop.blueprints;
 
+import java.util.Set;
+
 /**
  * A Graph is a container object for a collection of vertices and a collection edges.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public interface Graph {
+
+    /**
+     * Whether the transaction being stopped was successful (commit) or a failure (rollback).
+     * When the graph is shutdown, any open transactions should be successfully committed.
+     */
+    @Deprecated
+    public enum Conclusion {
+        SUCCESS, FAILURE
+    }
+
 
     /**
      * Get the particular features of the graph implementation.
@@ -121,5 +133,58 @@ public interface Graph {
      * This is important for implementations that utilize disk-based serializations.
      */
     public void shutdown();
+
+    /////////////////////////
+    // TRANSACTIONAL AREA //
+    ////////////////////////
+
+    /**
+     * Stop the current transaction and successfully apply mutations to the graph.
+     */
+    public void commit();
+
+    /**
+     * Stop the current transaction and drop any mutations applied since the last transaction.
+     */
+    public void rollback();
+
+    /**
+     * Returns a Graph that represents a transactional context independent of the executing transaction.
+     *
+     * @return A transactional context. Invoking TransactionalGraph.shutdown() successfully commits the transaction.
+     */
+    public Graph newTransaction();
+
+    //////////////////////////
+    // GRAPH INDEXING AREA //
+    /////////////////////////
+
+    /**
+     * Create an automatic indexing structure for indexing provided key for element class.
+     *
+     * @param key             the key to create the index for
+     * @param elementClass    the element class that the index is for
+     * @param indexParameters a collection of parameters for the underlying index implementation
+     * @param <T>             the element class specification
+     */
+    public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters);
+
+    /**
+     * Remove an automatic indexing structure associated with indexing provided key for element class.
+     *
+     * @param key          the key to drop the index for
+     * @param elementClass the element class that the index is for
+     * @param <T>          the element class specification
+     */
+    public <T extends Element> void dropIndex(String key, Class<T> elementClass);
+
+    /**
+     * Return all the index keys associated with a particular element class.
+     *
+     * @param elementClass the element class that the index is for
+     * @param <T>          the element class specification
+     * @return the indexed keys as a Set
+     */
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass);
 
 }

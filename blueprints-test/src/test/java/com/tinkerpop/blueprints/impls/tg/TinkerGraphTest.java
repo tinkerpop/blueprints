@@ -6,9 +6,6 @@ import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQueryTestSuite;
 import com.tinkerpop.blueprints.GraphTestSuite;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexTestSuite;
-import com.tinkerpop.blueprints.IndexableGraphTestSuite;
 import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
@@ -58,18 +55,6 @@ public class TinkerGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new KeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexableGraphTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexableGraphTestSuite(this));
-        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
-    }
-
-    public void testIndexTestSuite() throws Exception {
-        this.stopWatch();
-        doTestSuite(new IndexTestSuite(this));
-        printTestPerformance("IndexTestSuite", this.stopWatch());
     }
 
     public void testVertexQueryTestSuite() throws Exception {
@@ -216,8 +201,6 @@ public class TinkerGraphTest extends GraphTest {
 
         copyGraphs(sourceGraph, targetGraph);
 
-        createManualIndices(targetGraph);
-
         this.stopWatch();
         targetGraph.shutdown();
         printTestPerformance("save graph: " + fileType.toString(), this.stopWatch());
@@ -230,22 +213,8 @@ public class TinkerGraphTest extends GraphTest {
     }
 
     private void createKeyIndices(final TinkerGraph g) {
-        g.createKeyIndex("name", Vertex.class);
-        g.createKeyIndex("weight", Edge.class);
-    }
-
-    private void createManualIndices(final TinkerGraph g) {
-        final Index<Vertex> ageIndex = g.createIndex("age", Vertex.class);
-        final Vertex v1 = g.getVertex(1);
-        final Vertex v2 = g.getVertex(2);
-        ageIndex.put("age", v1.getProperty("age"), v1);
-        ageIndex.put("age", v2.getProperty("age"), v2);
-
-        final Index<Edge> weightIndex = g.createIndex("weight", Edge.class);
-        final Edge e7 = g.getEdge(7);
-        final Edge e12 = g.getEdge(12);
-        weightIndex.put("weight", e7.getProperty("weight"), e7);
-        weightIndex.put("weight", e12.getProperty("weight"), e12);
+        g.createIndex("name", Vertex.class);
+        g.createIndex("weight", Edge.class);
     }
 
     private void copyGraphs(final TinkerGraph src, final TinkerGraph dst) {
@@ -302,14 +271,6 @@ public class TinkerGraphTest extends GraphTest {
 
             assertTrue(ElementHelper.areEqual(e1, e2));
         }
-
-        final Index idxAge = g2.getIndex("age", Vertex.class);
-        assertEquals(g2.getVertex(1), idxAge.get("age", 29).iterator().next());
-        assertEquals(g2.getVertex(2), idxAge.get("age", 27).iterator().next());
-
-        final Index idxWeight = g2.getIndex("weight", Edge.class);
-        assertEquals(g2.getEdge(7), idxWeight.get("weight", 0.5f).iterator().next());
-        assertEquals(g2.getEdge(12), idxWeight.get("weight", 0.2f).iterator().next());
 
         final Iterator namesItty = g2.getVertices("name", "marko").iterator();
         assertEquals(g2.getVertex(1), namesItty.next());

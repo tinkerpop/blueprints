@@ -9,7 +9,6 @@ import org.junit.Assert;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
 
@@ -131,7 +130,7 @@ public class OrientGraphSpecificTestSuite extends TestSuite {
 		v.setProperty("deliveryAddress", delivery);
 		v.setProperty("pickupAddress", pickup);
 
-		((TransactionalGraph) graph).commit();
+		graph.commit();
 
 		// have to shutdown the graph so that the map will read back out as an
 		// OTrackedMap. Maps that exist in memory

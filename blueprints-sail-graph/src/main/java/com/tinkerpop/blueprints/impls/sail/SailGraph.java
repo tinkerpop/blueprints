@@ -2,10 +2,12 @@ package com.tinkerpop.blueprints.impls.sail;
 
 
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
 import com.tinkerpop.blueprints.MetaGraph;
-import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
@@ -46,6 +48,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -54,7 +57,7 @@ import java.util.UUID;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
+public class SailGraph implements MetaGraph<Sail> {
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
 
@@ -164,6 +167,22 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public Sail getRawGraph() {
         return this.rawGraph;
+    }
+
+    public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T extends Element> void dropIndex(String key, Class<T> elementClass) {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        throw new UnsupportedOperationException();
+    }
+
+    public Graph newTransaction() {
+        throw ExceptionFactory.graphDoesNotSupportThreadedTransactions();
     }
 
     private Vertex createVertex(String resource) {
@@ -350,8 +369,8 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      * Save RDF data from the SailGraph.
      * Supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig.
      *
-     * @param output    the OutputStream to which to write RDF data
-     * @param format    supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
+     * @param output the OutputStream to which to write RDF data
+     * @param format supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
      */
     public void saveRDF(final OutputStream output, final String format) {
         try {

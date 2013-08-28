@@ -2,9 +2,7 @@ package com.tinkerpop.blueprints.impls.neo4j.batch;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.StringFactory;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndex;
 
 import java.util.HashMap;
@@ -13,7 +11,7 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class Neo4jBatchIndex<T extends Element> implements Index<T> {
+class Neo4jBatchIndex<T extends Element> {
 
     private final Neo4jBatchGraph graph;
     protected final BatchInserterIndex rawIndex;
@@ -76,9 +74,5 @@ class Neo4jBatchIndex<T extends Element> implements Index<T> {
      */
     public void flush() {
         this.rawIndex.flush();
-    }
-
-    public String toString() {
-        return StringFactory.indexString(this);
     }
 }

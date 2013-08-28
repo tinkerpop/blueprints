@@ -60,7 +60,7 @@ public class GraphTestSuite extends TestSuite {
     public void testStringRepresentationOfVertexId() {
         final Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsTransactions) {
-            ((TransactionalGraph) graph).commit();
+            graph.commit();
         }
 
         final Vertex a = graph.addVertex(null);
@@ -347,7 +347,7 @@ public class GraphTestSuite extends TestSuite {
         if (!g.getFeatures().isWrapper && !g.getClass().getSimpleName().equals("SailGraph")) {
             Vertex v = g.addVertex(null);
             if (g.getFeatures().supportsTransactions) {
-                ((TransactionalGraph) g).commit();
+                g.commit();
             }
 
             boolean exceptionTossed = false;
@@ -360,7 +360,7 @@ public class GraphTestSuite extends TestSuite {
 
                 // rollback the change so the delete can be tried below
                 if (g.getFeatures().supportsTransactions) {
-                    ((TransactionalGraph) g).rollback();
+                    g.rollback();
                 }
             }
 
@@ -368,14 +368,14 @@ public class GraphTestSuite extends TestSuite {
 
             v = g.addVertex(null);
             if (g.getFeatures().supportsTransactions) {
-                ((TransactionalGraph) g).commit();
+                g.commit();
             }
             exceptionTossed = false;
 
             // this time commit the tx and then try to remove.  both should show illegal state.
             g.removeVertex(v);
             if (g.getFeatures().supportsTransactions) {
-                ((TransactionalGraph) g).commit();
+                g.commit();
             }
 
             try {

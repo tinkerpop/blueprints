@@ -6,7 +6,7 @@ import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
@@ -35,7 +35,7 @@ import java.util.Set;
  * If other vertices or edges have been created in the meantime, setting, getting or removing properties will throw
  * exceptions. This is done to avoid caching of edges which would require a great amount of memory.
  * <br />
- * BatchGraph wraps {@link TransactionalGraph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
+ * BatchGraph wraps {@link Graph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
  * which will additionally wrap non-transactional.
  * <br />
  * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use
@@ -45,7 +45,7 @@ import java.util.Set;
  * @author Matthias Broecheler (http://www.matthiasb.com)
  */
 
-public class BatchGraph<T extends TransactionalGraph> implements TransactionalGraph, WrapperGraph<T> {
+public class BatchGraph<T extends Graph> implements Graph, WrapperGraph<T> {
 
     /**
      * Default buffer size
@@ -91,11 +91,11 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
         remainingBufferSize = this.bufferSize;
     }
-    
+
     /**
      * Constructs a BatchGraph wrapping the provided baseGraph.
      *
-     * @param graph Graph to be wrapped
+     * @param graph      Graph to be wrapped
      * @param bufferSize Defines the number of vertices and edges loaded before starting a new transaction. The larger this value, the more memory is required but the faster the loading process.
      */
     public BatchGraph(final T graph, final long bufferSize) {
@@ -119,7 +119,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      */
     public static BatchGraph wrap(final Graph graph) {
         if (graph instanceof BatchGraph) return (BatchGraph) graph;
-        else if (graph instanceof TransactionalGraph) return new BatchGraph((TransactionalGraph) graph);
+        else if (graph.getFeatures().supportsTransactions) return new BatchGraph(graph);
         else return new BatchGraph(new WritethroughGraph(graph));
     }
 
@@ -132,8 +132,8 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      */
     public static BatchGraph wrap(final Graph graph, final long buffer) {
         if (graph instanceof BatchGraph) return (BatchGraph) graph;
-        else if (graph instanceof TransactionalGraph)
-            return new BatchGraph((TransactionalGraph) graph, VertexIDType.OBJECT, buffer);
+        else if (graph.getFeatures().supportsTransactions)
+            return new BatchGraph(graph, VertexIDType.OBJECT, buffer);
         else return new BatchGraph(new WritethroughGraph(graph), VertexIDType.OBJECT, buffer);
     }
 
@@ -227,21 +227,6 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
             remainingBufferSize = bufferSize;
         }
         remainingBufferSize--;
-    }
-
-
-    /**
-     * Should only be invoked after loading is complete. Stopping the transaction before will cause the loading to fail.
-     * Only Conclusion.SUCCESS is accepted.
-     *
-     * @param conclusion whether or not the current transaction was successful
-     */
-    @Override
-    public void stopTransaction(Conclusion conclusion) {
-        if (Conclusion.SUCCESS == conclusion)
-            commit();
-        else
-            rollback();
     }
 
     /**
@@ -415,6 +400,22 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
     @Override
     public String toString() {
         return StringFactory.graphString(this, this.baseGraph.toString());
+    }
+
+    public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+        this.baseGraph.createIndex(key, elementClass, indexParameters);
+    }
+
+    public <T extends Element> void dropIndex(String key, Class<T> elementClass) {
+        this.baseGraph.dropIndex(key, elementClass);
+    }
+
+    public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+        return this.baseGraph.getIndexedKeys(elementClass);
+    }
+
+    public Graph newTransaction() {
+        return this.baseGraph.newTransaction();
     }
 
     // ################### Unsupported Graph Methods ####################

@@ -34,7 +34,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testRepeatedTransactionStopException() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         graph.commit();
         graph.rollback();
         graph.commit();
@@ -42,7 +42,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testAutoStartTransaction() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         Vertex v1 = graph.addVertex(null);
         vertexCount(graph, 1);
         assertEquals(v1.getId(), graph.getVertex(v1.getId()).getId());
@@ -55,7 +55,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
 
     public void testTransactionsForVertices() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         List<Vertex> vin = new ArrayList<Vertex>();
         List<Vertex> vout = new ArrayList<Vertex>();
         vin.add(graph.addVertex(null));
@@ -87,7 +87,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testBasicVertexEdgeTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         Vertex v = graph.addVertex(null);
         graph.addEdge(null, v, v, graphTest.convertLabel("self"));
         assertEquals(count(v.getEdges(Direction.IN)), 1);
@@ -108,7 +108,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testBruteVertexTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         List<Vertex> vin = new ArrayList<Vertex>(), vout = new ArrayList<Vertex>();
         this.stopWatch();
         for (int i = 0; i < 100; i++) {
@@ -159,7 +159,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testTransactionsForEdges() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
 
         Vertex v = graph.addVertex(null);
         Vertex u = graph.addVertex(null);
@@ -222,7 +222,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testBruteEdgeTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         this.stopWatch();
         for (int i = 0; i < 100; i++) {
             Vertex v = graph.addVertex(null);
@@ -277,7 +277,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testPropertyTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsElementProperties()) {
             this.stopWatch();
             Vertex v = graph.addVertex(null);
@@ -331,65 +331,18 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void testIndexTransactions() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsVertexIndex) {
-            this.stopWatch();
-            Index<Vertex> index = ((IndexableGraph) graph).createIndex("txIdx", Vertex.class);
-            Vertex v = graph.addVertex(null);
-            Object id = v.getId();
-            v.setProperty("name", "marko");
-            index.put("name", "marko", v);
-            vertexCount(graph, 1);
-            v = getOnlyElement(((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "marko"));
-            assertEquals(v.getId(), id);
-            assertEquals(v.getProperty("name"), "marko");
-            graph.commit();
-            printPerformance(graph.toString(), 1, "vertex added and retrieved from index in a successful transaction", this.stopWatch());
-
-
-            this.stopWatch();
-            vertexCount(graph, 1);
-            v = getOnlyElement(((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "marko"));
-            assertEquals(v.getId(), id);
-            assertEquals(v.getProperty("name"), "marko");
-            printPerformance(graph.toString(), 1, "vertex retrieved from index outside successful transaction", this.stopWatch());
-
-
-            this.stopWatch();
-            v = graph.addVertex(null);
-            v.setProperty("name", "pavel");
-            index.put("name", "pavel", v);
-            vertexCount(graph, 2);
-            v = getOnlyElement(((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "marko"));
-            assertEquals(v.getProperty("name"), "marko");
-            v = getOnlyElement(((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "pavel"));
-            assertEquals(v.getProperty("name"), "pavel");
-            graph.rollback();
-            printPerformance(graph.toString(), 1, "vertex not added in a failed transaction", this.stopWatch());
-
-            this.stopWatch();
-            vertexCount(graph, 1);
-            assertEquals(count(((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "pavel")), 0);
-            printPerformance(graph.toString(), 1, "vertex not retrieved in a successful transaction", this.stopWatch());
-            v = getOnlyElement(((IndexableGraph) graph).getIndex("txIdx", Vertex.class).get("name", "marko"));
-            assertEquals(v.getProperty("name"), "marko");
-        }
-        graph.shutdown();
-    }
-
     // public void testAutomaticIndexKeysRollback()
 
     public void testAutomaticSuccessfulTransactionOnShutdown() {
 
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().isPersistent && graph.getFeatures().supportsVertexProperties) {
             Vertex v = graph.addVertex(null);
             Object id = v.getId();
             v.setProperty("count", "1");
             v.setProperty("count", "2");
             graph.shutdown();
-            graph = (TransactionalGraph) graphTest.generateGraph();
+            graph = graphTest.generateGraph();
             Vertex reloadedV = graph.getVertex(id);
             assertEquals("2", reloadedV.getProperty("count"));
 
@@ -398,7 +351,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testVertexCountOnPreTransactionCommit() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         Vertex v1 = graph.addVertex(null);
         graph.commit();
 
@@ -417,7 +370,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testVertexPropertiesOnPreTransactionCommit() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexProperties) {
             Vertex v1 = graph.addVertex(null);
             v1.setProperty("name", "marko");
@@ -434,7 +387,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testBulkTransactionsOnEdges() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         for (int i = 0; i < 5; i++) {
             graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("test"));
         }
@@ -462,7 +415,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
 
     public void testCompetingThreads() {
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        final Graph graph = graphTest.generateGraph();
         int totalThreads = 250;
         final AtomicInteger vertices = new AtomicInteger(0);
         final AtomicInteger edges = new AtomicInteger(0);
@@ -522,8 +475,8 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graphTest.dropGraph("first");
         graphTest.dropGraph("second");
 
-        final TransactionalGraph graph1 = (TransactionalGraph) graphTest.generateGraph("first");
-        final TransactionalGraph graph2 = (TransactionalGraph) graphTest.generateGraph("second");
+        final Graph graph1 = graphTest.generateGraph("first");
+        final Graph graph2 = graphTest.generateGraph("second");
 
 
         final Thread threadModFirstGraph = new Thread() {
@@ -569,7 +522,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void testTransactionIsolationCommitCheck() throws Exception {
         // the purpose of this test is to simulate rexster access to a graph instance, where one thread modifies
         // the graph and a separate thread cannot affect the transaction of the first
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        final Graph graph = graphTest.generateGraph();
 
         final CountDownLatch latchCommittedInOtherThread = new CountDownLatch(1);
         final CountDownLatch latchCommitInOtherThread = new CountDownLatch(1);
@@ -625,7 +578,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     }
 
     public void testRemoveInTransaction() {
-        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Graph graph = graphTest.generateGraph();
         edgeCount(graph, 0);
 
         Vertex v1 = graph.addVertex(null);
@@ -658,10 +611,10 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // this test simulates the flow of rexster integration test.  integration tests requests are generally not made
         // in parallel, but it is expected each request they may be processed by different threads from a thread pool
         // for each request.  this test fails for orientdb given it's optimnisitc locking strategy.
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        final Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsKeyIndices) {
             final String id = "_ID";
-            ((KeyIndexableGraph) graph).createKeyIndex(id, Vertex.class);
+            graph.createIndex(id, Vertex.class);
 
             final int numberOfVerticesToCreate = 100;
             final Random rand = new Random(12356);
@@ -761,10 +714,10 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // in parallel, but it is expected each request they may be processed by different threads from a thread pool
         // for each request...this test is similar to the previous one but includes retries.  in this case,
         // orientdb passes, but this isn't currently how Rexster integration tests work.
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        final Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsKeyIndices) {
             final String id = "_ID";
-            ((KeyIndexableGraph) graph).createKeyIndex(id, Vertex.class);
+            graph.createIndex(id, Vertex.class);
 
             final int maxRetries = 10;
             final int numberOfVerticesToCreate = 100;
@@ -865,7 +818,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
     public void untestTransactionVertexPropertiesAcrossThreads() throws Exception {
         // the purpose of this test is to ensure that properties of a element are available prior to commit()
         // across threads
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        final Graph graph = graphTest.generateGraph();
 
         final AtomicReference<Vertex> v = new AtomicReference<Vertex>();
         final Thread thread = new Thread() {
@@ -889,7 +842,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // the graph and a separate thread reads before the transaction is committed.  the expectation is that
         // the changes in the transaction are isolated to the thread that made the change and the second thread
         // should not see the change until commit() in the first thread.
-        final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        final Graph graph = graphTest.generateGraph();
 
         final CountDownLatch latchCommit = new CountDownLatch(1);
         final CountDownLatch latchFirstRead = new CountDownLatch(1);

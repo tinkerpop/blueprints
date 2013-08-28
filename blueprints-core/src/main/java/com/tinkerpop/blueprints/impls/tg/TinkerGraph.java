@@ -5,15 +5,13 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
-import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
+import com.tinkerpop.blueprints.util.GraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.apache.commons.configuration.Configuration;
@@ -34,7 +32,7 @@ import java.util.Set;
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializable {
+public class TinkerGraph implements Graph, Serializable {
 
     protected Long currentId = 0l;
     protected Map<String, Vertex> vertices = new HashMap<String, Vertex>();
@@ -161,7 +159,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         }
     }
 
-    public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
+    public <T extends Element> void createIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -174,7 +172,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         }
     }
 
-    public <T extends Element> void dropKeyIndex(final String key, final Class<T> elementClass) {
+    public <T extends Element> void dropIndex(final String key, final Class<T> elementClass) {
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
@@ -200,28 +198,10 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         }
     }
 
-    public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        if (this.indices.containsKey(indexName))
-            throw ExceptionFactory.indexAlreadyExists(indexName);
 
-        final TinkerIndex index = new TinkerIndex(indexName, indexClass);
-        this.indices.put(index.getIndexName(), index);
-        return index;
-    }
-
-    public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        Index index = this.indices.get(indexName);
-        if (null == index)
-            return null;
-        if (!indexClass.isAssignableFrom(index.getIndexClass()))
-            throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
-        else
-            return index;
-    }
-
-    public Iterable<Index<? extends Element>> getIndices() {
-        final List<Index<? extends Element>> list = new ArrayList<Index<? extends Element>>();
-        for (Index index : indices.values()) {
+    private Iterable<TinkerIndex<? extends Element>> getIndices() {
+        final List<TinkerIndex<? extends Element>> list = new ArrayList<TinkerIndex<? extends Element>>();
+        for (TinkerIndex index : indices.values()) {
             list.add(index);
         }
         return list;
@@ -291,7 +271,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         }
 
         this.vertexKeyIndex.removeElement((TinkerVertex) vertex);
-        for (Index index : this.getIndices()) {
+        for (TinkerIndex index : this.getIndices()) {
             if (Vertex.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerVertex> idx = (TinkerIndex<TinkerVertex>) index;
                 idx.removeElement((TinkerVertex) vertex);
@@ -349,7 +329,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
 
 
         this.edgeKeyIndex.removeElement((TinkerEdge) edge);
-        for (Index index : this.getIndices()) {
+        for (TinkerIndex index : this.getIndices()) {
             if (Edge.class.isAssignableFrom(index.getIndexClass())) {
                 TinkerIndex<TinkerEdge> idx = (TinkerIndex<TinkerEdge>) index;
                 idx.removeElement((TinkerEdge) edge);
@@ -440,9 +420,9 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             this.indexedKeys.add(key);
 
             if (TinkerVertex.class.equals(this.indexClass)) {
-                KeyIndexableGraphHelper.reIndexElements(graph, graph.getVertices(), new HashSet<String>(Arrays.asList(key)));
+                GraphHelper.reIndexElements(graph, graph.getVertices(), new HashSet<String>(Arrays.asList(key)));
             } else {
-                KeyIndexableGraphHelper.reIndexElements(graph, graph.getEdges(), new HashSet<String>(Arrays.asList(key)));
+                GraphHelper.reIndexElements(graph, graph.getEdges(), new HashSet<String>(Arrays.asList(key)));
             }
         }
 
@@ -461,6 +441,18 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
             else
                 return Collections.emptySet();
         }
+    }
+
+    public void commit() {
+        throw ExceptionFactory.graphDoesNotSupportTransactions();
+    }
+
+    public void rollback() {
+        throw ExceptionFactory.graphDoesNotSupportTransactions();
+    }
+
+    public Graph newTransaction() {
+        throw ExceptionFactory.graphDoesNotSupportTransactions();
     }
 
 }

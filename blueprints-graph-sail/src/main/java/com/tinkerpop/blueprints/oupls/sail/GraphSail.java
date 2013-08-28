@@ -2,8 +2,7 @@ package com.tinkerpop.blueprints.oupls.sail;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.wrappers.WrapperGraph;
 import org.openrdf.model.BNode;
@@ -59,7 +58,7 @@ import java.util.regex.Pattern;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase implements WrapperGraph<T> {
+public class GraphSail<T extends Graph> extends NotifyingSailBase implements WrapperGraph<T> {
 
     private static final Logger LOGGER = Logger.getLogger(GraphSail.class.getName());
 
@@ -110,13 +109,21 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
         RDFParser p = Rio.createParser(org.openrdf.rio.RDFFormat.NTRIPLES);
         p.setRDFHandler(new RDFHandler() {
-            public void startRDF() throws RDFHandlerException {}
-            public void endRDF() throws RDFHandlerException {}
-            public void handleNamespace(String s, String s1) throws RDFHandlerException {}
+            public void startRDF() throws RDFHandlerException {
+            }
+
+            public void endRDF() throws RDFHandlerException {
+            }
+
+            public void handleNamespace(String s, String s1) throws RDFHandlerException {
+            }
+
             public void handleStatement(Statement s) throws RDFHandlerException {
 
             }
-            public void handleComment(String s) throws RDFHandlerException {}
+
+            public void handleComment(String s) throws RDFHandlerException {
+            }
         });
 
         //this(graph, "s,p,o,c,sp,so,sc,po,pc,oc,spo,spc,soc,poc,spoc");
@@ -142,10 +149,10 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         store.sail = this;
         store.graph = graph;
 
-        store.manualTransactions = store.graph instanceof TransactionalGraph;
+        store.manualTransactions = store.graph.getFeatures().supportsTransactions;
 
         if (!store.graph.getIndexedKeys(Vertex.class).contains(VALUE)) {
-            store.graph.createKeyIndex(VALUE, Vertex.class);
+            store.graph.createIndex(VALUE, Vertex.class);
         }
 
         store.matchers[0] = new TrivialMatcher(graph);
@@ -159,7 +166,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
                 store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
             } finally {
                 if (store.manualTransactions) {
-                    ((TransactionalGraph) graph).commit();
+                    graph.commit();
                 }
             }
         }
@@ -422,7 +429,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
         for (String key : u) {
             if (!store.graph.getIndexedKeys(Edge.class).contains(key)) {
-                store.graph.createKeyIndex(key, Edge.class);
+                store.graph.createIndex(key, Edge.class);
             }
 
             createIndexingMatcher(key);

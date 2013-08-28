@@ -3,10 +3,11 @@ package com.tinkerpop.blueprints.util.wrappers.batch;
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.TransactionalGraph;
+import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.IgnoreIdTinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.MockTransactionalGraph;
@@ -14,6 +15,7 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import junit.framework.TestCase;
 
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Tests {@link BatchGraph} by creating a variable length chain and verifying that the chain is correctly inserted into the wrapped TinkerGraph.
@@ -194,7 +196,7 @@ public class BatchGraphTest extends TestCase {
             previous = next;
         }
 
-        loader.stopTransaction(TransactionalGraph.Conclusion.SUCCESS);
+        loader.commit();
         assertTrue(tgraph.allSuccessful());
 
         loader.shutdown();
@@ -209,7 +211,7 @@ public class BatchGraphTest extends TestCase {
     }
 
 
-    static class BLGraph implements TransactionalGraph {
+    static class BLGraph implements Graph {
 
         private static final int keepLast = 10;
 
@@ -217,10 +219,10 @@ public class BatchGraphTest extends TestCase {
         private boolean first = true;
         private final LoadingFactory ids;
 
-        private final TransactionalGraph graph;
+        private final Graph baseGraph;
 
-        BLGraph(TransactionalGraph graph, final VertexEdgeCounter counter, LoadingFactory ids) {
-            this.graph = graph;
+        BLGraph(Graph baseGraph, final VertexEdgeCounter counter, LoadingFactory ids) {
+            this.baseGraph = baseGraph;
             this.counter = counter;
             this.ids = ids;
         }
@@ -237,28 +239,20 @@ public class BatchGraphTest extends TestCase {
 
         @Override
         public void commit() {
-            graph.commit();
+            baseGraph.commit();
             verifyCounts();
         }
 
         @Override
         public void rollback() {
-            graph.rollback();
+            baseGraph.rollback();
             verifyCounts();
-        }
-
-        @Override
-        public void stopTransaction(Conclusion conclusion) {
-            if (Conclusion.SUCCESS == conclusion)
-                commit();
-            else
-                rollback();
         }
 
         private void verifyCounts() {
             //System.out.println("Committed (vertices/edges): " + counter.numVertices + " / " + counter.numEdges);
-            assertEquals(counter.numVertices, BaseTest.count(graph.getVertices()) - (first ? 0 : keepLast));
-            assertEquals(counter.numEdges, BaseTest.count(graph.getEdges()));
+            assertEquals(counter.numVertices, BaseTest.count(baseGraph.getVertices()) - (first ? 0 : keepLast));
+            assertEquals(counter.numEdges, BaseTest.count(baseGraph.getEdges()));
             for (Edge e : getEdges()) {
                 int id = ((Number) e.getProperty(UID)).intValue();
                 if (!ignoreIDs) {
@@ -290,7 +284,7 @@ public class BatchGraphTest extends TestCase {
                 }
             }
             for (Edge e : getEdges()) removeEdge(e);
-            assertEquals(keepLast, BaseTest.count(graph.getVertices()));
+            assertEquals(keepLast, BaseTest.count(baseGraph.getVertices()));
             counter.numVertices = 0;
             counter.numEdges = 0;
             first = false;
@@ -299,67 +293,83 @@ public class BatchGraphTest extends TestCase {
 
         @Override
         public Features getFeatures() {
-            return graph.getFeatures();
+            return baseGraph.getFeatures();
         }
 
         @Override
         public Vertex addVertex(Object id) {
-            return graph.addVertex(id);
+            return baseGraph.addVertex(id);
         }
 
         @Override
         public Vertex getVertex(Object id) {
-            return graph.getVertex(id);
+            return baseGraph.getVertex(id);
         }
 
         @Override
         public void removeVertex(Vertex vertex) {
-            graph.removeVertex(vertex);
+            baseGraph.removeVertex(vertex);
         }
 
         @Override
         public Iterable<Vertex> getVertices() {
-            return graph.getVertices();
+            return baseGraph.getVertices();
         }
 
         @Override
         public Iterable<Vertex> getVertices(String key, Object value) {
-            return graph.getVertices(key, value);
+            return baseGraph.getVertices(key, value);
         }
 
         @Override
         public Edge addEdge(Object id, Vertex outVertex, Vertex inVertex, String label) {
-            return graph.addEdge(id, outVertex, inVertex, label);
+            return baseGraph.addEdge(id, outVertex, inVertex, label);
         }
 
         @Override
         public Edge getEdge(Object id) {
-            return graph.getEdge(id);
+            return baseGraph.getEdge(id);
         }
 
         @Override
         public void removeEdge(Edge edge) {
-            graph.removeEdge(edge);
+            baseGraph.removeEdge(edge);
         }
 
         @Override
         public Iterable<Edge> getEdges() {
-            return graph.getEdges();
+            return baseGraph.getEdges();
         }
 
         @Override
         public Iterable<Edge> getEdges(String key, Object value) {
-            return graph.getEdges(key, value);
+            return baseGraph.getEdges(key, value);
         }
 
         @Override
         public void shutdown() {
-            graph.shutdown();
+            baseGraph.shutdown();
         }
 
         @Override
         public GraphQuery query() {
-            return graph.query();
+            return baseGraph.query();
+        }
+
+        public <T extends Element> void createIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
+            this.baseGraph.createIndex(key, elementClass, indexParameters);
+        }
+
+        public <T extends Element> void dropIndex(String key, Class<T> elementClass) {
+            this.baseGraph.dropIndex(key, elementClass);
+        }
+
+        public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
+            return this.baseGraph.getIndexedKeys(elementClass);
+        }
+
+        public Graph newTransaction() {
+            return this.baseGraph.newTransaction();
         }
 
 

@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.oupls.sail;
 
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
 import org.junit.Test;
 
@@ -62,7 +62,7 @@ public class Neo4jGraphSailTest extends GraphSailTest {
 
     }
 
-    protected KeyIndexableGraph createGraph() throws Exception {
+    protected Graph createGraph() throws Exception {
         String directory = System.getProperty("neo4jGraphDirectory");
         if (directory == null) {
             directory = this.getWorkingDirectory();

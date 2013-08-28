@@ -1,15 +1,11 @@
 package com.tinkerpop.blueprints.util.wrappers.event;
 
-import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import com.tinkerpop.blueprints.util.GraphHelper;
 
-class TinkerTransactionalGraph extends TinkerGraph implements TransactionalGraph {
+class TinkerTransactionalGraph extends TinkerGraph {
 
-    @Override
-    public void stopTransaction(Conclusion conclusion) {
-    }
 
     public void rollback() {
 

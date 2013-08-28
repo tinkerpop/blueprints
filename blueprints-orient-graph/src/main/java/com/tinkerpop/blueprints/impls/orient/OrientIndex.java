@@ -16,7 +16,6 @@ import com.orientechnologies.orient.core.tx.OTransactionIndexChangesPerKey.OTran
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
@@ -30,7 +29,7 @@ import java.util.Iterator;
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 @SuppressWarnings("unchecked")
-public class OrientIndex<T extends OrientElement> implements Index<T> {
+public class OrientIndex<T extends OrientElement> {
     protected static final String VERTEX = "Vertex";
     protected static final String EDGE = "Edge";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
@@ -174,9 +173,6 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         underlying.put(key, element.getRecord());
     }
 
-    public String toString() {
-        return StringFactory.indexString(this);
-    }
 
     protected void removeElement(final T vertex) {
         graph.autoStartTransaction();

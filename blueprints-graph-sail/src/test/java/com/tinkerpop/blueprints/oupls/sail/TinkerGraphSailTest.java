@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.oupls.sail;
 
 
-import com.tinkerpop.blueprints.KeyIndexableGraph;
+import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 
 /**
@@ -9,7 +9,7 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
  */
 public class TinkerGraphSailTest extends GraphSailTest {
     @Override
-    protected KeyIndexableGraph createGraph() {
+    protected Graph createGraph() {
         /*
         BNodeImpl b = new BNodeImpl("foo");
         System.out.println(b.toString());
