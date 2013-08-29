@@ -780,6 +780,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 					}
 				}
 			}
+			
+			iVertex.save();
 
 		} finally {
 			OMVRBTreeRID.getLock().releaseExclusiveLock();
