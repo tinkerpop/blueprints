@@ -83,6 +83,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 			final String... iLabels) {
 		graph.setCurrentGraphInThreadLocal();
 
+		OrientBaseGraph.encodeClassNames(iLabels);
+		
 		final ODocument doc = getRecord();
 
 		final OMultiCollectionIterator<Vertex> iterable = new OMultiCollectionIterator<Vertex>();
@@ -357,6 +359,9 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 	public long countEdges(final Direction iDirection, final String... iLabels) {
 		long counter = 0;
+		
+		OrientBaseGraph.encodeClassNames(iLabels);
+		
 		if (graph.isUseVertexFieldsForEdgeLabels() || iLabels == null
 				|| iLabels.length == 0) {
 			// VERY FAST
@@ -397,6 +402,8 @@ public class OrientVertex extends OrientElement implements Vertex {
 		graph.setCurrentGraphInThreadLocal();
 
 		final ODocument doc = getRecord();
+		
+		OrientBaseGraph.encodeClassNames(iLabels);
 
 		final OMultiCollectionIterator<Edge> iterable = new OMultiCollectionIterator<Edge>()
 				.setEmbedded(true);

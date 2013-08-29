@@ -1044,6 +1044,13 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 			final boolean useVertexFieldsForEdgeLabels) {
 		this.useVertexFieldsForEdgeLabels = useVertexFieldsForEdgeLabels;
 	}
+	
+	public static void encodeClassNames(final String... iLabels) {
+		if( iLabels != null )
+			// ENCODE LABELS
+			for( int i = 0; i < iLabels.length;++i)
+				iLabels[i] = encodeClassName(iLabels[i]);
+	}
 
 	public static String encodeClassName(String iClassName) {
 		if (iClassName == null)
