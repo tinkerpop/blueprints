@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.impls.orient;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
@@ -260,7 +261,16 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 			final Object iValue) {
 		if (iValue instanceof String)
 			text.append(QUERY_STRING);
-		text.append(iValue);
+		
+		final Object value;
+		
+		if( iValue instanceof Date )
+			value = ((Date) iValue).getTime();
+		else 
+			value = iValue;
+		
+		text.append(value);
+		
 		if (iValue instanceof String)
 			text.append(QUERY_STRING);
 	}
