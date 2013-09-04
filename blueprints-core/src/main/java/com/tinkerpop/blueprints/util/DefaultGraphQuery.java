@@ -74,7 +74,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
         return new DefaultGraphQueryIterable<Vertex>(true);
     }
 
-    private class DefaultGraphQueryIterable<T extends Element> implements Iterable<T> {
+    protected class DefaultGraphQueryIterable<T extends Element> implements Iterable<T> {
 
         private Iterable<T> iterable = null;
 
@@ -142,7 +142,7 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
 
         private Iterable<?> getElementIterable(final Class<? extends Element> elementClass) {
             if (graph instanceof KeyIndexableGraph) {
-                final Set<String> keys = ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
+                final Set<String> keys = getIndexedKeys(elementClass);
                 HasContainer container = null;
                 for (final HasContainer hasContainer : hasContainers) {
                     if (hasContainer.predicate.equals(com.tinkerpop.blueprints.Compare.EQUAL) && keys.contains(hasContainer.key)) {
@@ -163,6 +163,11 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
             else
                 return graph.getEdges();
         }
+
+        protected Set<String> getIndexedKeys(final Class<? extends Element> elementClass) {
+          return ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
+        }
+        
     }
 
 }

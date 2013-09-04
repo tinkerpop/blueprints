@@ -835,8 +835,8 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	public <T extends Element> void dropKeyIndex(final String key,
 			final Class<T> elementClass) {
-        if (elementClass == null)
-            throw ExceptionFactory.classForElementCannotBeNull();
+		if (elementClass == null)
+			throw ExceptionFactory.classForElementCannotBeNull();
 
 		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
 			@Override
@@ -875,8 +875,8 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	@SuppressWarnings({ "rawtypes" })
 	public <T extends Element> void createKeyIndex(final String key,
 			final Class<T> elementClass, final Parameter... indexParameters) {
-        if (elementClass == null)
-            throw ExceptionFactory.classForElementCannotBeNull();
+		if (elementClass == null)
+			throw ExceptionFactory.classForElementCannotBeNull();
 
 		executeOutsideTx(new OCallable<OClass, OrientBaseGraph>() {
 			@Override
@@ -927,8 +927,13 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	public <T extends Element> Set<String> getIndexedKeys(
 			final Class<T> elementClass) {
-        if (elementClass == null)
-            throw ExceptionFactory.classForElementCannotBeNull();
+		return getIndexedKeys(elementClass, false);
+	}
+
+	public <T extends Element> Set<String> getIndexedKeys(
+			final Class<T> elementClass, final boolean includeClassNames) {
+		if (elementClass == null)
+			throw ExceptionFactory.classForElementCannotBeNull();
 
 		final OSchema schema = getRawGraph().getMetadata().getSchema();
 		final String elementOClassName = getClassName(elementClass);
@@ -942,8 +947,12 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 			if (point > 0) {
 				String oClassName = indexName.substring(0, point);
 				OClass oClass = schema.getClass(oClassName);
-				if (oClass.isSubClassOf(elementOClassName))
-					result.add(index.getDefinition().getFields().get(0));
+				if (oClass.isSubClassOf(elementOClassName)) {
+					if (includeClassNames)
+						result.add(index.getName());
+					else
+						result.add(index.getDefinition().getFields().get(0));
+				}
 			}
 		}
 		return result;
@@ -1044,11 +1053,11 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 			final boolean useVertexFieldsForEdgeLabels) {
 		this.useVertexFieldsForEdgeLabels = useVertexFieldsForEdgeLabels;
 	}
-	
+
 	public static void encodeClassNames(final String... iLabels) {
-		if( iLabels != null )
+		if (iLabels != null)
 			// ENCODE LABELS
-			for( int i = 0; i < iLabels.length;++i)
+			for (int i = 0; i < iLabels.length; ++i)
 				iLabels[i] = encodeClassName(iLabels[i]);
 	}
 

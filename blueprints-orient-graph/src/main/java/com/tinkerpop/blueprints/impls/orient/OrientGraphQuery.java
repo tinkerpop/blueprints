@@ -3,11 +3,13 @@ package com.tinkerpop.blueprints.impls.orient;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
 import com.tinkerpop.blueprints.Contains;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Query;
 import com.tinkerpop.blueprints.Vertex;
@@ -53,7 +55,18 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
     public int skip = 0;
     public String orderBy = "";     
-    public String orderByDir = "desc";    
+    public String orderByDir = "desc";
+    
+    public class OrientGraphQueryIterable<T extends Element> extends DefaultGraphQueryIterable<T>{
+
+		public OrientGraphQueryIterable(final boolean forVertex) {
+			super(forVertex);
+		}
+		
+        protected Set<String> getIndexedKeys(final Class<? extends Element> elementClass) {
+            return ((OrientBaseGraph) graph).getIndexedKeys(elementClass, true);
+        }
+    }
     
 	public OrientGraphQuery(final Graph iGraph) {
 		super(iGraph);
@@ -87,7 +100,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 		
 		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive() )
 			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL SUPPORTED USED THE BASIC IMPL
-			return super.vertices();
+			return new OrientGraphQueryIterable<Vertex>(true);
 
 		final StringBuilder text = new StringBuilder();
 
@@ -102,7 +115,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 				text.append(OrientBaseGraph.encodeClassName(labels[0]));
 			else {
 				// MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
-				return super.vertices();
+				return new OrientGraphQueryIterable<Vertex>(true);
 			}
 		} else
 			text.append(OrientVertex.CLASS_NAME);
@@ -146,10 +159,10 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 
 		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive() )
 			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL SUPPORTED USED THE BASIC IMPL
-			return super.edges();
+			return new OrientGraphQueryIterable<Edge>(false);
 
 		if (((OrientBaseGraph) graph).isUseLightweightEdges())
-			return super.edges();
+			return new OrientGraphQueryIterable<Edge>(false);
 
 		final StringBuilder text = new StringBuilder();
 
@@ -164,7 +177,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 				text.append(OrientBaseGraph.encodeClassName(labels[0]));
 			else {
 				// MULTIPLE CLASSES NOT SUPPORTED DIRECTLY: CREATE A SUB-QUERY
-				return super.edges();
+				return new OrientGraphQueryIterable<Edge>(false);
 			}
 		} else
 			text.append(OrientEdge.CLASS_NAME);
