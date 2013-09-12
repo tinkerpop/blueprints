@@ -1,5 +1,7 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import org.apache.commons.configuration.Configuration;
+
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.tx.OTransaction.TXSTATUS;
 import com.orientechnologies.orient.core.tx.OTransactionNoTx;
@@ -35,6 +37,15 @@ public abstract class OrientTransactionalGraph extends OrientBaseGraph
 			final String password) {
 		super(url, username, password);
 		autoStartTransaction();
+	}	
+	
+	public OrientTransactionalGraph( final Configuration configuration ){
+		super( configuration );
+
+		final Boolean autoStartTx = configuration.getBoolean(
+				"blueprints.orientdb.autoStartTx", null);
+		if (autoStartTx != null)
+			setAutoStartTx(autoStartTx);
 	}
 
 	@SuppressWarnings("deprecation")
