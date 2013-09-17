@@ -102,7 +102,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 		this.openOrCreate();
 		readDatabaseConfiguration();
 	}
-	
+
 	/**
 	 * Builds a OrientGraph instance passing a configuration. Supported
 	 * configuration settings are:
@@ -167,7 +167,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	 * 
 	 * @param configuration
 	 */
-	public OrientBaseGraph( final Configuration configuration ){
+	public OrientBaseGraph(final Configuration configuration) {
 		this(configuration.getString("blueprints.orientdb.url", null),
 				configuration.getString("blueprints.orientdb.username", null),
 				configuration.getString("blueprints.orientdb.password", null));
@@ -200,7 +200,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 		final Boolean lightweightEdges = configuration.getBoolean(
 				"blueprints.orientdb.lightweightEdges", null);
 		if (lightweightEdges != null)
-			setUseLightweightEdges(lightweightEdges);		
+			setUseLightweightEdges(lightweightEdges);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -525,7 +525,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 		if (idx != null) {
 			iValue = convertKey(idx, iValue);
 
-			Object indexValue = (Iterable<?>) idx.get(iValue);
+			Object indexValue = idx.get(iValue);
 			if (indexValue != null && !(indexValue instanceof Iterable<?>))
 				indexValue = Arrays.asList(indexValue);
 
