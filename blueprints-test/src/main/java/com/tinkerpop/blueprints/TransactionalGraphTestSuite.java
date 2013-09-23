@@ -1,6 +1,9 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.TransactionGraphHelper;
+import com.tinkerpop.blueprints.util.TransactionStrategy;
+import com.tinkerpop.blueprints.util.TransactionWork;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
 import org.codehaus.jettison.json.JSONObject;
@@ -652,6 +655,141 @@ public class TransactionalGraphTestSuite extends TestSuite {
         edgeCount(graph, 0);
         assertNull(getOnlyElement(graph.getVertex(v1id).getEdges(Direction.OUT)));
         graph.shutdown();
+    }
+
+    public void testTransactionGraphHelperFireAndForget() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        // first fail the tx
+        TransactionGraphHelper.<Vertex>newRetryHelper(graph).fireAndForget(new TransactionWork<Vertex>() {
+            @Override
+            public Vertex execute(final TransactionalGraph graph) throws Exception {
+                graph.addVertex(null);
+                throw new Exception("fail");
+            }
+        });
+        vertexCount(graph, 0);
+
+        // this tx will work
+        List<Vertex> vin = new ArrayList<Vertex>();
+        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).fireAndForget(new TransactionWork<Vertex>() {
+            @Override
+            public Vertex execute(final TransactionalGraph graph) throws Exception{
+                return graph.addVertex(null);
+            }
+        }));
+
+        vertexCount(graph, 1);
+        containsVertices(graph, vin);
+    }
+
+    public void testTransactionGraphHelperOneAndDone() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        // first fail the tx
+        try {
+            TransactionGraphHelper.<Vertex>newRetryHelper(graph).oneAndDone(new TransactionWork<Vertex>() {
+                @Override
+                public Vertex execute(final TransactionalGraph graph) throws Exception{
+                    graph.addVertex(null);
+                    throw new Exception("fail");
+                }
+            });
+        } catch (Exception ex) {
+            assertEquals("fail", ex.getCause().getMessage());
+        }
+
+        vertexCount(graph, 0);
+
+        // this tx will work
+        List<Vertex> vin = new ArrayList<Vertex>();
+        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).oneAndDone(new TransactionWork<Vertex>() {
+            @Override
+            public Vertex execute(final TransactionalGraph graph) throws Exception{
+                return graph.addVertex(null);
+            }
+        }));
+
+        vertexCount(graph, 1);
+        containsVertices(graph, vin);
+    }
+
+    public void testTransactionGraphHelperExponentialBackoff() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        // first fail the tx
+        final AtomicInteger attempts = new AtomicInteger(0);
+        try {
+            TransactionGraphHelper.<Vertex>newRetryHelper(graph).exponentialBackoff(new TransactionWork<Vertex>() {
+                @Override
+                public Vertex execute(final TransactionalGraph graph) throws Exception {
+                    graph.addVertex(null);
+                    attempts.incrementAndGet();
+                    throw new Exception("fail");
+                }
+            });
+        } catch (Exception ex) {
+            assertEquals("fail", ex.getCause().getMessage());
+        }
+
+        assertEquals(TransactionStrategy.DelayedRetry.DEFAULT_TRIES, attempts.get());
+        vertexCount(graph, 0);
+
+        // this tx will work after several tries
+        final AtomicInteger tries = new AtomicInteger(0);
+        List<Vertex> vin = new ArrayList<Vertex>();
+        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).exponentialBackoff(new TransactionWork<Vertex>() {
+            @Override
+            public Vertex execute(final TransactionalGraph graph) throws Exception{
+                final int tryNumber = tries.incrementAndGet();
+                if (tryNumber == TransactionStrategy.DelayedRetry.DEFAULT_TRIES - 2)
+                    return graph.addVertex(null);
+                else
+                    throw new Exception("fail");
+            }
+        }));
+
+        vertexCount(graph, 1);
+        containsVertices(graph, vin);
+    }
+
+    public void testTransactionGraphHelperRetry() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+
+        // first fail the tx
+        final AtomicInteger attempts = new AtomicInteger(0);
+        try {
+            TransactionGraphHelper.<Vertex>newRetryHelper(graph).retry(new TransactionWork<Vertex>() {
+                @Override
+                public Vertex execute(final TransactionalGraph graph) throws Exception {
+                    graph.addVertex(null);
+                    attempts.incrementAndGet();
+                    throw new Exception("fail");
+                }
+            });
+        } catch (Exception ex) {
+            assertEquals("fail", ex.getCause().getMessage());
+        }
+
+        assertEquals(TransactionStrategy.DelayedRetry.DEFAULT_TRIES, attempts.get());
+        vertexCount(graph, 0);
+
+        // this tx will work after several tries
+        final AtomicInteger tries = new AtomicInteger(0);
+        List<Vertex> vin = new ArrayList<Vertex>();
+        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).retry(new TransactionWork<Vertex>() {
+            @Override
+            public Vertex execute(final TransactionalGraph graph) throws Exception {
+                final int tryNumber = tries.incrementAndGet();
+                if (tryNumber == TransactionStrategy.DelayedRetry.DEFAULT_TRIES - 2)
+                    return graph.addVertex(null);
+                else
+                    throw new Exception("fail");
+            }
+        }));
+
+        vertexCount(graph, 1);
+        containsVertices(graph, vin);
     }
 
     public void untestSimulateRexsterIntegrationTests() throws Exception {
