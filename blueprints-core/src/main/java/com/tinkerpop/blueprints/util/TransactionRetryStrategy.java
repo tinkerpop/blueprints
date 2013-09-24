@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */
-public interface TransactionStrategy<T> {
+public interface TransactionRetryStrategy<T> {
 
     /**
      * Executes the TransactionWork with a give strategy.
@@ -24,7 +24,7 @@ public interface TransactionStrategy<T> {
     /**
      * Executes the work committing if possible and rolling back on failure.  On failure, not exception is reported.
      */
-    public static class OneAndDone<T> implements TransactionStrategy<T> {
+    public static class OneAndDone<T> implements TransactionRetryStrategy<T> {
         public T execute(final TransactionalGraph graph, final TransactionWork<T> work) {
             T returnValue;
             try {
@@ -42,7 +42,7 @@ public interface TransactionStrategy<T> {
     /**
      * Executes the work committing if possible and rolling back on failure.  On failure an exception is reported.
      */
-    public static class FireAndForget<T> implements TransactionStrategy<T> {
+    public static class FireAndForget<T> implements TransactionRetryStrategy<T> {
         public T execute(final TransactionalGraph graph, final TransactionWork<T> work) {
             T returnValue = null;
             try {
@@ -59,7 +59,7 @@ public interface TransactionStrategy<T> {
     /**
      * Executes the work with a number of retries and with a number of milliseconds delay between each try.
      */
-    public static class DelayedRetry<T> extends RetryStrategy<T> {
+    public static class DelayedRetry<T> extends AbstractRetryStrategy<T> {
         public static final long DEFAULT_DELAY_MS = 20;
         private final long delayBetweenRetry;
 
@@ -86,7 +86,7 @@ public interface TransactionStrategy<T> {
      * Executes the work with a number of retries and with a exponentially increasing number of milliseconds
      * between each retry.
      */
-    public static class ExponentialBackoff<T> extends RetryStrategy<T> {
+    public static class ExponentialBackoff<T> extends AbstractRetryStrategy<T> {
         public static final long DEFAULT_DELAY_MS = 20;
         private final long initialDelay;
 
@@ -112,17 +112,17 @@ public interface TransactionStrategy<T> {
     /**
      * Base class for strategy that require a retry.
      */
-    public static abstract class RetryStrategy<T> implements TransactionStrategy<T> {
+    public static abstract class AbstractRetryStrategy<T> implements TransactionRetryStrategy<T> {
         public static final int DEFAULT_TRIES = 8;
 
         protected final int tries;
         protected final Set<Class> exceptionsToRetryOn;
 
-        public RetryStrategy() {
+        public AbstractRetryStrategy() {
             this(DEFAULT_TRIES, new HashSet<Class>());
         }
 
-        public RetryStrategy(final int tries, final Set<Class> exceptionsToRetryOn) {
+        public AbstractRetryStrategy(final int tries, final Set<Class> exceptionsToRetryOn) {
             this.tries = tries;
             this.exceptionsToRetryOn = exceptionsToRetryOn;
         }

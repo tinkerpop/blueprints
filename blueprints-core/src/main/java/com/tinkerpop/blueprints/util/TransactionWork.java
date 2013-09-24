@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.util;
 import com.tinkerpop.blueprints.TransactionalGraph;
 
 /**
- * Work to be performed within a transaction as part of a TransactionStrategy.
+ * Work to be performed within a transaction as part of a TransactionRetryStrategy.
  *
  * @author Stephen Mallette (http://stephen.genoprime.com)
  */

@@ -1,8 +1,8 @@
 package com.tinkerpop.blueprints;
 
 import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.util.TransactionGraphHelper;
-import com.tinkerpop.blueprints.util.TransactionStrategy;
+import com.tinkerpop.blueprints.util.TransactionRetryHelper;
+import com.tinkerpop.blueprints.util.TransactionRetryStrategy;
 import com.tinkerpop.blueprints.util.TransactionWork;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONMode;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONUtility;
@@ -661,23 +661,26 @@ public class TransactionalGraphTestSuite extends TestSuite {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
 
         // first fail the tx
-        TransactionGraphHelper.<Vertex>newRetryHelper(graph).fireAndForget(new TransactionWork<Vertex>() {
-            @Override
-            public Vertex execute(final TransactionalGraph graph) throws Exception {
-                graph.addVertex(null);
-                throw new Exception("fail");
-            }
-        });
+        new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
+           @Override
+           public Vertex execute(final TransactionalGraph graph) throws Exception {
+               graph.addVertex(null);
+               throw new Exception("fail");
+           }
+        }).build().fireAndForget();
         vertexCount(graph, 0);
 
         // this tx will work
         List<Vertex> vin = new ArrayList<Vertex>();
-        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).fireAndForget(new TransactionWork<Vertex>() {
+        TransactionRetryHelper<Vertex> trh = new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
             public Vertex execute(final TransactionalGraph graph) throws Exception{
                 return graph.addVertex(null);
             }
-        }));
+        }).build();
+        vin.add(trh.fireAndForget());
+
+
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
@@ -688,13 +691,13 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         // first fail the tx
         try {
-            TransactionGraphHelper.<Vertex>newRetryHelper(graph).oneAndDone(new TransactionWork<Vertex>() {
+            new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
                 @Override
                 public Vertex execute(final TransactionalGraph graph) throws Exception{
                     graph.addVertex(null);
                     throw new Exception("fail");
                 }
-            });
+            }).build().oneAndDone();
         } catch (Exception ex) {
             assertEquals("fail", ex.getCause().getMessage());
         }
@@ -703,12 +706,12 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         // this tx will work
         List<Vertex> vin = new ArrayList<Vertex>();
-        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).oneAndDone(new TransactionWork<Vertex>() {
+        vin.add(new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
             public Vertex execute(final TransactionalGraph graph) throws Exception{
                 return graph.addVertex(null);
             }
-        }));
+        }).build().oneAndDone());
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
@@ -720,34 +723,34 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // first fail the tx
         final AtomicInteger attempts = new AtomicInteger(0);
         try {
-            TransactionGraphHelper.<Vertex>newRetryHelper(graph).exponentialBackoff(new TransactionWork<Vertex>() {
+            new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
                 @Override
                 public Vertex execute(final TransactionalGraph graph) throws Exception {
                     graph.addVertex(null);
                     attempts.incrementAndGet();
                     throw new Exception("fail");
                 }
-            });
+            }).build().exponentialBackoff();
         } catch (Exception ex) {
             assertEquals("fail", ex.getCause().getMessage());
         }
 
-        assertEquals(TransactionStrategy.DelayedRetry.DEFAULT_TRIES, attempts.get());
+        assertEquals(TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES, attempts.get());
         vertexCount(graph, 0);
 
         // this tx will work after several tries
         final AtomicInteger tries = new AtomicInteger(0);
         List<Vertex> vin = new ArrayList<Vertex>();
-        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).exponentialBackoff(new TransactionWork<Vertex>() {
+        vin.add(new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
             public Vertex execute(final TransactionalGraph graph) throws Exception{
                 final int tryNumber = tries.incrementAndGet();
-                if (tryNumber == TransactionStrategy.DelayedRetry.DEFAULT_TRIES - 2)
+                if (tryNumber == TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2)
                     return graph.addVertex(null);
                 else
                     throw new Exception("fail");
             }
-        }));
+        }).build().exponentialBackoff());
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
@@ -759,34 +762,34 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // first fail the tx
         final AtomicInteger attempts = new AtomicInteger(0);
         try {
-            TransactionGraphHelper.<Vertex>newRetryHelper(graph).retry(new TransactionWork<Vertex>() {
+            new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
                 @Override
                 public Vertex execute(final TransactionalGraph graph) throws Exception {
                     graph.addVertex(null);
                     attempts.incrementAndGet();
                     throw new Exception("fail");
                 }
-            });
+            }).build().retry();
         } catch (Exception ex) {
             assertEquals("fail", ex.getCause().getMessage());
         }
 
-        assertEquals(TransactionStrategy.DelayedRetry.DEFAULT_TRIES, attempts.get());
+        assertEquals(TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES, attempts.get());
         vertexCount(graph, 0);
 
         // this tx will work after several tries
         final AtomicInteger tries = new AtomicInteger(0);
         List<Vertex> vin = new ArrayList<Vertex>();
-        vin.add(TransactionGraphHelper.<Vertex>newRetryHelper(graph).retry(new TransactionWork<Vertex>() {
+        vin.add(new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
             public Vertex execute(final TransactionalGraph graph) throws Exception {
                 final int tryNumber = tries.incrementAndGet();
-                if (tryNumber == TransactionStrategy.DelayedRetry.DEFAULT_TRIES - 2)
+                if (tryNumber == TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2)
                     return graph.addVertex(null);
                 else
                     throw new Exception("fail");
             }
-        }));
+        }).build().retry());
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
