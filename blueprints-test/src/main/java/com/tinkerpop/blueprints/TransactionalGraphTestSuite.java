@@ -756,6 +756,68 @@ public class TransactionalGraphTestSuite extends TestSuite {
         containsVertices(graph, vin);
     }
 
+    public void testTransactionGraphHelperExponentialBackoffWithExceptionChecks() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        Set<Class> exceptions = new HashSet<Class>() {{
+            add(IllegalStateException.class);
+        }};
+
+        // immediately fail the tx
+        final AtomicInteger attempts = new AtomicInteger(0);
+        try {
+            new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
+                @Override
+                public Vertex execute(final TransactionalGraph graph) throws Exception {
+                    graph.addVertex(null);
+                    attempts.incrementAndGet();
+                    throw new Exception("fail");
+                }
+            }).build().exponentialBackoff(TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES, 20, exceptions);
+        } catch (Exception ex) {
+            assertEquals("fail", ex.getCause().getMessage());
+        }
+
+        assertEquals(1, attempts.get());
+        vertexCount(graph, 0);
+
+        // this tx will fail after a few tries due to exception raised not in set
+        final AtomicInteger setOfTries = new AtomicInteger(0);
+        try {
+            new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
+                @Override
+                public Vertex execute(final TransactionalGraph graph) throws Exception{
+                    final int tryNumber = setOfTries.incrementAndGet();
+                    if (tryNumber == TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2)
+                        throw new Exception("fail");
+                    else
+                        throw new IllegalStateException("fail");
+                }
+            }).build().exponentialBackoff(TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES, 20, exceptions);
+        } catch (Exception ex) {
+            assertEquals("fail", ex.getCause().getMessage());
+        }
+
+        assertEquals(TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2, setOfTries.get());
+        vertexCount(graph, 0);
+
+        // this tx will work after several tries
+        final AtomicInteger tries = new AtomicInteger(0);
+        List<Vertex> vin = new ArrayList<Vertex>();
+        vin.add(new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
+            @Override
+            public Vertex execute(final TransactionalGraph graph) throws Exception{
+                final int tryNumber = tries.incrementAndGet();
+                if (tryNumber == TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2)
+                    return graph.addVertex(null);
+                else
+                    throw new IllegalStateException("fail");
+            }
+        }).build().exponentialBackoff(TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES, 20, exceptions));
+
+        vertexCount(graph, 1);
+        containsVertices(graph, vin);
+    }
+
     public void testTransactionGraphHelperRetry() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
 

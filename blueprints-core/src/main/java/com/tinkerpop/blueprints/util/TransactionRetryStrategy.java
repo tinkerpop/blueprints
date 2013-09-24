@@ -22,7 +22,7 @@ public interface TransactionRetryStrategy<T> {
     public T execute(TransactionalGraph graph, TransactionWork<T> work);
 
     /**
-     * Executes the work committing if possible and rolling back on failure.  On failure, not exception is reported.
+     * Executes the work committing if possible and rolling back on failure.  On failure, an exception is reported.
      */
     public static class OneAndDone<T> implements TransactionRetryStrategy<T> {
         public T execute(final TransactionalGraph graph, final TransactionWork<T> work) {
@@ -40,7 +40,7 @@ public interface TransactionRetryStrategy<T> {
     }
 
     /**
-     * Executes the work committing if possible and rolling back on failure.  On failure an exception is reported.
+     * Executes the work committing if possible and rolling back on failure.  On failure no exception is reported.
      */
     public static class FireAndForget<T> implements TransactionRetryStrategy<T> {
         public T execute(final TransactionalGraph graph, final TransactionWork<T> work) {
@@ -155,7 +155,7 @@ public interface TransactionRetryStrategy<T> {
                         retry = true;
                     else {
                         for (Class exceptionToRetryOn : this.exceptionsToRetryOn) {
-                            if (ex.getCause().getClass().isAssignableFrom(exceptionToRetryOn)) {
+                            if (ex.getClass().equals(exceptionToRetryOn)) {
                                 retry = true;
                                 break;
                             }
