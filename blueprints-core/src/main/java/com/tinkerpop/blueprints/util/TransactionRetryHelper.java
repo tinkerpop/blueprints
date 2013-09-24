@@ -21,14 +21,14 @@ public class TransactionRetryHelper<T> {
      * Executes the work committing if possible and rolling back on failure.  On failure, not exception is reported.
      */
     public T fireAndForget() {
-        return tryIt(new TransactionRetryStrategy.FireAndForget<T>());
+        return use(new TransactionRetryStrategy.FireAndForget<T>());
     }
 
     /**
      * Executes the work committing if possible and rolling back on failure.  On failure an exception is reported.
      */
     public T oneAndDone() {
-        return tryIt(new TransactionRetryStrategy.OneAndDone<T>());
+        return use(new TransactionRetryStrategy.OneAndDone<T>());
     }
 
     /**
@@ -36,7 +36,7 @@ public class TransactionRetryHelper<T> {
      * each try.
      */
     public T retry() {
-        return tryIt(new TransactionRetryStrategy.DelayedRetry<T>());
+        return use(new TransactionRetryStrategy.DelayedRetry<T>());
     }
 
     /**
@@ -44,7 +44,7 @@ public class TransactionRetryHelper<T> {
      * each try.
      */
     public T retry(final int retries) {
-        return tryIt(new TransactionRetryStrategy.DelayedRetry<T>(retries, TransactionRetryStrategy.DelayedRetry.DEFAULT_DELAY_MS));
+        return use(new TransactionRetryStrategy.DelayedRetry<T>(retries, TransactionRetryStrategy.DelayedRetry.DEFAULT_DELAY_MS));
     }
 
     /**
@@ -52,7 +52,7 @@ public class TransactionRetryHelper<T> {
      * each try.
      */
     public T retry(final int retries, final long delayBetweenRetries) {
-        return tryIt(new TransactionRetryStrategy.DelayedRetry<T>(retries, delayBetweenRetries));
+        return use(new TransactionRetryStrategy.DelayedRetry<T>(retries, delayBetweenRetries));
     }
 
     /**
@@ -60,7 +60,7 @@ public class TransactionRetryHelper<T> {
      * between each retry.
      */
     public T exponentialBackoff() {
-        return tryIt(new TransactionRetryStrategy.ExponentialBackoff<T>());
+        return use(new TransactionRetryStrategy.ExponentialBackoff<T>());
     }
 
     /**
@@ -68,17 +68,20 @@ public class TransactionRetryHelper<T> {
      * between each retry.
      */
     public T exponentialBackoff(final int retries) {
-        return tryIt(new TransactionRetryStrategy.ExponentialBackoff<T>(
+        return use(new TransactionRetryStrategy.ExponentialBackoff<T>(
                 retries, TransactionRetryStrategy.ExponentialBackoff.DEFAULT_TRIES));
     }
 
     /**
      * Executes the work with a specified TransactionRetryStrategy.
      */
-    public T tryIt(final TransactionRetryStrategy<T> strategy) {
+    public T use(final TransactionRetryStrategy<T> strategy) {
         return strategy.execute(this.graph, this.work);
     }
 
+    /**
+     * Constructs a TransactionRetryStrategy.
+     */
     public static class Builder<T> {
         private final TransactionalGraph graph;
         private TransactionWork<T> work;
