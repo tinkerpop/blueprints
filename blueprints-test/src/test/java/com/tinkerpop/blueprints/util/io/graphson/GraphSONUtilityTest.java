@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -692,6 +693,50 @@ public class GraphSONUtilityTest {
             Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
             Assert.assertEquals("this", valueAsJson.optString(GraphSONTokens.VALUE));
         }
+    }
+
+    @Test
+    public void jsonFromElementVertexListPropertiesEmbeddedMapNoKeysWithTypes() throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("x", 500);
+        map.put("y", "some");
+
+        ArrayList friends = new ArrayList();
+        friends.add("x");
+        friends.add(5);
+        friends.add(map);
+
+        v.setProperty("friends", friends);
+
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.EXTENDED);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
+        Assert.assertTrue(json.has("friends"));
+
+        JSONObject friendsProperty = json.optJSONObject("friends");
+        Assert.assertEquals("list", friendsProperty.getString("type"));
+
+        JSONArray friendPropertyList = friendsProperty.getJSONArray("value");
+        JSONObject object1 = friendPropertyList.getJSONObject(0);
+        Assert.assertEquals("string", object1.getString("type"));
+        Assert.assertEquals("x", object1.getString("value"));
+
+        JSONObject object2 = friendPropertyList.getJSONObject(1);
+        Assert.assertEquals("integer", object2.getString("type"));
+        Assert.assertEquals(5, object2.getInt("value"));
+
+        JSONObject object3 = friendPropertyList.getJSONObject(2);
+        Assert.assertEquals("map", object3.getString("type"));
+        JSONObject object3Value = object3.getJSONObject("value");
+        JSONObject object3ValueY = object3Value.getJSONObject("y");
+        Assert.assertEquals("string", object3ValueY.getString("type"));
+        Assert.assertEquals("some", object3ValueY.getString("value"));
+        JSONObject object3ValueX = object3Value.getJSONObject("x");
+        Assert.assertEquals("integer", object3ValueX.getString("type"));
+        Assert.assertEquals(500, object3ValueX.getInt("value"));
     }
 
     @Test

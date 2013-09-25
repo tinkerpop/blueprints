@@ -720,6 +720,10 @@ public class GraphSONUtility {
                 // this is an array so just send it back so that it can be
                 // reprocessed to its primitive components
                 theValue = node;
+            } else if (node.isObject()) {
+                // this is an array so just send it back so that it can be
+                // reprocessed to its primitive components
+                theValue = node;
             } else {
                 theValue = node.textValue();
             }
