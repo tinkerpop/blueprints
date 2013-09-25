@@ -19,6 +19,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * Add overload to @GraphFactory.open@ that takes a @Map@ for configuration.
 * The @elementClass@ argument on the @KeyIndexableGraph@ methods cannot be null and must throw @IllegalArgumentException@ if it is.
 * Add @TransactionGraphHelper@ with various strategies for transaction execution: @FireAndForget@, @OneAndDone@, @DelayedRetry@ and @ExponentialBackoff@.
+* Fixed bug with @Map@ objects embedded in lists for GraphSON serialization in @EXTENDED@ mode.
 
 ==<hr/>==
 
