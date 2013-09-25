@@ -193,8 +193,6 @@ public class ElementHelper {
             return true;
         if (null == b)
             return false;
-        if (!a.getClass().equals(b.getClass()))
-            return false;
         return a.getId().equals(((Element) b).getId());
     }
 
