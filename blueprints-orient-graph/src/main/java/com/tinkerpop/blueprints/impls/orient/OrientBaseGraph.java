@@ -243,6 +243,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 					// ADD THE INDEX IN ALL CURRENT CONTEXTS
 					for (OrientGraphContext ctx : contexts)
 						ctx.manualIndices.put(index.getIndexName(), index);
+					context.manualIndices.put(index.getIndexName(), index);
 
 					// SAVE THE CONFIGURATION INTO THE GLOBAL CONFIG
 					saveIndexConfiguration();
