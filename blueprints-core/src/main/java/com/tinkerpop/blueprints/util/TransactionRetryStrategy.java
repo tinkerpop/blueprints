@@ -137,8 +137,10 @@ public interface TransactionRetryStrategy<T> {
 
             // try to commit a few times
             for (int ix = 0; ix < tries; ix++) {
-                // increase time after each failed attempt
-                try { Thread.sleep(getDelay(ix)); } catch (InterruptedException ie) { }
+
+                // increase time after each failed attempt though there is no delay on the first try
+                if (ix > 0)
+                    try { Thread.sleep(getDelay(ix)); } catch (InterruptedException ie) { }
 
                 try {
                     returnValue = work.execute(graph);
