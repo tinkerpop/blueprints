@@ -721,6 +721,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
 
         // first fail the tx
+        final long startOnWayToFailure = System.currentTimeMillis();
         final AtomicInteger attempts = new AtomicInteger(0);
         try {
             new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
@@ -735,6 +736,10 @@ public class TransactionalGraphTestSuite extends TestSuite {
             assertEquals("fail", ex.getCause().getMessage());
         }
 
+        // time taken given default settings should not exceed 10 seconds, given 20ms init time it should finish in
+        // about 5 seconds.
+        final long timeTakenWithRetries = System.currentTimeMillis() - startOnWayToFailure;
+        assertTrue(timeTakenWithRetries < 10000);
         assertEquals(TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES, attempts.get());
         vertexCount(graph, 0);
 
