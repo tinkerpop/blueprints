@@ -562,21 +562,21 @@ public class GraphSONUtility {
     private static void addObject(final ArrayNode jsonList, final Object value) {
         if (value == null) {
             jsonList.add((JsonNode) null);
-        } else if (value instanceof Boolean) {
+        } else if (value.getClass() == Boolean.class) {
             jsonList.add((Boolean) value);
-        } else if (value instanceof Long) {
+        } else if (value.getClass() == Long.class) {
             jsonList.add((Long) value);
-        } else if (value instanceof Integer) {
+        } else if (value.getClass() == Integer.class) {
             jsonList.add((Integer) value);
-        } else if (value instanceof Float) {
+        } else if (value.getClass() == Float.class) {
             jsonList.add((Float) value);
-        } else if (value instanceof Double) {
+        } else if (value.getClass() == Double.class) {
             jsonList.add((Double) value);
-        } else if (value instanceof Byte) {
+        } else if (value.getClass() == Byte.class) {
             jsonList.add((Byte) value);
-        } else if (value instanceof Short) {
+        } else if (value.getClass() == Short.class) {
             jsonList.add((Short) value);
-        } else if (value instanceof String) {
+        } else if (value.getClass() == String.class) {
             jsonList.add((String) value);
         } else if (value instanceof ObjectNode) {
             jsonList.add((ObjectNode) value);
@@ -590,21 +590,21 @@ public class GraphSONUtility {
     private static void putObject(final ObjectNode jsonMap, final String key, final Object value) {
         if (value == null) {
             jsonMap.put(key, (JsonNode) null);
-        } else if (value instanceof Boolean) {
+        } else if (value.getClass() == Boolean.class) {
             jsonMap.put(key, (Boolean) value);
-        } else if (value instanceof Long) {
+        } else if (value.getClass() == Long.class) {
             jsonMap.put(key, (Long) value);
-        } else if (value instanceof Integer) {
+        } else if (value.getClass() == Integer.class) {
             jsonMap.put(key, (Integer) value);
-        } else if (value instanceof Float) {
+        } else if (value.getClass() == Float.class) {
             jsonMap.put(key, (Float) value);
-        } else if (value instanceof Double) {
+        } else if (value.getClass() == Double.class) {
             jsonMap.put(key, (Double) value);
-        } else if (value instanceof Short) {
+        } else if (value.getClass() == Short.class) {
             jsonMap.put(key, (Short) value);
-        } else if (value instanceof Byte) {
+        } else if (value.getClass() == Byte.class) {
             jsonMap.put(key, (Byte) value);
-        } else if (value instanceof String) {
+        } else if (value.getClass() == String.class) {
             jsonMap.put(key, (String) value);
         } else if (value instanceof ObjectNode) {
             jsonMap.put(key, (ObjectNode) value);
@@ -710,6 +710,8 @@ public class GraphSONUtility {
                 theValue = node.booleanValue();
             } else if (node.isDouble()) {
                 theValue = node.doubleValue();
+            } else if (node.isFloatingPointNumber()) {
+                theValue = node.floatValue();
             } else if (node.isInt()) {
                 theValue = node.intValue();
             } else if (node.isLong()) {
@@ -746,19 +748,19 @@ public class GraphSONUtility {
         String type = GraphSONTokens.TYPE_STRING;
         if (value == null) {
             type = GraphSONTokens.TYPE_UNKNOWN;
-        } else if (value instanceof Double) {
+        } else if (value.getClass() == Double.class) {
             type = GraphSONTokens.TYPE_DOUBLE;
-        } else if (value instanceof Float) {
+        } else if (value.getClass() == Float.class) {
             type = GraphSONTokens.TYPE_FLOAT;
-        } else if (value instanceof Byte) {
+        } else if (value.getClass() == Byte.class) {
             type = GraphSONTokens.TYPE_BYTE;
-        } else if (value instanceof Short) {
+        } else if (value.getClass() == Short.class) {
             type = GraphSONTokens.TYPE_SHORT;
-        } else if (value instanceof Integer) {
+        } else if (value.getClass() == Integer.class) {
             type = GraphSONTokens.TYPE_INTEGER;
-        } else if (value instanceof Long) {
+        } else if (value.getClass() == Long.class) {
             type = GraphSONTokens.TYPE_LONG;
-        } else if (value instanceof Boolean) {
+        } else if (value.getClass() == Boolean.class) {
             type = GraphSONTokens.TYPE_BOOLEAN;
         } else if (value instanceof ArrayNode) {
             type = GraphSONTokens.TYPE_LIST;

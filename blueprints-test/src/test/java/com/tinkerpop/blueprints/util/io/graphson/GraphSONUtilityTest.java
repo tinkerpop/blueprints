@@ -701,11 +701,13 @@ public class GraphSONUtilityTest {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("x", 500);
         map.put("y", "some");
+        map.put("z", 100f);
 
         ArrayList friends = new ArrayList();
         friends.add("x");
         friends.add(5);
         friends.add(map);
+        friends.add(100000f);
 
         v.setProperty("friends", friends);
 
@@ -737,6 +739,14 @@ public class GraphSONUtilityTest {
         JSONObject object3ValueX = object3Value.getJSONObject("x");
         Assert.assertEquals("integer", object3ValueX.getString("type"));
         Assert.assertEquals(500, object3ValueX.getInt("value"));
+        JSONObject object3ValueZ = object3Value.getJSONObject("z");
+        Assert.assertEquals("float", object3ValueZ.getString("type"));
+        Assert.assertEquals(100f, new Float(object3ValueZ.getDouble("value")), 0.0001f);
+
+        JSONObject object4 = friendPropertyList.getJSONObject(3);
+        Assert.assertEquals("float", object4.getString("type"));
+        Assert.assertEquals(100000f, new Float(object4.getDouble("value")), 0.0001f);
+
     }
 
     @Test

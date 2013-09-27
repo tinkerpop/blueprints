@@ -20,7 +20,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * The @elementClass@ argument on the @KeyIndexableGraph@ methods cannot be null and must throw @IllegalArgumentException@ if it is.
 * Add @TransactionGraphHelper@ with various strategies for transaction execution: @FireAndForget@, @OneAndDone@, @DelayedRetry@ and @ExponentialBackoff@.
 * Bumped Neo4j to 1.9.4
-* Fixed bug with @Map@ objects embedded in lists for GraphSON serialization in @EXTENDED@ mode.
+* Fixed bug with @Map@ and @Float@ objects embedded in lists for GraphSON serialization in @EXTENDED@ mode.
 
 ==<hr/>==
 
