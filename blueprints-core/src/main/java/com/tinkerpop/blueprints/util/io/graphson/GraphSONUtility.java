@@ -710,6 +710,10 @@ public class GraphSONUtility {
                 theValue = node.booleanValue();
             } else if (node.isDouble()) {
                 theValue = node.doubleValue();
+            } else if (node.isFloatingPointNumber()) {
+                //if it's not a double and it's a floating point number
+                //then it must be a float
+                theValue = node.numberValue().floatValue();
             } else if (node.isInt()) {
                 theValue = node.intValue();
             } else if (node.isLong()) {
