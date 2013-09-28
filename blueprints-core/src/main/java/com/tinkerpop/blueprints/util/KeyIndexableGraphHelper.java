@@ -38,6 +38,9 @@ public class KeyIndexableGraphHelper {
                 }
             }
         }
+        if (isTransactional) {
+            ((TransactionalGraph) graph).commit();
+        }
         return counter;
     }
 }
