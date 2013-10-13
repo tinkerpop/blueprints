@@ -15,8 +15,11 @@ import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OSchema;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.serialization.OSerializableStream;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.util.ElementHelper;
+import com.tinkerpop.blueprints.util.ExceptionFactory;
+import com.tinkerpop.blueprints.util.StringFactory;
 
 /**
  * Base Graph Element where OrientVertex and OrientEdge classes extends from.
@@ -49,17 +52,20 @@ public abstract class OrientElement implements Element, OSerializableStream,
 	@Override
 	public void remove() {
 		graph.autoStartTransaction();
-		
-		final ORecordOperation oper = graph.getRawGraph().getTransaction().getRecordEntry(getIdentity());
-		if( oper != null && oper.type == ORecordOperation.DELETED )
-			throw new IllegalStateException("The elements "+getIdentity()+" has already been deleted");
-		
+
+		final ORecordOperation oper = graph.getRawGraph().getTransaction()
+				.getRecordEntry(getIdentity());
+		if (oper != null && oper.type == ORecordOperation.DELETED)
+			throw new IllegalStateException("The elements " + getIdentity()
+					+ " has already been deleted");
+
 		try {
-		  getRecord().load();
-		} catch( ORecordNotFoundException e ) {
-			throw new IllegalStateException("The elements "+getIdentity()+" has already been deleted");
+			getRecord().load();
+		} catch (ORecordNotFoundException e) {
+			throw new IllegalStateException("The elements " + getIdentity()
+					+ " has already been deleted");
 		}
-		
+
 		getRecord().delete();
 	}
 
@@ -90,7 +96,7 @@ public abstract class OrientElement implements Element, OSerializableStream,
 	}
 
 	public void setProperty(final String key, final Object value) {
-		ElementHelper.validateProperty(this, key, value);
+		validateProperty(this, key, value);
 		graph.autoStartTransaction();
 		getRecord().field(key, value);
 		save();
@@ -272,13 +278,28 @@ public abstract class OrientElement implements Element, OSerializableStream,
 		return iClassName;
 	}
 
-	protected static void setPropertyInternal(final Element element,
+	protected void setPropertyInternal(final Element element,
 			final ODocument doc, final String key, final Object value) {
-		ElementHelper.validateProperty(element, key, value);
+		validateProperty(element, key, value);
 		doc.field(key, value);
 	}
 
 	public OrientBaseGraph getGraph() {
 		return graph;
 	}
+
+	public final void validateProperty(final Element element, final String key,
+			final Object value) throws IllegalArgumentException {
+		if (graph.isStandardElementConstraints() && null == value)
+			throw ExceptionFactory.propertyValueCanNotBeNull();
+		if (null == key)
+			throw ExceptionFactory.propertyKeyCanNotBeNull();
+		if (graph.isStandardElementConstraints() && key.equals(StringFactory.ID))
+			throw ExceptionFactory.propertyKeyIdIsReserved();
+		if (element instanceof Edge && key.equals(StringFactory.LABEL))
+			throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
+		if (key.isEmpty())
+			throw ExceptionFactory.propertyKeyCanNotBeEmpty();
+	}
+
 }

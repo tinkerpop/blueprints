@@ -70,6 +70,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	protected boolean keepInMemoryReferences = false;
 	protected boolean useVertexFieldsForEdgeLabels = true;
 	protected boolean saveOriginalIds = false;
+	protected boolean standardElementConstraints = true;
 	protected THREAD_MODE threadMode = THREAD_MODE.AUTOSET_IFNULL;
 
 	private String url;
@@ -1157,6 +1158,14 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 		this.useVertexFieldsForEdgeLabels = useVertexFieldsForEdgeLabels;
 	}
 
+	public boolean isStandardElementConstraints() {
+		return standardElementConstraints;
+	}
+
+	public void setStandardElementConstraints(final boolean allowsPropertyValueNull) {
+		this.standardElementConstraints = allowsPropertyValueNull;
+	}
+	
 	public static void encodeClassNames(final String... iLabels) {
 		if (iLabels != null)
 			// ENCODE LABELS
