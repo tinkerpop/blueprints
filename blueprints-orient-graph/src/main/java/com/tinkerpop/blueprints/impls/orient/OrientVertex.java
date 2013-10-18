@@ -596,6 +596,13 @@ public class OrientVertex extends OrientElement implements Vertex {
 			// ADD THE LINK TO THE COLLECTION
 			out = null;
 			((OMVRBTreeRIDSet) found).add(iTo);
+		} else if (found instanceof Collection<?>) {
+			// CONVERT IT IN SET
+			out = new OMVRBTreeRIDSet(((Collection<?>) found).size());
+			((OMVRBTreeRIDSet) out)
+					.addAll((Collection<? extends OIdentifiable>) found);
+			((OMVRBTreeRIDSet) out).add(iTo);
+
 		} else
 			throw new IllegalStateException(
 					"Relationship content is invalid on field " + iFieldName
@@ -723,12 +730,13 @@ public class OrientVertex extends OrientElement implements Vertex {
 
 			} else if (fieldValue instanceof OMVRBTreeRIDSet) {
 				// COLLECTION OF RECORDS: REMOVE THE ENTRY
+				final OMVRBTreeRIDSet set = (OMVRBTreeRIDSet) fieldValue;
 
 				if (iVertexToRemove != null) {
-					if (!((OMVRBTreeRIDSet) fieldValue).remove(iVertexToRemove)) {
+					if (!set.remove(iVertexToRemove)) {
 						// SEARCH SEQUENTIALLY (SLOWER)
 						boolean found = false;
-						for (OLazyIterator<OIdentifiable> it = ((OMVRBTreeRIDSet) fieldValue)
+						for (OLazyIterator<OIdentifiable> it = set
 								.iterator(false); it.hasNext();) {
 							final ODocument curr = it.next().getRecord();
 
@@ -781,11 +789,21 @@ public class OrientVertex extends OrientElement implements Vertex {
 				} else {
 
 					// DELETE ALL THE EDGES
-					for (OLazyIterator<OIdentifiable> it = ((OMVRBTreeRIDSet) fieldValue)
-							.iterator(false); it.hasNext();) {
-						deleteEdgeIfAny(it.next());
+					for (OLazyIterator<OIdentifiable> it = set.iterator(false); it
+							.hasNext();) {
+						final OIdentifiable edge = it.next();
+
+						if (iAlsoInverse)
+							removeInverseEdge(iVertex, iFieldName, null, edge,
+									useVertexFieldsForEdgeLabels);
+
+						deleteEdgeIfAny(edge);
 					}
 				}
+
+				if (set.isEmpty())
+					// FORCE REMOVAL OF ENTIRE FIELD
+					iVertex.removeField(iFieldName);
 			}
 
 			iVertex.save();
