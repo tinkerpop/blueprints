@@ -63,7 +63,7 @@ public class GMLReader {
     }
 
     /**
-     * @param vertexIdKey gml property to use as id for verticies
+     * @param vertexIdKey gml property to use as id for vertices
      */
     public void setVertexIdKey(String vertexIdKey) {
         this.vertexIdKey = vertexIdKey;
