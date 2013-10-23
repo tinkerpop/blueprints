@@ -209,6 +209,10 @@ public class OrientVertex extends OrientElement implements Vertex {
 			final String iClassName) {
 		return addEdge(label, inVertex, iClassName, null, (Object[]) null);
 	}
+	
+	public OrientEdge addEdge(final String label, final OrientVertex inVertex, final Object[] fields){
+			return addEdge(label, inVertex, null, null, fields);
+	}
 
 	public OrientEdge addEdge(String label, final OrientVertex inVertex,
 			final String iClassName, final String iClusterName,
