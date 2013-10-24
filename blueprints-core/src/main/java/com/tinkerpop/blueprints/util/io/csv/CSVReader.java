@@ -37,6 +37,9 @@ public class CSVReader {
     private String edgeTargetKey;
     private String edgeLabelKey;
 
+    private final Map<String, String> vertexMappedIdMap = new HashMap<String, String>();
+    private int edgeCount = 0;
+
     /**
      * @param graph the Graph to read data into
      */
@@ -157,14 +160,7 @@ public class CSVReader {
             if (row == null) { break; }
 
             Map<String, String> map = readPropertyMap(headers, row);
-
-            final String vertexId = map.remove(vertexIdKey);
-            if (vertexId == null) {
-                throw new IOException("No id found for vertex");
-            } else {
-                final Vertex vertex = graph.addVertex(vertexId);
-                addProperties(vertex, map);
-            }
+            addVertex(map);
         }
 
         csvReader.close();
@@ -234,39 +230,7 @@ public class CSVReader {
 
             Map<String, String> map = readPropertyMap(headers, row);
 
-            String edgeId = map.remove(edgeIdKey);
-            if (edgeId == null) {
-                throw new IOException("No id found for edge");
-            }
-
-            String source = map.remove(edgeSourceKey);
-            if (source == null) {
-                throw new IOException("Edge has no source");
-            }
-
-            String target = map.remove(edgeTargetKey);
-            if (target == null) {
-                throw new IOException("Edge has no target");
-            }
-
-            final Vertex outVertex = graph.getVertex(source);
-            if (outVertex == null) {
-                throw new IOException("Edge source " + source + " not found");
-            }
-
-            final Vertex inVertex = graph.getVertex(target);
-            if (inVertex == null) {
-                throw new IOException("Edge target " + target + " not found");
-            }
-
-            String label = map.remove(edgeLabelKey);
-            if (label == null) {
-                label = defaultEdgeLabel;
-            }
-
-            final Edge edge = graph.addEdge(edgeId, outVertex, inVertex, label);
-
-            addProperties(edge, map);
+            addEdge(map);
         }
 
         csvReader.close();
@@ -328,6 +292,95 @@ public class CSVReader {
         reader.setEdgeTargetKey(edgeTargetKey);
         reader.setEdgeLabelKey(edgeLabelKey);
         reader.inputEdges(inputStream);
+    }
+
+    private void addVertex(final Map<String, String> map) throws IOException {
+        final String id = map.remove("id");
+        if (id != null) {
+            final Vertex vertex = createVertex(map, id);
+            addProperties(vertex, map);
+        } else {
+            throw new IOException("No id found for node");
+        }
+    }
+
+    private Vertex createVertex(final Map<String, String> map, final String id) {
+        String vertexId = id;
+        if (vertexIdKey != null) {
+            vertexId = map.remove(vertexIdKey);
+            if (vertexId == null) vertexId = id;
+            vertexMappedIdMap.put(id, vertexId);
+        }
+
+        final Vertex createdVertex = graph.addVertex(vertexId);
+
+        return createdVertex;
+    }
+
+    private void addEdge(final Map<String, String> map) throws IOException {
+        String source = map.remove(edgeSourceKey);
+        if (source == null) {
+            throw new IOException("Edge has no source");
+        }
+
+        String target = map.remove(edgeTargetKey);
+        if (target == null) {
+            throw new IOException("Edge has no target");
+        }
+
+        if (vertexIdKey != null) {
+            source = vertexMappedIdMap.get(source);
+            target = vertexMappedIdMap.get(target);
+        }
+
+        final Vertex outVertex = graph.getVertex(source);
+        if (outVertex == null) {
+            throw new IOException("Edge source " + source + " not found");
+        }
+
+        final Vertex inVertex = graph.getVertex(target);
+        if (inVertex == null) {
+            throw new IOException("Edge target " + target + " not found");
+        }
+
+        String label = map.remove(edgeLabelKey);
+        if (label == null) {
+            // try standard label key
+            label = map.remove("label");
+        } else {
+            // remove label in case edge label key is not label
+            // label is reserved and cannot be added as a property
+            // if so this data will be lost
+            map.remove("label");
+        }
+
+        if (label == null) {
+            label = defaultEdgeLabel;
+        }
+
+        String edgeId = String.valueOf(edgeCount++);
+        if (edgeIdKey != null) {
+            String mappedKey = map.remove(edgeIdKey);
+            if (mappedKey != null) {
+                edgeId = mappedKey;
+            }
+            // else use edgecount - could fail if mapped ids overlap with edge count
+        }
+
+        /*
+        String edgeId = map.remove(edgeIdKey);
+        if (edgeId == null) {
+            throw new IOException("No id found for edge");
+        }
+        */
+
+        // remove id as reserved property - can be left is edgeIdKey in not id
+        // This data will be lost
+        map.remove("id");
+
+        final Edge edge = graph.addEdge(edgeId, outVertex, inVertex, label);
+
+        addProperties(edge, map);
     }
 
     private Map<String, String> readPropertyMap(String[] headers, String[] row) {

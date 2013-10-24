@@ -13,11 +13,11 @@ public class CSVWriterTest extends TestCase {
         TinkerGraph g = new TinkerGraph();
 
         CSVReader r = new CSVReader(g);
-        r.setVertexIdKey("_id");
-        r.setEdgeIdKey("_id");
-        r.setEdgeSourceKey("_sourceV");
-        r.setEdgeTargetKey("_targetV");
-        r.setEdgeLabelKey("_label");
+        r.setVertexIdKey("id");
+        r.setEdgeIdKey("id");
+        r.setEdgeSourceKey("source");
+        r.setEdgeTargetKey("target");
+        r.setEdgeLabelKey("label");
         r.inputVertices(CSVWriterTest.class.getResourceAsStream("example-vertices-1.csv"));
         r.inputEdges(CSVWriterTest.class.getResourceAsStream("example-edges-1.csv"));
 
@@ -25,11 +25,11 @@ public class CSVWriterTest extends TestCase {
         ByteArrayOutputStream bosEdges = new ByteArrayOutputStream();
 
         CSVWriter w = new CSVWriter(g);
-        w.setVertexIdKey("_id");
-        w.setEdgeIdKey("_id");
-        w.setEdgeSourceKey("_sourceV");
-        w.setEdgeTargetKey("_targetV");
-        w.setEdgeLabelKey("_label");
+        w.setVertexIdKey("id");
+        w.setEdgeIdKey("id");
+        w.setEdgeSourceKey("source");
+        w.setEdgeTargetKey("target");
+        w.setEdgeLabelKey("label");
         w.setNormalize(true);
         w.outputVertices(bosVertices);
         w.outputEdges(bosEdges);
@@ -49,11 +49,11 @@ public class CSVWriterTest extends TestCase {
         TinkerGraph g = new TinkerGraph();
 
         CSVReader r = new CSVReader(g, '\t');
-        r.setVertexIdKey("_id");
-        r.setEdgeIdKey("_id");
-        r.setEdgeSourceKey("_sourceV");
-        r.setEdgeTargetKey("_targetV");
-        r.setEdgeLabelKey("_label");
+        r.setVertexIdKey("id");
+        r.setEdgeIdKey("id");
+        r.setEdgeSourceKey("source");
+        r.setEdgeTargetKey("target");
+        r.setEdgeLabelKey("label");
         r.inputVertices(CSVWriterTest.class.getResourceAsStream("example-vertices-1.tsv"));
         r.inputEdges(CSVWriterTest.class.getResourceAsStream("example-edges-1.tsv"));
 
@@ -61,11 +61,11 @@ public class CSVWriterTest extends TestCase {
         ByteArrayOutputStream bosEdges = new ByteArrayOutputStream();
 
         CSVWriter w = new CSVWriter(g, '\t');
-        w.setVertexIdKey("_id");
-        w.setEdgeIdKey("_id");
-        w.setEdgeSourceKey("_sourceV");
-        w.setEdgeTargetKey("_targetV");
-        w.setEdgeLabelKey("_label");
+        w.setVertexIdKey("id");
+        w.setEdgeIdKey("id");
+        w.setEdgeSourceKey("source");
+        w.setEdgeTargetKey("target");
+        w.setEdgeLabelKey("label");
         w.setNormalize(true);
         w.outputVertices(bosVertices);
         w.outputEdges(bosEdges);

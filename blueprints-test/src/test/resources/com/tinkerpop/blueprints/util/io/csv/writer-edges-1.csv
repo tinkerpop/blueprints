@@ -1,4 +1,4 @@
-"_id","_sourceV","_targetV","_label","weight"
+"id","source","target","label","weight"
 "10","4","5","created","1.0"
 "11","4","3","created","0.4"
 "12","6","3","created","0.2"

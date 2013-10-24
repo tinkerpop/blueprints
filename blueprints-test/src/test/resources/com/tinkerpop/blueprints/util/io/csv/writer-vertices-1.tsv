@@ -1,4 +1,4 @@
-"_id"	"age"	"lang"	"name"
+"id"	"age"	"lang"	"name"
 "1"	"29"		"marko"
 "2"	"27"		"vadas"
 "3"		"java"	"lop"

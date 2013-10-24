@@ -16,11 +16,11 @@ public class CSVReaderTest extends TestCase {
         Graph graph = new TinkerGraph();
 
         CSVReader r = new CSVReader(graph);
-        r.setVertexIdKey("_id");
-        r.setEdgeIdKey("_id");
-        r.setEdgeSourceKey("_sourceV");
-        r.setEdgeTargetKey("_targetV");
-        r.setEdgeLabelKey("_label");
+        r.setVertexIdKey("id");
+        r.setEdgeIdKey("id");
+        r.setEdgeSourceKey("source");
+        r.setEdgeTargetKey("target");
+        r.setEdgeLabelKey("label");
         r.inputVertices(CSVReaderTest.class.getResourceAsStream("example-vertices-1.csv"));
         r.inputEdges(CSVReaderTest.class.getResourceAsStream("example-edges-1.csv"));
 
@@ -32,11 +32,11 @@ public class CSVReaderTest extends TestCase {
         Graph graph = new TinkerGraph();
 
         CSVReader r = new CSVReader(graph);
-        r.setVertexIdKey("_id");
-        r.setEdgeIdKey("_id");
-        r.setEdgeSourceKey("_sourceV");
-        r.setEdgeTargetKey("_targetV");
-        r.setEdgeLabelKey("_label");
+        r.setVertexIdKey("id");
+        r.setEdgeIdKey("id");
+        r.setEdgeSourceKey("source");
+        r.setEdgeTargetKey("target");
+        r.setEdgeLabelKey("label");
         r.inputVertices(CSVReaderTest.class.getResourceAsStream("example-vertices-1.csv"));
         r.inputEdges(CSVReaderTest.class.getResourceAsStream("example-edges-1.csv"));
 
