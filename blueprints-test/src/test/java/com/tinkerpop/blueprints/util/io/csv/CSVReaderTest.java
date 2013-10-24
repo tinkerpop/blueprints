@@ -40,34 +40,35 @@ public class CSVReaderTest extends TestCase {
         r.inputVertices(CSVReaderTest.class.getResourceAsStream("example-vertices-1.csv"));
         r.inputEdges(CSVReaderTest.class.getResourceAsStream("example-edges-1.csv"));
 
+
         Vertex v1 = graph.getVertex(1);
         Assert.assertEquals("29", v1.getProperty("age"));
-        Assert.assertEquals("", v1.getProperty("lang"));
+        Assert.assertEquals(null, v1.getProperty("lang"));
         Assert.assertEquals("marko", v1.getProperty("name"));
 
         Vertex v2 = graph.getVertex(2);
         Assert.assertEquals("27", v2.getProperty("age"));
-        Assert.assertEquals("", v2.getProperty("lang"));
+        Assert.assertEquals(null, v2.getProperty("lang"));
         Assert.assertEquals("vadas", v2.getProperty("name"));
 
         Vertex v3 = graph.getVertex(3);
-        Assert.assertEquals("", v3.getProperty("age"));
+        Assert.assertEquals(null, v3.getProperty("age"));
         Assert.assertEquals("java", v3.getProperty("lang"));
         Assert.assertEquals("lop", v3.getProperty("name"));
 
         Vertex v4 = graph.getVertex(4);
         Assert.assertEquals("32", v4.getProperty("age"));
-        Assert.assertEquals("", v4.getProperty("lang"));
+        Assert.assertEquals(null, v4.getProperty("lang"));
         Assert.assertEquals("josh", v4.getProperty("name"));
 
         Vertex v5 = graph.getVertex(5);
-        Assert.assertEquals("", v5.getProperty("age"));
+        Assert.assertEquals(null, v5.getProperty("age"));
         Assert.assertEquals("java", v5.getProperty("lang"));
         Assert.assertEquals("ripple", v5.getProperty("name"));
 
         Vertex v6 = graph.getVertex(6);
         Assert.assertEquals("35", v6.getProperty("age"));
-        Assert.assertEquals("", v6.getProperty("lang"));
+        Assert.assertEquals(null, v6.getProperty("lang"));
         Assert.assertEquals("peter", v6.getProperty("name"));
 
         Edge e10 = graph.getEdge(10);

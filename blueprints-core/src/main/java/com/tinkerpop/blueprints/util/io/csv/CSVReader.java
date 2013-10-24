@@ -339,7 +339,7 @@ public class CSVReader {
                 String key = headers[i];
                 String property = row[i];
 
-                if (property != null) {
+                if (property != null && !property.equals("")) {
                     map.put(key, property);
                 }
             }
