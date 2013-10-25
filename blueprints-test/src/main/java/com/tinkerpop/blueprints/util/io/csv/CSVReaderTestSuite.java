@@ -36,10 +36,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-1 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-1 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
 
             assertEquals(count(graph.getVertex("1").getEdges(Direction.OUT)), 3);
             assertEquals(count(graph.getVertex("1").getEdges(Direction.IN)), 0);
@@ -95,10 +95,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-1 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-1 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> edgeIds = new HashSet<String>();
             Set<String> edgeKeys = new HashSet<String>();
             Set<String> edgeValues = new HashSet<String>();
@@ -129,10 +129,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-1 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-1 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> vertexNames = new HashSet<String>();
             int count = 0;
             for (Vertex v : graph.getVertices()) {
@@ -162,10 +162,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-1 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-1 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<Vertex> softwareVertices = new HashSet<Vertex>();
             int count = 0;
             for (Vertex v : graph.getVertices()) {
@@ -194,10 +194,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-1 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-1 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Vertex marko = null;
             Vertex peter = null;
             Vertex josh = null;
@@ -335,21 +335,21 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-3 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-3 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             // Specific Graph Characteristics
 
-            assertEquals(count(graph.getVertex(1).getEdges(Direction.OUT)), 3);
-            assertEquals(count(graph.getVertex(1).getEdges(Direction.IN)), 0);
-            Vertex marko = graph.getVertex(1);
+            assertEquals(count(graph.getVertex("1").getEdges(Direction.OUT)), 3);
+            assertEquals(count(graph.getVertex("1").getEdges(Direction.IN)), 0);
+            Vertex marko = graph.getVertex("1");
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(marko.getProperty("age"), "29");
             assertEquals(marko.getProperty("id2"), "2");
             int counter = 0;
-            for (Edge e : graph.getVertex(1).getEdges(Direction.OUT)) {
+            for (Edge e : graph.getVertex("1").getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getProperty("id2"), "8");
@@ -374,26 +374,26 @@ public class CSVReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(graph.getVertex(2).getEdges(Direction.OUT)), 0);
-            assertEquals(count(graph.getVertex(2).getEdges(Direction.IN)), 1);
-            Vertex vadas = graph.getVertex(2);
+            assertEquals(count(graph.getVertex("2").getEdges(Direction.OUT)), 0);
+            assertEquals(count(graph.getVertex("2").getEdges(Direction.IN)), 1);
+            Vertex vadas = graph.getVertex("2");
             assertEquals(vadas.getProperty("name"), "vadas");
             assertEquals(vadas.getProperty("age"), "27");
             assertEquals(vadas.getProperty("id2"), "3");
 
-            assertEquals(count(graph.getVertex(3).getEdges(Direction.OUT)), 0);
-            assertEquals(count(graph.getVertex(3).getEdges(Direction.IN)), 3);
-            Vertex lop = graph.getVertex(3);
+            assertEquals(count(graph.getVertex("3").getEdges(Direction.OUT)), 0);
+            assertEquals(count(graph.getVertex("3").getEdges(Direction.IN)), 3);
+            Vertex lop = graph.getVertex("3");
             assertEquals(lop.getProperty("name"), "lop");
             assertEquals(lop.getProperty("lang"), "java");
             assertEquals(lop.getProperty("id2"), "4");
 
-            assertEquals(count(graph.getVertex(4).getEdges(Direction.OUT)), 2);
-            assertEquals(count(graph.getVertex(4).getEdges(Direction.IN)), 1);
-            Vertex josh = graph.getVertex(4);
+            assertEquals(count(graph.getVertex("4").getEdges(Direction.OUT)), 2);
+            assertEquals(count(graph.getVertex("4").getEdges(Direction.IN)), 1);
+            Vertex josh = graph.getVertex("4");
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), "32");
-            for (Edge e : graph.getVertex(4).getEdges(Direction.OUT)) {
+            for (Edge e : graph.getVertex("4").getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
                     assertEquals(e.getProperty("id2"), "13");
@@ -411,20 +411,20 @@ public class CSVReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(graph.getVertex(5).getEdges(Direction.OUT)), 0);
-            assertEquals(count(graph.getVertex(5).getEdges(Direction.IN)), 1);
-            Vertex ripple = graph.getVertex(5);
+            assertEquals(count(graph.getVertex("5").getEdges(Direction.OUT)), 0);
+            assertEquals(count(graph.getVertex("5").getEdges(Direction.IN)), 1);
+            Vertex ripple = graph.getVertex("5");
             assertEquals(ripple.getProperty("name"), "ripple");
             assertEquals(ripple.getProperty("lang"), "java");
             assertEquals(ripple.getProperty("id2"), "7");
 
-            assertEquals(count(graph.getVertex(6).getEdges(Direction.OUT)), 1);
-            assertEquals(count(graph.getVertex(6).getEdges(Direction.IN)), 0);
-            Vertex peter = graph.getVertex(6);
+            assertEquals(count(graph.getVertex("6").getEdges(Direction.OUT)), 1);
+            assertEquals(count(graph.getVertex("6").getEdges(Direction.IN)), 0);
+            Vertex peter = graph.getVertex("6");
             assertEquals(peter.getProperty("name"), "peter");
             assertEquals(peter.getProperty("age"), "35");
 
-            for (Edge e : graph.getVertex(6).getEdges(Direction.OUT)) {
+            for (Edge e : graph.getVertex("6").getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
                     assertEquals(e.getProperty("id2"), null);
@@ -491,10 +491,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label2");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-3 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-3 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
             Set<String> vertexKeys = new HashSet<String>();
@@ -560,10 +560,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-3 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-3 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
             Set<String> vertexKeys = new HashSet<String>();
@@ -629,10 +629,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label2");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-3 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-3 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
             Set<String> vertexKeys = new HashSet<String>();
@@ -699,10 +699,10 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-vertices-3 loaded", this.stopWatch());
-            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
-            printPerformance(graph.toString(), null, "graph-example-edges-3 loaded", this.stopWatch());
+            csvReader.inputGraph(
+                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
+                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             this.stopWatch();
             // FIXME Should not explicitly define the Graph type (TinkerGraph)
@@ -713,14 +713,14 @@ public class CSVReaderTestSuite extends TestSuite {
 
             // Specific Graph Characteristics
 
-            assertEquals(count(toGraph.getVertex(1).getEdges(Direction.OUT)), 3);
-            assertEquals(count(toGraph.getVertex(1).getEdges(Direction.IN)), 0);
-            Vertex marko = toGraph.getVertex(1);
+            assertEquals(count(toGraph.getVertex("1").getEdges(Direction.OUT)), 3);
+            assertEquals(count(toGraph.getVertex("1").getEdges(Direction.IN)), 0);
+            Vertex marko = toGraph.getVertex("1");
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(marko.getProperty("age"), "29");
             assertEquals(marko.getProperty("id2"), "2");
             int counter = 0;
-            for (Edge e : toGraph.getVertex(1).getEdges(Direction.OUT)) {
+            for (Edge e : toGraph.getVertex("1").getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
                     assertEquals(e.getProperty("id2"), "8");
@@ -745,26 +745,26 @@ public class CSVReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(toGraph.getVertex(2).getEdges(Direction.OUT)), 0);
-            assertEquals(count(toGraph.getVertex(2).getEdges(Direction.IN)), 1);
-            Vertex vadas = toGraph.getVertex(2);
+            assertEquals(count(toGraph.getVertex("2").getEdges(Direction.OUT)), 0);
+            assertEquals(count(toGraph.getVertex("2").getEdges(Direction.IN)), 1);
+            Vertex vadas = toGraph.getVertex("2");
             assertEquals(vadas.getProperty("name"), "vadas");
             assertEquals(vadas.getProperty("age"), "27");
             assertEquals(vadas.getProperty("id2"), "3");
 
-            assertEquals(count(toGraph.getVertex(3).getEdges(Direction.OUT)), 0);
-            assertEquals(count(toGraph.getVertex(3).getEdges(Direction.IN)), 3);
-            Vertex lop = toGraph.getVertex(3);
+            assertEquals(count(toGraph.getVertex("3").getEdges(Direction.OUT)), 0);
+            assertEquals(count(toGraph.getVertex("3").getEdges(Direction.IN)), 3);
+            Vertex lop = toGraph.getVertex("3");
             assertEquals(lop.getProperty("name"), "lop");
             assertEquals(lop.getProperty("lang"), "java");
             assertEquals(lop.getProperty("id2"), "4");
 
-            assertEquals(count(toGraph.getVertex(4).getEdges(Direction.OUT)), 2);
-            assertEquals(count(toGraph.getVertex(4).getEdges(Direction.IN)), 1);
-            Vertex josh = toGraph.getVertex(4);
+            assertEquals(count(toGraph.getVertex("4").getEdges(Direction.OUT)), 2);
+            assertEquals(count(toGraph.getVertex("4").getEdges(Direction.IN)), 1);
+            Vertex josh = toGraph.getVertex("4");
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), "32");
-            for (Edge e : toGraph.getVertex(4).getEdges(Direction.OUT)) {
+            for (Edge e : toGraph.getVertex("4").getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
                     assertEquals(e.getProperty("id2"), "13");
@@ -782,20 +782,20 @@ public class CSVReaderTestSuite extends TestSuite {
                 }
             }
 
-            assertEquals(count(toGraph.getVertex(5).getEdges(Direction.OUT)), 0);
-            assertEquals(count(toGraph.getVertex(5).getEdges(Direction.IN)), 1);
-            Vertex ripple = toGraph.getVertex(5);
+            assertEquals(count(toGraph.getVertex("5").getEdges(Direction.OUT)), 0);
+            assertEquals(count(toGraph.getVertex("5").getEdges(Direction.IN)), 1);
+            Vertex ripple = toGraph.getVertex("5");
             assertEquals(ripple.getProperty("name"), "ripple");
             assertEquals(ripple.getProperty("lang"), "java");
             assertEquals(ripple.getProperty("id2"), "7");
 
-            assertEquals(count(toGraph.getVertex(6).getEdges(Direction.OUT)), 1);
-            assertEquals(count(toGraph.getVertex(6).getEdges(Direction.IN)), 0);
-            Vertex peter = toGraph.getVertex(6);
+            assertEquals(count(toGraph.getVertex("6").getEdges(Direction.OUT)), 1);
+            assertEquals(count(toGraph.getVertex("6").getEdges(Direction.IN)), 0);
+            Vertex peter = toGraph.getVertex("6");
             assertEquals(peter.getProperty("name"), "peter");
             assertEquals(peter.getProperty("age"), "35");
 
-            for (Edge e : toGraph.getVertex(6).getEdges(Direction.OUT)) {
+            for (Edge e : toGraph.getVertex("6").getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
                     assertEquals(e.getProperty("id2"), null);
