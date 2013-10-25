@@ -1,6 +1,10 @@
 package com.tinkerpop.blueprints.util.io.csv;
 
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.util.io.csv.CSVReader;
@@ -236,8 +240,7 @@ public class CSVReaderTestSuite extends TestSuite {
             Set<Vertex> vertices = new HashSet<Vertex>();
             assertEquals(marko.getProperty("name"), "marko");
             assertEquals(marko.getProperty("age"), "29");
-            assertEquals(marko.getProperty("lang"), "");
-            assertEquals(marko.getPropertyKeys().size(), 3);
+            assertEquals(marko.getPropertyKeys().size(), 2);
             assertEquals(count(marko.getEdges(Direction.OUT)), 3);
             assertEquals(count(marko.getEdges(Direction.IN)), 0);
             for (Edge e : marko.getEdges(Direction.OUT)) {
@@ -251,8 +254,7 @@ public class CSVReaderTestSuite extends TestSuite {
             vertices = new HashSet<Vertex>();
             assertEquals(peter.getProperty("name"), "peter");
             assertEquals(peter.getProperty("age"), "35");
-            assertEquals(peter.getProperty("lang"), "");
-            assertEquals(peter.getPropertyKeys().size(), 3);
+            assertEquals(peter.getPropertyKeys().size(), 2);
             assertEquals(count(peter.getEdges(Direction.OUT)), 1);
             assertEquals(count(peter.getEdges(Direction.IN)), 0);
             for (Edge e : peter.getEdges(Direction.OUT)) {
@@ -264,8 +266,7 @@ public class CSVReaderTestSuite extends TestSuite {
             vertices = new HashSet<Vertex>();
             assertEquals(josh.getProperty("name"), "josh");
             assertEquals(josh.getProperty("age"), "32");
-            assertEquals(josh.getProperty("lang"), "");
-            assertEquals(josh.getPropertyKeys().size(), 3);
+            assertEquals(josh.getPropertyKeys().size(), 2);
             assertEquals(count(josh.getEdges(Direction.OUT)), 2);
             assertEquals(count(josh.getEdges(Direction.IN)), 1);
             for (Edge e : josh.getEdges(Direction.OUT)) {
@@ -284,8 +285,7 @@ public class CSVReaderTestSuite extends TestSuite {
             vertices = new HashSet<Vertex>();
             assertEquals(vadas.getProperty("name"), "vadas");
             assertEquals(vadas.getProperty("age"), "27");
-            assertEquals(vadas.getProperty("lang"), "");
-            assertEquals(vadas.getPropertyKeys().size(), 3);
+            assertEquals(vadas.getPropertyKeys().size(), 2);
             assertEquals(count(vadas.getEdges(Direction.OUT)), 0);
             assertEquals(count(vadas.getEdges(Direction.IN)), 1);
             for (Edge e : vadas.getEdges(Direction.IN)) {
@@ -296,9 +296,8 @@ public class CSVReaderTestSuite extends TestSuite {
             // test lop
             vertices = new HashSet<Vertex>();
             assertEquals(lop.getProperty("name"), "lop");
-            assertEquals(lop.getProperty("age"), "");
             assertEquals(lop.getProperty("lang"), "java");
-            assertEquals(lop.getPropertyKeys().size(), 3);
+            assertEquals(lop.getPropertyKeys().size(), 2);
             assertEquals(count(lop.getEdges(Direction.OUT)), 0);
             assertEquals(count(lop.getEdges(Direction.IN)), 3);
             for (Edge e : lop.getEdges(Direction.IN)) {
@@ -311,9 +310,8 @@ public class CSVReaderTestSuite extends TestSuite {
             // test ripple
             vertices = new HashSet<Vertex>();
             assertEquals(ripple.getProperty("name"), "ripple");
-            assertEquals(ripple.getProperty("age"), "");
             assertEquals(ripple.getProperty("lang"), "java");
-            assertEquals(ripple.getPropertyKeys().size(), 3);
+            assertEquals(ripple.getPropertyKeys().size(), 2);
             assertEquals(count(ripple.getEdges(Direction.OUT)), 0);
             assertEquals(count(ripple.getEdges(Direction.IN)), 1);
             for (Edge e : ripple.getEdges(Direction.IN)) {
@@ -399,7 +397,7 @@ public class CSVReaderTestSuite extends TestSuite {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
                     assertEquals(e.getProperty("id2"), "13");
-                    assertEquals(e.getProperty("label2"), "");
+                    assertEquals(e.getProperty("label2"), null);
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "11");
                     counter++;
@@ -429,8 +427,8 @@ public class CSVReaderTestSuite extends TestSuite {
             for (Edge e : graph.getVertex(6).getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
                     assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
-                    assertEquals(e.getProperty("id2"), "");
-                    assertEquals(e.getProperty("label2"), "");
+                    assertEquals(e.getProperty("id2"), null);
+                    assertEquals(e.getProperty("label2"), null);
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "12");
                     counter++;
@@ -487,7 +485,6 @@ public class CSVReaderTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
-
             CSVReader csvReader = new CSVReader(graph);
             csvReader.setVertexIdKey("id");
             csvReader.setEdgeIdKey("id");
@@ -557,7 +554,6 @@ public class CSVReaderTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
-
             CSVReader csvReader = new CSVReader(graph);
             csvReader.setVertexIdKey("id2");
             csvReader.setEdgeIdKey("id2");
@@ -627,7 +623,6 @@ public class CSVReaderTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
             this.stopWatch();
-
             CSVReader csvReader = new CSVReader(graph);
             csvReader.setVertexIdKey("id2");
             csvReader.setEdgeIdKey("id2");
@@ -698,7 +693,6 @@ public class CSVReaderTestSuite extends TestSuite {
         if (!graph.getFeatures().ignoresSuppliedIds && graph.getFeatures().supportsEdgeIteration && graph.getFeatures().supportsVertexIteration) {
 
             this.stopWatch();
-
             CSVReader csvReader = new CSVReader(graph);
             csvReader.setVertexIdKey("id");
             csvReader.setEdgeIdKey("id");
@@ -723,27 +717,27 @@ public class CSVReaderTestSuite extends TestSuite {
             assertEquals(count(toGraph.getVertex(1).getEdges(Direction.IN)), 0);
             Vertex marko = toGraph.getVertex(1);
             assertEquals(marko.getProperty("name"), "marko");
-            assertEquals(marko.getProperty("age"), 29);
-            assertEquals(marko.getProperty("id2"), 2);
+            assertEquals(marko.getProperty("age"), "29");
+            assertEquals(marko.getProperty("id2"), "2");
             int counter = 0;
             for (Edge e : toGraph.getVertex(1).getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("2")) {
                     // assertEquals(e.getProperty("weight"), 0.5);
-                    assertEquals(e.getProperty("id2"), 8);
+                    assertEquals(e.getProperty("id2"), "8");
                     assertEquals(e.getProperty("label2"), "has high fived");
                     assertEquals(e.getLabel(), "knows");
                     assertEquals(e.getId(), "7");
                     counter++;
                 } else if (e.getVertex(Direction.IN).getId().equals("3")) {
-                    assertEquals(Math.round((Float) e.getProperty("weight")), 0);
-                    assertEquals(e.getProperty("id2"), 10);
+                    assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
+                    assertEquals(e.getProperty("id2"), "10");
                     assertEquals(e.getProperty("label2"), "has high fived");
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "9");
                     counter++;
                 } else if (e.getVertex(Direction.IN).getId().equals("4")) {
-                    assertEquals(Math.round((Float) e.getProperty("weight")), 1);
-                    assertEquals(e.getProperty("id2"), 9);
+                    assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 1);
+                    assertEquals(e.getProperty("id2"), "9");
                     assertEquals(e.getProperty("label2"), "has high fived");
                     assertEquals(e.getLabel(), "knows");
                     assertEquals(e.getId(), "8");
@@ -755,32 +749,32 @@ public class CSVReaderTestSuite extends TestSuite {
             assertEquals(count(toGraph.getVertex(2).getEdges(Direction.IN)), 1);
             Vertex vadas = toGraph.getVertex(2);
             assertEquals(vadas.getProperty("name"), "vadas");
-            assertEquals(vadas.getProperty("age"), 27);
-            assertEquals(vadas.getProperty("id2"), 3);
+            assertEquals(vadas.getProperty("age"), "27");
+            assertEquals(vadas.getProperty("id2"), "3");
 
             assertEquals(count(toGraph.getVertex(3).getEdges(Direction.OUT)), 0);
             assertEquals(count(toGraph.getVertex(3).getEdges(Direction.IN)), 3);
             Vertex lop = toGraph.getVertex(3);
             assertEquals(lop.getProperty("name"), "lop");
             assertEquals(lop.getProperty("lang"), "java");
-            assertEquals(lop.getProperty("id2"), 4);
+            assertEquals(lop.getProperty("id2"), "4");
 
             assertEquals(count(toGraph.getVertex(4).getEdges(Direction.OUT)), 2);
             assertEquals(count(toGraph.getVertex(4).getEdges(Direction.IN)), 1);
             Vertex josh = toGraph.getVertex(4);
             assertEquals(josh.getProperty("name"), "josh");
-            assertEquals(josh.getProperty("age"), 32);
+            assertEquals(josh.getProperty("age"), "32");
             for (Edge e : toGraph.getVertex(4).getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
-                    assertEquals(Math.round((Float) e.getProperty("weight")), 0);
-                    assertEquals(e.getProperty("id2"), 13);
+                    assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
+                    assertEquals(e.getProperty("id2"), "13");
                     assertEquals(e.getProperty("label2"), null);
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "11");
                     counter++;
                 } else if (e.getVertex(Direction.IN).getId().equals("5")) {
-                    assertEquals(Math.round((Float) e.getProperty("weight")), 1);
-                    assertEquals(e.getProperty("id2"), 11);
+                    assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 1);
+                    assertEquals(e.getProperty("id2"), "11");
                     assertEquals(e.getProperty("label2"), "has high fived");
                     assertEquals(e.getLabel(), "created");
                     assertEquals(e.getId(), "10");
@@ -793,17 +787,17 @@ public class CSVReaderTestSuite extends TestSuite {
             Vertex ripple = toGraph.getVertex(5);
             assertEquals(ripple.getProperty("name"), "ripple");
             assertEquals(ripple.getProperty("lang"), "java");
-            assertEquals(ripple.getProperty("id2"), 7);
+            assertEquals(ripple.getProperty("id2"), "7");
 
             assertEquals(count(toGraph.getVertex(6).getEdges(Direction.OUT)), 1);
             assertEquals(count(toGraph.getVertex(6).getEdges(Direction.IN)), 0);
             Vertex peter = toGraph.getVertex(6);
             assertEquals(peter.getProperty("name"), "peter");
-            assertEquals(peter.getProperty("age"), 35);
+            assertEquals(peter.getProperty("age"), "35");
 
             for (Edge e : toGraph.getVertex(6).getEdges(Direction.OUT)) {
                 if (e.getVertex(Direction.IN).getId().equals("3")) {
-                    assertEquals(Math.round((Float) e.getProperty("weight")), 0);
+                    assertEquals(Math.round(Float.parseFloat((String) e.getProperty("weight"))), 0);
                     assertEquals(e.getProperty("id2"), null);
                     assertEquals(e.getProperty("label2"), null);
                     assertEquals(e.getLabel(), "created");
