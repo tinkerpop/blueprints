@@ -36,9 +36,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
 
             assertEquals(count(graph.getVertex("1").getEdges(Direction.OUT)), 3);
@@ -95,9 +94,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> edgeIds = new HashSet<String>();
             Set<String> edgeKeys = new HashSet<String>();
@@ -129,9 +127,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<String> vertexNames = new HashSet<String>();
             int count = 0;
@@ -162,9 +159,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Set<Vertex> softwareVertices = new HashSet<Vertex>();
             int count = 0;
@@ -194,9 +190,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-1.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-1.csv"));
             printPerformance(graph.toString(), null, "graph-example-1 loaded", this.stopWatch());
             Vertex marko = null;
             Vertex peter = null;
@@ -335,9 +330,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             // Specific Graph Characteristics
@@ -491,9 +485,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label2");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
@@ -560,9 +553,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
@@ -629,9 +621,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label2");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             Set<String> vertexIds = new HashSet<String>();
@@ -699,9 +690,8 @@ public class CSVReaderTestSuite extends TestSuite {
             csvReader.setEdgeSourceKey("source");
             csvReader.setEdgeTargetKey("target");
             csvReader.setEdgeLabelKey("label");
-            csvReader.inputGraph(
-                    CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"),
-                    CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
+            csvReader.inputVertices(CSVReader.class.getResourceAsStream("graph-example-vertices-3.csv"));
+            csvReader.inputEdges(CSVReader.class.getResourceAsStream("graph-example-edges-3.csv"));
             printPerformance(graph.toString(), null, "graph-example-3 loaded", this.stopWatch());
 
             this.stopWatch();

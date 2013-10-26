@@ -24,7 +24,7 @@ public class CSVReader {
     public static final int DEFAULT_BUFFER_SIZE = 1000;
     public static final String DEFAULT_LABEL = "undefined";
 
-    private final Graph graph;
+    private final BatchGraph graph;
     private final char separator;
     private final char quoteChar;
     private final char escapeChar;
@@ -78,17 +78,20 @@ public class CSVReader {
      * @param escapeChar  the character to use for escaping characters
      */
     public CSVReader(final Graph graph, char separator, char quoteChar, char escapeChar) {
-        this.graph = graph;
-        this.separator = separator;
-        this.quoteChar = quoteChar;
-        this.escapeChar = escapeChar;
+        this(graph, separator, quoteChar, escapeChar, DEFAULT_BUFFER_SIZE);
     }
 
     /**
-     * @param bufferSize
+     * @param graph
+     * @param separator   the delimiter to use for separating entries
+     * @param quoteChar   the delimiter to use for quoting entries
+     * @param escapeChar  the character to use for escaping characters
      */
-    public void setBufferSize(int bufferSize) {
-        this.bufferSize = bufferSize;
+    public CSVReader(final Graph graph, char separator, char quoteChar, char escapeChar, int bufferSize) {
+        this.graph = BatchGraph.wrap(graph, bufferSize);
+        this.separator = separator;
+        this.quoteChar = quoteChar;
+        this.escapeChar = escapeChar;
     }
 
     /**
@@ -141,60 +144,13 @@ public class CSVReader {
     }
 
     /**
-     * Load the CSV vertex and edge streams into the Graph.
-     *
-     * @param vertexInputStream
-     * @param edgeInputStream
-     * @throws IOException
-     */
-    public void inputGraph(InputStream vertexInputStream, InputStream edgeInputStream) throws IOException {
-        final BatchGraph graph = BatchGraph.wrap(this.graph, this.bufferSize);
-        readVertices(graph, vertexInputStream);
-
-        if (edgeInputStream != null) {
-            readEdges(graph, edgeInputStream);
-        }
-
-        graph.commit();
-    }
-
-    /**
-     * Load the CSV vertex and edge files into the Graph.
-     *
-     * @param vertexFilename
-     * @param edgeFilename
-     * @throws IOException
-     */
-    public void inputGraph(String vertexFilename, String edgeFilename) throws IOException {
-        FileInputStream vertexFis = new FileInputStream(vertexFilename);
-
-        try {
-            if (edgeFilename == null) {
-                inputGraph(vertexFis, null);
-            } else {
-                FileInputStream edgeFis = new FileInputStream(edgeFilename);
-
-                try {
-                    inputGraph(vertexFis, edgeFis);
-                } finally {
-                    edgeFis.close();
-                }
-            }
-        } finally {
-            vertexFis.close();
-        }
-    }
-
-    /**
      * Load the CSV vertex stream into the Graph.
      *
      * @param inputStream
      * @throws IOException
      */
     public void inputVertices(InputStream inputStream) throws IOException {
-        final BatchGraph graph = BatchGraph.wrap(this.graph, this.bufferSize);
-        graph.setLoadingFromScratch(false);
-        readVertices(graph, inputStream);
+        readVertices(inputStream);
         graph.commit();
     }
 
@@ -247,9 +203,7 @@ public class CSVReader {
      * @throws IOException
      */
     public void inputEdges(InputStream inputStream) throws IOException {
-        final BatchGraph graph = BatchGraph.wrap(this.graph, bufferSize);
-        graph.setLoadingFromScratch(false);
-        readEdges(graph, inputStream);
+        readEdges(inputStream);
         graph.commit();
     }
 
@@ -310,8 +264,7 @@ public class CSVReader {
         reader.inputEdges(inputStream);
     }
 
-    private void readVertices(final BatchGraph graph, InputStream inputStream) throws IOException {
-        System.out.println("readVertices: " + inputStream + " " + charset);
+    private void readVertices(InputStream inputStream) throws IOException {
         final Reader r = new BufferedReader(new InputStreamReader(inputStream, charset));
         au.com.bytecode.opencsv.CSVReader csvReader = new au.com.bytecode.opencsv.CSVReader(r, separator, quoteChar,
                 escapeChar);
@@ -323,23 +276,23 @@ public class CSVReader {
             if (row == null) { break; }
 
             Map<String, String> map = readPropertyMap(headers, row);
-            addVertex(graph, map);
+            addVertex(map);
         }
 
         csvReader.close();
     }
 
-    private void addVertex(final BatchGraph graph, final Map<String, String> map) throws IOException {
+    private void addVertex(final Map<String, String> map) throws IOException {
         final String id = map.remove("id");
         if (id != null) {
-            final Vertex vertex = createVertex(graph, map, id);
+            final Vertex vertex = createVertex(map, id);
             addProperties(vertex, map);
         } else {
             throw new IOException("No id found for node");
         }
     }
 
-    private Vertex createVertex(final BatchGraph graph, final Map<String, String> map, final String id) {
+    private Vertex createVertex(final Map<String, String> map, final String id) {
         String vertexId = id;
         if (vertexIdKey != null) {
             vertexId = map.remove(vertexIdKey);
@@ -352,7 +305,7 @@ public class CSVReader {
         return createdVertex;
     }
 
-    private void readEdges(final BatchGraph graph, InputStream inputStream) throws IOException {
+    private void readEdges(InputStream inputStream) throws IOException {
         final Reader r = new BufferedReader(new InputStreamReader(inputStream, charset));
         au.com.bytecode.opencsv.CSVReader csvReader = new au.com.bytecode.opencsv.CSVReader(r, separator, quoteChar,
                 escapeChar);
@@ -365,13 +318,13 @@ public class CSVReader {
 
             Map<String, String> map = readPropertyMap(headers, row);
 
-            addEdge(graph, map);
+            addEdge(map);
         }
 
         csvReader.close();
     }
 
-    private void addEdge(final BatchGraph graph, final Map<String, String> map) throws IOException {
+    private void addEdge(final Map<String, String> map) throws IOException {
         String source = map.remove(edgeSourceKey);
         if (source == null) {
             throw new IOException("Edge has no source");

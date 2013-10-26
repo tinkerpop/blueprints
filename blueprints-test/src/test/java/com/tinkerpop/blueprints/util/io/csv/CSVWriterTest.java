@@ -18,9 +18,8 @@ public class CSVWriterTest extends TestCase {
         r.setEdgeSourceKey("source");
         r.setEdgeTargetKey("target");
         r.setEdgeLabelKey("label");
-        r.inputGraph(
-                CSVWriterTest.class.getResourceAsStream("example-vertices-1.csv"),
-                CSVWriterTest.class.getResourceAsStream("example-edges-1.csv"));
+        r.inputVertices(CSVWriterTest.class.getResourceAsStream("example-vertices-1.csv"));
+        r.inputEdges(CSVWriterTest.class.getResourceAsStream("example-edges-1.csv"));
 
         ByteArrayOutputStream bosVertices = new ByteArrayOutputStream();
         ByteArrayOutputStream bosEdges = new ByteArrayOutputStream();
@@ -55,9 +54,8 @@ public class CSVWriterTest extends TestCase {
         r.setEdgeSourceKey("source");
         r.setEdgeTargetKey("target");
         r.setEdgeLabelKey("label");
-        r.inputGraph(
-                CSVWriterTest.class.getResourceAsStream("example-vertices-1.tsv"),
-                CSVWriterTest.class.getResourceAsStream("example-edges-1.tsv"));
+        r.inputVertices(CSVWriterTest.class.getResourceAsStream("example-vertices-1.tsv"));
+        r.inputEdges(CSVWriterTest.class.getResourceAsStream("example-edges-1.tsv"));
 
         ByteArrayOutputStream bosVertices = new ByteArrayOutputStream();
         ByteArrayOutputStream bosEdges = new ByteArrayOutputStream();

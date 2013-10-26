@@ -21,9 +21,8 @@ public class CSVReaderTest extends TestCase {
         r.setEdgeSourceKey("source");
         r.setEdgeTargetKey("target");
         r.setEdgeLabelKey("label");
-        r.inputGraph(
-                CSVReaderTest.class.getResourceAsStream("example-vertices-1.csv"),
-                CSVReaderTest.class.getResourceAsStream("example-edges-1.csv"));
+        r.inputVertices(CSVReaderTest.class.getResourceAsStream("example-vertices-1.csv"));
+        r.inputEdges(CSVReaderTest.class.getResourceAsStream("example-edges-1.csv"));
 
         Assert.assertEquals(6, getIterableCount(graph.getVertices()));
         Assert.assertEquals(6, getIterableCount(graph.getEdges()));
@@ -38,9 +37,8 @@ public class CSVReaderTest extends TestCase {
         r.setEdgeSourceKey("source");
         r.setEdgeTargetKey("target");
         r.setEdgeLabelKey("label");
-        r.inputGraph(
-                CSVReaderTest.class.getResourceAsStream("example-vertices-1.csv"),
-                CSVReaderTest.class.getResourceAsStream("example-edges-1.csv"));
+        r.inputVertices(CSVReaderTest.class.getResourceAsStream("example-vertices-1.csv"));
+        r.inputEdges(CSVReaderTest.class.getResourceAsStream("example-edges-1.csv"));
 
         Vertex v1 = graph.getVertex(1);
         Assert.assertEquals("29", v1.getProperty("age"));
