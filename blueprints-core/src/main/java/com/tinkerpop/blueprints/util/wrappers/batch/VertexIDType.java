@@ -43,8 +43,5 @@ public enum VertexIDType {
         }
     };
 
-    public VertexCache getVertexCache() {
-        throw new IllegalArgumentException("Unrecognized ID type: " + this);
-    }
-
+    public abstract VertexCache getVertexCache();
 }
