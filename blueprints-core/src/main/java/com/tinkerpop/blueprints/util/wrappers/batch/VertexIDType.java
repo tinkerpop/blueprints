@@ -14,21 +14,34 @@ import com.tinkerpop.blueprints.util.wrappers.batch.cache.VertexCache;
  */
 public enum VertexIDType {
 
-    OBJECT, NUMBER, STRING, URL;
-
-    public VertexCache getVertexCache() {
-        switch (this) {
-            case OBJECT:
-                return new ObjectIDVertexCache();
-            case NUMBER:
-                return new LongIDVertexCache();
-            case STRING:
-                return new StringIDVertexCache();
-            case URL:
-                return new StringIDVertexCache(new URLCompression());
-            default:
-                throw new IllegalArgumentException("Unrecognized ID type: " + this);
+    OBJECT {
+        @Override
+        public VertexCache getVertexCache() {
+            return new ObjectIDVertexCache();
         }
-    }
+    },
 
+    NUMBER {
+        @Override
+        public VertexCache getVertexCache() {
+            return new LongIDVertexCache();
+        }
+    },
+
+    STRING {
+        @Override
+        public VertexCache getVertexCache() {
+            return new StringIDVertexCache();
+        }
+    },
+
+    URL {
+        @Override
+        public VertexCache getVertexCache() {
+            return new StringIDVertexCache(new URLCompression());
+
+        }
+    };
+
+    public abstract VertexCache getVertexCache();
 }
