@@ -83,7 +83,7 @@ public class OrientDeleteVertexTest {
 	}
 
 	private OrientGraph createGraph() {
-		return new OrientGraph("memory:db");
+		return (OrientGraph) new OrientGraph("memory:db").setWarnOnForceClosingTx(false);
 	}
 
 }
