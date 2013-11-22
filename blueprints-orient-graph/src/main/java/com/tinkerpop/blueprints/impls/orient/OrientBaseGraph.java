@@ -49,7 +49,7 @@ import com.tinkerpop.blueprints.util.StringFactory;
 /**
  * A Blueprints implementation of the graph database OrientDB
  * (http://www.orientechnologies.com)
- * 
+ *
  * @author Luca Garulli (http://www.orientechnologies.com)
  */
 public abstract class OrientBaseGraph implements IndexableGraph,
@@ -83,7 +83,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	/**
 	 * Constructs a new object using an existent OGraphDatabase instance.
-	 * 
+	 *
 	 * @param iDatabase
 	 *            Underlying OGraphDatabase object to attach
 	 */
@@ -166,7 +166,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	 * <td>true</td>
 	 * </tr>
 	 * </table>
-	 * 
+	 *
 	 * @param configuration
 	 */
 	public OrientBaseGraph(final Configuration configuration) {
@@ -290,14 +290,21 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 			@Override
 			public Object call(OrientBaseGraph g) {
 				try {
+                    String recordMapIndexName = null;
 					synchronized (contexts) {
 						for (OrientGraphContext ctx : contexts) {
-							ctx.manualIndices.remove(indexName);
+							OrientIndex<?> index = ctx.manualIndices.remove(indexName);
+                            if (recordMapIndexName == null && index != null)
+                                recordMapIndexName = index.getUnderlying().getConfiguration().field(OrientIndex.CONFIG_RECORD_MAP_NAME);
 						}
 					}
 
 					getRawGraph().getMetadata().getIndexManager()
 							.dropIndex(indexName);
+                    if (recordMapIndexName != null)
+                        getRawGraph().getMetadata().getIndexManager()
+                                .dropIndex(recordMapIndexName);
+
 					saveIndexConfiguration();
 					return null;
 				} catch (Exception e) {
@@ -367,7 +374,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	/**
 	 * Creates a temporary vertex. The vertex is not saved and the transaction
 	 * is not started.
-	 * 
+	 *
 	 * @param iClassName
 	 *            Vertex's class name
 	 * @param prop
@@ -588,7 +595,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	/**
 	 * Reuses the underlying database avoiding to create and open it every time.
-	 * 
+	 *
 	 * @param iDatabase
 	 *            Underlying OGraphDatabase object
 	 */
@@ -807,7 +814,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 	/**
 	 * Returns a graph element, vertex or edge, starting from an ID.
-	 * 
+	 *
 	 * @param id
 	 *            element id
 	 * @return OrientElement subclass such as OrientVertex or OrientEdge
@@ -958,7 +965,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	/**
 	 * Create an automatic indexing structure for indexing provided key for
 	 * element class.
-	 * 
+	 *
 	 * @param key
 	 *            the key to create the index for
 	 * @param elementClass
@@ -1077,7 +1084,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	/**
 	 * Executes commands against the graph. Commands are executed outside
 	 * transaction.
-	 * 
+	 *
 	 * @param iCommand
 	 *            Command request between SQL, GREMLIN and SCRIPT commands
 	 */
@@ -1273,7 +1280,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	 * <li><b>ALWAYS_AUTOSET</b> each call assures the current graph instance is
 	 * set in the Thread Local</li>
 	 * </ul>
-	 * 
+	 *
 	 * @see #setThreadMode(THREAD_MODE)
 	 * @return Current Graph instance to allow calls in chain (fluent interface)
 	 */
@@ -1293,7 +1300,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	 * <li><b>ALWAYS_AUTOSET</b> each call assures the current graph instance is
 	 * set in the Thread Local</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param iControl
 	 *            Value to set
 	 * @see #getThreadMode()
