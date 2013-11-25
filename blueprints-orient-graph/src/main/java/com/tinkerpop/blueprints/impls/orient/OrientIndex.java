@@ -1,23 +1,21 @@
 package com.tinkerpop.blueprints.impls.orient;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import com.orientechnologies.common.collection.OCompositeKey;
 import com.orientechnologies.orient.core.db.record.OIdentifiable;
 import com.orientechnologies.orient.core.index.OIndex;
 import com.orientechnologies.orient.core.index.OIndexTxAwareMultiValue;
+import com.orientechnologies.orient.core.index.OIndexTxAwareOneValue;
 import com.orientechnologies.orient.core.index.OSimpleKeyIndexDefinition;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
-import com.orientechnologies.orient.core.record.ORecord;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.CloseableIterable;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author Luca Garulli (http://www.orientechnologies.com)
@@ -27,11 +25,13 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected static final String VERTEX = "Vertex";
     protected static final String EDGE = "Edge";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
+    public static final String CONFIG_RECORD_MAP_NAME = "recrod_map_name";
 
     protected static final String SEPARATOR = "!=!";
 
     protected OrientBaseGraph graph;
     protected OIndex<?> underlying;
+    protected OIndex<?> recordKeyValueIndex;
 
     protected Class<? extends Element> indexClass;
 
@@ -66,12 +66,13 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         graph.autoStartTransaction();
         underlying.put(keyTemp, doc);
+        recordKeyValueIndex.put(new OCompositeKey(element.getIdentity(), keyTemp), element.getIdentity());
     }
 
     @SuppressWarnings("rawtypes")
     public CloseableIterable<T> get(final String key, final Object iValue) {
         final String keyTemp = key + SEPARATOR + iValue;
-        Collection<OIdentifiable> records  = (Collection<OIdentifiable>) underlying.get(keyTemp);
+        Collection<OIdentifiable> records = (Collection<OIdentifiable>) underlying.get(keyTemp);
 
         if (records == null || records.isEmpty())
             return new WrappingCloseableIterable(Collections.emptySet());
@@ -94,6 +95,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         graph.autoStartTransaction();
         try {
             underlying.remove(keyTemp, element.getRecord());
+            recordKeyValueIndex.remove(new OCompositeKey(element.getIdentity(), keyTemp), element.getIdentity());
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -103,10 +105,20 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         return StringFactory.indexString(this);
     }
 
-    protected void removeElement(final T vertex) {
+    protected void removeElement(final T element) {
         graph.autoStartTransaction();
-        final ORecord<?> vertexDoc = vertex.getRecord();
-        underlying.remove(vertexDoc);
+        Collection<ODocument> entries = recordKeyValueIndex.getEntriesBetween(new OCompositeKey(element.getIdentity()),
+                new OCompositeKey(element.getIdentity()));
+        for (ODocument entry : entries) {
+            OCompositeKey key = entry.field("key");
+            List<Object> keys = key.getKeys();
+            underlying.remove(keys.get(1).toString(), element.getIdentity());
+            recordKeyValueIndex.remove(key, element.getIdentity());
+        }
+    }
+
+    public OIndex<?> getUnderlying() {
+        return underlying;
     }
 
     private void create(final String indexName, final Class<? extends Element> indexClass, OType iKeyType) {
@@ -128,13 +140,22 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         else
             className = indexClass.getName();
 
+        this.recordKeyValueIndex = new OIndexTxAwareOneValue(graph.getRawGraph(), (OIndex<OIdentifiable>) graph
+                .getRawGraph()
+                .getMetadata()
+                .getIndexManager()
+                .createIndex("__@recordmap@___" + indexName, OClass.INDEX_TYPE.DICTIONARY.toString(),
+                        new OSimpleKeyIndexDefinition(OType.LINK, OType.STRING), null, null));
+
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
         underlying.getConfiguration().field(CONFIG_CLASSNAME, className);
+        underlying.getConfiguration().field(CONFIG_RECORD_MAP_NAME, recordKeyValueIndex.getName());
     }
 
     private void load(final ODocument indexConfiguration) {
         // LOAD TREEMAP
         final String indexClassName = indexConfiguration.field(CONFIG_CLASSNAME);
+        final String recordKeyValueMap = indexConfiguration.field(CONFIG_RECORD_MAP_NAME);
 
         if (VERTEX.equals(indexClassName))
             this.indexClass = OrientVertex.class;
@@ -147,6 +168,9 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
                 throw new IllegalArgumentException("Index class '" + indexClassName
                         + "' is not registered. Supported ones: Vertex, Edge and custom class that extends them");
             }
+
+        recordKeyValueIndex = new OIndexTxAwareOneValue(graph.getRawGraph(), (OIndex<OIdentifiable>) graph.getRawGraph().getMetadata()
+                .getIndexManager().getIndex(recordKeyValueMap));
     }
 
     public void close() {
