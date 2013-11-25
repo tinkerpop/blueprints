@@ -125,6 +125,7 @@ public abstract class OrientGraphTest extends GraphTest {
         this.currentGraph = new OrientGraph("local:" + dbPath);
 
         //OGlobalConfiguration.CACHE_LEVEL1_ENABLED.setValue(false);
+        currentGraph.setWarnOnForceClosingTx(false);
 
         return currentGraph;
     }

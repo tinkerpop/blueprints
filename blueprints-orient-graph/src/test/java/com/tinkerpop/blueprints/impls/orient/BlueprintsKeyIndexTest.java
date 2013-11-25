@@ -18,6 +18,7 @@ public class BlueprintsKeyIndexTest {
 	@Test
 	public void test_with_createKeyIndex() throws Exception {
 		final OrientGraph graph = new OrientGraph("memory:temp");
+        graph.setWarnOnForceClosingTx(false);
 		try {
 			/* create key index */
 			graph.createKeyIndex(KEY_NAME, Vertex.class);
@@ -45,6 +46,7 @@ public class BlueprintsKeyIndexTest {
 	@Test
 	public void test_without_createKeyIndex() throws Exception {
 		final OrientGraph graph = new OrientGraph("memory:temp");
+        graph.setWarnOnForceClosingTx(false);
 		try {
 			/* create key index */
 			// graph.createKeyIndex("name", Vertex.class);

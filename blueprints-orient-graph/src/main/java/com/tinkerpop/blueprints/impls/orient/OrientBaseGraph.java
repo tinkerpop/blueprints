@@ -71,6 +71,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	protected boolean useVertexFieldsForEdgeLabels = true;
 	protected boolean saveOriginalIds = false;
 	protected boolean standardElementConstraints = true;
+	protected boolean warnOnForceClosingTx = true;
 	protected THREAD_MODE threadMode = THREAD_MODE.AUTOSET_IFNULL;
 
 	private String url;
@@ -1180,10 +1181,11 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 		return standardElementConstraints;
 	}
 
-	public void setStandardElementConstraints(final boolean allowsPropertyValueNull) {
+	public void setStandardElementConstraints(
+			final boolean allowsPropertyValueNull) {
 		this.standardElementConstraints = allowsPropertyValueNull;
 	}
-	
+
 	public static void encodeClassNames(final String... iLabels) {
 		if (iLabels != null)
 			// ENCODE LABELS
@@ -1236,7 +1238,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 		final boolean committed;
 		final ODatabaseDocumentTx raw = getRawGraph();
 		if (raw.getTransaction().isActive()) {
-			if (OLogManager.instance().isWarnEnabled()) {
+			if (warnOnForceClosingTx && OLogManager.instance().isWarnEnabled()) {
 				// COMPOSE THE MESSAGE
 				final StringBuilder msg = new StringBuilder();
 				for (String s : iOperationStrings)
@@ -1333,5 +1335,15 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 				// SET IT
 				ODatabaseRecordThreadLocal.INSTANCE.set(getRawGraph());
 		}
+	}
+
+	public boolean isWarnOnForceClosingTx() {
+		return warnOnForceClosingTx;
+	}
+
+	public OrientBaseGraph setWarnOnForceClosingTx(
+			final boolean warnOnSchemaChangeInTx) {
+		this.warnOnForceClosingTx = warnOnSchemaChangeInTx;
+		return this;
 	}
 }

@@ -294,7 +294,8 @@ public abstract class OrientElement implements Element, OSerializableStream,
 			throw ExceptionFactory.propertyValueCanNotBeNull();
 		if (null == key)
 			throw ExceptionFactory.propertyKeyCanNotBeNull();
-		if (graph.isStandardElementConstraints() && key.equals(StringFactory.ID))
+		if (graph.isStandardElementConstraints()
+				&& key.equals(StringFactory.ID))
 			throw ExceptionFactory.propertyKeyIdIsReserved();
 		if (element instanceof Edge && key.equals(StringFactory.LABEL))
 			throw ExceptionFactory.propertyKeyLabelIsReservedForEdges();
