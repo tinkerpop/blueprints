@@ -13,7 +13,11 @@ import com.orientechnologies.orient.core.index.OSimpleKeyIndexDefinition;
 import com.orientechnologies.orient.core.metadata.schema.OClass;
 import com.orientechnologies.orient.core.metadata.schema.OType;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.tinkerpop.blueprints.*;
+import com.tinkerpop.blueprints.CloseableIterable;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
 import com.tinkerpop.blueprints.util.WrappingCloseableIterable;
 
@@ -25,7 +29,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected static final String VERTEX = "Vertex";
     protected static final String EDGE = "Edge";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
-    public static final String CONFIG_RECORD_MAP_NAME = "recrod_map_name";
+	public static final String CONFIG_RECORD_MAP_NAME = "record_map_name";
 
     protected static final String SEPARATOR = "!=!";
 
@@ -149,7 +153,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
 
         // CREATE THE CONFIGURATION FOR THE NEW INDEX
         underlying.getConfiguration().field(CONFIG_CLASSNAME, className);
-        underlying.getConfiguration().field(CONFIG_RECORD_MAP_NAME, recordKeyValueIndex.getName());
+		underlying.getConfiguration().field(CONFIG_RECORD_MAP_NAME, recordKeyValueIndex.getName());
     }
 
     private void load(final ODocument indexConfiguration) {
