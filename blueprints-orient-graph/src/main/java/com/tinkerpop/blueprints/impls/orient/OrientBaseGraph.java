@@ -466,25 +466,24 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 		int pos = iKey.indexOf('.');
 		if (pos > -1) {
 			indexName = iKey;
-					  
-		  String oClassName = iKey.substring(0, pos);
-			key = iKey.substring(iKey.indexOf('.') + 1);		 
-						
-	 		final OSchema schema = getContext(true).rawGraph.getMetadata().getSchema();
-			OClass oClass = schema.getClass(oClassName);
-			
-      final Collection<? extends OIndex<?>> indexes = oClass.getIndexes();
-      for (OIndex<?> index : indexes) {
-         String oInName = index.getName();        
-         int point = oInName.indexOf(".");
-         String okey = oInName.substring(point + 1);    
-         if (okey.equals(key))
-         {
-           indexName = oInName;
-           break;
-         }
-      }
-      
+
+			final String className = iKey.substring(0, pos);
+			key = iKey.substring(iKey.indexOf('.') + 1);
+
+			final OClass clazz = getContext(true).rawGraph.getMetadata()
+					.getSchema().getClass(className);
+
+			final Collection<? extends OIndex<?>> indexes = clazz.getIndexes();
+			for (OIndex<?> index : indexes) {
+				final String oInName = index.getName();
+				final int point = oInName.indexOf(".");
+				final String okey = oInName.substring(point + 1);
+				if (okey.equals(key)) {
+					indexName = oInName;
+					break;
+				}
+			}
+
 		} else {
 			indexName = OrientVertex.CLASS_NAME + "." + iKey;
 			key = iKey;
