@@ -67,7 +67,7 @@
         <module>blueprints-test</module>
         <module>blueprints-graph-jung</module>
         <module>blueprints-rexster-graph</module>
-        <module>blueprints-dex-graph</module>
+        <module>blueprints-sparksee-graph</module>
         <module>blueprints-neo4j-graph</module>
         <module>blueprints-orient-graph</module>
         <module>blueprints-graph-sail</module>
