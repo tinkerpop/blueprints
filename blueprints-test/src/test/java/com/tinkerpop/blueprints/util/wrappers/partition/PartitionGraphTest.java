@@ -91,13 +91,14 @@ public class PartitionGraphTest extends GraphTest {
         }
     }
 
-    public void makeThisTestPasstestVerticesSeparatedByEdgeInDifferentPartition() {
+    public void testVerticesSeparatedByEdgeInDifferentPartition() {
         TinkerGraph rawGraph = new TinkerGraph();
         PartitionIndexableGraph graph = new PartitionIndexableGraph(rawGraph, "_writeGraph", "p1");
         Vertex inp1 = graph.addVertex("inp1");
 
         graph.setWritePartition("p2");
         Vertex inp2 = graph.addVertex("inp2");
+        inp2.setProperty("key","value");
 
         graph.setWritePartition("p3");
         graph.addEdge("inp3", inp1, inp2, "links");
@@ -198,8 +199,8 @@ public class PartitionGraphTest extends GraphTest {
         assertEquals(graph.getWritePartition(), "c");
         assertEquals(count(graph.getVertices()), 0);
         assertEquals(count(graph.getEdges()), 1);
-        assertEquals(knows.getVertex(Direction.IN), peter);
-        assertEquals(knows.getVertex(Direction.OUT), marko);
+        assertNull(knows.getVertex(Direction.IN));
+        assertNull(knows.getVertex(Direction.OUT));
 
         // testing indices
         /*marko.setProperty("name", "marko");
