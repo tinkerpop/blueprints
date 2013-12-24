@@ -29,7 +29,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
     protected static final String VERTEX = "Vertex";
     protected static final String EDGE = "Edge";
     protected static final String CONFIG_CLASSNAME = "blueprintsIndexClass";
-	public static final String CONFIG_RECORD_MAP_NAME = "record_map_name";
+    public static final String CONFIG_RECORD_MAP_NAME = "record_map_name";
 
     protected static final String SEPARATOR = "!=!";
 
@@ -50,7 +50,7 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         this.graph = orientGraph;
         this.underlying = rawIndex instanceof OIndexTxAwareMultiValue ? rawIndex : new OIndexTxAwareMultiValue(
                 orientGraph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) rawIndex);
-        load(rawIndex.getConfiguration());
+        load(rawIndex.getMetadata());
     }
 
     public String getIndexName() {
@@ -131,10 +131,12 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         if (iKeyType == null)
             iKeyType = OType.STRING;
 
-        // CREATE THE MAP
-        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph()
-                .getMetadata().getIndexManager()
-                .createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(), new OSimpleKeyIndexDefinition(iKeyType), null, null));
+        this.recordKeyValueIndex = new OIndexTxAwareOneValue(graph.getRawGraph(), (OIndex<OIdentifiable>) graph
+                .getRawGraph()
+                .getMetadata()
+                .getIndexManager()
+                .createIndex("__@recordmap@___" + indexName, OClass.INDEX_TYPE.DICTIONARY.toString(),
+                        new OSimpleKeyIndexDefinition(OType.LINK, OType.STRING), null, null, null));
 
         final String className;
         if (Vertex.class.isAssignableFrom(indexClass))
@@ -144,22 +146,23 @@ public class OrientIndex<T extends OrientElement> implements Index<T> {
         else
             className = indexClass.getName();
 
-        this.recordKeyValueIndex = new OIndexTxAwareOneValue(graph.getRawGraph(), (OIndex<OIdentifiable>) graph
-                .getRawGraph()
-                .getMetadata()
-                .getIndexManager()
-                .createIndex("__@recordmap@___" + indexName, OClass.INDEX_TYPE.DICTIONARY.toString(),
-                        new OSimpleKeyIndexDefinition(OType.LINK, OType.STRING), null, null));
+        final ODocument metadata = new ODocument();
+        metadata.field(CONFIG_CLASSNAME, className);
+        metadata.field(CONFIG_RECORD_MAP_NAME, recordKeyValueIndex.getName());
 
-        // CREATE THE CONFIGURATION FOR THE NEW INDEX
-        underlying.getConfiguration().field(CONFIG_CLASSNAME, className);
-		underlying.getConfiguration().field(CONFIG_RECORD_MAP_NAME, recordKeyValueIndex.getName());
+        // CREATE THE MAP
+        this.underlying = new OIndexTxAwareMultiValue(graph.getRawGraph(), (OIndex<Collection<OIdentifiable>>) graph.getRawGraph()
+                .getMetadata().getIndexManager()
+                .createIndex(indexName, OClass.INDEX_TYPE.NOTUNIQUE.toString(), new OSimpleKeyIndexDefinition(iKeyType), null, null
+                        , metadata));
+
+
     }
 
-    private void load(final ODocument indexConfiguration) {
+    private void load(final ODocument metadata) {
         // LOAD TREEMAP
-        final String indexClassName = indexConfiguration.field(CONFIG_CLASSNAME);
-        final String recordKeyValueMap = indexConfiguration.field(CONFIG_RECORD_MAP_NAME);
+        final String indexClassName = metadata.field(CONFIG_CLASSNAME);
+        final String recordKeyValueMap = metadata.field(CONFIG_RECORD_MAP_NAME);
 
         if (VERTEX.equals(indexClassName))
             this.indexClass = OrientVertex.class;
