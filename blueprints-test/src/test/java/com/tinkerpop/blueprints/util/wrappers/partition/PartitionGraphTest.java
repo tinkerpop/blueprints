@@ -12,6 +12,7 @@ import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.util.io.csv.CSVReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
@@ -53,6 +54,12 @@ public class PartitionGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new IndexTestSuite(this));
         printTestPerformance("IndexTestSuite", this.stopWatch());
+    }
+
+    public void testCSVReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new CSVReaderTestSuite(this));
+        printTestPerformance("CSVReaderTestSuite", this.stopWatch());
     }
 
     public void testGraphMLReaderTestSuite() throws Exception {

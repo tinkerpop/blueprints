@@ -16,6 +16,7 @@ import com.tinkerpop.blueprints.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.VertexQueryTestSuite;
 import com.tinkerpop.blueprints.VertexTestSuite;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.util.io.csv.CSVReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
@@ -87,6 +88,12 @@ public abstract class OrientGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new TransactionalGraphTestSuite(this));
         printTestPerformance("TransactionGraphTestSuite", this.stopWatch());
+    }
+
+    public void testCSVReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new CSVReaderTestSuite(this));
+        printTestPerformance("CSVReaderTestSuite", this.stopWatch());
     }
 
     public void testGraphMLReaderTestSuite() throws Exception {
