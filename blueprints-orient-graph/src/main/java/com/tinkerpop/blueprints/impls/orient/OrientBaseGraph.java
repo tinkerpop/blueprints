@@ -131,7 +131,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	 * </tr>
 	 * <tr>
 	 * <td>blueprints.orientdb.saveOriginalIds</td>
-	 * <td>Saves the original element IDs by using the property _id. This could
+	 * <td>Saves the original element IDs by using the property origId. This could
 	 * be useful on import of graph to preserve original ids</td>
 	 * <td>false</td>
 	 * </tr>
