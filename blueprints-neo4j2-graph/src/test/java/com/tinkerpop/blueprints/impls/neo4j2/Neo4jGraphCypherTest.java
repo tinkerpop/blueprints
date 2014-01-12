@@ -1,5 +1,7 @@
-package com.tinkerpop.blueprints.impls.neo4j;
+package com.tinkerpop.blueprints.impls.neo4j2;
 
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4jVertex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,8 +10,6 @@ import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.kernel.impl.util.FileUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;

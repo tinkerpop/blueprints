@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.neo4j;
+package com.tinkerpop.blueprints.impls.neo4j2;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Index;
@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;

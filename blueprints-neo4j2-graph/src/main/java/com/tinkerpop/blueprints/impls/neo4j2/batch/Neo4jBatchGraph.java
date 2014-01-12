@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.neo4j.batch;
+package com.tinkerpop.blueprints.impls.neo4j2.batch;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;

@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.neo4j;
+package com.tinkerpop.blueprints.impls.neo4j2;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
@@ -7,7 +7,6 @@ import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.IteratorWrapper;
 
 import java.util.*;
 

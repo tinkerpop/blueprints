@@ -1,7 +1,6 @@
-package com.tinkerpop.blueprints.impls.neo4j;
+package com.tinkerpop.blueprints.impls.neo4j2;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 

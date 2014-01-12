@@ -1,7 +1,8 @@
-package com.tinkerpop.blueprints.impls.neo4j.batch;
+package com.tinkerpop.blueprints.impls.neo4j2.batch;
 
 import com.tinkerpop.blueprints.*;
-import com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
+import com.tinkerpop.blueprints.impls.neo4j2.batch.Neo4jBatchGraph;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;

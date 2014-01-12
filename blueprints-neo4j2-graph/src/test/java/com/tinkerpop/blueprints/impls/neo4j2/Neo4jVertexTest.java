@@ -1,5 +1,7 @@
-package com.tinkerpop.blueprints.impls.neo4j;
+package com.tinkerpop.blueprints.impls.neo4j2;
 
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4jVertex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

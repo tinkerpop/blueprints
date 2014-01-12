@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.neo4j;
+package com.tinkerpop.blueprints.impls.neo4j2;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.Edge;
@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
