@@ -13,21 +13,21 @@ import java.util.Map;
  *
  * @author Stephen Mallette
  */
-public class Neo4jHaGraph extends Neo4jGraph {
+public class Neo4j2HaGraph extends Neo4j2Graph {
 
-    public Neo4jHaGraph(final String directory) {
+    public Neo4j2HaGraph(final String directory) {
         super(new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabase(directory));
     }
 
-    public Neo4jHaGraph(final String directory, final Map<String, String> configuration) {
+    public Neo4j2HaGraph(final String directory, final Map<String, String> configuration) {
         super(new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabaseBuilder(directory).setConfig(configuration).newGraphDatabase());
     }
 
-    public Neo4jHaGraph(final HighlyAvailableGraphDatabase rawGraph) {
+    public Neo4j2HaGraph(final HighlyAvailableGraphDatabase rawGraph) {
         super(rawGraph);
     }
 
-    public Neo4jHaGraph(final Configuration configuration) {
+    public Neo4j2HaGraph(final Configuration configuration) {
         this(configuration.getString("blueprints.neo4jha.directory", null),
                 convertConfiguration(configuration.subset("blueprints.neo4jha.conf")));
     }

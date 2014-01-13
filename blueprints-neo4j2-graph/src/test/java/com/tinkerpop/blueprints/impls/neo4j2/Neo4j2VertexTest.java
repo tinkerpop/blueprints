@@ -1,7 +1,5 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
-import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
-import com.tinkerpop.blueprints.impls.neo4j2.Neo4jVertex;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,19 +14,19 @@ import static org.junit.Assert.assertEquals;
  * @author mh
  * @since 08.01.14
  */
-public class Neo4jVertexTest {
+public class Neo4j2VertexTest {
 
-    private Neo4jGraph graph;
+    private Neo4j2Graph graph;
 
     @Before
     public void setUp() throws Exception {
         FileUtils.deleteRecursively(new File("target/test.db"));
-        graph = new Neo4jGraph("target/test.db");
+        graph = new Neo4j2Graph("target/test.db");
     }
 
     @Test
     public void testVertexLabels() throws Exception {
-        Neo4jVertex vertex = graph.addVertex(null);
+        Neo4j2Vertex vertex = graph.addVertex(null);
         vertex.addLabel("Label");
         assertEquals(Arrays.asList("Label"), vertex.getLabels());
         vertex.addLabel("Label2");

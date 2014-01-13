@@ -9,12 +9,12 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class Neo4jBatchVertexIterable implements CloseableIterable<Vertex> {
+class Neo4j2BatchVertexIterable implements CloseableIterable<Vertex> {
 
     private final IndexHits<Long> hits;
-    private final Neo4jBatchGraph graph;
+    private final Neo4j2BatchGraph graph;
 
-    public Neo4jBatchVertexIterable(final Neo4jBatchGraph graph, final IndexHits<Long> hits) {
+    public Neo4j2BatchVertexIterable(final Neo4j2BatchGraph graph, final IndexHits<Long> hits) {
         this.hits = hits;
         this.graph = graph;
     }
@@ -32,7 +32,7 @@ class Neo4jBatchVertexIterable implements CloseableIterable<Vertex> {
             }
 
             public Vertex next() {
-                return new Neo4jBatchVertex(graph, itty.next());
+                return new Neo4j2BatchVertex(graph, itty.next());
             }
         };
     }

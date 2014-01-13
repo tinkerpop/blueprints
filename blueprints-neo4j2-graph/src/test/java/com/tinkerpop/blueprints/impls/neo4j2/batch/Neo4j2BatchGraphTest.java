@@ -1,8 +1,7 @@
 package com.tinkerpop.blueprints.impls.neo4j2.batch;
 
 import com.tinkerpop.blueprints.*;
-import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
-import com.tinkerpop.blueprints.impls.neo4j2.batch.Neo4jBatchGraph;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2Graph;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
@@ -21,11 +20,11 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchGraphTest extends BaseTest {
+public class Neo4j2BatchGraphTest extends BaseTest {
 
     public void testFeatureCompliance() {
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         System.out.println(batch.getFeatures());
         batch.getFeatures().checkCompliance();
         batch.shutdown();
@@ -33,7 +32,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
     public void testAddingVerticesEdges() {
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         assertEquals(count(batch.getIndices()), 0); // no indices created
         final List<Long> ids = new ArrayList<Long>();
         for (int i = 0; i < 10; i++) {
@@ -50,7 +49,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         // native neo4j graph load
 
-        final Neo4jGraph graph = new Neo4jGraph(directory);
+        final Neo4j2Graph graph = new Neo4j2Graph(directory);
         graph.autoStartTransaction();
         assertEquals(count(graph.getVertices()), 10);
 
@@ -71,7 +70,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
     public void testAddingVerticesWithUserIdsThenSettingProperties() {
         List<Long> ids = new ArrayList<Long>(Arrays.asList(100L, 5L, 10L, 4L, 10000L));
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         for (final Long id : ids) {
             Vertex v = batch.addVertex(id);
             v.setProperty("theKey", id);
@@ -87,7 +86,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         // native neo4j graph load
 
-        final Neo4jGraph graph = new Neo4jGraph(directory);
+        final Neo4j2Graph graph = new Neo4j2Graph(directory);
         graph.autoStartTransaction();
         assertEquals(count(graph.getVertices()), ids.size());
         for (final Long id : ids) {
@@ -104,7 +103,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
     public void testAddingVerticesWithUserIdsAsStringsThenSettingProperties() {
         List<Object> ids = new ArrayList<Object>(Arrays.asList(100L, 5.0d, "10", 4.0f, "10000.00"));
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         for (final Object id : ids) {
             Vertex v = batch.addVertex(id);
             v.setProperty("theKey", id);
@@ -120,7 +119,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         // native neo4j graph load
 
-        final Neo4jGraph graph = new Neo4jGraph(directory);
+        final Neo4j2Graph graph = new Neo4j2Graph(directory);
         graph.autoStartTransaction();
         assertEquals(count(graph.getVertices()), ids.size());
         assertNotNull(graph.getVertex(100l));
@@ -135,7 +134,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
     public void testAddingVerticesEdgesWithIndices() {
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         assertEquals(0, count(batch.getIndices()));
         batch.createKeyIndex("name", Vertex.class);
         batch.createKeyIndex("age", Vertex.class);
@@ -172,7 +171,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         // native neo4j graph load
 
-        final Neo4jGraph graph = new Neo4jGraph(directory);
+        final Neo4j2Graph graph = new Neo4j2Graph(directory);
         graph.autoStartTransaction();
 
         assertEquals(count(graph.getIndices()), 1);
@@ -242,7 +241,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
     public void testElementPropertyManipulation() {
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         List<Long> vertexIds = new ArrayList<Long>();
         for (int i = 0; i < 10; i++) {
             Map<String, Object> map = new HashMap<String, Object>();
@@ -290,7 +289,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         // native neo4j graph load
 
-        Neo4jGraph graph = new Neo4jGraph(directory);
+        Neo4j2Graph graph = new Neo4j2Graph(directory);
         graph.autoStartTransaction();
         assertEquals(count(graph.getVertices()), 10);
         for (final Long id : vertexIds) {
@@ -313,7 +312,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
     public void testToStringMethods() {
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         System.out.println(batch.createIndex("anIdx", Vertex.class));
         System.out.println(batch.addVertex(null));
         System.out.println(batch.addEdge(null, batch.addVertex(null), batch.addVertex(null), "label"));
@@ -322,7 +321,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
     public void testGraphMLLoad() throws Exception {
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         new GraphMLReader(batch).inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
         assertNotNull(batch.getVertex(1));
         assertNotNull(batch.getVertex(2));
@@ -341,7 +340,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         // native neo4j graph load
 
-        Neo4jGraph graph = new Neo4jGraph(directory);
+        Neo4j2Graph graph = new Neo4j2Graph(directory);
         graph.autoStartTransaction();
         assertEquals(count(graph.getVertices()), 6);
         assertEquals(count(graph.getEdges()), 6);
@@ -374,7 +373,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
     public void testIndexParameters() throws Exception {
         final String directory = this.getWorkingDirectory();
-        final Neo4jBatchGraph batch = new Neo4jBatchGraph(directory);
+        final Neo4j2BatchGraph batch = new Neo4j2BatchGraph(directory);
         Index<Vertex> index = batch.createIndex("testIdx", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
         Vertex a = batch.addVertex(null);
         a.setProperty("name", "marko");
@@ -384,7 +383,7 @@ public class Neo4jBatchGraphTest extends BaseTest {
 
         // native neo4j graph load
 
-        Neo4jGraph graph = new Neo4jGraph(directory);
+        Neo4j2Graph graph = new Neo4j2Graph(directory);
         graph.autoStartTransaction();
         Iterator<Vertex> itty = graph.getIndex("testIdx", Vertex.class).query("name", "*rko").iterator();
         int counter = 0;

@@ -37,19 +37,19 @@ import java.util.Set;
  * A Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
  * This is a single threaded, non-transactional bulk loader and should not be used for any other reason than for massive initial data loads.
  * <p/>
- * Neo4jBatchGraph is <b>not</b> a completely faithful Blueprints implementation.
+ * Neo4j2BatchGraph is <b>not</b> a completely faithful Blueprints implementation.
  * Many methods throw UnsupportedOperationExceptions and take unique arguments. Be sure to review each method's JavaDoc.
  * The Neo4j "reference node" (vertex 0) is automatically created and is not removed until the database is shutdown() (do not add edges to the reference node).
  * Key indices are not available until after the graph has been shutdown.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaGraph<BatchInserter> {
+public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, MetaGraph<BatchInserter> {
 
     private final BatchInserter rawGraph;
     private final BatchInserterIndexProvider indexProvider;
 
-    private final Map<String, Neo4jBatchIndex<? extends Element>> indices = new HashMap<String, Neo4jBatchIndex<? extends Element>>();
+    private final Map<String, Neo4j2BatchIndex<? extends Element>> indices = new HashMap<String, Neo4j2BatchIndex<? extends Element>>();
 
     private Long idCounter = 0l;
 
@@ -95,12 +95,12 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     }
 
 
-    public Neo4jBatchGraph(final String directory) {
+    public Neo4j2BatchGraph(final String directory) {
         this.rawGraph = BatchInserters.inserter(directory);
         this.indexProvider = new LuceneBatchInserterIndexProvider(this.rawGraph);
     }
 
-    public Neo4jBatchGraph(final String directory, final Map<String, String> parameters) {
+    public Neo4j2BatchGraph(final String directory, final Map<String, String> parameters) {
         if (null == parameters)
             this.rawGraph = BatchInserters.inserter(directory);
         else
@@ -108,7 +108,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         this.indexProvider = new LuceneBatchInserterIndexProvider(this.rawGraph);
     }
 
-    public Neo4jBatchGraph(final BatchInserter rawGraph, final BatchInserterIndexProvider indexProvider) {
+    public Neo4j2BatchGraph(final BatchInserter rawGraph, final BatchInserterIndexProvider indexProvider) {
         this.rawGraph = rawGraph;
         this.indexProvider = indexProvider;
     }
@@ -123,11 +123,11 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     /**
      * This is necessary prior to using indices to ensure that indexed data is available to index queries.
      * This method is not part of the Blueprints Graph or IndexableGraph API.
-     * Therefore, be sure to typecast your graph to a Neo4jBatchGraph to use this necessary index-based method.
-     * Note that key indices are not usable until the Neo4jBatchGraph has been shutdown.
+     * Therefore, be sure to typecast your graph to a Neo4j2BatchGraph to use this necessary index-based method.
+     * Note that key indices are not usable until the Neo4j2BatchGraph has been shutdown.
      */
     public void flushIndices() {
-        for (final Neo4jBatchIndex index : this.indices.values()) {
+        for (final Neo4j2BatchIndex index : this.indices.values()) {
             index.flush();
         }
     }
@@ -222,8 +222,8 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
             finalId = (Long) id;
         } else if (id instanceof Map) {
             finalProperties = makePropertyMap((Map<String, Object>) id);
-            final Long providedId = (Long) ((Map<String, Object>) id).get(Neo4jBatchTokens.ID);
-            finalProperties.remove(Neo4jBatchTokens.ID);
+            final Long providedId = (Long) ((Map<String, Object>) id).get(Neo4j2BatchTokens.ID);
+            finalProperties.remove(Neo4j2BatchTokens.ID);
             if (providedId == null)
                 finalId = rawGraph.createNode(finalProperties);
             else {
@@ -239,7 +239,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
             }
         }
 
-        return new Neo4jBatchVertex(this, finalId);
+        return new Neo4j2BatchVertex(this, finalId);
     }
 
     public Vertex getVertex(final Object id) {
@@ -254,7 +254,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
                 longId = Double.valueOf(id.toString()).longValue();
 
             if (rawGraph.nodeExists(longId)) {
-                return new Neo4jBatchVertex(this, longId);
+                return new Neo4j2BatchVertex(this, longId);
             } else {
                 return null;
             }
@@ -281,7 +281,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
      * @throws UnsupportedOperationException
      */
     public void removeVertex(final Vertex vertex) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
+        throw new UnsupportedOperationException(Neo4j2BatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     /**
@@ -305,7 +305,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
             finalProperties = makePropertyMap((Map<String, Object>) id);
         final Long finalId = this.rawGraph.createRelationship((Long) outVertex.getId(), (Long) inVertex.getId(), DynamicRelationshipType.withName(label), finalProperties);
 
-        return new Neo4jBatchEdge(this, finalId, label);
+        return new Neo4j2BatchEdge(this, finalId, label);
     }
 
     /**
@@ -333,7 +333,7 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
      * @throws UnsupportedOperationException
      */
     public void removeEdge(final Edge edge) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
+        throw new UnsupportedOperationException(Neo4j2BatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
@@ -341,17 +341,17 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
     }
 
     public <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        final Neo4jBatchIndex<T> index;
+        final Neo4j2BatchIndex<T> index;
 
         final Map<String, String> map = generateParameterMap(indexParameters);
         if (indexParameters.length == 0) {
-            map.put(Neo4jBatchTokens.TYPE, Neo4jBatchTokens.EXACT);
+            map.put(Neo4j2BatchTokens.TYPE, Neo4j2BatchTokens.EXACT);
         }
 
         if (Vertex.class.isAssignableFrom(indexClass)) {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.nodeIndex(indexName, map), indexName, indexClass);
+            index = new Neo4j2BatchIndex<T>(this, indexProvider.nodeIndex(indexName, map), indexName, indexClass);
         } else {
-            index = new Neo4jBatchIndex<T>(this, indexProvider.relationshipIndex(indexName, map), indexName, indexClass);
+            index = new Neo4j2BatchIndex<T>(this, indexProvider.relationshipIndex(indexName, map), indexName, indexClass);
         }
         this.indices.put(indexName, index);
         return index;
@@ -365,13 +365,13 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
      * @throws UnsupportedOperationException
      */
     public void dropIndex(final String indexName) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
+        throw new UnsupportedOperationException(Neo4j2BatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     private Map<String, Object> makePropertyMap(final Map<String, Object> map) {
         final Map<String, Object> properties = new HashMap<String, Object>();
         for (final Map.Entry<String, Object> entry : map.entrySet()) {
-            if (!entry.getKey().equals(Neo4jBatchTokens.ID)) {
+            if (!entry.getKey().equals(Neo4j2BatchTokens.ID)) {
                 properties.put(entry.getKey(), entry.getValue());
             }
         }

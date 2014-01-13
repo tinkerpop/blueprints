@@ -19,14 +19,14 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> implements Index<T> {
+public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> implements Index<T> {
 
     private final Class<T> indexClass;
-    protected final Neo4jGraph graph;
+    protected final Neo4j2Graph graph;
     private final String indexName;
     protected org.neo4j.graphdb.index.Index<S> rawIndex;
 
-    protected Neo4jIndex(final String indexName, final Class<T> indexClass, final Neo4jGraph graph, final Parameter... indexParameters) {
+    protected Neo4j2Index(final String indexName, final Class<T> indexClass, final Neo4j2Graph graph, final Parameter... indexParameters) {
         this.indexClass = indexClass;
         this.graph = graph;
         this.indexName = indexName;
@@ -62,10 +62,10 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
      */
     public CloseableIterable<T> get(final String key, final Object value) {
         final IndexHits<S> itty = this.rawIndex.get(key, value);
-        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
+        if (this.indexClass.isAssignableFrom(Neo4j2Vertex.class))
+            return new Neo4j2VertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
+            return new Neo4j2EdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
     }
 
     /**
@@ -77,10 +77,10 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
      */
     public CloseableIterable<T> query(final String key, final Object query) {
         final IndexHits<S> itty = this.rawIndex.query(key, query);
-        if (this.indexClass.isAssignableFrom(Neo4jVertex.class))
-            return new Neo4jVertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
+        if (this.indexClass.isAssignableFrom(Neo4j2Vertex.class))
+            return new Neo4j2VertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
         else
-            return new Neo4jEdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
+            return new Neo4j2EdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
     }
 
     /**

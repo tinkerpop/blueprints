@@ -1,7 +1,6 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
 import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
@@ -19,7 +18,7 @@ import org.neo4j.kernel.impl.nioneo.store.StoreId;
 
 import static org.junit.Assert.assertThat;
 
-public class Neo4jGraphUsingANonInternalAbstractGraphClassFail {
+public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
     private class LazyLoadedGraphDatabase implements GraphDatabaseService {
         private GraphDatabaseService lazy;
 
@@ -205,25 +204,25 @@ public class Neo4jGraphUsingANonInternalAbstractGraphClassFail {
     }
 
     /**
-     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph#getInternalIndexKeys}
+     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4j2Graph#getInternalIndexKeys}
      * won't load any index, with an additional {@link ClassCastException}
      */
     @Test
     public void loadingANeo4jGraphFromAnyGraphDatabaseClassShouldWork() throws ClassCastException {
-        Neo4jGraph tested = new Neo4jGraph(new LazyLoadedGraphDatabase());
+        Neo4j2Graph tested = new Neo4j2Graph(new LazyLoadedGraphDatabase());
         assertThat(tested, IsNull.notNullValue());
         // this one isn't a GraphDatabaseAPI. As a consequence, the indexing features are disgraded.
         assertThat(tested.getIndices().iterator().hasNext(), Is.is(false));
     }
 
     /**
-     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4jGraph#getInternalIndexKeys}
+     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4j2Graph#getInternalIndexKeys}
      * won't load any index, with an additional {@link ClassCastException}
      */
     @Test
     public void loadingANeo4jGraphFromAnyGraphAPIClassShouldWork() throws ClassCastException {
         String METHOD_NAME = "#loadingANeo4jGraphFromAnyGraphAPIClassShouldWork";
-        Neo4jGraph tested = new Neo4jGraph(new LazyLoadableGraphAPI());
+        Neo4j2Graph tested = new Neo4j2Graph(new LazyLoadableGraphAPI());
         assertThat(tested, IsNull.notNullValue());
         // at startup there is no index
         assertThat(tested.getIndices().iterator().hasNext(), Is.is(false));

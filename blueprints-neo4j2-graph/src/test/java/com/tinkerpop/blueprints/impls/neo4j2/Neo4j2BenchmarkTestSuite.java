@@ -6,7 +6,6 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -16,14 +15,14 @@ import org.neo4j.graphdb.Relationship;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jBenchmarkTestSuite extends TestSuite {
+public class Neo4j2BenchmarkTestSuite extends TestSuite {
 
     private static final int TOTAL_RUNS = 10;
 
-    public Neo4jBenchmarkTestSuite() {
+    public Neo4j2BenchmarkTestSuite() {
     }
 
-    public Neo4jBenchmarkTestSuite(final GraphTest graphTest) {
+    public Neo4j2BenchmarkTestSuite(final GraphTest graphTest) {
         super(graphTest);
     }
 
@@ -35,7 +34,7 @@ public class Neo4jBenchmarkTestSuite extends TestSuite {
 
         for (int i = 0; i < TOTAL_RUNS; i++) {
             graph = graphTest.generateGraph();
-            GraphDatabaseService neo4j = ((Neo4jGraph) graph).getRawGraph();
+            GraphDatabaseService neo4j = ((Neo4j2Graph) graph).getRawGraph();
             int counter = 0;
             this.stopWatch();
             for (final Node node : neo4j.getAllNodes()) {
@@ -94,10 +93,10 @@ public class Neo4jBenchmarkTestSuite extends TestSuite {
             }
             double currentTime = this.stopWatch();
             totalTime = totalTime + currentTime;
-            BaseTest.printPerformance(graph.toString(), counter, "Neo4jGraph elements touched", currentTime);
+            BaseTest.printPerformance(graph.toString(), counter, "Neo4j2Graph elements touched", currentTime);
             graph.shutdown();
         }
-        BaseTest.printPerformance("Neo4jGraph", 1, "Neo4jGraph experiment average", totalTime / (double) TOTAL_RUNS);
+        BaseTest.printPerformance("Neo4j2Graph", 1, "Neo4j2Graph experiment average", totalTime / (double) TOTAL_RUNS);
     }
 
 

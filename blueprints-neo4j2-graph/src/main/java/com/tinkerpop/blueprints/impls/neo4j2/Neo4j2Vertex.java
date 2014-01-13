@@ -13,9 +13,9 @@ import java.util.*;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jVertex extends Neo4jElement implements Vertex {
+public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
 
-    public Neo4jVertex(final Node node, final Neo4jGraph graph) {
+    public Neo4j2Vertex(final Node node, final Neo4j2Graph graph) {
         super(graph);
         this.rawElement = node;
 
@@ -66,7 +66,7 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
     }
 
     public boolean equals(final Object object) {
-        return object instanceof Neo4jVertex && ((Neo4jVertex) object).getId().equals(this.getId());
+        return object instanceof Neo4j2Vertex && ((Neo4j2Vertex) object).getId().equals(this.getId());
     }
 
     public String toString() {
@@ -77,13 +77,13 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
         return (Node) this.rawElement;
     }
 
-    private class Neo4jVertexVertexIterable<T extends Vertex> implements Iterable<Neo4jVertex> {
-        private final Neo4jGraph graph;
+    private class Neo4jVertexVertexIterable<T extends Vertex> implements Iterable<Neo4j2Vertex> {
+        private final Neo4j2Graph graph;
         private final Node node;
         private final Direction direction;
         private final DynamicRelationshipType[] labels;
 
-        public Neo4jVertexVertexIterable(final Neo4jGraph graph, final Node node, final Direction direction, final String... labels) {
+        public Neo4jVertexVertexIterable(final Neo4j2Graph graph, final Node node, final Direction direction, final String... labels) {
             this.graph = graph;
             this.node = node;
             this.direction = direction;
@@ -93,16 +93,16 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
             }
         }
 
-        public Iterator<Neo4jVertex> iterator() {
+        public Iterator<Neo4j2Vertex> iterator() {
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
             else
                 itty = node.getRelationships(direction).iterator();
 
-            return new Iterator<Neo4jVertex>() {
-                public Neo4jVertex next() {
-                    return new Neo4jVertex(itty.next().getOtherNode(node), graph);
+            return new Iterator<Neo4j2Vertex>() {
+                public Neo4j2Vertex next() {
+                    return new Neo4j2Vertex(itty.next().getOtherNode(node), graph);
                 }
 
                 public boolean hasNext() {
@@ -116,14 +116,14 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
         }
     }
 
-    private class Neo4jVertexEdgeIterable<T extends Edge> implements Iterable<Neo4jEdge> {
+    private class Neo4jVertexEdgeIterable<T extends Edge> implements Iterable<Neo4j2Edge> {
 
-        private final Neo4jGraph graph;
+        private final Neo4j2Graph graph;
         private final Node node;
         private final Direction direction;
         private final DynamicRelationshipType[] labels;
 
-        public Neo4jVertexEdgeIterable(final Neo4jGraph graph, final Node node, final Direction direction, final String... labels) {
+        public Neo4jVertexEdgeIterable(final Neo4j2Graph graph, final Node node, final Direction direction, final String... labels) {
             this.graph = graph;
             this.node = node;
             this.direction = direction;
@@ -133,16 +133,16 @@ public class Neo4jVertex extends Neo4jElement implements Vertex {
             }
         }
 
-        public Iterator<Neo4jEdge> iterator() {
+        public Iterator<Neo4j2Edge> iterator() {
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
             else
                 itty = node.getRelationships(direction).iterator();
 
-            return new Iterator<Neo4jEdge>() {
-                public Neo4jEdge next() {
-                    return new Neo4jEdge(itty.next(), graph);
+            return new Iterator<Neo4j2Edge>() {
+                public Neo4j2Edge next() {
+                    return new Neo4j2Edge(itty.next(), graph);
                 }
 
                 public boolean hasNext() {

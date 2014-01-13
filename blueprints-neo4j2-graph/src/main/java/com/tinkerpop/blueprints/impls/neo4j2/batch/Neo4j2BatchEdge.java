@@ -11,11 +11,11 @@ import java.util.Map;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class Neo4jBatchEdge extends Neo4jBatchElement implements Edge {
+class Neo4j2BatchEdge extends Neo4j2BatchElement implements Edge {
 
     private final String label;
 
-    public Neo4jBatchEdge(final Neo4jBatchGraph graph, final Long id, final String label) {
+    public Neo4j2BatchEdge(final Neo4j2BatchGraph graph, final Long id, final String label) {
         super(graph, id);
         this.label = label;
     }

@@ -11,25 +11,24 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4jEdge> {
+public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo4j2Edge> {
 
     private final Iterable<Relationship> relationships;
-    private final Neo4jGraph graph;
+    private final Neo4j2Graph graph;
     private final boolean checkTransaction;
-    private static final String DUMMY_PROPERTY = "a";
 
-    public Neo4jEdgeIterable(final Iterable<Relationship> relationships, final Neo4jGraph graph, final boolean checkTransaction) {
+    public Neo4j2EdgeIterable(final Iterable<Relationship> relationships, final Neo4j2Graph graph, final boolean checkTransaction) {
         this.relationships = relationships;
         this.graph = graph;
         this.checkTransaction = checkTransaction;
     }
 
-    public Neo4jEdgeIterable(final Iterable<Relationship> relationships, final Neo4jGraph graph) {
+    public Neo4j2EdgeIterable(final Iterable<Relationship> relationships, final Neo4j2Graph graph) {
         this(relationships, graph, false);
     }
 
-    public Iterator<Neo4jEdge> iterator() {
-        return new Iterator<Neo4jEdge>() {
+    public Iterator<Neo4j2Edge> iterator() {
+        return new Iterator<Neo4j2Edge>() {
             private final Iterator<Relationship> itty = relationships.iterator();
             private Relationship nextRelationship = null;
 
@@ -37,20 +36,20 @@ public class Neo4jEdgeIterable<T extends Edge> implements CloseableIterable<Neo4
                 this.itty.remove();
             }
 
-            public Neo4jEdge next() {
+            public Neo4j2Edge next() {
                 if (!checkTransaction) {
-                    return new Neo4jEdge(this.itty.next(), graph);
+                    return new Neo4j2Edge(this.itty.next(), graph);
                 } else {
                     if (null != this.nextRelationship) {
                         final Relationship temp = this.nextRelationship;
                         this.nextRelationship = null;
-                        return new Neo4jEdge(temp, graph);
+                        return new Neo4j2Edge(temp, graph);
                     } else {
                         while (true) {
                             final Relationship relationship = this.itty.next();
                             try {
                                 if (!graph.relationshipIsDeleted(relationship.getId())) {
-                                    return new Neo4jEdge(relationship, graph);
+                                    return new Neo4j2Edge(relationship, graph);
                                 }
                             } catch (final IllegalStateException e) {
                                 // tried to access a relationship not available to the transaction

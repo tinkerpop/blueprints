@@ -9,12 +9,12 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-class Neo4jBatchEdgeIterable implements CloseableIterable<Edge> {
+class Neo4j2BatchEdgeIterable implements CloseableIterable<Edge> {
 
     private final IndexHits<Long> hits;
-    private final Neo4jBatchGraph graph;
+    private final Neo4j2BatchGraph graph;
 
-    public Neo4jBatchEdgeIterable(final Neo4jBatchGraph graph, final IndexHits<Long> hits) {
+    public Neo4j2BatchEdgeIterable(final Neo4j2BatchGraph graph, final IndexHits<Long> hits) {
         this.hits = hits;
         this.graph = graph;
     }
@@ -32,7 +32,7 @@ class Neo4jBatchEdgeIterable implements CloseableIterable<Edge> {
             }
 
             public Edge next() {
-                return new Neo4jBatchEdge(graph, itty.next(), null);
+                return new Neo4j2BatchEdge(graph, itty.next(), null);
             }
         };
     }

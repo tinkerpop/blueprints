@@ -10,12 +10,12 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-abstract class Neo4jBatchElement implements Element {
+abstract class Neo4j2BatchElement implements Element {
 
-    protected final Neo4jBatchGraph graph;
+    protected final Neo4j2BatchGraph graph;
     protected final Long id;
 
-    protected Neo4jBatchElement(final Neo4jBatchGraph graph, final Long id) {
+    protected Neo4j2BatchElement(final Neo4j2BatchGraph graph, final Long id) {
         this.graph = graph;
         this.id = id;
     }
@@ -48,7 +48,7 @@ abstract class Neo4jBatchElement implements Element {
     }
 
     public void remove() {
-        throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
+        throw new UnsupportedOperationException(Neo4j2BatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     public boolean equals(final Object object) {

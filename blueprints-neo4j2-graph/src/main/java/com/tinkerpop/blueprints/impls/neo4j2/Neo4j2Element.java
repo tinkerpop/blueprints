@@ -19,12 +19,12 @@ import java.util.Set;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-abstract class Neo4jElement implements Element {
+abstract class Neo4j2Element implements Element {
 
-    protected final Neo4jGraph graph;
+    protected final Neo4j2Graph graph;
     protected PropertyContainer rawElement;
 
-    public Neo4jElement(final Neo4jGraph graph) {
+    public Neo4j2Element(final Neo4j2Graph graph) {
         this.graph = graph;
     }
 

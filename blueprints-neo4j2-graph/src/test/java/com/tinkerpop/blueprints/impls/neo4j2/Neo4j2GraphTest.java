@@ -24,12 +24,12 @@ import java.util.*;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraphTest extends GraphTest {
+public class Neo4j2GraphTest extends GraphTest {
 
     /*public void testNeo4jBenchmarkTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new Neo4jBenchmarkTestSuite(this));
-        printTestPerformance("Neo4jBenchmarkTestSuite", this.stopWatch());
+        doTestSuite(new Neo4j2BenchmarkTestSuite(this));
+        printTestPerformance("Neo4j2BenchmarkTestSuite", this.stopWatch());
     }*/
 
     public void testVertexTestSuite() throws Exception {
@@ -106,8 +106,8 @@ public class Neo4jGraphTest extends GraphTest {
 
     public void testNeo4jGraphSpecificTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new Neo4jGraphSpecificTestSuite(this));
-        printTestPerformance("Neo4jGraphSpecificTestSuite", this.stopWatch());
+        doTestSuite(new Neo4j2GraphSpecificTestSuite(this));
+        printTestPerformance("Neo4j2GraphSpecificTestSuite", this.stopWatch());
     }
 
     public Graph generateGraph() {
@@ -116,7 +116,7 @@ public class Neo4jGraphTest extends GraphTest {
 
     public Graph generateGraph(final String graphDirectoryName) {
         final String directory = getWorkingDirectory();
-        Neo4jGraph graph = new Neo4jTestGraph(directory + "/" + graphDirectoryName);
+        Neo4j2Graph graph = new Neo4jTest2Graph(directory + "/" + graphDirectoryName);
         graph.setCheckElementsInTransaction(true);
 
         // for clean shutdown later
@@ -163,12 +163,12 @@ public class Neo4jGraphTest extends GraphTest {
         return this.computeTestDataRoot().getAbsolutePath();
     }
 
-    private static class Neo4jTestGraph extends Neo4jGraph {
+    private static class Neo4jTest2Graph extends Neo4j2Graph {
         private final static ThreadLocal<Transaction> outerTx = new ThreadLocal<Transaction>();
         private Collection<Transaction> outerTransactions;
         boolean shuttingDown = false;
 
-        public Neo4jTestGraph(String path) {
+        public Neo4jTest2Graph(String path) {
             super(path);
         }
 

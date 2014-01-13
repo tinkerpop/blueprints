@@ -11,25 +11,24 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<Neo4jVertex> {
+public class Neo4j2VertexIterable<T extends Vertex> implements CloseableIterable<Neo4j2Vertex> {
 
     private final Iterable<Node> nodes;
-    private final Neo4jGraph graph;
+    private final Neo4j2Graph graph;
     private final boolean checkTransaction;
-    private static final String DUMMY_PROPERTY = "a";
 
-    public Neo4jVertexIterable(final Iterable<Node> nodes, final Neo4jGraph graph, final boolean checkTransaction) {
+    public Neo4j2VertexIterable(final Iterable<Node> nodes, final Neo4j2Graph graph, final boolean checkTransaction) {
         this.graph = graph;
         this.nodes = nodes;
         this.checkTransaction = checkTransaction;
     }
 
-    public Neo4jVertexIterable(final Iterable<Node> nodes, final Neo4jGraph graph) {
+    public Neo4j2VertexIterable(final Iterable<Node> nodes, final Neo4j2Graph graph) {
         this(nodes, graph, false);
     }
 
-    public Iterator<Neo4jVertex> iterator() {
-        return new Iterator<Neo4jVertex>() {
+    public Iterator<Neo4j2Vertex> iterator() {
+        return new Iterator<Neo4j2Vertex>() {
             private final Iterator<Node> itty = nodes.iterator();
             private Node nextNode = null;
 
@@ -37,19 +36,19 @@ public class Neo4jVertexIterable<T extends Vertex> implements CloseableIterable<
                 this.itty.remove();
             }
 
-            public Neo4jVertex next() {
+            public Neo4j2Vertex next() {
                 if (!checkTransaction) {
-                    return new Neo4jVertex(this.itty.next(), graph);
+                    return new Neo4j2Vertex(this.itty.next(), graph);
                 } else {
                     if (null != this.nextNode) {
                         final Node temp = this.nextNode;
                         this.nextNode = null;
-                        return new Neo4jVertex(temp, graph);
+                        return new Neo4j2Vertex(temp, graph);
                     } else {
                         while (true) {
                             final Node node = this.itty.next();
                             try {
-                                if (!graph.nodeIsDeleted(node.getId())) return new Neo4jVertex(node, graph);
+                                if (!graph.nodeIsDeleted(node.getId())) return new Neo4j2Vertex(node, graph);
                             } catch (final IllegalStateException e) {
                                 // tried to access a node not available to the transaction
                             }

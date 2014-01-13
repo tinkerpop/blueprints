@@ -6,7 +6,6 @@ import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
-import com.tinkerpop.blueprints.impls.neo4j2.Neo4jGraph;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
@@ -20,12 +19,12 @@ import java.util.Iterator;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4jGraphSpecificTestSuite extends TestSuite {
+public class Neo4j2GraphSpecificTestSuite extends TestSuite {
 
-    public Neo4jGraphSpecificTestSuite() {
+    public Neo4j2GraphSpecificTestSuite() {
     }
 
-    public Neo4jGraphSpecificTestSuite(final GraphTest graphTest) {
+    public Neo4j2GraphSpecificTestSuite(final GraphTest graphTest) {
         super(graphTest);
     }
 
@@ -62,7 +61,7 @@ public class Neo4jGraphSpecificTestSuite extends TestSuite {
     }
 
     public void testQueryIndex() throws Exception {
-        Neo4jGraph graph = (Neo4jGraph) graphTest.generateGraph();
+        Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
         Index<Vertex> vertexIndex = graph.createIndex("vertices", Vertex.class);
         Index<Edge> edgeIndex = graph.createIndex("edges", Edge.class);
 
@@ -105,7 +104,7 @@ public class Neo4jGraphSpecificTestSuite extends TestSuite {
     }
 
     public void testIndexParameters() throws Exception {
-        Neo4jGraph graph = (Neo4jGraph) graphTest.generateGraph();
+        Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
         Index<Vertex> index = graph.createIndex("luceneIdx", Vertex.class, new Parameter<String, String>("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
@@ -133,13 +132,13 @@ public class Neo4jGraphSpecificTestSuite extends TestSuite {
         assertTrue(InternalAbstractGraphDatabase.class.isAssignableFrom(HighlyAvailableGraphDatabase.class));
 
         /*String directory = this.getWorkingDirectory();
-        Neo4jHaGraph graph = new Neo4jHaGraph(directory);
+        Neo4j2HaGraph graph = new Neo4j2HaGraph(directory);
         graph.shutdown();
         deleteDirectory(new File(directory));*/
     }
 
     public void testRollbackExceptionOnBeforeTxCommit() throws Exception {
-        Neo4jGraph graph = (Neo4jGraph) graphTest.generateGraph();
+        Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
         GraphDatabaseService rawGraph = graph.getRawGraph();
         rawGraph.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
             @Override
