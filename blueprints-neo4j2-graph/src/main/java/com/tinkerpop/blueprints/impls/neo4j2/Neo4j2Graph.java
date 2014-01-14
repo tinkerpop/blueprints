@@ -257,6 +257,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
+        this.autoStartTransaction();
         if (Vertex.class.isAssignableFrom(indexClass)) {
             if (this.rawGraph.index().existsForNodes(indexName)) {
                 return new Neo4j2Index(indexName, indexClass, this);
@@ -304,6 +305,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
+        this.autoStartTransaction();
         final List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
         for (final String name : this.rawGraph.index().nodeIndexNames()) {
             if (!name.equals(Neo4j2Tokens.NODE_AUTO_INDEX))
@@ -322,6 +324,8 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public Neo4j2Vertex getVertex(final Object id) {
+        this.autoStartTransaction();
+
         if (null == id)
             throw ExceptionFactory.vertexIdCanNotBeNull();
 
@@ -354,10 +358,12 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      * @return all the vertices in the graph
      */
     public Iterable<Vertex> getVertices() {
+        this.autoStartTransaction();
         return new Neo4j2VertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, this.checkElementsInTransaction());
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
+        this.autoStartTransaction();
         final AutoIndexer indexer = this.rawGraph.index().getNodeAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
             return new Neo4j2VertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this, this.checkElementsInTransaction());
@@ -378,6 +384,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      * @return all the edges in the graph
      */
     public Iterable<Edge> getEdges() {
+        this.autoStartTransaction();
         return new Neo4j2EdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, this.checkElementsInTransaction());
     }
 
@@ -488,6 +495,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
 
+        this.autoStartTransaction();
         try {
             final Long longId;
             if (id instanceof Long)

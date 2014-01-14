@@ -29,6 +29,7 @@ abstract class Neo4j2Element implements Element {
     }
 
     public <T> T getProperty(final String key) {
+        this.graph.autoStartTransaction();
         if (this.rawElement.hasProperty(key))
             return (T) tryConvertCollectionToArrayList(this.rawElement.getProperty(key));
         else
@@ -52,6 +53,7 @@ abstract class Neo4j2Element implements Element {
     }
 
     public Set<String> getPropertyKeys() {
+        this.graph.autoStartTransaction();
         final Set<String> keys = new HashSet<String>();
         for (final String key : this.rawElement.getPropertyKeys()) {
             keys.add(key);
@@ -68,6 +70,7 @@ abstract class Neo4j2Element implements Element {
     }
 
     public Object getId() {
+        this.graph.autoStartTransaction();
         if (this.rawElement instanceof Node) {
             return ((Node) this.rawElement).getId();
         } else {

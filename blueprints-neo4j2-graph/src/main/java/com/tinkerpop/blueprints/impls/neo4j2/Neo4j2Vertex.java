@@ -6,9 +6,17 @@ import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -22,6 +30,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public Iterable<Edge> getEdges(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
+        this.graph.autoStartTransaction();
         if (direction.equals(com.tinkerpop.blueprints.Direction.OUT))
             return new Neo4jVertexEdgeIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
         else if (direction.equals(com.tinkerpop.blueprints.Direction.IN))
@@ -31,6 +40,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public Iterable<Vertex> getVertices(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
+        this.graph.autoStartTransaction();
         if (direction.equals(com.tinkerpop.blueprints.Direction.OUT))
             return new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
         else if (direction.equals(com.tinkerpop.blueprints.Direction.IN))
@@ -44,7 +54,8 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public Collection<String> getLabels() {
-        Collection<String> labels=new ArrayList<String>();
+        this.graph.autoStartTransaction();
+        final Collection<String> labels = new ArrayList<String>();
         for (Label label : getRawVertex().getLabels()) {
             labels.add(label.name());
         }
@@ -62,6 +73,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public VertexQuery query() {
+        this.graph.autoStartTransaction();
         return new DefaultVertexQuery(this);
     }
 
