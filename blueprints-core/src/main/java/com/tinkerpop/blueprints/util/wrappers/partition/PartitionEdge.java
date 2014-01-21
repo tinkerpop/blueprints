@@ -14,7 +14,8 @@ public class PartitionEdge extends PartitionElement implements Edge {
     }
 
     public Vertex getVertex(final Direction direction) throws IllegalArgumentException {
-        return new PartitionVertex(((Edge) baseElement).getVertex(direction), graph);
+        final Vertex vertex = ((Edge) baseElement).getVertex(direction);
+        return graph.isInPartition(vertex) ? new PartitionVertex(((Edge) baseElement).getVertex(direction), graph) : null;
     }
 
     public String getLabel() {

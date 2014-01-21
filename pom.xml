@@ -69,6 +69,7 @@
         <module>blueprints-rexster-graph</module>
         <module>blueprints-sparksee-graph</module>
         <module>blueprints-neo4j-graph</module>
+        <module>blueprints-neo4j2-graph</module>
         <module>blueprints-orient-graph</module>
         <module>blueprints-graph-sail</module>
         <module>blueprints-sail-graph</module>

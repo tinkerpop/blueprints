@@ -33,7 +33,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	protected static final String OPERATOR_EQUALS = "=";
 	protected static final String OPERATOR_IS = "is";
 	protected static final String OPERATOR_IN = " in ";
-	protected static final String OPERATOR_LIKE = " like ";	
+	protected static final String OPERATOR_LIKE = " like ";
 
 	protected static final String QUERY_FILTER_AND = " and ";
 	protected static final String QUERY_FILTER_OR = " or ";
@@ -47,27 +47,29 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 	protected static final String QUERY_LABEL_END = "]";
 	protected static final String QUERY_WHERE = " where ";
 	protected static final String QUERY_SELECT_FROM = "select from ";
-	protected static final String SKIP = " SKIP ";	
+	protected static final String SKIP = " SKIP ";
 	protected static final String LIMIT = " LIMIT ";
-    protected static final String ORDERBY = " ORDER BY ";	
+	protected static final String ORDERBY = " ORDER BY ";
 
 	protected String fetchPlan;
 
-    public int skip = 0;
-    public String orderBy = "";     
-    public String orderByDir = "desc";
-    
-    public class OrientGraphQueryIterable<T extends Element> extends DefaultGraphQueryIterable<T>{
+	public int skip = 0;
+	public String orderBy = "";
+	public String orderByDir = "desc";
+
+	public class OrientGraphQueryIterable<T extends Element> extends
+			DefaultGraphQueryIterable<T> {
 
 		public OrientGraphQueryIterable(final boolean forVertex) {
 			super(forVertex);
 		}
-		
-        protected Set<String> getIndexedKeys(final Class<? extends Element> elementClass) {
-            return ((OrientBaseGraph) graph).getIndexedKeys(elementClass, true);
-        }
-    }
-    
+
+		protected Set<String> getIndexedKeys(
+				final Class<? extends Element> elementClass) {
+			return ((OrientBaseGraph) graph).getIndexedKeys(elementClass, true);
+		}
+	}
+
 	public OrientGraphQuery(final Graph iGraph) {
 		super(iGraph);
 	}
@@ -76,30 +78,31 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 		this.labels = labels;
 		return this;
 	}
-	
+
 	public Query skip(int cnt) {
-	    this.skip = cnt;
-	    return this;
+		this.skip = cnt;
+		return this;
 	}
-	
+
 	public Query order(final String props) {
-	    this.order(props, orderByDir);
-	    return this;
+		this.order(props, orderByDir);
+		return this;
 	}
-	    
+
 	public Query order(final String props, final String dir) {
-	    this.orderBy = props;
-	    this.orderByDir = dir;
-	    return this;
+		this.orderBy = props;
+		this.orderByDir = dir;
+		return this;
 	}
 
 	@Override
 	public Iterable<Vertex> vertices() {
 		if (limit == 0)
 			return Collections.emptyList();
-		
-		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive() )
-			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL SUPPORTED USED THE BASIC IMPL
+
+		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive())
+			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL
+			// SUPPORTED USED THE BASIC IMPL
 			return new OrientGraphQueryIterable<Vertex>(true);
 
 		final StringBuilder text = new StringBuilder();
@@ -126,12 +129,11 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 		if (!((OrientBaseGraph) graph).isUseClassForVertexLabel())
 			manageLabels(text);
 
-        if (orderBy.length()>1)
-        {
-            text.append(ORDERBY);
+		if (orderBy.length() > 1) {
+			text.append(ORDERBY);
 			text.append(orderBy);
-            text.append(" "+orderByDir+" ");
-        }
+			text.append(" " + orderByDir + " ");
+		}
 		if (skip > 0 && skip < Long.MAX_VALUE) {
 			text.append(SKIP);
 			text.append(skip);
@@ -141,7 +143,7 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 			text.append(LIMIT);
 			text.append(limit);
 		}
-		
+
 		final OSQLSynchQuery<OIdentifiable> query = new OSQLSynchQuery<OIdentifiable>(
 				text.toString());
 
@@ -157,8 +159,9 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 		if (limit == 0)
 			return Collections.emptyList();
 
-		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive() )
-			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL SUPPORTED USED THE BASIC IMPL
+		if (((OrientBaseGraph) graph).getRawGraph().getTransaction().isActive())
+			// INSIDE TRANSACTION QUERY DOESN'T SEE IN MEMORY CHANGES, UNTIL
+			// SUPPORTED USED THE BASIC IMPL
 			return new OrientGraphQueryIterable<Edge>(false);
 
 		if (((OrientBaseGraph) graph).isUseLightweightEdges())
@@ -240,28 +243,26 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 					text.append(OPERATOR_NOT);
 					text.append(PARENTHESIS_BEGIN);
 				}
-                text.append(has.key);
-                
-			    if (has.value instanceof String) {
-			        text.append(OPERATOR_LIKE);
-                    generateFilterValue(text, has.value);			        
-			    }
-			    else {
-			        text.append(OPERATOR_IN);
-    				text.append(COLLECTION_BEGIN);
+				text.append(has.key);
 
-    				boolean firstItem = true;
-    				for (Object o : (Collection<Object>) has.value) {
-    					if (!firstItem)
-    						text.append(QUERY_SEPARATOR);
-    					else
-    						firstItem = false;
-    					generateFilterValue(text, o);
-    				}
+				if (has.value instanceof String) {
+					text.append(OPERATOR_LIKE);
+					generateFilterValue(text, has.value);
+				} else {
+					text.append(OPERATOR_IN);
+					text.append(COLLECTION_BEGIN);
 
-    				text.append(COLLECTION_END);
-			    }
+					boolean firstItem = true;
+					for (Object o : (Collection<Object>) has.value) {
+						if (!firstItem)
+							text.append(QUERY_SEPARATOR);
+						else
+							firstItem = false;
+						generateFilterValue(text, o);
+					}
 
+					text.append(COLLECTION_END);
+				}
 
 				if (has.predicate == Contains.NOT_IN)
 					text.append(PARENTHESIS_END);
@@ -314,16 +315,18 @@ public class OrientGraphQuery extends DefaultGraphQuery {
 			final Object iValue) {
 		if (iValue instanceof String)
 			text.append(QUERY_STRING);
-		
+
 		final Object value;
-		
-		if( iValue instanceof Date )
+
+		if (iValue instanceof Date)
 			value = ((Date) iValue).getTime();
-		else 
+		else if (iValue != null)
+			value = iValue.toString().replace("'", "\\'");
+		else
 			value = iValue;
-		
+
 		text.append(value);
-		
+
 		if (iValue instanceof String)
 			text.append(QUERY_STRING);
 	}

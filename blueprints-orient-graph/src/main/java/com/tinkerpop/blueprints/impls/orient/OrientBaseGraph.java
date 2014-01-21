@@ -131,7 +131,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 	 * </tr>
 	 * <tr>
 	 * <td>blueprints.orientdb.saveOriginalIds</td>
-	 * <td>Saves the original element IDs by using the property _id. This could
+	 * <td>Saves the original element IDs by using the property origId. This could
 	 * be useful on import of graph to preserve original ids</td>
 	 * <td>false</td>
 	 * </tr>
@@ -917,7 +917,8 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 
 				for (OIndex<?> idx : context.rawGraph.getMetadata()
 						.getIndexManager().getIndexes()) {
-					if (idx.getConfiguration().field(
+                    ODocument metadata = idx.getMetadata();
+					if (metadata != null && metadata.field(
 							OrientIndex.CONFIG_CLASSNAME) != null)
 						// LOAD THE INDEXES
 						loadIndex(idx);
@@ -1047,7 +1048,7 @@ public abstract class OrientBaseGraph implements IndexableGraph,
 								indexType,
 								new OPropertyIndexDefinition(className, key,
 										keyType),
-								cls.getPolymorphicClusterIds(), null);
+								cls.getPolymorphicClusterIds(), null, null);
 				return null;
 
 			}

@@ -19,10 +19,13 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * Add overload to @GraphFactory.open@ that takes a @Map@ for configuration
 * The @elementClass@ argument on the @KeyIndexableGraph@ methods cannot be null and must throw @IllegalArgumentException@ if it is
 * Add @TransactionGraphHelper@ with various strategies for transaction execution: @FireAndForget@, @OneAndDone@, @DelayedRetry@ and @ExponentialBackoff@
-* Bumped Neo4j to 1.9.4
+* Bumped Neo4j to 1.9.5
 * Fixed bug with @Map@ and @Float@ objects embedded in lists for GraphSON serialization in @EXTENDED@ mode
 * Fixed a bug in @KeyIndexableGraphHelper@ around transaction commits
 * Fixed bug in usage of @GraphFactory@ in relation to Neo4jHA
+* Fixed a bug around accessing an incident vertex of an edge that is not in a valid partition in @PartitionGraph@
+* Added support for Neo4j 2.0.0 GA release in @blueprints-neo4j-graph@ package
+* Bumped OrientDB to 1.6.3
 
 ==<hr/>==
 
