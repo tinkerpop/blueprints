@@ -249,10 +249,10 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public synchronized <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+        this.autoStartTransaction();
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw ExceptionFactory.indexAlreadyExists(indexName);
         }
-        this.autoStartTransaction();
         return new Neo4j2Index(indexName, indexClass, this, indexParameters);
     }
 
