@@ -174,7 +174,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     private void loadKeyIndices() {
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         for (final String key : this.getInternalIndexKeys(Vertex.class)) {
             this.createKeyIndex(key, Vertex.class);
         }
@@ -249,7 +249,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public synchronized <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw ExceptionFactory.indexAlreadyExists(indexName);
         }
@@ -257,7 +257,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(false);
         if (Vertex.class.isAssignableFrom(indexClass)) {
             if (this.rawGraph.index().existsForNodes(indexName)) {
                 return new Neo4j2Index(indexName, indexClass, this);
@@ -289,7 +289,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      * @param indexName the name of the index to drop
      */
     public synchronized void dropIndex(final String indexName) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         if (this.rawGraph.index().existsForNodes(indexName)) {
             org.neo4j.graphdb.index.Index<Node> nodeIndex = this.rawGraph.index().forNodes(indexName);
             if (nodeIndex.isWriteable()) {
@@ -305,7 +305,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public Iterable<Index<? extends Element>> getIndices() {
-        this.autoStartTransaction();
+        this.autoStartTransaction(false);
         final List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
         for (final String name : this.rawGraph.index().nodeIndexNames()) {
             if (!name.equals(Neo4j2Tokens.NODE_AUTO_INDEX))
@@ -319,12 +319,12 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public Neo4j2Vertex addVertex(final Object id) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         return new Neo4j2Vertex(this.rawGraph.createNode(), this);
     }
 
     public Neo4j2Vertex getVertex(final Object id) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(false);
 
         if (null == id)
             throw ExceptionFactory.vertexIdCanNotBeNull();
@@ -358,12 +358,12 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      * @return all the vertices in the graph
      */
     public Iterable<Vertex> getVertices() {
-        this.autoStartTransaction();
+        this.autoStartTransaction(false);
         return new Neo4j2VertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, this.checkElementsInTransaction());
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(false);
         final AutoIndexer indexer = this.rawGraph.index().getNodeAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
             return new Neo4j2VertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this, this.checkElementsInTransaction());
@@ -384,7 +384,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      * @return all the edges in the graph
      */
     public Iterable<Edge> getEdges() {
-        this.autoStartTransaction();
+        this.autoStartTransaction(false);
         return new Neo4j2EdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, this.checkElementsInTransaction());
     }
 
@@ -401,7 +401,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         if (elementClass == null)
             throw ExceptionFactory.classForElementCannotBeNull();
 
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         if (Vertex.class.isAssignableFrom(elementClass)) {
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())
                 return;
@@ -421,7 +421,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
             throw ExceptionFactory.classForElementCannotBeNull();
 
         if (Vertex.class.isAssignableFrom(elementClass)) {
-            this.autoStartTransaction();
+            this.autoStartTransaction(true);
             if (!this.rawGraph.index().getNodeAutoIndexer().isEnabled())
                 this.rawGraph.index().getNodeAutoIndexer().setEnabled(true);
 
@@ -429,18 +429,18 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
             if (!this.getInternalIndexKeys(Vertex.class).contains(key)) {
 
                 KeyIndexableGraphHelper.reIndexElements(this, this.getVertices(), new HashSet<String>(Arrays.asList(key)));
-                this.autoStartTransaction();
+                this.autoStartTransaction(true);
                 this.createInternalIndexKey(key, elementClass);
             }
         } else if (Edge.class.isAssignableFrom(elementClass)) {
-            this.autoStartTransaction();
+            this.autoStartTransaction(true);
             if (!this.rawGraph.index().getRelationshipAutoIndexer().isEnabled())
                 this.rawGraph.index().getRelationshipAutoIndexer().setEnabled(true);
 
             this.rawGraph.index().getRelationshipAutoIndexer().startAutoIndexingProperty(key);
             if (!this.getInternalIndexKeys(Edge.class).contains(key)) {
                 KeyIndexableGraphHelper.reIndexElements(this, this.getEdges(), new HashSet<String>(Arrays.asList(key)));
-                this.autoStartTransaction();
+                this.autoStartTransaction(true);
                 this.createInternalIndexKey(key, elementClass);
             }
         } else {
@@ -466,7 +466,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public void removeVertex(final Vertex vertex) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
 
         try {
             final Node node = ((Neo4j2Vertex) vertex).getRawVertex();
@@ -486,7 +486,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         if (label == null)
             throw ExceptionFactory.edgeLabelCanNotBeNull();
 
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         return new Neo4j2Edge(((Neo4j2Vertex) outVertex).getRawVertex().createRelationshipTo(((Neo4j2Vertex) inVertex).getRawVertex(),
                 DynamicRelationshipType.withName(label)), this);
     }
@@ -495,7 +495,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
 
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         try {
             final Long longId;
             if (id instanceof Long)
@@ -511,7 +511,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public void removeEdge(final Edge edge) {
-        this.autoStartTransaction();
+        this.autoStartTransaction(true);
         ((Relationship) ((Neo4j2Edge) edge).getRawElement()).delete();
     }
 
@@ -564,7 +564,14 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         this.rawGraph.shutdown();
     }
 
-    public void autoStartTransaction() {
+    // The forWrite flag is true when the autoStartTransaction method is
+    // called before any operation which will modify the graph in any way. It
+    // is not used in this simple implementation but is required in subclasses
+    // which enforce transaction rules. Now that Neo4j reads also require a
+    // transaction to be open it is otherwise impossible to tell the difference
+    // between the beginning of a write operation and the beginning of a read
+    // operation.
+    public void autoStartTransaction(boolean forWrite) {
         if (tx.get() == null)
             tx.set(this.rawGraph.beginTx());
     }

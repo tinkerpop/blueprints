@@ -46,7 +46,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
 
     public void put(final String key, final Object value, final T element) {
         try {
-            this.graph.autoStartTransaction();
+            this.graph.autoStartTransaction(true);
             this.rawIndex.add((S) element.getRawElement(), key, value);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -61,7 +61,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
      * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
      */
     public CloseableIterable<T> get(final String key, final Object value) {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4j2Vertex.class))
             return new Neo4j2VertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
@@ -77,7 +77,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
      * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
      */
     public CloseableIterable<T> query(final String key, final Object query) {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         final IndexHits<S> itty = this.rawIndex.query(key, query);
         if (this.indexClass.isAssignableFrom(Neo4j2Vertex.class))
             return new Neo4j2VertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
@@ -93,7 +93,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
      * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
      */
     public long count(final String key, final Object value) {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         if (!this.graph.checkElementsInTransaction()) {
             final IndexHits hits = this.rawIndex.get(key, value);
             final long count = hits.size();
@@ -112,7 +112,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
 
     public void remove(final String key, final Object value, final T element) {
         try {
-            this.graph.autoStartTransaction();
+            this.graph.autoStartTransaction(true);
             this.rawIndex.remove((S) element.getRawElement(), key, value);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -120,7 +120,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
     }
 
     private void generateIndex(final Parameter<Object, Object>... indexParameters) {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(true);
         final IndexManager manager = this.graph.getRawGraph().index();
         if (Vertex.class.isAssignableFrom(this.indexClass)) {
             if (indexParameters.length > 0)
