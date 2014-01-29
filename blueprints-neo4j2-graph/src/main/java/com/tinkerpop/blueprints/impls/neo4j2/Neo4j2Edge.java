@@ -19,12 +19,12 @@ public class Neo4j2Edge extends Neo4j2Element implements Edge {
     }
 
     public String getLabel() {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         return ((Relationship) this.rawElement).getType().name();
     }
 
     public Vertex getVertex(final Direction direction) {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         if (direction.equals(Direction.OUT))
             return new Neo4j2Vertex(((Relationship) this.rawElement).getStartNode(), this.graph);
         else if (direction.equals(Direction.IN))

@@ -60,7 +60,7 @@ h3. Version 2.4.0 (August 4, 2013)
 * Added @has(key)@ and @hasNot(key)@ in @Query@ API
 * Added @has(key,predicate,value)@ in @Query@ API
 * Deprecated @Query.has(key,value,compare)@ in @Query@ API
-* Added @CompareRelation@ interface to support future compare-type operations
+* Added @Predicate@ interface to support future compare-type operations
 * Ignore nulls property values in loading of GraphSON as graphs do not accept such values for element properties
 * Adding an edge with a @null@ value results in @IllegalArgumentException@
 * Added @GraphFactory@ support to allow for the creation of graphs via Apache @Configuration@

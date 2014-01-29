@@ -29,7 +29,7 @@ abstract class Neo4j2Element implements Element {
     }
 
     public <T> T getProperty(final String key) {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         if (this.rawElement.hasProperty(key))
             return (T) tryConvertCollectionToArrayList(this.rawElement.getProperty(key));
         else
@@ -38,7 +38,7 @@ abstract class Neo4j2Element implements Element {
 
     public void setProperty(final String key, final Object value) {
         ElementHelper.validateProperty(this, key, value);
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(true);
         // attempts to take a collection and convert it to an array so that Neo4j can consume it
         this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
     }
@@ -47,13 +47,13 @@ abstract class Neo4j2Element implements Element {
         if (!this.rawElement.hasProperty(key))
             return null;
         else {
-            this.graph.autoStartTransaction();
+            this.graph.autoStartTransaction(true);
             return (T) this.rawElement.removeProperty(key);
         }
     }
 
     public Set<String> getPropertyKeys() {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         final Set<String> keys = new HashSet<String>();
         for (final String key : this.rawElement.getPropertyKeys()) {
             keys.add(key);
@@ -70,7 +70,7 @@ abstract class Neo4j2Element implements Element {
     }
 
     public Object getId() {
-        this.graph.autoStartTransaction();
+        this.graph.autoStartTransaction(false);
         if (this.rawElement instanceof Node) {
             return ((Node) this.rawElement).getId();
         } else {
