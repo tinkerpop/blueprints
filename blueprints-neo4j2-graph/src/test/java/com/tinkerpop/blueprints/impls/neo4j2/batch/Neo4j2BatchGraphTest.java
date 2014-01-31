@@ -50,7 +50,7 @@ public class Neo4j2BatchGraphTest extends BaseTest {
         // native neo4j graph load
 
         final Neo4j2Graph graph = new Neo4j2Graph(directory);
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
         assertEquals(count(graph.getVertices()), 10);
 
         assertEquals(count(graph.getEdges()), 9);
@@ -87,7 +87,7 @@ public class Neo4j2BatchGraphTest extends BaseTest {
         // native neo4j graph load
 
         final Neo4j2Graph graph = new Neo4j2Graph(directory);
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
         assertEquals(count(graph.getVertices()), ids.size());
         for (final Long id : ids) {
             assertNotNull(graph.getVertex(id));
@@ -120,7 +120,7 @@ public class Neo4j2BatchGraphTest extends BaseTest {
         // native neo4j graph load
 
         final Neo4j2Graph graph = new Neo4j2Graph(directory);
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
         assertEquals(count(graph.getVertices()), ids.size());
         assertNotNull(graph.getVertex(100l));
         assertNotNull(graph.getVertex(5l));
@@ -172,7 +172,7 @@ public class Neo4j2BatchGraphTest extends BaseTest {
         // native neo4j graph load
 
         final Neo4j2Graph graph = new Neo4j2Graph(directory);
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
 
         assertEquals(count(graph.getIndices()), 1);
 
@@ -290,7 +290,7 @@ public class Neo4j2BatchGraphTest extends BaseTest {
         // native neo4j graph load
 
         Neo4j2Graph graph = new Neo4j2Graph(directory);
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
         assertEquals(count(graph.getVertices()), 10);
         for (final Long id : vertexIds) {
             Vertex vertex = graph.getVertex(id);
@@ -341,7 +341,7 @@ public class Neo4j2BatchGraphTest extends BaseTest {
         // native neo4j graph load
 
         Neo4j2Graph graph = new Neo4j2Graph(directory);
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
         assertEquals(count(graph.getVertices()), 6);
         assertEquals(count(graph.getEdges()), 6);
         assertEquals(count(graph.getVertex("1").getEdges(Direction.OUT)), 3);
@@ -384,7 +384,7 @@ public class Neo4j2BatchGraphTest extends BaseTest {
         // native neo4j graph load
 
         Neo4j2Graph graph = new Neo4j2Graph(directory);
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
         Iterator<Vertex> itty = graph.getIndex("testIdx", Vertex.class).query("name", "*rko").iterator();
         int counter = 0;
         while (itty.hasNext()) {

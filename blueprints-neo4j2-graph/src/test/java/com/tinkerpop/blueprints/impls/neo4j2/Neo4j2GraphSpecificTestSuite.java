@@ -165,7 +165,7 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         } catch (Exception e) {
             graph.rollback();
         }
-        assertTrue(!GlobalGraphOperations.at(rawGraph).getAllNodes().iterator().hasNext());
+        assertTrue(!graph.getVertices().iterator().hasNext());
         graph.shutdown();
     }
 }

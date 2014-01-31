@@ -24,7 +24,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * Fixed a bug in @KeyIndexableGraphHelper@ around transaction commits
 * Fixed bug in usage of @GraphFactory@ in relation to Neo4jHA
 * Fixed a bug around accessing an incident vertex of an edge that is not in a valid partition in @PartitionGraph@
-* Added support for Neo4j 2.0.0 GA release in @blueprints-neo4j-graph@ package
+* Added support for Neo4j 2.0.0 GA release in @blueprints-neo4j2-graph@ package
 * Bumped OrientDB to 1.6.3
 
 ==<hr/>==
@@ -60,7 +60,7 @@ h3. Version 2.4.0 (August 4, 2013)
 * Added @has(key)@ and @hasNot(key)@ in @Query@ API
 * Added @has(key,predicate,value)@ in @Query@ API
 * Deprecated @Query.has(key,value,compare)@ in @Query@ API
-* Added @CompareRelation@ interface to support future compare-type operations
+* Added @Predicate@ interface to support future compare-type operations
 * Ignore nulls property values in loading of GraphSON as graphs do not accept such values for element properties
 * Adding an edge with a @null@ value results in @IllegalArgumentException@
 * Added @GraphFactory@ support to allow for the creation of graphs via Apache @Configuration@

@@ -15,11 +15,11 @@ import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
-import org.neo4j.graphdb.Transaction;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -116,7 +116,7 @@ public class Neo4j2GraphTest extends GraphTest {
 
     public Graph generateGraph(final String graphDirectoryName) {
         final String directory = getWorkingDirectory();
-        Neo4j2Graph graph = new Neo4jTest2Graph(directory + "/" + graphDirectoryName);
+        Neo4j2Graph graph = new Neo4j2Graph(directory + "/" + graphDirectoryName);
         graph.setCheckElementsInTransaction(true);
 
         // for clean shutdown later
@@ -130,22 +130,22 @@ public class Neo4j2GraphTest extends GraphTest {
     public void doTestSuite(final TestSuite testSuite) throws Exception {
         String directory = this.getWorkingDirectory();
         deleteDirectory(new File(directory));
-        int total=0;
-        Map<Method,Exception> failures=new LinkedHashMap<Method,Exception>();
+        int total = 0;
+        Map<Method, Exception> failures = new LinkedHashMap<Method, Exception>();
         for (Method method : testSuite.getClass().getDeclaredMethods()) {
             if (method.getName().startsWith("test")) {
                 System.out.println("Testing " + method.getName() + "...");
                 try {
                     total++;
                     method.invoke(testSuite);
-                } catch(Exception e) {
+                } catch (Exception e) {
                     // report all errors not just the first
-                    failures.put(method,e);
-                    System.out.println("Error during "+method.getName()+" "+e.getMessage());
+                    failures.put(method, e);
+                    System.out.println("Error during " + method.getName() + " " + e.getMessage());
                     e.printStackTrace();
                 } finally {
                     // clean shutdown w/o leaking resources even in case of AssertionErrors
-                    if (testGraph.get()!=null) {
+                    if (testGraph.get() != null) {
                         testGraph.get().shutdown();
                     }
                     deleteDirectory(new File(directory));
@@ -154,98 +154,12 @@ public class Neo4j2GraphTest extends GraphTest {
         }
         // fail the suite
         if (!failures.isEmpty()) {
-            throw new AssertionError(testSuite.getName()+" failed, total "+ total+ " failures: "+failures.size()+"\n"+
-            failures.keySet());
+            throw new AssertionError(testSuite.getName() + " failed, total " + total + " failures: " + failures.size() + "\n" +
+                    failures.keySet());
         }
     }
 
     private String getWorkingDirectory() {
         return this.computeTestDataRoot().getAbsolutePath();
-    }
-
-    private static class Neo4jTest2Graph extends Neo4j2Graph {
-        private final static ThreadLocal<Transaction> outerTx = new ThreadLocal<Transaction>();
-        private Collection<Transaction> outerTransactions;
-        boolean shuttingDown = false;
-
-        public Neo4jTest2Graph(String path) {
-            super(path);
-        }
-
-        @Override
-        protected void init() {
-            outerTransactions = new HashSet<Transaction>();
-            restartTx();
-            super.init();
-        }
-
-        private void restartTx() {
-            Transaction tx = getRawGraph().beginTx();
-            outerTx.set(tx);
-            outerTransactions.add(tx);
-        }
-
-        @Override
-        public void shutdown() {
-            shuttingDown = true;
-            finishOuter(true,false);
-            closeOpenTransactions();
-            super.shutdown();
-            testGraph.remove();
-        }
-
-        private void closeOpenTransactions() {
-            Iterator<Transaction> it = outerTransactions.iterator();
-            while (it.hasNext()) {
-                Transaction tx = it.next();
-                try {
-                    tx.failure();
-                } catch(Exception e) {
-//                    System.out.println("Error cleaning up outer transaction " + e.getMessage());
-                } finally {
-                    try {
-                        tx.close();
-                    } catch(Exception e) {
-//                        System.out.println("Error cleaning up outer transaction " + e.getMessage());
-                    }
-                }
-                it.remove();
-            }
-        }
-
-        private void finishOuter(boolean success, boolean restart) {
-            if (outerTx.get() != null) {
-                Transaction tx = outerTx.get();
-                try {
-                    if (success) tx.success();
-                    else tx.failure();
-                } catch (Exception e) {
-//                    System.out.println("Error " + (success ? "succeeding" : "failing") + " outer transaction " + e.getMessage());
-                } finally {
-                    try {
-                        tx.close();
-                    } catch (Exception e) {
-//                        System.out.println("Error committing " + (success ? "successful" : "failing") + " outer transaction " + e.getMessage());
-                    }
-                    outerTransactions.remove(tx);
-                    outerTx.remove();
-                }
-            }
-            if (restart && !shuttingDown) {
-                restartTx();
-            }
-        }
-
-        @Override
-        public void commit() {
-            super.commit();
-            finishOuter(true,true);
-        }
-
-        @Override
-        public void rollback() {
-            super.rollback();
-            finishOuter(false,true);
-        }
     }
 }
