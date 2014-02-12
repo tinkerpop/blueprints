@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.dex;
+package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.BaseTest;
 import com.tinkerpop.blueprints.CloseableIterable;
@@ -13,18 +13,18 @@ import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class DexBenchmarkTestSuite extends TestSuite {
+public class SparkseeBenchmarkTestSuite extends TestSuite {
 
     private static final int TOTAL_RUNS = 10;
 
-    public DexBenchmarkTestSuite() {
+    public SparkseeBenchmarkTestSuite() {
     }
 
-    public DexBenchmarkTestSuite(final GraphTest graphTest) {
+    public SparkseeBenchmarkTestSuite(final GraphTest graphTest) {
         super(graphTest);
     }
 
-    public void testDexGraph() throws Exception {
+    public void testSparkseeGraph() throws Exception {
         double totalTime = 0.0d;
         Graph graph = graphTest.generateGraph();
         GraphMLReader.inputGraph(graph, GraphMLReader.class.getResourceAsStream("graph-example-2.xml"));
@@ -62,9 +62,9 @@ public class DexBenchmarkTestSuite extends TestSuite {
             vv.close();
             double currentTime = this.stopWatch();
             totalTime = totalTime + currentTime;
-            BaseTest.printPerformance(graph.toString(), counter, "DexGraph elements touched (run=" + i + ")", currentTime);
+            BaseTest.printPerformance(graph.toString(), counter, "SparkseeGraph elements touched (run=" + i + ")", currentTime);
             graph.shutdown();
         }
-        BaseTest.printPerformance("DexGraph", 1, "DexGraph experiment average", totalTime / (double) TOTAL_RUNS);
+        BaseTest.printPerformance("SparkseeGraph", 1, "SparkseeGraph experiment average", totalTime / (double) TOTAL_RUNS);
     }
 }

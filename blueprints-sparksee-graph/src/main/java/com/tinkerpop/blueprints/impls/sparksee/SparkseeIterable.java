@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.tinkerpop.blueprints.impls.dex;
+package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
@@ -14,25 +14,25 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
- * {@link Iterable} {@link DexElement} collection implementation for Dex.
+ * {@link Iterable} {@link SparkseeElement} collection implementation for Sparksee.
  * <p/>
- * It is just a wrapper for Dex Objects class.
+ * It is just a wrapper for Sparksee Objects class.
  * <p/>
- * This collections are registered into the {@link DexGraph} to be automatically
+ * This collections are registered into the {@link SparkseeGraph} to be automatically
  * closed when the database is stopped.
  *
  * @param <T>
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-class DexIterable<T extends Element> implements CloseableIterable<T> {
+class SparkseeIterable<T extends Element> implements CloseableIterable<T> {
 
-    private DexGraph graph;
-    private com.sparsity.dex.gdb.Objects iterable;
+    private SparkseeGraph graph;
+    private com.sparsity.sparksee.gdb.Objects iterable;
     private Class<T> clazz;
-    private final List<DexIterator> iterators = new ArrayList<DexIterator>();
+    private final List<SparkseeIterator> iterators = new ArrayList<SparkseeIterator>();
 
-    public DexIterable(final DexGraph g, final com.sparsity.dex.gdb.Objects iterable, final Class<T> clazz) {
+    public SparkseeIterable(final SparkseeGraph g, final com.sparsity.sparksee.gdb.Objects iterable, final Class<T> clazz) {
         this.graph = g;
         this.iterable = iterable;
         this.clazz = clazz;
@@ -41,7 +41,7 @@ class DexIterable<T extends Element> implements CloseableIterable<T> {
 
     @Override
     public Iterator<T> iterator() {
-        final DexIterator itty = new DexIterator();
+        final SparkseeIterator itty = new SparkseeIterator();
         this.iterators.add(itty);
         return itty;
     }
@@ -54,7 +54,7 @@ class DexIterable<T extends Element> implements CloseableIterable<T> {
     }
 
     void close(boolean unregister) {
-        for (final DexIterator itty : iterators) {
+        for (final SparkseeIterator itty : iterators) {
             itty.close();
         }
         iterable.close();
@@ -65,8 +65,8 @@ class DexIterable<T extends Element> implements CloseableIterable<T> {
         graph = null;
     }
 
-    private class DexIterator implements Iterator<T> {
-        private com.sparsity.dex.gdb.ObjectsIterator itty = iterable.iterator();
+    private class SparkseeIterator implements Iterator<T> {
+        private com.sparsity.sparksee.gdb.ObjectsIterator itty = iterable.iterator();
 
         @Override
         public boolean hasNext() {
@@ -80,11 +80,11 @@ class DexIterable<T extends Element> implements CloseableIterable<T> {
                 throw new NoSuchElementException();
             T ret = null;
             if (clazz == Vertex.class) {
-                ret = (T) new DexVertex(graph, oid);
+                ret = (T) new SparkseeVertex(graph, oid);
             } else if (clazz == Edge.class) {
-                ret = (T) new DexEdge(graph, oid);
+                ret = (T) new SparkseeEdge(graph, oid);
             } else if (clazz == Element.class) {
-                ret = (T) new DexElement(graph, oid);
+                ret = (T) new SparkseeElement(graph, oid);
             } else {
                 throw new IllegalStateException();
             }

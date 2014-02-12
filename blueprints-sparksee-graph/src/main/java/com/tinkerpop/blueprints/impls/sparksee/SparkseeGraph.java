@@ -1,7 +1,7 @@
-package com.tinkerpop.blueprints.impls.dex;
+package com.tinkerpop.blueprints.impls.sparksee;
 
-import com.sparsity.dex.gdb.AttributeKind;
-import com.sparsity.dex.gdb.ObjectType;
+import com.sparsity.sparksee.gdb.AttributeKind;
+import com.sparsity.sparksee.gdb.ObjectType;
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -26,27 +26,27 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Dex is a graph database developed by Sparsity Technologies.
+ * Sparksee is a graph database developed by Sparsity Technologies.
  * <p/>
- * Dex natively supports the property graph data model defined by Blueprints.
+ * Sparksee natively supports the property graph data model defined by Blueprints.
  * However, there are a few peculiarities. No user defined element identifiers:
- * Dex is the gatekeeper and creator of vertex and edge identifiers. Thus, when
+ * Sparksee is the gatekeeper and creator of vertex and edge identifiers. Thus, when
  * creating a new vertex or edge instance, the provided object identifier is
  * ignored.
  * <p/>
  * Vertices are labeled too: When adding vertices, the user can set
- * {@link DexGraph#label} to be used as the label of the vertex to be created.
+ * {@link SparkseeGraph#label} to be used as the label of the vertex to be created.
  * Also, the label of a vertex (or even an element) can be retrieved through the
  * {@link StringFactory#LABEL} property.
  * <p/>
- * DexGraph implements {@link KeyIndexableGraph} with some particularities on
+ * SparkseeGraph implements {@link KeyIndexableGraph} with some particularities on
  * the way it can be used. As both vertices and edges are labeled when working
- * with Dex, the use of some APIs may require previously setting the label (by
- * means of {@link DexGraph#label}). Those APIs are:
+ * with Sparksee, the use of some APIs may require previously setting the label (by
+ * means of {@link SparkseeGraph#label}). Those APIs are:
  * {@link #getVertices(String, Object)}, {@link #getEdges(String, Object)}, and
  * {@link #createKeyIndex(String, Class)}.
  * <p/>
- * When working with DexGraph, all methods having as a result a collection
+ * When working with SparkseeGraph, all methods having as a result a collection
  * actually return a {@link CloseableIterable} collection. Thus users can
  * {@link CloseableIterable#close()} the collection to free resources.
  * Otherwise, all those collections will automatically be closed when the
@@ -56,18 +56,18 @@ import java.util.Set;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndexableGraph, TransactionalGraph {
+public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>, KeyIndexableGraph, TransactionalGraph {
 
     /**
      * Default Vertex label.
      */
-    public static final String DEFAULT_DEX_VERTEX_LABEL = "VERTEX_LABEL";
+    public static final String DEFAULT_SPARKSEE_VERTEX_LABEL = "VERTEX_LABEL";
 
     /**
-     * This is a "bypass" to set the Dex vertex label (node type).
+     * This is a "bypass" to set the Sparksee vertex label (node type).
      * <p/>
-     * Dex vertices belong to a vertex/node type (thus all of them have a label).
-     * By default, all vertices will have the {@link #DEFAULT_DEX_VERTEX_LABEL} label.
+     * Sparksee vertices belong to a vertex/node type (thus all of them have a label).
+     * By default, all vertices will have the {@link #DEFAULT_SPARKSEE_VERTEX_LABEL} label.
      * The user may set a different vertex label by setting this property when calling
      * {@link #addVertex(Object)}.
      * <p/>
@@ -90,12 +90,12 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      */
     private File dbFile = null;
 
-    private com.sparsity.dex.gdb.Dex dex = null;
-    private com.sparsity.dex.gdb.Database db = null;
+    private com.sparsity.sparksee.gdb.Sparksee sparksee = null;
+    private com.sparsity.sparksee.gdb.Database db = null;
 
     private class Metadata {
-        com.sparsity.dex.gdb.Session session = null;
-        List<DexIterable<? extends Element>> collection = null;
+        com.sparsity.sparksee.gdb.Session session = null;
+        List<SparkseeIterable<? extends Element>> collection = null;
     }
 
     ;
@@ -144,12 +144,12 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     /**
-     * Gets the Dex raw graph.
+     * Gets the Sparksee raw graph.
      *
-     * @return Dex raw graph.
+     * @return Sparksee raw graph.
      */
-    public com.sparsity.dex.gdb.Graph getRawGraph() {
-        com.sparsity.dex.gdb.Session sess = getRawSession(false);
+    public com.sparsity.sparksee.gdb.Graph getRawGraph() {
+        com.sparsity.sparksee.gdb.Session sess = getRawSession(false);
         if (sess == null) {
             throw new IllegalStateException("Transaction has not been started");
         }
@@ -157,21 +157,21 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     }
 
     /**
-     * Gets the Dex Session
+     * Gets the Sparksee Session
      *
-     * @return The Dex Session
+     * @return The Sparksee Session
      */
-    com.sparsity.dex.gdb.Session getRawSession() {
+    com.sparsity.sparksee.gdb.Session getRawSession() {
         return getRawSession(true);
     }
 
     /**
-     * Gets the Dex Session
+     * Gets the Sparksee Session
      *
-     * @return The Dex Session
+     * @return The Sparksee Session
      */
-    com.sparsity.dex.gdb.Session getRawSession(boolean exception) {
-        com.sparsity.dex.gdb.Session sess = sessionData.get().session;
+    com.sparsity.sparksee.gdb.Session getRawSession(boolean exception) {
+        com.sparsity.sparksee.gdb.Session sess = sessionData.get().session;
         if (sess == null && exception) {
             throw new IllegalStateException("Transaction has not been started");
         }
@@ -183,9 +183,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      *
      * @param col Collection to be registered.
      */
-    protected void register(final DexIterable<? extends Element> col) {
+    protected void register(final SparkseeIterable<? extends Element> col) {
         if (sessionData.get().collection == null) {
-            sessionData.get().collection = new ArrayList<DexIterable<? extends Element>>();
+            sessionData.get().collection = new ArrayList<SparkseeIterable<? extends Element>>();
         }
         sessionData.get().collection.add(col);
         //System.out.println("> register " + sess + ":" + col);
@@ -196,7 +196,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      *
      * @param col Collection to be unregistered
      */
-    protected void unregister(final DexIterable<? extends Element> col) {
+    protected void unregister(final SparkseeIterable<? extends Element> col) {
         if (sessionData.get().collection == null) {
             throw new IllegalStateException("Session with no collections");
         }
@@ -209,7 +209,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      *
      * @param fileName Database persistent file.
      */
-    public DexGraph(final String fileName) {
+    public SparkseeGraph(final String fileName) {
         this(fileName, null);
     }
 
@@ -217,9 +217,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * Creates a new instance.
      *
      * @param fileName Database persistent file.
-     * @param config   Dex configuration file.
+     * @param config   Sparksee configuration file.
      */
-    public DexGraph(final String fileName, final String config) {
+    public SparkseeGraph(final String fileName, final String config) {
         try {
             this.dbFile = new File(fileName);
             final File dbPath = dbFile.getParentFile();
@@ -232,16 +232,16 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
             final boolean create = !dbFile.exists();
 
-            if (config != null) com.sparsity.dex.gdb.DexProperties.load(config);
-            dex = new com.sparsity.dex.gdb.Dex(new com.sparsity.dex.gdb.DexConfig());
-            db = (create ? dex.create(dbFile.getPath(), dbFile.getName()) : dex.open(dbFile.getPath(), false));
+            if (config != null) com.sparsity.sparksee.gdb.SparkseeProperties.load(config);
+            sparksee = new com.sparsity.sparksee.gdb.Sparksee(new com.sparsity.sparksee.gdb.SparkseeConfig());
+            db = (create ? sparksee.create(dbFile.getPath(), dbFile.getName()) : sparksee.open(dbFile.getPath(), false));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
 
-    public DexGraph(final Configuration configuration) {
-        this(configuration.getString("blueprints.dex.directory", null), configuration.getString("blueprints.dex.config", null));
+    public SparkseeGraph(final Configuration configuration) {
+        this(configuration.getString("blueprints.sparksee.directory", null), configuration.getString("blueprints.sparksee.config", null));
     }
 
     /**
@@ -250,7 +250,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      * Given identifier is ignored.
      * <p/>
      * Use {@link #label} to specify the label for the new Vertex.
-     * If no label is given, {@value #DEFAULT_DEX_VERTEX_LABEL} will be used.
+     * If no label is given, {@value #DEFAULT_SPARKSEE_VERTEX_LABEL} will be used.
      *
      * @param id It is ignored.
      * @return Added Vertex.
@@ -261,17 +261,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public Vertex addVertex(final Object id) {
         autoStartTransaction();
 
-        String label = this.label.get() == null ? DEFAULT_DEX_VERTEX_LABEL : this.label.get();
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        String label = this.label.get() == null ? DEFAULT_SPARKSEE_VERTEX_LABEL : this.label.get();
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         int type = rawGraph.findType(label);
-        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+        if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newNodeType(label);
         }
-        assert type != com.sparsity.dex.gdb.Type.InvalidType;
+        assert type != com.sparsity.sparksee.gdb.Type.InvalidType;
         // create object instance
         long oid = rawGraph.newNode(type);
-        return new DexVertex(this, oid);
+        return new SparkseeVertex(this, oid);
     }
 
     /*
@@ -287,16 +287,16 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             throw ExceptionFactory.vertexIdCanNotBeNull();
         try {
             final Long longId = Double.valueOf(id.toString()).longValue();
-            com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+            com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
             final int type = rawGraph.getObjectType(longId);
-            if (type != com.sparsity.dex.gdb.Type.InvalidType)
-                return new DexVertex(this, longId);
+            if (type != com.sparsity.sparksee.gdb.Type.InvalidType)
+                return new SparkseeVertex(this, longId);
             else
                 return null;
         } catch (NumberFormatException e) {
             return null;
         } catch (RuntimeException re) {
-            // dex throws a runtime exception => [DEX: 12] Invalid object identifier.
+            // sparksee throws a runtime exception => [SPARKSEE: 12] Invalid object identifier.
             return null;
         }
     }
@@ -315,7 +315,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         if (getVertex(vertex.getId()) == null)
             throw ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
 
-        assert vertex instanceof DexVertex;
+        assert vertex instanceof SparkseeVertex;
 
         try {
             getRawGraph().drop((Long) vertex.getId());
@@ -333,12 +333,12 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public CloseableIterable<Vertex> getVertices() {
         autoStartTransaction();
 
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
-        com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findNodeTypes();
         List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
         for (Integer type : tlist) {
-            com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-            vertices.add(new DexIterable<Vertex>(this, objs, Vertex.class));
+            com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+            vertices.add(new SparkseeIterable<Vertex>(this, objs, Vertex.class));
         }
         tlist.delete();
         tlist = null;
@@ -363,16 +363,16 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
         autoStartTransaction();
 
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
 
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
 
             int type = rawGraph.findType(value.toString());
-            if (type != com.sparsity.dex.gdb.Type.InvalidType) {
-                com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
+            if (type != com.sparsity.sparksee.gdb.Type.InvalidType) {
+                com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
                 if (tdata.getObjectType() == ObjectType.Node) {
-                    com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-                    return new DexIterable<Vertex>(this, objs, Vertex.class);
+                    com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+                    return new SparkseeIterable<Vertex>(this, objs, Vertex.class);
                 }
             }
             return null;
@@ -381,17 +381,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         String label = this.label.get();
         if (label == null) { // all vertex types
 
-            com.sparsity.dex.gdb.TypeList tlist = rawGraph.findNodeTypes();
+            com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findNodeTypes();
             List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
             for (Integer type : tlist) {
                 int attr = rawGraph.findAttribute(type, key);
-                if (com.sparsity.dex.gdb.Attribute.InvalidAttribute != attr) {
-                    com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
+                if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute != attr) {
+                    com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
                     if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                        com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-                        vertices.add(new PropertyFilteredIterable<Vertex>(key, value, new DexIterable<Vertex>(this, objs, Vertex.class)));
+                        com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+                        vertices.add(new PropertyFilteredIterable<Vertex>(key, value, new SparkseeIterable<Vertex>(this, objs, Vertex.class)));
                     } else { // use the index
-                        vertices.add(new DexIterable<Vertex>(this, this.rawGet(adata, value), Vertex.class));
+                        vertices.add(new SparkseeIterable<Vertex>(this, this.rawGet(adata, value), Vertex.class));
                     }
                 }
             }
@@ -404,26 +404,26 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         } else { // restricted to a type
 
             int type = rawGraph.findType(label);
-            if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+            if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
                 throw new IllegalArgumentException("Unnexisting vertex label: " + label);
             }
-            com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
-            if (tdata.getObjectType() != com.sparsity.dex.gdb.ObjectType.Node) {
+            com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
+            if (tdata.getObjectType() != com.sparsity.sparksee.gdb.ObjectType.Node) {
                 throw new IllegalArgumentException("Given label is not a vertex label: " + label);
             }
 
             int attr = rawGraph.findAttribute(type, key);
-            if (com.sparsity.dex.gdb.Attribute.InvalidAttribute == attr) {
+            if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute == attr) {
                 throw new IllegalArgumentException("The given attribute '" + key
                         + "' does not exist for the given node label '" + label + "'");
             }
 
-            com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
+            com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
             if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-                return new PropertyFilteredIterable<Vertex>(key, value, new DexIterable<Vertex>(this, objs, Vertex.class));
+                com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+                return new PropertyFilteredIterable<Vertex>(key, value, new SparkseeIterable<Vertex>(this, objs, Vertex.class));
             } else { // use the index
-                return new DexIterable<Vertex>(this, this.rawGet(adata, value), Vertex.class);
+                return new SparkseeIterable<Vertex>(this, this.rawGet(adata, value), Vertex.class);
             }
         }
     }
@@ -442,17 +442,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
         autoStartTransaction();
 
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         int type = rawGraph.findType(label);
-        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+        if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newEdgeType(label, true, true);
         }
-        assert type != com.sparsity.dex.gdb.Type.InvalidType;
+        assert type != com.sparsity.sparksee.gdb.Type.InvalidType;
         // create object instance
-        assert outVertex instanceof DexVertex && inVertex instanceof DexVertex;
+        assert outVertex instanceof SparkseeVertex && inVertex instanceof SparkseeVertex;
         long oid = rawGraph.newEdge(type, (Long) outVertex.getId(), (Long) inVertex.getId());
-        return new DexEdge(this, oid);
+        return new SparkseeEdge(this, oid);
     }
 
     /*
@@ -467,17 +467,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
         try {
-            com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+            com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
             Long longId = Double.valueOf(id.toString()).longValue();
             int type = rawGraph.getObjectType(longId);
-            if (type != com.sparsity.dex.gdb.Type.InvalidType)
-                return new DexEdge(this, longId);
+            if (type != com.sparsity.sparksee.gdb.Type.InvalidType)
+                return new SparkseeEdge(this, longId);
             else
                 return null;
         } catch (NumberFormatException e) {
             return null;
         } catch (RuntimeException re) {
-            // dex throws an runtime exception => [DEX: 12] Invalid object identifier.
+            // sparksee throws an runtime exception => [SPARKSEE: 12] Invalid object identifier.
             return null;
         }
 
@@ -494,7 +494,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public void removeEdge(final Edge edge) {
         autoStartTransaction();
 
-        assert edge instanceof DexEdge;
+        assert edge instanceof SparkseeEdge;
         getRawGraph().drop((Long) edge.getId());
     }
 
@@ -507,12 +507,12 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public CloseableIterable<Edge> getEdges() {
         autoStartTransaction();
 
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
-        com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findEdgeTypes();
         List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
         for (Integer type : tlist) {
-            com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-            edges.add(new DexIterable<Edge>(this, objs, Edge.class));
+            com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+            edges.add(new SparkseeIterable<Edge>(this, objs, Edge.class));
         }
         tlist.delete();
         tlist = null;
@@ -537,16 +537,16 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     public CloseableIterable<Edge> getEdges(final String key, final Object value) {
         autoStartTransaction();
 
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
 
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
 
             int type = rawGraph.findType(value.toString());
-            if (type != com.sparsity.dex.gdb.Type.InvalidType) {
-                com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
+            if (type != com.sparsity.sparksee.gdb.Type.InvalidType) {
+                com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
                 if (tdata.getObjectType() == ObjectType.Edge) {
-                    com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-                    return new DexIterable<Edge>(this, objs, Edge.class);
+                    com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+                    return new SparkseeIterable<Edge>(this, objs, Edge.class);
                 }
             }
             return null;
@@ -555,17 +555,17 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         String label = this.label.get();
         if (label == null) { // all vertex types
 
-            com.sparsity.dex.gdb.TypeList tlist = rawGraph.findEdgeTypes();
+            com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findEdgeTypes();
             List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
             for (Integer type : tlist) {
                 int attr = rawGraph.findAttribute(type, key);
-                if (com.sparsity.dex.gdb.Attribute.InvalidAttribute != attr) {
-                    com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
+                if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute != attr) {
+                    com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
                     if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                        com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-                        edges.add(new PropertyFilteredIterable<Edge>(key, value, new DexIterable<Edge>(this, objs, Edge.class)));
+                        com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+                        edges.add(new PropertyFilteredIterable<Edge>(key, value, new SparkseeIterable<Edge>(this, objs, Edge.class)));
                     } else { // use the index
-                        edges.add(new DexIterable<Edge>(this, this.rawGet(adata, value), Edge.class));
+                        edges.add(new SparkseeIterable<Edge>(this, this.rawGet(adata, value), Edge.class));
                     }
                 }
             }
@@ -578,26 +578,26 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         } else { // restricted to a type
 
             int type = rawGraph.findType(label);
-            if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+            if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
                 throw new IllegalArgumentException("Unnexisting edge label: " + label);
             }
-            com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
-            if (tdata.getObjectType() != com.sparsity.dex.gdb.ObjectType.Edge) {
+            com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
+            if (tdata.getObjectType() != com.sparsity.sparksee.gdb.ObjectType.Edge) {
                 throw new IllegalArgumentException("Given label is not a edge label: " + label);
             }
 
             int attr = rawGraph.findAttribute(type, key);
-            if (com.sparsity.dex.gdb.Attribute.InvalidAttribute == attr) {
+            if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute == attr) {
                 throw new IllegalArgumentException("The given attribute '" + key
                         + "' does not exist for the given edge label '" + label + "'");
             }
 
-            com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
+            com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
             if (adata.getKind() == AttributeKind.Basic) { // "table" scan
-                com.sparsity.dex.gdb.Objects objs = rawGraph.select(type);
-                return new PropertyFilteredIterable<Edge>(key, value, new DexIterable<Edge>(this, objs, Edge.class));
+                com.sparsity.sparksee.gdb.Objects objs = rawGraph.select(type);
+                return new PropertyFilteredIterable<Edge>(key, value, new SparkseeIterable<Edge>(this, objs, Edge.class));
             } else { // use the index
-                return new DexIterable<Edge>(this, this.rawGet(adata, value), Edge.class);
+                return new SparkseeIterable<Edge>(this, this.rawGet(adata, value), Edge.class);
             }
         }
     }
@@ -607,7 +607,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
      */
     protected void closeAllSessionCollections() {
         if (sessionData.get().collection != null) {
-            for (DexIterable<? extends Element> elem : sessionData.get().collection) {
+            for (SparkseeIterable<? extends Element> elem : sessionData.get().collection) {
                 elem.close(false);
             }
             sessionData.get().collection.clear();
@@ -624,7 +624,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         commit();
 
         db.close();
-        dex.close();
+        sparksee.close();
     }
 
     @Override
@@ -636,8 +636,8 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         return FEATURES;
     }
 
-    private com.sparsity.dex.gdb.Objects rawGet(final com.sparsity.dex.gdb.Attribute adata, final Object value) {
-        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+    private com.sparsity.sparksee.gdb.Objects rawGet(final com.sparsity.sparksee.gdb.Attribute adata, final Object value) {
+        com.sparsity.sparksee.gdb.Value v = new com.sparsity.sparksee.gdb.Value();
         switch (adata.getDataType()) {
             case Boolean:
                 v.setBooleanVoid((Boolean) value);
@@ -661,7 +661,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             default:
                 throw new UnsupportedOperationException();
         }
-        return this.getRawGraph().select(adata.getId(), com.sparsity.dex.gdb.Condition.Equal, v);
+        return this.getRawGraph().select(adata.getId(), com.sparsity.sparksee.gdb.Condition.Equal, v);
     }
 
     @Override
@@ -676,7 +676,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
     /**
      * Create an automatic indexing structure for indexing provided key for element class.
      * <p/>
-     * Dex attributes are restricted to an specific vertex/edge type. The property
+     * Sparksee attributes are restricted to an specific vertex/edge type. The property
      * {@link #label} must be used to specify the vertex/edge label.
      * <p/>
      * The index could be created even before the vertex/edge label
@@ -699,10 +699,10 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             throw new IllegalArgumentException("Label must be given");
         }
 
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
 
         int type = rawGraph.findType(label);
-        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+        if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
             // create the node/edge type
             if (Vertex.class.isAssignableFrom(elementClass)) {
                 type = rawGraph.newNodeType(label);
@@ -713,7 +713,7 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
             }
         } else {
             // validate the node/edge type
-            com.sparsity.dex.gdb.Type tdata = rawGraph.getType(type);
+            com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
             if (tdata.getObjectType() == ObjectType.Node) {
                 if (!Vertex.class.isAssignableFrom(elementClass)) {
                     throw new IllegalArgumentException("Given element class '"
@@ -732,19 +732,19 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         }
 
         int attr = rawGraph.findAttribute(type, key);
-        if (com.sparsity.dex.gdb.Attribute.InvalidAttribute == attr) {
+        if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute == attr) {
             // create the attribute (indexed)
             attr = rawGraph.newAttribute(type, key,
-                    com.sparsity.dex.gdb.DataType.String,
-                    com.sparsity.dex.gdb.AttributeKind.Indexed);
+                    com.sparsity.sparksee.gdb.DataType.String,
+                    com.sparsity.sparksee.gdb.AttributeKind.Indexed);
         } else {
             // it already exists, let's indexe it if necessary
-            com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
+            com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
             if (adata.getKind() == AttributeKind.Indexed || adata.getKind() == AttributeKind.Unique) {
                 throw ExceptionFactory.indexAlreadyExists(label + " " + key);
             }
             rawGraph.indexAttribute(attr,
-                    com.sparsity.dex.gdb.AttributeKind.Indexed);
+                    com.sparsity.sparksee.gdb.AttributeKind.Indexed);
         }
     }
 
@@ -755,8 +755,8 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
 
         autoStartTransaction();
 
-        com.sparsity.dex.gdb.TypeList tlist = null;
-        com.sparsity.dex.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.TypeList tlist = null;
+        com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         if (Vertex.class.isAssignableFrom(elementClass)) {
             tlist = rawGraph.findNodeTypes();
         } else if (Edge.class.isAssignableFrom(elementClass)) {
@@ -766,9 +766,9 @@ public class DexGraph implements MetaGraph<com.sparsity.dex.gdb.Graph>, KeyIndex
         }
         Set<String> ret = new HashSet<String>();
         for (Integer type : tlist) {
-            com.sparsity.dex.gdb.AttributeList alist = rawGraph.findAttributes(type);
+            com.sparsity.sparksee.gdb.AttributeList alist = rawGraph.findAttributes(type);
             for (Integer attr : alist) {
-                com.sparsity.dex.gdb.Attribute adata = rawGraph.getAttribute(attr);
+                com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
                 if (adata.getKind() == AttributeKind.Indexed || adata.getKind() == AttributeKind.Unique) {
                     ret.add(adata.getName());
                 }

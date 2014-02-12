@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.dex;
+package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
@@ -17,12 +17,12 @@ import java.lang.reflect.Method;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-public class DexGraphTest extends GraphTest {
+public class SparkseeGraphTest extends GraphTest {
 
-    /*public void testDexBenchmarkTestSuite() throws Exception {
+    /*public void testSparkseeBenchmarkTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new DexBenchmarkTestSuite(this));
-        printTestPerformance("DexBenchmarkTestSuite", this.stopWatch());
+        doTestSuite(new SparkseeBenchmarkTestSuite(this));
+        printTestPerformance("SparkseeBenchmarkTestSuite", this.stopWatch());
     }*/
 
     public void testVertexTestSuite() throws Exception {
@@ -56,7 +56,7 @@ public class DexGraphTest extends GraphTest {
     }
 
     /*
-    This test does not work because Dex properties are restricted to
+    This test does not work because Sparksee properties are restricted to
     the scope of a node/edge type. Thus, when using the KeyIndexableGraph
     APIs it is required to previously set the label where the key property
     is defined, as it is shown in the testKeyIndex below.
@@ -81,7 +81,7 @@ public class DexGraphTest extends GraphTest {
     }
 
     /*
-    the GML Reader won't work with Dex because of our test approach.  the test uses the toy
+    the GML Reader won't work with Sparksee because of our test approach.  the test uses the toy
     tinkergraph which has a mix of data types for the "weight" property on the edge...dex does
     not allow an attribute with the same name to have values with different data types so it
     blows up the test.
@@ -93,12 +93,12 @@ public class DexGraphTest extends GraphTest {
     */
 
     //
-    // Dex specific test
+    // Sparksee specific test
     //
-    public void testDexSpecificTestSuite() throws Exception {
+    public void testSparkseeSpecificTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new DexGraphSpecificTestSuite(this));
-        printTestPerformance("DexGraphSpecificTestSuite", this.stopWatch());
+        doTestSuite(new SparkseeGraphSpecificTestSuite(this));
+        printTestPerformance("SparkseeGraphSpecificTestSuite", this.stopWatch());
     }
 
     public Graph generateGraph() {
@@ -106,7 +106,7 @@ public class DexGraphTest extends GraphTest {
     }
 
     public Graph generateGraph(boolean create) {
-        return this.generateGraph(create, "blueprints_test.dex");
+        return this.generateGraph(create, "blueprints_sparksee_test.gdb");
     }
 
     public Graph generateGraph(final String graphDirectoryName) {
@@ -120,7 +120,7 @@ public class DexGraphTest extends GraphTest {
             deleteDirectory(this.computeTestDataRoot());
         }
 
-        return new DexGraph(db, "./blueprints-dex.cfg");
+        return new SparkseeGraph(db, "./blueprints-sparksee.cfg");
     }
 
     public void doTestSuite(final TestSuite testSuite) throws Exception {

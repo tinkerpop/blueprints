@@ -1,4 +1,4 @@
-package com.tinkerpop.blueprints.impls.dex;
+package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -18,29 +18,29 @@ import java.util.List;
 
 /**
  */
-public class DexGraphSpecificTestSuite extends TestSuite {
+public class SparkseeGraphSpecificTestSuite extends TestSuite {
 
-    public DexGraphSpecificTestSuite() {
+    public SparkseeGraphSpecificTestSuite() {
     }
 
-    public DexGraphSpecificTestSuite(final GraphTest graphTest) {
+    public SparkseeGraphSpecificTestSuite(final GraphTest graphTest) {
         super(graphTest);
     }
 
-    public void testDexVertexLabel() throws Exception {
+    public void testSparkseeVertexLabel() throws Exception {
         Graph graph = graphTest.generateGraph();
         this.stopWatch();
 
-        assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(DexGraph.DEFAULT_DEX_VERTEX_LABEL));
-        ((DexGraph) graph).label.set("people");
+        assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(SparkseeGraph.DEFAULT_SPARKSEE_VERTEX_LABEL));
+        ((SparkseeGraph) graph).label.set("people");
         assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals("people"));
-        ((DexGraph) graph).label.set("thing");
+        ((SparkseeGraph) graph).label.set("thing");
         assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals("thing"));
         assertTrue(graph.addVertex("whatever").getProperty(StringFactory.LABEL).equals("thing"));
-        ((DexGraph) graph).label.set(null);
-        assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(DexGraph.DEFAULT_DEX_VERTEX_LABEL));
+        ((SparkseeGraph) graph).label.set(null);
+        assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(SparkseeGraph.DEFAULT_SPARKSEE_VERTEX_LABEL));
 
-        ((DexGraph) graph).label.set("mylabel");
+        ((SparkseeGraph) graph).label.set("mylabel");
         Vertex v1 = graph.addVertex("mylabel");
         boolean excep = false;
         try {
@@ -51,7 +51,7 @@ public class DexGraphSpecificTestSuite extends TestSuite {
             assertTrue(excep);
         }
 
-        printPerformance(graph.toString(), null, "testDexVertexLabel", this.stopWatch());
+        printPerformance(graph.toString(), null, "testSparkseeVertexLabel", this.stopWatch());
         graph.shutdown();
     }
 
@@ -59,35 +59,35 @@ public class DexGraphSpecificTestSuite extends TestSuite {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
         this.stopWatch();
 
-        ((DexGraph) graph).label.set("people");
+        ((SparkseeGraph) graph).label.set("people");
         graph.createKeyIndex("name", Vertex.class);
 
-        ((DexGraph) graph).label.set("thing");
+        ((SparkseeGraph) graph).label.set("thing");
         graph.createKeyIndex("name", Vertex.class);
 
         assertTrue(graph.getIndexedKeys(Edge.class).isEmpty());
         assertTrue(graph.getIndexedKeys(Vertex.class).size() == 1);
         assertTrue(graph.getIndexedKeys(Vertex.class).contains("name"));
 
-        ((DexGraph) graph).label.set("people");
+        ((SparkseeGraph) graph).label.set("people");
         Vertex v1 = graph.addVertex(null);
         v1.setProperty("name", "foo");
         Vertex v2 = graph.addVertex(null);
         v2.setProperty("name", "boo");
 
-        ((DexGraph) graph).label.set("thing");
+        ((SparkseeGraph) graph).label.set("thing");
         Vertex v10 = graph.addVertex(null);
         v10.setProperty("name", "foo");
         Vertex v20 = graph.addVertex(null);
         v20.setProperty("name", "boo");
 
-        ((DexGraph) graph).label.set("people");
+        ((SparkseeGraph) graph).label.set("people");
         assertTrue(graph.getVertices("name", "foo").iterator().next().equals(v1));
-        ((DexGraph) graph).label.set("thing");
+        ((SparkseeGraph) graph).label.set("thing");
         assertTrue(graph.getVertices("name", "foo").iterator().next().equals(v10));
 
         ArrayList<Vertex> result = new ArrayList<Vertex>(Arrays.asList(v1, v10));
-        ((DexGraph) graph).label.set(null); // all types!
+        ((SparkseeGraph) graph).label.set(null); // all types!
         for (Vertex current : graph.getVertices("name", "foo")) {
             assertTrue(result.contains(current));
             result.remove(current);
@@ -103,7 +103,7 @@ public class DexGraphSpecificTestSuite extends TestSuite {
 
         // table scan
         v1.setProperty("age", 99);
-        ((DexGraph) graph).label.set("people");
+        ((SparkseeGraph) graph).label.set("people");
         assertTrue(graph.getVertices("age", 99).iterator().next().equals(v1));
 
         printPerformance(graph.toString(), null, "testKeyIndex", this.stopWatch());
@@ -121,17 +121,17 @@ public class DexGraphSpecificTestSuite extends TestSuite {
         assertTrue(graph.getVertices("name", "sergio").iterator().next()
                 .getProperty("name").equals("sergio"));
         graph.commit();
-        assertTrue(((DexGraph) graph).getRawSession(false) == null);
+        assertTrue(((SparkseeGraph) graph).getRawSession(false) == null);
 
         assertTrue(graph.getVertices("name", "sergio").iterator().next().getProperty("name").equals("sergio"));
         graph.commit();
-        assertTrue(((DexGraph) graph).getRawSession(false) == null);
+        assertTrue(((SparkseeGraph) graph).getRawSession(false) == null);
         graph.commit();
-        assertTrue(((DexGraph) graph).getRawSession(false) == null);
+        assertTrue(((SparkseeGraph) graph).getRawSession(false) == null);
 
         graph.addVertex(null);
         graph.shutdown();
-        assertTrue(((DexGraph) graph).getRawSession(false) == null);
+        assertTrue(((SparkseeGraph) graph).getRawSession(false) == null);
         printPerformance(graph.toString(), null, "testTx", this.stopWatch());
         graph.shutdown();
     }
@@ -166,9 +166,9 @@ public class DexGraphSpecificTestSuite extends TestSuite {
 
         // This test requires a multiple sessions license, 
         // so just executed if a license has been given, 
-        // see DexGraphTest#generateGraph(...) -> blueprints-dex.cfg
+        // see SparkseeGraphTest#generateGraph(...) -> blueprints-sparksee.cfg
 
-        com.sparsity.dex.gdb.DexConfig cfg = new com.sparsity.dex.gdb.DexConfig();
+        com.sparsity.sparksee.gdb.SparkseeConfig cfg = new com.sparsity.sparksee.gdb.SparkseeConfig();
         if (cfg.getLicense() == null || cfg.getLicense().length() == 0) {
             printPerformance(graph.toString(), null, "skip because no license", this.stopWatch());
             graph.shutdown();

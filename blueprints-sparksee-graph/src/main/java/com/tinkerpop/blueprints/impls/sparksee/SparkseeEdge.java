@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.tinkerpop.blueprints.impls.dex;
+package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
@@ -10,7 +10,7 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
 
 /**
- * {@link Edge} implementation for Dex.
+ * {@link Edge} implementation for Sparksee.
  * <p/>
  * It computes "in vertex" and "out vertex" just when it is necessary.
  * <p/>
@@ -21,28 +21,28 @@ import com.tinkerpop.blueprints.util.StringFactory;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-class DexEdge extends DexElement implements Edge {
+class SparkseeEdge extends SparkseeElement implements Edge {
 
     /**
      * In vertex.
      *
      * @see #setEdges()
      */
-    private long in = com.sparsity.dex.gdb.Objects.InvalidOID;
+    private long in = com.sparsity.sparksee.gdb.Objects.InvalidOID;
 
     /**
      * Out vertex.
      *
      * @see #setEdges()
      */
-    private long out = com.sparsity.dex.gdb.Objects.InvalidOID;
+    private long out = com.sparsity.sparksee.gdb.Objects.InvalidOID;
 
     /**
      * Sets in vertex and out vertex in case they have not been set before.
      */
     private void setEdges() {
-        if (in == com.sparsity.dex.gdb.Objects.InvalidOID || out == com.sparsity.dex.gdb.Objects.InvalidOID) {
-            com.sparsity.dex.gdb.EdgeData edata = graph.getRawGraph().getEdgeData(oid);
+        if (in == com.sparsity.sparksee.gdb.Objects.InvalidOID || out == com.sparsity.sparksee.gdb.Objects.InvalidOID) {
+            com.sparsity.sparksee.gdb.EdgeData edata = graph.getRawGraph().getEdgeData(oid);
             out = edata.getTail();
             in = edata.getHead();
             edata = null;
@@ -52,13 +52,13 @@ class DexEdge extends DexElement implements Edge {
     /**
      * Creates a new instance.
      *
-     * @param g   DexGraph.
-     * @param oid Dex OID.
+     * @param g   SparkseeGraph.
+     * @param oid Sparksee OID.
      */
-    protected DexEdge(final DexGraph g, final long oid) {
+    protected SparkseeEdge(final SparkseeGraph g, final long oid) {
         super(g, oid);
-        this.in = com.sparsity.dex.gdb.Objects.InvalidOID;
-        this.out = com.sparsity.dex.gdb.Objects.InvalidOID;
+        this.in = com.sparsity.sparksee.gdb.Objects.InvalidOID;
+        this.out = com.sparsity.sparksee.gdb.Objects.InvalidOID;
     }
 
     /*
@@ -72,9 +72,9 @@ class DexEdge extends DexElement implements Edge {
 
         setEdges();
         if (direction.equals(Direction.OUT))
-            return new DexVertex(graph, out);
+            return new SparkseeVertex(graph, out);
         else if (direction.equals(Direction.IN))
-            return new DexVertex(graph, in);
+            return new SparkseeVertex(graph, in);
         else
             throw ExceptionFactory.bothIsNotSupported();
     }

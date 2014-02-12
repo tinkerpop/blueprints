@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.tinkerpop.blueprints.impls.dex;
+package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * {@link Element} implementation for Dex.
+ * {@link Element} implementation for Sparksee.
  * <p/>
  * All elements are typed or labeled. The way to get the type or label for an
  * element is retrieving the property {@link StringFactory#LABEL}. This
@@ -26,33 +26,33 @@ import java.util.Set;
  * @author <a href="http://www.sparsity-technologies.com">Sparsity
  *         Technologies</a>
  */
-class DexElement implements Element {
+class SparkseeElement implements Element {
     /**
-     * DexGraph instance.
+     * SparkseeGraph instance.
      */
-    protected DexGraph graph = null;
+    protected SparkseeGraph graph = null;
     /**
-     * Dex OID.
+     * Sparksee OID.
      */
-    protected long oid = com.sparsity.dex.gdb.Objects.InvalidOID;
+    protected long oid = com.sparsity.sparksee.gdb.Objects.InvalidOID;
     /**
-     * Dex object type.
+     * Sparksee object type.
      * <p/>
      * It is loaded as late as possible (and just if required).
      *
      * @see #getObjectType()
      */
-    private int type = com.sparsity.dex.gdb.Type.InvalidType;
+    private int type = com.sparsity.sparksee.gdb.Type.InvalidType;
 
     /**
-     * Gets the Dex object type.
+     * Gets the Sparksee object type.
      * <p/>
-     * If it has not been loaded yet, it is retrieved from Dex database.
+     * If it has not been loaded yet, it is retrieved from Sparksee database.
      *
      * @return The element type.
      */
     protected int getObjectType() {
-        if (type == com.sparsity.dex.gdb.Type.InvalidType) {
+        if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
             type = graph.getRawGraph().getObjectType(oid);
         }
         return type;
@@ -61,7 +61,7 @@ class DexElement implements Element {
     /**
      * Gets the type or label of the element.
      * <p/>
-     * The label is the name of the Dex object type.
+     * The label is the name of the Sparksee object type.
      *
      * @return Type or label of the element.
      */
@@ -72,12 +72,12 @@ class DexElement implements Element {
     /**
      * Creates a new instance.
      *
-     * @param g   DexGraph.
-     * @param oid Dex OID.
+     * @param g   SparkseeGraph.
+     * @param oid Sparksee OID.
      */
-    protected DexElement(final DexGraph g, final long oid) {
+    protected SparkseeElement(final SparkseeGraph g, final long oid) {
         assert g != null;
-        assert oid != com.sparsity.dex.gdb.Objects.InvalidOID;
+        assert oid != com.sparsity.sparksee.gdb.Objects.InvalidOID;
 
         this.graph = g;
         this.oid = oid;
@@ -94,17 +94,17 @@ class DexElement implements Element {
 
         int type = getObjectType();
         if (key.compareTo(StringFactory.LABEL) == 0) {
-            com.sparsity.dex.gdb.Type tdata = graph.getRawGraph().getType(type);
+            com.sparsity.sparksee.gdb.Type tdata = graph.getRawGraph().getType(type);
             return (T) tdata.getName();
         }
         int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
-        if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
+        if (attr == com.sparsity.sparksee.gdb.Attribute.InvalidAttribute) {
             return null;
         }
-        com.sparsity.dex.gdb.Attribute adata = graph.getRawGraph().getAttribute(attr);
+        com.sparsity.sparksee.gdb.Attribute adata = graph.getRawGraph().getAttribute(attr);
         assert adata != null;
 
-        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+        com.sparsity.sparksee.gdb.Value v = new com.sparsity.sparksee.gdb.Value();
         graph.getRawGraph().getAttribute(oid, attr, v);
         Object result = null;
         if (!v.isNull()) {
@@ -125,7 +125,7 @@ class DexElement implements Element {
                     result = v.getDouble();
                     break;
                 default:
-                    throw new UnsupportedOperationException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+                    throw new UnsupportedOperationException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
             }
         }
         return (T) result;
@@ -140,7 +140,7 @@ class DexElement implements Element {
     public Set<String> getPropertyKeys() {
         graph.autoStartTransaction();
 
-        com.sparsity.dex.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
+        com.sparsity.sparksee.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
         Set<String> attrKeys = new HashSet<String>();
         for (Integer attr : alist) {
             String key = graph.getRawGraph().getAttribute(attr).getName();
@@ -165,38 +165,38 @@ class DexElement implements Element {
         graph.autoStartTransaction();
 
         int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
-        com.sparsity.dex.gdb.DataType datatype = null;
-        if (attr == com.sparsity.dex.gdb.Attribute.InvalidAttribute) {
+        com.sparsity.sparksee.gdb.DataType datatype = null;
+        if (attr == com.sparsity.sparksee.gdb.Attribute.InvalidAttribute) {
             //
             // First time we set this attribute, let's create it.
             //
             if (value instanceof Boolean) {
-                datatype = com.sparsity.dex.gdb.DataType.Boolean;
+                datatype = com.sparsity.sparksee.gdb.DataType.Boolean;
             } else if (value instanceof Integer) {
-                datatype = com.sparsity.dex.gdb.DataType.Integer;
+                datatype = com.sparsity.sparksee.gdb.DataType.Integer;
             } else if (value instanceof Long) {
-                datatype = com.sparsity.dex.gdb.DataType.Long;
+                datatype = com.sparsity.sparksee.gdb.DataType.Long;
             } else if (value instanceof String) {
-                datatype = com.sparsity.dex.gdb.DataType.String;
+                datatype = com.sparsity.sparksee.gdb.DataType.String;
             } else if (value instanceof Double || value instanceof Float) {
-                datatype = com.sparsity.dex.gdb.DataType.Double;
-            } else if (value instanceof com.sparsity.dex.gdb.Value) {
-                datatype = ((com.sparsity.dex.gdb.Value) value).getDataType();
+                datatype = com.sparsity.sparksee.gdb.DataType.Double;
+            } else if (value instanceof com.sparsity.sparksee.gdb.Value) {
+                datatype = ((com.sparsity.sparksee.gdb.Value) value).getDataType();
             } else {
-                throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+                throw new IllegalArgumentException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
             }
             assert datatype != null;
-            attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.dex.gdb.AttributeKind.Basic);
-            assert attr != com.sparsity.dex.gdb.Attribute.InvalidAttribute;
+            attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.sparksee.gdb.AttributeKind.Basic);
+            assert attr != com.sparsity.sparksee.gdb.Attribute.InvalidAttribute;
         } else {
             datatype = graph.getRawGraph().getAttribute(attr).getDataType();
         }
         //
         // Set the Value
         //
-        com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
-        if (value instanceof com.sparsity.dex.gdb.Value) {
-            v = (com.sparsity.dex.gdb.Value) value;
+        com.sparsity.sparksee.gdb.Value v = new com.sparsity.sparksee.gdb.Value();
+        if (value instanceof com.sparsity.sparksee.gdb.Value) {
+            v = (com.sparsity.sparksee.gdb.Value) value;
         } else {
             // from Object to Value
             switch (datatype) {
@@ -212,7 +212,7 @@ class DexElement implements Element {
                     } else if (value instanceof Integer) {
                         v.setLongVoid(((Integer) value).longValue());
                     } else {
-                        throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+                        throw new IllegalArgumentException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
                     }
                     break;
                 case String:
@@ -227,7 +227,7 @@ class DexElement implements Element {
                     }
                     break;
                 default:
-                    throw new IllegalArgumentException(DexTokens.TYPE_EXCEPTION_MESSAGE);
+                    throw new IllegalArgumentException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
             }
         }
         //try {
@@ -251,7 +251,7 @@ class DexElement implements Element {
 
         try {
             Object ret = getProperty(key);
-            com.sparsity.dex.gdb.Value v = new com.sparsity.dex.gdb.Value();
+            com.sparsity.sparksee.gdb.Value v = new com.sparsity.sparksee.gdb.Value();
             v.setNull();
             setProperty(key, v);
             return (T) ret;

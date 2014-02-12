@@ -6,7 +6,7 @@ Blueprints is a "property graph model interface":http://github.com/tinkerpop/gre
 ** "TinkerGraph":http://wiki.github.com/tinkerpop/gremlin/tinkergraph in-memory graph
 ** "Neo4j":http://neo4j.org/ graph database
 ** "OrientDB":http://www.orientechnologies.com/ graph database
-** "DEX":http://www.sparsity-technologies.com/dex graph database
+** "Sparksee":http://www.sparsity-technologies.com/#sparksee graph database
 ** "Titan":http://thinkaurelius.github.com/titan/ (available "here":http://thinkaurelius.github.com/titan/)
 ** "InfiniteGraph":http://www.objectivity.com/products/infinitegraph/ (available "here":http://wiki.infinitegraph.com/2.1/w/index.php?title=InfiniteGraph_Tinkerpop_Blueprints_Implementation)
 ** "Rexster":http://rexster.tinkerpop.com graph server
