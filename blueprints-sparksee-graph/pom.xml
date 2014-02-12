@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.sparsity</groupId>
             <artifactId>sparkseejava</artifactId>
-            <version>5.0</version>
+            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
