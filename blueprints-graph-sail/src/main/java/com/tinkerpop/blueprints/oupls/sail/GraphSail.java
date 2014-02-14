@@ -169,14 +169,6 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         return this.store.getGraph();
     }
 
-    public void setDataDir(final File file) {
-        throw new UnsupportedOperationException();
-    }
-
-    public File getDataDir() {
-        throw new UnsupportedOperationException();
-    }
-
     public void initializeInternal() throws SailException {
         // Do nothing.
     }

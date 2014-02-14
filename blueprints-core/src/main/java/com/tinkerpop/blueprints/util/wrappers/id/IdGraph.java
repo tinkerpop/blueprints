@@ -58,7 +58,6 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         this(baseGraph, true, true);
     }
 
-
     /**
      * Adds custom ID functionality to the given graph,
      * supporting either custom vertex IDs, custom edge IDs, or both.
