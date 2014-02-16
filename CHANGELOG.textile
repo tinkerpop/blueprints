@@ -26,6 +26,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * Fixed a bug around accessing an incident vertex of an edge that is not in a valid partition in @PartitionGraph@
 * Added support for Neo4j 2.0.0 GA release in @blueprints-neo4j2-graph@ package
 * Bumped OrientDB to 1.6.3
+* GraphSON supports a "normalization" of output (like GraphML)
 
 ==<hr/>==
 
