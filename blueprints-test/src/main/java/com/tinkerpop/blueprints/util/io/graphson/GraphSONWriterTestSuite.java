@@ -23,7 +23,7 @@ public class GraphSONWriterTestSuite extends TestSuite {
 
     public void testGratefulGraphNormalized() throws Exception {
         Graph graph = this.graphTest.generateGraph();
-        if (graph.getFeatures().supportsEdgeIteration) {
+        if (graph.getFeatures().supportsEdgeIteration && !graph.getFeatures().ignoresSuppliedIds) {
             this.stopWatch();
             final String readGraphSON = readFile(GraphSONReader.class.getResourceAsStream("graph-example-2-normalized.json"), Charset.forName("UTF-8"));
             new GraphSONReader(graph).inputGraph(GraphSONReader.class.getResourceAsStream("graph-example-2-normalized.json"));
