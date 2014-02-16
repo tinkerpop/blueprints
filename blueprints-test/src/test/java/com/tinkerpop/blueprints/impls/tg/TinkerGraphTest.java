@@ -19,6 +19,7 @@ import com.tinkerpop.blueprints.util.ElementHelper;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphson.GraphSONReaderTestSuite;
+import com.tinkerpop.blueprints.util.io.graphson.GraphSONWriterTestSuite;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -94,6 +95,12 @@ public class TinkerGraphTest extends GraphTest {
         this.stopWatch();
         doTestSuite(new GraphSONReaderTestSuite(this));
         printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
+    }
+
+    public void testGraphSONWriterTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphSONWriterTestSuite(this));
+        printTestPerformance("GraphSONWriterTestSuite", this.stopWatch());
     }
 
     public void testGMLReaderTestSuite() throws Exception {

@@ -6,10 +6,15 @@ import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.io.LexicographicalElementComparator;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -55,22 +60,33 @@ public class GraphSONWriter {
      */
     public void outputGraph(final OutputStream jsonOutputStream, final Set<String> vertexPropertyKeys,
                             final Set<String> edgePropertyKeys, final GraphSONMode mode) throws IOException {
+        outputGraph(jsonOutputStream, vertexPropertyKeys, edgePropertyKeys, mode, false);
+    }
+
+
+    public void outputGraph(final OutputStream jsonOutputStream, final Set<String> vertexPropertyKeys,
+                            final Set<String> edgePropertyKeys, final GraphSONMode mode, final boolean normalize) throws IOException {
         final JsonGenerator jg = jsonFactory.createGenerator(jsonOutputStream);
-        final GraphSONUtility graphson = new GraphSONUtility(mode, null, vertexPropertyKeys, edgePropertyKeys);
+        final GraphSONUtility graphson = new GraphSONUtility(mode, null,
+                ElementPropertyConfig.includeProperties(vertexPropertyKeys, edgePropertyKeys, normalize));
 
         jg.writeStartObject();
 
         jg.writeStringField(GraphSONTokens.MODE, mode.toString());
 
         jg.writeArrayFieldStart(GraphSONTokens.VERTICES);
-        for (Vertex v : this.graph.getVertices()) {
+
+        final Iterable<Vertex> vertices = vertices(normalize);
+        for (Vertex v : vertices) {
             jg.writeTree(graphson.objectNodeFromElement(v));
         }
 
         jg.writeEndArray();
 
         jg.writeArrayFieldStart(GraphSONTokens.EDGES);
-        for (Edge e : this.graph.getEdges()) {
+
+        final Iterable<Edge> edges = edges(normalize);
+        for (Edge e : edges) {
             jg.writeTree(graphson.objectNodeFromElement(e));
         }
         jg.writeEndArray();
@@ -79,6 +95,34 @@ public class GraphSONWriter {
 
         jg.flush();
         jg.close();
+    }
+
+    private Iterable<Vertex> vertices(boolean normalize) {
+        Iterable<Vertex> vertices;
+        if (normalize) {
+            vertices = new ArrayList<Vertex>();
+            for (Vertex v : graph.getVertices()) {
+                ((Collection<Vertex>) vertices).add(v);
+            }
+            Collections.sort((List<Vertex>) vertices, new LexicographicalElementComparator());
+        } else {
+            vertices = graph.getVertices();
+        }
+        return vertices;
+    }
+
+    private Iterable<Edge> edges(boolean normalize) {
+        Iterable<Edge> edges;
+        if (normalize) {
+            edges = new ArrayList<Edge>();
+            for (Edge v : graph.getEdges()) {
+                ((Collection<Edge>) edges).add(v);
+            }
+            Collections.sort((List<Edge>) edges, new LexicographicalElementComparator());
+        } else {
+            edges = graph.getEdges();
+        }
+        return edges;
     }
 
     /**

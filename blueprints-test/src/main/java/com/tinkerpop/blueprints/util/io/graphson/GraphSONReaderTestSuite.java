@@ -7,6 +7,7 @@ import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
 
+import java.io.FileOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 

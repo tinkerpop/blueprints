@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1090,7 +1089,7 @@ public class GraphSONUtilityTest {
 
         Set<String> ignoreAge = new HashSet<String>();
         ignoreAge.add("age");
-        ElementPropertyConfig config = ElementPropertyConfig.ExcludeProperties(ignoreAge, null);
+        ElementPropertyConfig config = ElementPropertyConfig.excludeProperties(ignoreAge, null);
         GraphSONUtility utility = new GraphSONUtility(GraphSONMode.NORMAL, factory, config);
         Vertex v = utility.vertexFromJson(new JSONObject(new JSONTokener(vertexJson1)));
 
@@ -1154,7 +1153,7 @@ public class GraphSONUtilityTest {
 
         Set<String> ignoreWeight = new HashSet<String>();
         ignoreWeight.add("weight");
-        ElementPropertyConfig config = ElementPropertyConfig.ExcludeProperties(null, ignoreWeight);
+        ElementPropertyConfig config = ElementPropertyConfig.excludeProperties(null, ignoreWeight);
         GraphSONUtility utility = new GraphSONUtility(GraphSONMode.NORMAL, factory, config);
         Edge e = utility.edgeFromJson(new JSONObject(new JSONTokener(edgeJson)), v1, v2);
 

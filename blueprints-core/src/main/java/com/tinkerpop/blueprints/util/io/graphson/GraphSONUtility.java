@@ -20,7 +20,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +44,13 @@ public class GraphSONUtility {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     private final GraphSONMode mode;
-    private final Set<String> vertexPropertyKeys;
-    private final Set<String> edgePropertyKeys;
+    private final List<String> vertexPropertyKeys;
+    private final List<String> edgePropertyKeys;
     private final ElementFactory factory;
     private final boolean hasEmbeddedTypes;
     private final ElementPropertiesRule vertexPropertiesRule;
     private final ElementPropertiesRule edgePropertiesRule;
+    private final boolean normalized;
 
     private final boolean includeReservedVertexId;
     private final boolean includeReservedEdgeId;
@@ -69,7 +72,7 @@ public class GraphSONUtility {
      */
     public GraphSONUtility(final GraphSONMode mode, final ElementFactory factory,
                            final Set<String> vertexPropertyKeys, final Set<String> edgePropertyKeys) {
-        this(mode, factory, ElementPropertyConfig.IncludeProperties(vertexPropertyKeys, edgePropertyKeys));
+        this(mode, factory, ElementPropertyConfig.includeProperties(vertexPropertyKeys, edgePropertyKeys));
     }
 
     public GraphSONUtility(final GraphSONMode mode, final ElementFactory factory,
@@ -78,6 +81,7 @@ public class GraphSONUtility {
         this.edgePropertyKeys = config.getEdgePropertyKeys();
         this.vertexPropertiesRule = config.getVertexPropertiesRule();
         this.edgePropertiesRule = config.getEdgePropertiesRule();
+        this.normalized = config.isNormalized();
 
         this.mode = mode;
         this.factory = factory;
@@ -103,7 +107,7 @@ public class GraphSONUtility {
      * Creates a vertex from GraphSON using settings supplied in the constructor.
      */
     public Vertex vertexFromJson(final String json) throws IOException {
-        final JsonParser jp = jsonFactory.createJsonParser(json);
+        final JsonParser jp = jsonFactory.createParser(json);
         final JsonNode node = jp.readValueAsTree();
         return this.vertexFromJson(node);
     }
@@ -112,7 +116,7 @@ public class GraphSONUtility {
      * Creates a vertex from GraphSON using settings supplied in the constructor.
      */
     public Vertex vertexFromJson(final InputStream json) throws IOException {
-        final JsonParser jp = jsonFactory.createJsonParser(json);
+        final JsonParser jp = jsonFactory.createParser(json);
         final JsonNode node = jp.readValueAsTree();
         return this.vertexFromJson(node);
     }
@@ -147,7 +151,7 @@ public class GraphSONUtility {
      * Creates an edge from GraphSON using settings supplied in the constructor.
      */
     public Edge edgeFromJson(final String json, final Vertex out, final Vertex in) throws IOException {
-        final JsonParser jp = jsonFactory.createJsonParser(json);
+        final JsonParser jp = jsonFactory.createParser(json);
         final JsonNode node = jp.readValueAsTree();
         return this.edgeFromJson(node, out, in);
     }
@@ -156,7 +160,7 @@ public class GraphSONUtility {
      * Creates an edge from GraphSON using settings supplied in the constructor.
      */
     public Edge edgeFromJson(final InputStream json, final Vertex out, final Vertex in) throws IOException {
-        final JsonParser jp = jsonFactory.createJsonParser(json);
+        final JsonParser jp = jsonFactory.createParser(json);
         final JsonNode node = jp.readValueAsTree();
         return this.edgeFromJson(node, out, in);
     }
@@ -208,10 +212,10 @@ public class GraphSONUtility {
     public ObjectNode objectNodeFromElement(final Element element) {
         final boolean isEdge = element instanceof Edge;
         final boolean showTypes = mode == GraphSONMode.EXTENDED;
-        final Set<String> propertyKeys = isEdge ? this.edgePropertyKeys : this.vertexPropertyKeys;
+        final List<String> propertyKeys = isEdge ? this.edgePropertyKeys : this.vertexPropertyKeys;
         final ElementPropertiesRule elementPropertyConfig = isEdge ? this.edgePropertiesRule : this.vertexPropertiesRule;
 
-        final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys, elementPropertyConfig), propertyKeys, showTypes);
+        final ObjectNode jsonElement = createJSONMap(createPropertyMap(element, propertyKeys, elementPropertyConfig, normalized), propertyKeys, showTypes);
 
         if ((isEdge && this.includeReservedEdgeId) || (!isEdge && this.includeReservedVertexId)) {
             putObject(jsonElement, GraphSONTokens._ID, element.getId());
@@ -397,6 +401,12 @@ public class GraphSONUtility {
         return graphson.objectNodeFromElement(element);
     }
 
+    private static ObjectNode objectNodeFromElement(final Element element, final List<String> propertyKeys, final GraphSONMode mode) {
+        final GraphSONUtility graphson = element instanceof Edge ? new GraphSONUtility(mode, null, null, new HashSet<String>(propertyKeys))
+                : new GraphSONUtility(mode, null, new HashSet<String>(propertyKeys), null);
+        return graphson.objectNodeFromElement(element);
+    }
+
     static Map<String, Object> readProperties(final JsonNode node, final boolean ignoreReservedKeys, final boolean hasEmbeddedTypes) {
         final Map<String, Object> map = new HashMap<String, Object>();
 
@@ -418,14 +428,14 @@ public class GraphSONUtility {
     }
 
     private static boolean includeReservedKey(final GraphSONMode mode, final String key,
-                                              final Set<String> propertyKeys,
+                                              final List<String> propertyKeys,
                                               final ElementPropertiesRule rule) {
         // the key is always included in modes other than compact.  if it is compact, then validate that the
         // key is in the property key list
         return mode != GraphSONMode.COMPACT || includeKey(key, propertyKeys, rule);
     }
 
-    private static boolean includeKey(final String key, final Set<String> propertyKeys,
+    private static boolean includeKey(final String key, final List<String> propertyKeys,
                                       final ElementPropertiesRule rule) {
         if (propertyKeys == null) {
             // when null always include the key and shortcut this piece
@@ -517,7 +527,7 @@ public class GraphSONUtility {
         return array;
     }
 
-    private static ArrayNode createJSONList(final List list, final Set<String> propertyKeys, final boolean showTypes) {
+    private static ArrayNode createJSONList(final List list, final List<String> propertyKeys, final boolean showTypes) {
         final ArrayNode jsonList = jsonNodeFactory.arrayNode();
         for (Object item : list) {
             if (item instanceof Element) {
@@ -536,7 +546,7 @@ public class GraphSONUtility {
         return jsonList;
     }
 
-    private static ObjectNode createJSONMap(final Map map, final Set<String> propertyKeys, final boolean showTypes) {
+    private static ObjectNode createJSONMap(final Map map, final List<String> propertyKeys, final boolean showTypes) {
         final ObjectNode jsonMap = jsonNodeFactory.objectNode();
         for (Object key : map.keySet()) {
             Object value = map.get(key);
@@ -615,23 +625,31 @@ public class GraphSONUtility {
         }
     }
 
-    private static Map createPropertyMap(final Element element, final Set<String> propertyKeys, final ElementPropertiesRule rule) {
+    private static Map createPropertyMap(final Element element, final List<String> propertyKeys,
+                                         final ElementPropertiesRule rule, final boolean normalized) {
         final Map map = new HashMap<String, Object>();
+        final List<String> propertyKeyList;
+        if (normalized) {
+            final List<String> sorted = new ArrayList<String>(element.getPropertyKeys());
+            Collections.sort(sorted);
+            propertyKeyList = sorted;
+        } else
+            propertyKeyList = new ArrayList<String>(element.getPropertyKeys());
 
         if (propertyKeys == null) {
-            for (String key : element.getPropertyKeys()) {
+            for (String key : propertyKeyList) {
                 map.put(key, element.getProperty(key));
             }
         } else {
             if (rule == ElementPropertiesRule.INCLUDE) {
                 for (String key : propertyKeys) {
-                    Object valToPutInMap = element.getProperty(key);
+                    final Object valToPutInMap = element.getProperty(key);
                     if (valToPutInMap != null) {
                         map.put(key, valToPutInMap);
                     }
                 }
             } else {
-                for (String key : element.getPropertyKeys()) {
+                for (String key : propertyKeyList) {
                     if (!propertyKeys.contains(key)) {
                         map.put(key, element.getProperty(key));
                     }
