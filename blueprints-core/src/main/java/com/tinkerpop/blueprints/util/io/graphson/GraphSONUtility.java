@@ -638,7 +638,10 @@ public class GraphSONUtility {
 
         if (propertyKeys == null) {
             for (String key : propertyKeyList) {
-                map.put(key, element.getProperty(key));
+                final Object valToPutInMap = element.getProperty(key);
+                if (valToPutInMap != null) {
+                    map.put(key, valToPutInMap);
+                }
             }
         } else {
             if (rule == ElementPropertiesRule.INCLUDE) {
@@ -651,7 +654,10 @@ public class GraphSONUtility {
             } else {
                 for (String key : propertyKeyList) {
                     if (!propertyKeys.contains(key)) {
-                        map.put(key, element.getProperty(key));
+                        final Object valToPutInMap = element.getProperty(key);
+                        if (valToPutInMap != null) {
+                            map.put(key, valToPutInMap);
+                        }
                     }
                 }
             }

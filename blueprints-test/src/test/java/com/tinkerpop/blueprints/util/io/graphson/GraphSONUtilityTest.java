@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -934,15 +935,42 @@ public class GraphSONUtilityTest {
         Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, thatAsJson.optString(GraphSONTokens.TYPE));
         Assert.assertTrue(thatAsJson.has(GraphSONTokens.VALUE));
         Assert.assertEquals(1, thatAsJson.optInt(GraphSONTokens.VALUE));
+    }
 
+    /**
+     * This test is kinda weird since a Blueprints graph can't have properties set to null, howerver that does not
+     * mean that a graph may never return null (https://github.com/tinkerpop/blueprints/issues/400).
+     */
+    @Test
+    public void jsonFromElementInTheOddCasePropertyReturnsNullNoKeysWithTypes() throws Exception {
+        final Vertex v = new VertexThatReturnsNull();
+        final JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.EXTENDED);
 
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1234l, json.optLong(GraphSONTokens._ID));
+        Assert.assertFalse(json.has("alwaysNull"));
+    }
+
+    /**
+     * This test is kinda weird since a Blueprints graph can't have properties set to null, howerver that does not
+     * mean that a graph may never return null (https://github.com/tinkerpop/blueprints/issues/400).
+     */
+    @Test
+    public void jsonFromElementInTheOddCasePropertyReturnsNullNoKeysNoTypes() throws Exception {
+        final Vertex v = new VertexThatReturnsNull();
+        final JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.NORMAL);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1234l, json.optLong(GraphSONTokens._ID));
+        Assert.assertFalse(json.has("alwaysNull"));
     }
 
     @Test
     public void jsonFromElementNullsNoKeysNoTypes() throws JSONException {
         Graph g = new TinkerGraph();
         Vertex v = g.addVertex(1);
-        //v.setProperty("key", null);
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("innerkey", null);
@@ -1235,6 +1263,59 @@ public class GraphSONUtilityTest {
         @Override
         public String toString() {
             return this.name;
+        }
+    }
+
+    private class VertexThatReturnsNull implements Vertex {
+        @Override
+        public Iterable<Edge> getEdges(Direction direction, String... labels) {
+            return null;
+        }
+
+        @Override
+        public Iterable<Vertex> getVertices(Direction direction, String... labels) {
+            return null;
+        }
+
+        @Override
+        public VertexQuery query() {
+            return null;
+        }
+
+        @Override
+        public Edge addEdge(String label, Vertex inVertex) {
+            return null;
+        }
+
+        @Override
+        public <T> T getProperty(String key) {
+            return null;
+        }
+
+        @Override
+        public Set<String> getPropertyKeys() {
+            return new HashSet<String>() {{
+                add("alwaysNull");
+            }};
+        }
+
+        @Override
+        public void setProperty(String key, Object value) {
+
+        }
+
+        @Override
+        public <T> T removeProperty(String key) {
+            return null;
+        }
+
+        @Override
+        public void remove() {
+        }
+
+        @Override
+        public Object getId() {
+            return 1234l;
         }
     }
 }
