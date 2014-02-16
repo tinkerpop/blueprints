@@ -39,7 +39,7 @@ public class GraphSONWriter {
      */
     public void outputGraph(final String filename, final Set<String> vertexPropertyKeys,
                             final Set<String> edgePropertyKeys, final GraphSONMode mode) throws IOException {
-        FileOutputStream fos = new FileOutputStream(filename);
+        final FileOutputStream fos = new FileOutputStream(filename);
         outputGraph(fos, vertexPropertyKeys, edgePropertyKeys, mode);
         fos.close();
     }
@@ -55,7 +55,7 @@ public class GraphSONWriter {
      */
     public void outputGraph(final OutputStream jsonOutputStream, final Set<String> vertexPropertyKeys,
                             final Set<String> edgePropertyKeys, final GraphSONMode mode) throws IOException {
-        final JsonGenerator jg = jsonFactory.createJsonGenerator(jsonOutputStream);
+        final JsonGenerator jg = jsonFactory.createGenerator(jsonOutputStream);
         final GraphSONUtility graphson = new GraphSONUtility(mode, null, vertexPropertyKeys, edgePropertyKeys);
 
         jg.writeStartObject();
