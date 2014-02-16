@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
 /**
  * Constructs TinkerFile instances to load and save TinkerGraph instances.
@@ -111,7 +112,15 @@ class TinkerStorageFactory {
 
             saveGraphData(graph, directory);
             deleteFile(directory + GRAPH_FILE_METADATA);
-            TinkerMetadataWriter.save(graph, new FileOutputStream(directory + GRAPH_FILE_METADATA));
+
+            final OutputStream os = new FileOutputStream(directory + GRAPH_FILE_METADATA);
+            try {
+                TinkerMetadataWriter.save(graph, os);
+            } catch (IOException ioe) {
+                throw ioe;
+            } finally {
+                os.close();
+            }
         }
     }
 
@@ -129,7 +138,15 @@ class TinkerStorageFactory {
         @Override
         public void saveGraphData(final TinkerGraph graph, final String directory) throws IOException {
             deleteFile(directory + GRAPH_FILE_GML);
-            GMLWriter.outputGraph(graph, new FileOutputStream(directory + GRAPH_FILE_GML));
+
+            final OutputStream os = new FileOutputStream(directory + GRAPH_FILE_GML);
+            try {
+                GMLWriter.outputGraph(graph, os);
+            } catch (IOException ioe) {
+                throw ioe;
+            } finally {
+                os.close();
+            }
         }
     }
 
@@ -147,7 +164,15 @@ class TinkerStorageFactory {
         @Override
         public void saveGraphData(final TinkerGraph graph, final String directory) throws IOException {
             deleteFile(directory + GRAPH_FILE_GRAPHSON);
-            GraphSONWriter.outputGraph(graph, new FileOutputStream(directory + GRAPH_FILE_GRAPHSON), GraphSONMode.EXTENDED);
+            final OutputStream os = new FileOutputStream(directory + GRAPH_FILE_GRAPHSON);
+
+            try {
+                GraphSONWriter.outputGraph(graph, os, GraphSONMode.EXTENDED);
+            } catch (IOException ioe) {
+                throw ioe;
+            } finally {
+                os.close();
+            }
         }
     }
 
@@ -165,7 +190,15 @@ class TinkerStorageFactory {
         @Override
         public void saveGraphData(final TinkerGraph graph, final String directory) throws IOException {
             deleteFile(directory + GRAPH_FILE_GRAPHML);
-            GraphMLWriter.outputGraph(graph, new FileOutputStream(directory + GRAPH_FILE_GRAPHML));
+            final OutputStream os = new FileOutputStream(directory + GRAPH_FILE_GRAPHML);
+
+            try {
+                GraphMLWriter.outputGraph(graph, os);
+            } catch (IOException ioe) {
+                throw ioe;
+            } finally {
+                os.close();
+            }
         }
     }
 
@@ -192,8 +225,13 @@ class TinkerStorageFactory {
         public void save(final TinkerGraph graph, final String directory) throws IOException {
             deleteFile(directory + GRAPH_FILE_JAVA);
             final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(directory + GRAPH_FILE_JAVA));
-            out.writeObject(graph);
-            out.close();
+            try {
+                out.writeObject(graph);
+            } catch (IOException ioe) {
+                throw ioe;
+            } finally {
+                out.close();
+            }
         }
     }
 }
