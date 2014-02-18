@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 
 public class GraphSONWriterTest {
 
@@ -115,5 +116,20 @@ public class GraphSONWriterTest {
 
         ArrayNode edges = (ArrayNode) rootNode.get(GraphSONTokens.EDGES);
         Assert.assertEquals(6, edges.size());
+    }
+
+    @Test
+    public void streamStaysOpen() throws JSONException, IOException {
+        final Graph g = TinkerGraphFactory.createTinkerGraph();
+        final PrintStream oldStream = System.out;
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        final GraphSONWriter writer = new GraphSONWriter(g);
+        writer.outputGraph(System.out, null, null, GraphSONMode.NORMAL);
+        System.out.println("working");
+        System.setOut(oldStream);
+
+        Assert.assertTrue(outContent.toString().endsWith("working\n"));
     }
 }

@@ -67,6 +67,10 @@ public class GraphSONWriter {
     public void outputGraph(final OutputStream jsonOutputStream, final Set<String> vertexPropertyKeys,
                             final Set<String> edgePropertyKeys, final GraphSONMode mode, final boolean normalize) throws IOException {
         final JsonGenerator jg = jsonFactory.createGenerator(jsonOutputStream);
+
+        // don't let the JsonGenerator close the underlying stream...leave that to the client passing in the stream
+        jg.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
+
         final GraphSONUtility graphson = new GraphSONUtility(mode, null,
                 ElementPropertyConfig.includeProperties(vertexPropertyKeys, edgePropertyKeys, normalize));
 
