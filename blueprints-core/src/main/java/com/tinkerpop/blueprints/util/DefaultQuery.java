@@ -1,6 +1,7 @@
 package com.tinkerpop.blueprints.util;
 
 import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Predicate;
 import com.tinkerpop.blueprints.Query;
@@ -75,7 +76,13 @@ public abstract class DefaultQuery implements Query {
         }
 
         public boolean isLegal(final Element element) {
-            return this.predicate.evaluate(element.getProperty(this.key), this.value);
+            if (this.key.equals(StringFactory.ID)) {
+                return this.predicate.evaluate(element.getId(), this.value);
+            } else if (this.key.equals(StringFactory.LABEL) && element instanceof Edge) {
+                return this.predicate.evaluate(((Edge) element).getLabel(), this.value);
+            } else {
+                return this.predicate.evaluate(element.getProperty(this.key), this.value);
+            }
         }
     }
 }
