@@ -1,6 +1,7 @@
 org.openrdf.rio.n3.N3WriterFactory
 org.openrdf.rio.nquads.NQuadsWriterFactory
 org.openrdf.rio.ntriples.NTriplesWriterFactory
+org.openrdf.rio.rdfjson.RDFJSONWriterFactory
 org.openrdf.rio.rdfxml.RDFXMLWriterFactory
 org.openrdf.rio.trig.TriGWriterFactory
 org.openrdf.rio.trix.TriXWriterFactory

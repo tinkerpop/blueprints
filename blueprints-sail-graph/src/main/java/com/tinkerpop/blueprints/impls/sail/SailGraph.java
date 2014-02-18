@@ -97,13 +97,14 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     }
 
     static {
-        formats.put("rdf-xml", RDFFormat.RDFXML);
-        formats.put("n-triples", RDFFormat.NTRIPLES);
-        formats.put("turtle", RDFFormat.TURTLE);
         formats.put("n3", RDFFormat.N3);
+        formats.put("n-quads", RDFFormat.NQUADS);
+        formats.put("n-triples", RDFFormat.NTRIPLES);
+        formats.put("rdf-json", RDFFormat.RDFJSON);
+        formats.put("rdf-xml", RDFFormat.RDFXML);
         formats.put("trix", RDFFormat.TRIX);
         formats.put("trig", RDFFormat.TRIG);
-        formats.put("n-quads", RDFFormat.NQUADS);
+        formats.put("turtle", RDFFormat.TURTLE);
     }
 
     public static RDFFormat getFormat(final String format) {
