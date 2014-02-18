@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Iterator;
 
 public class GMLWriterTest extends TestCase {
@@ -162,6 +163,21 @@ public class GMLWriterTest extends TestCase {
 
         Vertex v2 = g2.getVertex(1);
         assertEquals("\u00E9", v2.getProperty("text"));
+    }
+
+
+    public void testStreamStaysOpen() throws IOException {
+        final Graph g = TinkerGraphFactory.createTinkerGraph();
+        final PrintStream oldStream = System.out;
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        final GMLWriter writer = new GMLWriter(g);
+        writer.outputGraph(System.out);
+        System.out.println("working");
+        System.setOut(oldStream);
+
+        assertTrue(outContent.toString().endsWith("working\n"));
     }
 
     private int getIterableCount(Iterable<?> elements) {

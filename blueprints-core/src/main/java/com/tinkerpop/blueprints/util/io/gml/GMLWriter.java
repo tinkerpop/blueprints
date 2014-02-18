@@ -132,8 +132,8 @@ public class GMLWriter {
 
         writeGraph(writer, vertices, edges);
 
+        // just flush, don't close...allow the underlying stream to stay open and let the calling function close it
         writer.flush();
-        writer.close();
     }
 
     private void writeGraph(final Writer writer, final List<Vertex> vertices, final List<Edge> edges) throws IOException {
