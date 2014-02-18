@@ -146,6 +146,25 @@ public class EdgeTestSuite extends TestSuite {
         graph.shutdown();
     }
 
+    public void untestGetEdgesByLabel() {
+        Graph graph = graphTest.generateGraph();
+        Vertex v1 = graph.addVertex(null);
+        Vertex v2 = graph.addVertex(null);
+        Vertex v3 = graph.addVertex(null);
+
+        Edge e1 = graph.addEdge(null, v1, v2, graphTest.convertLabel("test1"));
+        Edge e2 = graph.addEdge(null, v2, v3, graphTest.convertLabel("test2"));
+        Edge e3 = graph.addEdge(null, v3, v1, graphTest.convertLabel("test3"));
+
+        assertEquals(e1, getOnlyElement(graph.query().has("label", "test1").edges()));
+        assertEquals(e2, getOnlyElement(graph.query().has("label", "test2").edges()));
+        assertEquals(e3, getOnlyElement(graph.query().has("label", "test3").edges()));
+
+        assertEquals(e1, getOnlyElement(graph.getEdges("label", graphTest.convertLabel("test1"))));
+        assertEquals(e2, getOnlyElement(graph.getEdges("label", graphTest.convertLabel("test2"))));
+        assertEquals(e3, getOnlyElement(graph.getEdges("label", graphTest.convertLabel("test3"))));
+    }
+
     public void testGetNonExistantEdges() {
         Graph graph = graphTest.generateGraph();
 
