@@ -38,6 +38,16 @@
             <version>${sesame.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-model</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openrdf.sesame</groupId>
+            <artifactId>sesame-util</artifactId>
+            <version>${sesame.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
             <version>${blueprints.version}</version>

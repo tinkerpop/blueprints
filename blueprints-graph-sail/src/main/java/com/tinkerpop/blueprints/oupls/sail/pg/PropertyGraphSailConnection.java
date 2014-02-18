@@ -22,8 +22,9 @@ import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.UpdateExpr;
 import org.openrdf.query.algebra.evaluation.TripleSource;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
-import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
+import org.openrdf.sail.helpers.SailBase;
+import org.openrdf.sail.helpers.SailConnectionBase;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ import java.util.Map;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-class PropertyGraphSailConnection implements SailConnection {
+class PropertyGraphSailConnection extends SailConnectionBase {
     private static final Map<String, Namespace> namespaces = new HashMap<String, Namespace>();
 
     static {
@@ -68,8 +69,11 @@ class PropertyGraphSailConnection implements SailConnection {
 
     private final boolean firstClassEdges;
 
-    public PropertyGraphSailConnection(final PropertyGraphSail.PropertyGraphContext context,
+    public PropertyGraphSailConnection(final SailBase sailBase,
+                                       final PropertyGraphSail.PropertyGraphContext context,
                                        final boolean firstClassEdges) {
+        super(sailBase);
+
         this.context = context;
         this.firstClassEdges = firstClassEdges;
 
@@ -137,18 +141,18 @@ class PropertyGraphSailConnection implements SailConnection {
         namespaces.put(prefix, n);
     }
 
-    public boolean isOpen() throws SailException {
+    protected boolean isOpenInternal() throws SailException {
         return open;
     }
 
-    public void close() throws SailException {
+    protected void closeInternal() throws SailException {
         open = false;
     }
 
-    public CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluate(final TupleExpr query,
-                                                                                       final Dataset dataset,
-                                                                                       final BindingSet bindings,
-                                                                                       final boolean includeInferred) throws SailException {
+    protected CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluateInternal(final TupleExpr query,
+                                                                                                  final Dataset dataset,
+                                                                                                  final BindingSet bindings,
+                                                                                                  final boolean includeInferred) throws SailException {
         try {
             TripleSource tripleSource = new SailConnectionTripleSource(this, context.valueFactory, includeInferred);
             EvaluationStrategyImpl strategy = new EvaluationStrategyImpl(tripleSource, dataset);
@@ -162,7 +166,7 @@ class PropertyGraphSailConnection implements SailConnection {
         // Do nothing.
     }
 
-    public CloseableIteration<? extends Resource, SailException> getContextIDs() throws SailException {
+    protected CloseableIteration<? extends Resource, SailException> getContextIDsInternal() throws SailException {
         throw new UnsupportedOperationException();
     }
 
@@ -180,11 +184,11 @@ class PropertyGraphSailConnection implements SailConnection {
         }
     }
 
-    public CloseableIteration<? extends Statement, SailException> getStatements(final Resource subject,
-                                                                                final URI predicate,
-                                                                                final Value object,
-                                                                                final boolean includeInferred,
-                                                                                final Resource... contexts) throws SailException {
+    protected CloseableIteration<? extends Statement, SailException> getStatementsInternal(final Resource subject,
+                                                                                           final URI predicate,
+                                                                                           final Value object,
+                                                                                           final boolean includeInferred,
+                                                                                           final Resource... contexts) throws SailException {
         // Statements exist only in the default context.
         if (!matchesNullContext(contexts)) {
             return new StatementIteration();
@@ -922,7 +926,7 @@ class PropertyGraphSailConnection implements SailConnection {
         return predicate.stringValue().substring(PropertyGraphSail.PROPERTY_NS.length());
     }
 
-    public long size(final Resource... contexts) throws SailException {
+    protected long sizeInternal(final Resource... contexts) throws SailException {
         if (!matchesNullContext(contexts)) {
             return 0;
         }
@@ -946,44 +950,48 @@ class PropertyGraphSailConnection implements SailConnection {
         return count;
     }
 
-    public void commit() throws SailException {
+    protected void startTransactionInternal() throws SailException {
         // Do nothing.
     }
 
-    public void rollback() throws SailException {
+    protected void commitInternal() throws SailException {
         // Do nothing.
     }
 
-    public void addStatement(Resource resource, URI uri, Value value, Resource... resources) throws SailException {
+    protected void rollbackInternal() throws SailException {
         // Do nothing.
     }
 
-    public void removeStatements(Resource resource, URI uri, Value value, Resource... resources) throws SailException {
+    protected void addStatementInternal(Resource resource, URI uri, Value value, Resource... resources) throws SailException {
         // Do nothing.
     }
 
-    public void clear(Resource... resources) throws SailException {
+    protected void removeStatementsInternal(Resource resource, URI uri, Value value, Resource... resources) throws SailException {
         // Do nothing.
     }
 
-    public CloseableIteration<? extends Namespace, SailException> getNamespaces() throws SailException {
+    protected void clearInternal(Resource... resources) throws SailException {
+        // Do nothing.
+    }
+
+    protected CloseableIteration<? extends Namespace, SailException> getNamespacesInternal() throws SailException {
         return new SimpleCloseableIteration<Namespace, SailException>(namespaces.values().iterator());
     }
 
-    public String getNamespace(final String prefix) throws SailException {
+    protected String getNamespaceInternal(final String prefix) throws SailException {
         Namespace n = namespaces.get(prefix);
         return null == n ? null : n.getName();
     }
 
-    public void setNamespace(String s, String s1) throws SailException {
+    protected void setNamespaceInternal(String s, String s1) throws SailException {
         // Do nothing.
     }
 
-    public void removeNamespace(String s) throws SailException {
+    protected void removeNamespaceInternal(String s) throws SailException {
         // Do nothing.
     }
 
-    public void clearNamespaces() throws SailException {
+    protected void clearNamespacesInternal() throws SailException {
         // Do nothing.
     }
 

@@ -47,6 +47,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * A Blueprints implementation of the RDF-based Sail interfaces by Aduna (http://openrdf.org).
@@ -55,6 +56,7 @@ import java.util.UUID;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
+    private static final Logger LOGGER = Logger.getLogger(SailGraph.class.getName());
 
     public static final Map<String, RDFFormat> formats = new HashMap<String, RDFFormat>();
 
@@ -140,8 +142,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         try {
             PropertyConfigurator.configure(SailGraph.class.getResource(LOG4J_PROPERTIES));
         } catch (Throwable e) {
-            // TODO: uncomment this?
-            //e.printStackTrace(System.err);
+            LOGGER.warning("failed to configure Log4j: " + e.getMessage());
         }
         try {
             this.rawGraph = sail;
@@ -331,6 +332,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
             this.commit();
             final SailConnection c = this.rawGraph.getConnection();
             try {
+                c.begin();
                 RDFParser p = Rio.createParser(getFormat(format));
                 RDFHandler h = null == baseGraph
                         ? new SailAdder(c)
@@ -339,6 +341,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
                 p.parse(input, baseURI);
                 c.commit();
             } finally {
+                c.rollback();
                 c.close();
             }
         } catch (Exception e) {
@@ -350,14 +353,15 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      * Save RDF data from the SailGraph.
      * Supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig.
      *
-     * @param output    the OutputStream to which to write RDF data
-     * @param format    supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
+     * @param output the OutputStream to which to write RDF data
+     * @param format supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
      */
     public void saveRDF(final OutputStream output, final String format) {
         try {
             this.commit();
             final SailConnection c = this.rawGraph.getConnection();
             try {
+                c.begin();
                 RDFWriter w = Rio.createWriter(getFormat(format), output);
                 w.startRDF();
 
@@ -372,6 +376,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
                 w.endRDF();
             } finally {
+                c.rollback();
                 c.close();
             }
         } catch (Exception e) {
@@ -382,6 +387,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     private synchronized SailConnection createConnection() throws SailException {
         cleanupConnections();
         final SailConnection sc = rawGraph.getConnection();
+        sc.begin();
         connections.add(sc);
         return sc;
     }
@@ -462,15 +468,18 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     }
 
     public void stopTransaction(Conclusion conclusion) {
-        if (Conclusion.SUCCESS == conclusion)
+        if (Conclusion.SUCCESS == conclusion) {
             commit();
-        else
+        } else {
             rollback();
+        }
     }
 
     public void commit() {
         try {
-            this.sailConnection.get().commit();
+            SailConnection sc = this.sailConnection.get();
+            sc.commit();
+            sc.begin();
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -478,7 +487,9 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     public void rollback() {
         try {
-            this.sailConnection.get().rollback();
+            SailConnection sc = this.sailConnection.get();
+            sc.rollback();
+            sc.begin();
         } catch (SailException e) {
             throw new RuntimeException(e.getMessage(), e);
         }

@@ -79,6 +79,7 @@ public abstract class GraphSailTest extends SailTest {
 
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             edgesBefore = countEdges();
             verticesBefore = countVertices();
         } finally {
@@ -91,12 +92,14 @@ public abstract class GraphSailTest extends SailTest {
         sc = sail.getConnection();
         //showStatements(sc, null, null, null);
         try {
+            sc.begin();
             assertEquals(14, countStatements(sc, null, null, null, false));
             assertEquals(edgesBefore + 14, countEdges());
             assertEquals(verticesBefore + 10, countVertices());
 
             sc.removeStatements(ref, null, null);
             sc.commit();
+            sc.begin();
 
             assertEquals(13, countStatements(sc, null, null, null, false));
             assertEquals(edgesBefore + 13, countEdges());
@@ -104,12 +107,14 @@ public abstract class GraphSailTest extends SailTest {
 
             sc.clear();
             sc.commit();
+            sc.begin();
 
             assertEquals(0, countStatements(sc, null, null, null, false));
             assertEquals(0, countEdges());
             // Namespaces vertex is still present.
             assertEquals(verticesBefore, countVertices());
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -124,9 +129,11 @@ public abstract class GraphSailTest extends SailTest {
 
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             edgesBefore = countEdges();
             verticesBefore = countVertices();
         } finally {
+            sc.rollback();
             sc.close();
         }
 
@@ -139,6 +146,7 @@ public abstract class GraphSailTest extends SailTest {
             assertEquals(edgesBefore + 14, countEdges());
             assertEquals(verticesBefore + 10, countVertices());
         } finally {
+            sc.rollback();
             sc.close();
         }
 
@@ -153,6 +161,7 @@ public abstract class GraphSailTest extends SailTest {
             assertEquals(edgesBefore + 23, countEdges());
             assertEquals(verticesBefore + 12, countVertices());
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -175,6 +184,7 @@ public abstract class GraphSailTest extends SailTest {
         try {
             SailConnection sc = sail.getConnection();
             try {
+                sc.begin();
                 ValueFactory vf = sail.getValueFactory();
                 sc.addStatement(vf.createURI("http://tinkerpop.com#1"), vf.createURI("http://tinkerpop.com#knows"), vf.createURI("http://tinkerpop.com#3"), vf.createURI("http://tinkerpop.com"));
                 sc.addStatement(vf.createURI("http://tinkerpop.com#1"), vf.createURI("http://tinkerpop.com#name"), vf.createLiteral("marko"), vf.createURI("http://tinkerpop.com"));

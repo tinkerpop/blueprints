@@ -10,6 +10,7 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.ValueFactoryImpl;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Date;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -76,6 +77,10 @@ class PropertyGraphValueFactory implements ValueFactory {
 
     public Literal createLiteral(XMLGregorianCalendar c) {
         return other.createLiteral(c);
+    }
+
+    public Literal createLiteral(Date date) {
+        return other.createLiteral(date);
     }
 
     public Statement createStatement(Resource resource, URI uri, Value value) {

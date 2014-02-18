@@ -4,11 +4,9 @@ import com.tinkerpop.blueprints.Graph;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
-
-import java.io.File;
+import org.openrdf.sail.helpers.SailBase;
 
 /**
  * A Sail implementation which provides an RDF view of any Blueprints graph.
@@ -19,7 +17,7 @@ import java.io.File;
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class PropertyGraphSail implements Sail {
+public class PropertyGraphSail extends SailBase {
 
     public static final String EDGE_NS = "http://tinkerpop.com/pgm/edge/";
     public static final String ONTOLOGY_NS = "http://tinkerpop.com/pgm/ontology#";
@@ -65,28 +63,16 @@ public class PropertyGraphSail implements Sail {
         this.firstClassEdges = firstClassEdges;
     }
 
-    public void setDataDir(File file) {
-        throw new UnsupportedOperationException();
-    }
-
-    public File getDataDir() {
-        throw new UnsupportedOperationException();
-    }
-
-    public void initialize() throws SailException {
-        // Do nothing.
-    }
-
-    public void shutDown() throws SailException {
-        // Do nothing.
-    }
-
     public boolean isWritable() throws SailException {
         return false;
     }
 
-    public SailConnection getConnection() throws SailException {
-        return new PropertyGraphSailConnection(context, firstClassEdges);
+    protected void shutDownInternal() throws SailException {
+        // Nothing to do.
+    }
+
+    public SailConnection getConnectionInternal() throws SailException {
+        return new PropertyGraphSailConnection(this, context, firstClassEdges);
     }
 
     public ValueFactory getValueFactory() {

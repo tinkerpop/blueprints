@@ -38,15 +38,11 @@
             <artifactId>sesame-sail-nativerdf</artifactId>
             <version>${sesame.version}</version>
         </dependency>
+        <!-- note: the LinkedDataSail dependency also includes RDF writers and parsers -->
         <dependency>
             <groupId>net.fortytwo</groupId>
             <artifactId>linked-data-sail</artifactId>
             <version>${ripple.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.fortytwo.sesametools</groupId>
-            <artifactId>nquads</artifactId>
-            <version>${sesametools.version}</version>
         </dependency>
         <dependency>
             <groupId>net.fortytwo.sesametools</groupId>

@@ -95,6 +95,7 @@ public abstract class SailTest {
     public void testGetStatementsS_POG() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/test/S_POG#a");
             URI uriB = sail.getValueFactory().createURI("http://example.org/test/S_POG#b");
             URI uriC = sail.getValueFactory().createURI("http://example.org/test/S_POG#c");
@@ -104,9 +105,11 @@ public abstract class SailTest {
             // default context, different S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, null, null, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, null, null, false);
             assertEquals(0, before);
             System.out.flush();
@@ -115,9 +118,11 @@ public abstract class SailTest {
             // one specific context, different S,P,O
             sc.removeStatements(uriA, null, null, uriD);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, null, null, false, uriD);
             sc.addStatement(uriA, uriB, uriC, uriD);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, null, null, false, uriD);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -125,9 +130,11 @@ public abstract class SailTest {
             // one specific context, same S,P,O,G
             sc.removeStatements(uriA, null, null, uriA);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, null, null, false, uriA);
             sc.addStatement(uriA, uriB, uriC, uriA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, null, null, false, uriA);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -135,13 +142,16 @@ public abstract class SailTest {
             // default context, same S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, null, null, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, null, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -150,6 +160,7 @@ public abstract class SailTest {
     public void testGetStatementsSP_OG() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/test/SP_OG#a");
             URI uriB = sail.getValueFactory().createURI("http://example.org/test/SP_OG#b");
             URI uriC = sail.getValueFactory().createURI("http://example.org/test/SP_OG#c");
@@ -160,10 +171,12 @@ public abstract class SailTest {
             before = countStatements(sc, uriA, uriB, null, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, uriB, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -172,6 +185,7 @@ public abstract class SailTest {
     public void testGetStatementsO_SPG() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/test/O_SPG#a");
             URI uriB = sail.getValueFactory().createURI("http://example.org/test/O_SPG#b");
             URI uriC = sail.getValueFactory().createURI("http://example.org/test/O_SPG#c");
@@ -182,9 +196,11 @@ public abstract class SailTest {
             // Add statement to a specific context.
             sc.removeStatements(null, null, uriA, uriA);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, null, uriA, false);
             sc.addStatement(uriB, uriC, uriA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, null, uriA, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -192,9 +208,11 @@ public abstract class SailTest {
             // Add plain literal statement to the default context.
             sc.removeStatements(null, null, plainLitA);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, null, plainLitA, false);
             sc.addStatement(uriA, uriA, plainLitA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, null, plainLitA, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -202,13 +220,16 @@ public abstract class SailTest {
             // Add string-typed literal statement to the default context.
             sc.removeStatements(null, null, plainLitA);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, null, stringLitA, false);
             sc.addStatement(uriA, uriA, stringLitA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, null, stringLitA, false);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -217,6 +238,7 @@ public abstract class SailTest {
     public void testGetStatementsPO_SG() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/test/PO_SG#a");
             URI uriB = sail.getValueFactory().createURI("http://example.org/test/PO_SG#b");
             URI foo = sail.getValueFactory().createURI("http://example.org/ns#foo");
@@ -228,9 +250,11 @@ public abstract class SailTest {
             // Add statement to the implicit null context.
             sc.removeStatements(null, null, null, uriA);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, uriA, uriB, false);
             sc.addStatement(uriA, uriA, uriB);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, uriA, uriB, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -238,11 +262,13 @@ public abstract class SailTest {
             // Add plain literal statement to the default context.
             sc.removeStatements(null, null, plainLitA);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, uriA, plainLitA, false);
             sc.addStatement(uriA, uriA, plainLitA);
             sc.addStatement(uriA, uriB, plainLitA);
             sc.addStatement(uriB, uriB, plainLitA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, uriA, plainLitA, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -250,15 +276,18 @@ public abstract class SailTest {
             // Add string-typed literal statement to the default context.
             sc.removeStatements(null, null, fooLabel);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, firstName, fooLabel, false);
             sc.addStatement(foo, firstName, fooLabel);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, firstName, fooLabel, false);
             assertEquals(0, before);
             assertEquals(1, after);
             assertEquals(foo, toSet(sc.getStatements(null, firstName, fooLabel, false)).iterator().next().getSubject());
 
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -267,6 +296,7 @@ public abstract class SailTest {
     public void testGetStatementsSPO_G() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/test/S_POG#a");
             URI uriB = sail.getValueFactory().createURI("http://example.org/test/S_POG#b");
             URI uriC = sail.getValueFactory().createURI("http://example.org/test/S_POG#c");
@@ -276,9 +306,11 @@ public abstract class SailTest {
             // default context, different S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, uriB, uriC, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, uriB, uriC, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -286,9 +318,11 @@ public abstract class SailTest {
             // default context, same S,P,O
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, uriB, uriC, false);
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, uriB, uriC, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -296,9 +330,11 @@ public abstract class SailTest {
             // one specific context, different S,P,O
             sc.removeStatements(uriA, null, null, uriD);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, uriB, uriC, false, uriD);
             sc.addStatement(uriA, uriB, uriC, uriD);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, uriB, uriC, false, uriD);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -306,13 +342,16 @@ public abstract class SailTest {
             // one specific context, same S,P,O,G
             sc.removeStatements(uriA, null, null, uriA);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, uriA, uriB, uriC, false, uriA);
             sc.addStatement(uriA, uriB, uriC, uriA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, uriA, uriB, uriC, false, uriA);
             assertEquals(0, before);
             assertEquals(1, after);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -321,6 +360,7 @@ public abstract class SailTest {
     public void testGetStatementsP_SOG() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/test/P_SOG#a");
             URI uriB = sail.getValueFactory().createURI("http://example.org/test/P_SOG#b");
             URI uriC = sail.getValueFactory().createURI("http://example.org/test/P_SOG#c");
@@ -333,9 +373,11 @@ public abstract class SailTest {
             // Add statement to the implicit null context.
             sc.removeStatements(null, uriA, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriB, uriA, uriC);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -343,11 +385,13 @@ public abstract class SailTest {
             // Add plain literal statement to the default context.
             sc.removeStatements(null, uriA, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriA, uriA, plainLitA);
             sc.addStatement(uriA, uriB, plainLitA);
             sc.addStatement(uriB, uriB, plainLitA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -355,9 +399,11 @@ public abstract class SailTest {
             // Add string-typed literal statement to the default context.
             sc.removeStatements(null, firstName, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, firstName, null, false);
             sc.addStatement(foo, firstName, fooLabel);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, firstName, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
@@ -366,26 +412,32 @@ public abstract class SailTest {
             // Add statement to a non-null context.
             sc.removeStatements(null, uriA, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriB, uriA, uriC, uriA);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(1, after);
 
             sc.removeStatements(null, uriA, null);
             sc.commit();
+            sc.begin();
             before = countStatements(sc, null, uriA, null, false);
             sc.addStatement(uriB, uriA, uriC, uriC);
             sc.addStatement(uriC, uriA, uriA, uriA);
             sc.commit();
+            sc.begin();
             sc.addStatement(uriA, uriA, uriB, uriB);
             sc.commit();
+            sc.begin();
             after = countStatements(sc, null, uriA, null, false);
             assertEquals(0, before);
             assertEquals(3, after);
 
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -394,6 +446,7 @@ public abstract class SailTest {
     public void testGetStatementsWithVariableContexts() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
             URI uriB = sail.getValueFactory().createURI("http://example.org/uriB");
             URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
@@ -401,9 +454,11 @@ public abstract class SailTest {
             sc.clear();
             //sc.removeStatements(uriA, uriA, uriA);
             sc.commit();
+            sc.begin();
             Resource[] contexts = {uriA, null};
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
+            sc.begin();
 
             // Get statements from all contexts.
             count = countStatements(sc, uriA, null, null, false);
@@ -425,6 +480,7 @@ public abstract class SailTest {
             assertEquals(1 + countLast, count);
 
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -433,6 +489,7 @@ public abstract class SailTest {
     public void testRemoveStatements() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
             URI uriB = sail.getValueFactory().createURI("http://example.org/uriB");
             URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
@@ -442,62 +499,75 @@ public abstract class SailTest {
             // Remove from all contexts.
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
 
             // Remove from one partition context.
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             Resource[] oneContext = {uriA};
             sc.removeStatements(uriA, null, null, oneContext);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
 
             // Remove from the null context.
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             Resource[] nullContext = {null};
             sc.removeStatements(uriA, null, null, nullContext);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
 
             // Remove from more than one context.
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC, contexts);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(2, count);
             sc.removeStatements(uriA, null, null);
             sc.commit();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false, contexts);
             assertEquals(0, count);
 
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -510,6 +580,7 @@ public abstract class SailTest {
 
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             sc.clear();
             assertEquals(0L, sc.size());
             sc.addStatement(uriA, uriB, uriC, uriA);
@@ -537,6 +608,7 @@ public abstract class SailTest {
             assertEquals(0L, sc.size());
             sc.commit();
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -554,6 +626,7 @@ public abstract class SailTest {
 
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             sc.removeStatements(null, null, null);
 
             assertEquals(0L, sc.size());
@@ -580,6 +653,7 @@ public abstract class SailTest {
             assertEquals(3L, sc.size(uriA, uriB));
             sc.commit();
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -592,6 +666,7 @@ public abstract class SailTest {
             URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
             SailConnection sc = sail.getConnection();
             try {
+                sc.begin();
                 sc.clear();
                 assertEquals(0, countStatements(sc, uriA, uriB, uriC, false));
                 sc.addStatement(uriA, uriB, uriC);
@@ -604,6 +679,7 @@ public abstract class SailTest {
                 assertEquals(1, countStatements(sc, uriA, uriB, uriC, false, uriC));
                 sc.commit();
             } finally {
+                sc.rollback();
                 sc.close();
             }
         }
@@ -786,6 +862,7 @@ public abstract class SailTest {
         assertEquals("2002-10-10T12:00:00-05:00", l.getLabel());
         assertEquals(XMLSchema.DATETIME, l.getDatatype());
         assertEquals(calendar, l.calendarValue());
+        sc.rollback();
         sc.close();
     }
 
@@ -797,6 +874,7 @@ public abstract class SailTest {
         URI uriB = sail.getValueFactory().createURI("http://example.org/test/S_POG#b");
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             ValueFactory factory = sail.getValueFactory();
             BNode bNode = factory.createBNode();
             try {
@@ -807,6 +885,7 @@ public abstract class SailTest {
             }
             sc.commit();
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -821,11 +900,13 @@ public abstract class SailTest {
 
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
             URI uriB = sail.getValueFactory().createURI("http://example.org/uriB");
             URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
             sc.addStatement(uriA, uriB, uriC);
             sc.commit();
+            sc.begin();
 
             SPARQLParser parser = new SPARQLParser();
             BindingSet bindings = new EmptyBindingSet();
@@ -1025,6 +1106,7 @@ public abstract class SailTest {
             // assertTrue(foundB);
 
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1057,6 +1139,7 @@ public abstract class SailTest {
             results.close();
             assertEquals(4, count);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1074,19 +1157,23 @@ public abstract class SailTest {
             TestListener listener1 = new TestListener(), listener2 = new TestListener();
             NotifyingSailConnection sc = ((NotifyingSail) sail).getConnection();
             try {
+                sc.begin();
                 sc.clear();
                 sc.commit();
+                sc.begin();
 
                 // Add a listener and add statements
                 sc.addConnectionListener(listener1);
                 sc.addStatement(uriA, uriB, uriC, uriA);
                 sc.addStatement(uriB, uriC, uriA, uriA);
                 sc.commit();
+                sc.begin();
 
                 // Add another listener and remove a statement
                 sc.addConnectionListener(listener2);
                 sc.removeStatements(uriA, null, null);
                 sc.commit();
+                sc.begin();
 
                 assertEquals(2, listener1.getAdded());
                 assertEquals(0, listener2.getAdded());
@@ -1097,10 +1184,12 @@ public abstract class SailTest {
                 sc.removeConnectionListener(listener1);
                 sc.clear();
                 sc.commit();
+                sc.begin();
 
                 assertEquals(1, listener1.getRemoved());
                 assertEquals(2, listener2.getRemoved());
             } finally {
+                sc.rollback();
                 sc.close();
             }
         }
@@ -1121,8 +1210,10 @@ public abstract class SailTest {
             URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
             SailConnection sc = sail.getConnection();
             try {
+                sc.begin();
                 sc.clear();
                 sc.commit();
+                sc.begin();
                 events.clear();
                 assertEquals(0, events.size());
                 sc.addStatement(uriA, uriB, uriC, uriA);
@@ -1130,6 +1221,7 @@ public abstract class SailTest {
                 // Events are buffered until the commit
                 assertEquals(0, events.size());
                 sc.commit();
+                sc.begin();
                 // Only one SailChangedEvent per commit
                 assertEquals(1, events.size());
                 SailChangedEvent event = events.iterator().next();
@@ -1139,6 +1231,7 @@ public abstract class SailTest {
                 assertEquals(0, events.size());
                 sc.removeStatements(uriA, uriB, uriC, uriA);
                 sc.commit();
+                sc.begin();
                 assertEquals(1, events.size());
                 event = events.iterator().next();
                 assertFalse(event.statementsAdded());
@@ -1147,11 +1240,13 @@ public abstract class SailTest {
                 assertEquals(0, events.size());
                 sc.clear();
                 sc.commit();
+                sc.begin();
                 assertEquals(1, events.size());
                 event = events.iterator().next();
                 assertFalse(event.statementsAdded());
                 assertTrue(event.statementsRemoved());
             } finally {
+                sc.rollback();
                 sc.close();
             }
         }
@@ -1176,6 +1271,7 @@ public abstract class SailTest {
             // TODO: actually clear namespaces (but this wipes them out for
             // subsequent tests)
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1196,6 +1292,7 @@ public abstract class SailTest {
             //sc.commit();
             assertEquals(name, "http://www.w3.org/2000/01/rdf-schema#");
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1217,6 +1314,7 @@ public abstract class SailTest {
     public void testGetNamespaces() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             CloseableIteration<? extends Namespace, SailException> namespaces;
             int before = 0, during = 0, after = 0;
             // just iterate through all namespaces
@@ -1235,6 +1333,7 @@ public abstract class SailTest {
                 sc.setNamespace(prefixPrefix + i, namePrefix + i);
             }
             sc.commit();
+            sc.begin();
             namespaces = sc.getNamespaces();
             while (namespaces.hasNext()) {
                 Namespace ns = namespaces.next();
@@ -1250,6 +1349,7 @@ public abstract class SailTest {
                 sc.removeNamespace(prefixPrefix + i);
             }
             sc.commit();
+            sc.begin();
             namespaces = sc.getNamespaces();
             while (namespaces.hasNext()) {
                 namespaces.next();
@@ -1259,6 +1359,7 @@ public abstract class SailTest {
             assertEquals(during, before + nTests);
             assertEquals(after, before);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1267,6 +1368,7 @@ public abstract class SailTest {
     public void testSetNamespace() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             String prefix = "foo";
             String emptyPrefix = "";
             String name = "http://example.org/foo";
@@ -1275,6 +1377,7 @@ public abstract class SailTest {
             sc.removeNamespace(prefix);
             sc.removeNamespace(emptyPrefix);
             sc.commit();
+            sc.begin();
 
             // Namespace initially absent?
             assertNull(sc.getNamespace(prefix));
@@ -1283,18 +1386,22 @@ public abstract class SailTest {
             // Can we set the namespace?
             sc.setNamespace(prefix, name);
             sc.commit();
+            sc.begin();
             assertEquals(sc.getNamespace(prefix), name);
 
             // Can we reset the namespace?
             sc.setNamespace(prefix, otherName);
             sc.commit();
+            sc.begin();
             assertEquals(sc.getNamespace(prefix), otherName);
 
             // Can we use an empty namespace prefix?
             sc.setNamespace(emptyPrefix, name);
             sc.commit();
+            sc.begin();
             assertEquals(sc.getNamespace(emptyPrefix), name);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1303,6 +1410,7 @@ public abstract class SailTest {
     public void testRemoveNamespace() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             String prefix = "foo";
             String emptyPrefix = "";
             String name = "http://example.org/foo";
@@ -1310,21 +1418,26 @@ public abstract class SailTest {
             // Set namespace initially.
             sc.setNamespace(prefix, name);
             sc.commit();
+            sc.begin();
             assertEquals(sc.getNamespace(prefix), name);
 
             // Remove the namespace and make sure it's gone.
             sc.removeNamespace(prefix);
             sc.commit();
+            sc.begin();
             assertNull(sc.getNamespace(prefix));
 
             // Same thing for the default namespace.
             sc.setNamespace(emptyPrefix, name);
             sc.commit();
+            sc.begin();
             assertEquals(sc.getNamespace(emptyPrefix), name);
             sc.removeNamespace(emptyPrefix);
             sc.commit();
+            sc.begin();
             assertNull(sc.getNamespace(emptyPrefix));
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1340,11 +1453,14 @@ public abstract class SailTest {
         URI uriC = sail.getValueFactory().createURI("http://example.org/test/persistentCommits#c");
         sc = sail.getConnection();
         try {
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
+            sc.rollback();
             sc.close();
 
             sc = sail.getConnection();
+            sc.begin();
             sc.addStatement(uriA, uriB, uriC);
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
@@ -1352,11 +1468,14 @@ public abstract class SailTest {
             sc.close();
 
             sc = sail.getConnection();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(1, count);
+            sc.rollback();
             sc.close();
 
             sc = sail.getConnection();
+            sc.begin();
             sc.removeStatements(uriA, null, null);
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
@@ -1364,9 +1483,11 @@ public abstract class SailTest {
             sc.close();
 
             sc = sail.getConnection();
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1416,6 +1537,7 @@ public abstract class SailTest {
 
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             count = countStatements(sc, uriA, null, null, false);
             assertEquals(0, count);
             sc.addStatement(uriA, uriB, uriC);
@@ -1425,6 +1547,7 @@ public abstract class SailTest {
             sc.removeStatements(uriA, null, null);
             sc.commit();
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1473,6 +1596,7 @@ public abstract class SailTest {
                     //assertEquals(1, countStatements(sc, uriA, RDF.TYPE, null));
                 }
             } finally {
+                sc.rollback();
                 sc.close();
             }
         }
@@ -1552,9 +1676,11 @@ public abstract class SailTest {
     protected void clear() throws Exception {
         SailConnection sc = sail.getConnection();
         try {
+            sc.begin();
             sc.clear();
             sc.commit();
         } finally {
+            sc.rollback();
             sc.close();
         }
     }
@@ -1563,6 +1689,7 @@ public abstract class SailTest {
                            final RDFFormat format) throws Exception {
         try {
             SailConnection sc = sail.getConnection();
+            sc.begin();
             try {
                 RDFHandler h = new SailAdder(sc);
                 RDFParser p = Rio.createParser(format);
@@ -1570,6 +1697,7 @@ public abstract class SailTest {
                 p.parse(in, "http://example.org/bogusBaseURI/");
                 sc.commit();
             } finally {
+                sc.rollback();
                 sc.close();
             }
         } finally {
