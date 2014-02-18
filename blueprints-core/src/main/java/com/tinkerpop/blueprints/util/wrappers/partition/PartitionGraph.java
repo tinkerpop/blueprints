@@ -1,5 +1,6 @@
 package com.tinkerpop.blueprints.util.wrappers.partition;
 
+import com.tinkerpop.blueprints.Contains;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -72,7 +73,7 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         if (element instanceof PartitionElement)
             writePartition = ((PartitionElement) element).getPartition();
         else
-            writePartition = (String) element.getProperty(this.partitionKey);
+            writePartition = element.getProperty(this.partitionKey);
         return (null == writePartition || this.readPartitions.contains(writePartition));
     }
 
@@ -154,12 +155,12 @@ public class PartitionGraph<T extends Graph> implements Graph, WrapperGraph<T> {
         return new WrappedGraphQuery(this.baseGraph.query()) {
             @Override
             public Iterable<Edge> edges() {
-                return new PartitionEdgeIterable(this.query.edges(), partitionGraph);
+                return new PartitionEdgeIterable(this.query.has(partitionKey, Contains.IN, readPartitions).edges(), partitionGraph);
             }
 
             @Override
             public Iterable<Vertex> vertices() {
-                return new PartitionVertexIterable(this.query.vertices(), partitionGraph);
+                return new PartitionVertexIterable(this.query.has(partitionKey, Contains.IN, readPartitions).vertices(), partitionGraph);
             }
         };
     }
