@@ -1,7 +1,10 @@
 package com.tinkerpop.blueprints.util;
 
 import com.tinkerpop.blueprints.CloseableIterable;
+import com.tinkerpop.blueprints.Compare;
+import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.Predicate;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -14,14 +17,12 @@ import java.util.NoSuchElementException;
  */
 public class PropertyFilteredIterable<T extends Element> implements CloseableIterable<T> {
 
-    private final String key;
-    private final Object value;
     private final Iterable<T> iterable;
+    private final HasContainer hasContainer;
 
     public PropertyFilteredIterable(final String key, final Object value, final Iterable<T> iterable) {
-        this.key = key;
-        this.value = value;
         this.iterable = iterable;
+        this.hasContainer = new HasContainer(key, Compare.EQUAL, value);
     }
 
     public void close() {
@@ -46,17 +47,9 @@ public class PropertyFilteredIterable<T extends Element> implements CloseableIte
                     try {
                         while (true) {
                             final T element = this.itty.next();
-                            final Object temp = element.getProperty(key);
-                            if (null != temp) {
-                                if (temp.equals(value)) {
-                                    this.nextElement = element;
-                                    return true;
-                                }
-                            } else {
-                                if (value == null) {
-                                    this.nextElement = element;
-                                    return true;
-                                }
+                            if (hasContainer.isLegal(element)) {
+                                this.nextElement = element;
+                                return true;
                             }
                         }
                     } catch (NoSuchElementException e) {
@@ -74,12 +67,34 @@ public class PropertyFilteredIterable<T extends Element> implements CloseableIte
                 } else {
                     while (true) {
                         final T element = this.itty.next();
-                        if (element.getPropertyKeys().contains(key) && element.getProperty(key).equals(value)) {
+                        if (hasContainer.isLegal(element))
                             return element;
-                        }
+
                     }
                 }
             }
         };
+    }
+
+    protected class HasContainer {
+        public String key;
+        public Object value;
+        public Predicate predicate;
+
+        public HasContainer(final String key, final Predicate predicate, final Object value) {
+            this.key = key;
+            this.value = value;
+            this.predicate = predicate;
+        }
+
+        public boolean isLegal(final Element element) {
+            if (this.key.equals(StringFactory.ID)) {
+                return this.predicate.evaluate(element.getId(), this.value);
+            } else if (this.key.equals(StringFactory.LABEL) && element instanceof Edge) {
+                return this.predicate.evaluate(((Edge) element).getLabel(), this.value);
+            } else {
+                return this.predicate.evaluate(element.getProperty(this.key), this.value);
+            }
+        }
     }
 }

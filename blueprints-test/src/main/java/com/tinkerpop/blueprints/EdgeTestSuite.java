@@ -146,7 +146,7 @@ public class EdgeTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    public void untestGetEdgesByLabel() {
+    public void testGetEdgesByLabel() {
         Graph graph = graphTest.generateGraph();
         Vertex v1 = graph.addVertex(null);
         Vertex v2 = graph.addVertex(null);
@@ -156,9 +156,9 @@ public class EdgeTestSuite extends TestSuite {
         Edge e2 = graph.addEdge(null, v2, v3, graphTest.convertLabel("test2"));
         Edge e3 = graph.addEdge(null, v3, v1, graphTest.convertLabel("test3"));
 
-        assertEquals(e1, getOnlyElement(graph.query().has("label", "test1").edges()));
-        assertEquals(e2, getOnlyElement(graph.query().has("label", "test2").edges()));
-        assertEquals(e3, getOnlyElement(graph.query().has("label", "test3").edges()));
+        assertEquals(e1, getOnlyElement(graph.query().has("label", graphTest.convertLabel("test1")).edges()));
+        assertEquals(e2, getOnlyElement(graph.query().has("label", graphTest.convertLabel("test2")).edges()));
+        assertEquals(e3, getOnlyElement(graph.query().has("label", graphTest.convertLabel("test3")).edges()));
 
         assertEquals(e1, getOnlyElement(graph.getEdges("label", graphTest.convertLabel("test1"))));
         assertEquals(e2, getOnlyElement(graph.getEdges("label", graphTest.convertLabel("test2"))));
