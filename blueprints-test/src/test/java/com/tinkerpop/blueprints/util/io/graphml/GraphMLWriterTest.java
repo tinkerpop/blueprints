@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.util.io.graphml;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
 import junit.framework.TestCase;
 
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -94,5 +96,19 @@ public class GraphMLWriterTest extends TestCase {
 
         Vertex v2 = g2.getVertex(1);
         assertEquals("\u00E9", v2.getProperty("text"));
+    }
+
+    public void testStreamStaysOpen() throws IOException {
+        final Graph g = TinkerGraphFactory.createTinkerGraph();
+        final PrintStream oldStream = System.out;
+        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        final GraphMLWriter writer = new GraphMLWriter(g);
+        writer.outputGraph(System.out);
+        System.out.println("working");
+        System.setOut(oldStream);
+
+        assertTrue(outContent.toString().endsWith("working\n"));
     }
 }
