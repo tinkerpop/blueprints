@@ -15,6 +15,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Added the SailLoader utility, for bulk-loading RDF into GraphSail and other Sail impls
 * Moved to Sesame 2.7, with its new transaction model.  Bumped SesameTools to 1.8 and Ripple to 1.1
 * Blueprints API now requires an @IllegalStateException@ to be thrown if @removeVertex@ on the @Graph@ interface is called on vertex that is already removed
 * Add overload to @GraphFactory.open@ that takes a @Map@ for configuration
