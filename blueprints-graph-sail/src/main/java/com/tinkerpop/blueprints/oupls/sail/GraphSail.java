@@ -35,13 +35,13 @@ import java.util.regex.Pattern;
  * An RDF storage interface for any graph database with a Blueprints IndexableGraph implementation.  It models
  * RDF graphs as property graphs which can be easily traversed and manipulated with other Blueprints-compatible tools.
  * At the same time, it can be used with OpenRDF-based tools to power a SPARQL endpoint, an RDF reasoner, etc.
- * <p/>
+ *
  * RDF resources are stored as vertices, RDF statements as edges using the Blueprints default (automatic) indices.
  * Namespaces are stored at a special vertex with the id "urn:com.tinkerpop.blueprints.sail:namespaces".
- * <p/>
+ *
  * This Sail is as transactional as the underlying graph database: if the provided Graph implements TransactionalGraph
  * and is in manual transaction mode, then the SailConnection's commit and rollback methods will be used correspondingly.
- * <p/>
+ *
  * Retrieval of RDF statements from the store involves both "index-based" and "graph-based" matching, as follows.
  * For each new statement edge which is added to the store, "p" (predicate), "c" (context), and "pc" (predicate and context)
  * property values are added and indexed.  These allow the statement to be quickly retrieved in a query where only the
@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
  * either the john or jane vertex as a starting point and filters on adjacent edges.  Graph-based matches are used for
  * all of the triple patterns s,o,sp,so,sc,po,oc,spo,spc,soc,poc,spoc which have not been explicitly flagged for
  * index-based matching.
- * <p/>
+ *
  * Note: this implementation attaches no semantics to Vertex and Edge IDs, so as to be compatible with Graph
  * implementations which do no not allow IDs to be chosen.
  *
