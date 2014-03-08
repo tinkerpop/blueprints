@@ -3,9 +3,9 @@ package com.tinkerpop.blueprints.oupls.sail;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import org.junit.Test;
-import org.neo4j.helpers.Exceptions;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
+import org.openrdf.sail.memory.MemoryStore;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -77,4 +77,17 @@ public class SailLoaderTest {
 
         return file;
     }
+
+    /*
+    @Test
+    public void testFormatExtensions() throws Exception {
+        Set<String> extensions = new HashSet<String>();
+        for (RDFFormat f : RDFFormat.values()) {
+            extensions.addAll(f.getFileExtensions());
+        }
+
+        for (String ext : extensions) {
+            System.out.println(ext);
+        }
+    }*/
 }

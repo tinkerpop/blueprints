@@ -25,58 +25,94 @@ import java.util.zip.GZIPInputStream;
 public class SailLoader {
     private static final Logger LOGGER = Logger.getLogger(SailLoader.class.getName());
 
-    private static final long BUFFER_SIZE = 1000;
-
-    private static final long LOGGING_BUFFER_SIZE = 10000;
-
-    private boolean verbose = false;
+    private static final int
+            DEFAULT_BUFFER_SIZE = 1000,
+            DEFAULT_LOGGING_BUFFER_SIZE = 10000;
 
     private final Sail sail;
-
+    private boolean verbose = false;
     private String baseUri = "http://example.org/baseURI/";
+    private int bufferSize = DEFAULT_BUFFER_SIZE;
+    private int loggingBufferSize = DEFAULT_LOGGING_BUFFER_SIZE;
 
     public SailLoader(final Sail sail) {
         this.sail = sail;
     }
 
+    /**
+     * @param baseUri the base URI for any relative URIs in the loaded file(s)
+     */
     public void setBaseUri(final String baseUri) {
         this.baseUri = baseUri;
     }
 
+    /**
+     * @param verbose whether to log information on individual files loaded and statements added
+     */
     public void setVerbose(final boolean verbose) {
         this.verbose = verbose;
     }
 
-    public void load(final File fileOrDirectory) throws Exception {
+    /**
+     * @param bufferSize the number of statements to be committed per transaction
+     */
+    public void setBufferSize(final int bufferSize) {
+        this.bufferSize = bufferSize;
+    }
+
+    /**
+     * @param loggingBufferSize the number of statements per logging message (if verbose=true)
+     */
+    public void setLoggingBufferSize(final int loggingBufferSize) {
+        this.loggingBufferSize = loggingBufferSize;
+    }
+
+    /**
+     * Loads an RDF file, or a directory containing RDF files, into a Sail
+     *
+     * @param fileOrDirectory a file in a supported RDF format or a directory which contains (at any level)
+     *                        one or more files in a supported RDF format.
+     *                        A directory should contain all or mostly RDF files.
+     *                        Files must be named with a format-appropriate extension, e.g. *.rdf, *.ttl, *.nt
+     *                        or a format-appropriate extension followed by .gz if they are compressed with Gzip.
+     */
+    public synchronized void load(final File fileOrDirectory) throws Exception {
+        LOGGER.info("loading from " + fileOrDirectory);
         SailConnection c = sail.getConnection();
         try {
             c.begin();
+
             long startTime = System.currentTimeMillis();
-
-            loadFile(fileOrDirectory, c);
-
+            long count = loadFile(fileOrDirectory, c);
             long endTime = System.currentTimeMillis();
 
+            // commit leftover statements
             c.commit();
-            LOGGER.info("resulting triple store has " + c.size() + " new statements");
-            LOGGER.info("total load time: " + (endTime - startTime) + "ms");
+
+            LOGGER.info("loaded " + count + " statements in " + (endTime - startTime) + "ms");
         } finally {
             c.rollback();
             c.close();
         }
     }
 
-    private void loadFile(final File fileOrDirectory,
+    private long loadFile(final File fileOrDirectory,
                           final SailConnection c) throws IOException {
         if (fileOrDirectory.isDirectory()) {
+            long count = 0;
+
             for (File child : fileOrDirectory.listFiles()) {
-                loadFile(child, c);
+                count += loadFile(child, c);
             }
+
+            return count;
         } else {
             RDFFormat format;
 
             long before = System.currentTimeMillis();
-            LOGGER.info("loading file: " + fileOrDirectory);
+            if (verbose) {
+                LOGGER.info("loading file: " + fileOrDirectory);
+            }
             String n = fileOrDirectory.getName();
             InputStream is;
             if (n.endsWith(".gz")) {
@@ -90,12 +126,13 @@ public class SailLoader {
 
             if (null == format) {
                 LOGGER.warning("could not guess format of file: " + n);
-                return;
+                return 0;
             }
 
             RDFParser p = Rio.createParser(format);
             p.setStopAtFirstError(false);
-            p.setRDFHandler(new SailConnectionAdder(c));
+            SailConnectionAdder adder = new SailConnectionAdder(c);
+            p.setRDFHandler(adder);
 
             try {
                 p.parse(is, baseUri);
@@ -107,7 +144,11 @@ public class SailLoader {
             }
 
             long after = System.currentTimeMillis();
-            LOGGER.info("\tfinished in " + (after - before) + "ms");
+            if (verbose) {
+                LOGGER.info("\tfinished in " + (after - before) + "ms");
+            }
+
+            return adder.count;
         }
     }
 
@@ -157,16 +198,14 @@ public class SailLoader {
 
         private void incrementCount() throws RDFHandlerException {
             count++;
-            if (0 == count % BUFFER_SIZE) {
+            if (0 == count % bufferSize) {
                 try {
                     c.commit();
                     c.begin();
 
-                    if (verbose && 0 == count % LOGGING_BUFFER_SIZE) {
+                    if (verbose && 0 == count % loggingBufferSize) {
                         LOGGER.info("" + System.currentTimeMillis() + "\t" + count);
                     }
-
-                    //count = 0;
                 } catch (SailException e) {
                     throw new RDFHandlerException(e);
                 }
