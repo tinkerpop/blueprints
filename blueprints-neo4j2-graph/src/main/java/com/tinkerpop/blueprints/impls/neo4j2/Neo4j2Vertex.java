@@ -106,6 +106,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
         }
 
         public Iterator<Neo4j2Vertex> iterator() {
+            graph.autoStartTransaction(true);
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
@@ -114,14 +115,17 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
 
             return new Iterator<Neo4j2Vertex>() {
                 public Neo4j2Vertex next() {
+                    graph.autoStartTransaction(false);
                     return new Neo4j2Vertex(itty.next().getOtherNode(node), graph);
                 }
 
                 public boolean hasNext() {
+                    graph.autoStartTransaction(false);
                     return itty.hasNext();
                 }
 
                 public void remove() {
+                    graph.autoStartTransaction(true);
                     itty.remove();
                 }
             };
@@ -146,6 +150,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
         }
 
         public Iterator<Neo4j2Edge> iterator() {
+            graph.autoStartTransaction(true);
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
@@ -154,14 +159,17 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
 
             return new Iterator<Neo4j2Edge>() {
                 public Neo4j2Edge next() {
+                    graph.autoStartTransaction(false);
                     return new Neo4j2Edge(itty.next(), graph);
                 }
 
                 public boolean hasNext() {
+                    graph.autoStartTransaction(false);
                     return itty.hasNext();
                 }
 
                 public void remove() {
+                    graph.autoStartTransaction(true);
                     itty.remove();
                 }
             };

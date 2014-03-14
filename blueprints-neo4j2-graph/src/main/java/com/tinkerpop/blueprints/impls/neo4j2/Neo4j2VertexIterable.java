@@ -37,6 +37,7 @@ public class Neo4j2VertexIterable<T extends Vertex> implements CloseableIterable
             }
 
             public Neo4j2Vertex next() {
+                graph.autoStartTransaction(false);
                 if (!checkTransaction) {
                     return new Neo4j2Vertex(this.itty.next(), graph);
                 } else {
@@ -58,6 +59,7 @@ public class Neo4j2VertexIterable<T extends Vertex> implements CloseableIterable
             }
 
             public boolean hasNext() {
+                graph.autoStartTransaction(false);
                 if (!checkTransaction)
                     return this.itty.hasNext();
                 else {

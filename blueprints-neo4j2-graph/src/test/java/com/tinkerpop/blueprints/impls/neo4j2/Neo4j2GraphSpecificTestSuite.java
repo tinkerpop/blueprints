@@ -1,12 +1,9 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.NotInTransactionException;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
@@ -126,6 +123,49 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         assertEquals(counter, 1);
 
         graph.shutdown();
+    }
+
+    public void testAutoStartTxOnVertexIterables() throws Exception {
+        Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        graph.addEdge(null, a, b, "testEdge");
+        Iterable<Vertex> graphIterable = graph.getVertices();
+        Iterable<Vertex> vertexIterable = a.getVertices(Direction.BOTH);
+        graph.commit();
+        try {
+            try {
+                assertTrue(graphIterable.iterator().hasNext());
+                assertNotNull(graphIterable.iterator().next());
+            } catch (NotInTransactionException e) {
+                fail("Iterating graph vertex iterable does not auto-start transaction");
+            }
+            try {
+                assertTrue(vertexIterable.iterator().hasNext());
+                assertNotNull(vertexIterable.iterator().next());
+            } catch (NotInTransactionException e) {
+                fail("Iterating vertex iterable does not auto-start transaction");
+            }
+        } finally {
+            graph.shutdown();
+        }
+    }
+
+    public void testAutoStartTxOnEdgeIterables() throws Exception {
+        Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        graph.addEdge(null, a, b, "testEdge");
+        Iterable<Edge> iterable = graph.getEdges();
+        graph.commit();
+        try {
+            assertTrue(iterable.iterator().hasNext());
+            assertNotNull(iterable.iterator().next());
+        } catch (NotInTransactionException e) {
+            fail("Iterating edge iterable does not auto-start transaction");
+        } finally {
+            graph.shutdown();
+        }
     }
 
     public void testHaGraph() throws Exception {
