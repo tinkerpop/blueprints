@@ -19,11 +19,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * A Graph implementation which wraps another Graph implementation,
  * enabling custom element IDs even for those graphs which don't otherwise support them.
- * <p/>
+ *
  * The base Graph must be an instance of KeyIndexableGraph.
  * It *may* be an instance of IndexableGraph, in which case its indices will be wrapped appropriately.
  * It *may* be an instance of TransactionalGraph, in which case transaction operations will be passed through.
@@ -33,6 +34,8 @@ import java.util.UUID;
  * @author Joshua Shinavier (http://fortytwo.net)
  */
 public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, WrapperGraph<T>, IndexableGraph, TransactionalGraph {
+
+    private static final Logger LOGGER = Logger.getLogger(IdGraph.class.getName());
 
     // Note: using "__id" instead of "_id" avoids collision with Rexster's "_id"
     public static final String ID = "__id";
@@ -152,13 +155,13 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
             if (!iter.hasNext()) {
                 return null;
             } else {
-                Vertex e = iter.next();
+                Vertex v = iter.next();
 
                 if (iter.hasNext()) {
-                    throw new IllegalStateException("multiple vertices exist with id '" + id + "'");
+                    LOGGER.warning("multiple vertices exist with id '" + id + "'. Arbitarily choosing " + v);
                 }
 
-                return new IdVertex(e, this);
+                return new IdVertex(v, this);
             }
         } else {
             Vertex base = baseGraph.getVertex(id);
@@ -222,7 +225,7 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
                 Edge e = iter.next();
 
                 if (iter.hasNext()) {
-                    throw new IllegalStateException("multiple edges exist with id " + id);
+                    LOGGER.warning("multiple edges exist with id '" + id + "'. Arbitarily choosing " + e);
                 }
 
                 return new IdEdge(e, this);
