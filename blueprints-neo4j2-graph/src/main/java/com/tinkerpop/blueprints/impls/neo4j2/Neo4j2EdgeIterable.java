@@ -33,10 +33,12 @@ public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo
             private Relationship nextRelationship = null;
 
             public void remove() {
+                graph.autoStartTransaction(true);
                 this.itty.remove();
             }
 
             public Neo4j2Edge next() {
+                graph.autoStartTransaction(false);
                 if (!checkTransaction) {
                     return new Neo4j2Edge(this.itty.next(), graph);
                 } else {
@@ -60,6 +62,7 @@ public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo
             }
 
             public boolean hasNext() {
+                graph.autoStartTransaction(false);
                 if (!checkTransaction)
                     return this.itty.hasNext();
                 else {
