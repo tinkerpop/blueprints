@@ -31,7 +31,7 @@ public class EventTrigger {
 
     /**
      * Add an event to the event queue.
-     * <p/>
+     *
      * If the enqueEvents is false, then the queue fires and resets after each event is added.
      */
     public void addEvent(Event evt) {

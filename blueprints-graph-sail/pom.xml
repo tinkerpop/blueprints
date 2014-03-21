@@ -21,6 +21,13 @@
             <groupId>net.fortytwo.sesametools</groupId>
             <artifactId>common</artifactId>
             <version>${sesametools.version}</version>
+            <exclusions>
+                <!-- temporary; latest SesameTools does not have its own slf4j dependency -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.openrdf.sesame</groupId>

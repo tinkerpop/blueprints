@@ -14,10 +14,10 @@ import java.nio.charset.Charset;
 
 /**
  * A reader for the Graph Modelling Language (GML).
- * <p/>
+ *
  * GML definition taken from
  * (http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-documentation.tar.gz)
- * <p/>
+ *
  * It's not clear that all node have to have id's or that they have to be integers - we assume that this is the case. We
  * also assume that only one graph can be defined in a file.
  *
@@ -42,7 +42,7 @@ public class GMLReader {
 
     /**
      * Create a new GML reader
-     * <p/>
+     *
      * (Uses default edge label DEFAULT_LABEL)
      *
      * @param graph the graph to load data into
@@ -85,7 +85,7 @@ public class GMLReader {
 
     /**
      * Read the GML from from the stream.
-     * <p/>
+     *
      * If the file is malformed incomplete data can be loaded.
      *
      * @param inputStream
@@ -98,7 +98,7 @@ public class GMLReader {
 
     /**
      * Read the GML from from the stream.
-     * <p/>
+     *
      * If the file is malformed incomplete data can be loaded.
      *
      * @param filename
@@ -111,7 +111,7 @@ public class GMLReader {
 
     /**
      * Read the GML from from the stream.
-     * <p/>
+     *
      * If the file is malformed incomplete data can be loaded.
      *
      * @param inputStream
@@ -125,7 +125,7 @@ public class GMLReader {
 
     /**
      * Read the GML from from the stream.
-     * <p/>
+     *
      * If the file is malformed incomplete data can be loaded.
      *
      * @param filename
@@ -211,7 +211,7 @@ public class GMLReader {
             new GMLParser(graph, defaultEdgeLabel, vertexIdKey, edgeIdKey, edgeLabelKey).parse(st);
 
             graph.commit();
-            ;
+
         } catch (IOException e) {
             throw new IOException("GML malformed line number " + st.lineno() + ": ", e);
         }

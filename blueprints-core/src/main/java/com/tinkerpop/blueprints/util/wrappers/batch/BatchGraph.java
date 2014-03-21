@@ -23,21 +23,21 @@ import java.util.Set;
  * BatchGraph is a wrapper that enables batch loading of a large number of edges and vertices by chunking the entire
  * load into smaller batches and maintaining a memory-efficient vertex cache so that the entire transactional state can
  * be flushed after each chunk is loaded.
- * <br />
+ *
  * BatchGraph is ONLY meant for loading data and does not support any retrieval or removal operations.
  * That is, BatchGraph only supports the following methods:
  * - {@link #addVertex(Object)} for adding vertices
  * - {@link #addEdge(Object, com.tinkerpop.blueprints.Vertex, com.tinkerpop.blueprints.Vertex, String)} for adding edges
  * - {@link #getVertex(Object)} to be used when adding edges
  * - Property getter, setter and removal methods for vertices and edges.
- * <br />
+ *
  * An important limitation of BatchGraph is that edge properties can only be set immediately after the edge has been added.
  * If other vertices or edges have been created in the meantime, setting, getting or removing properties will throw
  * exceptions. This is done to avoid caching of edges which would require a great amount of memory.
- * <br />
+ *
  * BatchGraph wraps {@link TransactionalGraph}. To wrap arbitrary graphs, use {@link #wrap(com.tinkerpop.blueprints.Graph)}
  * which will additionally wrap non-transactional.
- * <br />
+ *
  * BatchGraph can also automatically set the provided element ids as properties on the respective element. Use
  * {@link #setVertexIdKey(String)} and {@link #setEdgeIdKey(String)} to set the keys for the vertex and edge properties
  * respectively. This allows to make the loaded baseGraph compatible for later wrapping with {@link IdGraph}.
@@ -187,14 +187,14 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
      * Sets whether the graph loaded through this instance of {@link BatchGraph} is loaded from scratch
      * (i.e. the wrapped graph is initially empty) or whether graph is loaded incrementally into an
      * existing graph.
-     * <p/>
+     *
      * In the former case, BatchGraph does not need to check for the existence of vertices with the wrapped
      * graph but only needs to consult its own cache which can be significantly faster. In the latter case,
      * the cache is checked first but an additional check against the wrapped graph may be necessary if
      * the vertex does not exist.
-     * <p/>
+     *
      * By default, BatchGraph assumes that the data is loaded from scratch.
-     * <p/>
+     *
      * When setting loading from scratch to false, a vertex id key must be specified first using
      * {@link #setVertexIdKey(String)} - otherwise an exception is thrown.
      *
@@ -208,7 +208,7 @@ public class BatchGraph<T extends TransactionalGraph> implements TransactionalGr
 
     /**
      * Whether this BatchGraph is loading data from scratch or incrementally into an existing graph.
-     * <p/>
+     *
      * By default, this returns true.
      *
      * @return Whether this BatchGraph is loading data from scratch or incrementally into an existing graph.

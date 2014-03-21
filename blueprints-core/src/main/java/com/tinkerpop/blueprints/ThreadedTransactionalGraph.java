@@ -4,7 +4,7 @@ package com.tinkerpop.blueprints;
  * ThreadedTransactionalGraph provides more fine grained control over the transactional context.
  * While TransactionalGraph binds each transaction to the executing thread, ThreadedTransactionalGraph's {@link #newTransaction} returns a {@link TransactionalGraph} that represents its own transactional context independent of the executing thread.
  * Hence, one can have multiple threads operating against a single transaction represented by the returned TransactionalGraph object. This is useful for parallelizing graph algorithms.
- * <p/>
+ *
  * Note, that one needs to call {@link TransactionalGraph#commit()} or {@link TransactionalGraph#rollback()} to close the transactions returned
  * by {@link #newTransaction()}.
  *

@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.oupls.sail;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import org.junit.Test;
+import org.openrdf.rio.RDFFormat;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.memory.MemoryStore;
@@ -13,6 +14,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -83,11 +86,12 @@ public class SailLoaderTest {
     public void testFormatExtensions() throws Exception {
         Set<String> extensions = new HashSet<String>();
         for (RDFFormat f : RDFFormat.values()) {
+            System.out.println("" + f);
             extensions.addAll(f.getFileExtensions());
         }
 
         for (String ext : extensions) {
             System.out.println(ext);
         }
-    }*/
+    }//*/
 }

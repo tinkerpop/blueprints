@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints;
 
 /**
- * Compare is a predicate that determines whether the first argument is ==, !=, >, >=, <, <= to the second argument.
+ * Compare is a predicate that determines whether the first argument is ==, !=, &gt;, &gt;=, &lt;, &lt;= to the second argument.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */

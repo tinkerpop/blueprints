@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.util.io.gml;
 
 /**
  * A collection of tokens used for GML related data.
- * <p/>
+ *
  * Tokens defined from GML Tags
  * (http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-documentation.tar.gz)
  *

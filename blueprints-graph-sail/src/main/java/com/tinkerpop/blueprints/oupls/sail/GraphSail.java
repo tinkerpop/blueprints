@@ -135,10 +135,6 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
      *                        To use GraphSail with a base Graph which does not support edge indices, provide "" as the argument.
      */
     public GraphSail(final T graph, final String indexedPatterns) {
-        //if (graph instanceof TransactionalGraph)
-        //    ((TransactionalGraph) graph).setTransactionMode(TransactionalGraph.Mode.AUTOMATIC);
-        //printGraphInfo(graph);
-
         store.sail = this;
         store.graph = graph;
 

@@ -28,6 +28,13 @@
             <artifactId>neo4j-ha</artifactId>
             <version>1.9.5</version>
             <scope>compile</scope>
+            <exclusions>
+                <!-- conflict with Sesame -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>

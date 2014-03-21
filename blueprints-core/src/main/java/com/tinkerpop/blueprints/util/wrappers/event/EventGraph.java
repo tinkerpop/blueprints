@@ -25,9 +25,9 @@ import java.util.Map;
  * to one or more listeners on changes to the Graph.  Notifications to the listeners occur for the
  * following events: new vertex/edge, vertex/edge property changed, vertex/edge property removed,
  * vertex/edge removed.
- * <p/>
+ *
  * The limiting factor to events being raised is related to out-of-process functions changing graph elements.
- * <p/>
+ *
  * To gather events from EventGraph, simply provide an implementation of the {@link GraphChangedListener} to
  * the EventGraph by utilizing the addListener method.  EventGraph allows the addition of multiple GraphChangedListener
  * implementations.  Each listener will be notified in the order that it was added.

@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 /**
  * GMLWriter writes a Graph to a GML OutputStream.
- * <p/>
+ *
  * GML definition taken from
  * (http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-documentation.tar.gz)
  *

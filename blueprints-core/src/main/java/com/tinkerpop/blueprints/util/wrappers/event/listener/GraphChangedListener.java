@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Interface for a listener to EventGraph change events.
- * <p/>
+ *
  * Implementations of this interface should be added to the list of listeners on the addListener method on
  * the EventGraph.
  *

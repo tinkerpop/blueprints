@@ -4,7 +4,7 @@ package com.tinkerpop.blueprints;
  * A vertex maintains pointers to both a set of incoming and outgoing edges.
  * The outgoing edges are those edges for which the vertex is the tail.
  * The incoming edges are those edges for which the vertex is the head.
- * Diagrammatically, ---inEdges---> vertex ---outEdges--->.
+ * Diagrammatically, ---inEdges---&gt; vertex ---outEdges---&gt;.
  *
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  * @author Matthias Brocheler (http://matthiasb.com)
