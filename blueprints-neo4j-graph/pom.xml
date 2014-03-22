@@ -11,6 +11,7 @@
     <artifactId>blueprints-neo4j-graph</artifactId>
     <name>Blueprints-Neo4jGraph</name>
     <description>Blueprints property graph implementation for the Neo4j graph database</description>
+
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -20,27 +21,17 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>1.9.5</version>
-            <type>pom</type>
+            <version>${neo4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ha</artifactId>
-            <version>1.9.5</version>
-            <scope>compile</scope>
-            <exclusions>
-                <!-- conflict with Sesame -->
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${neo4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-management</artifactId>
-            <version>1.9.5</version>
-            <scope>compile</scope>
+            <version>${neo4j.version}</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -49,6 +40,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <directory>${basedir}/target</directory>
         <finalName>${project.artifactId}-${project.version}</finalName>
@@ -65,4 +57,5 @@
             </testResource>
         </testResources>
     </build>
+
 </project>
