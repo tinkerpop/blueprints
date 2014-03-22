@@ -53,6 +53,11 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
+                <!-- conflict with Sesame -->
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
                 <!-- temporary; latest Ripple no longer has its own slf4j dependency -->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
