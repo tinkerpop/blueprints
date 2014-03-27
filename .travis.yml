@@ -3,7 +3,7 @@ install: mvn install -DskipTests=true
 notifications:
   email:
     - okrammarko@gmail.com
-    - spmallette@gmail.com
+    - spmva@genoprime.com
     - parcour@gmail.com
     - me@matthiasb.com
     - l.garulli@gmail.com
