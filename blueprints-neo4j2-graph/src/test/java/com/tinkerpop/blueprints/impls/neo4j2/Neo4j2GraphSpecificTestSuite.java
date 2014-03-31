@@ -9,7 +9,6 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Iterator;
 
@@ -180,6 +179,8 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
     public void testRollbackExceptionOnBeforeTxCommit() throws Exception {
         Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
         GraphDatabaseService rawGraph = graph.getRawGraph();
+        // make sure the current transaction is closed
+        graph.commit();
         rawGraph.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
             @Override
             public Object beforeCommit(TransactionData data) throws Exception {

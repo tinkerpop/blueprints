@@ -181,7 +181,6 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         for (final String key : this.getInternalIndexKeys(Edge.class)) {
             this.createKeyIndex(key, Edge.class);
         }
-        this.commit();
     }
 
     private <T extends Element> void createInternalIndexKey(final String key, final Class<T> elementClass) {
