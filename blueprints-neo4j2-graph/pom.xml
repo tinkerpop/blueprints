@@ -20,19 +20,19 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.1</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ha</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-management</artifactId>
-            <version>2.0.0</version>
+            <version>2.0.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
