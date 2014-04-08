@@ -269,7 +269,7 @@ public class GMLWriter {
 
     private void writeStringProperty(final Writer writer, final Object string) throws IOException {
         writer.write("\"");
-        writer.write(string.toString());
+        writer.write(string.toString().replaceAll("\"","\\\""));
         writer.write("\"");
         writer.write(NEW_LINE);
     }
