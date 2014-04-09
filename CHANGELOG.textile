@@ -31,6 +31,7 @@ h3. Version 2.5.0 (NOT OFFICIALLY RELEASED YET)
 * GraphSON supports a "normalization" of output (like GraphML)
 * Ignore @null@ property values to while writing to GraphSON (while Blueprints does not allow @null@ property values to be set, that does not prevent graphs from returning them)
 * GraphML, GML, and GraphSON Writers don't close streams internally when outputting a graph (it leaves it to the original creator of the stream)
+* GML properly handles quotes within a property value.
 
 ==<hr/>==
 
