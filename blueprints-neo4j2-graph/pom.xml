@@ -36,6 +36,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>com.tinkerpop.rexster</groupId>
+            <artifactId>rexster-core</artifactId>
+            <version>${blueprints.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
             <version>${blueprints.version}</version>
@@ -57,5 +63,27 @@
                 </directory>
             </testResource>
         </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>
