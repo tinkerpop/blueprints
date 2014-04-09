@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -105,6 +106,16 @@ public class GMLReaderTest {
         Assert.assertEquals(0.1f, map.get("h"));
         Assert.assertEquals("earth.gif", map.get("bitmap"));
 
+    }
+
+    @Test
+    public void testEscapeQuotation() throws Exception {
+        TinkerGraph graph = new TinkerGraph();
+        GMLReader.inputGraph(graph, GMLReader.class.getResourceAsStream("example.gml"));
+        Vertex v3 = graph.getVertex(3);
+        Object tempProperty = v3.getProperty("escape_property");
+        Assert.assertNotNull(tempProperty);
+        Assert.assertEquals("Node 3 \"with quote\"", tempProperty);
     }
 
     private int getIterableCount(Iterable<?> elements) {
