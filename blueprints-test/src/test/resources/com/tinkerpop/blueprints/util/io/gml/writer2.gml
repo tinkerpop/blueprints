@@ -9,6 +9,7 @@ graph [
 	]
 	node [
 		id 3
+		escape_property "Node 3 \"with quote\""
 		label "Node 3"
 	]
 	edge [

@@ -14,7 +14,7 @@ graph [
 	node [
 		id 3
 		label "Node 3"
-	    escape_property "Node 4 \"with quote\""
+	    escape_property "Node 3 \"with quote\""
 	]
 	edge [
 		source 1

@@ -115,7 +115,7 @@ public class GMLReaderTest {
         Vertex v3 = graph.getVertex(3);
         Object tempProperty = v3.getProperty("escape_property");
         Assert.assertNotNull(tempProperty);
-        Assert.assertEquals("Node 4 \"with quote\"", tempProperty);
+        Assert.assertEquals("Node 3 \"with quote\"", tempProperty);
     }
 
     private int getIterableCount(Iterable<?> elements) {
