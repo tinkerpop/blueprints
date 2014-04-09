@@ -4,6 +4,7 @@ import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 import com.tinkerpop.blueprints.impls.tg.TinkerGraphFactory;
+
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
@@ -134,6 +135,27 @@ public class GMLWriterTest extends TestCase {
             buffer.close();
         }
         return buffer.toString("ISO-8859-1");
+    }
+
+    /**
+     * This tests checks, if quotation marks (") are escaped correctly, before
+     * they are written to the GML file.
+     * @throws Exception if something fails
+     */
+    public void testWriteStringPropertyWithQuotationMarks() throws Exception {
+      TinkerGraph g1 = TinkerGraphFactory.createTinkerGraph();
+      Vertex v = g1.getVertex(1);
+      v.setProperty("escape_property", "quotation \"quote\" quotation end");
+
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      GMLWriter w = new GMLWriter(g1);
+      w.setUseId(true);
+      w.outputGraph(bos);
+
+      String gmlOutput = bos.toString();
+      Assert.assertNotNull(gmlOutput);
+      String message = "escaped_property was not escaped properly";
+      Assert.assertTrue(message, gmlOutput.contains("quotation \\\"quote\\\" quotation end"));
     }
 
     // Note: this is only a very lightweight test of writer/reader encoding.
