@@ -29,9 +29,9 @@ public abstract class IdElement implements Element {
     public <T> T getProperty(final String key) {
         if (propertyBased && key.equals(IdGraph.ID)) {
             return null;
+        } else {
+            return baseElement.getProperty(key);
         }
-
-        return baseElement.getProperty(key);
     }
 
     public Set<String> getPropertyKeys() {
@@ -47,10 +47,8 @@ public abstract class IdElement implements Element {
     }
 
     public void setProperty(final String key, final Object value) {
-        if (propertyBased) {
-            if (key.equals(IdGraph.ID)) {
-                throw new IllegalArgumentException("Unable to set value for reserved property " + IdGraph.ID);
-            }
+        if (propertyBased && key.equals(IdGraph.ID)) {
+            throw new IllegalArgumentException("Unable to set value for reserved property " + IdGraph.ID);
         }
 
         baseElement.setProperty(key, value);
@@ -81,9 +79,10 @@ public abstract class IdElement implements Element {
     }
 
     public void remove() {
-        if (this instanceof Vertex)
+        if (this instanceof Vertex) {
             this.idGraph.removeVertex((Vertex) this);
-        else
+        } else {
             this.idGraph.removeEdge((Edge) this);
+        }
     }
 }
