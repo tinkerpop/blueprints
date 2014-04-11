@@ -20,7 +20,7 @@ public class IndexingMatcher extends Matcher {
         SUBJECT, PREDICATE, OBJECT, CONTEXT
     }
 
-    private final String propertyName;
+    private final String propertyKey;
     private final GraphSail.DataStore store;
 
     /**
@@ -54,7 +54,19 @@ public class IndexingMatcher extends Matcher {
         if (o) {
             sb.append("o");
         }
-        propertyName = sb.toString();
+        propertyKey = sb.toString();
+    }
+
+    private <T> List<T> addLazy(List<T> list,
+                                final T toAdd) {
+        list = null == list ? new LinkedList<T>() : list;
+        list.add(toAdd);
+        return list;
+    }
+
+    private String appendToKey(final String key,
+                               final String part) {
+        return null == key ? part : key + GraphSail.SEPARATOR + part;
     }
 
     public Iterable<Edge> match(final Resource subject,
@@ -63,47 +75,40 @@ public class IndexingMatcher extends Matcher {
                                 final Resource context,
                                 final boolean includeInferred) {
 
-        // TODO: the temporary linked list is a little wasty
-        List<FilteredIterator.Criterion<Edge>> criteria = new LinkedList<FilteredIterator.Criterion<Edge>>();
-
-        StringBuilder sb = new StringBuilder();
+        List<FilteredIterator.Criterion<Edge>> criteria = null;
+        String key = null;
 
         if (c) {
-            sb.append(GraphSail.SEPARATOR).append(null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context));
+            key = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
         } else if (null != context) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, store.resourceToNative(context)));
+            criteria = addLazy(criteria, new PartOfSpeechCriterion(PartOfSpeech.CONTEXT, store.resourceToNative(context)));
         }
 
         if (s) {
-            sb.append(GraphSail.SEPARATOR).append(store.resourceToNative(subject));
+            key = appendToKey(key, store.resourceToNative(subject));
         } else if (null != subject) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.SUBJECT, store.resourceToNative(subject)));
+            criteria = addLazy(criteria, new PartOfSpeechCriterion(PartOfSpeech.SUBJECT, store.resourceToNative(subject)));
         }
 
         if (p) {
-            sb.append(GraphSail.SEPARATOR).append(store.uriToNative(predicate));
+            key = appendToKey(key, store.uriToNative(predicate));
         } else if (null != predicate) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.PREDICATE, store.uriToNative(predicate)));
+            criteria = addLazy(criteria, new PartOfSpeechCriterion(PartOfSpeech.PREDICATE, store.uriToNative(predicate)));
         }
 
         if (o) {
-            sb.append(GraphSail.SEPARATOR).append(store.valueToNative(object));
+            key = appendToKey(key, store.valueToNative(object));
         } else if (null != object) {
-            criteria.add(new PartOfSpeechCriterion(PartOfSpeech.OBJECT, store.valueToNative(object)));
+            criteria = addLazy(criteria, new PartOfSpeechCriterion(PartOfSpeech.OBJECT, store.valueToNative(object)));
         }
 
         if (!includeInferred) {
-            criteria.add(new NoInferenceCriterion());
+            criteria = addLazy(criteria, new NoInferenceCriterion());
         }
 
-        //System.out.println("spoc: " + s + " " + p + " " + o + " " + c);
-        //System.out.println("\ts: " + subject + ", p: " + predicate + ", o: " + object + ", c: " + context);
+        Iterable<Edge> results = store.graph.getEdges(propertyKey, key);
 
-        //System.out.println("store = " + store);
-        //System.out.println("\tstore.edges = " + store.edges);
-        Iterable<Edge> results = store.graph.getEdges(propertyName, sb.toString().substring(1));
-
-        if (criteria.size() > 0) {
+        if (null != criteria) {
             FilteredIterator.Criterion<Edge> c = new FilteredIterator.CompoundCriterion<Edge>(criteria);
             results = new FilteredIterator<Edge>(results, c);
         }
@@ -141,8 +146,7 @@ public class IndexingMatcher extends Matcher {
             sb.append(GraphSail.SEPARATOR).append(store.valueToNative(object));
         }
 
-        //edges.put(propertyName, sb.toString(), edge);
-        statement.setProperty(propertyName, sb.toString().substring(1));
+        statement.setProperty(propertyKey, sb.toString().substring(1));
     }
 
     // TODO: unindexStatement

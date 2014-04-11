@@ -16,9 +16,25 @@ import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.algebra.QueryRoot;
 import org.openrdf.query.algebra.TupleExpr;
+import org.openrdf.query.algebra.Var;
+import org.openrdf.query.algebra.evaluation.EvaluationStrategy;
 import org.openrdf.query.algebra.evaluation.TripleSource;
+import org.openrdf.query.algebra.evaluation.impl.BindingAssigner;
+import org.openrdf.query.algebra.evaluation.impl.CompareOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.ConjunctiveConstraintSplitter;
+import org.openrdf.query.algebra.evaluation.impl.ConstantOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.DisjunctiveConstraintOptimizer;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
+import org.openrdf.query.algebra.evaluation.impl.FilterOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.IterativeEvaluationOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.OrderLimitOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.QueryJoinOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.QueryModelNormalizer;
+import org.openrdf.query.algebra.evaluation.impl.SameTermFilterOptimizer;
+import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
+import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.DefaultSailChangedEvent;
 import org.openrdf.sail.helpers.NotifyingSailConnectionBase;
@@ -79,17 +95,55 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
     }
 
-    public CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluateInternal(final TupleExpr query,
+    public CloseableIteration<? extends BindingSet, QueryEvaluationException> evaluateInternal(TupleExpr tupleExpr,
                                                                                                final Dataset dataset,
                                                                                                final BindingSet bindings,
                                                                                                final boolean includeInferred) throws SailException {
         try {
             TripleSource tripleSource = new SailConnectionTripleSource(this, store.valueFactory, includeInferred);
             EvaluationStrategyImpl strategy = new EvaluationStrategyImpl(tripleSource, dataset);
-            return strategy.evaluate(query, bindings);
+            return strategy.evaluate(tupleExpr, bindings);
         } catch (QueryEvaluationException e) {
             throw new SailException(e);
         }
+
+        /*
+        // Clone the tuple expression to allow for more aggressive optimizations
+        tupleExpr = tupleExpr.clone();
+
+        if (!(tupleExpr instanceof QueryRoot)) {
+            // Add a dummy root node to the tuple expressions to allow the
+            // optimizers to modify the actual root node
+            tupleExpr = new QueryRoot(tupleExpr);
+        }
+
+        try {
+            //replaceValues(tupleExpr);
+
+            TripleSource tripleSource = new SailConnectionTripleSource(this, store.valueFactory, includeInferred);
+            EvaluationStrategy strategy = new EvaluationStrategyImpl(tripleSource, dataset);
+
+            new BindingAssigner().optimize(tupleExpr, dataset, bindings);
+            new ConstantOptimizer(strategy).optimize(tupleExpr, dataset, bindings);
+            new CompareOptimizer().optimize(tupleExpr, dataset, bindings);
+            new ConjunctiveConstraintSplitter().optimize(tupleExpr, dataset, bindings);
+            new DisjunctiveConstraintOptimizer().optimize(tupleExpr, dataset, bindings);
+            new SameTermFilterOptimizer().optimize(tupleExpr, dataset, bindings);
+            new QueryModelNormalizer().optimize(tupleExpr, dataset, bindings);
+            // new SubSelectJoinOptimizer().optimize(tupleExpr, dataset, bindings);
+            //new QueryJoinOptimizer(new NativeEvaluationStatistics(nativeStore)).optimize(tupleExpr, dataset, bindings);
+            new IterativeEvaluationOptimizer().optimize(tupleExpr, dataset, bindings);
+            new FilterOptimizer().optimize(tupleExpr, dataset, bindings);
+            new OrderLimitOptimizer().optimize(tupleExpr, dataset, bindings);
+
+            logger.trace("Optimized query model:\n{}", tupleExpr);
+
+            return strategy.evaluate(tupleExpr, EmptyBindingSet.getInstance());
+        }
+        catch (QueryEvaluationException e) {
+            throw new SailException(e);
+        }
+        */
     }
 
     public CloseableIteration<? extends Resource, SailException> getContextIDsInternal() throws SailException {
@@ -592,13 +646,11 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     private class StableStatementIteration implements CloseableIteration<Statement, SailException> {
-        private final Iterable<Edge> iterator;
         private final Iterator<Edge> iter;
         private boolean closed = false;
 
         public StableStatementIteration(final Iterable<Edge> iterator) {
             writeSemaphoreUp();
-            this.iterator = iterator;
             iter = iterator.iterator();
         }
 
@@ -614,7 +666,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             // but such is not the behavior of Aduna's LookAheadIteration, which simply does not provide any more
             // elements if the iteration has already been closed.
             // The CloseableIteration API says nothing about what to expect from a closed iteration,
-            // so the behavior of LookAheadIteration will be taken as normative.
+            // so the behavior of LookAheadIteration will be taken as definitive.
             return !closed && iter.hasNext();
         }
 
