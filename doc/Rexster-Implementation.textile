@@ -1,0 +1,61 @@
+!https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-logo.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-rexster-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+"Rexster":http://rexster.tinkerpop.com is a RESTful graph shell that exposes any Blueprints graph through a standalone HTTP server. @RexsterGraph@ talks to a Rexster-exposed graph via the "Rexster RESTful API":https://github.com/tinkerpop/rexster/wiki/Basic-REST-API. Thus, @RexsterGraph@ can be used to communicate with a remote graph with complete HTTP-transparency to the user. @RexsterGraph@ is composed of HTTP calls (through @java.net.*@) and "JSON":http://json.org/ parsing.
+
+```java
+Graph graph = new RexsterGraph("http://localhost:8182/graphs/tinkergraph");
+```
+
+*Note* - @RexsterGraph@ is not meant for high-performing graph traversals.  It is best suited for two things:
+
+# Providing a convenient way to browse a remote graph with the Blueprints API.
+# Exposing an easy way to issue requests to the "Gremlin Extension":https://github.com/tinkerpop/rexster/wiki/Gremlin-Extension in Rexster via the @execute@ method defined below.
+
+h2. GraphFactory Settings
+
+If using "GraphFactory":https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory to instantiate a @RexsterGraph@, the following properties will apply:
+
+|_. key |_. description |
+| @blueprints.graph@ | @com.tinkerpop.blueprints.impls.rexster.RexsterGraph@ |
+| @blueprints.rexster.url@ | The URL of a Rexster server that @RexsterGraph@ will connect to. |
+| @blueprints.rexster.buffer-size@ | The buffer size that @RexsterGraph@ uses when returning data from Rexster. |
+| @blueprints.rexster.username@ | The username to use if Rexster is configured with security. |
+| @blueprints.rexster.password@ | The password to use if Rexster is configured with security. |
+
+h2. Gremlin Scripts
+
+It is possible to execute raw "Gremlin":http://gremlin.tinkerpop.com scripts through @RexsterGraph@ by using the @execute@ method.  The @execute@ method will always return a @JSONArray@ of results.  Using the Gremlin REPL:
+
+```text
+gremlin> g = new RexsterGraph("http://localhost:8182/graphs/tinkergraph")
+==>rexstergraph[http://localhost:8182/graphs/tinkergraph[mocktinkertransactionalgraph[vertices:6 edges:6 directory:data/graph-example-1]]]
+gremlin> g.execute("g.v(1)")                                             
+==>[{"name":"marko","age":29,"_id":"1","_type":"vertex"}]
+```
+
+It is also possible to pass variables, as a second parameter, that will be bound to the script on execution.
+
+```text
+gremlin> g.execute("g.v(x)",[x:1]) 
+==>[{"name":"marko","age":29,"_id":"1","_type":"vertex"}]
+gremlin> g.execute("g.v(x)",[x:1]).get(0).name
+==>marko
+gremlin> g.execute("g.v(x.toArray())",'{"x":[1,2]}')       
+==>[{"name":"marko","age":29,"_id":"1","_type":"vertex"},{"name":"vadas","age":27,"_id":"2","_type":"vertex"}]
+gremlin> import org.codehaus.jettison.json.JSONObject
+...
+gremlin> jsonParams = new JSONObject('{"x":[1,2]}')  
+==>{"x":[1,2]}
+gremlin> g.execute("g.v(x.toArray())",jsonParams)    
+==>[{"name":"marko","age":29,"_id":"1","_type":"vertex"},{"name":"vadas","age":27,"_id":"2","_type":"vertex"}] 
+```
+
+Note that the "Gremlin Extension":https://github.com/tinkerpop/rexster/wiki/Gremlin-Extension must be configured in Rexster for this function to work.

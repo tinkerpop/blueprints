@@ -1,0 +1,104 @@
+!http:/www.orientechnologies.com/images/orientdb_small.png!
+
+Blueprints is the default Java API for OrientDB, so you don't need to include additional modules. For more information look at "OrientDB Blueprints API":https://github.com/orientechnologies/orientdb/wiki/Graph-Database-Tinkerpop.
+
+```java
+// OPEN THE GRAPH 'tinkerpop' ON LOCAL FILE SYSTEM
+Graph localGraph = new OrientGraph("local:/tmp/tinkerpop");
+
+// OPEN THE GRAPH 'tinkerpop' ON REMOTE SERVER (localhost). THE SERVER COULD RUN IN DISTRIBUTED MODE
+Graph remoteGraph = new OrientGraph("remote:localhost/tinkerpop");
+
+// OPEN THE GRAPH 'tinkerpop' CREATING IN MEMORY ONLY
+Graph memoryGraph = new OrientGraph("memory:tinkerpop");
+```
+
+"Orient Technologies":http://www.orientechnologies.com/ are the developers of "OrientDB":http://www.orientdb.org.
+
+h2. GraphFactory Settings
+
+If using "GraphFactory":https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory to instantiate a @OrientGraph@, the following properties will apply:
+
+|_. key |_. description |
+| @blueprints.graph@ | @com.tinkerpop.blueprints.impls.orient.OrientGraph@ |
+| @blueprints.orientdb.url@ | The connection URL for the @OrientGraph@ instance. |
+| @blueprints.orientdb.username@ | Username to connect to @OrientGraph@ instance. |
+| @blueprints.orientdb.password@ | Password to connect to @OrientGraph@ instance. |
+
+h2. OrientGraph Feature List
+
+OrientGraph is transactional. This means that as soon as the graph is modified (add and remove vertex/edges, set properties) a new transaction is started automatically and it's committed manually or at the graph shutdown.
+
+```
+supportsDuplicateEdges: true
+supportsSelfLoops: true
+supportsSerializableObjectProperty: true
+supportsBooleanProperty: true
+supportsDoubleProperty: true
+supportsFloatProperty: true
+supportsIntegerProperty: true
+supportsPrimitiveArrayProperty: true
+supportsUniformListProperty: true
+supportsMixedListProperty: true
+supportsLongProperty: true
+supportsMapProperty: true
+supportsStringProperty: true
+ignoresSuppliedIds: true
+isPersistent: true
+isRDFModel: false
+isWrapper: false
+supportsIndices: true
+supportsVertexIndex: true
+supportsEdgeIndex: true by default or false if setUseLightweightEdges(false)
+supportsKeyIndices: true
+supportsVertexKeyIndex: true
+supportsEdgeKeyIndex: true by default or false if setUseLightweightEdges(false)
+supportsEdgeIteration: true by default or false if setUseLightweightEdges(false)
+supportsEdgeRetrieval: true by default or false if setUseLightweightEdges(false)
+supportsVertexIteration: true
+supportsTransactions: true
+supportsThreadedTransactions: false
+```
+
+h2. Notes on Caching and Concurrency
+
+By default, "OrientDB keeps a per-database instance cache":https://github.com/nuvolabase/orientdb/wiki/Caching of vertices and their properties. This can cause issues with concurrent access to the database where different threads will receive inconsistent results when querying the database after writes.
+
+A way around this is to disable OrientDB's L1 cache. This option can slow performance when doing certain graph operations. You can do this in code, before you create your graph with:
+
+```java
+OGlobalConfiguration.CACHE_LEVEL1_ENABLED.setValue(false);
+```
+
+A more fine grained option is to have Orient force reload vertices when appropriate using ODocument's reload() command:
+
+```java
+((ODocument)((OrientVertex)vertex).getRawElement()).reload();
+```
+
+h2. Custom Types
+
+OrientDB supports custom types for vertices and edges in an Object Oriented manner. Even if this isn't supported directly by Blueprints there are some tricks to use them. For more information look at "Custom types":https://github.com/nuvolabase/orientdb/wiki/Graph-Schema.
+
+h2. Other Graph types
+
+h3. Non Transactional Graph: OrientGraphNoTx
+
+OrientGraphNoTx is non transactional. This means that every non idempotent operations against the graph is atomic. Use this implementation to massive import graphs. Example:
+
+```java
+// OPEN THE GRAPH 'tinkerpop' ON LOCAL FILE SYSTEM
+Graph localGraph = new OrientGraphNoTx("local:/tmp/tinkerpop");
+```
+
+h2. Retro compatibility
+
+Since Blueprints 2.4.x the underlying structure used for graphs is changed to be much more lightweight. To open databases created with Blueprints 2.3.x or minor disable the new optimizations right after opened the graph:
+
+```java
+OrientGraph graph = new OrientGraph("local:/tmp/tinkerpop");
+graph.setUseLightweightEdges(false);
+graph.setUseClassForEdgeLabel(false);
+graph.setUseClassForVertexLabel(false);
+graph.setUseVertexFieldsForEdgeLabels(false);
+```

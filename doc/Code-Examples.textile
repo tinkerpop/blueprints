@@ -1,0 +1,139 @@
+This section will provide a collection of basic code examples that work with the Blueprints graph API. The in-memory [[TinkerGraph]] database will be used throughout the examples. Please feel free to alter the graph constructor to work with different graph databases.
+
+# "Create a Simple Graph":#create
+# "Iterate through the Elements of a Graph":#elements
+# "Iterate through the Edges of a Vertex":#edge
+
+<a name="create"></a>
+
+h2(#create). Create a Simple Graph
+
+Create a graph. Add two vertices. Set the @name@ property of each vertex. Create an @knows@ edge between the two vertices. Print the components of the graph.
+
+```java
+import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
+import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Direction;
+
+Graph graph = new TinkerGraph();
+Vertex a = graph.addVertex(null);
+Vertex b = graph.addVertex(null);
+a.setProperty("name", "marko");
+b.setProperty("name", "peter");
+Edge e = graph.addEdge(null, a, b, "knows");
+System.out.println(e.getVertex(Direction.OUT).getProperty("name") + "--" + e.getLabel() + "-->" + e.getVertex(Direction.IN).getProperty("name"));
+```
+
+The @System.out@ after the code executes is:
+
+bc. marko--knows-->peter
+
+<a name="elements"></a>
+
+h3. Use GraphFactory
+
+The Blueprints @GraphFactory@ provides a common way to instantiate different @Graph@ implementations, thereby abstracting away the specifics of @Graph@ instance construction.  The benefit of this approach is that the construction of a @Graph@ instance can become a configuration as opposed to explicitly specifying a @Graph@ implementation in the code itself.
+
+To demonstrate this concept, consider the explicit approach to instantiating a @TinkerGraph@:
+
+```java
+Graph g = new TinkerGraph()
+```
+
+Compare the above to the approach using @GraphFactory@:
+
+```java
+Graph g = GraphFactory.open("graph.properties")
+```
+
+where the @graph.properties@ file contains:
+
+```text
+blueprints.graph=com.tinkerpop.blueprints.impls.tg.TinkerGraph
+```
+
+Both approaches create an in-memory @TinkerGraph@, but the @GraphFactory@ approach is a bit more resilient to change, as converting from @TinkerGraph@ to a different @Graph@ instance, such as @Neo4jGraph@, is accomplished by simply changing the configuration file:
+
+```text
+blueprints.graph=com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph
+blueprints.neo4j.directory=/tmp/neo4j
+blueprints.neo4j.conf.neostore.nodestore.db.mapped_memory=285M               
+blueprints.neo4j.conf.neostore.relationshipstore.db.mapped_memory=285M
+```
+
+The structure of the properties file is dependent on the implementation itself with the only common and required key of @blueprints.graph@, which must be the full class name of the @Graph@ implementation.  
+
+It is also possible to construct a @Graph@ from @GraphFactory@ with a @Map@ or dynamically constructed @Configuration@ object as follows:
+
+```java
+Map<String,Object> conf = new HashMap<String,Object>();
+conf.put("blueprints.graph", "com.tinkerpop.blueprints.impls.tg.TinkerGraph");
+Graph g = GraphFactory.open(conf);
+
+Configuration c = new BaseConfiguration();
+c.setProperty("blueprints.graph", "com.tinkerpop.blueprints.impls.tg.TinkerGraph");
+Graph g = GraphFactory.open(c);
+```
+
+Not all @Graph@ implementations will support @GraphFactory@.  Those interested in learning which ones support it or those implementing the @Graph@ API can read more about this requirement "here":https://github.com/tinkerpop/blueprints/wiki/Implementations#graphfactory-support.
+
+h2(#elements). Iterate through the Elements of a Graph
+
+Load the TinkerPop play graph diagrammed in [[Property Graph Model]]. Iterate through all the vertices and print them to @System.out@. Iterate through all the edges and print them to @System.out@.
+
+```java
+public void testIteratingGraph() {
+  Graph graph = TinkerGraphFactory.createTinkerGraph();
+  System.out.println("Vertices of " + graph);
+  for (Vertex vertex : graph.getVertices()) {
+    System.out.println(vertex);
+  }
+  System.out.println("Edges of " + graph);
+  for (Edge edge : graph.getEdges()) {
+    System.out.println(edge);
+   }
+}
+```
+
+The @System.out@ after the code executes is:
+
+bc. Vertices of tinkergraph[vertices:6 edges:6]
+v[3]
+v[2]
+v[1]
+v[6]
+v[5]
+v[4]
+Edges of tinkergraph[vertices:6 edges:6]
+e[10][4-created->5]
+e[7][1-knows->2]
+e[9][1-created->3]
+e[8][1-knows->4]
+e[11][4-created->3]
+e[12][6-created->3]
+
+<a name="edge"></a>
+
+h2(#edge). Iterate through the Edges of a Vertex
+
+Load the TinkerPop play graph diagrammed in [[Property Graph Model]]. Get vertex @1@ from the graph by its @id@. Print some information about the vertex. Iterate through the outgoing edges of the vertex and print the edges.
+
+```java
+Graph graph = TinkerGraphFactory.createTinkerGraph();
+Vertex a = graph.getVertex("1");
+System.out.println("vertex " + a.getId() + " has name " + a.getProperty("name"));
+for(Edge e : a.getEdges(OUT)) {
+  System.out.println(e);
+}
+```
+
+The @System.out@ after the code executes is:
+
+bc. vertex 1 has name marko
+e[7][1-knows->2]
+e[9][1-created->3]
+e[8][1-knows->4]
+
+<a name="index"></a>

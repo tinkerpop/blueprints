@@ -5,36 +5,6 @@ h2. Blueprints 2.y.z
 
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
-h3. Version 2.5.0 (April 14, 2014)
-
-```xml
-<dependency>
-  <groupId>com.tinkerpop.blueprints</groupId>
-  <artifactId>blueprints-core</artifactId>
-  <version>2.5.0</version>
-</dependency>
-```
-
-* Added the SailLoader utility, for bulk-loading RDF into GraphSail and other Sail impls
-* Moved to Sesame 2.7, with its new transaction model.  Bumped SesameTools to 1.8 and Ripple to 1.1
-* Blueprints API now requires an @IllegalStateException@ to be thrown if @removeVertex@ on the @Graph@ interface is called on vertex that is already removed
-* Add overload to @GraphFactory.open@ that takes a @Map@ for configuration
-* The @elementClass@ argument on the @KeyIndexableGraph@ methods cannot be null and must throw @IllegalArgumentException@ if it is
-* Add @TransactionGraphHelper@ with various strategies for transaction execution: @FireAndForget@, @OneAndDone@, @DelayedRetry@ and @ExponentialBackoff@
-* Bumped Neo4j to 1.9.6
-* Fixed bug with @Map@ and @Float@ objects embedded in lists for GraphSON serialization in @EXTENDED@ mode
-* Fixed a bug in @KeyIndexableGraphHelper@ around transaction commits
-* Fixed bug in usage of @GraphFactory@ in relation to Neo4jHA
-* Fixed a bug around accessing an incident vertex of an edge that is not in a valid partition in @PartitionGraph@
-* Added support for Neo4j 2.0.1 release in @blueprints-neo4j2-graph@ package
-* Removed support for OrientDB as now that is maintained by Orient Technologies
-* GraphSON supports a "normalization" of output (like GraphML)
-* Ignore @null@ property values to while writing to GraphSON (while Blueprints does not allow @null@ property values to be set, that does not prevent graphs from returning them)
-* GraphML, GML, and GraphSON Writers don't close streams internally when outputting a graph (it leaves it to the original creator of the stream)
-* GML Readers/Writers properly handles quotes within a property value.
-
-==<hr/>==
-
 h3. Version 2.4.0 (August 4, 2013)
 
 ```xml

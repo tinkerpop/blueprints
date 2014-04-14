@@ -1,0 +1,83 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/tinkerpop-logo-small.jpg!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+TinkerGraph is a lightweight, "POJO":http://en.wikipedia.org/wiki/Plain_Old_Java_Object based, in-memory property graph that serves as the reference implementation for the [[property graph model]]. If you have a small graph that can be loaded and saved using the [[GraphML reader and writer library]], then TinkerGraph can be handy to use.  It is also great for use in writing unit tests in place of other implementations that require greater resources. TinkerGraph packaged with the core Blueprints distribution.
+
+```java
+// in-memory
+Graph graph = new TinkerGraph();
+
+// on graph.shutdown() the graph is serialized to disk with Java serialization
+Graph graph = new TinkerGraph("/tmp/tinkergraph"); 
+```
+
+There is a hardcoded representation of the graph diagrammed in [[Property Graph Model]]. This is useful as a small, play dataset to get acquainted with the Blueprints API.
+
+```java
+Graph graph = TinkerGraphFactory.createTinkerGraph();
+```
+
+h2. Configurable Storage
+
+By default, TinkerGraph uses standard Java serialization for persisting its contents to disk, but there are other more portable options as well using the Blueprints IO functions: [[GML|GML-Reader-and-Writer-Library]], [[GraphML|GraphML-Reader-and-Writer-Library]] and [[GraphSON|GraphSON-Reader-and-Writer-Library]].
+
+```java
+Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.GML); 
+Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.GRAPHML); 
+Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.GRAPHSON); 
+
+// the following is the same as the constructor that simply specifies the directory
+Graph graph = new TinkerGraph("/tmp/tinkergraph", TinkerGraph.FileType.JAVA); 
+```
+
+In the case of GML, GraphML and GraphSON, TinkerGraph will write two files to the specified directory.  One will contain the data for the graph which will be obviously prefixed with an appropriate @.gml@, @.xml@ or @.json@ extension depending on the option selected.  The other file will be a binary metadata file.
+
+Note that TinkerGraph can store any Java object within its properties, however the storage type chosen will limit the property types that can be persisted on @shutdown()@.  
+
+h2. GraphFactory Settings
+
+If using "GraphFactory":https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory to instantiate a @TinkerGraph@, the following properties will apply:
+
+|_. key |_. description |
+| @blueprints.graph@ | @com.tinkerpop.blueprints.impls.tg.TinkerGraph@ |
+| @blueprints.tg.directory@ | When absent the @GraphFactory@ assumes that an in-memory @TinkerGraph@ will be used, otherwise this property should be the directory in which to store the @TinkerGraph@. |
+| @blueprints.tg.file-type@ | If the @blueprints.tg.directory@ is set then this property specifies the storage type for the data and must match one of the available @TinkerGraph.FileType@ enum: @JAVA@, @GRAPHML@, @GRAPHSON@, or @GML@. If not specified, this setting defaults to @JAVA@. |
+
+h2. TinkerGraph Feature List
+
+```
+supportsDuplicateEdges: true
+supportsSelfLoops: true
+supportsSerializableObjectProperty: true
+supportsBooleanProperty: true
+supportsDoubleProperty: true
+supportsFloatProperty: true
+supportsIntegerProperty: true
+supportsPrimitiveArrayProperty: true
+supportsUniformListProperty: true
+supportsMixedListProperty: true
+supportsLongProperty: true
+supportsMapProperty: true
+supportsStringProperty: true
+ignoresSuppliedIds: false
+isPersistent: true
+isRDFModel: false
+isWrapper: false
+supportsIndices: true
+supportsVertexIndex: true
+supportsEdgeIndex: true
+supportsKeyIndices: true
+supportsVertexKeyIndex: true
+supportsEdgeKeyIndex: true
+supportsEdgeIteration: true
+supportsVertexIteration: true
+supportsTransactions: false
+supportsThreadedTransactions: false
+```

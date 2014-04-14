@@ -1,0 +1,35 @@
+[[https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-character-3.png|width=125px]]
+
+A vertex is incident to both incoming and outgoing edges. There are many things that distinguish an edge.
+
+* Edges have labels
+* Edges have properties
+* Edges have directions.
+
+With the method @Vertex.query()@ it is possible to query the graph from the perspective of a vertex. In this way, only those edges that meet the query criteria are selected from the underlying graph representation. 
+
+h2. Query and the Supernode Problem
+
+The benefit of @Vertex.query()@ is that it helps to reduce I/O and in-memory filtering, by allowing the developer to state exactly the edges/vertices needed by the application. More specifically, it helps to alleviate the "supernode":http://en.wikipedia.org/wiki/Supernode_(networking) problem. Many "real-world graphs":http://en.wikipedia.org/wiki/Scale-free_network have numerous vertices with very few edges and very few vertices with numerous edges. When traversing a graph without query selection, if a vertex is reached that has numerous edges, then all those edges are loaded into memory and processed. By using @Vertex.query()@, it is possible to provide fine-grained, selective control over which edges are ultimately retrieved. In this way, by being selective, a supernode is seen as less densely connected than when being unbiased about edge selection. 
+
+This notion generalizes to only grabbing those edges from the underlying graph representation that are actually going to be needed higher-up in the stack. 
+
+h2. Query Use Cases
+
+Here are examples of when @Vertex.query()@ and the resultant @Query@ object are useful in graph processing.
+
+* *Edge label selection*: If a person vertex has _liked_ many things, but the traverser is only interested in events the person has _attended_, then there is no need to touch the _liked_ edges. The @Query.labels()@ method serves this purpose.
+
+* *Edge property selection*: If a person has _liked_ many things, but the traverser is only interested in those _liked_ edges that have a property of "greater than 4 stars" (the things the person really likes), then @Query.has()@ can be used to only select the _liked_ edges that are reflective of the person really liking something.
+
+* *Edge property interval selection*: If a person has _liked_ many things, but the traverser is only interested in those things that the person has _liked_ in the last 2 weeks, then by using the @Query.interval()@ method, only those recently created _liked_ edges are retrieved.
+
+* *Edge direction selection*: If a person _follows_ many people and is followed by many people, but the traverser is only interested in who the person follows, then @Query.direction()@ can be used to select only outgoing _follows_ edges.
+
+Note that for label and direction filtering, the methods @Vertex.getEdges()@ and @Vertex.getVertices()@ can be used as these are typical behaviors. Finally, while not mentioned in this section, there are other methods in @Query@ that provide more ways of intelligently selecting data from the underlying graph representation.
+
+h2. Query and Graph Implementations
+
+For network/server-based graph systems (e.g. those graph databases backed by "Rexster":http://rexster.tinkerpop.com), the @Query@ feature is readily useable in that instead of pulling all the edge data over the wire to only be filtered by the client, the filtering can take place at the remote/server location.
+
+However, more specifically at the graph's location, @Query@ is useful in that if the underlying graph supports "vertex-centric indices," then every vertex will index its edges according to label, direction, properties, etc. In this way, instead of doing a linear scan/filter of all the edges emanating from a vertex, a lookup to only those edges that meet the @Query@ criteria can be enacted and thus, a linear scan can be avoided. For graphs at scale (billions of edges) where a vertex can have a million edges (i.e. a supernode), this can yield significant performance benefits during traversal.

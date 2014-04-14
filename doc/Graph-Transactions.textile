@@ -1,0 +1,93 @@
+A @Graph@ that implements the @TransactionalGraph@ or @ThreadedTransactionalGraph@ interfaces must natively support "transaction handling":http://en.wikipedia.org/wiki/Database_transaction. A transaction describes a coherent and complete unit of work comprised of multiple read and write operations to be executed against the database together or not at all. In addition, transactions are needed to handle conflicts and consistency issues that arise when multiple users interact with the @Graph@ concurrently. The exact "ACID":http://en.wikipedia.org/wiki/ACID and "isolation":http://en.wikipedia.org/wiki/Isolation_(database_systems) level guarantees extended by a @TransactionalGraph@ or @ThreadedTransactionalGraph@ depend on the specific implementation.
+
+h2. TransactionalGraph and Starting and Stopping Transactions
+
+A @TransactionalGraph@ has just two methods for terminating the transaction:
+
+```java
+public void commit();
+public void rollback();
+```
+
+Transactions are automatically started with the first operation on the graph, that is, any read or write operation. Hence, a transaction does NOT need to be started. Transactions need to be manually closed to mark the end of a transactional context and to inform the graph database whether the transaction was successful or not. Calling @TransactionalGraph.commit()@ persists the transactional state to the database whereas @TransactionalGraph.rollback()@ fails the transaction and discards any mutations.
+
+Transactions are bound to the current thread, which means that any graph operation executed by the thread occurs in the context of that transaction and that there may only be one thread executing in a single transaction. For thread independent transactions that allow concurrent thread access, use @ThreadedTransactionalGraph@.
+
+When a transaction is started, all the subsequent read and write operations occur within this transaction context. When the transaction is successfully committed, those mutations operations are persisted and visible to other contexts interacting with the graph and all locks are released. If a transaction is rolled back, then the mutation operations in that transaction are discarded as if they never happened.
+
+@TransactionalGraph@ makes no assumptions about how transactions are implemented by a graph database. Hence, a transaction may fail at any point if a conflict arises that could not be resolved.
+
+Note, that a @TransactionalGraph.shutdown()@ will automatically successfully commit any open transaction. Also note, that keeping transactions open for a long time may result in @OutOfMemoryException@ if too many mutations have occurred and possible dead-locks if locks are held for too long in multi-user environments. 
+
+Note, that element references created in a transactional context may not be accessed outside the transactional context.  Doing so may cause an exception. A transaction marks a complete unit of work and after it is stopped, its state may be discarded. Moreover, concurrently running transaction can render such references out-of-sync. Any references created during the transaction may therefore no longer be alive. Hence, the following code snippet may cause an exception:
+
+```java
+Vertex v = graph.addVertex(null);
+//More operations inside the transaction
+graph.commit();
+//Other code
+v.setProperty("name","marko");
+```
+
+In such cases, the transactional context should be extended until all operations have been completed. In other words, the @commit()@ call should be moved after the @v.setProperty("name","marko");@ write operation.
+In cases where the element reference needs to be accessed outside its original transactional context, it should be re-instantiated based on the element id. For example:
+
+```java
+Vertex v = graph.addVertex(null);
+//More operations inside the transaction
+graph.commit();
+//Other code
+v = graph.getVertex(v.getId());
+v.setProperty("name","marko");
+```
+
+h2. ThreadedTransactionalGraph and Multi-Threads for One Transaction
+
+@ThreadedTransactionalGraph@ provides more fine grained control over the transactional context.  While @TransactionalGraph@ binds each transaction to the executing thread, @ThreadedTransactionalGraph.newTransaction()@ returns a @TransactionalGraph@ that represents its own transactional context independent of the executing thread.
+Hence, one can have multiple threads operating against a single transaction represented by the returned TransactionalGraph object. This is useful for parallelizing graph algorithms.
+
+A @ThreadedTransactionalGraph@ extends @TransactionalGraph@ with a single method.
+
+```java
+public TransactionalGraph newTransaction()
+```
+
+The returned transaction represented by a @TransactionalGraph@ object needs to be explicitly closed by calling @TransactionalGraph.commit()@. Calling @TransactionalGraph.shutdown()@ will successfully commit the transaction without closing the underlying graph database.
+
+h2. Transaction Retry Helper
+
+There are times when transactions fail and there are some @Graph@ implementations, such as "Titan":http://titan.thinkaurelius.com and "OrientDB":https://github.com/tinkerpop/blueprints/wiki/OrientDB-Implementation, that benefit from retrying the transaction with the expectation that the same transaction might succeed on a future attempt (e.g. the transaction fails due to a locking exception, but on retry the lock is no longer present and the transaction succeeds).  To help with this situation, the @TransactionRetryHelper@ provides a way to execute the work of a transaction within the context of a retry strategy.  
+
+The work performed in the transaction is defined by way of the @TransactionWork@ interface.  It has a single method which takes the @TransactionalGraph@ to do the work on:
+
+```java
+public T execute(TransactionalGraph graph) throws Exception;
+```
+
+A retry strategy is implemented by way of the @TransactionRetryStrategy@ interface.  This interface provides a single method, which takes a @TransactionalGraph@ and a @TransactionWork@ implementation to execute within the context of the strategy:
+
+```java
+public T execute(TransactionalGraph graph, TransactionWork<T> work);
+```
+
+The strategy implementation should handle error handling along with commit and rollback in the context of how the retry occurs.
+
+Blueprints supplies several built-in @TransactionRetryStrategy@ implementations:
+
+* @OneAndDone@ - Executes the work without retry, committing if possible and rolling back on failure.  On failure, an exception is reported.
+* @FireAndForget@ - Executes the work without retry, committing if possible and rolling back on failure.  On failure, no exception is reported.
+* @DelayedRetry@ - Executes the work with a specified number of retries and specified delay in milliseconds between each retry.
+* @ExponentialBackoff@ - Executes the work with a specified number of retries with exponentially increasing number of milliseconds between each retry.
+
+The following code example demonstrates how to add two vertices and an edge between them within a transaction with an exponential backoff strategy that tries the transaction sixteen times with increasing delay between each retry.
+
+```java
+new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
+    @Override
+    public Vertex execute(final TransactionalGraph graph) throws Exception {
+        final Vertex v1 = graph.addVertex(null);
+        final Vertex v2 = graph.addVertex(null);
+        g.addEdge(v1, v2, "friend")
+    }
+}).build().exponentialBackoff(16);
+```

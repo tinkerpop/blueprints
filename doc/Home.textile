@@ -1,0 +1,106 @@
+[[https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png|height=152px]]
+
+[[https://github.com/tinkerpop/rexster/raw/master/doc/images/rexster-system-arch.png|width=350px|height=375px|align=right|float]]
+
+Blueprints is a collection of interfaces, implementations, ouplementations, and test suites for the property graph data model. Blueprints is analogous to the "JDBC":http://en.wikipedia.org/wiki/Java_Database_Connectivity, but for "graph databases":http://en.wikipedia.org/wiki/Graph_database. As such, it provides a common set of interfaces to allow developers to plug-and-play their graph database backend. Moreover, software written atop Blueprints works over all Blueprints-enabled graph databases. Within the TinkerPop software stack, Blueprints serves as the foundational technology for:
+
+* "Pipes":http://pipes.tinkerpop.com: A lazy, data flow framework
+* "Gremlin":http://gremlin.tinkerpop.com: A graph traversal language
+* "Frames":http://frames.tinkerpop.com: An object-to-graph mapper
+* "Furnace":http://furnace.tinkerpop.com: A graph algorithms package
+* "Rexster":http://rexster.tinkerpop.com: A graph server
+
+The documentation herein will provide information regarding the use of Blueprints.[1] Please join the Gremlin users group at "http://groups.google.com/group/gremlin-users":http://groups.google.com/group/gremlin-users for all "TinkerPop":http://tinkerpop.com related discussions. 
+
+Blueprints JavaDoc: "2.5.0":http://tinkerpop.com/docs/javadocs/blueprints/2.5.0/ - "2.4.0":http://tinkerpop.com/docs/javadocs/blueprints/2.4.0/ - "2.3.0":http://tinkerpop.com/docs/javadocs/blueprints/2.3.0/ - "2.2.0":http://tinkerpop.com/docs/javadocs/blueprints/2.2.0/ - "2.1.0":http://tinkerpop.com/docs/javadocs/blueprints/2.1.0/ - "2.0.0":http://tinkerpop.com/docs/javadocs/blueprints/2.0.0/ - "1.2":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/1.2/api/ - "1.1":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/1.1/api/ - "1.0":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/1.0/api/ - "0.9":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.9/api/ -  "0.8":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.8/api/ - "0.7":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.7/api/ - "0.6":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/blueprints/0.6/api/ - "0.5":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.5/api/ - "0.4":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.4/api/ - "0.3":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.3/api/ - "0.2":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.2/api/ - "0.1":http://tinkerpop.com/maven2/com/tinkerpop/blueprints/0.1/api/
+Blueprints WikiDoc: "2.4.0":http://tinkerpop.com/docs/wikidocs/blueprints/2.4.0/Home.html - "2.4.0":http://tinkerpop.com/docs/wikidocs/blueprints/2.4.0/Home.html - "2.3.0":http://tinkerpop.com/docs/wikidocs/blueprints/2.3.0/Home.html - "2.2.0":http://tinkerpop.com/docs/wikidocs/blueprints/2.2.0/Home.html - "2.1.0":http://tinkerpop.com/docs/wikidocs/blueprints/2.1.0/Home.html - "2.0.0":http://tinkerpop.com/docs/wikidocs/blueprints/2.0.0/Home.html
+
+==<hr/>==
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>2.5.0</version>
+</dependency>
+```
+
+Non-Maven users can get the raw release jars from Apache's "Central Repository":http://maven.org.  Snapshots can be obtained from "Sonatype":https://oss.sonatype.org/content/repositories/snapshots/  (see "Maven Repositories":https://github.com/tinkerpop/homepage/wiki/Maven-Repositories for more information).
+
+```java
+Graph graph = new Neo4jGraph("/tmp/my_graph");
+Vertex a = graph.addVertex(null);
+Vertex b = graph.addVertex(null);
+a.setProperty("name","marko");
+b.setProperty("name","peter");
+Edge e = graph.addEdge(null, a, b, "knows");
+e.setProperty("since", 2006);
+graph.shutdown();
+```
+*[[The Major Differences Between Blueprints 1.x and 2.x]]*
+
+==<hr/>==
+
+* Introduction
+  ** [[The Benefits of Blueprints]]
+  ** [[Property Graph Model]]
+  ** [[Graph Morphisms]]
+  ** [[Property Graph Model Test Suite]] (*implementation help*)
+  ** [[Code Examples]]
+* Advanced Graph Handling
+  ** [[Graph Transactions]]
+  ** [[Graph Indices]]
+  ** [[Vertex Query]]
+* [[Implementations]] (*implementation help*)
+  ** [[TinkerGraph]] (@TinkerGraph@)
+  ** [[Neo4j Implementation]] (@Neo4jGraph@)
+    **** [[Neo4jHA Implementation]] (@Neo4jHaGraph@)
+    **** [[Neo4jBatch Implementation]] (@Neo4jBatchGraph@)
+  ** [[Sail Implementation]] (@SailGraph@)
+  ** [[Sparksee Implementation]] (@SparkseeGraph@)
+  ** [[Rexster Implementation]] (@RexsterGraph@)
+  ** [[Accumulo Implementation|https://github.com/mikelieberman/blueprints-accumulo-graph]] (@AccumuloGraph@ - *3rd party* - implements Blueprints 2.3.0)
+  ** [[ArangoDB Implementation|https://github.com/triAGENS/blueprints-arangodb-graph]] (@ArangoDBGraph@ - *3rd party* - implements Blueprints 2.3.0)
+  ** [[Bitsy|https://bitbucket.org/lambdazen/bitsy/wiki/Home]] (@BitsyGraph@ - *3rd party* - implements Blueprints 2.4.0)
+  ** [[FluxGraph - Datomic Implementation|https://github.com/datablend/fluxgraph]] (@FluxGraph@ - *3rd party* - implements Blueprints 2.1.0)
+  ** [[FoundationDB Implementation|https://github.com/wwilson/blueprints-foundationdb-graph]] (@FoundationDBGraph@ - *3rd party* - implements Blueprints 2.4.0)
+  ** [[InfiniteGraph Implementation]]  (@IGGraph@ - *3rd party* - implements Blueprints 2.1.0)
+  ** "JPA Implementation":https://github.com/sgougi/blueprints-jpa-graph/ (@JpaGraph@ - *3rd party* - implements Blueprints 2.5.0)
+  ** "MongoDB Implementation":https://github.com/datablend/blueprints-mongodb-graph (@MongoDBGraph@  - *3rd party* - implements Blueprints 2.3.0)
+  ** [[Oracle NoSQL Implementation|https://github.com/dwmclary/blueprints-oracle-nosqldb]] (@KVGraph@ - *3rd party* - implements Blueprints 2.1.0)
+  ** [[OrientDB Implementation|https://github.com/orientechnologies/orientdb/wiki/Graph-Database-Tinkerpop]] (@OrientGraph@ - *3rd party* - implements Blueprints 2.4.0)
+  ** "SQL/JDBC Implementation":https://github.com/mikesname/blueprints-sql-graph - *3rd party* - implements Blueprints 2.4.0)
+  ** "Titan Implementation":http://thinkaurelius.github.com/titan/ (@TitanGraph@  - *3rd party* - implements Blueprints 2.3.0)
+  ** [[Desired Implementations]] (*help contribute*)
+* [[Ouplementations]]
+  ** [[JUNG Ouplementation]] (@GraphJung@)
+  ** [[Sail Ouplementation]] (@GraphSail@)
+    *** [[PropertyGraphSail Ouplementation]] (@PropertyGraphSail@)
+* Utilities
+  ** Import/Export
+    *** [[GML Reader and Writer Library]]
+    *** [[GraphML Reader and Writer Library]]
+    *** [[GraphSON Reader and Writer Library]]
+  ** Wrappers
+    *** [[Batch Implementation]] (@BatchGraph@)
+    *** [[Event Implementation]] (@EventGraph@)
+    *** [[Id Implementation]] (@IdGraph@)
+    *** [[Partition Implementation]] (@PartitionGraph@)
+    *** [[ReadOnly Implementation]] (@ReadOnlyGraph@)
+* Related Third-Party Projects
+  ** [[clj-blueprints2|https://github.com/olabini/clj-blueprints]] (clojure)
+  ** [[blueprints-scala|https://github.com/anvie/blueprints-scala]] (scala)
+  ** [[Archimedes|https://github.com/zmaril/archimedes]] (clojure)
+  ** [[Blueprints Griffon Plugin|http://artifacts.griffon-framework.org/plugin/blueprints]]
+  ** [[Gaedo Java Persistence Layer|https://github.com/Riduidel/gaedo]]
+  ** [[Gephi Blueprints Plugin|https://github.com/datablend/gephi-blueprints-plugin]]
+  ** [[Mogawi|https://github.com/gulthor/mogwai]] (javascript)
+* Conclusion
+  ** [[Acknowledgments]]
+  ** [[Release Notes]]
+
+==<hr/>==
+
+<a name="fn1"></a>
+
+fn1. Blueprints documentation is up to date with the current Blueprints "codebase":http://github.com/tinkerpop/blueprints/tree/master, not with the latest Blueprints release.

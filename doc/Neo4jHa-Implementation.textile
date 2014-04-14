@@ -1,0 +1,26 @@
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4j-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Map<String, String> configuration = new HashMap<String, String>();
+configuration.put("ha.machine_id", "1");
+configuration.put("ha.server", "localhost:6001");
+configuration.put("ha.initial_hosts", "localhost:2181,localhost:2182,localhost:2183");
+Graph graph = new Neo4jHaGraph("/tmp/neo4j", configuration);
+```
+
+@Neo4jHaGraph@ provides support for the Neo4j "High Availability Cluster (HA)":http://docs.neo4j.org/chunked/stable/ha.html which provides a fault-tolerant database structure and horizontal scaling capability.  Instantiating the @Neo4jHaGraph@ class requires several configuration elements as shown in the sample above. Setting up the cluster is described "here":http://docs.neo4j.org/chunked/stable/ha.html.
+
+h2. GraphFactory Settings
+
+If using "GraphFactory":https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory to instantiate a @Neo4jHaGraph@, the following properties will apply:
+
+|_. key |_. description |
+| @blueprints.graph@ | @com.tinkerpop.blueprints.impls.neo4j.Neo4jHaGraph@ |
+| @blueprints.neo4jha.directory@ | The directory of the @Neo4jHaGraph@ instance. |
+| @blueprints.neo4jha.conf.*@ | The prefix to use for any Neo4j HA specific "settings":http://docs.neo4j.org/chunked/stable/configuration-caches.html (e.g. @blueprints.neo4jha.config.machine_id@). |

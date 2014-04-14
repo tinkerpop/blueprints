@@ -1,0 +1,121 @@
+[[http://www.sparsity-technologies.com/images/sparsity_logo_web.png]]
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-sparksee-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new SparkseeGraph("/tmp/graph.gdb");
+```
+
+[[Sparksee|http://www.sparsity-technologies.com/.#sparksee]] is a graph database developed by [[Sparsity Technologies|http://www.sparsity-technologies.com/]] For a fine summary of the Sparksee graph database, please read the [[documentation|http://www.sparsity-technologies.com/.#documentation]] section. The software can be downloaded from [[here|http://www.sparsity-technologies.com/.#download]] and be used with the default evaluation license (which restricts the amount of information Sparksee can deal with).
+
+Note that while Sparksee does implement @TransactionalGraph@ it does not conform to its semantics.  Transactions in @SparkseeGraph@ translate to the Sparksee concept of a session and aid with the release of resources used by the graph when the session is complete.
+
+h2. Vertex label
+
+Analogously of what happens with the edges, Sparksee vertices have a label too. Thus, when adding a vertex to the database, its label can be set as follows:
+
+```java
+((SparkseGraph)graph).label.set("people");
+Vertex v = graph.addVertex(null)
+assertTrue(v.getProperty(StringFactory.LABEL).equals("people"));
+```
+
+The @SparkseeGraph#label@ property is also relevant for the following methods: 
+* @SparkseeGraph#addVertex@
+* @SparkseeGraph#createKeyIndex(String, Class<T>)@
+* @SparkseeGraph#getEdges(String, Object)@
+* @SparkseeGraph#getVertices(String, Object)@
+
+h2. Memory Configuration
+
+Sparksee memory is not managed by the JVM heap, so an specific memory configuration must be set for Sparksee in order to set the maximum amount of memory to be used by a Sparksee application.
+
+Specifically, users should set @sparksee.io.cache.maxsize@ as is explained in the [[Configuration chapter of Sparksee User Manual|http://www.sparsity-technologies.com/UserManual/Configuration.html#cache]].
+
+h2. Managment of @Iterable@ collections
+
+Since Sparksee resources are not managed by the JVM heap, Sparksee-based blueprints applications should take into account the management of @Iterable@ collections and explicitly close them in order to free native resources.
+
+For example, if we execute a long traversal like this:
+
+```java
+for (final Vertex vertex : graph.getVertices()) {
+    for (final Edge edge : vertex.getOutEdges()) {
+        final Vertex vertex2 = edge.getInVertex();
+        for (final Edge edge2 : vertex2.getOutEdges()) {
+            ...
+        }
+    }
+}
+```
+
+all retrieved collections won't be closed until the graph database is stopped. Of course, keeping active this amount of resources will have a negative impact in the performance. 
+
+To avoid this, all retrieved collections from methods in the Sparksee implementation implement @CloseableIterable@. Thus, we could implement the previous traversal as follows:
+
+```java
+CloseableIterable<Vertex> vv = (CloseableIterable<Vertex>)graph.getVertices();
+for (final Vertex vertex : vv) {
+    CloseableIterable<Edge> ee = (CloseableIterable<Edge>)vertex.getOutEdges();
+    for (final Edge edge : ee) {
+        final Vertex vertex2 = edge.getInVertex();
+        CloseableIterable<Edge> ee2 = (CloseableIterable<Edge>)vertex2.getOutEdges();
+        for (final Edge edge2 : ee2) {
+            ...
+        }
+        ee2.close();
+    }
+    ee.close();
+}
+vv.close();
+```
+
+h2. GraphFactory Settings
+
+If using "GraphFactory":https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory to instantiate a @SparkseeGraph@, the following properties will apply:
+
+|_. key |_. description |
+| @blueprints.graph@ | @com.tinkerpop.blueprints.impls.sparksee.SparkseeGraph@ |
+| @blueprints.sparksee.directory@ | The directory of the @SparkseeGraph@ instance. |
+| @blueprints.sparksee.config@ | Location of the Sparksee configuration file. |
+
+
+h2. SparkseeGraph Feature List
+
+```
+supportsDuplicateEdges = true;
+supportsSelfLoops = true;
+isPersistent = true;
+isRDFModel = false;
+supportsVertexIteration = true;
+supportsEdgeIteration = true;
+supportsVertexIndex = false;
+supportsEdgeIndex = false;
+ignoresSuppliedIds = true;
+supportsTransactions = false;
+supportsIndices = false;
+
+supportsSerializableObjectProperty = false;
+supportsBooleanProperty = true;
+supportsDoubleProperty = true;
+supportsFloatProperty = true;
+supportsIntegerProperty = true;
+supportsPrimitiveArrayProperty = false;
+supportsUniformListProperty = false;
+supportsMixedListProperty = false;
+supportsLongProperty = true;
+supportsMapProperty = false;
+supportsStringProperty = true;
+
+isWrapper = false;
+supportsKeyIndices = true;
+supportsVertexKeyIndex = true;
+supportsEdgeKeyIndex = true;
+supportsThreadedTransactions = false;
+```

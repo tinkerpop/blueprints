@@ -1,0 +1,238 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/openrdf-logo.png!
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-graph-sail</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+
+"Sail":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/Sail.html is an "RDF":http://www.w3.org/RDF/ triple/quad store interface developed by "OpenRDF":http://openrdf.org. Any database the implements the Sail interfaces properly is a valid RDF triple/quad store. A graph database is a great way to build a triple/quad store because its possible to mix indexing and graph traversals to solve the RDF "pattern match" problem. To go from @Graph@ to @Sail@, simply use @GraphSail@. @GraphSail@ requires a @KeyIndexableGraph@ (e.g. @TinkerGraph@, @Neo4jGraph@, @OrientGraph@). @DexGraph@ is not supported at this time (see [[#279|https://github.com/tinkerpop/blueprints/issues/279]]). The examples below use [[TinkerGraph]] and expose it as a @GraphSail@ and thus, a @Sail@. While some basic examples are provided, please refer to the "OpenRDF":http://openrdf.org Sail documentation for a complete review of the framework.
+
+*NOTE ON TRANSACTION SAFETY:* as of Blueprints 2.0, there are issues in the @Neo4jGraph@ and @OrientGraph@ implementations which affect the transaction safety of GraphSail (see "here":https://github.com/tinkerpop/blueprints/issues/236, and "here":https://github.com/tinkerpop/blueprints/issues/268), among other applications.  There is a workaround for the Neo4jGraph issue (see below), while the OrientGraph issue has yet to be resolved.  In the meantime, please "contact us":mailto:josh@fortytwo.net if you encounter any problems, and we will do our best to come up with a targeted solution.
+
+To ensure the transaction safety of Neo4jGraph, use the @setCheckElementsInTransaction@ method, e.g.
+
+```java
+Neo4jGraph graph = new Neo4jGraph("/path/to/db");
+graph.setCheckElementsInTransaction(true);
+Sail sail = new GraphSail(graph);
+sail.initialize();
+```
+
+h2. Basic Statement Handling
+
+A statement in RDF is a triple or quad. The components of a statement are called: subject, predicate, object, and graph/context. The subject can be a URI or blank node. The predicate can only be a URI. The object can be a URI, blank node, or literal. Finally, the graph (or context) can be a URI or blank node.
+
+```java
+TinkerGraph graph = new TinkerGraph();
+Sail sail = new GraphSail(graph);
+sail.initialize();
+SailConnection sc = sail.getConnection();
+ValueFactory vf = sail.getValueFactory();
+sc.addStatement(vf.createURI("http://tinkerpop.com#1"), vf.createURI("http://tinkerpop.com#knows"), vf.createURI("http://tinkerpop.com#3"), vf.createURI("http://tinkerpop.com"));
+sc.addStatement(vf.createURI("http://tinkerpop.com#1"), vf.createURI("http://tinkerpop.com#name"), vf.createLiteral("marko"), vf.createURI("http://tinkerpop.com"));
+sc.addStatement(vf.createURI("http://tinkerpop.com#3"), vf.createURI("http://tinkerpop.com#name"), vf.createLiteral("josh"), vf.createURI("http://tinkerpop.com"));
+
+System.out.println("get statements: ?s ?p ?o ?g");
+CloseableIteration<? extends Statement, SailException> results = sc.getStatements(null, null, null, false);
+while(results.hasNext()) {
+    System.out.println(results.next());
+}
+
+System.out.println("\nget statements: http://tinkerpop.com#3 ?p ?o ?g");
+results = sc.getStatements(vf.createURI("http://tinkerpop.com#3"), null, null, false);
+while(results.hasNext()) {
+    System.out.println(results.next());
+}
+
+sc.close();
+graph.shutdown();
+sail.shutDown();
+```
+
+```text
+get statements: ?s ?p ?o ?g
+(http://tinkerpop.com#1, http://tinkerpop.com#knows, http://tinkerpop.com#3) [http://tinkerpop.com]
+(http://tinkerpop.com#3, http://tinkerpop.com#name, "josh") [http://tinkerpop.com]
+(http://tinkerpop.com#1, http://tinkerpop.com#name, "marko") [http://tinkerpop.com]
+
+get statements: http://tinkerpop.com#3 ?p ?o ?g
+(http://tinkerpop.com#3, http://tinkerpop.com#name, "josh") [http://tinkerpop.com]
+```
+
+h2. Using SPARQL
+
+"SPARQL":http://www.w3.org/TR/rdf-sparql-query/ is the standard query language for RDF stores. OpenRDF provides a SPARQL query engine that can be used over any @Sail@. An example is provided below. Assume that the same statements from the previous example exist in the @GraphSail@ below.
+
+```java
+SPARQLParser parser = new SPARQLParser();
+CloseableIteration<? extends BindingSet, QueryEvaluationException> sparqlResults;
+String queryString = "SELECT ?x ?y WHERE { ?x <http://tinkerpop.com#knows> ?y }";
+ParsedQuery query = parser.parseQuery(queryString, "http://tinkerPop.com");
+
+System.out.println("\nSPARQL: " + queryString);
+sparqlResults = sc.evaluate(query.getTupleExpr(), query.getDataset(), new EmptyBindingSet(), false);
+while (sparqlResults.hasNext()) {
+    System.out.println(sparqlResults.next());
+}
+```
+
+```text
+SPARQL: SELECT ?x ?y WHERE { ?x <http://tinkerpop.com#knows> ?y }
+[y=http://tinkerpop.com#3;x=http://tinkerpop.com#1]
+```
+
+h2. Moving Between Sail and Graph
+
+Its possible to get the @Graph@ that is being modeled as a @Sail@ and work from the Blueprints API perspective. In this way, its possible to leverage the tools provided for both @Sail@ and Blueprints @Graph@.
+
+```java
+Graph graph = ((GraphSail) sail).getBaseGraph();
+System.out.println();
+for (Vertex v : graph.getVertices()) {
+    System.out.println("------");
+    System.out.println(v);
+    for (String key : v.getPropertyKeys()) {
+        System.out.println(key + "=" + v.getProperty(key));
+    }
+}
+for (Edge e : graph.getEdges()) {
+    System.out.println("------");
+    System.out.println(e);
+    for (String key : e.getPropertyKeys()) {
+        System.out.println(key + "=" + e.getProperty(key));
+    }
+}
+```
+
+```text
+------
+v[2]
+value=http://tinkerpop.com#3
+kind=uri
+------
+v[1]
+value=http://tinkerpop.com#1
+kind=uri
+------
+v[0]
+value=urn:com.tinkerpop.blueprints.pgm.oupls.sail:namespaces
+------
+v[6]
+value=josh
+kind=literal
+------
+v[4]
+value=marko
+kind=literal
+------
+e[3][1-http://tinkerpop.com#knows->2]
+cp=U http://tinkerpop.com U http://tinkerpop.com#knows
+c=U http://tinkerpop.com
+p=U http://tinkerpop.com#knows
+------
+e[7][2-http://tinkerpop.com#name->6]
+cp=U http://tinkerpop.com U http://tinkerpop.com#name
+c=U http://tinkerpop.com
+p=U http://tinkerpop.com#name
+------
+e[5][1-http://tinkerpop.com#name->4]
+cp=U http://tinkerpop.com U http://tinkerpop.com#name
+c=U http://tinkerpop.com
+p=U http://tinkerpop.com#name
+```
+
+h2. Inferencing support
+
+Blueprints Sail implements "NotifyingSail":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/NotifyingSail.html, produces "InferencerConnections":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/inferencer/InferencerConnection.html, and does all of the right things under the hood to support Sesame-based reasoning/inferencing tools such as "ForwardChainingRDFSInferencer":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/inferencer/fc/ForwardChainingRDFSInferencer.html, with no extra plumbing required.  For example:
+
+```java
+   Sail reasoner = new ForwardChainingRDFSInferencer(new GraphSail(new TinkerGraph()));
+   reasoner.initialize();
+```
+
+How it works: a reasoner such as @ForwardChainingRDFSInferencer@ is expected to listen for RDF statements added to or removed from the base @Sail@ (here: an instance of @GraphSail@) and to manage a collection of "inferred" statements accordingly.  The inferred statements are stored along with the explicitly asserted RDF statements in the base @Sail@.  In Blueprints Sail, these statements are marked with a special property, @inferred@, which when present has the boolean value @true@, so you can see which edges "you" have added, and which edges the reasoner has added, when traversing the underlying Property Graph.  The following is a more detailed example:
+
+```java
+Resource beijing = new URIImpl("http://example.org/things/Beijing");
+Resource city = new URIImpl("http://example.org/terms/city");
+Resource place = new URIImpl("http://example.org/terms/place");
+
+Graph graph = new TinkerGraph();
+Sail reasoner = new ForwardChainingRDFSInferencer(new GraphSail(graph));
+reasoner.initialize();
+
+try {
+    SailConnection c = reasoner.getConnection();
+    try {
+        c.addStatement(city, RDFS.SUBCLASSOF, place);
+        c.addStatement(beijing, RDF.TYPE, city);
+        c.commit();
+
+        CloseableIteration<? extends Statement, SailException> i
+                = c.getStatements(beijing, null, null, true);
+        try {
+            while (i.hasNext()) {
+                System.out.println("statement " + i.next());
+            }
+        } finally {
+            i.close();
+        }
+    } finally {
+        c.close();
+    }
+} finally {
+    reasoner.shutDown();
+}
+
+graph.shutdown();
+```
+
+Output of the example:
+```
+statement (http://example.org/things/Beijing, http://www.w3.org/1999/02/22-rdf-syntax-ns#type, http://www.w3.org/2000/01/rdf-schema#Resource)
+statement (http://example.org/things/Beijing, http://www.w3.org/1999/02/22-rdf-syntax-ns#type, http://example.org/terms/place)
+statement (http://example.org/things/Beijing, http://www.w3.org/1999/02/22-rdf-syntax-ns#type, http://example.org/terms/city)
+```
+
+h2. Handling of duplicate statements
+
+Triple store implementations differ in their enforcement of set semantics with respect to the RDF statements in a store.  If you add two identical statements to the store, then you iterate or query over matching statements, should you find two matches, or only one?  Blueprints Sail allows you to have it either way, but defaults to non-strict set semantics.  To treat the triple store as a set instead of bag of statements, override the default behavior by using @enforceUniqueStatements@, e.g.
+
+```java
+gSail.enforceUniqueStatements(true);
+```
+
+There is a significant performance advantage to using bag semantics, so it is recommended in applications which load large amounts of data, and in which duplicate statements are not likely to be a problem.
+
+h2. Optimizing triple indices
+
+Blueprints Sail uses a hybrid technique for storing and retrieving the RDF statements you pass into it.  On the one hand, it makes use of *index-based matching*, in which string-valued metadata is attached to individual statements, stored in global indices, and looked up in indices for relatively fast O(log(n)) retrieval of statements.  Blueprints Sail will index statements on any combination of subject, predicate, object, and graph context that you specify, e.g. "sp" or "poc".  For example, if you have an application in which you need to quickly answer "?s p o c" queries (e.g. find all subjects with @rdf:type@ @foaf:Person@ in graph @ex:doc1@), you might want to index on the "poc" pattern.  That will allow you begin iterating over all matching statements in a single step.  The boost in read performance comes at the cost of additional property storage and indexing overhead.  The alternative is to allow Blueprints Sail to use *graph-based matching* operations, which combine graph traversal with filtering.  For "?s p o c", a graph-based matcher retrieves matching "o" in a vertex index, then looks for adjacent edges with @rdf:type@ as their label and @ex:doc@ as their context property.  This may be comparable to or vastly slower on reads than index-based matching, depending on your application, but it will always take less space and less time on writes.
+
+When you instantiate Blueprints Sail, you have the option of specifying which triple patterns you would like to handle with index-based matchers.  The basic constructor defaults to "p", "c", and "pc":
+
+```java
+// this is equivalent to: GraphSail(graph, "p,c,pc");
+Sail sail = new GraphSail(graph);
+```
+
+To customize the set of patterns, provide them as a comma-separated list:
+
+```java
+Sail sail = new GraphSail(graph, "p,c,pc,poc");
+```
+
+The above creates a Sail in which the three default triple patterns, as well as the "poc" pattern, are handled by index-based matchers.  All others are handled by graph-based matchers.
+
+h3. Using Blueprints Sail without edge indices
+
+If you don't want to use index-based matching at all (for example, if the underlying graph implementation does not support edge indices), just supply an empty list to the constructor:
+
+```java
+Sail sail = new GraphSail(graph, "");
+```
+
+If you do this, be sure to avoid the query patterns "?s p ?o", "?s ?p ?o c", and "?s p ?o c" if your graph is at all large; these will trigger full scans through the edge list of the graph.

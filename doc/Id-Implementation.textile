@@ -1,0 +1,65 @@
+[[http://upload.wikimedia.org/wikipedia/commons/2/2c/Fingerprintforcriminologystubs2.png|width=100px]]
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+@IdGraph@ is a graph wrapper which affords complete control over element ids.  Some @Graph@ implementations, such as @TinkerGraph@, allow you to specify your own ids when you create elements, e.g.
+
+```java
+Graph g = new TinkerGraph();
+Vertex v = g.addVertex("42");
+System.out.println(v.getId()); // prints "42"
+```
+
+Other graph implementations, however, choose element ids for you, e.g.
+
+```java
+Graph g = new Neo4jGraph("/tmp/neo");
+Vertex v = g.addVertex("42");
+System.out.println(v.getId()); // prints "0"
+```
+
+This means that ids are generally not conserved when you move data between graph instances and implementations, to XML and back again, etc.  So for applications which need it, there is @IdGraph@.  Using vertex and edge indices under the hood, @IdGraph@ enables custom ids regardless of whether the underlying Graph implementation allows them.  The only requirement is that the underlying graph is an instance of @KeyIndexableGraph@.  E.g.
+
+```java
+KeyIndexableGraph base = new Neo4jGraph("/tmp/neo");
+Graph g = new IdGraph(base);
+Vertex v = g.addVertex("42");
+System.out.println(v.getId()); // prints "42"
+```
+
+When a non-null id is passed to @IdGraph.addVertex@ or @IdGraph.addEdge@, that id will be used to uniquely identify the element.  When @null@ is passed in, @IdGraph@ will generate an id for you.
+
+h3. Supplying a factory for the generated ids
+
+By default, the generated id is a pseudo-random UUID string.  However, you can supply your own vertex and/or edge id factory after instantiating @IdGraph@:
+
+```java
+IdGraph.IdFactory f = new IdGraph.IdFactory() {
+    private int count = 0;
+    public Object createId() {
+        return "v" + ++count;
+    }};
+KeyIndexableGraph base = new Neo4jGraph("/tmp/neo");
+Graph g = new IdGraph(base);
+g.setVertexIdFactory(f);
+Vertex v = g.addVertex(null);
+System.out.println(v.getId()); // prints "v1"
+```
+
+h3. Only vertex ids or only edge ids
+
+Not all implementations of @KeyIndexableGraph@ support both @Vertex@ and @Edge@ indices, and there are applications for which you might not care about the ids of either your vertices or your edges (therefore, the use of properties and indices for the ids of the element class you don't care about is a waste of resources).  To accommodate these two scenarios, @IdGraph@ allows you to selectively enable custom id support for vertices and edges in an overloaded constructor:
+
+```java
+KeyIndexableGraph base = ...
+// Instantiate IdGraph with support for custom vertex ids only
+Graph g = new IdGraph(base, true, false);
+```
+
+This instance of @IdGraph@ will allow you to specify your own vertex ids, but it will not allow you to create your own edge ids; these will merely be passed up from the base graph.  It will therefore be compatible with @KeyIndexableGraph@ implementations which do not support edge indices, and will not spend any disk space or CPU cycles managing id-related properties for edges.

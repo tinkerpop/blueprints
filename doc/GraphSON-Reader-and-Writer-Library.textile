@@ -1,0 +1,326 @@
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+GraphSON is a "JSON-based":http://json.org format for individual graph elements (i.e. vertices and edges).  How these elements are organized and utilized when written as a complete graph can also be considered GraphSON format.  In other words, the schema for GraphSON is very flexible and therefore, any JSON document or fragment that is produced by or can be consumed by the Blueprints "IO packages":https://github.com/tinkerpop/blueprints/tree/master/blueprints-core/src/main/java/com/tinkerpop/blueprints/util/io/graphson can be considered valid GraphSON.
+
+h1. Reading and Writing an Entire Graph
+
+The GraphSON reader and writer package allows an entire graph to be streamed to and from the standard JSON format which is utilized across the TinkerPop stack.  GraphSON can be read or written in several styles: 
+
+* JSON-based data types
+* Explicit data typing within the JSON 
+* A compact format where certain property keys can be ignored
+
+For most scenarios, standard JSON without data typing should generally be acceptable.  Using the more verbose outputting of explicit data types only provides the added value of ensuring that numeric values are converted properly (ie. float versus double).
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/graph-example-1.jpg!
+
+The following example shows the format without explicit data types:
+
+```javascript
+{
+    "graph": {
+        "mode":"NORMAL",
+        "vertices": [
+            {
+                "name": "lop",
+                "lang": "java",
+                "_id": "3",
+                "_type": "vertex"
+            },
+            {
+                "name": "vadas",
+                "age": 27,
+                "_id": "2",
+                "_type": "vertex"
+            },
+            {
+                "name": "marko",
+                "age": 29,
+                "_id": "1",
+                "_type": "vertex"
+            },
+            {
+                "name": "peter",
+                "age": 35,
+                "_id": "6",
+                "_type": "vertex"
+            },
+            {
+                "name": "ripple",
+                "lang": "java",
+                "_id": "5",
+                "_type": "vertex"
+            },
+            {
+                "name": "josh",
+                "age": 32,
+                "_id": "4",
+                "_type": "vertex"
+            }
+        ],
+        "edges": [
+            {
+                "weight": 1,
+                "_id": "10",
+                "_type": "edge",
+                "_outV": "4",
+                "_inV": "5",
+                "_label": "created"
+            },
+            {
+                "weight": 0.5,
+                "_id": "7",
+                "_type": "edge",
+                "_outV": "1",
+                "_inV": "2",
+                "_label": "knows"
+            },
+            {
+                "weight": 0.4000000059604645,
+                "_id": "9",
+                "_type": "edge",
+                "_outV": "1",
+                "_inV": "3",
+                "_label": "created"
+            },
+            {
+                "weight": 1,
+                "_id": "8",
+                "_type": "edge",
+                "_outV": "1",
+                "_inV": "4",
+                "_label": "knows"
+            },
+            {
+                "weight": 0.4000000059604645,
+                "_id": "11",
+                "_type": "edge",
+                "_outV": "4",
+                "_inV": "3",
+                "_label": "created"
+            },
+            {
+                "weight": 0.20000000298023224,
+                "_id": "12",
+                "_type": "edge",
+                "_outV": "6",
+                "_inV": "3",
+                "_label": "created"
+            }
+        ]
+    }
+}
+```
+
+The following example shows the format with explicit data types:
+
+```javascript
+{
+    "mode":"EXTENDED",
+    "vertices": [
+        {
+            "name": {
+                "type": "string",
+                "value": "lop"
+            },
+            "lang": {
+                "type": "string",
+                "value": "java"
+            },
+            "_id": "3",
+            "_type": "vertex"
+        },
+        {
+            "name": {
+                "type": "string",
+                "value": "vadas"
+            },
+            "age": {
+                "type": "integer",
+                "value": 27
+            },
+            "_id": "2",
+            "_type": "vertex"
+        },
+        {
+            "name": {
+                "type": "string",
+                "value": "marko"
+            },
+            "age": {
+                "type": "integer",
+                "value": 29
+            },
+            "_id": "1",
+            "_type": "vertex"
+        },
+        {
+            "name": {
+                "type": "string",
+                "value": "peter"
+            },
+            "age": {
+                "type": "integer",
+                "value": 35
+            },
+            "_id": "6",
+            "_type": "vertex"
+        },
+        {
+            "name": {
+                "type": "string",
+                "value": "ripple"
+            },
+            "lang": {
+                "type": "string",
+                "value": "java"
+            },
+            "_id": "5",
+            "_type": "vertex"
+        },
+        {
+            "name": {
+                "type": "string",
+                "value": "josh"
+            },
+            "age": {
+                "type": "integer",
+                "value": 32
+            },
+            "_id": "4",
+            "_type": "vertex"
+        }
+    ],
+    "edges": [
+        {
+            "weight": {
+                "type": "float",
+                "value": 1
+            },
+            "_id": "10",
+            "_type": "edge",
+            "_outV": "4",
+            "_inV": "5",
+            "_label": "created"
+        },
+        {
+            "weight": {
+                "type": "float",
+                "value": 0.5
+            },
+            "_id": "7",
+            "_type": "edge",
+            "_outV": "1",
+            "_inV": "2",
+            "_label": "knows"
+        },
+        {
+            "weight": {
+                "type": "float",
+                "value": 0.4000000059604645
+            },
+            "_id": "9",
+            "_type": "edge",
+            "_outV": "1",
+            "_inV": "3",
+            "_label": "created"
+        },
+        {
+            "weight": {
+                "type": "float",
+                "value": 1
+            },
+            "_id": "8",
+            "_type": "edge",
+            "_outV": "1",
+            "_inV": "4",
+            "_label": "knows"
+        },
+        {
+            "weight": {
+                "type": "float",
+                "value": 0.4000000059604645
+            },
+            "_id": "11",
+            "_type": "edge",
+            "_outV": "4",
+            "_inV": "3",
+            "_label": "created"
+        },
+        {
+            "weight": {
+                "type": "float",
+                "value": 0.20000000298023224
+            },
+            "_id": "12",
+            "_type": "edge",
+            "_outV": "6",
+            "_inV": "3",
+            "_label": "created"
+        }
+    ]
+}
+```
+
+*Note* - It is important to note that the order of the property keys in the JSON: @mode@, @vertices@, and @edges@, are required to appear in that order, as the @GraphSONReader@ parses them through an @InputStream@.  Failing to include those keys in that order will cause the reader to fail.
+
+There are a few differences between the formats.  If types are embedded, the JSON must start with a @mode@ key with a value of @EMBEDDED@.  This key acts as a hint to the reader that it must extract property values in a different manner.  If the key is omitted, that setting is assumed to be @NORMAL@.  
+
+There is a third option for the @mode@, which is @COMPACT@.  This mode allows more complete control over exactly what element properties get serialized to the GraphSON output.  As there is complete control, there is a possibility that the GraphSON will not be viable for reading (ie. if an important property is not serialized out, like the vertex @_id@).  
+
+All values of keys, short of the values for reserved keys that start with an underscore, must contain an object that has two keys: @type@ and @value@.  The @type@ must be one of the following: @boolean@, @string@, @integer@, @long@, @float@, @double@, @short@, @byte@, @list@, or @map@.
+
+If the type is a @map@ or a @list@, then each component object that make up that key must use that same format.  For example:
+
+```javascript
+"someMap": {
+             "name": {"type":"string", "value":"william"},
+             "age": {"type":"int", "value":76}
+},
+"someList" [{"type":"int", "value":1},{"type":"int", "value":2},{"type":"int", "value":3}]
+```
+
+Please note that complex objects stored as properties will be converted to strings by way of the object's @toString@ method.
+
+h1. Usage
+
+To output a graph in JSON format, pass the graph into the @GraphSONWriter@ constructor, then call @outputGraph@:
+
+```java
+Graph graph = ...
+OutputStream out = ...
+
+GraphSONWriter.outputGraph(graph, out);
+```
+
+The @GraphSONReader@ works in a similar format.  Simply pass what would likely be an empty graph into the constructor, then call @inputGraph@:
+
+```java
+Graph graph = ...
+InputStream in = ...
+
+GraphSONReader.inputGraph(graph, in);
+```
+
+There are a number of static method overloads that offer more options and control.
+
+h1. GraphSONUtility Usage
+
+The @GraphSONUtility@ class is used by both @GraphSONReader@ and @GraphSONWriter@ to convert individual graph elements (vertices and edges) to and from the GraphSON format with conversion options to both a "Jettison":http://jettison.codehaus.org/ @JSONObject@ and a "Jackson":http://jackson.codehaus.org/ @ObjectNode@.  Usage is as follows:
+
+```java
+Vertex v = graph.getVertex(1);
+JSONObject json = GraphSONUtility.jsonFromElement(v);
+System.out.println(json.toString())
+
+Vertex convertedBack = GraphSONUtility.vertexFromJson(json, 
+    new GraphElementFactory(graph), GraphSONMode.NORMAL, null);
+```
+
+The @GraphElementFactory@ is an implementation of the @ElementFactory@ class, that utilizes a @Graph@ instance to construct @Vertex@ and @Edge@ instances.  In most cases, the @GraphElementFactory@ is all that is needed to use the @GraphSONUtility@, though in cases where vertices or edges need to be constructed outside of the context of a @Graph@ implementation, it might be necessary to implement a custom implementation.

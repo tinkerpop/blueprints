@@ -1,7 +1,7 @@
 package com.tinkerpop.blueprints.oupls.sail;
 
 import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.impls.dex.DexGraph;
+import com.tinkerpop.blueprints.impls.sparksee.SparkseeGraph;
 import org.junit.Test;
 
 import java.io.File;
@@ -12,7 +12,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
  */
-public class DexGraphSailTest {//extends GraphSailTest {
+public class SparkseeGraphSailTest {//extends GraphSailTest {
 
     @Test
     public void testTrue() {
@@ -22,22 +22,22 @@ public class DexGraphSailTest {//extends GraphSailTest {
     protected KeyIndexableGraph createGraph() throws IOException {
         /*
         boolean create = true;
-        String db = this.computeTestDataRoot() + "/blueprints_test.dex";
+        String db = this.computeTestDataRoot() + "/blueprints_test.sparksee";
 
         if (create) {
             File f = new File(db);
             if (f.exists()) f.delete();
         }
-        return new DexGraph(db);
+        return new SparkseeGraph(db);
         */
 
 
-        File dir = File.createTempFile("blueprints", "-dex-test");
+        File dir = File.createTempFile("blueprints", "-sparksee-test");
         String path = dir.getPath();
         dir.delete();
         //dir.mkdir();
 
-        DexGraph g = new DexGraph(path);
+        SparkseeGraph g = new SparkseeGraph(path);
         //g.label.set("thing");
         //g.clear();
         return g;
@@ -45,6 +45,6 @@ public class DexGraphSailTest {//extends GraphSailTest {
     }
 
     private String getWorkingDirectory() {
-        return System.getProperty("os.name").toUpperCase().contains("WINDOWS") ? "C:/temp/blueprints_test/graphsail/dexgraph" : "/tmp/blueprints_test/graphsail/dexgraph";
+        return System.getProperty("os.name").toUpperCase().contains("WINDOWS") ? "C:/temp/blueprints_test/graphsail/sparkseegraph" : "/tmp/blueprints_test/graphsail/sparkseegraph";
     }
 }

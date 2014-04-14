@@ -1,0 +1,106 @@
+Blueprints comes with a suite of test cases to ensure that any implementation of the [[property graph model]] interfaces behaves as required in order to work seamlessly within applications that depend on Blueprints. This section will discuss the test suites and how to build a simple JUnit test class to validate an implementation of this model.
+
+There currently exists the following test suites:
+
+# *GraphTestSuite*: ensure that vertices and edges work together properly.
+# *VertexTestSuite*: ensure that vertices and their properties are added and removed properly.
+# *EdgeTestSuite*: ensure that edges and their properties are added and removed properly.
+# *GraphMLReaderTestSuite*: ensure that GraphML files are read properly from disk and represented properly.
+# *GMLReaderTestSuite*: ensure that GML files are read properly from disk and represented properly.
+# *GraphSONReaderTestSuite*: ensure that GraphSON files are read properly from disk and represented properly.
+# *KeyIndexableGraphTestSuite*: ensures that graphs that support automatic key indices work properly.
+# *IndexableGraphTestSuite*: ensures that graphs that support indices behave properly.
+# *IndexTestSuite*: ensure that the index system works properly.
+# *TransactionalGraphTestSuite*: ensures that graphs that support transactions behave properly.
+
+h2. Blueprints-Tests Dependency
+
+It is necessary that the Blueprints test suite is depended when testing a Blueprints-enabled graph framework. Simply import the @blueprints-tests@. With this dependency the test suite is available.
+
+```xml
+<dependency>
+  <groupId>com.tinkerpop.blueprints</groupId>
+  <artifactId>blueprints-test</artifactId>
+  <version>??</version>
+  <scope>test</scope>
+</dependency>
+```
+
+h2. Testing a Property Graph Model Implementation
+
+To ensure that an implementation of the [[property graph model]] is implemented correctly, a simple "JUnit":http://www.junit.org/ test case of the following form will determine its compliance. Unfortunately, there is no perfect general interface solution that will work regardless of the underlying graph framework, while being specific enough to be useful. For this reason, be sure the @Features@ of the respective @Graph@ implementations are set correctly as this allows the test suite to dynamically alter is testing behavior to account for the various nuances of an implementation.
+
+```java
+public class TinkerGraphTest extends GraphTest {
+
+    public void testVertexTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new VertexTestSuite(this));
+        printTestPerformance("VertexTestSuite", this.stopWatch());
+    }
+
+    public void testEdgeTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new EdgeTestSuite(this));
+        printTestPerformance("EdgeTestSuite", this.stopWatch());
+    }
+
+    public void testGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphTestSuite(this));
+        printTestPerformance("GraphTestSuite", this.stopWatch());
+    }
+
+    public void testKeyIndexableGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new KeyIndexableGraphTestSuite(this));
+        printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
+    }
+
+    public void testIndexableGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new IndexableGraphTestSuite(this));
+        printTestPerformance("IndexableGraphTestSuite", this.stopWatch());
+    }
+
+    public void testIndexTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new IndexTestSuite(this));
+        printTestPerformance("IndexTestSuite", this.stopWatch());
+    }
+
+    public void testGraphMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphMLReaderTestSuite(this));
+        printTestPerformance("GraphMLReaderTestSuite", this.stopWatch());
+    }
+
+    public void testGMLReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GMLReaderTestSuite(this));
+        printTestPerformance("GMLReaderTestSuite", this.stopWatch());
+    }
+
+    public void testGraphSONReaderTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new GraphSONReaderTestSuite(this));
+        printTestPerformance("GraphSONReaderTestSuite", this.stopWatch());
+    }
+
+    public Graph generateGraph() {
+        return new TinkerGraph();
+    }
+
+    public void doTestSuite(final TestSuite testSuite) throws Exception {
+        String doTest = System.getProperty("testTinkerGraph");
+        if (doTest == null || doTest.equals("true")) {
+            for (Method method : testSuite.getClass().getDeclaredMethods()) {
+                if (method.getName().startsWith("test")) {
+                    System.out.println("Testing " + method.getName() + "...");
+                    method.invoke(testSuite);
+                }
+            }
+        }
+    }
+}
+```

@@ -1,0 +1,79 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/neotech-logo.png!:http://neotechnology.com
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4j-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+*OR* (for Neo4j2 support)
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-neo4j2-graph</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+```java
+Graph graph = new Neo4jGraph("/tmp/neo4j");
+```
+
+h2. GraphFactory Settings
+
+If using "GraphFactory":https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory to instantiate a @Neo4jGraph@, the following properties will apply:
+
+|_. key |_. description |
+| @blueprints.graph@ | @com.tinkerpop.blueprints.impls.neo4j.Neo4jGraph@ |
+| @blueprints.neo4j.directory@ | The directory of the @Neo4jGraph@ instance. |
+| @blueprints.neo4j.conf.*@ | The prefix to use for any Neo4j specific "settings":http://docs.neo4j.org/chunked/stable/configuration-caches.html (e.g. @blueprints.neo4j.conf.string_block_size@). |
+
+h2. Neo4jGraph Feature List
+
+"Neo Technology":http://neotechnology.com are the developers of the "Neo4j graph database":http://neo4j.org. Neo4j natively supports the property graph data model. Note that Neo4j requires that the value objects in the property map of an element be Java primitives, @java.lang.String@ values, or arrays of primitives and @java.lang.String@ values.  @Neo4jElement@ will also accept a @Collection@ of like primitives or @java.lang.String@ values and will convert those to the appropriate array type for storage in Neo4j. 
+
+```
+supportsDuplicateEdges: true
+supportsSelfLoops: true
+supportsSerializableObjectProperty: false
+supportsBooleanProperty: true
+supportsDoubleProperty: true
+supportsFloatProperty: true
+supportsIntegerProperty: true
+supportsPrimitiveArrayProperty: true
+supportsUniformListProperty: true
+supportsMixedListProperty: false
+supportsLongProperty: true
+supportsMapProperty: false
+supportsStringProperty: true
+ignoresSuppliedIds: true
+isPersistent: true
+isRDFModel: false
+isWrapper: false
+supportsIndices: true
+supportsVertexIndex: true
+supportsEdgeIndex: true
+supportsKeyIndices: true
+supportsVertexKeyIndex: true
+supportsEdgeKeyIndex: true
+supportsEdgeIteration: true
+supportsVertexIteration: true
+supportsTransactions: true
+supportsThreadedTransactions: false
+```
+
+h2. Indices with Neo4jGraph
+
+It is possible to parameterize the indices created through Blueprints. Learn more about the types of indices supported by Neo4j at "this location":http://docs.neo4j.org/chunked/milestone/indexing-create-advanced.html.
+
+```java
+Index<Vertex> index = graph.createIndex("myIdx", Vertex.class, new Parameter("analyzer", LowerCaseKeywordAnalyzer.class.getName()));
+Vertex a = graph.addVertex(null);
+a.setProperty("name", "marko");
+index.put("name", "marko", a);
+Iterator itty = graph.getIndex("myIdx", Vertex.class).query("name", "MaRkO").iterator();
+assertEquals(itty.next(), a);
+```

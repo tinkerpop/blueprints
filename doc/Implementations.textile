@@ -1,0 +1,76 @@
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/impls.png!
+
+In order to connect a graph database to Blueprints, the Blueprints property graph interfaces must be implemented. For non-native Blueprints graph databases, the raw graph database API and the Blueprints API need to be coupled. For native Blueprints graph databases, no such coupling is needed as only the interfaces need to be implemented. Each subsection discusses the various implementations of the Blueprints interfaces maintained by the main Blueprints distribution.
+
+*DEPENDENCY NOTE*: It is important to note that including a @<dependency/>@ to Blueprints does not entail all the respective graph database/framework dependencies distributed with Blueprints. The reason for this is that it allows users to include only those graph implementations they wish for their particular projects (e.g. based on licensing, size, performance, etc.).
+
+h1. Developer Notes
+
+[[https://raw.github.com/tinkerpop/blueprints/master/doc/images/blueprints-character-1.png|width=120px|align=left|float]]
+
+This section defines the general rules and standards by which Blueprints implementations are expected to work.  By following these implementation details, developers implementing the Blueprints API can expect consistent operations throughout the "TinkerPop":http://tinkerpop.com stack.  Many of these details are enforced by the Blueprints [[Property Graph Model Test Suite]], so there will be little choice in those areas when it comes to implementation, however others are merely convention and not explicitly enforced.  Choosing not to following convention will introduce risk that the implementation will not work as expected elsewhere in the stack.
+
+To be considered a _recognized_ Blueprints implementation (i.e. included on the Blueprints wiki as a third-party implementation, or otherwise promoted by TinkerPop), the implementation must meet these conditions:
+
+# It must pass the Blueprints Test Suite.
+# It must include a Rexster configuration class.
+# It must include some form of documentation (e.g. README.md, wiki, etc.)
+
+Those offering Blueprints implementations are encouraged to use the "gremlin-users":https://groups.google.com/forum/?fromgroups#!forum/gremlin-users mailing list to announce their releases and feature updates, as well as a to provide support to the community on usage.
+
+h2. getVertex/Edge
+
+The @getVertex@ and @getEdge@ methods on the @Graph@ class accept an @object@ type as the parameter for the respective vertex or edge identifier.  Always coerce that identifier to its expected type.  If the underlying graph, only expects a @long@ as an identifier, then ensure that the parameter is converted to a long (as it may come in as a @String@ or other such value).  If the identifier cannot be coerced to its expected type then simply return @null@.  
+
+The identifier parameter cannot be @null@ and if it is an exception should immediately be thrown:
+
+```java
+if (null == id)
+    throw ExceptionFactory.vertexIdCanNotBeNull();
+```
+
+h2. Deprecation
+
+Some methods of the Blueprints API are marked as @@deprecated@.  While this annotation does mean that the method is bound for future removal from the API, it may be smart to implement it anyway for backward compatibility with the rest of the stack.  Generally speaking other elements of the stack that depend on Blueprints, such as Rexster, will attempt to delay upgrade to newer methods over older ones in an effort to stay compatible with as many older Blueprints versions as possible.  The other reason to implement the deprecated methods is to allow users with older code to easily swap in the newly built implementation without having to make a lot of changes to their code that they may not be prepared to make.
+
+h2. Rexster Support
+
+To be a complete Blueprints implementation it is important to make it possible to expose a Blueprints implementation through Rexster.  Doing do has the following benefits:
+
+* Accessibility of the implementation through to the top of the TinkerPop stack.
+* Makes the implementation consumable by the widest group of possible users as Rexster enables access to the graph through any language.
+* Through Rexster the implementation is consumable through other tools and frameworks, like "Bulbs":http://bulbflow.com, "Thunderdome":https://github.com/StartTheShift/thunderdome, "Faunus":http://faunus.thinkaurelius.com, etc.
+
+Adding Rexster Support usually just involves the creation of a single class file. This blog "post":http://stephen.genoprime.com/2012/05/03/graph-configuration-in-rexster.html discusses how to create a configuration and samples of the TinkerPop maintained Blueprints implementations can be found "here":https://github.com/tinkerpop/rexster/tree/master/rexster-server/src/main/java/com/tinkerpop/rexster/config.
+
+h2. GraphFactory Support
+
+Blueprints provides a "GraphFactory":https://github.com/tinkerpop/blueprints/wiki/Code-Examples#use-graphfactory, which allows for a generic way to instantiate @Graph@ implementations.  To support @GraphFactory@, a the library must provide either or both of the following:
+
+* A @Graph@ implementation constructor that takes a single argument of type @org.apache.commons.configuration.Configuration@.  
+* A static _factory_ method that has a method called @open@ that takes a single argument of type @org.apache.commons.configuration.Configuration@.  
+
+It is up to each @Graph@ implementation to define what the @Configuration@ object contains, but generally speaking, it is expected that it will contain name-value pairs.  
+
+Blueprints uses a standard whereby the name in the pair is prefixed with @blueprints.graphname@, where the _graphname_ refers to a friendly name of the @Graph@ implementation. For example, @Neo4jGraph@ has a friendly configuration name of @neo4j@ and therefore a complete configuration name would look like: @blueprints.neo4j.directory@.
+
+h2. Other Tests
+
+In addition to the Blueprints Test Suite, developers have the option to test their implementations with other test suites higher in the stack.  These tests can help uncover other problems that the Blueprints tests don't (however, efforts are made to push the logic higher level tests down to Blueprints when problems are found).  Running these tests can provide additional confidence that there is consistency all the way to the top of the TinkerPop stack.
+
+h3. Rexster Integration Tests
+
+"Rexster":http://rexster.tinkerpop.com has a suite of integration tests that runs across multiple graphs to validate operational consistency of implementations.  It is assumed that the Blueprints implementation being tested has a configuration class so that it can be configured to run in Rexster. To run the tests:
+
+1. Copy the jar file of the Blueprints implementation to the @REXSTER_HOME/ext@ directory.
+1. Pull the Rexster source code from GitHub and edit the "rexster.xml":https://github.com/tinkerpop/rexster/blob/master/rexster-server/src/integration/resources/com/tinkerpop/rexster/rexster-integration-test.xml used by the integration tests to include the graph configuration to include in the tests.
+1. Execute: @mvn clean install -Pintegration-test@ from the command line. 
+
+h3. RexsterGraph Tests
+
+The [[RexsterGraph|Rexster Implementation]] runs the Property Graph Model Test Suite over a running instance of Rexster.  By default, the tests for @RexsterGraph@ are disabled.  It is assumed that the Blueprints implementation being tested has a configuration class so that it can be configured to run in Rexster. To run these tests:
+
+1. Pull the source code for Blueprints from GitHub and edit the "pom.xml":https://github.com/tinkerpop/blueprints/blob/master/blueprints-rexster-graph/pom.xml file.  Change the @-DtestRexsterGraph=false@ to @-DtestRexsterGraph=true@ so that the tests will be enabled.
+1. In Rexster, edit the @rexster.xml@ file to include the Blueprints implementation to be tested.  By default the @rexsterGraph@ tests try to use a graph named @emptygraph@, which is configured in the default @rexster.xml@ as a [[TinkerGraph]].  Either edit that configuration to be for the new graph or change the @RexsterGraph@ @pom.xml@ to point at a different graph by changing this settings: @-DrexsterGraphURI=http://127.0.0.1:8182/graphs/emptygraph@
+1. Start Rexster with: @rexster.sh -s@
+1. Run @mvn clean install@ on @RexsterGraph@ from the command line.

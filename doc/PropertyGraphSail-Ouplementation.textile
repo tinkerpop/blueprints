@@ -1,0 +1,220 @@
+PropertyGraphSail, like "Blueprints Sail":https://github.com/tinkerpop/blueprints/wiki/Sail-Ouplementation, adapts the Blueprints Property Graph data model to the Resource Description Framework ("RDF":http://en.wikipedia.org/wiki/Resource_Description_Framework).  However, it serves a different purpose.  Blueprints Sail allows *generic RDF data* to be stored in a Blueprints-compatible graph database like "Neo4j":http://neo4j.org/, or "OrientDB":http://www.orientdb.org/, while PropertyGraphSail allows *generic Blueprints graphs* to be accessed as if they were RDF data.
+
+For example, if you have a large dump of RDF data such as the "DBpedia":http://neo4j.org/ data set which you would like to store in Neo4j, then use Blueprints Sail.  If you have a bunch of "Grateful Dead":http://en.wikipedia.org/wiki/Grateful_Dead concert data you have put together in Blueprints and now you want to use RDF-based tools to expose or query the data, then use PropertyGraphSail.
+
+PropertyGraphSail is based on the Sesame "Sail":http://www.openrdf.org/doc/sesame2/api/org/openrdf/sail/Sail.html API and provides a raw "vertices and edges" view of a Blueprints graph, like so:
+
+```
+@prefix prop: <http://tinkerpop.com/pgm/property/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix pgm: <http://tinkerpop.com/pgm/ontology#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://tinkerpop.com/pgm/vertex/3> a pgm:Vertex ;
+	prop:name "lop" ;
+	prop:lang "java" ;
+	pgm:id "3" .
+
+<http://tinkerpop.com/pgm/vertex/2> a pgm:Vertex ;
+	prop:name "vadas" ;
+	prop:age "27"^^xsd:int ;
+	pgm:id "2" .
+
+<http://tinkerpop.com/pgm/vertex/1> a pgm:Vertex ;
+	prop:name "marko" ;
+	prop:age "29"^^xsd:int ;
+	pgm:id "1" .
+
+<http://tinkerpop.com/pgm/vertex/6> a pgm:Vertex ;
+	prop:name "peter" ;
+	prop:age "35"^^xsd:int ;
+	pgm:id "6" .
+
+<http://tinkerpop.com/pgm/vertex/5> a pgm:Vertex ;
+	prop:name "ripple" ;
+	prop:lang "java" ;
+	pgm:id "5" .
+
+<http://tinkerpop.com/pgm/vertex/4> a pgm:Vertex ;
+	prop:name "josh" ;
+	prop:age "32"^^xsd:int ;
+	pgm:id "4" .
+
+<http://tinkerpop.com/pgm/edge/10> prop:weight "1.0"^^xsd:float ;
+	pgm:id "10" ;
+	a pgm:Edge ;
+	pgm:label "created" ;
+	pgm:head <http://tinkerpop.com/pgm/vertex/5> ;
+	pgm:tail <http://tinkerpop.com/pgm/vertex/4> .
+
+<http://tinkerpop.com/pgm/edge/7> prop:weight "0.5"^^xsd:float ;
+	pgm:id "7" ;
+	a pgm:Edge ;
+	pgm:label "knows" ;
+	pgm:head <http://tinkerpop.com/pgm/vertex/2> ;
+	pgm:tail <http://tinkerpop.com/pgm/vertex/1> .
+
+<http://tinkerpop.com/pgm/edge/9> prop:weight "0.4"^^xsd:float ;
+	pgm:id "9" ;
+	a pgm:Edge ;
+	pgm:label "created" ;
+	pgm:head <http://tinkerpop.com/pgm/vertex/3> ;
+	pgm:tail <http://tinkerpop.com/pgm/vertex/1> .
+
+<http://tinkerpop.com/pgm/edge/8> prop:weight "1.0"^^xsd:float ;
+	pgm:id "8" ;
+	a pgm:Edge ;
+	pgm:label "knows" ;
+	pgm:head <http://tinkerpop.com/pgm/vertex/4> ;
+	pgm:tail <http://tinkerpop.com/pgm/vertex/1> .
+
+<http://tinkerpop.com/pgm/edge/11> prop:weight "0.4"^^xsd:float ;
+	pgm:id "11" ;
+	a pgm:Edge ;
+	pgm:label "created" ;
+	pgm:head <http://tinkerpop.com/pgm/vertex/3> ;
+	pgm:tail <http://tinkerpop.com/pgm/vertex/4> .
+
+<http://tinkerpop.com/pgm/edge/12> prop:weight "0.2"^^xsd:float ;
+	pgm:id "12" ;
+	a pgm:Edge ;
+	pgm:label "created" ;
+	pgm:head <http://tinkerpop.com/pgm/vertex/3> ;
+	pgm:tail <http://tinkerpop.com/pgm/vertex/6> .
+```
+
+To instantiate PropertyGraphSail, pass a Blueprints Graph into its constructor:
+
+```java
+Graph graph = new TinkerGraph();
+Sail sail = new PropertyGraphSail(graph);
+sail.initialize();
+```
+
+You can modify the graph before or after instantiating PropertyGraphSail, e.g. adding some data:
+
+```java
+GraphMLReader r = new GraphMLReader(g);
+r.inputGraph(GraphMLReader.class.getResourceAsStream("graph-example-1.xml"));
+```
+
+Create connections and issue queries as with any other Sail.  Here is a SPARQL example:
+
+```java
+String queryStr = "PREFIX pgm: <" + PropertyGraphSail.ONTOLOGY_NS + ">\\n" +
+        "PREFIX prop: <" + PropertyGraphSail.PROPERTY_NS + ">\\n" +
+        "SELECT ?project ?name WHERE {\\n" +
+        "   ?marko prop:name \\"marko\\".\\n" +
+        "   ?e1 pgm:label \\"knows\\".\\n" +
+        "   ?e1 pgm:tail ?marko.\\n" +
+        "   ?e1 pgm:head ?friend.\\n" +
+        "   ?e2 pgm:label \\"created\\".\\n" +
+        "   ?e2 pgm:tail ?friend.\\n" +
+        "   ?e2 pgm:head ?project.\\n" +
+        "   ?project prop:name ?name.\\n" +
+        "}";
+System.out.println(queryStr);
+ParsedQuery query = new SPARQLParser().parseQuery(queryStr, "http://example.org/bogus/");
+CloseableIteration<? extends BindingSet, QueryEvaluationException> results
+        = sc.evaluate(query.getTupleExpr(), query.getDataset(), new EmptyBindingSet(), false);
+try {
+    while (results.hasNext()) {
+        BindingSet set = results.next();
+        URI project = (URI) set.getValue("project");
+        Literal name = (Literal) set.getValue("name");
+        System.out.println("project = " + project + ", name = " + name);
+    }
+} finally {
+    results.close();
+}
+```
+
+The output is as follows:
+
+```
+PREFIX pgm: <http://tinkerpop.com/pgm/ontology#>
+PREFIX prop: <http://tinkerpop.com/pgm/property/>
+SELECT ?project ?name WHERE {
+   ?marko prop:name "marko".
+   ?e1 pgm:label "knows".
+   ?e1 pgm:tail ?marko.
+   ?e1 pgm:head ?friend.
+   ?e2 pgm:label "created".
+   ?e2 pgm:tail ?friend.
+   ?e2 pgm:head ?project.
+   ?project prop:name ?name.
+}
+project = http://tinkerpop.com/pgm/vertex/5, name = "ripple"
+project = http://tinkerpop.com/pgm/vertex/3, name = "lop"
+```
+
+h3. Compact views versus edge-reified views
+
+PropertyGraphSail supports two distinct styles of RDF views with respect to how edges are represented. Each style determines the RDF data that you see and the results that you receive when you execute a query over the graph in a language such as SPARQL. By default, PropertyGraphSail produces *edge-reified views*, which is what you see in the first example above.
+
+In the edge-reified style, each edge is a first class entity with its own URI. The id of the edge, the label of the edge, its type (pgm:Edge) and each of its properties are expressed as individual RDF statements, reflecting all of the information we have about the edge.
+
+In contrast, the *compact view* style uses only one RDF statement for each edge, without explicitly stating the id, label, or type of the edge and *ignoring its properties*. This is appropriate for certain applications in which we don't have any edge properties or we don't care about them, and we are interested in producing a more typical RDF graph structure, with vertices as resources connected by statements. To configure PropertyGraphSail to use compact views, instantiate it with its overloaded constructor:
+
+```java
+// The 'firstClassEdges' argument tells PGS whether to use edge-reified views
+Sail sail = new PropertyGraphSail(graph, false);
+sail.initialize();
+```
+
+Below is the same example graph as above, exported to a compact RDF view.
+
+```
+@prefix prop: <http://tinkerpop.com/pgm/property/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix pgm: <http://tinkerpop.com/pgm/ontology#> .
+@prefix rel: <http://tinkerpop.com/pgm/relation/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://tinkerpop.com/pgm/vertex/3> a pgm:Vertex ;
+        prop:name "lop" ;
+        prop:lang "java" ;
+        pgm:id "3" .
+
+<http://tinkerpop.com/pgm/vertex/2> a pgm:Vertex ;
+        prop:name "vadas" ;
+        prop:age "27"^^xsd:int ;
+        pgm:id "2" .
+
+<http://tinkerpop.com/pgm/vertex/1> a pgm:Vertex ;
+        prop:name "marko" ;
+        prop:age "29"^^xsd:int ;
+        pgm:id "1" ;
+        rel:knows <http://tinkerpop.com/pgm/vertex/2> ;
+        rel:created <http://tinkerpop.com/pgm/vertex/3> ;
+        rel:knows <http://tinkerpop.com/pgm/vertex/4> .
+
+<http://tinkerpop.com/pgm/vertex/6> a pgm:Vertex ;
+        prop:name "peter" ;
+        prop:age "35"^^xsd:int ;
+        pgm:id "6" ;
+        rel:created <http://tinkerpop.com/pgm/vertex/3> .
+
+<http://tinkerpop.com/pgm/vertex/5> a pgm:Vertex ;
+        prop:name "ripple" ;
+        prop:lang "java" ;
+        pgm:id "5" .
+
+<http://tinkerpop.com/pgm/vertex/4> a pgm:Vertex ;
+        prop:name "josh" ;
+        prop:age "32"^^xsd:int ;
+        pgm:id "4" ;
+        rel:created <http://tinkerpop.com/pgm/vertex/5> .
+```
+
+h3. Maven usage
+
+PropertyGraphSail is part of the blueprints-graph-sail module and can be included in your Maven project with:
+
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-graph-sail</artifactId>
+   <version>??</version>
+</dependency>
+```

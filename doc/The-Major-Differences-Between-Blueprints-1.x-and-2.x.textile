@@ -1,0 +1,90 @@
+[[https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-character-1.png|width=130px]] [[https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-character-2.png|width=100px]] [[https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-character-3.png|width=118px]]
+
+Blueprints 2 introduced numerous changes to the Blueprints API. This page helps to explain these differences so updating code from Blueprints 1.x to Blueprints 2.x is as easy as possible.
+
+h2. A Change to the Package Name
+
+In the early days of Blueprints, there were two notions:
+  * Property Graphs Model
+  * Object Document Model
+
+To account for these two models, there were two packages: @com.tinkerpop.blueprints.pgm@ and @com.tinkerpop.blueprints.odm@. Blueprints has since focused solely on the [[property graph model]] and as such, in Blueprints 2.x, there is no more @pgm@, it is simply @com.tinkerpop.blueprints@.
+
+h2. KeyIndexableGraph and the new AutomaticIndices
+
+There is no more notion of @AutomaticIndex@ in Blueprints 2. Many graph databases such as @DexGraph@, @IGGraph@, and @TitanGraph@ do not support the notion of arbitrary indexing. Instead, they simply allow an element to be indexed by its key/value property pairs. As such, @KeyIndexableGraph@ provides an interface to this basic indexing functionality (see [[Graph Indices]]). To index the @name@ key of all vertices, simply do:
+
+```java
+graph.createKeyIndex("name", Vertex.class);
+```
+
+Now, when @graph.getVertices("name", "stephen")@ is evaluated, the @name@ index is used. If no such key index was created, then a linear scan of all the vertices in the graph would occur. Thus, be sure to add the appropriate indices to make an @n@-lookup a @log(n)@-lookup.
+
+For "manual indexing," there is still the notion of @IndexableGraph@ and the @Index@ class. This is used by graph engines like @Neo4jGraph@, @OrientGraph@, and @TinkerGraph@.
+
+Since automatic indices in Blueprints 1.x are now just normal indices in Blueprints 2.x, it is relatively easy to convert them as follows: 
+
+```java
+graph.dropIndex("blueprints-1-auto-index-name") 
+graph.createKeyIndex(....) 
+```
+
+When @graph.createKeyIndex()@ is executed, it will automatically re-index the graph.  The amount of time taken to complete this re-indexing is dependent upon the size of the graph and what is being indexed.  As an added step for safety, be sure to back up the Neo4j directory prior to re-indexing. 
+ 
+h2. Vertex/Edge API and the Direction Enum
+
+In Blueprints 1.x, there existed the following @Vertex@ methods.
+
+```java
+Vertex.getOutEdges(String... labels)
+Vertex.getInEdges(String... labels)
+```
+
+As of Blueprints 2.x, there are now the following @Vertex@ methods.
+
+```java
+Vertex.getEdges(Direction direction, String... labels)
+Vertex.getVertices(Direction direction, String... labels)
+```
+
+With @Vertex.getEdges()@, it is possible to get the incoming, outgoing, or both incident edges to a vertex filtered by their edge label. With @Vertex.getVertices()@, it is possible to get the incoming, outgoing, or both adjacent vertices to a vertex filtered by the edge label of the adjoining edges. Likewise, in a similar fashion, @Edge@ has been updated with the following method.
+
+```java
+Edge.getVertex(Direction direction)
+```
+
+h2. Vertex Query
+
+There is a new method in the @Vertex@ class called @Vertex.query()@. This method returns a @Query@ object that has a "fluent interface":http://en.wikipedia.org/wiki/Fluent_interface. The @Query@ object is a way of intelligently selecting adjacent vertices or incident edges to a vertex. Please learn more about @Query@ on the [[Vertex Query]] wiki page.
+
+h2. BatchGraph and the Removal of TransactionalGraph Buffers
+
+In Blueprints 1.x, @TransactionalGraph@ had the following methods.
+
+```java
+TransactionalGraph.setMaxBufferSize(long size)
+TransactionalGraph.getMaxBufferSize();
+TransactionalGraph.getCurrentBufferSize()
+```
+
+These methods were used to automatically commits "chunks" of data. Those chunks were the size of the buffer. This functionality was deemed too specific a use case and should not be mixed in with @TransactionalGraph@. As such, this behavior has now been relegated to @BatchGraph@ (see [[Batch Implementation]]).
+
+h2. TransactionalGraph Semantics and ThreadedTransactionalGraph
+
+In @TransactionalGraph@ each transaction is bound to an executing thread and a transaction is automatically started with the first operation on the graph (read or write). Hence, @TransactionalGraph.startTransaction()@ is not needed and has been removed. The user only needs to mark the end of a transaction by calling @TransactionalGraph.stopTransaction(Conclusion conclusion)@.
+To allow multiple threads to execute in one transaction, which is useful when implementing parallelized graph algorithms, the @ThreadedTransactionalGraph@ interface has been added. It's @startTransaction()@ method returns a @TransactionalGraph@ object which represents a single transaction and can be accessed concurrently from multiple threads.
+
+*NOTE*: Since Blueprints 2.3.0 @stopTransaction(Conclusion)@ has been deprecated in favor of @commit()@ and @rollback()@. Same semantics as @SUCCESS@/@FAILURE@, but less typing for the developer.
+
+h2. WrapperGraph and MetaGraph
+
+There are two types of "wrapping" Blueprints implementations.
+  # @WrapperGraph@: The underlying graph is a Blueprints @Graph@
+  # @MetaGraph@: The underlying graph is a vendor specific API.
+
+Blueprints provides numerous @WrapperGraph@ implementations that allow users add-on functionality to their graph. Examples include @ReadOnlyGraph@, @IdGraph@, @BatchGraph@, etc. Next, most vendors make use of @MetaGraph@ where their Blueprints implementation wraps their native API. Thus, there are two methods to be aware of in these respective interfaces.
+
+```java
+T extends Graph WrapperGraph.getBaseGraph() // can recursively go down if T is a WrapperGraph
+T MetaGraph.getRawGraph() // returns the raw vendor specific graph object
+```

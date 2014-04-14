@@ -1,0 +1,15 @@
+<img width="100" src="https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-character-2.png"/>
+
+This section provides a list of the people that have contributed in some way to the creation of Blueprints.
+
+# "Marko A. Rodriguez":http://markorodriguez.com -- designed, developed, tested, and documented Blueprints.
+# "Luca Garulli":http://orientechnologies.com -- developed the OrientDB implementation (@OrientGraph@).
+# "Joshua Shinavier":http://fortytwo.net -- developed Blueprints Sail (@GraphSail@).
+# "Darrick Weibe":http://github.com/pangloss -- tests, bug fixes, and transaction work.
+# "Stephen Mallette":http://stephen.genoprime.com -- develops @RexsterGraph@, the IO packages (i.e. GraphSON) and other components.
+# "Sergio Gómez Villamor":http://github.com/sgomezvillamor -- developed the Dex implementation (@DexGraph@).
+# "Pierre De Wilde":http://www.linkedin.com/in/pierredewilde -- designs and tests new features.
+# "Ketrina Yim":http://www.ketrinayim.com/ -- designed the Blueprints logo.
+# "Matthias Broecheler":http://www.matthiasb.com/ -- designed many of the TinkerPop 2 API changes.
+
+Please review Blueprints' "pom.xml":http://github.com/tinkerpop/blueprints/blob/master/pom.xml. Blueprints would not be possible without the work done by others to create these useful packages.

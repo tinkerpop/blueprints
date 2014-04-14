@@ -1,0 +1,126 @@
+```xml
+<dependency>
+   <groupId>com.tinkerpop.blueprints</groupId>
+   <artifactId>blueprints-core</artifactId>
+   <version>??</version>
+</dependency>
+```
+
+The "GML":http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html reader and writer package allows an entire graph to be streamed to and from GML (Graph Modelling Language).  
+
+!https://github.com/tinkerpop/blueprints/raw/master/doc/images/graph-example-1.jpg!
+
+The following example shows the format of the graph diagram above in GML:
+
+```text
+graph [
+	node [
+		id 1
+		blueprintsId "3"
+		name "lop"
+		lang "java"
+	]
+	node [
+		id 2
+		blueprintsId "2"
+		name "vadas"
+		age 27
+	]
+	node [
+		id 3
+		blueprintsId "1"
+		name "marko"
+		age 29
+	]
+	node [
+		id 4
+		blueprintsId "6"
+		name "peter"
+		age 35
+	]
+	node [
+		id 5
+		blueprintsId "5"
+		name "ripple"
+		lang "java"
+	]
+	node [
+		id 6
+		blueprintsId "4"
+		name "josh"
+		age 32
+	]
+	edge [
+		source 6
+		target 5
+		label "created"
+		blueprintsId "10"
+		weight 1.0
+	]
+	edge [
+		source 3
+		target 2
+		label "knows"
+		blueprintsId "7"
+		weight 0.5
+	]
+	edge [
+		source 3
+		target 1
+		label "created"
+		blueprintsId "9"
+		weight 0.4
+	]
+	edge [
+		source 3
+		target 6
+		label "knows"
+		blueprintsId "8"
+		weight 1.0
+	]
+	edge [
+		source 6
+		target 1
+		label "created"
+		blueprintsId "11"
+		weight 0.4
+	]
+	edge [
+		source 4
+		target 1
+		label "created"
+		blueprintsId "12"
+		weight 0.2
+	]
+]
+```
+
+h1. Usage
+
+To output a graph in GML format, pass the graph into the @GMLWriter@ constructor, then call @outputGraph@:
+
+```java
+Graph graph = ...
+OutputStream out = ...
+
+GMLWriter.outputGraph(graph, out);
+```
+
+The @GMLReader@ works in a similar format.  Simply pass what would likely be an empty graph into the constructor, then call @inputGraph@:
+
+```java
+Graph graph = ...
+InputStream in = ...
+
+GMLReader.inputGraph(graph, in);
+```
+By default, the @id@ property is used for vertex and edge ids. In GML edges may not have id, in this case an integer id will be generated. The @label@ property is used for edge labels and "undefined" if not present. The properties used for the vertex id, the edge id and the edge label can be set using.
+
+```java
+reader.setVertexId("propertyToUseAsVertexId");
+reader.setEdgeId("propertyToUseAsEdgeId");
+reader.setEdgeLabel("propertyToUseAsEdgeLabel");
+```
+If set manually the reader assumes that the ids are unique. There are a number of static method overloads that offer more options and control.
+
+Note that the @GMLWriter@ has a @strict@ option that will enforce the GML specification for property keys, such that keys names not meeting the specification are ignored.  By default, this value is set to @false@.  This value can be changed using the @setStrict@ method on a @GMLWriter@ instance.
