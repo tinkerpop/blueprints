@@ -85,8 +85,8 @@ public class IndexTestSuite extends TestSuite {
             printPerformance(graph.toString(), 1, "manual index created", this.stopWatch());
             Vertex v1 = graph.addVertex(null);
             Vertex v2 = graph.addVertex(null);
-            Edge e1 = graph.addEdge(null, v1, v2, "test1");
-            Edge e2 = graph.addEdge(null, v1, v2, "test2");
+            Edge e1 = graph.addEdge(null, v1, v2, graphTest.convertLabel("test1"));
+            Edge e2 = graph.addEdge(null, v1, v2, graphTest.convertLabel("test2"));
             if (graph.getFeatures().supportsEdgeIteration)
                 assertEquals(count(graph.getEdges()), 2);
 
