@@ -472,7 +472,7 @@ public class EdgeTestSuite extends TestSuite {
             for (Edge e : graph.getEdges()) {
                 count++;
                 edgeIds.add(e.getId().toString());
-                assertEquals(graphTest.convertId("test"), e.getLabel());
+                assertEquals(graphTest.convertLabel("test"), e.getLabel());
                 if (e.getId().toString().equals(e1.getId().toString())) {
                     assertEquals(v1, e.getVertex(Direction.OUT));
                     assertEquals(v2, e.getVertex(Direction.IN));
@@ -501,7 +501,7 @@ public class EdgeTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeProperties) {
             Vertex a = graph.addVertex(graphTest.convertId("1"));
             Vertex b = graph.addVertex(graphTest.convertId("2"));
-            Edge edge = graph.addEdge(graphTest.convertId("3"), a, b, "knows");
+            Edge edge = graph.addEdge(graphTest.convertId("3"), a, b, graphTest.convertLabel("knows"));
             assertEquals(edge.getPropertyKeys().size(), 0);
             assertNull(edge.getProperty("weight"));
 
@@ -534,7 +534,7 @@ public class EdgeTestSuite extends TestSuite {
         // fail based on the id or label properties.
         if (graph.getFeatures().supportsEdgeProperties) {
 
-            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
             try {
                 edge.setProperty("id", "123");
                 fail("Setting edge property with reserved key 'id' should fail");
@@ -575,7 +575,7 @@ public class EdgeTestSuite extends TestSuite {
         // no point in testing graph features for setting string properties because the intent is for it to
         // fail based on the empty key.
         if (graph.getFeatures().supportsEdgeProperties) {
-            final Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "friend");
+            final Edge e = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("friend"));
             try {
                 e.setProperty("", "value");
                 fail("Setting an edge property with an empty string key should fail");
@@ -613,7 +613,7 @@ public class EdgeTestSuite extends TestSuite {
     public void testSettingBadVertexProperties() {
         final Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexProperties) {
-            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
             try {
                 edge.setProperty(null, -1);
                 fail("Setting property with a null key should throw an error");

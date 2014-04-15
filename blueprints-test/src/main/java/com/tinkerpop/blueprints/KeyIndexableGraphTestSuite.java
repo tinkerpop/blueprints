@@ -114,10 +114,10 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             assertEquals(graph.getIndexedKeys(Edge.class).size(), 1);
             assertTrue(graph.getIndexedKeys(Edge.class).contains("place"));
 
-            Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            Edge e1 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
             e1.setProperty("name", "marko");
             e1.setProperty("place", "everywhere");
-            Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            Edge e2 = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
             e2.setProperty("name", "stephen");
             e2.setProperty("place", "everywhere");
 
@@ -143,7 +143,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         }
 
         if (graph.getFeatures().supportsEdgeKeyIndex) {
-            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "knows");
+            Edge edge = graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("knows"));
             edge.setProperty("date", 2012);
             assertEquals(count(graph.getEdges("date", 2012)), 1);
             assertEquals(graph.getEdges("date", 2012).iterator().next(), edge);
@@ -159,7 +159,7 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
         if (graph.getFeatures().supportsEdgeKeyIndex) {
             graph.createKeyIndex("key", Edge.class);
             for (int i = 0; i < 25; i++) {
-                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), "test").setProperty("key", "value");
+                graph.addEdge(null, graph.addVertex(null), graph.addVertex(null), graphTest.convertLabel("test")).setProperty("key", "value");
             }
             if (graph.getFeatures().supportsVertexIteration) assertEquals(count(graph.getVertices()), 50);
             if (graph.getFeatures().supportsEdgeIteration) assertEquals(count(graph.getEdges()), 25);
