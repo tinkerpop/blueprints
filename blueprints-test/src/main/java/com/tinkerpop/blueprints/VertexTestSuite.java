@@ -156,8 +156,8 @@ public class VertexTestSuite extends TestSuite {
 
     public void testGetNonExistantVertices() {
         Graph graph = graphTest.generateGraph();
-        assertNull(graph.getVertex("asbv"));
-        assertNull(graph.getVertex(12.0d));
+        assertNull(graph.getVertex(graphTest.convertId("asbv")));
+        assertNull(graph.getVertex(graphTest.convertId(12.0d)));
         graph.shutdown();
     }
 
@@ -275,8 +275,8 @@ public class VertexTestSuite extends TestSuite {
         Graph graph = graphTest.generateGraph();
         if (graph.getFeatures().supportsVertexProperties) {
 
-            Vertex v1 = graph.addVertex("1");
-            Vertex v2 = graph.addVertex("2");
+            Vertex v1 = graph.addVertex(graphTest.convertId("1"));
+            Vertex v2 = graph.addVertex(graphTest.convertId("2"));
 
             assertNull(v1.removeProperty("key1"));
             assertNull(v1.removeProperty("key2"));
@@ -309,8 +309,8 @@ public class VertexTestSuite extends TestSuite {
             }
 
             if (!graph.getFeatures().ignoresSuppliedIds) {
-                v1 = graph.getVertex("1");
-                v2 = graph.getVertex("2");
+                v1 = graph.getVertex(graphTest.convertId("1"));
+                v2 = graph.getVertex(graphTest.convertId("2"));
 
                 if (graph.getFeatures().supportsStringProperty) {
                     assertEquals("value1", v1.removeProperty("key1"));
@@ -325,8 +325,8 @@ public class VertexTestSuite extends TestSuite {
                 assertNull(v1.removeProperty("key2"));
                 assertNull(v2.removeProperty("key2"));
 
-                v1 = graph.getVertex("1");
-                v2 = graph.getVertex("2");
+                v1 = graph.getVertex(graphTest.convertId("1"));
+                v2 = graph.getVertex(graphTest.convertId("2"));
 
                 if (graph.getFeatures().supportsStringProperty) {
                     v1.setProperty("key1", "value2");
