@@ -63,6 +63,7 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     private static final Features FEATURES = new Features();
 
     static {
+        FEATURES.hasImplicitElements = true;
         FEATURES.supportsDuplicateEdges = false;
         FEATURES.supportsSelfLoops = true;
         FEATURES.isPersistent = false;
@@ -74,7 +75,6 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         FEATURES.supportsEdgeRetrieval = false;
         FEATURES.supportsVertexProperties = false;
         FEATURES.supportsEdgeProperties = false;
-
 
         FEATURES.supportsTransactions = true;
         FEATURES.supportsEdgeKeyIndex = false;
@@ -178,27 +178,27 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
             resource = this.expandPrefix(resource);
             return new SailVertex(new URIImpl(resource), this);
         } else {
-            throw new RuntimeException(resource + " is not a valid URI, blank node, or literal value");
+            return null;
         }
         //return new SailVertex(NTriplesUtil.parseValue(resource, new ValueFactoryImpl()), this.sailConnection);
-
     }
 
     public Vertex addVertex(Object id) {
         if (null == id)
             id = SailTokens.URN_UUID_PREFIX + UUID.randomUUID().toString();
-        return createVertex(id.toString());
+
+        Vertex v = createVertex(id.toString());
+        if (null == v) {
+            throw new IllegalArgumentException("argument is not a valid URI, blank node, or literal value: " + id);
+        }
+        return v;
     }
 
     public Vertex getVertex(final Object id) {
         if (null == id)
             throw ExceptionFactory.vertexIdCanNotBeNull();
 
-        try {
-            return createVertex(id.toString());
-        } catch (RuntimeException re) {
-            return null;
-        }
+        return createVertex(id.toString());
     }
 
     public Edge getEdge(final Object id) {

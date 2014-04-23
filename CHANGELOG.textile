@@ -3,6 +3,8 @@ Blueprints: A Property Graph Model Interface
 
 h2. Blueprints 2.y.z
 
+* Added the hasImplicitElements feature for use with SailGraph and others which return elements not explicitly created with addVertex or addEdge
+
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
 h3. Version 2.5.0 (April 14, 2014)

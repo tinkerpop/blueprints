@@ -69,6 +69,10 @@ public class Features {
      */
     public Boolean supportsStringProperty = null;
     /**
+     * Does the graph return elements not explicitly created with addVertex or addEdge?
+     */
+    public Boolean hasImplicitElements = false;
+    /**
      * Does the graph ignore user provided ids in graph.addVertex(Object id)?
      */
     public Boolean ignoresSuppliedIds = null;

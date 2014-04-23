@@ -154,10 +154,12 @@ public class VertexTestSuite extends TestSuite {
 
     }
 
-    public void testGetNonExistantVertices() {
+    public void testGetNonExistentVertices() {
         Graph graph = graphTest.generateGraph();
-        assertNull(graph.getVertex("asbv"));
-        assertNull(graph.getVertex(12.0d));
+        if (!graph.getFeatures().hasImplicitElements) {
+            assertNull(graph.getVertex(graphTest.convertId("asbv")));
+            assertNull(graph.getVertex(graphTest.convertId(12.0d)));
+        }
         graph.shutdown();
     }
 

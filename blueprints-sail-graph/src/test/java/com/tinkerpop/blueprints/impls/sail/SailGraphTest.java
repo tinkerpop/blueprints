@@ -82,10 +82,10 @@ public class SailGraphTest extends GraphTest {
     }
 
     public Object convertId(final Object id) {
-        return "blueprints:" + id;
+        return "urn:com.tinkerpop.blueprints:" + id;
     }
 
     public String convertLabel(final String label) {
-        return "blueprints:" + label;
+        return "urn:com.tinkerpop.blueprints:" + label;
     }
 }
