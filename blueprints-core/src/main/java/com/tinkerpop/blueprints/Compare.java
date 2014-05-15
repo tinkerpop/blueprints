@@ -22,18 +22,26 @@ public enum Compare implements Predicate {
             case GREATER_THAN:
                 if (null == first || second == null)
                     return false;
+                if (first.getClass() != second.getClass())
+		            return false;
                 return ((Comparable) first).compareTo(second) >= 1;
             case LESS_THAN:
                 if (null == first || second == null)
                     return false;
+                if (first.getClass() != second.getClass())
+		            return false;
                 return ((Comparable) first).compareTo(second) <= -1;
             case GREATER_THAN_EQUAL:
                 if (null == first || second == null)
                     return false;
+                if (first.getClass() != second.getClass())
+		            return false;
                 return ((Comparable) first).compareTo(second) >= 0;
             case LESS_THAN_EQUAL:
                 if (null == first || second == null)
                     return false;
+                if (first.getClass() != second.getClass())
+		            return false;
                 return ((Comparable) first).compareTo(second) <= 0;
             default:
                 throw new IllegalArgumentException("Invalid state as no valid filter was provided");
