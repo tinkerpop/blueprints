@@ -20,6 +20,8 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             graph.getIndexedKeys(null);
         } catch (IllegalArgumentException iae) {
             return;
+        } finally {
+            graph.shutdown();
         }
 
         fail();
@@ -31,6 +33,8 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             graph.createKeyIndex("test", null);
         } catch (IllegalArgumentException iae) {
             return;
+        } finally {
+            graph.shutdown();
         }
 
         fail();
@@ -42,6 +46,8 @@ public class KeyIndexableGraphTestSuite extends TestSuite {
             graph.dropKeyIndex("test", null);
         } catch (IllegalArgumentException iae) {
             return;
+        } finally {
+            graph.shutdown();
         }
 
         fail();
