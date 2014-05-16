@@ -109,6 +109,6 @@ public class GraphMLWriterTest extends TestCase {
         System.out.println("working");
         System.setOut(oldStream);
 
-        assertTrue(outContent.toString().endsWith("working\n"));
+        assertTrue(outContent.toString().endsWith("working" + System.lineSeparator()));
     }
 }
