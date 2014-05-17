@@ -34,6 +34,7 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.RDFHandlerWrapper;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
@@ -327,17 +328,36 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      * @param baseURI   the baseURI for RDF data
      * @param format    supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
      * @param baseGraph the baseGraph to insert the data into
+     * @param rdfParser
+     *            The {@link RDFParser} to use. It's {@link RDFHandler} will be
+     *            changed. Can be <code>null</code> if you want to use a new
+     *            default parser for the specified <var>format</var>.
+     * @param rdfHandler
+     *            An {@link RDFHandler} to run after the internal
+     *            {@link RDFHandler} that will be created in this class. This is
+     *            mainly for implementing your own logging. The internal one
+     *            uses the graph passed to the constructor to add statements.
+     *            Can be <code>null</code> if you only want to use the default
+     *            {@link RDFHandler} created in this class.
      */
-    public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
+    public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph,
+            RDFParser rdfParser,
+            RDFHandler rdfHandler) {
         try {
             this.commit();
             final SailConnection c = this.rawGraph.getConnection();
             try {
                 c.begin();
-                RDFParser p = Rio.createParser(getFormat(format));
+                RDFParser p = rdfParser;
+                if (p == null) {
+                    p = Rio.createParser(getFormat(format));
+                }
                 RDFHandler h = null == baseGraph
                         ? new SailAdder(c)
                         : new SailAdder(c, new URIImpl(baseGraph));
+                if (rdfHandler != null) {
+                    h = new RDFHandlerWrapper(h, rdfHandler);
+                }
                 p.setRDFHandler(h);
                 p.parse(input, baseURI);
                 c.commit();
@@ -348,6 +368,21 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 
+     * @param input
+     * @param baseURI
+     * @param format
+     * @param baseGraph
+     * @see SailGraph#loadRDF(InputStream, String, String, String, RDFParser,
+     *      RDFHandler) SailGraph.loadRDF with <code>null</code>
+     *      <var>rdfParser</var> and <var>rdfHandler</var>.
+     */
+    public void loadRDF(final InputStream input, final String baseURI,
+            final String format, final String baseGraph) {
+        loadRDF(input, baseURI, format, baseGraph, null, null);
     }
 
     /**
