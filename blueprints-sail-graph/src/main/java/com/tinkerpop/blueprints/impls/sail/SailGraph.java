@@ -19,9 +19,11 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.BNodeImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
@@ -330,14 +332,25 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      * @param baseGraph the baseGraph to insert the data into
      * @param rdfParser
      *            The {@link RDFParser} to use. It's {@link RDFHandler} will be
-     *            changed. Can be <code>null</code> if you want to use a new
-     *            default parser for the specified <var>format</var>.
+     *            changed. The main purpose of this is to use a custom
+     *            {@link ValueFactory}. It is recommended to use
+     *            <code>Rio.createParser(getFormat(format))</code> and set the
+     *            {@link ValueFactory} of the parser to something that
+     *            <code>extends</code> the {@link ValueFactory} of your
+     *            {@link Sail}.
+     *            <p>
+     *            For example, <code>extend {@link ValueFactoryImpl}</code> if
+     *            you are using a <code>GraphSail</code>.
+     *            </p>
+     *            Can be <code>null</code> to use the default:
+     *            <code>Rio.createParser(getFormat(format))</code>.
      * @param rdfHandler
-     *            An {@link RDFHandler} to run after the internal
+     *            A {@link RDFHandler} to run <b>after</b> the internal
      *            {@link RDFHandler} that will be created in this class. This is
-     *            mainly for implementing your own logging. The internal one
-     *            uses the graph passed to the constructor to add statements.
-     *            Can be <code>null</code> if you only want to use the default
+     *            mainly for implementing your own logging since it will be
+     *            added using {@link RDFHandlerWrapper}. The internal one uses
+     *            the graph passed to the constructor to add statements. Can be
+     *            <code>null</code> if you only want to use the default
      *            {@link RDFHandler} created in this class.
      */
     public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph,
@@ -348,9 +361,8 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
             final SailConnection c = this.rawGraph.getConnection();
             try {
                 c.begin();
-                RDFParser p = rdfParser;
-                if (p == null) {
-                    p = Rio.createParser(getFormat(format));
+                if (rdfParser == null) {
+                    rdfParser = Rio.createParser(getFormat(format));
                 }
                 RDFHandler h = null == baseGraph
                         ? new SailAdder(c)
@@ -358,8 +370,8 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
                 if (rdfHandler != null) {
                     h = new RDFHandlerWrapper(h, rdfHandler);
                 }
-                p.setRDFHandler(h);
-                p.parse(input, baseURI);
+                rdfParser.setRDFHandler(h);
+                rdfParser.parse(input, baseURI);
                 c.commit();
             } finally {
                 c.rollback();
@@ -382,7 +394,8 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      */
     public void loadRDF(final InputStream input, final String baseURI,
             final String format, final String baseGraph) {
-        loadRDF(input, baseURI, format, baseGraph, null, null);
+        loadRDF(input, baseURI, format, baseGraph,
+                Rio.createParser(getFormat(format)), null);
     }
 
     /**
