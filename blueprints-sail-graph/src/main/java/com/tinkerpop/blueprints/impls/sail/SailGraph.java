@@ -389,8 +389,9 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      * @param format
      * @param baseGraph
      * @see SailGraph#loadRDF(InputStream, String, String, String, RDFParser,
-     *      RDFHandler) SailGraph.loadRDF with <code>null</code>
-     *      <var>rdfParser</var> and <var>rdfHandler</var>.
+     *      RDFHandler) SailGraph.loadRDF with <var>rdfParser</var> set to
+     *      <code>Rio.createParser(getFormat(format))</code> and
+     *      <var>rdfHandler</var> set to <code>null</code>.
      */
     public void loadRDF(final InputStream input, final String baseURI,
             final String format, final String baseGraph) {
