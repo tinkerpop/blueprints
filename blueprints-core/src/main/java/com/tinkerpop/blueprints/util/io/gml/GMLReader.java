@@ -214,6 +214,8 @@ public class GMLReader {
 
         } catch (IOException e) {
             throw new IOException("GML malformed line number " + st.lineno() + ": ", e);
+        } finally {
+            r.close();
         }
     }
 }

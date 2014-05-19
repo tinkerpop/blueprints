@@ -165,6 +165,7 @@ public class EdgeTestSuite extends TestSuite {
           assertEquals(e2, getOnlyElement(graph.getEdges("label", graphTest.convertLabel("test2"))));
           assertEquals(e3, getOnlyElement(graph.getEdges("label", graphTest.convertLabel("test3"))));
         }
+        graph.shutdown();
     }
 
     public void testGetNonExistantEdges() {

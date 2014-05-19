@@ -684,6 +684,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
+        graph.shutdown();
     }
 
     public void testTransactionGraphHelperOneAndDone() {
@@ -715,6 +716,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
+        graph.shutdown();
     }
 
     public void testTransactionGraphHelperExponentialBackoff() {
@@ -754,6 +756,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
+        graph.shutdown();
     }
 
     public void testTransactionGraphHelperExponentialBackoffWithExceptionChecks() {
@@ -816,6 +819,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
+        graph.shutdown();
     }
 
     public void testTransactionGraphHelperRetry() {
@@ -855,6 +859,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         vertexCount(graph, 1);
         containsVertices(graph, vin);
+        graph.shutdown();
     }
 
     public void untestSimulateRexsterIntegrationTests() throws Exception {
@@ -1085,6 +1090,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         Set<String> k = v.get().getPropertyKeys();
         assertTrue(k.contains("name"));
         assertEquals("stephen", v.get().getProperty("name"));
+        graph.shutdown();
     }
 
     public void untestTransactionIsolationWithSeparateThreads() throws Exception {
