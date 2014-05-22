@@ -130,6 +130,6 @@ public class GraphSONWriterTest {
         System.out.println("working");
         System.setOut(oldStream);
 
-        Assert.assertTrue(outContent.toString().endsWith("working\n"));
+        Assert.assertTrue(outContent.toString().endsWith("working" + System.lineSeparator()));
     }
 }

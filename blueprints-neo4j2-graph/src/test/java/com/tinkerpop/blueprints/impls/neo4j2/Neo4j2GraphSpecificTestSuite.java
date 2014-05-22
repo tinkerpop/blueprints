@@ -9,7 +9,6 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Iterator;
 
@@ -96,6 +95,34 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         assertEquals(counter, 1);
         assertEquals(count(graph.getIndex("edges", Edge.class).query("weight", "[0.1 TO 0.5]")), 0);
 
+
+        graph.shutdown();
+    }
+
+    public void testLuceneQueryIndex() throws Exception {
+        Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
+        Index<Vertex> vertexIndex = graph.createIndex("vertices", Vertex.class);
+
+        Vertex a = graph.addVertex(null);
+        vertexIndex.put("name", "marko", a);
+
+        Iterator ittyLuceneQuery = ((Neo4j2Index) graph.getIndex("vertices", Vertex.class)).query("name:*rko").iterator();
+        int counter = 0;
+        while (ittyLuceneQuery.hasNext()) {
+            counter++;
+            assertEquals(a, ittyLuceneQuery.next());
+        }
+        assertEquals(counter, 1);
+
+        vertexIndex.put("name", "marko some_other name", graph.addVertex(null));
+        ittyLuceneQuery = ((Neo4j2Index) graph.getIndex("vertices", Vertex.class)).query("name:*rko*").iterator();
+
+        counter = 0;
+        while (ittyLuceneQuery.hasNext()) {
+            ittyLuceneQuery.next();
+            counter++;
+        }
+        assertEquals(2, counter);
 
         graph.shutdown();
     }

@@ -65,8 +65,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
         final IndexHits<S> itty = this.rawIndex.get(key, value);
         if (this.indexClass.isAssignableFrom(Neo4j2Vertex.class))
             return new Neo4j2VertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
-        else
-            return new Neo4j2EdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
+        return new Neo4j2EdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
     }
 
     /**
@@ -81,8 +80,22 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
         final IndexHits<S> itty = this.rawIndex.query(key, query);
         if (this.indexClass.isAssignableFrom(Neo4j2Vertex.class))
             return new Neo4j2VertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
-        else
-            return new Neo4j2EdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
+        return new Neo4j2EdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * The underlying Neo4j graph does not natively support this method within a transaction.
+     * If the graph is not currently in a transaction, then the operation runs efficiently.
+     * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
+     */
+    public CloseableIterable<T> query(final Object query) {
+        this.graph.autoStartTransaction(false);
+        final IndexHits<S> itty = this.rawIndex.query(query);
+        if (this.indexClass.isAssignableFrom(Neo4j2Vertex.class))
+            return new Neo4j2VertexIterable((Iterable<Node>) itty, this.graph, this.graph.checkElementsInTransaction());
+        return new Neo4j2EdgeIterable((Iterable<Relationship>) itty, this.graph, this.graph.checkElementsInTransaction());
     }
 
     /**
