@@ -260,7 +260,12 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             String c = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
 
             Vertex out = getOrCreateVertex(subject);
-            Vertex in = getOrCreateVertex(object);
+            Vertex in;
+            if (subject.equals(object)) {
+                in = out;
+            } else {
+                in = getOrCreateVertex(object);
+            }
             Edge edge = store.graph.addEdge(null, out, in, predicate.stringValue());
             if (inferred) {
                 //System.out.println("inferred!");
