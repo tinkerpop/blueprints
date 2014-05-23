@@ -661,11 +661,11 @@ public class TransactionalGraphTestSuite extends TestSuite {
 
         // first fail the tx
         new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
-           @Override
-           public Vertex execute(final TransactionalGraph graph) throws Exception {
-               graph.addVertex(null);
-               throw new Exception("fail");
-           }
+            @Override
+            public Vertex execute(final TransactionalGraph graph) throws Exception {
+                graph.addVertex(null);
+                throw new Exception("fail");
+            }
         }).build().fireAndForget();
         vertexCount(graph, 0);
 
@@ -673,7 +673,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         List<Vertex> vin = new ArrayList<Vertex>();
         TransactionRetryHelper<Vertex> trh = new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
-            public Vertex execute(final TransactionalGraph graph) throws Exception{
+            public Vertex execute(final TransactionalGraph graph) throws Exception {
                 return graph.addVertex(null);
             }
         }).build();
@@ -692,7 +692,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         try {
             new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
                 @Override
-                public Vertex execute(final TransactionalGraph graph) throws Exception{
+                public Vertex execute(final TransactionalGraph graph) throws Exception {
                     graph.addVertex(null);
                     throw new Exception("fail");
                 }
@@ -707,7 +707,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         List<Vertex> vin = new ArrayList<Vertex>();
         vin.add(new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
-            public Vertex execute(final TransactionalGraph graph) throws Exception{
+            public Vertex execute(final TransactionalGraph graph) throws Exception {
                 return graph.addVertex(null);
             }
         }).build().oneAndDone());
@@ -744,7 +744,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         List<Vertex> vin = new ArrayList<Vertex>();
         vin.add(new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
-            public Vertex execute(final TransactionalGraph graph) throws Exception{
+            public Vertex execute(final TransactionalGraph graph) throws Exception {
                 final int tryNumber = tries.incrementAndGet();
                 if (tryNumber == TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2)
                     return graph.addVertex(null);
@@ -788,7 +788,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         try {
             new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
                 @Override
-                public Vertex execute(final TransactionalGraph graph) throws Exception{
+                public Vertex execute(final TransactionalGraph graph) throws Exception {
                     final int tryNumber = setOfTries.incrementAndGet();
                     if (tryNumber == TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2)
                         throw new Exception("fail");
@@ -808,7 +808,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         List<Vertex> vin = new ArrayList<Vertex>();
         vin.add(new TransactionRetryHelper.Builder<Vertex>(graph).perform(new TransactionWork<Vertex>() {
             @Override
-            public Vertex execute(final TransactionalGraph graph) throws Exception{
+            public Vertex execute(final TransactionalGraph graph) throws Exception {
                 final int tryNumber = tries.incrementAndGet();
                 if (tryNumber == TransactionRetryStrategy.DelayedRetry.DEFAULT_TRIES - 2)
                     return graph.addVertex(null);
@@ -862,6 +862,57 @@ public class TransactionalGraphTestSuite extends TestSuite {
         containsVertices(graph, vin);
 
         graph.shutdown();
+    }
+
+    public void testRemovedElementsInvisibleInTransaction() {
+        TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        try {
+            boolean supportsVertexIteration = graph.getFeatures().supportsVertexIteration;
+            boolean supportsEdgeIteration = graph.getFeatures().supportsEdgeIteration;
+
+            if (supportsEdgeIteration) {
+                assertEquals(0, count(graph.getEdges()));
+            }
+            Vertex v1 = graph.addVertex(null);
+            Vertex v2 = graph.addVertex(null);
+            Edge e1 = graph.addEdge(null, v1, v2, graphTest.convertLabel("link"));
+            if (supportsVertexIteration) {
+                assertEquals(2, count(graph.getVertices()));
+            }
+            if (supportsEdgeIteration) {
+                assertEquals(1, count(graph.getEdges()));
+            }
+            graph.commit();
+            if (supportsVertexIteration) {
+                assertEquals(2, count(graph.getVertices()));
+            }
+            if (supportsEdgeIteration) {
+                assertEquals(1, count(graph.getEdges()));
+            }
+
+            graph.removeEdge(e1);
+            // We have removed an edge and not yet committed the change.
+            // However, the edge should appear to be removed until the end of the transaction.
+            if (supportsVertexIteration) {
+                assertEquals(2, count(graph.getVertices()));
+            }
+            if (supportsEdgeIteration) {
+                assertEquals(0, count(graph.getEdges()));
+            }
+            graph.removeVertex(v1);
+            if (supportsVertexIteration) {
+                assertEquals(1, count(graph.getVertices()));
+            }
+            graph.rollback();
+            if (supportsVertexIteration) {
+                assertEquals(2, count(graph.getVertices()));
+            }
+            if (supportsEdgeIteration) {
+                assertEquals(1, count(graph.getEdges()));
+            }
+        } finally {
+            graph.shutdown();
+        }
     }
 
     public void untestSimulateRexsterIntegrationTests() throws Exception {
