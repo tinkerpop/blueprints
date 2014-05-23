@@ -199,7 +199,7 @@ public class GMLWriterTest extends TestCase {
         System.out.println("working");
         System.setOut(oldStream);
 
-        assertTrue(outContent.toString().endsWith("working" + System.lineSeparator()));
+        assertTrue(outContent.toString().endsWith("working" + System.getProperty("line.separator")));
     }
 
     private int getIterableCount(Iterable<?> elements) {
