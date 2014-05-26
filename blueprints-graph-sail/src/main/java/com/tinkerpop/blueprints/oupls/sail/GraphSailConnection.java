@@ -45,7 +45,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * A stateful connection to a BlueprintsSail RDF store interface.
+ * A stateful connection to a GraphSail RDF store
  *
  * @author Joshua Shinavier (http://fortytwo.net)
  */
@@ -260,7 +260,9 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             String c = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
 
             Vertex out = getOrCreateVertex(subject);
-            Vertex in = getOrCreateVertex(object);
+            // object-level identity of subject and object facilitates creation of self-loop edges in some Graph implementations
+            Vertex in = subject.equals(object) ? out : getOrCreateVertex(object);
+
             Edge edge = store.graph.addEdge(null, out, in, predicate.stringValue());
             if (inferred) {
                 //System.out.println("inferred!");
