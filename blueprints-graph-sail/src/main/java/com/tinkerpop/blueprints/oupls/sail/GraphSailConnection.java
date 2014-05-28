@@ -77,6 +77,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     protected void startTransactionInternal() throws SailException {
         statementsAdded = false;
         statementsRemoved = false;
+        prevSubject = null;
+        prevOutVertex = null;
     }
 
     public void commitInternal() throws SailException {
@@ -394,6 +396,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
         if (0 < edgesToRemove.size()) {
             statementsRemoved = true;
+            prevSubject = null;
+            prevOutVertex = null;
         }
 
         //System.out.println("\tdone removing");
@@ -459,6 +463,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 }
 
                 statementsRemoved = true;
+                prevSubject = null;
+                prevOutVertex = null;
             }
         }
     }
