@@ -59,6 +59,16 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     private boolean statementsAdded;
     private boolean statementsRemoved;
 
+    /**
+     * The subject that was just seen when adding a statement.
+     */
+    private Resource prevSubject = null;
+
+    /**
+     * The vertex corresponding to {@link #prevSubject}.
+     */
+    private Vertex prevOutVertex = null;
+
     public GraphSailConnection(final GraphSail.DataStore store) {
         super(store.sail);
         this.store = store;
@@ -259,7 +269,10 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         for (Resource context : ((0 == contexts.length) ? NULL_CONTEXT_ARRAY : contexts)) {
             String c = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
 
-            Vertex out = getOrCreateVertex(subject);
+            // Track the subject since data will often list relations for the same subject consecutively.
+            Vertex out = subject.equals(prevSubject) ? prevOutVertex
+                    : (prevOutVertex = getOrCreateVertex(prevSubject = subject));
+
             // object-level identity of subject and object facilitates creation of self-loop edges in some Graph implementations
             Vertex in = subject.equals(object) ? out : getOrCreateVertex(object);
 
