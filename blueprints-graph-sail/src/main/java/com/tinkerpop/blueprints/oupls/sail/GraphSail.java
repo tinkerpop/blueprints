@@ -554,4 +554,15 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
             System.out.println("\t\t" + i.next());
         }
     }
+
+    /**
+     * Adds a vertex to the store.
+     * 
+     * @param value
+     *            The used to initialize the vertex.
+     * @return The newly created vertex.
+     */
+    public Vertex addVertex(Value value) {
+        return store.addVertex(value);
+    }
 }
