@@ -189,6 +189,8 @@ public class ElementHelper {
      * @return Whether the two elements are equal
      */
     public static boolean areEqual(final Element a, final Object b) {
+		if (null == a && b != null)
+			return false;
         if (a == b)
             return true;
         if (null == b)

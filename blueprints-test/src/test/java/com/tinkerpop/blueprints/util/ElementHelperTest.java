@@ -156,4 +156,34 @@ public class ElementHelperTest extends BaseTest {
         }
 
     }
+
+	public void testAreEqualNullFirstArg() {
+		Graph graph = new TinkerGraph();
+		Vertex vertex = graph.addVertex(null);
+
+		ElementHelper.areEqual(null, vertex);
+	}
+
+	public void testAreEqualNullSecondArg() {
+		Graph graph = new TinkerGraph();
+		Vertex vertex = graph.addVertex(null);
+
+		ElementHelper.areEqual(vertex, null);
+	}
+
+	public void testAreEqualValid() {
+		Graph graph = new TinkerGraph();
+		Vertex vertex = graph.addVertex(null);
+
+		ElementHelper.areEqual(vertex, vertex);
+	}
+
+	public void testAreEqualInvalid() {
+		Graph graph = new TinkerGraph();
+		Vertex vertex1 = graph.addVertex(null);
+		Vertex vertex2 = graph.addVertex(null);
+
+		ElementHelper.areEqual(vertex2, vertex1);
+	}
+
 }
