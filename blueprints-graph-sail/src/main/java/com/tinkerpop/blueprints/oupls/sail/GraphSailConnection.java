@@ -16,25 +16,9 @@ import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.query.algebra.QueryRoot;
 import org.openrdf.query.algebra.TupleExpr;
-import org.openrdf.query.algebra.Var;
-import org.openrdf.query.algebra.evaluation.EvaluationStrategy;
 import org.openrdf.query.algebra.evaluation.TripleSource;
-import org.openrdf.query.algebra.evaluation.impl.BindingAssigner;
-import org.openrdf.query.algebra.evaluation.impl.CompareOptimizer;
-import org.openrdf.query.algebra.evaluation.impl.ConjunctiveConstraintSplitter;
-import org.openrdf.query.algebra.evaluation.impl.ConstantOptimizer;
-import org.openrdf.query.algebra.evaluation.impl.DisjunctiveConstraintOptimizer;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
-import org.openrdf.query.algebra.evaluation.impl.FilterOptimizer;
-import org.openrdf.query.algebra.evaluation.impl.IterativeEvaluationOptimizer;
-import org.openrdf.query.algebra.evaluation.impl.OrderLimitOptimizer;
-import org.openrdf.query.algebra.evaluation.impl.QueryJoinOptimizer;
-import org.openrdf.query.algebra.evaluation.impl.QueryModelNormalizer;
-import org.openrdf.query.algebra.evaluation.impl.SameTermFilterOptimizer;
-import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
-import org.openrdf.query.impl.EmptyBindingSet;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.DefaultSailChangedEvent;
 import org.openrdf.sail.helpers.NotifyingSailConnectionBase;
@@ -82,7 +66,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     public void commitInternal() throws SailException {
-        if (store.manualTransactions) {
+        if (store.isTransactional) {
             ((TransactionalGraph) store.graph).commit();
         }
 
@@ -95,15 +79,16 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     public void rollbackInternal() throws SailException {
-        if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        if (store.isTransactional) {
+
+            ((TransactionalGraph) store.graph).rollback();
         }
     }
 
     public void closeInternal() throws SailException {
         // Roll back any uncommitted operations.
-        if (store.manualTransactions) {
-            ((TransactionalGraph) store.graph).stopTransaction(TransactionalGraph.Conclusion.FAILURE);
+        if (store.isTransactional) {
+            ((TransactionalGraph) store.graph).rollback();
         }
     }
 
@@ -118,44 +103,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         } catch (QueryEvaluationException e) {
             throw new SailException(e);
         }
-
-        /*
-        // Clone the tuple expression to allow for more aggressive optimizations
-        tupleExpr = tupleExpr.clone();
-
-        if (!(tupleExpr instanceof QueryRoot)) {
-            // Add a dummy root node to the tuple expressions to allow the
-            // optimizers to modify the actual root node
-            tupleExpr = new QueryRoot(tupleExpr);
-        }
-
-        try {
-            //replaceValues(tupleExpr);
-
-            TripleSource tripleSource = new SailConnectionTripleSource(this, store.valueFactory, includeInferred);
-            EvaluationStrategy strategy = new EvaluationStrategyImpl(tripleSource, dataset);
-
-            new BindingAssigner().optimize(tupleExpr, dataset, bindings);
-            new ConstantOptimizer(strategy).optimize(tupleExpr, dataset, bindings);
-            new CompareOptimizer().optimize(tupleExpr, dataset, bindings);
-            new ConjunctiveConstraintSplitter().optimize(tupleExpr, dataset, bindings);
-            new DisjunctiveConstraintOptimizer().optimize(tupleExpr, dataset, bindings);
-            new SameTermFilterOptimizer().optimize(tupleExpr, dataset, bindings);
-            new QueryModelNormalizer().optimize(tupleExpr, dataset, bindings);
-            // new SubSelectJoinOptimizer().optimize(tupleExpr, dataset, bindings);
-            //new QueryJoinOptimizer(new NativeEvaluationStatistics(nativeStore)).optimize(tupleExpr, dataset, bindings);
-            new IterativeEvaluationOptimizer().optimize(tupleExpr, dataset, bindings);
-            new FilterOptimizer().optimize(tupleExpr, dataset, bindings);
-            new OrderLimitOptimizer().optimize(tupleExpr, dataset, bindings);
-
-            logger.trace("Optimized query model:\n{}", tupleExpr);
-
-            return strategy.evaluate(tupleExpr, EmptyBindingSet.getInstance());
-        }
-        catch (QueryEvaluationException e) {
-            throw new SailException(e);
-        }
-        */
     }
 
     public CloseableIteration<? extends Resource, SailException> getContextIDsInternal() throws SailException {
@@ -368,7 +315,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 //System.out.println("matcher: " + indexes.matchers[index]);
                 Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, context, inferred);
                 for (Edge e : i) {
-                    Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
+                    Boolean b = e.getProperty(GraphSail.INFERRED);
                     if ((!inferred && null == b)
                             || (inferred && null != b && b)) {
                         edgesToRemove.add(e);
@@ -436,7 +383,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         while (iter.hasNext()) {
             Edge e = iter.next();
 
-            Boolean b = (Boolean) e.getProperty(GraphSail.INFERRED);
+            Boolean b = e.getProperty(GraphSail.INFERRED);
             if ((!inferred && null == b)
                     || (inferred && null != b && b)) {
                 SimpleStatement s;
@@ -505,7 +452,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
             public Namespace next() throws SailException {
                 String prefix = prefixes.next();
-                String uri = (String) store.namespaces.getProperty(prefix);
+                String uri = store.namespaces.getProperty(prefix);
                 return new NamespaceImpl(fromNativePrefixKey(prefix), uri);
             }
 
@@ -802,13 +749,13 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     private Value toSesame(final Vertex v) {
-        String value = (String) v.getProperty(GraphSail.VALUE);
-        String kind = (String) v.getProperty(GraphSail.KIND);
+        String value = v.getProperty(GraphSail.VALUE);
+        String kind = v.getProperty(GraphSail.KIND);
         if (kind.equals(GraphSail.URI)) {
             return store.valueFactory.createURI(value);
         } else if (kind.equals(GraphSail.LITERAL)) {
-            String datatype = (String) v.getProperty(GraphSail.TYPE);
-            String lang = (String) v.getProperty(GraphSail.LANG);
+            String datatype = v.getProperty(GraphSail.TYPE);
+            String lang = v.getProperty(GraphSail.LANG);
             return null != datatype
                     ? store.valueFactory.createLiteral(value, store.valueFactory.createURI(datatype))
                     : null != lang

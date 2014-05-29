@@ -1,6 +1,5 @@
 package com.tinkerpop.blueprints.oupls.sail;
 
-import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.KeyIndexableGraph;
 import com.tinkerpop.blueprints.TransactionalGraph;
@@ -22,7 +21,6 @@ import org.openrdf.sail.NotifyingSailConnection;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.NotifyingSailBase;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -138,7 +136,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         store.sail = this;
         store.graph = graph;
 
-        store.manualTransactions = store.graph instanceof TransactionalGraph;
+        store.isTransactional = store.graph instanceof TransactionalGraph;
 
         if (!store.graph.getIndexedKeys(Vertex.class).contains(VALUE)) {
             store.graph.createKeyIndex(VALUE, Vertex.class);
@@ -154,7 +152,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
             try {
                 store.namespaces = store.addVertex(NAMESPACES_VERTEX_ID);
             } finally {
-                if (store.manualTransactions) {
+                if (store.isTransactional) {
                     ((TransactionalGraph) graph).commit();
                 }
             }
@@ -236,7 +234,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         // A triple pattern matcher for each spoc combination
         public final Matcher[] matchers = new Matcher[16];
 
-        public boolean manualTransactions;
+        public boolean isTransactional;
         public boolean volatileStatements = false;
         public boolean uniqueStatements = false;
 
@@ -293,8 +291,8 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
         public boolean matches(final Vertex vertex,
                                final Value value) {
-            String kind = (String) vertex.getProperty(KIND);
-            String val = (String) vertex.getProperty(VALUE);
+            String kind = vertex.getProperty(KIND);
+            String val = vertex.getProperty(VALUE);
             if (value instanceof URI) {
                 return kind.equals(URI) && val.equals(value.stringValue());
             } else if (value instanceof Literal) {
@@ -303,8 +301,8 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
                         return false;
                     }
 
-                    String type = (String) vertex.getProperty(TYPE);
-                    String lang = (String) vertex.getProperty(LANG);
+                    String type = vertex.getProperty(TYPE);
+                    String lang = vertex.getProperty(LANG);
 
                     URI vType = ((Literal) value).getDatatype();
                     String vLang = ((Literal) value).getLanguage();
@@ -528,6 +526,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         store.indexers.add(m);
     }
 
+    /*
     private static void debugEdge(final Edge e) {
         System.out.println("edge " + e + ":");
         for (String key : e.getPropertyKeys()) {
@@ -553,5 +552,5 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         while (i.hasNext()) {
             System.out.println("\t\t" + i.next());
         }
-    }
+    }*/
 }
