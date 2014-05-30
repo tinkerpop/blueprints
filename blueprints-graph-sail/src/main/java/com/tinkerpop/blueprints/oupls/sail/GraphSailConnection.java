@@ -2,8 +2,10 @@ package com.tinkerpop.blueprints.oupls.sail;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.util.StringFactory;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
 import net.fortytwo.sesametools.SailConnectionTripleSource;
 import info.aduna.iteration.CloseableIteration;
@@ -201,22 +203,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             throw new IllegalArgumentException("null part-of-speech for to-be-added statement");
         }
 
-        if (store.uniqueStatements) {
-            if (0 == contexts.length) {
-                removeStatementsInternal(inferred, subject, predicate, object, (Resource) null);
-                if (!inferred) {
-                    removeStatementsInternal(true, subject, predicate, object, (Resource) null);
-                }
-            } else {
-                removeStatementsInternal(inferred, subject, predicate, object, contexts);
-                if (!inferred) {
-                    removeStatementsInternal(true, subject, predicate, object, contexts);
-                }
-            }
-        }
-
         for (Resource context : ((0 == contexts.length) ? NULL_CONTEXT_ARRAY : contexts)) {
-            String c = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
+            String contextStr = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
 
             // Track the subject since data will often list relations for the same subject consecutively.
             Vertex out = subject.equals(prevSubject) ? prevOutVertex
@@ -224,6 +212,26 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
             // object-level identity of subject and object facilitates creation of self-loop edges in some Graph implementations
             Vertex in = subject.equals(object) ? out : getOrCreateVertex(object);
+
+            // if enforcing uniqueness of statements, check for an edge identical to the one we are about to add
+            if (store.uniqueStatements) {
+                Iterator<Edge> prevEdges = out.query().direction(Direction.OUT)
+                        .has(StringFactory.LABEL, predicate.stringValue())
+                        .has(GraphSail.CONTEXT_PROP, contextStr)
+                        .edges().iterator();
+                boolean found = false;
+                Object objectId = in.getId();
+                while (prevEdges.hasNext()) {
+                    if (prevEdges.next().getVertex(Direction.IN).getId().equals(objectId)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    continue;
+                }
+            }
 
             Edge edge = store.graph.addEdge(null, out, in, predicate.stringValue());
             if (inferred) {
@@ -233,12 +241,12 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
             for (IndexingMatcher m : (Collection<IndexingMatcher>) store.indexers) {
                 //System.out.println("\t\tindexing with: " + m);
-                m.indexStatement(edge, subject, predicate, object, c);
+                m.indexStatement(edge, subject, predicate, object, contextStr);
             }
 
             // Hack to encode graph context even if the "c" index is disabled
             if (null == edge.getProperty(GraphSail.CONTEXT_PROP)) {
-                edge.setProperty(GraphSail.CONTEXT_PROP, store.valueToNative(context));
+                edge.setProperty(GraphSail.CONTEXT_PROP, contextStr);
             }
 
             if (hasConnectionListeners()) {
@@ -249,9 +257,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             //System.out.println("added (s: " + s + ", p: " + p + ", o: " + o + ", c: " + c + ")");
             //System.out.print("\t--> ");
             //BlueprintsSail.debugEdge(edge);
+            statementsAdded = true;
         }
-
-        statementsAdded = true;
         //System.out.println("\tdone adding");
     }
 
