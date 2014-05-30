@@ -325,39 +325,31 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     /**
      * Load RDF data into the SailGraph. Supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig.
      * Before loading data, the current transaction is successfully committed.
-     * 
-     * @param input
-     *            The InputStream of RDF data.
-     * @param baseURI
-     *            The baseURI for RDF data.
-     * @param baseGraph
-     *            The baseGraph to insert the data into.
-     * @param rdfParser
-     *            The {@link RDFParser} to use. It's {@link RDFHandler} will be
-     *            changed to an internal one. The main purpose of this is to use
-     *            a custom {@link ValueFactory}. It is recommended to use
-     *            <code>Rio.createParser(getFormat(format))</code> and set the
-     *            {@link ValueFactory} of the parser to something that
-     *            <code>extends</code> the {@link ValueFactory} of the
-     *            {@link Sail} used to initialize this class.
-     *            <p>
-     *            For example, <code>extend {@link ValueFactoryImpl}</code> if
-     *            you used a <code>GraphSail</code> to initialize this class.
-     *            </p>
-     * @param rdfHandler
-     *            A {@link RDFHandler} to run <b>after</b> the internal
-     *            {@link RDFHandler} that will be created in this class.
-     *            <p>
-     *            This is mainly for implementing your own logging since it will
-     *            be added using {@link RDFHandlerWrapper}. The internal one
-     *            uses the graph passed to the constructor to add statements.
-     *            Can be <code>null</code> if you only want to use the default
-     *            {@link RDFHandler} created in this class.
-     *            </p>
+     *
+     * @param input       The InputStream of RDF data.
+     * @param baseURI     The baseURI for RDF data.
+     * @param rdfParser   The {@link RDFParser} to use. It's {@link RDFHandler} will be
+     *                    changed to an internal one. The main purpose of this is to use
+     *                    a custom {@link ValueFactory}. It is recommended to use
+     *                    <code>Rio.createParser(getFormat(format))</code> and set the
+     *                    {@link ValueFactory} of the parser to something that
+     *                    <code>extends</code> the {@link ValueFactory} of the
+     *                    {@link Sail} used to initialize this class.
+     *                    <p>
+     *                    For example, <code>extend {@link ValueFactoryImpl}</code> if
+     *                    you used a <code>GraphSail</code> to initialize this class.
+     * @param baseGraph   The baseGraph to insert the data into.  May be null, in which case data is added to the default graph.
+     * @param rdfHandlers Any number of {@link RDFHandler}s into which to pass parsed RDF statements <b>after</b>
+     *                    they have been added to the graph.
+     *                    These may be used, for example, for implementing your own logging.
+     *                    Can be <code>null</code> if you only want to use the default
+     *                    {@link RDFHandler} created internally.
      */
-    public void loadRDF(final InputStream input, final String baseURI, final String baseGraph,
-            final RDFParser rdfParser,
-            final RDFHandler rdfHandler) {
+    public void loadRDF(final InputStream input,
+                        final String baseURI,
+                        final RDFParser rdfParser,
+                        final String baseGraph,
+                        final RDFHandler... rdfHandlers) {
         try {
             this.commit();
             final SailConnection c = this.rawGraph.getConnection();
@@ -366,8 +358,11 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
                 RDFHandler h = null == baseGraph
                         ? new SailAdder(c)
                         : new SailAdder(c, new URIImpl(baseGraph));
-                if (rdfHandler != null) {
-                    h = new RDFHandlerWrapper(h, rdfHandler);
+                if (rdfHandlers != null) {
+                    RDFHandler[] handlers = new RDFHandler[rdfHandlers.length + 1];
+                    handlers[0] = h;
+                    System.arraycopy(rdfHandlers, 0, handlers, 1, rdfHandlers.length);
+                    h = new RDFHandlerWrapper(handlers);
                 }
                 rdfParser.setRDFHandler(h);
                 rdfParser.parse(input, baseURI);
@@ -384,38 +379,21 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     /**
      * Load RDF data into the SailGraph. Supported formats include rdf-xml,
      * n-triples, turtle, n3, trix, or trig.
-     * 
+     *
      * @param input
      * @param baseURI
      * @param format
      * @param baseGraph
-     * @param rdfHandler
-     * @see SailGraph#loadRDF(InputStream, String, String, RDFParser,
-     *      RDFHandler) SailGraph.loadRDF with <var>rdfParser</var> set to
-     *      <code>Rio.createParser(getFormat(format))</code>.
+     * @param rdfHandlers
+     * @see SailGraph#loadRDF(InputStream, String, RDFParser, String, RDFHandler...)
+     * with <var>rdfParser</var> set to <code>Rio.createParser(getFormat(format))</code>.
      */
-    public void loadRDF(final InputStream input, final String baseURI,
-            final String format,
-            final String baseGraph, final RDFHandler rdfHandler) {
-        loadRDF(input, baseURI, baseGraph, Rio.createParser(getFormat(format)),
-                rdfHandler);
-    }
-
-    /**
-     * Load RDF data into the SailGraph. Supported formats include rdf-xml,
-     * n-triples, turtle, n3, trix, or trig.
-     * 
-     * @param input
-     * @param baseURI
-     * @param format
-     * @param baseGraph
-     * @see SailGraph#loadRDF(InputStream, String, String, String, RDFHandler)
-     *      SailGraph.loadRDF with <var>rdfHandler</var> set to
-     *      <code>null</code>.
-     */
-    public void loadRDF(final InputStream input, final String baseURI,
-            final String format, final String baseGraph) {
-        loadRDF(input, baseURI, format, baseGraph, null);
+    public void loadRDF(final InputStream input,
+                        final String baseURI,
+                        final String format,
+                        final String baseGraph,
+                        final RDFHandler... rdfHandlers) {
+        loadRDF(input, baseURI, Rio.createParser(getFormat(format)), baseGraph, rdfHandlers);
     }
 
     /**
