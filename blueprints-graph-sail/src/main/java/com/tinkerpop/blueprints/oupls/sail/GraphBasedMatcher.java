@@ -43,8 +43,8 @@ public class GraphBasedMatcher extends Matcher {
         final String contextStr = null == context ? GraphSail.NULL_CONTEXT_NATIVE : store.resourceToNative(context);
 
         if (s && o) {
-            Vertex vs = store.findVertex(subject);
-            Vertex vo = store.findVertex(object);
+            Vertex vs = store.getVertex(subject);
+            Vertex vo = store.getVertex(object);
 
             if (null == vs || null == vo) {
                 return new IteratorCloseableIterable<Edge>(new EmptyIterator<Edge>());
@@ -61,7 +61,7 @@ public class GraphBasedMatcher extends Matcher {
                 });
             }
         } else if (s) {
-            Vertex vs = store.findVertex(subject);
+            Vertex vs = store.getVertex(subject);
             return null == vs ? new IteratorCloseableIterable<Edge>(new EmptyIterator<Edge>())
                     : new FilteredIterator<Edge>(vs.getEdges(Direction.OUT), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {
@@ -71,7 +71,7 @@ public class GraphBasedMatcher extends Matcher {
                 }
             });
         } else {
-            Vertex vo = store.findVertex(object);
+            Vertex vo = store.getVertex(object);
             return null == vo ? new IteratorCloseableIterable<Edge>(new EmptyIterator<Edge>())
                     : new FilteredIterator<Edge>(vo.getEdges(Direction.IN), new FilteredIterator.Criterion<Edge>() {
                 public boolean fulfilledBy(final Edge edge) {

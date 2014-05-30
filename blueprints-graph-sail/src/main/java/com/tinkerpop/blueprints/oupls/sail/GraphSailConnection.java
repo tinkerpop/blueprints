@@ -253,7 +253,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
     }
 
     private Vertex getOrCreateVertex(final Value value) {
-        Vertex v = store.findVertex(value);
+        Vertex v = store.getVertex(value);
         if (null == v) {
             v = store.addVertex(value);
         }

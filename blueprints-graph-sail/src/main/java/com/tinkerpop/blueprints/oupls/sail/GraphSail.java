@@ -204,7 +204,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
      * (in all of its subject, predicate, object and context) to an existing statement.
      * If enabled, this policy will first remove any existing statements identical to the to-be-added statement,
      * before adding the latter statement.
-     * This comes at the cost of significant querying overhead.
+     * This comes at the cost of some querying overhead.
      *
      * @param flag whether this policy should be enforced
      */
@@ -213,21 +213,31 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
     }
 
     /**
+     * Finds and returns the Vertex corresponding to an RDF value, if it exists in the graph.
+     *
+     * @param value the RDF value to find
+     * @return the corresponding Vertex.
+     * A Vertex will be found if an RDF statement has been added to the graph in which the provided value is
+     * the subject or object, or if the value has been explicitly added as a Vertex using {@link #addVertex(org.openrdf.model.Value)}
+     */
+    public Vertex getVertex(final Value value) {
+        return store.getVertex(value);
+    }
+
+    /**
      * Adds a vertex to the store.
      * <p>
-     * This is useful for adding all of your nodes to the graph before adding
-     * edges. Since adding edges often involves trying to find each vertex,
-     * there would initially be many lookup misses, unless this methods is used
-     * intially to add vertices.
-     * </p>
-     * 
+     * This is useful for adding vertices to a graph before adding
+     * edges. Since adding edges involves trying to find each vertex,
+     * this method can be used in order to avoid the overhead of lookup misses.
+     *
      * @param value
-     *            The value used to initialize the vertex. It will be used to
+     *            The RDF value represented by the vertex. It will be used to
      *            set other property on the vertex such as the {@value #KIND}
      *            and {@value #LANG}.
      * @return The newly created vertex.
      */
-    public Vertex addVertex(Value value) {
+    public Vertex addVertex(final Value value) {
         return store.addVertex(value);
     }
 
@@ -239,7 +249,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
     ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * A context object which is shared between the Blueprints Sail and its connections.
+     * A context object which is shared between the Sail and its Connections
      */
     class DataStore {
         public T graph;
@@ -298,7 +308,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
             return v;
         }
 
-        public Vertex findVertex(final Value value) {
+        public Vertex getVertex(final Value value) {
             for (Vertex v : store.graph.getVertices(VALUE, value.stringValue())) {
                 if (matches(v, value)) {
                     return v;

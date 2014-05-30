@@ -9,8 +9,11 @@ import info.aduna.iteration.CloseableIteration;
 import org.junit.Test;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.model.vocabulary.RDFS;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
@@ -27,6 +30,8 @@ import java.net.URL;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Joshua Shinavier (http://fortytwo.net)
@@ -55,22 +60,8 @@ public abstract class GraphSailTest extends SailTest {
         // Nothing to do.
     }
 
-    /*protected static void deleteDirectory(final File directory) {
-        if (directory.exists()) {
-            for (File file : directory.listFiles()) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
-                    file.delete();
-                }
-            }
-            directory.delete();
-        }
-    }*/
-
-
     @Test
-    public void testOrphanVerticesAutomaticallyDeleted() throws Exception {
+    public void testIsolatedVerticesAutomaticallyDeleted() throws Exception {
         String ex = "http://example.org/ns#";
         URI ref = new URIImpl(ex + "Ref");
 
@@ -175,6 +166,46 @@ public abstract class GraphSailTest extends SailTest {
 
         assertTriplePattern("xpoc", false);
         assertTriplePattern("sspo", false);
+    }
+
+    @Test
+    public void testAddVertex() throws Exception {
+        GraphSail gSail = (GraphSail) sail;
+
+        Value toAdd = new URIImpl("http://example.org/thelarch");
+        assertNull(gSail.getVertex(toAdd));
+        int count = countVertices();
+
+        Vertex added = gSail.addVertex(toAdd);
+        assertNotNull(added);
+        assertEquals(1 + count, countVertices());
+        assertEquals("http://example.org/thelarch", added.getProperty(GraphSail.VALUE));
+
+        // also test that we get the vertex through getVertex
+        added = gSail.getVertex(toAdd);
+        assertNotNull(added);
+        assertEquals("http://example.org/thelarch", added.getProperty(GraphSail.VALUE));
+    }
+
+    @Test
+    public void getGetVertex() throws Exception {
+        GraphSail gSail = (GraphSail) sail;
+        SailConnection sc = gSail.getConnection();
+        try {
+            sc.begin();
+
+            Vertex type = gSail.getVertex(RDF.TYPE);
+            assertNull(type);
+
+            sc.addStatement(RDF.TYPE, RDFS.LABEL, new LiteralImpl("type"));
+
+            type = gSail.getVertex(RDF.TYPE);
+            assertNotNull(type);
+            assertEquals(RDF.TYPE.stringValue(), type.getProperty(GraphSail.VALUE));
+        } finally {
+            sc.rollback();
+            sc.close();
+        }
     }
 
     @Test
