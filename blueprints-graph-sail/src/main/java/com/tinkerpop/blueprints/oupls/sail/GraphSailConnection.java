@@ -2,13 +2,12 @@ package com.tinkerpop.blueprints.oupls.sail;
 
 import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.StringFactory;
+import info.aduna.iteration.CloseableIteration;
 import net.fortytwo.sesametools.CompoundCloseableIteration;
 import net.fortytwo.sesametools.SailConnectionTripleSource;
-import info.aduna.iteration.CloseableIteration;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
@@ -116,7 +115,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                                                                                         final Value object,
                                                                                         final boolean includeInferred,
                                                                                         final Resource... contexts) throws SailException {
-        //System.out.println("getting: " + subject + ", " + predicate + ", " + object + ", " + includeInferred + ", " + contexts); System.out.flush();
         int index = 0;
 
         if (null != subject) {
@@ -185,8 +183,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                                       final URI predicate,
                                       final Value object,
                                       final Resource... contexts) throws SailException {
-        //System.out.println("adding (" + inferred + "): " + subject + ", " + predicate + ", " + object + ", " + contexts); System.out.flush();
-
         if (!canWrite()) {
             WriteAction a = new WriteAction(ActionType.ADD);
             a.inferred = inferred;
@@ -235,12 +231,10 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
             Edge edge = store.graph.addEdge(null, out, in, predicate.stringValue());
             if (inferred) {
-                //System.out.println("inferred!");
                 edge.setProperty(GraphSail.INFERRED, true);
             }
 
             for (IndexingMatcher m : (Collection<IndexingMatcher>) store.indexers) {
-                //System.out.println("\t\tindexing with: " + m);
                 m.indexStatement(edge, subject, predicate, object, contextStr);
             }
 
@@ -254,12 +248,8 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 notifyStatementAdded(s);
             }
 
-            //System.out.println("added (s: " + s + ", p: " + p + ", o: " + o + ", c: " + c + ")");
-            //System.out.print("\t--> ");
-            //BlueprintsSail.debugEdge(edge);
             statementsAdded = true;
         }
-        //System.out.println("\tdone adding");
     }
 
     private Vertex getOrCreateVertex(final Value value) {
@@ -279,8 +269,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                                           final URI predicate,
                                           final Value object,
                                           final Resource... contexts) throws SailException {
-        //System.out.println("removing (" + inferred + "): " + subject + ", " + predicate + ", " + object + ", " + contexts); System.out.flush();
-
         if (!canWrite()) {
             WriteAction a = new WriteAction(ActionType.REMOVE);
             a.inferred = inferred;
@@ -319,7 +307,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             for (Resource context : contexts) {
                 index |= 0x8;
 
-                //System.out.println("matcher: " + indexes.matchers[index]);
                 Iterable<Edge> i = store.matchers[index].match(subject, predicate, object, context, inferred);
                 for (Edge e : i) {
                     Boolean b = e.getProperty(GraphSail.INFERRED);
@@ -340,7 +327,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 s = null;
             }
 
-            //System.out.println("removing this edge: " + e);
             removeEdge(e);
 
             if (null != s) {
@@ -353,8 +339,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             prevSubject = null;
             prevOutVertex = null;
         }
-
-        //System.out.println("\tdone removing");
     }
 
     public void clearInternal(final Resource... contexts) throws SailException {
@@ -363,8 +347,6 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
 
     private void clearInternal(final boolean inferred,
                                final Resource... contexts) throws SailException {
-        //System.out.println("clearing (" + inferred + "): " + contexts); System.out.flush();
-
         if (!canWrite()) {
             WriteAction a = new WriteAction(ActionType.CLEAR);
             a.inferred = inferred;
@@ -587,7 +569,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             }
         }
 
-        // Note: the meaning of the return value is not documented (in the Sesame 2.3.2 JavaDocs)
+        // Note: the meaning of the return value is not documented (in the Sesame 2.7.9 JavaDocs)
         return false;
     }
 
@@ -598,7 +580,7 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                                            final Resource... contexts) throws SailException {
         removeStatementsInternal(true, subject, predicate, object, contexts);
 
-        // Note: the meaning of the return value is not documented (in the Sesame 2.3.2 JavaDocs)
+        // Note: the meaning of the return value is not documented (in the Sesame 2.7.9 JavaDocs)
         return false;
     }
 
