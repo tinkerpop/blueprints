@@ -212,6 +212,25 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         store.uniqueStatements = flag;
     }
 
+    /**
+     * Adds a vertex to the store.
+     * <p>
+     * This is useful for adding all of your nodes to the graph before adding
+     * edges. Since adding edges often involves trying to find each vertex,
+     * there would initially be many lookup misses, unless this methods is used
+     * intially to add vertices.
+     * </p>
+     * 
+     * @param value
+     *            The value used to initialize the vertex. It will be used to
+     *            set other property on the vertex such as the {@value #KIND}
+     *            and {@value #LANG}.
+     * @return The newly created vertex.
+     */
+    public Vertex addVertex(Value value) {
+        return store.addVertex(value);
+    }
+
     public String toString() {
         String type = store.graph.getClass().getSimpleName().toLowerCase();
         return "graphsail[" + type + "]";
