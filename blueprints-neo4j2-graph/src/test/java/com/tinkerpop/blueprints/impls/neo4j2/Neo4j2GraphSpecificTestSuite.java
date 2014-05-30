@@ -182,12 +182,14 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
         Vertex a = graph.addVertex(null);
         Vertex b = graph.addVertex(null);
-        graph.addEdge(null, a, b, "testEdge");
+        Neo4j2Edge edge = graph.addEdge(null, a, b, "testEdge");
+        edge.setProperty("foo", "bar");
         Iterable<Edge> iterable = graph.getEdges();
         graph.commit();
         try {
             assertTrue(iterable.iterator().hasNext());
             assertNotNull(iterable.iterator().next());
+            assertNotNull(graph.getEdges("foo", "bar").iterator().hasNext());
         } catch (NotInTransactionException e) {
             fail("Iterating edge iterable does not auto-start transaction");
         } finally {
