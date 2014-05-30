@@ -39,11 +39,6 @@ public interface TransactionalGraph extends Graph {
     public void stopTransaction(Conclusion conclusion);
 
     /**
-     * When the graph is shutdown, any open transactions should be successfully committed.
-     */
-    public void shutdown();
-
-    /**
      * Stop the current transaction and successfully apply mutations to the graph.
      */
     public void commit();
