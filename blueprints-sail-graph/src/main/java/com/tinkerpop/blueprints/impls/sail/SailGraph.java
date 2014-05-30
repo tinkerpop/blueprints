@@ -19,9 +19,11 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.BNodeImpl;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
@@ -34,6 +36,7 @@ import org.openrdf.rio.RDFHandlerException;
 import org.openrdf.rio.RDFParser;
 import org.openrdf.rio.RDFWriter;
 import org.openrdf.rio.Rio;
+import org.openrdf.rio.helpers.RDFHandlerWrapper;
 import org.openrdf.sail.Sail;
 import org.openrdf.sail.SailConnection;
 import org.openrdf.sail.SailException;
@@ -322,24 +325,52 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     /**
      * Load RDF data into the SailGraph. Supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig.
      * Before loading data, the current transaction is successfully committed.
-     *
-     * @param input     the InputStream of RDF data
-     * @param baseURI   the baseURI for RDF data
-     * @param format    supported formats include rdf-xml, n-triples, turtle, n3, trix, or trig
-     * @param baseGraph the baseGraph to insert the data into
+     * 
+     * @param input
+     *            The InputStream of RDF data.
+     * @param baseURI
+     *            The baseURI for RDF data.
+     * @param baseGraph
+     *            The baseGraph to insert the data into.
+     * @param rdfParser
+     *            The {@link RDFParser} to use. It's {@link RDFHandler} will be
+     *            changed to an internal one. The main purpose of this is to use
+     *            a custom {@link ValueFactory}. It is recommended to use
+     *            <code>Rio.createParser(getFormat(format))</code> and set the
+     *            {@link ValueFactory} of the parser to something that
+     *            <code>extends</code> the {@link ValueFactory} of the
+     *            {@link Sail} used to initialize this class.
+     *            <p>
+     *            For example, <code>extend {@link ValueFactoryImpl}</code> if
+     *            you used a <code>GraphSail</code> to initialize this class.
+     *            </p>
+     * @param rdfHandler
+     *            A {@link RDFHandler} to run <b>after</b> the internal
+     *            {@link RDFHandler} that will be created in this class.
+     *            <p>
+     *            This is mainly for implementing your own logging since it will
+     *            be added using {@link RDFHandlerWrapper}. The internal one
+     *            uses the graph passed to the constructor to add statements.
+     *            Can be <code>null</code> if you only want to use the default
+     *            {@link RDFHandler} created in this class.
+     *            </p>
      */
-    public void loadRDF(final InputStream input, final String baseURI, final String format, final String baseGraph) {
+    public void loadRDF(final InputStream input, final String baseURI, final String baseGraph,
+            final RDFParser rdfParser,
+            final RDFHandler rdfHandler) {
         try {
             this.commit();
             final SailConnection c = this.rawGraph.getConnection();
             try {
                 c.begin();
-                RDFParser p = Rio.createParser(getFormat(format));
                 RDFHandler h = null == baseGraph
                         ? new SailAdder(c)
                         : new SailAdder(c, new URIImpl(baseGraph));
-                p.setRDFHandler(h);
-                p.parse(input, baseURI);
+                if (rdfHandler != null) {
+                    h = new RDFHandlerWrapper(h, rdfHandler);
+                }
+                rdfParser.setRDFHandler(h);
+                rdfParser.parse(input, baseURI);
                 c.commit();
             } finally {
                 c.rollback();
@@ -348,6 +379,43 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Load RDF data into the SailGraph. Supported formats include rdf-xml,
+     * n-triples, turtle, n3, trix, or trig.
+     * 
+     * @param input
+     * @param baseURI
+     * @param format
+     * @param baseGraph
+     * @param rdfHandler
+     * @see SailGraph#loadRDF(InputStream, String, String, RDFParser,
+     *      RDFHandler) SailGraph.loadRDF with <var>rdfParser</var> set to
+     *      <code>Rio.createParser(getFormat(format))</code>.
+     */
+    public void loadRDF(final InputStream input, final String baseURI,
+            final String format,
+            final String baseGraph, final RDFHandler rdfHandler) {
+        loadRDF(input, baseURI, baseGraph, Rio.createParser(getFormat(format)),
+                rdfHandler);
+    }
+
+    /**
+     * Load RDF data into the SailGraph. Supported formats include rdf-xml,
+     * n-triples, turtle, n3, trix, or trig.
+     * 
+     * @param input
+     * @param baseURI
+     * @param format
+     * @param baseGraph
+     * @see SailGraph#loadRDF(InputStream, String, String, String, RDFHandler)
+     *      SailGraph.loadRDF with <var>rdfHandler</var> set to
+     *      <code>null</code>.
+     */
+    public void loadRDF(final InputStream input, final String baseURI,
+            final String format, final String baseGraph) {
+        loadRDF(input, baseURI, format, baseGraph, null);
     }
 
     /**
