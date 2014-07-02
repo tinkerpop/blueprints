@@ -20,14 +20,17 @@ import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.evaluation.TripleSource;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
+import org.openrdf.query.algebra.evaluation.iterator.CollectionIteration;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.DefaultSailChangedEvent;
 import org.openrdf.sail.helpers.NotifyingSailConnectionBase;
 import org.openrdf.sail.inferencer.InferencerConnection;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * A stateful connection to a GraphSail RDF store
@@ -106,8 +109,24 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
         }
     }
 
+    // note: iterates over all statements
     public CloseableIteration<? extends Resource, SailException> getContextIDsInternal() throws SailException {
-        throw new UnsupportedOperationException("the getContextIDs operation is not yet supported");
+
+        Set<Resource> contexts = new HashSet<Resource>();
+        CloseableIteration<? extends Statement, SailException> iter = getStatementsInternal(null, null, null, false);
+        try {
+            while (iter.hasNext()) {
+                Resource context = iter.next().getContext();
+                // match the behavior of Sesame stores, which do not include the null context
+                if (null != context) {
+                    contexts.add(context);
+                }
+            }
+        } finally {
+            iter.close();
+        }
+
+        return new CollectionIteration<Resource, SailException>(contexts);
     }
 
     public CloseableIteration<? extends Statement, SailException> getStatementsInternal(final Resource subject,

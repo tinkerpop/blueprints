@@ -38,6 +38,7 @@ import org.openrdf.sail.inferencer.InferencerConnection;
 import org.openrdf.sail.inferencer.fc.ForwardChainingRDFSInferencer;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.Closeable;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
@@ -615,7 +616,32 @@ public abstract class SailTest {
 
     @Test
     public void testGetContextIDs() throws Exception {
-        // TODO
+        URI uriA = sail.getValueFactory().createURI("http://example.org/uriA");
+        URI uriB = sail.getValueFactory().createURI("http://example.org/uriB");
+        URI uriC = sail.getValueFactory().createURI("http://example.org/uriC");
+        URI uriD = sail.getValueFactory().createURI("http://example.org/uriD");
+
+        SailConnection sc = sail.getConnection();
+        try {
+            sc.begin();
+            sc.clear();
+
+            sc.addStatement(uriA, uriB, uriC);
+            assertEquals(1, countStatements(sc, null, null, null, false));
+            assertEquals(0, count(sc.getContextIDs()));
+
+            sc.addStatement(uriC, uriB, uriA, uriC);
+            assertEquals(2, countStatements(sc, null, null, null, false));
+            assertEquals(1, count(sc.getContextIDs()));
+            assertEquals(uriC, sc.getContextIDs().next());
+
+            sc.addStatement(uriD, uriB, uriA, uriC);
+            assertEquals(3, countStatements(sc, null, null, null, false));
+            assertEquals(1, count(sc.getContextIDs()));
+        } finally {
+            sc.rollback();
+            sc.close();
+        }
     }
 
     @Test
@@ -1640,6 +1666,21 @@ public abstract class SailTest {
         } finally {
             statements.close();
         }
+    }
+
+    private <E, X extends Exception> int count(final CloseableIteration<E, X> iter) throws X {
+        int c = 0;
+
+        try {
+            while (iter.hasNext()) {
+                c++;
+                iter.next();
+            }
+        } finally {
+            iter.close();
+        }
+
+        return c;
     }
 
     protected int countStatements(final SailConnection sc,

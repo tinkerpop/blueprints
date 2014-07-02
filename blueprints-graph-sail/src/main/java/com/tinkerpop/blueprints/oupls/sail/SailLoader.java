@@ -54,7 +54,7 @@ public class SailLoader {
     }
 
     /**
-     * @param bufferSize the number of statements to be committed per transaction
+     * @param bufferSize the number of statements to be added per transaction commit
      */
     public void setBufferSize(final int bufferSize) {
         this.bufferSize = bufferSize;
@@ -81,13 +81,14 @@ public class SailLoader {
         SailConnection c = sail.getConnection();
         try {
             c.begin();
-
             long startTime = System.currentTimeMillis();
+
             long count = loadFile(fileOrDirectory, c);
-            long endTime = System.currentTimeMillis();
 
             // commit leftover statements
             c.commit();
+
+            long endTime = System.currentTimeMillis();
 
             LOGGER.info("loaded " + count + " statements in " + (endTime - startTime) + "ms");
         } finally {
@@ -109,7 +110,7 @@ public class SailLoader {
         } else {
             RDFFormat format;
 
-            long before = System.currentTimeMillis();
+            long startTime = System.currentTimeMillis();
             if (verbose) {
                 LOGGER.info("loading file: " + fileOrDirectory);
             }
@@ -124,31 +125,35 @@ public class SailLoader {
                 is = new FileInputStream(fileOrDirectory);
             }
 
-            if (null == format) {
-                LOGGER.warning("could not guess format of file: " + n);
-                return 0;
-            }
-
-            RDFParser p = Rio.createParser(format);
-            p.setStopAtFirstError(false);
-            SailConnectionAdder adder = new SailConnectionAdder(c);
-            p.setRDFHandler(adder);
-
             try {
-                p.parse(is, baseUri);
-            } catch (Throwable t) {
-                // Attempt to recover.
-                t.printStackTrace(System.err);
+                if (null == format) {
+                    LOGGER.warning("could not guess format of file: " + n);
+                    return 0;
+                }
+
+                RDFParser p = Rio.createParser(format);
+                p.setStopAtFirstError(false);
+                SailConnectionAdder adder = new SailConnectionAdder(c);
+                p.setRDFHandler(adder);
+
+                try {
+                    p.parse(is, baseUri);
+                } catch (Throwable t) {
+                    // Attempt to recover.
+                    t.printStackTrace(System.err);
+                } finally {
+                    is.close();
+                }
+
+                long endTime = System.currentTimeMillis();
+                if (verbose) {
+                    LOGGER.info("\tfinished in " + (endTime - startTime) + "ms");
+                }
+
+                return adder.count;
             } finally {
                 is.close();
             }
-
-            long after = System.currentTimeMillis();
-            if (verbose) {
-                LOGGER.info("\tfinished in " + (after - before) + "ms");
-            }
-
-            return adder.count;
         }
     }
 
