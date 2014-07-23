@@ -18,6 +18,7 @@ h3. Version 2.6.0 (NOT YET RELEASED)
 ```
 
 * @Neo4j2Index@ has a new @query@ method for raw Lucene queries.
+* Dependencies on Colt removed in favor of HPPC.
 
 h3. Version 2.5.0 (April 14, 2014)
 
