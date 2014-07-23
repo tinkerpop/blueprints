@@ -25,9 +25,9 @@
             <version>2.2.3</version>
         </dependency>
         <dependency>
-            <groupId>colt</groupId>
-            <artifactId>colt</artifactId>
-            <version>1.2.0</version>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>hppc</artifactId>
+            <version>0.6.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
