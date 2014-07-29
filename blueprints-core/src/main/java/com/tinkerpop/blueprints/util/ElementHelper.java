@@ -160,8 +160,10 @@ public class ElementHelper {
      * @param properties the properties to set as a Map
      */
     public static void setProperties(final Element element, final Map<String, Object> properties) {
-        for (Map.Entry<String, Object> property : properties.entrySet()) {
-            element.setProperty(property.getKey(), property.getValue());
+       for (Map.Entry<String, Object> property : properties.entrySet()) {
+            if (property.getValue()!=null && !property.getKey().equals("id")) {
+                element.setProperty(property.getKey(), property.getValue());
+            }
         }
     }
 
