@@ -7,10 +7,16 @@ import com.tinkerpop.blueprints.impls.tg.TinkerGraph;
 
 import org.junit.Assert;
 import org.junit.Test;
+import sun.misc.IOUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 public class GMLReaderTest {
 
@@ -118,6 +124,32 @@ public class GMLReaderTest {
         Assert.assertEquals("Node 3 \"with quote\"", tempProperty);
     }
 
+    @Test
+    public void testIdGenerationInGML() throws IOException {
+        TinkerGraph graph1 = new TinkerGraph();
+        GMLReader.inputGraph(graph1, GMLReader.class.getResourceAsStream("simple.gml"));
+
+        Vertex toRemove = graph1.getVertex("123");
+        graph1.removeVertex(toRemove);
+
+        String file = "/tmp/simple-" + UUID.randomUUID() + ".gml";
+        GMLWriter.outputGraph(graph1, file);
+
+        TinkerGraph graph2 = new TinkerGraph();
+        GMLReader.inputGraph(graph2, file);
+
+        String gml = new String(Files.readAllBytes(Paths.get(file)));
+        String sep = "\r\n";
+        String expected = "graph [" + sep +
+                          "\tnode [" + sep +
+                          "\t\tid 1" + sep +
+                          "\t\tblueprintsId \"456\"" + sep +
+                          "\t]" + sep +
+                          "]" + sep;
+        Assert.assertEquals(expected, gml);
+        Assert.assertEquals(1, getIterableCount(graph2.getVertices()));
+    }
+
     private int getIterableCount(Iterable<?> elements) {
         int counter = 0;
 
@@ -129,5 +161,4 @@ public class GMLReaderTest {
 
         return counter;
     }
-
 }
