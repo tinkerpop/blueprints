@@ -106,7 +106,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
         }
 
         public Iterator<Neo4j2Vertex> iterator() {
-            graph.autoStartTransaction(true);
+            graph.autoStartTransaction(false);
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
@@ -150,7 +150,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
         }
 
         public Iterator<Neo4j2Edge> iterator() {
-            graph.autoStartTransaction(true);
+            graph.autoStartTransaction(false);
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
