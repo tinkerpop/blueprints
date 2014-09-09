@@ -17,9 +17,24 @@ import org.openrdf.model.impl.NamespaceImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.algebra.QueryRoot;
+import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
+import org.openrdf.query.algebra.Var;
 import org.openrdf.query.algebra.evaluation.TripleSource;
+import org.openrdf.query.algebra.evaluation.impl.BindingAssigner;
+import org.openrdf.query.algebra.evaluation.impl.CompareOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.ConjunctiveConstraintSplitter;
+import org.openrdf.query.algebra.evaluation.impl.ConstantOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.DisjunctiveConstraintOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.EvaluationStatistics;
 import org.openrdf.query.algebra.evaluation.impl.EvaluationStrategyImpl;
+import org.openrdf.query.algebra.evaluation.impl.FilterOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.IterativeEvaluationOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.OrderLimitOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.QueryJoinOptimizer;
+import org.openrdf.query.algebra.evaluation.impl.QueryModelNormalizer;
+import org.openrdf.query.algebra.evaluation.impl.SameTermFilterOptimizer;
 import org.openrdf.query.algebra.evaluation.iterator.CollectionIteration;
 import org.openrdf.sail.SailException;
 import org.openrdf.sail.helpers.DefaultSailChangedEvent;
@@ -100,9 +115,28 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                                                                                                final Dataset dataset,
                                                                                                final BindingSet bindings,
                                                                                                final boolean includeInferred) throws SailException {
+        // allow for better optimization
+        tupleExpr = tupleExpr.clone();
+        if (!(tupleExpr instanceof QueryRoot)) {
+            tupleExpr = new QueryRoot(tupleExpr);
+        }
         try {
             TripleSource tripleSource = new SailConnectionTripleSource(this, store.valueFactory, includeInferred);
             EvaluationStrategyImpl strategy = new EvaluationStrategyImpl(tripleSource, dataset);
+            
+            // query optimization
+            new BindingAssigner().optimize(tupleExpr, dataset, bindings);
+            new ConstantOptimizer(strategy).optimize(tupleExpr, dataset, bindings);
+            new CompareOptimizer().optimize(tupleExpr, dataset, bindings);
+            new SameTermFilterOptimizer().optimize(tupleExpr, dataset, bindings);
+            new QueryModelNormalizer().optimize(tupleExpr, dataset, bindings);
+            new ConjunctiveConstraintSplitter().optimize(tupleExpr, dataset, bindings);
+            new DisjunctiveConstraintOptimizer().optimize(tupleExpr, dataset, bindings);
+            new IterativeEvaluationOptimizer().optimize(tupleExpr, dataset, bindings);
+            new QueryJoinOptimizer(new GraphSailEvaluationStatistics()).optimize(tupleExpr, dataset, bindings);
+            new FilterOptimizer().optimize(tupleExpr, dataset, bindings);
+            new OrderLimitOptimizer().optimize(tupleExpr, dataset, bindings);
+            
             return strategy.evaluate(tupleExpr, bindings);
         } catch (QueryEvaluationException e) {
             throw new SailException(e);
@@ -796,6 +830,26 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
                 return null;
             default:
                 throw new IllegalStateException();
+        }
+    }
+    
+    protected static class GraphSailEvaluationStatistics extends EvaluationStatistics {
+
+        public GraphSailEvaluationStatistics() {
+        }
+
+        @Override
+        protected CardinalityCalculator createCardinalityCalculator() {
+            return new GraphSailCardinalityCalculator();
+        }
+
+        protected class GraphSailCardinalityCalculator extends CardinalityCalculator {
+
+            @Override
+            protected double getCardinality(StatementPattern sp) {
+                return super.getCardinality(sp);
+            }
+
         }
     }
 }
