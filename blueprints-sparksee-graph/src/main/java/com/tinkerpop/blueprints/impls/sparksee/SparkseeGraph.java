@@ -141,6 +141,7 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
         FEATURES.supportsVertexKeyIndex = true;
         FEATURES.supportsEdgeKeyIndex = true;
         FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsThreadIsolatedTransactions = false;
     }
 
     /**
