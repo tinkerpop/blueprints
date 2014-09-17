@@ -67,13 +67,12 @@ public class SparkseeGraphTest extends GraphTest {
     the scope of a node/edge type. Thus, when using the KeyIndexableGraph
     APIs it is required to previously set the label where the key property
     is defined, as it is shown in the testKeyIndex below.
-    
+    */
     public void testKeyIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new KeyIndexableGraphTestSuite(this));
+        doTestSuite(new SparkseeKeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
-    //*/
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();

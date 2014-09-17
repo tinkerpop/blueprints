@@ -24,6 +24,10 @@ import java.util.Set;
  *         Technologies</a>
  */
 class SparkseeElement implements Element {
+    
+    private static final int NODE_SCOPE  = com.sparsity.sparksee.gdb.Type.NodesType;
+    private static final int EDGE_SCOPE  = com.sparsity.sparksee.gdb.Type.EdgesType;
+    
     /**
      * SparkseeGraph instance.
      */
@@ -89,12 +93,22 @@ class SparkseeElement implements Element {
     public <T> T getProperty(final String key) {
         graph.autoStartTransaction(false);
 
-        int type = getObjectType();
         if (key.compareTo(StringFactory.LABEL) == 0) {
-            com.sparsity.sparksee.gdb.Type tdata = graph.getRawGraph().getType(type);
+            com.sparsity.sparksee.gdb.Type tdata = graph.getRawGraph().getType(getObjectType());
             return (T) tdata.getName();
         }
-        int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
+        
+        int attrType = getObjectType();
+        if (!graph.typeScope.get())
+        {
+            if (graph.getRawGraph().getType(getObjectType()).getObjectType() == com.sparsity.sparksee.gdb.ObjectType.Node) {
+                attrType = NODE_SCOPE;
+            } else {
+                attrType = EDGE_SCOPE;
+            }
+        }
+        
+        int attr = graph.getRawGraph().findAttribute(attrType, key);
         if (attr == com.sparsity.sparksee.gdb.Attribute.InvalidAttribute) {
             return null;
         }
@@ -137,9 +151,27 @@ class SparkseeElement implements Element {
     public Set<String> getPropertyKeys() {
         graph.autoStartTransaction(false);
 
-        com.sparsity.sparksee.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
+        com.sparsity.sparksee.gdb.AttributeList alist;
+        if (graph.typeScope.get()) {
+            alist = graph.getRawGraph().getAttributes(oid);
+        } else {
+            int attrType;
+            if (graph.getRawGraph().getType(getObjectType()).getObjectType() == com.sparsity.sparksee.gdb.ObjectType.Node) {
+                attrType = NODE_SCOPE;
+            } else {
+                attrType = EDGE_SCOPE;
+            }
+            alist = graph.getRawGraph().findAttributes(attrType);
+        }
         Set<String> attrKeys = new HashSet<String>();
+        com.sparsity.sparksee.gdb.Value v = new com.sparsity.sparksee.gdb.Value();
         for (Integer attr : alist) {
+            if (!graph.typeScope.get()) {
+                graph.getRawGraph().getAttribute(oid, attr, v);
+                if (v.isNull()) {
+                    continue;
+                }
+            }
             String key = graph.getRawGraph().getAttribute(attr).getName();
             attrKeys.add(key);
         }
@@ -162,7 +194,19 @@ class SparkseeElement implements Element {
         }
         
         graph.autoStartTransaction(true);
-        int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
+        
+        int attrType = getObjectType();
+        
+        if (!graph.typeScope.get())
+        {
+            if (graph.getRawGraph().getType(attrType).getObjectType() == com.sparsity.sparksee.gdb.ObjectType.Node) {
+                attrType = NODE_SCOPE;
+            } else {
+                attrType = EDGE_SCOPE;
+            }
+        }
+        
+        int attr = graph.getRawGraph().findAttribute(attrType, key);
         com.sparsity.sparksee.gdb.DataType datatype = null;
         if (attr == com.sparsity.sparksee.gdb.Attribute.InvalidAttribute) {
             //
@@ -184,7 +228,7 @@ class SparkseeElement implements Element {
                 throw new IllegalArgumentException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
             }
             assert datatype != null;
-            attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.sparksee.gdb.AttributeKind.Basic);
+            attr = graph.getRawGraph().newAttribute(attrType, key, datatype, com.sparsity.sparksee.gdb.AttributeKind.Basic);
             assert attr != com.sparsity.sparksee.gdb.Attribute.InvalidAttribute;
         } else {
             datatype = graph.getRawGraph().getAttribute(attr).getDataType();

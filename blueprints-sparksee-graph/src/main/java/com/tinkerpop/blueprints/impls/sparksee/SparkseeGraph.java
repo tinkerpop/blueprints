@@ -86,6 +86,24 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             return null;
         }
     };
+    
+    /**
+     * Sparksee allows creating properties in the scope of the types instead of the
+     * usual tinkerpop common property for all nodes or edges. This variable allows
+     * to switch between this two behaviors.
+     * 
+     * If set true the properties will be at specific type scope.
+     * If set false (default value) the properties will be at nodes or edges scope.
+     * 
+     * Be aware that the type properties and nodes or edges properties can share one
+     * name but will store independent values.
+     */
+    public ThreadLocal<Boolean> typeScope = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
 
     /**
      * Database persistent file.
@@ -94,6 +112,9 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
 
     private com.sparsity.sparksee.gdb.Sparksee sparksee = null;
     private com.sparsity.sparksee.gdb.Database db = null;
+    
+    private static final int NODE_SCOPE  = com.sparsity.sparksee.gdb.Type.NodesType;
+    private static final int EDGE_SCOPE  = com.sparsity.sparksee.gdb.Type.EdgesType;
 
     private class Metadata {
         boolean isUpdating = false;
@@ -359,12 +380,10 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      */
     @Override
     public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
-        
         autoStartTransaction(false);
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
-
+        
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
-
             int type = rawGraph.findType(value.toString());
             if (type != com.sparsity.sparksee.gdb.Type.InvalidType) {
                 com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
@@ -382,7 +401,8 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findNodeTypes();
             List<Iterable<Vertex>> vertices = new ArrayList<Iterable<Vertex>>();
             for (Integer type : tlist) {
-                int attr = rawGraph.findAttribute(type, key);
+                int attrType = typeScope.get() ? type : NODE_SCOPE;
+                int attr = rawGraph.findAttribute(attrType, key);
                 if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute != attr) {
                     com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
                     if (adata.getKind() == AttributeKind.Basic) { // "table" scan
@@ -557,7 +577,8 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findEdgeTypes();
             List<Iterable<Edge>> edges = new ArrayList<Iterable<Edge>>();
             for (Integer type : tlist) {
-                int attr = rawGraph.findAttribute(type, key);
+                int attrType = typeScope.get() ? type : EDGE_SCOPE;
+                int attr = rawGraph.findAttribute(attrType, key);
                 if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute != attr) {
                     com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
                     if (adata.getKind() == AttributeKind.Basic) { // "table" scan
@@ -689,14 +710,24 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
         }
         
         String label = this.label.get();
-        if (label == null) {
+        if (label == null && typeScope.get()) {
             throw new IllegalArgumentException("Label must be given");
         }
 
         autoStartTransaction(true);
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
 
-        int type = rawGraph.findType(label);
+        int type;
+        if (!typeScope.get()) {
+            if (Vertex.class.isAssignableFrom(elementClass)) {
+                type = NODE_SCOPE;
+            } else {
+                type = EDGE_SCOPE;
+            }
+        } else {
+            type = rawGraph.findType(label);
+        }
+        
         if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
             // create the node/edge type
             if (Vertex.class.isAssignableFrom(elementClass)) {
@@ -704,7 +735,7 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             } else {
                 type = rawGraph.newEdgeType(label, true, true);
             }
-        } else {
+        } else if (typeScope.get()) {
             com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
             if (tdata.getObjectType() == ObjectType.Node) {
                 if (!Vertex.class.isAssignableFrom(elementClass)) {
@@ -745,21 +776,31 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
         if (!Vertex.class.isAssignableFrom(elementClass) && !Edge.class.isAssignableFrom(elementClass)) {
             throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
-        
+
         autoStartTransaction(false);
-        com.sparsity.sparksee.gdb.TypeList tlist = null;
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
+        com.sparsity.sparksee.gdb.TypeList tlist = null;
         if (Vertex.class.isAssignableFrom(elementClass)) {
-            tlist = rawGraph.findNodeTypes();
+            if (typeScope.get()) {
+                tlist = rawGraph.findNodeTypes();
+            } else {
+                tlist = new com.sparsity.sparksee.gdb.TypeList();
+                tlist.add(NODE_SCOPE);
+            }
         } else if (Edge.class.isAssignableFrom(elementClass)) {
-            tlist = rawGraph.findEdgeTypes();
+            if (typeScope.get()) {
+                tlist =rawGraph.findEdgeTypes();
+            } else {
+                tlist = new com.sparsity.sparksee.gdb.TypeList();
+                tlist.add(EDGE_SCOPE);
+            }
         }
-        
+
         Set<String> ret = new HashSet<String>();
         for (Integer type : tlist) {
             com.sparsity.sparksee.gdb.AttributeList alist = rawGraph.findAttributes(type);
             for (Integer attr : alist) {
-                com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
+        		com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
                 if (adata.getKind() == AttributeKind.Indexed || adata.getKind() == AttributeKind.Unique) {
                     ret.add(adata.getName());
                 }
