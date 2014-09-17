@@ -3,8 +3,6 @@ Blueprints: A Property Graph Model Interface
 
 h2. Blueprints 2.y.z
 
-* Added the hasImplicitElements feature for use with SailGraph and others which return elements not explicitly created with addVertex or addEdge
-
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-2.png!
 
 h3. Version 2.6.0 (September 17, 2014)
@@ -17,6 +15,7 @@ h3. Version 2.6.0 (September 17, 2014)
 </dependency>
 ```
 
+* Added the hasImplicitElements feature for use with SailGraph and others which return elements not explicitly created with addVertex or addEdge
 * @Neo4j2Index@ has a new @query@ method for raw Lucene queries.
 * Dependencies on Colt removed in favor of HPPC.
 * Bump to Sparksee 5.1.0
