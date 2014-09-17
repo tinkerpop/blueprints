@@ -128,12 +128,12 @@ public class GraphSailConnection extends NotifyingSailConnectionBase implements 
             new BindingAssigner().optimize(tupleExpr, dataset, bindings);
             new ConstantOptimizer(strategy).optimize(tupleExpr, dataset, bindings);
             new CompareOptimizer().optimize(tupleExpr, dataset, bindings);
-            new SameTermFilterOptimizer().optimize(tupleExpr, dataset, bindings);
-            new QueryModelNormalizer().optimize(tupleExpr, dataset, bindings);
             new ConjunctiveConstraintSplitter().optimize(tupleExpr, dataset, bindings);
             new DisjunctiveConstraintOptimizer().optimize(tupleExpr, dataset, bindings);
-            new IterativeEvaluationOptimizer().optimize(tupleExpr, dataset, bindings);
+            new SameTermFilterOptimizer().optimize(tupleExpr, dataset, bindings);
+            new QueryModelNormalizer().optimize(tupleExpr, dataset, bindings);
             new QueryJoinOptimizer(new GraphSailEvaluationStatistics()).optimize(tupleExpr, dataset, bindings);
+            new IterativeEvaluationOptimizer().optimize(tupleExpr, dataset, bindings);
             new FilterOptimizer().optimize(tupleExpr, dataset, bindings);
             new OrderLimitOptimizer().optimize(tupleExpr, dataset, bindings);
             
