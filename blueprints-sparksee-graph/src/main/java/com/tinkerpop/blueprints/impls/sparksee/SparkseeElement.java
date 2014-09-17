@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.Edge;
@@ -90,7 +87,7 @@ class SparkseeElement implements Element {
       */
     @Override
     public <T> T getProperty(final String key) {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(false);
 
         int type = getObjectType();
         if (key.compareTo(StringFactory.LABEL) == 0) {
@@ -138,7 +135,7 @@ class SparkseeElement implements Element {
       */
     @Override
     public Set<String> getPropertyKeys() {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(false);
 
         com.sparsity.sparksee.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
         Set<String> attrKeys = new HashSet<String>();
@@ -160,10 +157,11 @@ class SparkseeElement implements Element {
     @Override
     public void setProperty(final String key, final Object value) {
         ElementHelper.validateProperty(this, key, value);
-        if (key.equals(StringFactory.LABEL))
+        if (key.equals(StringFactory.LABEL)) {
             throw new IllegalArgumentException("Property key is reserved for all vertices and edges: " + StringFactory.LABEL);
-        graph.autoStartTransaction();
-
+        }
+        
+        graph.autoStartTransaction(true);
         int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
         com.sparsity.sparksee.gdb.DataType datatype = null;
         if (attr == com.sparsity.sparksee.gdb.Attribute.InvalidAttribute) {
@@ -230,13 +228,8 @@ class SparkseeElement implements Element {
                     throw new IllegalArgumentException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
             }
         }
-        //try {
+        
         this.graph.getRawGraph().setAttribute(oid, attr, v);
-        //} catch(RuntimeException e) {
-        //System.out.println("\t" + this + "!!" + attr + "!!" + v);
-        //    throw e;
-        //}
-
     }
 
     /*
@@ -247,7 +240,7 @@ class SparkseeElement implements Element {
       */
     @Override
     public <T> T removeProperty(final String key) {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
 
         try {
             Object ret = getProperty(key);
@@ -271,14 +264,15 @@ class SparkseeElement implements Element {
     }
 
     public void remove() {
-        if (this instanceof Vertex)
+        if (this instanceof Vertex) {
             this.graph.removeVertex((Vertex) this);
-        else
+        } else {
             this.graph.removeEdge((Edge) this);
+        }
     }
 
     public boolean equals(final Object object) {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(false);
 
         return ElementHelper.areEqual(this, object);
     }

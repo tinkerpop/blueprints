@@ -17,6 +17,7 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
+
 import org.apache.commons.configuration.Configuration;
 
 import java.io.File;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Sparksee is a graph database developed by Sparsity Technologies.
@@ -94,18 +96,12 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
     private com.sparsity.sparksee.gdb.Database db = null;
 
     private class Metadata {
+        boolean isUpdating = false;
         com.sparsity.sparksee.gdb.Session session = null;
-        List<SparkseeIterable<? extends Element>> collection = null;
-    }
-
-    ;
-
-    private ThreadLocal<Metadata> sessionData = new ThreadLocal<Metadata>() {
-        @Override
-        protected Metadata initialValue() {
-            return new Metadata();
-        }
+        List<SparkseeIterable<? extends Element>> collection = new ArrayList<SparkseeIterable<? extends Element>>();
     };
+    
+    private ConcurrentHashMap<Long, Metadata> threadData = new ConcurrentHashMap<Long, Metadata>();
 
     private static final Features FEATURES = new Features();
 
@@ -121,7 +117,7 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
         FEATURES.supportsEdgeRetrieval = true;
         FEATURES.supportsVertexProperties = true;
         FEATURES.supportsEdgeProperties = true;
-        FEATURES.supportsTransactions = false;
+        FEATURES.supportsTransactions = true;
         FEATURES.supportsIndices = false;
 
         FEATURES.supportsSerializableObjectProperty = false;
@@ -172,11 +168,14 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      * @return The Sparksee Session
      */
     com.sparsity.sparksee.gdb.Session getRawSession(boolean exception) {
-        com.sparsity.sparksee.gdb.Session sess = sessionData.get().session;
-        if (sess == null && exception) {
-            throw new IllegalStateException("Transaction has not been started");
+        Long threadId = Thread.currentThread().getId();
+        if (!threadData.containsKey(threadId)) {
+            if (exception) {
+                throw new IllegalStateException("Transaction has not been started");
+            }
+            return null;
         }
-        return sess;
+        return threadData.get(threadId).session;
     }
 
     /**
@@ -185,11 +184,9 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      * @param col Collection to be registered.
      */
     protected void register(final SparkseeIterable<? extends Element> col) {
-        if (sessionData.get().collection == null) {
-            sessionData.get().collection = new ArrayList<SparkseeIterable<? extends Element>>();
-        }
-        sessionData.get().collection.add(col);
-        //System.out.println("> register " + sess + ":" + col);
+        Metadata metadata = threadData.get(Thread.currentThread().getId());
+        assert !metadata.collection.contains(col);
+        metadata.collection.add(col);
     }
 
     /**
@@ -198,11 +195,9 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      * @param col Collection to be unregistered
      */
     protected void unregister(final SparkseeIterable<? extends Element> col) {
-        if (sessionData.get().collection == null) {
-            throw new IllegalStateException("Session with no collections");
-        }
-        sessionData.get().collection.remove(col);
-        //System.out.println("< unregister " + sess + ":" + col);
+        Metadata metadata = threadData.get(Thread.currentThread().getId());
+        assert metadata.collection.contains(col);
+        metadata.collection.remove(col);
     }
 
     /**
@@ -225,17 +220,20 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             this.dbFile = new File(fileName);
             final File dbPath = dbFile.getParentFile();
 
-            if (!dbPath.exists()) {
-                if (!dbPath.mkdirs()) {
-                    throw new RuntimeException("Could not create directory");
-                }
+            if (!dbPath.exists() && !dbPath.mkdirs()) {
+                throw new RuntimeException("Could not create directory");
             }
 
-            final boolean create = !dbFile.exists();
-
-            if (config != null) com.sparsity.sparksee.gdb.SparkseeProperties.load(config);
+            if (config != null) {
+                com.sparsity.sparksee.gdb.SparkseeProperties.load(config);
+            }
             sparksee = new com.sparsity.sparksee.gdb.Sparksee(new com.sparsity.sparksee.gdb.SparkseeConfig());
-            db = (create ? sparksee.create(dbFile.getPath(), dbFile.getName()) : sparksee.open(dbFile.getPath(), false));
+
+            if (!dbFile.exists()) {
+                db = sparksee.create(dbFile.getPath(), dbFile.getName());
+            } else {
+                db = sparksee.open(dbFile.getPath(), false);
+            }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -260,9 +258,9 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      */
     @Override
     public Vertex addVertex(final Object id) {
-        autoStartTransaction();
+        autoStartTransaction(true);
 
-        String label = this.label.get() == null ? DEFAULT_SPARKSEE_VERTEX_LABEL : this.label.get();
+        String label = (this.label.get() == null) ? DEFAULT_SPARKSEE_VERTEX_LABEL : this.label.get();
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         int type = rawGraph.findType(label);
         if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
@@ -282,24 +280,24 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public Vertex getVertex(final Object id) {
-        autoStartTransaction();
-
-        if (null == id)
+        if (id == null)  {
             throw ExceptionFactory.vertexIdCanNotBeNull();
+        }
+        
         try {
             final Long longId = Double.valueOf(id.toString()).longValue();
+            autoStartTransaction(false);
             com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
             final int type = rawGraph.getObjectType(longId);
-            if (type != com.sparsity.sparksee.gdb.Type.InvalidType)
+            
+            if (type != com.sparsity.sparksee.gdb.Type.InvalidType) {
                 return new SparkseeVertex(this, longId);
-            else
-                return null;
-        } catch (NumberFormatException e) {
-            return null;
-        } catch (RuntimeException re) {
-            // sparksee throws a runtime exception => [SPARKSEE: 12] Invalid object identifier.
-            return null;
+            }
+        } catch (Exception e) {
+            // If any exception was thrown (Number format or sparksee exceptions are not handled) or 
+            // the object type is InvalidType return null
         }
+        return null;
     }
 
     /*
@@ -311,16 +309,15 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public void removeVertex(final Vertex vertex) {
-        autoStartTransaction();
-
-        if (getVertex(vertex.getId()) == null)
+        if (getVertex(vertex.getId()) == null) {
             throw ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
-
+        }
         assert vertex instanceof SparkseeVertex;
 
+        autoStartTransaction(true);
         try {
             getRawGraph().drop((Long) vertex.getId());
-        } catch (RuntimeException re) {
+        } catch (Exception e) {
             ExceptionFactory.vertexWithIdDoesNotExist(vertex.getId());
         }
     }
@@ -332,7 +329,7 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public CloseableIterable<Vertex> getVertices() {
-        autoStartTransaction();
+        autoStartTransaction(false);
 
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findNodeTypes();
@@ -362,8 +359,8 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      */
     @Override
     public CloseableIterable<Vertex> getVertices(final String key, final Object value) {
-        autoStartTransaction();
-
+        
+        autoStartTransaction(false);
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
 
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
@@ -398,10 +395,12 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             }
             tlist.delete();
             tlist = null;
+            
+            if (vertices.size() == 0) {
+                throw new IllegalArgumentException("The given attribute '" + key + "' does not exist");
+            }
 
-            if (vertices.size() > 0) return new MultiIterable<Vertex>(vertices);
-            else throw new IllegalArgumentException("The given attribute '" + key + "' does not exist");
-
+            return new MultiIterable<Vertex>(vertices);
         } else { // restricted to a type
 
             int type = rawGraph.findType(label);
@@ -412,7 +411,6 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             if (tdata.getObjectType() != com.sparsity.sparksee.gdb.ObjectType.Node) {
                 throw new IllegalArgumentException("Given label is not a vertex label: " + label);
             }
-
             int attr = rawGraph.findAttribute(type, key);
             if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute == attr) {
                 throw new IllegalArgumentException("The given attribute '" + key
@@ -438,20 +436,21 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public Edge addEdge(final Object id, final Vertex outVertex, final Vertex inVertex, final String label) {
-        if (label == null)
+        if (label == null) {
             throw ExceptionFactory.edgeLabelCanNotBeNull();
-
-        autoStartTransaction();
-
+        }
+            
+        autoStartTransaction(true);
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         int type = rawGraph.findType(label);
         if (type == com.sparsity.sparksee.gdb.Type.InvalidType) {
             // First instance of this type, let's create it
             type = rawGraph.newEdgeType(label, true, true);
         }
+        
         assert type != com.sparsity.sparksee.gdb.Type.InvalidType;
-        // create object instance
         assert outVertex instanceof SparkseeVertex && inVertex instanceof SparkseeVertex;
+        
         long oid = rawGraph.newEdge(type, (Long) outVertex.getId(), (Long) inVertex.getId());
         return new SparkseeEdge(this, oid);
     }
@@ -463,25 +462,24 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public Edge getEdge(final Object id) {
-        autoStartTransaction();
-
-        if (null == id)
+        if (null == id) {
             throw ExceptionFactory.edgeIdCanNotBeNull();
-        try {
-            com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
-            Long longId = Double.valueOf(id.toString()).longValue();
-            int type = rawGraph.getObjectType(longId);
-            if (type != com.sparsity.sparksee.gdb.Type.InvalidType)
-                return new SparkseeEdge(this, longId);
-            else
-                return null;
-        } catch (NumberFormatException e) {
-            return null;
-        } catch (RuntimeException re) {
-            // sparksee throws an runtime exception => [SPARKSEE: 12] Invalid object identifier.
-            return null;
         }
-
+        
+        try {
+            Long longId = Double.valueOf(id.toString()).longValue();
+            
+            autoStartTransaction(false);
+            com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
+            int type = rawGraph.getObjectType(longId);
+            if (type != com.sparsity.sparksee.gdb.Type.InvalidType) {
+                return new SparkseeEdge(this, longId);
+            }
+        } catch (Exception e) {
+            // If any exception was thrown (Number format or sparksee exceptions are not handled) or 
+            // the object type is InvalidType return null
+        }
+        return null;
     }
 
     /*
@@ -493,9 +491,9 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public void removeEdge(final Edge edge) {
-        autoStartTransaction();
-
         assert edge instanceof SparkseeEdge;
+        
+        autoStartTransaction(true);
         getRawGraph().drop((Long) edge.getId());
     }
 
@@ -506,7 +504,7 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public CloseableIterable<Edge> getEdges() {
-        autoStartTransaction();
+        autoStartTransaction(false);
 
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         com.sparsity.sparksee.gdb.TypeList tlist = rawGraph.findEdgeTypes();
@@ -536,8 +534,8 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      */
     @Override
     public CloseableIterable<Edge> getEdges(final String key, final Object value) {
-        autoStartTransaction();
-
+        
+        autoStartTransaction(false);
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
 
         if (key.compareTo(StringFactory.LABEL) == 0) { // label is "indexed"
@@ -572,10 +570,13 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             }
             tlist.delete();
             tlist = null;
+            
+            if (edges.size() == 0) 
+            {
+                throw new IllegalArgumentException("The given attribute '" + key + "' does not exist");
+            }
 
-            if (edges.size() > 0) return new MultiIterable<Edge>(edges);
-            else throw new IllegalArgumentException("The given attribute '" + key + "' does not exist");
-
+            return new MultiIterable<Edge>(edges);
         } else { // restricted to a type
 
             int type = rawGraph.findType(label);
@@ -586,7 +587,6 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             if (tdata.getObjectType() != com.sparsity.sparksee.gdb.ObjectType.Edge) {
                 throw new IllegalArgumentException("Given label is not a edge label: " + label);
             }
-
             int attr = rawGraph.findAttribute(type, key);
             if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute == attr) {
                 throw new IllegalArgumentException("The given attribute '" + key
@@ -602,19 +602,7 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             }
         }
     }
-
-    /**
-     * Closes all non-closed iterables.
-     */
-    protected void closeAllSessionCollections() {
-        if (sessionData.get().collection != null) {
-            for (SparkseeIterable<? extends Element> elem : sessionData.get().collection) {
-                elem.close(false);
-            }
-            sessionData.get().collection.clear();
-        }
-    }
-
+    
     /*
       * (non-Javadoc)
       *
@@ -622,7 +610,11 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
       */
     @Override
     public void shutdown() {
-        commit();
+        
+        for (Metadata md : threadData.values()) {
+            closeMetadata(md, true);   
+        }
+        threadData.clear();
 
         db.close();
         sparksee.close();
@@ -666,10 +658,10 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
     }
 
     @Override
-    public <T extends Element> void dropKeyIndex(String key,
-                                                 Class<T> elementClass) {
-        if (elementClass == null)
+    public <T extends Element> void dropKeyIndex(String key, Class<T> elementClass) {
+        if (elementClass == null) {
             throw ExceptionFactory.classForElementCannotBeNull();
+        }
 
         throw new UnsupportedOperationException();
     }
@@ -690,16 +682,18 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
      */
     @Override
     public <T extends Element> void createKeyIndex(String key, Class<T> elementClass, final Parameter... indexParameters) {
-        if (elementClass == null)
+        if (elementClass == null) {
             throw ExceptionFactory.classForElementCannotBeNull();
-
-        autoStartTransaction();
-
+        } else if (!Vertex.class.isAssignableFrom(elementClass) && !Edge.class.isAssignableFrom(elementClass)) {
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
+        }
+        
         String label = this.label.get();
         if (label == null) {
             throw new IllegalArgumentException("Label must be given");
         }
 
+        autoStartTransaction(true);
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
 
         int type = rawGraph.findType(label);
@@ -707,13 +701,10 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
             // create the node/edge type
             if (Vertex.class.isAssignableFrom(elementClass)) {
                 type = rawGraph.newNodeType(label);
-            } else if (Edge.class.isAssignableFrom(elementClass)) {
-                type = rawGraph.newEdgeType(label, true, true);
             } else {
-                throw ExceptionFactory.classIsNotIndexable(elementClass);
+                type = rawGraph.newEdgeType(label, true, true);
             }
         } else {
-            // validate the node/edge type
             com.sparsity.sparksee.gdb.Type tdata = rawGraph.getType(type);
             if (tdata.getObjectType() == ObjectType.Node) {
                 if (!Vertex.class.isAssignableFrom(elementClass)) {
@@ -734,37 +725,36 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
 
         int attr = rawGraph.findAttribute(type, key);
         if (com.sparsity.sparksee.gdb.Attribute.InvalidAttribute == attr) {
-            // create the attribute (indexed)
             attr = rawGraph.newAttribute(type, key,
                     com.sparsity.sparksee.gdb.DataType.String,
                     com.sparsity.sparksee.gdb.AttributeKind.Indexed);
         } else {
-            // it already exists, let's indexe it if necessary
             com.sparsity.sparksee.gdb.Attribute adata = rawGraph.getAttribute(attr);
-            if (adata.getKind() == AttributeKind.Indexed || adata.getKind() == AttributeKind.Unique) {
+            if (adata.getKind() != AttributeKind.Basic) {
                 throw ExceptionFactory.indexAlreadyExists(label + " " + key);
             }
-            rawGraph.indexAttribute(attr,
-                    com.sparsity.sparksee.gdb.AttributeKind.Indexed);
+            rawGraph.indexAttribute(attr, com.sparsity.sparksee.gdb.AttributeKind.Indexed);
         }
     }
 
     @Override
     public <T extends Element> Set<String> getIndexedKeys(Class<T> elementClass) {
-        if (elementClass == null)
+        if (elementClass == null) {
             throw ExceptionFactory.classForElementCannotBeNull();
-
-        autoStartTransaction();
-
+        }
+        if (!Vertex.class.isAssignableFrom(elementClass) && !Edge.class.isAssignableFrom(elementClass)) {
+            throw ExceptionFactory.classIsNotIndexable(elementClass);
+        }
+        
+        autoStartTransaction(false);
         com.sparsity.sparksee.gdb.TypeList tlist = null;
         com.sparsity.sparksee.gdb.Graph rawGraph = getRawGraph();
         if (Vertex.class.isAssignableFrom(elementClass)) {
             tlist = rawGraph.findNodeTypes();
         } else if (Edge.class.isAssignableFrom(elementClass)) {
             tlist = rawGraph.findEdgeTypes();
-        } else {
-            throw ExceptionFactory.classIsNotIndexable(elementClass);
         }
+        
         Set<String> ret = new HashSet<String>();
         for (Integer type : tlist) {
             com.sparsity.sparksee.gdb.AttributeList alist = rawGraph.findAttributes(type);
@@ -782,37 +772,70 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
         return ret;
     }
 
-    void autoStartTransaction() {
-        if (sessionData.get().session == null) {
-            sessionData.get().session = db.newSession();
-            //System.out.println("> th=" + Thread.currentThread().getId() + " starts tx with sess=" + sess);
+    void autoStartTransaction(boolean update) {
+        Long threadId = Thread.currentThread().getId();
+        if (!threadData.containsKey(threadId)) {
+            Metadata metadata = new Metadata();
+            metadata.session = db.newSession();
+            threadData.put(threadId, metadata);
         } else {
-            assert !sessionData.get().session.isClosed();
+            assert !threadData.get(threadId).session.isClosed();
         }
+        Metadata metadata = threadData.get(threadId);
+        if (update && !metadata.isUpdating) {
+            metadata.isUpdating = true;
+            threadData.get(threadId).session.beginUpdate();
+        }
+    }
+    
+    protected void closeMetadata(Metadata metadata, boolean commit) {
+        for (SparkseeIterable<? extends Element> elem : metadata.collection) {
+            elem.close(false);
+        }
+        metadata.collection.clear();
+        
+        if (metadata.isUpdating) {
+            if (commit) {
+                metadata.session.commit();
+            } else {
+                metadata.session.rollback();
+            }
+            metadata.isUpdating = false;
+        }
+        metadata.session.close();
     }
 
     public void commit() {
-        if (sessionData.get().session == null) {
+        Long threadId = Thread.currentThread().getId();
+        if (!threadData.containsKey(threadId)) {
             // already closed session
             return;
         }
-        closeAllSessionCollections();
-        if (sessionData.get().session != null && !sessionData.get().session.isClosed()) {
-            sessionData.get().session.close();
-        }
-        sessionData.get().session = null;
+        
+        Metadata metadata = threadData.get(threadId);
+        closeMetadata(metadata, true);
+        threadData.remove(threadId);
     }
 
     public void rollback() {
-        throw new UnsupportedOperationException("Rollback is not supported");
+        Long threadId = Thread.currentThread().getId();
+        if (!threadData.containsKey(threadId)) {
+            // already closed session
+            return;
+        }
+        
+        Metadata metadata = threadData.get(threadId);
+        closeMetadata(metadata, false);
+        threadData.remove(threadId);
     }
 
     @Override
     public void stopTransaction(Conclusion conclusion) {
-        if (Conclusion.SUCCESS == conclusion)
+        if (Conclusion.SUCCESS == conclusion) {
             commit();
-        else
+        } else {
             rollback();
+        }
     }
 
     public GraphQuery query() {
