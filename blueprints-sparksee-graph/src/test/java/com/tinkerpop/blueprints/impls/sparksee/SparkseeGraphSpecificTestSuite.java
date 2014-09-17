@@ -29,6 +29,7 @@ public class SparkseeGraphSpecificTestSuite extends TestSuite {
 
     public void testSparkseeVertexLabel() throws Exception {
         Graph graph = graphTest.generateGraph();
+        ((SparkseeGraph) graph).typeScope.set(true);
         this.stopWatch();
 
         assertTrue(graph.addVertex(null).getProperty(StringFactory.LABEL).equals(SparkseeGraph.DEFAULT_SPARKSEE_VERTEX_LABEL));
@@ -57,6 +58,7 @@ public class SparkseeGraphSpecificTestSuite extends TestSuite {
 
     public void testKeyIndex() {
         KeyIndexableGraph graph = (KeyIndexableGraph) graphTest.generateGraph();
+        ((SparkseeGraph) graph).typeScope.set(true);
         this.stopWatch();
 
         ((SparkseeGraph) graph).label.set("people");
@@ -112,6 +114,7 @@ public class SparkseeGraphSpecificTestSuite extends TestSuite {
 
     public void testTx() {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        ((SparkseeGraph) graph).typeScope.set(true);
         this.stopWatch();
 
         graph.commit();
@@ -162,6 +165,7 @@ public class SparkseeGraphSpecificTestSuite extends TestSuite {
 
     public void testMultipleSessions() throws InterruptedException, IOException {
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        ((SparkseeGraph) graph).typeScope.set(true);
         this.stopWatch();
 
         // This test requires a multiple sessions license, 

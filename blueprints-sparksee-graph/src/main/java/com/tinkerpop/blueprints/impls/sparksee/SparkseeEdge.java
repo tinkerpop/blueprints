@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.Direction;
@@ -68,15 +65,14 @@ class SparkseeEdge extends SparkseeElement implements Edge {
       */
     @Override
     public Vertex getVertex(final Direction direction) {
-        graph.autoStartTransaction();
-
-        setEdges();
-        if (direction.equals(Direction.OUT))
-            return new SparkseeVertex(graph, out);
-        else if (direction.equals(Direction.IN))
-            return new SparkseeVertex(graph, in);
-        else
+        if (direction.equals(Direction.BOTH)) {
             throw ExceptionFactory.bothIsNotSupported();
+        }
+        
+        graph.autoStartTransaction(false);
+        setEdges();
+        long vertexId = (direction.equals(Direction.OUT)) ? out : in;
+        return new SparkseeVertex(graph, vertexId);
     }
 
     /*
@@ -86,14 +82,12 @@ class SparkseeEdge extends SparkseeElement implements Edge {
       */
     @Override
     public String getLabel() {
-        graph.autoStartTransaction();
-
+        graph.autoStartTransaction(false);
         return getTypeLabel();
     }
 
     public String toString() {
-        graph.autoStartTransaction();
-
+        graph.autoStartTransaction(false);
         return StringFactory.edgeString(this);
     }
 }

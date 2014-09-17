@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.Edge;
@@ -27,6 +24,10 @@ import java.util.Set;
  *         Technologies</a>
  */
 class SparkseeElement implements Element {
+    
+    private static final int NODE_SCOPE  = com.sparsity.sparksee.gdb.Type.NodesType;
+    private static final int EDGE_SCOPE  = com.sparsity.sparksee.gdb.Type.EdgesType;
+    
     /**
      * SparkseeGraph instance.
      */
@@ -90,14 +91,24 @@ class SparkseeElement implements Element {
       */
     @Override
     public <T> T getProperty(final String key) {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(false);
 
-        int type = getObjectType();
         if (key.compareTo(StringFactory.LABEL) == 0) {
-            com.sparsity.sparksee.gdb.Type tdata = graph.getRawGraph().getType(type);
+            com.sparsity.sparksee.gdb.Type tdata = graph.getRawGraph().getType(getObjectType());
             return (T) tdata.getName();
         }
-        int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
+        
+        int attrType = getObjectType();
+        if (!graph.typeScope.get())
+        {
+            if (graph.getRawGraph().getType(getObjectType()).getObjectType() == com.sparsity.sparksee.gdb.ObjectType.Node) {
+                attrType = NODE_SCOPE;
+            } else {
+                attrType = EDGE_SCOPE;
+            }
+        }
+        
+        int attr = graph.getRawGraph().findAttribute(attrType, key);
         if (attr == com.sparsity.sparksee.gdb.Attribute.InvalidAttribute) {
             return null;
         }
@@ -138,11 +149,29 @@ class SparkseeElement implements Element {
       */
     @Override
     public Set<String> getPropertyKeys() {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(false);
 
-        com.sparsity.sparksee.gdb.AttributeList alist = graph.getRawGraph().getAttributes(oid);
+        com.sparsity.sparksee.gdb.AttributeList alist;
+        if (graph.typeScope.get()) {
+            alist = graph.getRawGraph().getAttributes(oid);
+        } else {
+            int attrType;
+            if (graph.getRawGraph().getType(getObjectType()).getObjectType() == com.sparsity.sparksee.gdb.ObjectType.Node) {
+                attrType = NODE_SCOPE;
+            } else {
+                attrType = EDGE_SCOPE;
+            }
+            alist = graph.getRawGraph().findAttributes(attrType);
+        }
         Set<String> attrKeys = new HashSet<String>();
+        com.sparsity.sparksee.gdb.Value v = new com.sparsity.sparksee.gdb.Value();
         for (Integer attr : alist) {
+            if (!graph.typeScope.get()) {
+                graph.getRawGraph().getAttribute(oid, attr, v);
+                if (v.isNull()) {
+                    continue;
+                }
+            }
             String key = graph.getRawGraph().getAttribute(attr).getName();
             attrKeys.add(key);
         }
@@ -160,11 +189,24 @@ class SparkseeElement implements Element {
     @Override
     public void setProperty(final String key, final Object value) {
         ElementHelper.validateProperty(this, key, value);
-        if (key.equals(StringFactory.LABEL))
+        if (key.equals(StringFactory.LABEL)) {
             throw new IllegalArgumentException("Property key is reserved for all vertices and edges: " + StringFactory.LABEL);
-        graph.autoStartTransaction();
-
-        int attr = graph.getRawGraph().findAttribute(getObjectType(), key);
+        }
+        
+        graph.autoStartTransaction(true);
+        
+        int attrType = getObjectType();
+        
+        if (!graph.typeScope.get())
+        {
+            if (graph.getRawGraph().getType(attrType).getObjectType() == com.sparsity.sparksee.gdb.ObjectType.Node) {
+                attrType = NODE_SCOPE;
+            } else {
+                attrType = EDGE_SCOPE;
+            }
+        }
+        
+        int attr = graph.getRawGraph().findAttribute(attrType, key);
         com.sparsity.sparksee.gdb.DataType datatype = null;
         if (attr == com.sparsity.sparksee.gdb.Attribute.InvalidAttribute) {
             //
@@ -186,7 +228,7 @@ class SparkseeElement implements Element {
                 throw new IllegalArgumentException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
             }
             assert datatype != null;
-            attr = graph.getRawGraph().newAttribute(type, key, datatype, com.sparsity.sparksee.gdb.AttributeKind.Basic);
+            attr = graph.getRawGraph().newAttribute(attrType, key, datatype, com.sparsity.sparksee.gdb.AttributeKind.Basic);
             assert attr != com.sparsity.sparksee.gdb.Attribute.InvalidAttribute;
         } else {
             datatype = graph.getRawGraph().getAttribute(attr).getDataType();
@@ -230,13 +272,8 @@ class SparkseeElement implements Element {
                     throw new IllegalArgumentException(SparkseeTokens.TYPE_EXCEPTION_MESSAGE);
             }
         }
-        //try {
+        
         this.graph.getRawGraph().setAttribute(oid, attr, v);
-        //} catch(RuntimeException e) {
-        //System.out.println("\t" + this + "!!" + attr + "!!" + v);
-        //    throw e;
-        //}
-
     }
 
     /*
@@ -247,7 +284,7 @@ class SparkseeElement implements Element {
       */
     @Override
     public <T> T removeProperty(final String key) {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(true);
 
         try {
             Object ret = getProperty(key);
@@ -271,14 +308,15 @@ class SparkseeElement implements Element {
     }
 
     public void remove() {
-        if (this instanceof Vertex)
+        if (this instanceof Vertex) {
             this.graph.removeVertex((Vertex) this);
-        else
+        } else {
             this.graph.removeEdge((Edge) this);
+        }
     }
 
     public boolean equals(final Object object) {
-        graph.autoStartTransaction();
+        graph.autoStartTransaction(false);
 
         return ElementHelper.areEqual(this, object);
     }
