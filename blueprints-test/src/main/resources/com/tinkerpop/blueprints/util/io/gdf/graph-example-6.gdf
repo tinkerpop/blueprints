@@ -1,0 +1,5 @@
+nodedef>name,weight INT
+a,1
+ b, 2
+edgedef>node1,node2, label , weight FLOAT
+a,b, a->b , 0.01
