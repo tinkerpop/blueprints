@@ -51,6 +51,8 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
 
     private boolean uniqueIds = true;
 
+    private static boolean indicesEnsured = false;
+
     /**
      * Adds custom ID functionality to the given graph,
      * supporting both custom vertex IDs and custom edge IDs.
@@ -418,6 +420,9 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
     }
 
     private void createIndices() {
+        if (indicesEnsured)
+            return;
+
         if (supportVertexIds && !baseGraph.getIndexedKeys(Vertex.class).contains(ID)) {
             baseGraph.createKeyIndex(ID, Vertex.class);
         }
@@ -425,6 +430,8 @@ public class IdGraph<T extends KeyIndexableGraph> implements KeyIndexableGraph, 
         if (supportEdgeIds && !baseGraph.getIndexedKeys(Edge.class).contains(ID)) {
             baseGraph.createKeyIndex(ID, Edge.class);
         }
+
+        indicesEnsured = true;
     }
 
     private static void verifyNativeElement(final Element e) {
