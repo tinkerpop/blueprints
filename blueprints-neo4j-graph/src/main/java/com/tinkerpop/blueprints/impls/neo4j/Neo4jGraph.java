@@ -103,6 +103,7 @@ public class Neo4jGraph implements TransactionalGraph, IndexableGraph, KeyIndexa
         FEATURES.supportsVertexProperties = true;
         FEATURES.supportsEdgeProperties = true;
         FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsThreadIsolatedTransactions = true;
     }
 
     protected boolean checkElementsInTransaction() {

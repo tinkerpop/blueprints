@@ -2,6 +2,7 @@ package com.tinkerpop.blueprints.impls.sparksee;
 
 import com.tinkerpop.blueprints.EdgeTestSuite;
 import com.tinkerpop.blueprints.Graph;
+import com.tinkerpop.blueprints.TransactionalGraphTestSuite;
 import com.tinkerpop.blueprints.GraphQueryTestSuite;
 import com.tinkerpop.blueprints.GraphTestSuite;
 import com.tinkerpop.blueprints.TestSuite;
@@ -48,6 +49,12 @@ public class SparkseeGraphTest extends GraphTest {
         doTestSuite(new VertexQueryTestSuite(this));
         printTestPerformance("VertexQueryTestSuite", this.stopWatch());
     }
+    
+    public void testTransactionalGraphTestSuite() throws Exception {
+        this.stopWatch();
+        doTestSuite(new TransactionalGraphTestSuite(this));
+        printTestPerformance("TransactionalGraphTestSuite", this.stopWatch());
+    }
 
     public void testGraphQueryTestSuite() throws Exception {
         this.stopWatch();
@@ -60,13 +67,12 @@ public class SparkseeGraphTest extends GraphTest {
     the scope of a node/edge type. Thus, when using the KeyIndexableGraph
     APIs it is required to previously set the label where the key property
     is defined, as it is shown in the testKeyIndex below.
-    
+    */
     public void testKeyIndexableGraphTestSuite() throws Exception {
         this.stopWatch();
-        doTestSuite(new KeyIndexableGraphTestSuite(this));
+        doTestSuite(new SparkseeKeyIndexableGraphTestSuite(this));
         printTestPerformance("KeyIndexableGraphTestSuite", this.stopWatch());
     }
-    //*/
 
     public void testGraphMLReaderTestSuite() throws Exception {
         this.stopWatch();
@@ -115,7 +121,6 @@ public class SparkseeGraphTest extends GraphTest {
 
     public Graph generateGraph(boolean create, final String graphDirectoryName) {
         String db = this.computeTestDataRoot() + "/" + graphDirectoryName;
-
         if (create) {
             deleteDirectory(this.computeTestDataRoot());
         }

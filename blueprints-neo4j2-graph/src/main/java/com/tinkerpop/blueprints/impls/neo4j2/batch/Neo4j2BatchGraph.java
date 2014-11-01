@@ -92,6 +92,7 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
         FEATURES.supportsVertexProperties = true;
         FEATURES.supportsEdgeProperties = true;
         FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsThreadIsolatedTransactions = false;
     }
 
 

@@ -82,6 +82,7 @@ public class TinkerGraph implements IndexableGraph, KeyIndexableGraph, Serializa
         FEATURES.supportsVertexProperties = true;
         FEATURES.supportsEdgeProperties = true;
         FEATURES.supportsThreadedTransactions = false;
+        FEATURES.supportsThreadIsolatedTransactions = false;
 
         PERSISTENT_FEATURES = FEATURES.copyFeatures();
         PERSISTENT_FEATURES.isPersistent = true;

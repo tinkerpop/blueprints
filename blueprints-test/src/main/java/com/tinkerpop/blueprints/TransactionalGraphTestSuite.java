@@ -380,8 +380,6 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-    // public void testAutomaticIndexKeysRollback()
-
     public void testAutomaticSuccessfulTransactionOnShutdown() {
 
         TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
@@ -462,57 +460,58 @@ public class TransactionalGraphTestSuite extends TestSuite {
         graph.shutdown();
     }
 
-
     public void testCompetingThreads() {
         final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
-        int totalThreads = 250;
-        final AtomicInteger vertices = new AtomicInteger(0);
-        final AtomicInteger edges = new AtomicInteger(0);
-        final AtomicInteger completedThreads = new AtomicInteger(0);
-        for (int i = 0; i < totalThreads; i++) {
-            new Thread() {
-                public void run() {
-                    Random random = new Random();
-                    if (random.nextBoolean()) {
-                        Vertex a = graph.addVertex(null);
-                        Vertex b = graph.addVertex(null);
-                        Edge e = graph.addEdge(null, a, b, graphTest.convertLabel("friend"));
-
-                        if (graph.getFeatures().supportsElementProperties()) {
-                            a.setProperty("test", this.getId());
-                            b.setProperty("blah", random.nextFloat());
-                            e.setProperty("bloop", random.nextInt());
-                        }
-                        vertices.getAndAdd(2);
-                        edges.getAndAdd(1);
-                        graph.commit();
-                    } else {
-                        Vertex a = graph.addVertex(null);
-                        Vertex b = graph.addVertex(null);
-                        Edge e = graph.addEdge(null, a, b, graphTest.convertLabel("friend"));
-                        if (graph.getFeatures().supportsElementProperties()) {
-                            a.setProperty("test", this.getId());
-                            b.setProperty("blah", random.nextFloat());
-                            e.setProperty("bloop", random.nextInt());
-                        }
+        if (graph.getFeatures().supportsThreadIsolatedTransactions) {
+            int totalThreads = 250;
+            final AtomicInteger vertices = new AtomicInteger(0);
+            final AtomicInteger edges = new AtomicInteger(0);
+            final AtomicInteger completedThreads = new AtomicInteger(0);
+            for (int i = 0; i < totalThreads; i++) {
+                new Thread() {
+                    public void run() {
+                        Random random = new Random();
                         if (random.nextBoolean()) {
-                            graph.commit();
+                            Vertex a = graph.addVertex(null);
+                            Vertex b = graph.addVertex(null);
+                            Edge e = graph.addEdge(null, a, b, graphTest.convertLabel("friend"));
+
+                            if (graph.getFeatures().supportsElementProperties()) {
+                                a.setProperty("test", this.getId());
+                                b.setProperty("blah", random.nextFloat());
+                                e.setProperty("bloop", random.nextInt());
+                            }
                             vertices.getAndAdd(2);
                             edges.getAndAdd(1);
+                            graph.commit();
                         } else {
-                            graph.rollback();
+                            Vertex a = graph.addVertex(null);
+                            Vertex b = graph.addVertex(null);
+                            Edge e = graph.addEdge(null, a, b, graphTest.convertLabel("friend"));
+                            if (graph.getFeatures().supportsElementProperties()) {
+                                a.setProperty("test", this.getId());
+                                b.setProperty("blah", random.nextFloat());
+                                e.setProperty("bloop", random.nextInt());
+                            }
+                            if (random.nextBoolean()) {
+                                graph.commit();
+                                vertices.getAndAdd(2);
+                                edges.getAndAdd(1);
+                            } else {
+                                graph.rollback();
+                            }
                         }
+                        completedThreads.getAndAdd(1);
                     }
-                    completedThreads.getAndAdd(1);
-                }
-            }.start();
-        }
+                }.start();
+            }
 
-        while (completedThreads.get() < totalThreads) {
+            while (completedThreads.get() < totalThreads) {
+            }
+            assertEquals(completedThreads.get(), 250);
+            edgeCount(graph, edges.get());
+            vertexCount(graph, vertices.get());
         }
-        assertEquals(completedThreads.get(), 250);
-        edgeCount(graph, edges.get());
-        vertexCount(graph, vertices.get());
         graph.shutdown();
     }
 
@@ -573,57 +572,59 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // the graph and a separate thread cannot affect the transaction of the first
         final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
 
-        final CountDownLatch latchCommittedInOtherThread = new CountDownLatch(1);
-        final CountDownLatch latchCommitInOtherThread = new CountDownLatch(1);
+        if (graph.getFeatures().supportsThreadIsolatedTransactions) {
+            final CountDownLatch latchCommittedInOtherThread = new CountDownLatch(1);
+            final CountDownLatch latchCommitInOtherThread = new CountDownLatch(1);
 
-        // this thread starts a transaction then waits while the second thread tries to commit it.
-        final Thread threadTxStarter = new Thread() {
-            public void run() {
-                final Vertex v = graph.addVertex(null);
+            // this thread starts a transaction then waits while the second thread tries to commit it.
+            final Thread threadTxStarter = new Thread() {
+                public void run() {
+                    final Vertex v = graph.addVertex(null);
 
-                // System.out.println("added vertex");
+                    // System.out.println("added vertex");
 
-                latchCommitInOtherThread.countDown();
+                    latchCommitInOtherThread.countDown();
 
-                try {
-                    latchCommittedInOtherThread.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
+                    try {
+                        latchCommittedInOtherThread.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
+                    graph.rollback();
+
+                    // there should be no vertices here
+                    // System.out.println("reading vertex before tx");
+                    assertFalse(graph.getVertices().iterator().hasNext());
+                    // System.out.println("read vertex before tx");
                 }
+            };
 
-                graph.rollback();
+            threadTxStarter.start();
 
-                // there should be no vertices here
-                // System.out.println("reading vertex before tx");
-                assertFalse(graph.getVertices().iterator().hasNext());
-                // System.out.println("read vertex before tx");
-            }
-        };
+            // this thread tries to commit the transaction started in the first thread above.
+            final Thread threadTryCommitTx = new Thread() {
+                public void run() {
+                    try {
+                        latchCommitInOtherThread.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
 
-        threadTxStarter.start();
+                    // try to commit the other transaction
+                    graph.commit();
 
-        // this thread tries to commit the transaction started in the first thread above.
-        final Thread threadTryCommitTx = new Thread() {
-            public void run() {
-                try {
-                    latchCommitInOtherThread.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
+                    latchCommittedInOtherThread.countDown();
                 }
+            };
 
-                // try to commit the other transaction
-                graph.commit();
+            threadTryCommitTx.start();
 
-                latchCommittedInOtherThread.countDown();
-            }
-        };
+            threadTxStarter.join();
+            threadTryCommitTx.join();
+        }
 
-        threadTryCommitTx.start();
-
-        threadTxStarter.join();
-        threadTryCommitTx.join();
         graph.shutdown();
-
     }
 
     public void testRemoveInTransaction() {
@@ -1023,7 +1024,7 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // for each request...this test is similar to the previous one but includes retries.  in this case,
         // orientdb passes, but this isn't currently how Rexster integration tests work.
         final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
-        if (graph.getFeatures().supportsKeyIndices) {
+        if (graph.getFeatures().supportsKeyIndices && graph.getFeatures().supportsThreadIsolatedTransactions) {
             final String id = "_ID";
             ((KeyIndexableGraph) graph).createKeyIndex(id, Vertex.class);
 
@@ -1127,22 +1128,23 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // the purpose of this test is to ensure that properties of a element are available prior to commit()
         // across threads
         final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsThreadIsolatedTransactions) {
+            final AtomicReference<Vertex> v = new AtomicReference<Vertex>();
+            final Thread thread = new Thread() {
+                public void run() {
+                    final Vertex vertex = graph.addVertex(null);
+                    vertex.setProperty("name", "stephen");
+                    v.set(vertex);
+                }
+            };
 
-        final AtomicReference<Vertex> v = new AtomicReference<Vertex>();
-        final Thread thread = new Thread() {
-            public void run() {
-                final Vertex vertex = graph.addVertex(null);
-                vertex.setProperty("name", "stephen");
-                v.set(vertex);
-            }
-        };
+            thread.start();
+            thread.join();
 
-        thread.start();
-        thread.join();
-
-        Set<String> k = v.get().getPropertyKeys();
-        assertTrue(k.contains("name"));
-        assertEquals("stephen", v.get().getProperty("name"));
+            Set<String> k = v.get().getPropertyKeys();
+            assertTrue(k.contains("name"));
+            assertEquals("stephen", v.get().getProperty("name"));
+        }
         graph.shutdown();
     }
 
@@ -1152,67 +1154,67 @@ public class TransactionalGraphTestSuite extends TestSuite {
         // the changes in the transaction are isolated to the thread that made the change and the second thread
         // should not see the change until commit() in the first thread.
         final TransactionalGraph graph = (TransactionalGraph) graphTest.generateGraph();
+        if (graph.getFeatures().supportsThreadIsolatedTransactions) {
+            final CountDownLatch latchCommit = new CountDownLatch(1);
+            final CountDownLatch latchFirstRead = new CountDownLatch(1);
+            final CountDownLatch latchSecondRead = new CountDownLatch(1);
 
-        final CountDownLatch latchCommit = new CountDownLatch(1);
-        final CountDownLatch latchFirstRead = new CountDownLatch(1);
-        final CountDownLatch latchSecondRead = new CountDownLatch(1);
+            final Thread threadMod = new Thread() {
+                public void run() {
+                    final Vertex v = graph.addVertex(null);
+                    //v.setProperty("name", "stephen");
 
-        final Thread threadMod = new Thread() {
-            public void run() {
-                final Vertex v = graph.addVertex(null);
-                //v.setProperty("name", "stephen");
+                    // System.out.println("added vertex");
 
-                // System.out.println("added vertex");
+                    latchFirstRead.countDown();
 
-                latchFirstRead.countDown();
+                    try {
+                        latchCommit.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
 
-                try {
-                    latchCommit.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
+                    graph.commit();
+
+                    // System.out.println("committed vertex");
+
+                    latchSecondRead.countDown();
                 }
+            };
 
-                graph.commit();
+            threadMod.start();
 
-                // System.out.println("committed vertex");
+            final Thread threadRead = new Thread() {
+                public void run() {
+                    try {
+                        latchFirstRead.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
 
-                latchSecondRead.countDown();
-            }
-        };
+                    // System.out.println("reading vertex before tx");
+                    assertFalse(graph.getVertices().iterator().hasNext());
+                    // System.out.println("read vertex before tx");
 
-        threadMod.start();
+                    latchCommit.countDown();
 
-        final Thread threadRead = new Thread() {
-            public void run() {
-                try {
-                    latchFirstRead.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
+                    try {
+                        latchSecondRead.await();
+                    } catch (InterruptedException ie) {
+                        throw new RuntimeException(ie);
+                    }
+
+                    // System.out.println("reading vertex after tx");
+                    assertTrue(graph.getVertices().iterator().hasNext());
+                    // System.out.println("read vertex after tx");
                 }
+            };
 
-                // System.out.println("reading vertex before tx");
-                assertFalse(graph.getVertices().iterator().hasNext());
-                // System.out.println("read vertex before tx");
+            threadRead.start();
 
-                latchCommit.countDown();
-
-                try {
-                    latchSecondRead.await();
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException(ie);
-                }
-
-                // System.out.println("reading vertex after tx");
-                assertTrue(graph.getVertices().iterator().hasNext());
-                // System.out.println("read vertex after tx");
-            }
-        };
-
-        threadRead.start();
-
-        threadMod.join();
-        threadRead.join();
-
+            threadMod.join();
+            threadRead.join();
+        }
 
         graph.shutdown();
 

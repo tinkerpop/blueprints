@@ -136,6 +136,11 @@ public class Features {
      * Does the graph implement ThreadedTransactionalGraph?
      */
     public Boolean supportsThreadedTransactions = null;
+    /**
+     * Does the graph support transactions managed such that multiple threads operating on the same graph instance
+     * can have isolated transactions?
+     */
+    public Boolean supportsThreadIsolatedTransactions = null;
 
     /**
      * Checks whether the graph supports both vertex and edge properties
