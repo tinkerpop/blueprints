@@ -581,16 +581,10 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
 
     private static class QueryCacheSource implements CacheSource<String, ParsedQuery> {
         private final SPARQLParser parser = new SPARQLParser();
-        private AtomicInteger parseCount = new AtomicInteger();
 
         @Override
         public ParsedQuery get(final String sparqlQuery) throws Throwable {
-            parseCount.incrementAndGet();
             return parser.parseQuery(sparqlQuery, null);
-        }
-
-        public int cacheMissCount() {
-            return parseCount.get();
         }
     }
     static QueryCacheSource queryCacheSource = new QueryCacheSource();
@@ -599,19 +593,11 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
     }
     private static Cache<String, ParsedQuery> queryCache = makeCache();
 
-    private long showCacheMessage = 0;
     public List<Map<String, Vertex>> executeSparql(String sparqlQuery, final MapBindingSet mapBindingSet) throws RuntimeException {
         try {
             sparqlQuery = getPrefixes() + sparqlQuery;
 
-            // try to get the parsed query from the cache
             final ParsedQuery query = queryCache.get(sparqlQuery);
-
-            final long t = System.currentTimeMillis();
-            if(t > showCacheMessage) {
-                LOGGER.info(String.format("Cache misses: %d", queryCacheSource.cacheMissCount()));
-                showCacheMessage = t + 10000;
-            }
 
             boolean includeInferred = false;
             final CloseableIteration<? extends BindingSet, QueryEvaluationException> results =
