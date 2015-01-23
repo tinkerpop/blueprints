@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.tinkerpop.blueprints</groupId>
+        <groupId>org.allenai.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
         <version>2.7.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -14,7 +14,7 @@
     </description>
     <dependencies>
         <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
+            <groupId>org.allenai.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
@@ -34,7 +34,7 @@
             <version>2.0.1</version>
         </dependency>
         <dependency>
-            <groupId>com.tinkerpop.blueprints</groupId>
+            <groupId>org.allenai.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
             <version>${tinkerpop.version}</version>
             <scope>test</scope>
