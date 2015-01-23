@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.allenai.tinkerpop.blueprints</groupId>
         <artifactId>blueprints</artifactId>
-        <version>2.7.0</version>
+        <version>2.7.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-test</artifactId>
