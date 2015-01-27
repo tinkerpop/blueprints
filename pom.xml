@@ -8,9 +8,9 @@
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
-    <groupId>com.tinkerpop.blueprints</groupId>
+    <groupId>org.allenai.tinkerpop.blueprints</groupId>
     <artifactId>blueprints</artifactId>
-    <version>2.7.0-SNAPSHOT</version>
+    <version>2.7.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints: A Property Graph Model Interface</name>
@@ -25,9 +25,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:tinkerpop/blueprints.git</connection>
-        <developerConnection>scm:git:git@github.com:tinkerpop/blueprints.git</developerConnection>
-        <url>git@github.com:tinkerpop/blueprints.git</url>
+        <connection>scm:git:git@github.com:allenai/blueprints.git</connection>
+        <developerConnection>scm:git:git@github.com:allenai/blueprints.git</developerConnection>
+        <url>git@github.com:allenai/blueprints.git</url>
     </scm>
     <developers>
         <developer>
@@ -60,6 +60,11 @@
             <email>me@matthiasb.com</email>
             <url>http://matthiasb.com</url>
         </developer>
+        <developer>
+            <name>Dirk Groeneveld</name>
+            <email>dirkg@allenai.org</email>
+            <url>http://github.com/dirkgr</url>
+        </developer>
     </developers>
 
     <modules>
@@ -75,7 +80,7 @@
     </modules>
 
     <properties>
-        <tinkerpop.version>2.7.0-SNAPSHOT</tinkerpop.version>
+        <tinkerpop.version>2.7.1-SNAPSHOT</tinkerpop.version>
         <junit.version>4.11</junit.version>
         <ripple.version>1.1</ripple.version>
         <sesame.version>2.7.10</sesame.version>
@@ -133,7 +138,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.4</version>
@@ -146,7 +151,18 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -169,6 +185,18 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <reporting>
         <plugins>
             <plugin>

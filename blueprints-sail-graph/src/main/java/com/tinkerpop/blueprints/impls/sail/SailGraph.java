@@ -13,6 +13,9 @@ import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import info.aduna.iteration.CloseableIteration;
 import org.apache.log4j.PropertyConfigurator;
+import org.cache2k.Cache;
+import org.cache2k.CacheBuilder;
+import org.cache2k.CacheSource;
 import org.openrdf.model.Literal;
 import org.openrdf.model.Namespace;
 import org.openrdf.model.Resource;
@@ -50,6 +53,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 /**
@@ -572,12 +576,36 @@ public class SailGraph implements TransactionalGraph, MetaGraph<Sail> {
      * @throws RuntimeException if an error occurs in the SPARQL query engine
      */
     public List<Map<String, Vertex>> executeSparql(String sparqlQuery) throws RuntimeException {
+        return executeSparql(sparqlQuery, new MapBindingSet());
+    }
+
+    private static class QueryCacheSource implements CacheSource<String, ParsedQuery> {
+        private final SPARQLParser parser = new SPARQLParser();
+
+        @Override
+        public ParsedQuery get(final String sparqlQuery) throws Throwable {
+            return parser.parseQuery(sparqlQuery, null);
+        }
+    }
+    static QueryCacheSource queryCacheSource = new QueryCacheSource();
+    static Cache<String, ParsedQuery> makeCache() {
+        return CacheBuilder.newCache(String.class, ParsedQuery.class).source(queryCacheSource).build();
+    }
+    private static Cache<String, ParsedQuery> queryCache = makeCache();
+
+    public List<Map<String, Vertex>> executeSparql(String sparqlQuery, final MapBindingSet mapBindingSet) throws RuntimeException {
         try {
             sparqlQuery = getPrefixes() + sparqlQuery;
-            final SPARQLParser parser = new SPARQLParser();
-            final ParsedQuery query = parser.parseQuery(sparqlQuery, null);
+
+            final ParsedQuery query = queryCache.get(sparqlQuery);
+
             boolean includeInferred = false;
-            final CloseableIteration<? extends BindingSet, QueryEvaluationException> results = this.sailConnection.get().evaluate(query.getTupleExpr(), query.getDataset(), new MapBindingSet(), includeInferred);
+            final CloseableIteration<? extends BindingSet, QueryEvaluationException> results =
+                    this.sailConnection.get().evaluate(
+                            query.getTupleExpr(),
+                            query.getDataset(),
+                            mapBindingSet,
+                            includeInferred);
             final List<Map<String, Vertex>> returnList = new ArrayList<Map<String, Vertex>>();
             try {
                 while (results.hasNext()) {
