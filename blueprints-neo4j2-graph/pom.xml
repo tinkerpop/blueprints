@@ -11,6 +11,9 @@
     <artifactId>blueprints-neo4j2-graph</artifactId>
     <name>Blueprints-Neo4j2Graph</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
+    <properties>
+        <neo4j.version>2.1.6</neo4j.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -20,19 +23,19 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>2.0.1</version>
+            <version>${neo4j.version}</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-ha</artifactId>
-            <version>2.0.1</version>
+            <version>${neo4j.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-management</artifactId>
-            <version>2.0.1</version>
+            <version>${neo4j.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
