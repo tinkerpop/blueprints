@@ -9,9 +9,16 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-graph-jung</artifactId>
+    <packaging>bundle</packaging>
+
     <name>Blueprints-GraphJung</name>
     <description>Blueprints property graphs outplementation for the JUNG (Java Universal Network/Graph Framework)
     </description>
+
+    <properties>
+        <osgi.export>com.tinkerpop.blueprints.oupls.jung.*</osgi.export>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

@@ -9,8 +9,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-graph-sail</artifactId>
+    <packaging>bundle</packaging>
+
     <name>Blueprints-GraphSail</name>
     <description>Blueprints property graph ouplementation for Sesame RDF Sail</description>
+
+    <properties>
+        <osgi.export>com.tinkerpop.blueprints.oupls.sali.*</osgi.export>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

@@ -9,8 +9,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-sparksee-graph</artifactId>
+    <packaging>bundle</packaging>
+
     <name>Blueprints-SparkseeGraph</name>
     <description>Blueprints property graph implementation for the Sparksee graph database</description>
+
+    <properties>
+        <osgi.export>com.tinkerpop.blueprints.impls.sparksee.*</osgi.export>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>

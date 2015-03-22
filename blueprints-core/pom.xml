@@ -10,9 +10,21 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-core</artifactId>
-    <url>http://blueprints.tinkerpop.com</url>
+    <packaging>bundle</packaging>
+
     <name>Blueprints-Core</name>
     <description>Core interfaces and utilities for Blueprints</description>
+
+    <properties>
+        <osgi.export>com.tinkerpop.blueprints.*</osgi.export>
+        <osgi.import>
+            com.carrotsearch.hppc.*;resolution:=optional,
+            com.fasterxml.jackson.*;resolution:=optional,
+            org.codehaus.jettison.json;resolution:=optional,
+            *
+        </osgi.import>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
