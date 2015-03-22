@@ -2,7 +2,7 @@ package com.tinkerpop.blueprints.impls.rexster;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Element;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.apache.commons.lang.NotImplementedException;
 
 import java.util.Iterator;
 import java.util.LinkedList;

@@ -9,8 +9,15 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-rexster-graph</artifactId>
+    <packaging>bundle</packaging>
+
     <name>Blueprints-RexsterGraph</name>
     <description>Blueprints property graph implementation for Rexster</description>
+
+    <properties>
+        <osgi.export>com.tinkerpop.blueprints.impls.rexster.*</osgi.export>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
