@@ -560,8 +560,8 @@ public class GraphSONUtility {
                             showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL);
                 } else if (value.getClass().isArray()) {
                     value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
-                } else if (value instanceof IGraphSONIterable){
-                	value = createJSONList(((IGraphSONIterable)value).getList(), propertyKeys, showTypes);
+                } else if (value instanceof Iterable){
+                	value = createJSONList(getList((Iterable)value), propertyKeys, showTypes);
                 }
             }
 
@@ -570,6 +570,15 @@ public class GraphSONUtility {
         return jsonMap;
 
     }
+    
+	private static List<Element> getList(Iterable<Element> value) {
+		List<Element> result = new ArrayList<Element>();
+		for (Iterator<Element> iterator = value.iterator(); iterator.hasNext();) {
+			Element e = (Element) iterator.next();
+			result.add(e);
+		}
+		return result;
+	}
 
     private static void addObject(final ArrayNode jsonList, final Object value) {
         if (value == null) {
