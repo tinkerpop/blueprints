@@ -55,7 +55,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
 
     /**
      * {@inheritDoc}
-     * <p/>
      * The underlying Neo4j graph does not natively support this method within a transaction.
      * If the graph is not currently in a transaction, then the operation runs efficiently.
      * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
@@ -70,7 +69,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
 
     /**
      * {@inheritDoc}
-     * <p/>
      * The underlying Neo4j graph does not natively support this method within a transaction.
      * If the graph is not currently in a transaction, then the operation runs efficiently.
      * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.
@@ -85,7 +83,6 @@ public class Neo4jIndex<T extends Neo4jElement, S extends PropertyContainer> imp
 
     /**
      * {@inheritDoc}
-     * <p/>
      * The underlying Neo4j graph does not natively support this method within a transaction.
      * If the graph is not currently in a transaction, then the operation runs efficiently.
      * If the graph is in a transaction, then, for every element, a try/catch is used to determine if its in the current transaction.

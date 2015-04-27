@@ -213,20 +213,16 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
             @Override
             public Object beforeCommit(TransactionData data) throws Exception {
                 if (true) {
-                    throw new RuntimeException("jippo validation exception");
+                    throw new RuntimeException("Jippo validation exception");
                 }
-                return null;  //To change body of implemented methods use File | Settings | File Templates.
+                return null;
             }
 
             @Override
-            public void afterCommit(TransactionData data, Object state) {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
+            public void afterCommit(TransactionData data, Object state) {}
 
             @Override
-            public void afterRollback(TransactionData data, Object state) {
-                //To change body of implemented methods use File | Settings | File Templates.
-            }
+            public void afterRollback(TransactionData data, Object state) {}
         });
         try {
             Vertex vertex = graph.addVertex(null);

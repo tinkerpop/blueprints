@@ -3,7 +3,7 @@ package com.tinkerpop.blueprints.impls.neo4j2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.kernel.impl.util.FileUtils;
+import org.neo4j.io.fs.FileUtils;
 
 import java.io.File;
 import java.util.Arrays;

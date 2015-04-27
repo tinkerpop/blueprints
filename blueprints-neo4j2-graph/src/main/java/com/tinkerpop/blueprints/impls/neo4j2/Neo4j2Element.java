@@ -10,11 +10,7 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -29,7 +25,7 @@ abstract class Neo4j2Element implements Element {
     }
 
     public <T> T getProperty(final String key) {
-        this.graph.autoStartTransaction(false);
+        this.graph.autoStartTransaction();
         if (this.rawElement.hasProperty(key))
             return (T) tryConvertCollectionToArrayList(this.rawElement.getProperty(key));
         else
@@ -38,7 +34,7 @@ abstract class Neo4j2Element implements Element {
 
     public void setProperty(final String key, final Object value) {
         ElementHelper.validateProperty(this, key, value);
-        this.graph.autoStartTransaction(true);
+        this.graph.autoStartTransaction();
         // attempts to take a collection and convert it to an array so that Neo4j can consume it
         this.rawElement.setProperty(key, tryConvertCollectionToArray(value));
     }
@@ -47,13 +43,13 @@ abstract class Neo4j2Element implements Element {
         if (!this.rawElement.hasProperty(key))
             return null;
         else {
-            this.graph.autoStartTransaction(true);
+            this.graph.autoStartTransaction();
             return (T) this.rawElement.removeProperty(key);
         }
     }
 
     public Set<String> getPropertyKeys() {
-        this.graph.autoStartTransaction(false);
+        this.graph.autoStartTransaction();
         final Set<String> keys = new HashSet<String>();
         for (final String key : this.rawElement.getPropertyKeys()) {
             keys.add(key);
@@ -70,7 +66,7 @@ abstract class Neo4j2Element implements Element {
     }
 
     public Object getId() {
-        this.graph.autoStartTransaction(false);
+        this.graph.autoStartTransaction();
         if (this.rawElement instanceof Node) {
             return ((Node) this.rawElement).getId();
         } else {

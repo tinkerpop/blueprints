@@ -95,7 +95,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
     private static final String NAMESPACES_VERTEX_ID = "urn:com.tinkerpop.blueprints.pgm.oupls.sail:namespaces";
 
-    private final DataStore store = new DataStore();
+    private final DataStore<T> store;
 
     /**
      * Create a new RDF store using the provided Blueprints graph.  Default edge indices ("p,c,pc") will be used.
@@ -133,6 +133,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
      *                        To use GraphSail with a base Graph which does not support edge indices, provide "" as the argument.
      */
     public GraphSail(final T graph, final String indexedPatterns) {
+        store = createStore();
         store.sail = this;
         store.graph = graph;
 
@@ -247,11 +248,15 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
     }
 
     ////////////////////////////////////////////////////////////////////////////
+    protected DataStore<T> createStore() {
+        return new DataStore<T>();
+    }
+
 
     /**
      * A context object which is shared between the Sail and its Connections
      */
-    class DataStore {
+    protected static class DataStore<T extends KeyIndexableGraph> {
         public T graph;
         public NotifyingSailBase sail;
 
@@ -271,7 +276,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
 
         public Vertex getReferenceVertex() {
             //System.out.println("value = " + value);
-            Iterable<Vertex> i = store.graph.getVertices(VALUE, NAMESPACES_VERTEX_ID);
+            Iterable<Vertex> i = graph.getVertices(VALUE, NAMESPACES_VERTEX_ID);
             // TODO: restore the close()
             //try {
             Iterator<Vertex> iter = i.iterator();
@@ -309,7 +314,7 @@ public class GraphSail<T extends KeyIndexableGraph> extends NotifyingSailBase im
         }
 
         public Vertex getVertex(final Value value) {
-            for (Vertex v : store.graph.getVertices(VALUE, value.stringValue())) {
+            for (Vertex v : graph.getVertices(VALUE, value.stringValue())) {
                 if (matches(v, value)) {
                     return v;
                 }

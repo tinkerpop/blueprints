@@ -12,19 +12,20 @@ import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.graphdb.schema.Schema;
 import org.neo4j.graphdb.traversal.BidirectionalTraversalDescription;
 import org.neo4j.graphdb.traversal.TraversalDescription;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.TransactionBuilder;
-import org.neo4j.kernel.impl.nioneo.store.StoreId;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertThat;
 
 public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
+
     private class LazyLoadedGraphDatabase implements GraphDatabaseService {
+
         private GraphDatabaseService lazy;
 
         public GraphDatabaseService getLazy() {
             if (lazy == null) {
-                // load that lazy graph in a unique folder
+                //Load that lazy graph in a unique folder
                 lazy = new GraphDatabaseFactory().newEmbeddedDatabase(getClass().getName() + "/" + System.currentTimeMillis());
             }
             return lazy;
@@ -70,6 +71,40 @@ public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
         }
 
         /**
+         * @param label
+         * @param key
+         * @param value
+         * @return
+         * @category delegate
+         * @see org.neo4j.graphdb.GraphDatabaseService#findNodes(Label, String, Object)
+         */
+        public ResourceIterator<Node> findNodes(Label label, String key, Object value) {
+            return getLazy().findNodes(label, key, value);
+        }
+
+        /**
+         * @param label
+         * @param key
+         * @param value
+         * @return
+         * @category delegate
+         * @see org.neo4j.graphdb.GraphDatabaseService#findNode(Label, String, Object)
+         */
+        public Node findNode(Label label, String key, Object value) {
+            return getLazy().findNode(label, key, value);
+        }
+
+        /**
+         * @param label
+         * @return
+         * @category delegate
+         * @see org.neo4j.graphdb.GraphDatabaseService#findNodes(Label)
+         */
+        public ResourceIterator<Node> findNodes(Label label) {
+            return getLazy().findNodes(label);
+        }
+
+        /**
          * @return
          * @category delegate
          * @see org.neo4j.graphdb.GraphDatabaseService#getRelationshipTypes()
@@ -94,6 +129,27 @@ public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
          */
         public Transaction beginTx() {
             return getLazy().beginTx();
+        }
+
+        /**
+         * @param query
+         * @return
+         * @category delegate
+         * @see org.neo4j.graphdb.GraphDatabaseService#execute(String)
+         */
+        public Result execute(String query) throws QueryExecutionException {
+            return getLazy().execute(query);
+        }
+
+        /**
+         * @param query
+         * @param parameters
+         * @return
+         * @category delegate
+         * @see org.neo4j.graphdb.GraphDatabaseService#execute(String, Map)
+         */
+        public Result execute(String query, Map<String, Object> parameters) throws QueryExecutionException {
+            return getLazy().execute(query, parameters);
         }
 
         /**
@@ -176,33 +232,6 @@ public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
         }
     }
 
-    private class LazyLoadableGraphAPI extends LazyLoadedGraphDatabase implements GraphDatabaseAPI {
-
-        @Override
-        public DependencyResolver getDependencyResolver() {
-            return ((GraphDatabaseAPI) getLazy()).getDependencyResolver();
-        }
-
-        @Override
-        @Deprecated
-        public String getStoreDir() {
-            return ((GraphDatabaseAPI) getLazy()).getStoreDir();
-        }
-
-        @Override
-        @Deprecated
-        public StoreId storeId() {
-            return ((GraphDatabaseAPI) getLazy()).storeId();
-        }
-
-        @Override
-        @Deprecated
-        public TransactionBuilder tx() {
-            return ((GraphDatabaseAPI) getLazy()).tx();
-        }
-
-    }
-
     /**
      * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4j2Graph#getInternalIndexKeys}
      * won't load any index, with an additional {@link ClassCastException}
@@ -222,7 +251,7 @@ public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
     @Test
     public void loadingANeo4jGraphFromAnyGraphAPIClassShouldWork() throws ClassCastException {
         String METHOD_NAME = "#loadingANeo4jGraphFromAnyGraphAPIClassShouldWork";
-        Neo4j2Graph tested = new Neo4j2Graph(new LazyLoadableGraphAPI());
+        Neo4j2Graph tested = new Neo4j2Graph(new LazyLoadedGraphDatabase());
         assertThat(tested, IsNull.notNullValue());
         // at startup there is no index
         assertThat(tested.getIndices().iterator().hasNext(), Is.is(false));

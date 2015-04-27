@@ -1,16 +1,11 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
-import com.tinkerpop.blueprints.BaseTest;
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReader;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -37,23 +32,27 @@ public class Neo4j2BenchmarkTestSuite extends TestSuite {
             GraphDatabaseService neo4j = ((Neo4j2Graph) graph).getRawGraph();
             int counter = 0;
             this.stopWatch();
-            for (final Node node : neo4j.getAllNodes()) {
-                counter++;
-                for (final Relationship relationship : node.getRelationships(Direction.OUTGOING)) {
+            GlobalGraphOperations graphOperations = GlobalGraphOperations.at(neo4j);
+            try (Transaction tx = neo4j.beginTx()) {
+                for (final Node node : graphOperations.getAllNodes()) {
                     counter++;
-                    final Node node2 = relationship.getEndNode();
-                    counter++;
-                    for (final Relationship relationship2 : node2.getRelationships(Direction.OUTGOING)) {
+                    for (final Relationship relationship : node.getRelationships(Direction.OUTGOING)) {
                         counter++;
-                        final Node node3 = relationship2.getEndNode();
+                        final Node node2 = relationship.getEndNode();
                         counter++;
-                        for (final Relationship relationship3 : node3.getRelationships(Direction.OUTGOING)) {
+                        for (final Relationship relationship2 : node2.getRelationships(Direction.OUTGOING)) {
                             counter++;
-                            relationship3.getEndNode();
+                            final Node node3 = relationship2.getEndNode();
                             counter++;
+                            for (final Relationship relationship3 : node3.getRelationships(Direction.OUTGOING)) {
+                                counter++;
+                                relationship3.getEndNode();
+                                counter++;
+                            }
                         }
                     }
                 }
+                tx.success();
             }
             double currentTime = this.stopWatch();
             totalTime = totalTime + currentTime;

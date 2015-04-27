@@ -6,12 +6,7 @@ import com.tinkerpop.blueprints.VertexQuery;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
 import com.tinkerpop.blueprints.util.MultiIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +25,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public Iterable<Edge> getEdges(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
-        this.graph.autoStartTransaction(false);
+        this.graph.autoStartTransaction();
         if (direction.equals(com.tinkerpop.blueprints.Direction.OUT))
             return new Neo4jVertexEdgeIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
         else if (direction.equals(com.tinkerpop.blueprints.Direction.IN))
@@ -40,7 +35,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public Iterable<Vertex> getVertices(final com.tinkerpop.blueprints.Direction direction, final String... labels) {
-        this.graph.autoStartTransaction(false);
+        this.graph.autoStartTransaction();
         if (direction.equals(com.tinkerpop.blueprints.Direction.OUT))
             return new Neo4jVertexVertexIterable(this.graph, (Node) this.rawElement, Direction.OUTGOING, labels);
         else if (direction.equals(com.tinkerpop.blueprints.Direction.IN))
@@ -54,7 +49,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public Collection<String> getLabels() {
-        this.graph.autoStartTransaction(false);
+        this.graph.autoStartTransaction();
         final Collection<String> labels = new ArrayList<String>();
         for (Label label : getRawVertex().getLabels()) {
             labels.add(label.name());
@@ -63,17 +58,17 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
     }
 
     public void addLabel(String label) {
-        graph.autoStartTransaction(true);
+        graph.autoStartTransaction();
         getRawVertex().addLabel(DynamicLabel.label(label));
     }
 
     public void removeLabel(String label) {
-        graph.autoStartTransaction(true);
+        graph.autoStartTransaction();
         getRawVertex().removeLabel(DynamicLabel.label(label));
     }
 
     public VertexQuery query() {
-        this.graph.autoStartTransaction(false);
+        this.graph.autoStartTransaction();
         return new DefaultVertexQuery(this);
     }
 
@@ -106,7 +101,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
         }
 
         public Iterator<Neo4j2Vertex> iterator() {
-            graph.autoStartTransaction(false);
+            graph.autoStartTransaction();
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
@@ -115,17 +110,17 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
 
             return new Iterator<Neo4j2Vertex>() {
                 public Neo4j2Vertex next() {
-                    graph.autoStartTransaction(false);
+                    graph.autoStartTransaction();
                     return new Neo4j2Vertex(itty.next().getOtherNode(node), graph);
                 }
 
                 public boolean hasNext() {
-                    graph.autoStartTransaction(false);
+                    graph.autoStartTransaction();
                     return itty.hasNext();
                 }
 
                 public void remove() {
-                    graph.autoStartTransaction(true);
+                    graph.autoStartTransaction();
                     itty.remove();
                 }
             };
@@ -150,7 +145,7 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
         }
 
         public Iterator<Neo4j2Edge> iterator() {
-            graph.autoStartTransaction(false);
+            graph.autoStartTransaction();
             final Iterator<Relationship> itty;
             if (labels.length > 0)
                 itty = node.getRelationships(direction, labels).iterator();
@@ -159,17 +154,17 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
 
             return new Iterator<Neo4j2Edge>() {
                 public Neo4j2Edge next() {
-                    graph.autoStartTransaction(false);
+                    graph.autoStartTransaction();
                     return new Neo4j2Edge(itty.next(), graph);
                 }
 
                 public boolean hasNext() {
-                    graph.autoStartTransaction(false);
+                    graph.autoStartTransaction();
                     return itty.hasNext();
                 }
 
                 public void remove() {
-                    graph.autoStartTransaction(true);
+                    graph.autoStartTransaction();
                     itty.remove();
                 }
             };

@@ -36,7 +36,6 @@ import java.util.Set;
 /**
  * A Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
  * This is a single threaded, non-transactional bulk loader and should not be used for any other reason than for massive initial data loads.
- * <p/>
  * Neo4jBatchGraph is <b>not</b> a completely faithful Blueprints implementation.
  * Many methods throw UnsupportedOperationExceptions and take unique arguments. Be sure to review each method's JavaDoc.
  * The Neo4j "reference node" (vertex 0) is automatically created and is not removed until the database is shutdown() (do not add edges to the reference node).
@@ -205,7 +204,6 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
 
     /**
      * {@inheritDoc}
-     * <p/>
      * The object id can either be null, a long id, or a Map&lt;String,Object&gt;.
      * If null, then an internal long is provided on the construction of the vertex.
      * If a long id is provided, then the vertex is constructed with that long id.
@@ -268,30 +266,20 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         }
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Vertex> getVertices() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Vertex> getVertices(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public void removeVertex(final Vertex vertex) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     /**
      * {@inheritDoc}
-     * <p/>
      * The object id must be a Map&lt;String,Object&gt; or null.
      * The id is the properties written when the vertex is created.
      * While it is possible to Edge.setProperty(), this method is faster.
@@ -313,30 +301,18 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         return new Neo4jBatchEdge(this, finalId, label);
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Edge getEdge(final Object id) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Edge> getEdges() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Edge> getEdges(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public void removeEdge(final Edge edge) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
@@ -366,9 +342,6 @@ public class Neo4jBatchGraph implements KeyIndexableGraph, IndexableGraph, MetaG
         return (Iterable) this.indices.values();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public void dropIndex(final String indexName) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4jBatchTokens.DELETE_OPERATION_MESSAGE);
     }
