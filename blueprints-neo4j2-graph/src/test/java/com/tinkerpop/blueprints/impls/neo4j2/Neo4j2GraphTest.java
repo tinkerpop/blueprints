@@ -117,7 +117,6 @@ public class Neo4j2GraphTest extends GraphTest {
     public Graph generateGraph(final String graphDirectoryName) {
         final String directory = getWorkingDirectory();
         Neo4j2Graph graph = new Neo4j2Graph(directory + "/" + graphDirectoryName);
-        graph.setCheckElementsInTransaction(true);
 
         // for clean shutdown later
         testGraph.set(graph);

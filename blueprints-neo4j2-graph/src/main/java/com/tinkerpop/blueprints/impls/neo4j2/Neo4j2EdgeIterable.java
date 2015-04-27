@@ -15,22 +15,24 @@ public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo
 
     private final Iterable<Relationship> relationships;
     private final Neo4j2Graph graph;
-    private final boolean checkTransaction;
 
+    /**
+     * @deprecated the {@code checkTransaction} parameter is no longer used.
+     */
+    @Deprecated
     public Neo4j2EdgeIterable(final Iterable<Relationship> relationships, final Neo4j2Graph graph, final boolean checkTransaction) {
-        this.relationships = relationships;
-        this.graph = graph;
-        this.checkTransaction = checkTransaction;
+        this(relationships, graph);
     }
 
     public Neo4j2EdgeIterable(final Iterable<Relationship> relationships, final Neo4j2Graph graph) {
-        this(relationships, graph, false);
+        this.relationships = relationships;
+        this.graph = graph;
     }
 
     public Iterator<Neo4j2Edge> iterator() {
+        graph.autoStartTransaction(true);
         return new Iterator<Neo4j2Edge>() {
             private final Iterator<Relationship> itty = relationships.iterator();
-            private Relationship nextRelationship = null;
 
             public void remove() {
                 graph.autoStartTransaction(true);
@@ -39,50 +41,12 @@ public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo
 
             public Neo4j2Edge next() {
                 graph.autoStartTransaction(false);
-                if (!checkTransaction) {
-                    return new Neo4j2Edge(this.itty.next(), graph);
-                } else {
-                    if (null != this.nextRelationship) {
-                        final Relationship temp = this.nextRelationship;
-                        this.nextRelationship = null;
-                        return new Neo4j2Edge(temp, graph);
-                    } else {
-                        while (true) {
-                            final Relationship relationship = this.itty.next();
-                            try {
-                                if (!graph.relationshipIsDeleted(relationship.getId())) {
-                                    return new Neo4j2Edge(relationship, graph);
-                                }
-                            } catch (final IllegalStateException e) {
-                                // tried to access a relationship not available to the transaction
-                            }
-                        }
-                    }
-                }
+                return new Neo4j2Edge(this.itty.next(), graph);
             }
 
             public boolean hasNext() {
                 graph.autoStartTransaction(false);
-                if (!checkTransaction)
-                    return this.itty.hasNext();
-                else {
-                    if (null != this.nextRelationship)
-                        return true;
-                    else {
-                        while (this.itty.hasNext()) {
-                            final Relationship relationship = this.itty.next();
-                            try {
-                                if (!graph.relationshipIsDeleted(relationship.getId())) {
-                                    this.nextRelationship = relationship;
-                                    return true;
-                                }
-                            } catch (final IllegalStateException e) {
-                            }
-                        }
-                        return false;
-                    }
-
-                }
+                return this.itty.hasNext();
             }
         };
     }

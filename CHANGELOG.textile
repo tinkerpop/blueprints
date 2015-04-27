@@ -15,6 +15,12 @@ h3. Version 2.7.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* Bump Neo4j2Graph to 2.2.1
+* Deprecated @Neo4j2Graph.setCheckElementsInTransaction@, since the rationale behind it -
+  lack of consistency between Neo4j graph data and indexes - no longer applies.
+* Removed @Neo4j2Graph.nodeIsDeleted@ and @Neo4j2Graph.relationshipIsDeleted@ because
+  the Neo4j graph APIs no longer provide this information
+
 h3. Version 2.6.0 (September 17, 2014)
 
 ```xml
