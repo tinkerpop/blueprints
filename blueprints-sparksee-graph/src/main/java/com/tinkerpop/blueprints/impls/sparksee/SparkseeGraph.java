@@ -29,25 +29,20 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Sparksee is a graph database developed by Sparsity Technologies.
- * <p/>
  * Sparksee natively supports the property graph data model defined by Blueprints.
  * However, there are a few peculiarities. No user defined element identifiers:
  * Sparksee is the gatekeeper and creator of vertex and edge identifiers. Thus, when
  * creating a new vertex or edge instance, the provided object identifier is
  * ignored.
- * <p/>
  * Vertices are labeled too: When adding vertices, the user can set
  * {@link SparkseeGraph#label} to be used as the label of the vertex to be created.
  * Also, the label of a vertex (or even an element) can be retrieved through the
  * {@link StringFactory#LABEL} property.
- * <p/>
  * SparkseeGraph implements {@link KeyIndexableGraph} with some particularities on
  * the way it can be used. As both vertices and edges are labeled when working
  * with Sparksee, the use of some APIs may require previously setting the label (by
  * means of {@link SparkseeGraph#label}). Those APIs are:
  * {@link #getVertices(String, Object)}, {@link #getEdges(String, Object)}, and
- * {@link #createKeyIndex(String, Class)}.
- * <p/>
  * When working with SparkseeGraph, all methods having as a result a collection
  * actually return a {@link CloseableIterable} collection. Thus users can
  * {@link CloseableIterable#close()} the collection to free resources.
@@ -67,16 +62,13 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
 
     /**
      * This is a "bypass" to set the Sparksee vertex label (node type).
-     * <p/>
      * Sparksee vertices belong to a vertex/node type (thus all of them have a label).
      * By default, all vertices will have the {@link #DEFAULT_SPARKSEE_VERTEX_LABEL} label.
      * The user may set a different vertex label by setting this property when calling
      * {@link #addVertex(Object)}.
-     * <p/>
      * Moreover, this value will also be used for the KeyIndex-related methods.
      *
      * @see #addVertex(Object)
-     * @see #createKeyIndex(String, Class)
      * @see #getVertices(String, Object)
      * @see #getEdges(String, Object)
      */
@@ -266,9 +258,7 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
 
     /**
      * Creates a new Vertex.
-     * <p/>
      * Given identifier is ignored.
-     * <p/>
      * Use {@link #label} to specify the label for the new Vertex.
      * If no label is given, {@value #DEFAULT_SPARKSEE_VERTEX_LABEL} will be used.
      *
@@ -366,10 +356,8 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
 
     /**
      * Returns an iterable to all the vertices in the graph that have a particular key/value property.
-     * <p/>
      * In case key is {@link StringFactory#LABEL}, it returns an iterable of all the vertices having
      * the given value as the label (therefore, belonging to the given type).
-     * <p/>
      * In case {@link #label} is null, it will return all vertices having a particular
      * key/value no matters the type.
      * In case {@link #label} is not null, it will return all vertices having a particular
@@ -540,10 +528,8 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
 
     /**
      * Returns an iterable to all the edges in the graph that have a particular key/value property.
-     * <p/>
      * In case key is {@link StringFactory#LABEL}, it returns an iterable of all the edges having
      * the given value as the label (therefore, belonging to the given type).
-     * <p/>
      * In case {@link #label} is null, it will return all edges having a particular
      * key/value no matters the type.
      * In case {@link #label} is not null, it will return all edges having a particular
@@ -689,15 +675,12 @@ public class SparkseeGraph implements MetaGraph<com.sparsity.sparksee.gdb.Graph>
 
     /**
      * Create an automatic indexing structure for indexing provided key for element class.
-     * <p/>
      * Sparksee attributes are restricted to an specific vertex/edge type. The property
      * {@link #label} must be used to specify the vertex/edge label.
-     * <p/>
      * The index could be created even before the vertex/edge label
      * had been created (that is, there are no instances for the given vertex/edge label).
      * If so, this will create the vertex/edge type automatically.
      * The same way, if necessary the attribute will be created automatically.
-     * <p/>
      * FIXME: In case the attribute is created, this always creates an String
      * attribute, could this be set somehow?
      */

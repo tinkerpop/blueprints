@@ -5,9 +5,7 @@ import com.tinkerpop.blueprints.Index;
 import com.tinkerpop.blueprints.Vertex;
 import junit.framework.TestCase;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * @author Victor Su

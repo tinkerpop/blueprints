@@ -1,28 +1,14 @@
 package com.tinkerpop.blueprints.impls.neo4j2.batch;
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Features;
-import com.tinkerpop.blueprints.GraphQuery;
-import com.tinkerpop.blueprints.Index;
-import com.tinkerpop.blueprints.IndexableGraph;
-import com.tinkerpop.blueprints.KeyIndexableGraph;
-import com.tinkerpop.blueprints.MetaGraph;
-import com.tinkerpop.blueprints.Parameter;
-import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.index.lucene.unsafe.batchinsert.LuceneBatchInserterIndexProvider;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.core.NodeManager;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserterIndexProvider;
@@ -36,7 +22,6 @@ import java.util.Set;
 /**
  * A Blueprints implementation of the Neo4j batch inserter for bulk loading data into a Neo4j graph.
  * This is a single threaded, non-transactional bulk loader and should not be used for any other reason than for massive initial data loads.
- * <p/>
  * Neo4j2BatchGraph is <b>not</b> a completely faithful Blueprints implementation.
  * Many methods throw UnsupportedOperationExceptions and take unique arguments. Be sure to review each method's JavaDoc.
  * The Neo4j "reference node" (vertex 0) is automatically created and is not removed until the database is shutdown() (do not add edges to the reference node).
@@ -143,17 +128,23 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
                 builder.setConfig(GraphDatabaseSettings.relationship_keys_indexable, edgeIndexKeys.toString().replace("[", "").replace("]", "")).setConfig(GraphDatabaseSettings.relationship_auto_indexing, "true");
 
             rawGraphDB = builder.newGraphDatabase();
+            GlobalGraphOperations graphOperations = GlobalGraphOperations.at(rawGraphDB);
 
-            Transaction tx = rawGraphDB.beginTx();
-            try {
-                GlobalGraphOperations graphOperations = GlobalGraphOperations.at(rawGraphDB);
-                if (this.vertexIndexKeys.size() > 0)
-                    populateKeyIndices(rawGraphDB, rawGraphDB.index().getNodeAutoIndexer(), graphOperations.getAllNodes(), Vertex.class);
-                if (this.edgeIndexKeys.size() > 0)
-                    populateKeyIndices(rawGraphDB, rawGraphDB.index().getRelationshipAutoIndexer(), graphOperations.getAllRelationships(), Edge.class);
-                tx.success();
-            } finally {
-                tx.close();
+            if (this.vertexIndexKeys.size() > 0) {
+                ResourceIterable<Node> nodes;
+                try (Transaction tx = rawGraphDB.beginTx()) {
+                    nodes = graphOperations.getAllNodes();
+                    tx.success();
+                }
+                populateKeyIndices(rawGraphDB, rawGraphDB.index().getNodeAutoIndexer(), nodes, Vertex.class);
+            }
+            if (this.edgeIndexKeys.size() > 0) {
+                Iterable<Relationship> relationships;
+                try (Transaction tx = rawGraphDB.beginTx()) {
+                    relationships = graphOperations.getAllRelationships();
+                    tx.success();
+                }
+                populateKeyIndices(rawGraphDB, rawGraphDB.index().getRelationshipAutoIndexer(), relationships, Edge.class);
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
@@ -162,33 +153,39 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
         }
     }
 
+
     private static <T extends PropertyContainer> void populateKeyIndices(final GraphDatabaseService rawGraphDB, final AutoIndexer<T> rawAutoIndexer, final Iterable<T> rawElements, final Class elementClass) {
-        if (!rawAutoIndexer.isEnabled())
+        if (!rawAutoIndexer.isEnabled()) {
             return;
-
-
+        }
         final Set<String> properties = rawAutoIndexer.getAutoIndexedProperties();
+        Label indexesLabel = DynamicLabel.label(elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX);
+        try (Transaction tx = rawGraphDB.beginTx()) {
+            for (String property : properties) {
+                rawGraphDB.schema().indexFor(indexesLabel).on(property).create();
+            }
+            tx.success();
+        }
         Transaction tx = rawGraphDB.beginTx();
-
-        final PropertyContainer kernel = ((GraphDatabaseAPI) rawGraphDB).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties();
-        kernel.setProperty(elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX, properties.toArray(new String[properties.size()]));
-
         int count = 0;
         for (final PropertyContainer pc : rawElements) {
+            Transaction transaction = pc.getGraphDatabase().beginTx();
             for (final String property : properties) {
                 if (!pc.hasProperty(property)) continue;
                 pc.setProperty(property, pc.getProperty(property));
+                transaction.success();
+                transaction.close();
                 count++;
                 if (count >= 10000) {
                     count = 0;
                     tx.success();
-                    tx.finish();
+                    tx.close();
                     tx = rawGraphDB.beginTx();
                 }
             }
         }
         tx.success();
-        tx.finish();
+        tx.close();
     }
 
     public String toString() {
@@ -201,7 +198,6 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
 
     /**
      * {@inheritDoc}
-     * <p/>
      * The object id can either be null, a long id, or a Map&lt;String,Object&gt;.
      * If null, then an internal long is provided on the construction of the vertex.
      * If a long id is provided, then the vertex is constructed with that long id.
@@ -264,30 +260,20 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
         }
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Vertex> getVertices() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Vertex> getVertices(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public void removeVertex(final Vertex vertex) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4j2BatchTokens.DELETE_OPERATION_MESSAGE);
     }
 
     /**
      * {@inheritDoc}
-     * <p/>
      * The object id must be a Map&lt;String,Object&gt; or null.
      * The id is the properties written when the vertex is created.
      * While it is possible to Edge.setProperty(), this method is faster.
@@ -309,30 +295,18 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
         return new Neo4j2BatchEdge(this, finalId, label);
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Edge getEdge(final Object id) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Edge> getEdges() throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public Iterable<Edge> getEdges(final String key, final Object value) throws UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public void removeEdge(final Edge edge) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4j2BatchTokens.DELETE_OPERATION_MESSAGE);
     }
@@ -362,9 +336,6 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
         return (Iterable) this.indices.values();
     }
 
-    /**
-     * @throws UnsupportedOperationException
-     */
     public void dropIndex(final String indexName) throws UnsupportedOperationException {
         throw new UnsupportedOperationException(Neo4j2BatchTokens.DELETE_OPERATION_MESSAGE);
     }

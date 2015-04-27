@@ -12,7 +12,7 @@
     <name>Blueprints-Neo4j2Graph</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
     <properties>
-        <neo4j.version>2.1.6</neo4j.version>
+        <neo4j.version>2.2.1</neo4j.version>
     </properties>
     <dependencies>
         <dependency>
@@ -37,6 +37,11 @@
             <artifactId>neo4j-management</artifactId>
             <version>${neo4j.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>

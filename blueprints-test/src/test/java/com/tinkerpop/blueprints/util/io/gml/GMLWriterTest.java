@@ -30,11 +30,11 @@ public class GMLWriterTest extends TestCase {
         w.setNormalize(true);
         w.outputGraph(bos);
 
-        String actual = bos.toString();
-        String expected = streamToByteArray(GMLWriterTest.class.getResourceAsStream("writer.gml"));
+        String actual = bos.toString().replace("\r", "");
+        String expected = streamToByteArray(GMLWriterTest.class.getResourceAsStream("writer.gml")).replace("\r", "");
 
         // ignore carriage return character...not really relevant to the test
-        assertEquals(expected.replace("\r", ""), actual.replace("\r", ""));
+        assertEquals(expected, actual);
 
     }
 
@@ -48,11 +48,11 @@ public class GMLWriterTest extends TestCase {
         w.setUseId(true);
         w.outputGraph(bos);
 
-        String actual = bos.toString();
-        String expected = streamToByteArray(GMLWriterTest.class.getResourceAsStream("writer2.gml"));
+        String actual = bos.toString().replace("\r", "");
+        String expected = streamToByteArray(GMLWriterTest.class.getResourceAsStream("writer2.gml")).replace("\r", "");
 
         // ignore carriage return character...not really relevant to the test
-        assertEquals(expected.replace("\r", ""), actual.replace("\r", ""));
+        assertEquals(expected, actual);
 
     }
 

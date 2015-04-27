@@ -1,16 +1,6 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
-import com.tinkerpop.blueprints.EdgeTestSuite;
-import com.tinkerpop.blueprints.Graph;
-import com.tinkerpop.blueprints.GraphQueryTestSuite;
-import com.tinkerpop.blueprints.GraphTestSuite;
-import com.tinkerpop.blueprints.IndexTestSuite;
-import com.tinkerpop.blueprints.IndexableGraphTestSuite;
-import com.tinkerpop.blueprints.KeyIndexableGraphTestSuite;
-import com.tinkerpop.blueprints.TestSuite;
-import com.tinkerpop.blueprints.TransactionalGraphTestSuite;
-import com.tinkerpop.blueprints.VertexQueryTestSuite;
-import com.tinkerpop.blueprints.VertexTestSuite;
+import com.tinkerpop.blueprints.*;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.util.io.gml.GMLReaderTestSuite;
 import com.tinkerpop.blueprints.util.io.graphml.GraphMLReaderTestSuite;
@@ -26,11 +16,11 @@ import java.util.Map;
  */
 public class Neo4j2GraphTest extends GraphTest {
 
-    /*public void testNeo4jBenchmarkTestSuite() throws Exception {
+    public void testNeo4jBenchmarkTestSuite() throws Exception {
         this.stopWatch();
         doTestSuite(new Neo4j2BenchmarkTestSuite(this));
         printTestPerformance("Neo4j2BenchmarkTestSuite", this.stopWatch());
-    }*/
+    }
 
     public void testVertexTestSuite() throws Exception {
         this.stopWatch();
