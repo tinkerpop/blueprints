@@ -98,12 +98,14 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         FEATURES.supportsThreadIsolatedTransactions = true;
     }
 
+    /**
+     * @deprecated since Blueprints 2.7.0/Neo4j 2.2.x this method is
+     * no longer required since Neo4j indexes no longer return
+     * deleted elements. It will always return false.
+     */
+    @Deprecated
     protected boolean checkElementsInTransaction() {
-        if (this.tx.get() == null) {
-            return false;
-        } else {
-            return this.checkElementsInTransaction.get();
-        }
+        return false;
     }
 
     /**
@@ -351,14 +353,14 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      */
     public Iterable<Vertex> getVertices() {
         this.autoStartTransaction(false);
-        return new Neo4j2VertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, this.checkElementsInTransaction());
+        return new Neo4j2VertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this);
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
         this.autoStartTransaction(false);
         final AutoIndexer indexer = this.rawGraph.index().getNodeAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
-            return new Neo4j2VertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this, this.checkElementsInTransaction());
+            return new Neo4j2VertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this);
         else
             return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
     }
@@ -377,15 +379,14 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      */
     public Iterable<Edge> getEdges() {
         this.autoStartTransaction(false);
-        return new Neo4j2EdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, this.checkElementsInTransaction());
+        return new Neo4j2EdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this);
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
         this.autoStartTransaction(false);
         final AutoIndexer indexer = this.rawGraph.index().getRelationshipAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
-            return new Neo4j2EdgeIterable(this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndex().get(key, value), this,
-                    this.checkElementsInTransaction());
+            return new Neo4j2EdgeIterable(this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndex().get(key, value), this);
         else
             return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
