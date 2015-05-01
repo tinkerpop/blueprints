@@ -858,6 +858,79 @@ public class GraphSONUtilityTest {
     }
 
     @Test
+    public void jsonFromElementVertexIntIteratorPropertiesNoKeysWithTypes() throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+        List<Integer> list = new ArrayList<Integer>();
+        list.add(1);
+        list.add(1);
+        list.add(1);
+
+        // might be kinda weird if there were an Iterator in there but perhaps there is something that implements it
+        v.setProperty("keyList", list.iterator());
+
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.EXTENDED);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
+        Assert.assertTrue(json.has("keyList"));
+
+        JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
+        Assert.assertNotNull(listWithTypeAsJson);
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LIST, listWithTypeAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(GraphSONTokens.VALUE);
+        Assert.assertNotNull(listAsJSON);
+        Assert.assertEquals(3, listAsJSON.length());
+
+        for (int ix = 0; ix < listAsJSON.length(); ix++) {
+            JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
+            Assert.assertNotNull(valueAsJson);
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+            Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, valueAsJson.optString(GraphSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+            Assert.assertEquals(1, valueAsJson.optInt(GraphSONTokens.VALUE));
+        }
+    }
+
+    @Test
+    public void jsonFromElementVertexIntIterablePropertiesNoKeysWithTypes() throws JSONException {
+        Vertex v = this.graph.addVertex(1);
+        Set<Integer> list = new HashSet<Integer>();
+        list.add(1);
+        list.add(1);
+        list.add(1);
+
+        v.setProperty("keyList", list);
+
+        JSONObject json = GraphSONUtility.jsonFromElement(v, null, GraphSONMode.EXTENDED);
+
+        Assert.assertNotNull(json);
+        Assert.assertTrue(json.has(GraphSONTokens._ID));
+        Assert.assertEquals(1, json.optInt(GraphSONTokens._ID));
+        Assert.assertTrue(json.has("keyList"));
+
+        JSONObject listWithTypeAsJson = json.optJSONObject("keyList");
+        Assert.assertNotNull(listWithTypeAsJson);
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.TYPE));
+        Assert.assertEquals(GraphSONTokens.TYPE_LIST, listWithTypeAsJson.optString(GraphSONTokens.TYPE));
+        Assert.assertTrue(listWithTypeAsJson.has(GraphSONTokens.VALUE));
+        JSONArray listAsJSON = listWithTypeAsJson.optJSONArray(GraphSONTokens.VALUE);
+        Assert.assertNotNull(listAsJSON);
+        Assert.assertEquals(3, listAsJSON.length());
+
+        for (int ix = 0; ix < listAsJSON.length(); ix++) {
+            JSONObject valueAsJson = listAsJSON.optJSONObject(ix);
+            Assert.assertNotNull(valueAsJson);
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
+            Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, valueAsJson.optString(GraphSONTokens.TYPE));
+            Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
+            Assert.assertEquals(1, valueAsJson.optInt(GraphSONTokens.VALUE));
+        }
+    }
+
+    @Test
     public void jsonFromElementVertexListOfListPropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         List<Integer> list = new ArrayList<Integer>();

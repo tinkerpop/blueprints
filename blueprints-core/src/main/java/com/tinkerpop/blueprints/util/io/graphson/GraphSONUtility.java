@@ -553,6 +553,10 @@ public class GraphSONUtility {
             if (value != null) {
                 if (value instanceof List) {
                     value = createJSONList((List) value, propertyKeys, showTypes);
+                } else if (value instanceof Iterable){
+                    value = createJSONList(getList((Iterable) value), propertyKeys, showTypes);
+                } else if (value instanceof Iterator){
+                    value = createJSONList(getList((Iterator) value), propertyKeys, showTypes);
                 } else if (value instanceof Map) {
                     value = createJSONMap((Map) value, propertyKeys, showTypes);
                 } else if (value instanceof Element) {
@@ -560,8 +564,6 @@ public class GraphSONUtility {
                             showTypes ? GraphSONMode.EXTENDED : GraphSONMode.NORMAL);
                 } else if (value.getClass().isArray()) {
                     value = createJSONList(convertArrayToList(value), propertyKeys, showTypes);
-                } else if (value instanceof Iterable){
-                	value = createJSONList(getList((Iterable)value), propertyKeys, showTypes);
                 }
             }
 
@@ -571,14 +573,17 @@ public class GraphSONUtility {
 
     }
     
-	private static List<Element> getList(Iterable<Element> value) {
-		List<Element> result = new ArrayList<Element>();
-		for (Iterator<Element> iterator = value.iterator(); iterator.hasNext();) {
-			Element e = (Element) iterator.next();
-			result.add(e);
-		}
-		return result;
+	private static List getList(final Iterable value) {
+        return getList(value.iterator());
 	}
+
+    private static List getList(final Iterator value) {
+        final List result = new ArrayList();
+        while (value.hasNext()) {
+            result.add(value.next());
+        }
+        return result;
+    }
 
     private static void addObject(final ArrayNode jsonList, final Object value) {
         if (value == null) {
