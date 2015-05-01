@@ -898,9 +898,9 @@ public class GraphSONUtilityTest {
     public void jsonFromElementVertexIntIterablePropertiesNoKeysWithTypes() throws JSONException {
         Vertex v = this.graph.addVertex(1);
         Set<Integer> list = new HashSet<Integer>();
+        list.add(0);
         list.add(1);
-        list.add(1);
-        list.add(1);
+        list.add(2);
 
         v.setProperty("keyList", list);
 
@@ -926,7 +926,7 @@ public class GraphSONUtilityTest {
             Assert.assertTrue(valueAsJson.has(GraphSONTokens.TYPE));
             Assert.assertEquals(GraphSONTokens.TYPE_INTEGER, valueAsJson.optString(GraphSONTokens.TYPE));
             Assert.assertTrue(valueAsJson.has(GraphSONTokens.VALUE));
-            Assert.assertEquals(1, valueAsJson.optInt(GraphSONTokens.VALUE));
+            Assert.assertEquals(ix, valueAsJson.optInt(GraphSONTokens.VALUE));
         }
     }
 

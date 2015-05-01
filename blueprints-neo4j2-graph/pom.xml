@@ -12,7 +12,7 @@
     <name>Blueprints-Neo4j2Graph</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
     <properties>
-        <neo4j.version>2.1.6</neo4j.version>
+        <neo4j.version>2.2.1</neo4j.version>
     </properties>
     <dependencies>
         <dependency>
@@ -37,6 +37,25 @@
             <artifactId>neo4j-management</artifactId>
             <version>${neo4j.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <version>${neo4j.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-io</artifactId>
+            <version>${neo4j.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>

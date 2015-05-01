@@ -1,11 +1,11 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.MapUtil;
-import org.neo4j.kernel.impl.util.FileUtils;
 
 import java.io.File;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class Neo4j2GraphCypherTest {
 
     @Before
     public void setUp() throws Exception {
-        FileUtils.deleteRecursively(new File("target/test.db"));
+        FileUtils.deleteDirectory(new File("target/test.db"));
         graph = new Neo4j2Graph("target/test.db");
     }
 

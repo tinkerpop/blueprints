@@ -170,7 +170,7 @@ public class Neo4j2BatchGraph implements KeyIndexableGraph, IndexableGraph, Meta
         final Set<String> properties = rawAutoIndexer.getAutoIndexedProperties();
         Transaction tx = rawGraphDB.beginTx();
 
-        final PropertyContainer kernel = ((GraphDatabaseAPI) rawGraphDB).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties();
+        final PropertyContainer kernel = ((GraphDatabaseAPI) rawGraphDB).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
         kernel.setProperty(elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX, properties.toArray(new String[properties.size()]));
 
         int count = 0;

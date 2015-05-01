@@ -11,6 +11,7 @@ import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -195,6 +196,23 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         } finally {
             graph.shutdown();
         }
+    }
+
+    public void testIteratingDeletedElementsWithoutSCEIT() throws Exception {
+        Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
+        Vertex a = graph.addVertex(null);
+        Vertex b = graph.addVertex(null);
+        Neo4j2Edge edge = graph.addEdge(null, a, b, "testEdge");
+        edge.setProperty("foo", "bar");
+        graph.commit();
+        List<Vertex> list1 = asList(graph.getVertices());
+        assertEquals(2, list1.size());
+        assertTrue(asList(graph.getVertices()).contains(a));
+        a.remove();
+        assertFalse(asList(graph.getVertices()).contains(a));
+        assertEquals(1, asList(graph.getVertices()).size());
+        graph.commit();
+        assertEquals(1, asList(graph.getVertices()).size());
     }
 
     public void testHaGraph() throws Exception {

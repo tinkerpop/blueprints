@@ -18,7 +18,6 @@ import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -33,12 +32,8 @@ import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.graphdb.index.RelationshipIndex;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.core.NodeManager;
-import org.neo4j.kernel.impl.transaction.AbstractTransactionManager;
 import org.neo4j.tooling.GlobalGraphOperations;
 
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -103,15 +98,14 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         FEATURES.supportsThreadIsolatedTransactions = true;
     }
 
-    private final TransactionManager transactionManager;
-    private final ExecutionEngine cypher;
-
+    /**
+     * @deprecated since Blueprints 2.7.0/Neo4j 2.2.x this method is
+     * no longer required since Neo4j indexes no longer return
+     * deleted elements. It will always return false.
+     */
+    @Deprecated
     protected boolean checkElementsInTransaction() {
-        if (this.tx.get() == null) {
-            return false;
-        } else {
-            return this.checkElementsInTransaction.get();
-        }
+        return false;
     }
 
     /**
@@ -127,7 +121,12 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      *
      * @param checkElementsInTransaction check whether an element is in the transaction between
      *                                   returning it
+     *
+     * @deprecated since Blueprints 2.7.0/Neo4j 2.2.x this method is
+     * no longer required since Neo4j indexes no longer return
+     * deleted elements.
      */
+    @Deprecated
     public void setCheckElementsInTransaction(final boolean checkElementsInTransaction) {
         this.checkElementsInTransaction.set(checkElementsInTransaction);
     }
@@ -139,9 +138,6 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     public Neo4j2Graph(final GraphDatabaseService rawGraph) {
         this.rawGraph = rawGraph;
 
-        transactionManager = ((GraphDatabaseAPI) rawGraph).getDependencyResolver().resolveDependency(TransactionManager.class);
-
-        cypher = new ExecutionEngine(rawGraph);
         init();
     }
 
@@ -152,9 +148,6 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
                 this.rawGraph = builder.setConfig(configuration).newGraphDatabase();
             else
                 this.rawGraph = builder.newGraphDatabase();
-
-            transactionManager = ((GraphDatabaseAPI) rawGraph).getDependencyResolver().resolveDependency(TransactionManager.class);
-            cypher = new ExecutionEngine(rawGraph);
 
             init();
 
@@ -239,7 +232,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     private PropertyContainer getGraphProperties() {
-        return ((GraphDatabaseAPI) this.rawGraph).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties();
+        return ((GraphDatabaseAPI) this.rawGraph).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
     }
 
     private void logNotGraphDatabaseAPI() {
@@ -360,14 +353,14 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      */
     public Iterable<Vertex> getVertices() {
         this.autoStartTransaction(false);
-        return new Neo4j2VertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this, this.checkElementsInTransaction());
+        return new Neo4j2VertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this);
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
         this.autoStartTransaction(false);
         final AutoIndexer indexer = this.rawGraph.index().getNodeAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
-            return new Neo4j2VertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this, this.checkElementsInTransaction());
+            return new Neo4j2VertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this);
         else
             return new PropertyFilteredIterable<Vertex>(key, value, this.getVertices());
     }
@@ -386,15 +379,14 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
      */
     public Iterable<Edge> getEdges() {
         this.autoStartTransaction(false);
-        return new Neo4j2EdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this, this.checkElementsInTransaction());
+        return new Neo4j2EdgeIterable(GlobalGraphOperations.at(rawGraph).getAllRelationships(), this);
     }
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
         this.autoStartTransaction(false);
         final AutoIndexer indexer = this.rawGraph.index().getRelationshipAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
-            return new Neo4j2EdgeIterable(this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndex().get(key, value), this,
-                    this.checkElementsInTransaction());
+            return new Neo4j2EdgeIterable(this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndex().get(key, value), this);
         else
             return new PropertyFilteredIterable<Edge>(key, value, this.getEdges());
     }
@@ -532,7 +524,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         try {
             tx.get().success();
         } finally {
-            tx.get().finish();
+            tx.get().close();
             tx.remove();
         }
     }
@@ -543,13 +535,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         }
 
         try {
-            javax.transaction.Transaction t = transactionManager.getTransaction();
-            if (t == null || t.getStatus() == Status.STATUS_ROLLEDBACK) {
-                return;
-            }
             tx.get().failure();
-        } catch (SystemException e) {
-            throw new RuntimeException(e);
         } finally {
             tx.get().close();
             tx.remove();
@@ -595,13 +581,6 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     public Iterator<Map<String,Object>> query(String query, Map<String,Object> params) {
-        return cypher.execute(query,params==null ? Collections.<String,Object>emptyMap() : params).iterator();
-    }
-
-    public boolean nodeIsDeleted(long nodeId) {
-        return ((AbstractTransactionManager) transactionManager).getTransactionState().nodeIsDeleted(nodeId);
-    }
-    public boolean relationshipIsDeleted(long nodeId) {
-        return ((AbstractTransactionManager) transactionManager).getTransactionState().relationshipIsDeleted(nodeId);
+        return rawGraph.execute(query,params==null ? Collections.<String,Object>emptyMap() : params);
     }
 }
