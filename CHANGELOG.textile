@@ -15,6 +15,8 @@ h3. Version 2.7.0 (NOT OFFICIALLY RELEASED YET)
 </dependency>
 ```
 
+* @GraphSONUtility@ supports @Iterator@ and @Iterable@.
+
 h3. Version 2.6.0 (September 17, 2014)
 
 ```xml
