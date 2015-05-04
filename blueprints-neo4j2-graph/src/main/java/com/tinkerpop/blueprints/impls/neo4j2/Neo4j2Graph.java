@@ -160,6 +160,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
 
     protected void init() {
         this.loadKeyIndices();
+        this.commit();
     }
 
     public Neo4j2Graph(final Configuration configuration) {
