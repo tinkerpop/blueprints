@@ -7,9 +7,21 @@
     <version>2.6.1</version>
     <name>Blueprints-Neo4j2Graph (XN Release)</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
+    <url>http://xnlogic.com</url>
     <properties>
         <neo4j.version>2.2.1</neo4j.version>
     </properties>
+    <licenses>
+        <license>
+            <name>BSD 3-Clause</name>
+            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:xnlogic/blueprints.git</connection>
+        <developerConnection>scm:git:git@github.com:xnlogic/blueprints.git</developerConnection>
+        <url>git@github.com:xnlogic/blueprints.git</url>
+    </scm>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
