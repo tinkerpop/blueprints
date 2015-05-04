@@ -30,7 +30,7 @@ public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo
     }
 
     public Iterator<Neo4j2Edge> iterator() {
-        graph.autoStartTransaction(true);
+        graph.autoStartTransaction(false);
         return new Iterator<Neo4j2Edge>() {
             private final Iterator<Relationship> itty = relationships.iterator();
 
