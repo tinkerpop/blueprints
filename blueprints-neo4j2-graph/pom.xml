@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.xnlogic.blueprints</groupId>
     <artifactId>xn-blueprints-neo4j2-graph</artifactId>
-    <version>2.6.1-SNAPSHOT</version>
+    <version>2.6.1</version>
     <name>XN-Blueprints-Neo4j2-Graph</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
     <url>http://xnlogic.com</url>
