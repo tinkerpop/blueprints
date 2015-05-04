@@ -181,6 +181,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
 
     protected void init() {
         this.loadKeyIndices();
+        this.commit();
     }
 
     private void loadKeyIndices() {
@@ -505,7 +506,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
 
-        this.autoStartTransaction(true);
+        this.autoStartTransaction(false);
         try {
             final Long longId;
             if (id instanceof Long)
