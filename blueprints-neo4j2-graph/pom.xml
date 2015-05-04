@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.xnlogic.blueprints</groupId>
-    <artifactId>blueprints-neo4j2-graph</artifactId>
-    <version>2.6.1</version>
-    <name>Blueprints-Neo4j2Graph (XN Release)</name>
+    <artifactId>xn-blueprints-neo4j2-graph</artifactId>
+    <version>2.6.1-SNAPSHOT</version>
+    <name>XN-Blueprints-Neo4j2-Graph</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
     <url>http://xnlogic.com</url>
     <properties>
@@ -21,7 +20,8 @@
         <connection>scm:git:git@github.com:xnlogic/blueprints.git</connection>
         <developerConnection>scm:git:git@github.com:xnlogic/blueprints.git</developerConnection>
         <url>git@github.com:xnlogic/blueprints.git</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
@@ -124,6 +124,26 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4.1</version>
+                <configuration>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/pangloss/maven/xn-blueprints-neo4j2-graph</url>
+        </repository>
+    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>release</id>
+        </profile>
+    </profiles>
 </project>
