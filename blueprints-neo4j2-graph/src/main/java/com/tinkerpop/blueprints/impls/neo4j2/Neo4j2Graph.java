@@ -1,5 +1,35 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationConverter;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.TransactionFailureException;
+import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.index.AutoIndexer;
+import org.neo4j.graphdb.index.RelationshipIndex;
+import org.neo4j.helpers.Settings;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.impl.core.NodeManager;
+import org.neo4j.tooling.GlobalGraphOperations;
+
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Element;
 import com.tinkerpop.blueprints.Features;
@@ -16,27 +46,6 @@ import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
 import com.tinkerpop.blueprints.util.PropertyFilteredIterable;
 import com.tinkerpop.blueprints.util.StringFactory;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.TransactionFailureException;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.graphdb.index.AutoIndexer;
-import org.neo4j.graphdb.index.RelationshipIndex;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.core.NodeManager;
-import org.neo4j.tooling.GlobalGraphOperations;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A Blueprints implementation of the graph database Neo4j (http://neo4j.org)
@@ -44,8 +53,21 @@ import java.util.logging.Logger;
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
 public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndexableGraph, MetaGraph<GraphDatabaseService> {
+	
     private static final Logger logger = Logger.getLogger(Neo4j2Graph.class.getName());
+    
+    
+    public static GraphDatabaseBuilder createGraphDatabaseBuilder(String directory, Map<String, String> configuration){
+        GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(directory);
+        if (null != configuration){
+                for(String key: configuration.keySet()){
+                        builder.setConfig(Settings.setting(key, Settings.STRING, (String) null), configuration.get(key));
+                }
+        }
+        return builder;
+    }
 
+    
     private GraphDatabaseService rawGraph;
     private static final String INDEXED_KEYS_POSTFIX = ":indexed_keys";
 
@@ -131,40 +153,35 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         this.checkElementsInTransaction.set(checkElementsInTransaction);
     }
 
+    
     public Neo4j2Graph(final String directory) {
         this(directory, null);
     }
-
-    public Neo4j2Graph(final GraphDatabaseService rawGraph) {
-        this.rawGraph = rawGraph;
-
-        init();
-    }
-
-    public Neo4j2Graph(final String directory, final Map<String, String> configuration) {
-        try {
-            GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(directory);
-            if (null != configuration)
-                this.rawGraph = builder.setConfig(configuration).newGraphDatabase();
-            else
-                this.rawGraph = builder.newGraphDatabase();
-
-            init();
-
-        } catch (Exception e) {
-            if (this.rawGraph != null)
-                this.rawGraph.shutdown();
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
-    protected void init() {
-        this.loadKeyIndices();
-    }
-
+    
     public Neo4j2Graph(final Configuration configuration) {
         this(configuration.getString("blueprints.neo4j.directory", null),
                 ConfigurationConverter.getMap(configuration.subset("blueprints.neo4j.conf")));
+    }
+    
+    public Neo4j2Graph(final String directory, final Map<String, String> configuration) {
+    	this(createGraphDatabaseBuilder(directory, configuration).newGraphDatabase());
+    }
+
+    public Neo4j2Graph(final GraphDatabaseService rawGraph) {
+    	try{
+    		this.rawGraph = rawGraph;
+            init();
+    	} catch (Exception e) {
+          if (this.rawGraph != null)
+              this.rawGraph.shutdown();
+          throw new RuntimeException(e.getMessage(), e);
+      } 
+    }
+
+
+    protected void init() {
+        this.loadKeyIndices();
+        this.commit();
     }
 
     private void loadKeyIndices() {
@@ -358,7 +375,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
         this.autoStartTransaction(false);
-        final AutoIndexer indexer = this.rawGraph.index().getNodeAutoIndexer();
+        final AutoIndexer<?> indexer = this.rawGraph.index().getNodeAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
             return new Neo4j2VertexIterable(this.rawGraph.index().getNodeAutoIndexer().getAutoIndex().get(key, value), this);
         else
@@ -384,7 +401,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
 
     public Iterable<Edge> getEdges(final String key, final Object value) {
         this.autoStartTransaction(false);
-        final AutoIndexer indexer = this.rawGraph.index().getRelationshipAutoIndexer();
+        final AutoIndexer<?> indexer = this.rawGraph.index().getRelationshipAutoIndexer();
         if (indexer.isEnabled() && indexer.getAutoIndexedProperties().contains(key))
             return new Neo4j2EdgeIterable(this.rawGraph.index().getRelationshipAutoIndexer().getAutoIndex().get(key, value), this);
         else
@@ -489,7 +506,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         if (null == id)
             throw ExceptionFactory.edgeIdCanNotBeNull();
 
-        this.autoStartTransaction(true);
+        this.autoStartTransaction(false);
         try {
             final Long longId;
             if (id instanceof Long)

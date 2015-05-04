@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.neo4j2;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
+
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
 
@@ -30,13 +31,12 @@ public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo
     }
 
     public Iterator<Neo4j2Edge> iterator() {
-        graph.autoStartTransaction(true);
+        graph.autoStartTransaction(false);
         return new Iterator<Neo4j2Edge>() {
             private final Iterator<Relationship> itty = relationships.iterator();
 
             public void remove() {
-                graph.autoStartTransaction(true);
-                this.itty.remove();
+                throw new UnsupportedOperationException();
             }
 
             public Neo4j2Edge next() {
@@ -53,7 +53,7 @@ public class Neo4j2EdgeIterable<T extends Edge> implements CloseableIterable<Neo
 
     public void close() {
         if (this.relationships instanceof IndexHits) {
-            ((IndexHits) this.relationships).close();
+            ((IndexHits<?>) this.relationships).close();
         }
     }
 }

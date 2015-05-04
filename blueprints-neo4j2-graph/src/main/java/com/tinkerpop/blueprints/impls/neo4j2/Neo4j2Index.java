@@ -107,7 +107,7 @@ public class Neo4j2Index<T extends Neo4j2Element, S extends PropertyContainer> i
      */
     public long count(final String key, final Object value) {
         this.graph.autoStartTransaction(false);
-        final IndexHits hits = this.rawIndex.get(key, value);
+        final IndexHits<?> hits = this.rawIndex.get(key, value);
         final long count = hits.size();
         hits.close();
         return count;

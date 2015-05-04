@@ -3,6 +3,7 @@ package com.tinkerpop.blueprints.impls.neo4j2;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Vertex;
+
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.index.IndexHits;
 
@@ -35,7 +36,7 @@ public class Neo4j2VertexIterable<T extends Vertex> implements CloseableIterable
             private final Iterator<Node> itty = nodes.iterator();
 
             public void remove() {
-                this.itty.remove();
+                throw new UnsupportedOperationException();
             }
 
             public Neo4j2Vertex next() {
@@ -52,7 +53,7 @@ public class Neo4j2VertexIterable<T extends Vertex> implements CloseableIterable
 
     public void close() {
         if (this.nodes instanceof IndexHits) {
-            ((IndexHits) this.nodes).close();
+            ((IndexHits<?>) this.nodes).close();
         }
     }
 
