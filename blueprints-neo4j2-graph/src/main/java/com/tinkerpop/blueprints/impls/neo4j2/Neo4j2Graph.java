@@ -13,12 +13,16 @@ import java.util.logging.Logger;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
+import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.ResourceIterable;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
@@ -362,6 +366,17 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     public Iterable<Vertex> getVertices() {
         this.autoStartTransaction(false);
         return new Neo4j2VertexIterable(GlobalGraphOperations.at(rawGraph).getAllNodes(), this);
+    }
+    
+    
+    public Iterable<Vertex> getVertices(final String label) {
+    	Iterable<Node> nodes = new Iterable<Node>() {
+			@Override
+			public Iterator<Node> iterator() {
+				return rawGraph.findNodes(DynamicLabel.label(label));
+			}
+		};
+		return new Neo4j2VertexIterable(nodes , this);
     }
 
     public Iterable<Vertex> getVertices(final String key, final Object value) {
