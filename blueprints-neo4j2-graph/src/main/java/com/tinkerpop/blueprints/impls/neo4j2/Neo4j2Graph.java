@@ -16,13 +16,10 @@ import org.apache.commons.configuration.ConfigurationConverter;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
@@ -45,6 +42,10 @@ import com.tinkerpop.blueprints.MetaGraph;
 import com.tinkerpop.blueprints.Parameter;
 import com.tinkerpop.blueprints.TransactionalGraph;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.neo4j2.index.Neo4j2EdgeIndex;
+import com.tinkerpop.blueprints.impls.neo4j2.index.Neo4j2VertexIndex;
+import com.tinkerpop.blueprints.impls.neo4j2.iterate.Neo4j2EdgeIterable;
+import com.tinkerpop.blueprints.impls.neo4j2.iterate.Neo4j2VertexIterable;
 import com.tinkerpop.blueprints.util.DefaultGraphQuery;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.KeyIndexableGraphHelper;
@@ -262,20 +263,33 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
                     " Current graph class is " + rawGraph.getClass().getName());
         }
     }
+    
+    
+    /**
+     * Helper method, here only to support the existing methods that pass that Class<T> as an argument.
+     */
+    private <T extends Element> Index<T> _createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+    	if (Vertex.class.isAssignableFrom(indexClass)) {
+        	return (Index<T>) new Neo4j2VertexIndex(indexName, this, indexParameters);
+        } else {
+        	return (Index<T>) new Neo4j2EdgeIndex(indexName, this, indexParameters);
+        }
+    }
+    	
 
     public synchronized <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         this.autoStartTransaction(true);
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
             throw ExceptionFactory.indexAlreadyExists(indexName);
         }
-        return new Neo4j2Index(indexName, indexClass, this, indexParameters);
+        return _createIndex(indexName, indexClass, indexParameters);
     }
 
     public <T extends Element> Index<T> getIndex(final String indexName, final Class<T> indexClass) {
         this.autoStartTransaction(false);
         if (Vertex.class.isAssignableFrom(indexClass)) {
             if (this.rawGraph.index().existsForNodes(indexName)) {
-                return new Neo4j2Index(indexName, indexClass, this);
+                return _createIndex(indexName, indexClass);
             } else if (this.rawGraph.index().existsForRelationships(indexName)) {
                 throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
             } else {
@@ -283,7 +297,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
             }
         } else if (Edge.class.isAssignableFrom(indexClass)) {
             if (this.rawGraph.index().existsForRelationships(indexName)) {
-                return new Neo4j2Index(indexName, indexClass, this);
+            	return _createIndex(indexName, indexClass);
             } else if (this.rawGraph.index().existsForNodes(indexName)) {
                 throw ExceptionFactory.indexDoesNotSupportClass(indexName, indexClass);
             } else {
@@ -324,11 +338,11 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         final List<Index<? extends Element>> indices = new ArrayList<Index<? extends Element>>();
         for (final String name : this.rawGraph.index().nodeIndexNames()) {
             if (!name.equals(Neo4j2Tokens.NODE_AUTO_INDEX))
-                indices.add(new Neo4j2Index(name, Vertex.class, this));
+            	indices.add(new Neo4j2VertexIndex(name, this));
         }
         for (final String name : this.rawGraph.index().relationshipIndexNames()) {
             if (!name.equals(Neo4j2Tokens.RELATIONSHIP_AUTO_INDEX))
-                indices.add(new Neo4j2Index(name, Edge.class, this));
+            	indices.add(new Neo4j2EdgeIndex(name, this));
         }
         return indices;
     }

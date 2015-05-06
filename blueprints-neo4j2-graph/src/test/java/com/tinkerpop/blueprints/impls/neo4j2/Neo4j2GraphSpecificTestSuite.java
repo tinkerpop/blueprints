@@ -1,7 +1,8 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
-import com.tinkerpop.blueprints.*;
-import com.tinkerpop.blueprints.impls.GraphTest;
+import java.util.Iterator;
+import java.util.List;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotInTransactionException;
 import org.neo4j.graphdb.event.TransactionData;
@@ -10,8 +11,14 @@ import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
 import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 
-import java.util.Iterator;
-import java.util.List;
+import com.tinkerpop.blueprints.Direction;
+import com.tinkerpop.blueprints.Edge;
+import com.tinkerpop.blueprints.Index;
+import com.tinkerpop.blueprints.Parameter;
+import com.tinkerpop.blueprints.TestSuite;
+import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.blueprints.impls.GraphTest;
+import com.tinkerpop.blueprints.impls.neo4j2.index.Neo4j2VertexIndex;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -107,7 +114,7 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         Vertex a = graph.addVertex(null);
         vertexIndex.put("name", "marko", a);
 
-        Iterator ittyLuceneQuery = ((Neo4j2Index) graph.getIndex("vertices", Vertex.class)).query("name:*rko").iterator();
+        Iterator<Vertex> ittyLuceneQuery = ((Neo4j2VertexIndex) graph.getIndex("vertices", Vertex.class)).query("name:*rko").iterator(); 
         int counter = 0;
         while (ittyLuceneQuery.hasNext()) {
             counter++;
@@ -116,7 +123,7 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         assertEquals(counter, 1);
 
         vertexIndex.put("name", "marko some_other name", graph.addVertex(null));
-        ittyLuceneQuery = ((Neo4j2Index) graph.getIndex("vertices", Vertex.class)).query("name:*rko*").iterator();
+        ittyLuceneQuery = ((Neo4j2VertexIndex) graph.getIndex("vertices", Vertex.class)).query("name:*rko*").iterator();
 
         counter = 0;
         while (ittyLuceneQuery.hasNext()) {
@@ -134,7 +141,7 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
         Vertex a = graph.addVertex(null);
         a.setProperty("name", "marko");
         index.put("name", "marko", a);
-        Iterator itty = index.query("name", "*rko").iterator();
+        Iterator<?> itty = index.query("name", "*rko").iterator();
         int counter = 0;
         while (itty.hasNext()) {
             counter++;

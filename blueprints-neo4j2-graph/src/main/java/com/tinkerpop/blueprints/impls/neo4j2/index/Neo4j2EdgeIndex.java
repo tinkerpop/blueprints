@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
 
 import com.tinkerpop.blueprints.CloseableIterable;
 import com.tinkerpop.blueprints.Edge;
@@ -14,7 +15,7 @@ import com.tinkerpop.blueprints.impls.neo4j2.iterate.Neo4j2EdgeIterable;
 
 public class Neo4j2EdgeIndex  extends Neo4j2ElementIndex<Edge, Relationship> {
 
-	protected Neo4j2EdgeIndex(String indexName, Neo4j2Graph graph, Parameter<?,?>... indexParameters) {
+	public Neo4j2EdgeIndex(String indexName, Neo4j2Graph graph, Parameter<?,?>... indexParameters) {
 		super(indexName, graph, indexParameters);
 	}
 	
@@ -29,27 +30,14 @@ public class Neo4j2EdgeIndex  extends Neo4j2ElementIndex<Edge, Relationship> {
 	}
 
 	@Override
-	public void put(String key, Object value, Edge element) {
-		this.graph.autoStartTransaction(true);
-		this.rawIndex.add(((Neo4j2Edge)element).getRawEdge(), key, value);
+	protected Relationship getRawElement(Edge element) {
+		return ((Neo4j2Edge)element).getRawEdge();
 	}
 
 	@Override
-	public void remove(String key, Object value, Edge element) {
-		this.graph.autoStartTransaction(true);
-        this.rawIndex.remove(((Neo4j2Edge)element).getRawEdge(), key, value);
+	protected CloseableIterable<Edge> wrapIndexHits(IndexHits<Relationship> indexHits) {
+		return new Neo4j2EdgeIterable(indexHits, graph);
 	}
 
-	@Override
-	public CloseableIterable<Edge> get(String key, Object value) {
-		this.graph.autoStartTransaction(false);
-		return new Neo4j2EdgeIterable(this.graph, this.rawIndex.get(key, value));
-	}
-
-	@Override
-	public CloseableIterable<Edge> query(String key, Object query) {
-		this.graph.autoStartTransaction(false);
-		return new Neo4j2EdgeIterable(this.graph, this.rawIndex.query(key, query));
-	}
 
 }
