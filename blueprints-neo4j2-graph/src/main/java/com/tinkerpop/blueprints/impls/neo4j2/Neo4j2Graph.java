@@ -374,15 +374,6 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     /**
-     * {@inheritDoc}
-     * <p/>
-     * The underlying Neo4j graph does not natively support this method within a
-     * transaction. If the graph is not currently in a transaction, then the
-     * operation runs efficiently and correctly. If the graph is currently in a
-     * transaction, please use setCheckElementsInTransaction() if it is
-     * necessary to ensure proper transactional semantics. Note that it is
-     * costly to check if an element is in the transaction.
-     *
      * @return all the edges in the graph
      */
     public Iterable<Edge> getEdges() {
