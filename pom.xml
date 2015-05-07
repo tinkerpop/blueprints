@@ -60,6 +60,11 @@
             <email>me@matthiasb.com</email>
             <url>http://matthiasb.com</url>
         </developer>
+        <developer>
+            <name>Joey Freund</name>
+            <email>jf@xnlogic.com</email>
+            <url>http://github.com/joeyfreund</url>
+        </developer>
     </developers>
 
     <modules>
