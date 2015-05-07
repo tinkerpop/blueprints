@@ -74,7 +74,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
 
     
     private GraphDatabaseService rawGraph;
-    private static final String INDEXED_KEYS_POSTFIX = ":indexed_keys";
+    private Neo4j2GraphInternalIndexKeys indexKeys;
 
     protected final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {
         protected Transaction initialValue() {
@@ -175,6 +175,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     public Neo4j2Graph(final GraphDatabaseService rawGraph) {
     	try{
     		this.rawGraph = rawGraph;
+    		this.indexKeys = new Neo4j2GraphInternalIndexKeys(this.rawGraph);
             init();
     	} catch (Exception e) {
           if (this.rawGraph != null)
@@ -187,88 +188,25 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     protected void init() {
         this.loadKeyIndices();
         this.commit();
+        
     }
 
     private void loadKeyIndices() {
         this.autoStartTransaction(true);
-        for (final String key : this.getInternalIndexKeys(Vertex.class)) {
+        for (final String key : this.indexKeys.getKeys(Vertex.class)) {
             this.createKeyIndex(key, Vertex.class);
         }
-        for (final String key : this.getInternalIndexKeys(Edge.class)) {
+        for (final String key : this.indexKeys.getKeys(Edge.class)) {
             this.createKeyIndex(key, Edge.class);
         }
         this.commit();
     }
-
-    private <T extends Element> void createInternalIndexKey(final String key, final Class<T> elementClass) {
-        final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        if (rawGraph instanceof GraphDatabaseAPI) {
-            final PropertyContainer pc = getGraphProperties();
-            try {
-                final String[] keys = (String[]) pc.getProperty(propertyName);
-                final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
-                temp.add(key);
-                pc.setProperty(propertyName, temp.toArray(new String[temp.size()]));
-            } catch (Exception e) {
-                // no indexed_keys kernel data property
-                pc.setProperty(propertyName, new String[]{key});
-
-            }
-        } else {
-            throw new UnsupportedOperationException(
-                    "Unable to create an index on a non-GraphDatabaseAPI graph");
-        }
-    }
-
-    private <T extends Element> void dropInternalIndexKey(final String key, final Class<T> elementClass) {
-        final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        if (rawGraph instanceof GraphDatabaseAPI) {
-            final PropertyContainer pc = getGraphProperties();
-            try {
-                final String[] keys = (String[]) pc.getProperty(propertyName);
-                final Set<String> temp = new HashSet<String>(Arrays.asList(keys));
-                temp.remove(key);
-                pc.setProperty(propertyName, temp.toArray(new String[temp.size()]));
-            } catch (Exception e) {
-                // no indexed_keys kernel data property
-            }
-        } else {
-            logNotGraphDatabaseAPI();
-        }
-    }
-
-    public <T extends Element> Set<String> getInternalIndexKeys(final Class<T> elementClass) {
-        final String propertyName = elementClass.getSimpleName() + INDEXED_KEYS_POSTFIX;
-        if (rawGraph instanceof GraphDatabaseAPI) {
-            final PropertyContainer pc = getGraphProperties();
-            try {
-                final String[] keys = (String[]) pc.getProperty(propertyName);
-                return new HashSet<String>(Arrays.asList(keys));
-            } catch (Exception e) {
-                // no indexed_keys kernel data property
-            }
-        } else {
-            logNotGraphDatabaseAPI();
-        }
-        return Collections.emptySet();
-    }
-
-    private PropertyContainer getGraphProperties() {
-        return ((GraphDatabaseAPI) this.rawGraph).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
-    }
-
-    private void logNotGraphDatabaseAPI() {
-        if (logger.isLoggable(Level.WARNING)) {
-            logger.log(Level.WARNING, "Indices are not available on non-GraphDatabaseAPI instances" +
-                    " Current graph class is " + rawGraph.getClass().getName());
-        }
-    }
-    
     
     /**
      * Helper method, here only to support the existing methods that pass that Class<T> as an argument.
      */
-    private <T extends Element> Index<T> _createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private <T extends Element> Index<T> _createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
     	if (Vertex.class.isAssignableFrom(indexClass)) {
         	return (Index<T>) new Neo4j2VertexIndex(indexName, this, indexParameters);
         } else {
@@ -277,6 +215,8 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
     	
 
+    @SuppressWarnings("rawtypes")
+	@Override
     public synchronized <T extends Element> Index<T> createIndex(final String indexName, final Class<T> indexClass, final Parameter... indexParameters) {
         this.autoStartTransaction(true);
         if (this.rawGraph.index().existsForNodes(indexName) || this.rawGraph.index().existsForRelationships(indexName)) {
@@ -439,10 +379,11 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         	return;
         }
         autoIndexer.stopAutoIndexingProperty(key);
-        this.dropInternalIndexKey(key, elementClass);
+        this.indexKeys.removeKey(key, elementClass);
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public <T extends Element> void createKeyIndex(final String key, final Class<T> elementClass, final Parameter... indexParameters) {
     	this.autoStartTransaction(true);
         AutoIndexer<?> indexer = getAutoIndexer(elementClass);
@@ -458,7 +399,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     	Iterable<? extends Element> elements = Vertex.class.isAssignableFrom(elementClass) ? this.getVertices() : this.getEdges();
         KeyIndexableGraphHelper.reIndexElements(this, elements, new HashSet<String>(Arrays.asList(key)));
         this.autoStartTransaction(true);
-        this.createInternalIndexKey(key, elementClass);
+        this.indexKeys.addKey(key, elementClass);
     }
     
     private <T extends Element> AutoIndexer<?> getAutoIndexer(final Class<T> elementClass){
@@ -523,6 +464,9 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         ((Relationship) ((Neo4j2Edge) edge).getRawElement()).delete();
     }
 
+    
+    @SuppressWarnings("deprecation")
+	@Override
     public void stopTransaction(Conclusion conclusion) {
         if (Conclusion.SUCCESS == conclusion)
             commit();
@@ -596,6 +540,82 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
 
     public Iterator<Map<String,Object>> query(String query, Map<String,Object> params) {
         return rawGraph.execute(query,params==null ? Collections.<String,Object>emptyMap() : params);
+    }
+    
+    
+    /**
+     * A class that encapsulates some deprecated method calls, 
+     * and other "hackish" bits, leftover from previous implementation. 
+     * 
+     * @author Joey Freund
+     */
+    private class Neo4j2GraphInternalIndexKeys {
+
+    	private GraphDatabaseService rawGraph;
+    	
+    	public Neo4j2GraphInternalIndexKeys(GraphDatabaseService rawGraph) {
+    		this.rawGraph = rawGraph;
+    	}
+    	
+    	private <T extends Element> String getIndexKeysPropertyName(final Class<T> elementClass){
+        	return elementClass.getSimpleName() + ":indexed_keys";
+        }
+    	
+    	public <T extends Element> void addKey(String key, Class<T> elementClass){
+    		Set<String> keys = getKeys(elementClass);
+    		keys.add(key);
+    		setKeys(elementClass, keys);
+    	}
+
+    	public <T extends Element> void removeKey(String key, Class<T> elementClass){
+    		try {
+    			Set<String> keys = getKeys(elementClass);
+    			keys.remove(key);
+    			setKeys(elementClass, keys);
+    		} catch (Exception e) {
+    			// no indexed_keys kernel data property
+    		}
+    	}
+
+    	public <T extends Element> Set<String> getKeys(Class<T> elementClass){
+    		try {
+    			PropertyContainer pc = tryToGetGraphProperties();
+    			final String[] keys = (String[]) pc.getProperty(getIndexKeysPropertyName(elementClass));
+    			return new HashSet<String>(Arrays.asList(keys));
+    		} catch (Exception e) {
+    			return new HashSet<String>();
+    		}
+    	}
+    	
+    	private <T extends Element> void setKeys(Class<T> elementClass, Set<String> keys){
+    		PropertyContainer pc = getGraphProperties();
+    		pc.setProperty(getIndexKeysPropertyName(elementClass), keys.toArray(new String[keys.size()]));
+    	}
+    	
+    	private PropertyContainer getGraphProperties() {
+    		if (rawGraph instanceof GraphDatabaseAPI) {
+    			return ((GraphDatabaseAPI) this.rawGraph).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
+            } else {
+            	logNotGraphDatabaseAPI();
+                throw new UnsupportedOperationException("Cannot get graph properties of a non-GraphDatabaseAPI graph");
+            }
+        }
+    	
+    	private PropertyContainer tryToGetGraphProperties() {
+    		try{
+    			return getGraphProperties();		
+    		} catch (UnsupportedOperationException e){
+    			return null;
+    		}
+    	}
+    	
+    	private void logNotGraphDatabaseAPI() {
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, "Indices are not available on non-GraphDatabaseAPI instances" +
+                        " Current graph class is " + rawGraph.getClass().getName());
+            }
+        }
+    	
     }
 
 }
