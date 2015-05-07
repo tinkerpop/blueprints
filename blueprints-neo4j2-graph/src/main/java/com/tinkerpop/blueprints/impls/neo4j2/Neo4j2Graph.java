@@ -61,7 +61,6 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
 	
     private static final Logger logger = Logger.getLogger(Neo4j2Graph.class.getName());
     
-    
     public static GraphDatabaseBuilder createGraphDatabaseBuilder(String directory, Map<String, String> configuration){
         GraphDatabaseBuilder builder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(directory);
         if (null != configuration){
@@ -72,19 +71,12 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         return builder;
     }
 
-    
     private GraphDatabaseService rawGraph;
     private Neo4j2GraphInternalIndexKeys indexKeys;
 
     protected final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {
         protected Transaction initialValue() {
             return null;
-        }
-    };
-
-    protected final ThreadLocal<Boolean> checkElementsInTransaction = new ThreadLocal<Boolean>() {
-        protected Boolean initialValue() {
-            return false;
         }
     };
 
@@ -136,26 +128,13 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
     /**
-     * Neo4j's transactions are not consistent between the graph and the graph
-     * indices. Moreover, global graph operations are not consistent. For
-     * example, if a vertex is removed and then an index is queried in the same
-     * transaction, the removed vertex can be returned. This method allows the
-     * developer to turn on/off a Neo4j2Graph 'hack' that ensures transactional
-     * consistency. The default behavior for Neo4j2Graph is to use Neo4j's native
-     * behavior which ensures speed at the expensive of consistency. Note that
-     * this boolean switch is local to the current thread (i.e. a ThreadLocal
-     * variable).
-     *
-     * @param checkElementsInTransaction check whether an element is in the transaction between
-     *                                   returning it
-     *
      * @deprecated since Blueprints 2.7.0/Neo4j 2.2.x this method is
-     * no longer required since Neo4j indexes no longer return
-     * deleted elements.
+     * no longer required - Neo4j indexes no longer return deleted elements.
+     * 
+     * This method is now a no-op.
      */
     @Deprecated
     public void setCheckElementsInTransaction(final boolean checkElementsInTransaction) {
-        this.checkElementsInTransaction.set(checkElementsInTransaction);
     }
 
     
