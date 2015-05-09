@@ -11,7 +11,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4j2Edge extends Neo4j2Element implements Edge {
+public class Neo4j2Edge extends Neo4j2Element<Relationship> implements Edge {
 
     public Neo4j2Edge(final Relationship relationship, final Neo4j2Graph graph) {
         super(graph);
@@ -20,15 +20,15 @@ public class Neo4j2Edge extends Neo4j2Element implements Edge {
 
     public String getLabel() {
         this.graph.autoStartTransaction(false);
-        return ((Relationship) this.rawElement).getType().name();
+        return this.rawElement.getType().name();
     }
 
     public Vertex getVertex(final Direction direction) {
         this.graph.autoStartTransaction(false);
         if (direction.equals(Direction.OUT))
-            return new Neo4j2Vertex(((Relationship) this.rawElement).getStartNode(), this.graph);
+            return new Neo4j2Vertex(this.rawElement.getStartNode(), this.graph);
         else if (direction.equals(Direction.IN))
-            return new Neo4j2Vertex(((Relationship) this.rawElement).getEndNode(), this.graph);
+            return new Neo4j2Vertex(this.rawElement.getEndNode(), this.graph);
         else
             throw ExceptionFactory.bothIsNotSupported();
 
@@ -43,6 +43,6 @@ public class Neo4j2Edge extends Neo4j2Element implements Edge {
     }
 
     public Relationship getRawEdge() {
-        return (Relationship) this.rawElement;
+        return this.rawElement;
     }
 }

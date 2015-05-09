@@ -70,9 +70,46 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         }
         return builder;
     }
+    
+    //=========================================================================
+    // Element wrapper
+    
+    public static interface ElementWrapper<T extends Element, S extends PropertyContainer> {
+    	public T wrap(S rawElement);
+    }
+    
+    public static interface VertexWrapper<V extends Vertex> extends ElementWrapper<V, Node>{
+    }
+    
+    public static interface EdgeWrapper<E extends Edge>  extends ElementWrapper<E, Relationship>{
+    }
+    
+    
+    private static VertexWrapper<Neo4j2Vertex> createDefaultVertexWrapper(final Neo4j2Graph graph){
+    	return new VertexWrapper<Neo4j2Vertex>() {
+    		@Override
+			public Neo4j2Vertex wrap(Node rawVertex) {
+				return new Neo4j2Vertex(rawVertex, graph);
+			}
+		};
+    }
+    
+    private static EdgeWrapper<Neo4j2Edge> createDefaultEdgeWrapper(final Neo4j2Graph graph){
+    	return new EdgeWrapper<Neo4j2Edge>() {
+    		@Override
+			public Neo4j2Edge wrap(Relationship rawEdge) {
+				return new Neo4j2Edge(rawEdge, graph);
+			}
+		};
+    }
+    
+    
+  //=========================================================================
 
     private GraphDatabaseService rawGraph;
     private Neo4j2GraphInternalIndexKeys indexKeys;
+    private VertexWrapper<? extends Vertex> vertexWrapper;
+    private EdgeWrapper<? extends Edge> edgeWrapper;
 
     protected final ThreadLocal<Transaction> tx = new ThreadLocal<Transaction>() {
         protected Transaction initialValue() {
@@ -155,6 +192,8 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     	try{
     		this.rawGraph = rawGraph;
     		this.indexKeys = new Neo4j2GraphInternalIndexKeys(this.rawGraph);
+    		this.vertexWrapper = createDefaultVertexWrapper(this);
+    		this.edgeWrapper = createDefaultEdgeWrapper(this);
             init();
     	} catch (Exception e) {
           if (this.rawGraph != null)
@@ -164,6 +203,22 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
     }
 
 
+    public VertexWrapper<? extends Vertex> getVertexWrapper() {
+		return vertexWrapper;
+	}
+    
+    public EdgeWrapper<? extends Edge> getEdgeWrapper() {
+		return edgeWrapper;
+	}
+    
+    public void setVertexWrapper(VertexWrapper<? extends Vertex> vertexWrapper) {
+		this.vertexWrapper = vertexWrapper;
+	}
+    
+    public void setEdgeWrapper(EdgeWrapper<? extends Edge> edgeWrapper) {
+		this.edgeWrapper = edgeWrapper;
+	}
+    
     protected void init() {
         this.loadKeyIndices();
         this.commit();

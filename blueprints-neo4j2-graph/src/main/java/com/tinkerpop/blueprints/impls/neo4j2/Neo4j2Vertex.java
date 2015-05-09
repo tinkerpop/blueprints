@@ -15,6 +15,7 @@ import com.tinkerpop.blueprints.Direction;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.VertexQuery;
+import com.tinkerpop.blueprints.impls.neo4j2.Neo4j2Graph.ElementWrapper;
 import com.tinkerpop.blueprints.impls.neo4j2.iterate.Neo4j2EdgeIterable;
 import com.tinkerpop.blueprints.impls.neo4j2.iterate.Neo4j2ElementIterable;
 import com.tinkerpop.blueprints.util.DefaultVertexQuery;
@@ -24,97 +25,97 @@ import com.tinkerpop.blueprints.util.StringFactory;
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
  */
-public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
+public class Neo4j2Vertex extends Neo4j2Element<Node> implements Vertex {
 
-    public Neo4j2Vertex(final Node node, final Neo4j2Graph graph) {
-        super(graph);
-        this.rawElement = node;
-    }
+	public Neo4j2Vertex(final Node node, final Neo4j2Graph graph) {
+		super(graph);
+		this.rawElement = node;
+	}
 
-    
-    public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
-        if (direction.equals(Direction.OUT) || direction.equals(Direction.IN)){
-            return new Neo4j2EdgeIterable(getRelationships(direction, labels), graph);
-        } else {
-        	return new MultiIterable<Edge>(Arrays.asList((Iterable<Edge>) 
-        			new Neo4j2EdgeIterable(getRelationships(Direction.OUT, labels), graph),
-        			new Neo4j2EdgeIterable(getRelationships(Direction.IN, labels), graph)));
-        }
-    }
 
-    public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
-        if (direction.equals(Direction.OUT) || direction.equals(Direction.IN)){
-            return new AdjacentVertexIterable(getRelationships(direction, labels), graph);
-        } else {
-        	return new MultiIterable<Vertex>(Arrays.asList((Iterable<Vertex>) 
-        			new AdjacentVertexIterable(getRelationships(Direction.OUT, labels), graph),
-        			new AdjacentVertexIterable(getRelationships(Direction.IN, labels), graph)));
-        }
-    }
+	public Iterable<Edge> getEdges(final Direction direction, final String... labels) {
+		if (direction.equals(Direction.OUT) || direction.equals(Direction.IN)){
+			return new Neo4j2EdgeIterable(getRelationships(direction, labels), graph);
+		} else {
+			return new MultiIterable<Edge>(Arrays.asList((Iterable<Edge>) 
+					new Neo4j2EdgeIterable(getRelationships(Direction.OUT, labels), graph),
+					new Neo4j2EdgeIterable(getRelationships(Direction.IN, labels), graph)));
+		}
+	}
 
-    public Edge addEdge(final String label, final Vertex vertex) {
-        return this.graph.addEdge(null, this, vertex, label);
-    }
+	public Iterable<Vertex> getVertices(final Direction direction, final String... labels) {
+		if (direction.equals(Direction.OUT) || direction.equals(Direction.IN)){
+			return new AdjacentVertexIterable(getRelationships(direction, labels), graph);
+		} else {
+			return new MultiIterable<Vertex>(Arrays.asList((Iterable<Vertex>) 
+					new AdjacentVertexIterable(getRelationships(Direction.OUT, labels), graph),
+					new AdjacentVertexIterable(getRelationships(Direction.IN, labels), graph)));
+		}
+	}
 
-    public Collection<String> getLabels() {
-        this.graph.autoStartTransaction(false);
-        final Collection<String> labels = new ArrayList<String>();
-        for (Label label : getRawVertex().getLabels()) {
-            labels.add(label.name());
-        }
-        return labels;
-    }
+	public Edge addEdge(final String label, final Vertex vertex) {
+		return this.graph.addEdge(null, this, vertex, label);
+	}
 
-    public void addLabel(String label) {
-        graph.autoStartTransaction(true);
-        getRawVertex().addLabel(DynamicLabel.label(label));
-    }
+	public Collection<String> getLabels() {
+		this.graph.autoStartTransaction(false);
+		final Collection<String> labels = new ArrayList<String>();
+		for (Label label : getRawVertex().getLabels()) {
+			labels.add(label.name());
+		}
+		return labels;
+	}
 
-    public void removeLabel(String label) {
-        graph.autoStartTransaction(true);
-        getRawVertex().removeLabel(DynamicLabel.label(label));
-    }
+	public void addLabel(String label) {
+		graph.autoStartTransaction(true);
+		getRawVertex().addLabel(DynamicLabel.label(label));
+	}
 
-    public VertexQuery query() {
-        this.graph.autoStartTransaction(false);
-        return new DefaultVertexQuery(this);
-    }
+	public void removeLabel(String label) {
+		graph.autoStartTransaction(true);
+		getRawVertex().removeLabel(DynamicLabel.label(label));
+	}
 
-    public boolean equals(final Object object) {
-        return object instanceof Neo4j2Vertex && ((Neo4j2Vertex) object).getId().equals(this.getId());
-    }
+	public VertexQuery query() {
+		this.graph.autoStartTransaction(false);
+		return new DefaultVertexQuery(this);
+	}
 
-    public String toString() {
-        return StringFactory.vertexString(this);
-    }
+	public boolean equals(final Object object) {
+		return object instanceof Neo4j2Vertex && ((Neo4j2Vertex) object).getId().equals(this.getId());
+	}
 
-    public Node getRawVertex() {
-        return (Node) this.rawElement;
-    }
-    
+	public String toString() {
+		return StringFactory.vertexString(this);
+	}
 
-    //-------------------------------------------------------------------------
-    // Private helpers ...
-    
-    private Iterable<Relationship> getRelationships(final Direction direction, final String... labels){
-    	this.graph.autoStartTransaction(false);
-    	if(labels.length > 0){
-    		return ((Node)this.rawElement).getRelationships(toRawDirection(direction), toRelationshipTypes(labels));
-    	} else {
-    		return ((Node)this.rawElement).getRelationships(toRawDirection(direction));
-    	}
-    }
-    
-    private RelationshipType[] toRelationshipTypes(final String... labels){
+	public Node getRawVertex() {
+		return this.rawElement;
+	}
+
+
+	//-------------------------------------------------------------------------
+	// Private helpers ...
+
+	private Iterable<Relationship> getRelationships(final Direction direction, final String... labels){
+		this.graph.autoStartTransaction(false);
+		if(labels.length > 0){
+			return this.rawElement.getRelationships(toRawDirection(direction), toRelationshipTypes(labels));
+		} else {
+			return this.rawElement.getRelationships(toRawDirection(direction));
+		}
+	}
+
+	private RelationshipType[] toRelationshipTypes(final String... labels){
 		RelationshipType[] edgeLabels = new DynamicRelationshipType[labels.length];
-    	for (int i = 0; i < labels.length; i++) {
-    		edgeLabels[i] = DynamicRelationshipType.withName(labels[i]);
-    	}
-    	return edgeLabels;
-    }
-    
-    private org.neo4j.graphdb.Direction toRawDirection(final Direction direction){
-    	switch (direction) {
+		for (int i = 0; i < labels.length; i++) {
+			edgeLabels[i] = DynamicRelationshipType.withName(labels[i]);
+		}
+		return edgeLabels;
+	}
+
+	private org.neo4j.graphdb.Direction toRawDirection(final Direction direction){
+		switch (direction) {
 		case OUT:
 			return org.neo4j.graphdb.Direction.OUTGOING;
 		case IN:
@@ -124,17 +125,26 @@ public class Neo4j2Vertex extends Neo4j2Element implements Vertex {
 		default:
 			throw new IllegalArgumentException();
 		}
-    }
-    
-    private class AdjacentVertexIterable extends Neo4j2ElementIterable<Vertex, Relationship> {
-		public AdjacentVertexIterable(Iterable<Relationship> elements, Neo4j2Graph graph) {
-			super(elements, graph);
+	}
+	
+	private ElementWrapper<Neo4j2Vertex, Relationship> adjacentVertexWrapper = null;
+	private ElementWrapper<Neo4j2Vertex, Relationship> getAdjacentVertexWrapper(){
+		if(adjacentVertexWrapper == null){
+			adjacentVertexWrapper = new ElementWrapper<Neo4j2Vertex, Relationship>(){
+				@Override
+				public Neo4j2Vertex wrap(Relationship relationship) {
+					return new Neo4j2Vertex(relationship.getOtherNode(rawElement), graph);
+				}
+			}; 
 		}
+		return adjacentVertexWrapper;
+	}
 
-		@Override
-		protected Vertex wrapRawElement(Relationship relationship) {
-			return new Neo4j2Vertex(relationship.getOtherNode((Node)rawElement), graph);
+
+	private class AdjacentVertexIterable extends Neo4j2ElementIterable<Vertex, Relationship> {
+		public AdjacentVertexIterable(Iterable<Relationship> elements, final Neo4j2Graph graph) {
+			super(elements, graph, getAdjacentVertexWrapper());
 		}
-    }
-    
+	}
+
 }
