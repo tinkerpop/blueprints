@@ -31,7 +31,7 @@ public class Neo4j2EdgeIndex  extends Neo4j2ElementIndex<Edge, Relationship> {
 
 	@Override
 	protected Relationship getRawElement(Edge element) {
-		return ((Neo4j2Edge)element).getRawEdge();
+		return ((Neo4j2Edge)element).getRawElement();
 	}
 
 	@Override

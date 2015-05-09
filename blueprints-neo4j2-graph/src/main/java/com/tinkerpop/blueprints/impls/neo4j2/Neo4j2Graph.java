@@ -452,7 +452,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
         this.autoStartTransaction(true);
 
         try {
-            final Node node = ((Neo4j2Vertex) vertex).getRawVertex();
+            final Node node = ((Neo4j2Vertex) vertex).getRawElement();
             for (final Relationship relationship : node.getRelationships(org.neo4j.graphdb.Direction.BOTH)) {
                 relationship.delete();
             }
@@ -470,7 +470,7 @@ public class Neo4j2Graph implements TransactionalGraph, IndexableGraph, KeyIndex
             throw ExceptionFactory.edgeLabelCanNotBeNull();
 
         this.autoStartTransaction(true);
-        return new Neo4j2Edge(((Neo4j2Vertex) outVertex).getRawVertex().createRelationshipTo(((Neo4j2Vertex) inVertex).getRawVertex(),
+        return new Neo4j2Edge(((Neo4j2Vertex) outVertex).getRawElement().createRelationshipTo(((Neo4j2Vertex) inVertex).getRawElement(),
                 DynamicRelationshipType.withName(label)), this);
     }
 

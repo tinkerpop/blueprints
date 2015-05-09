@@ -6,6 +6,7 @@ import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.util.ExceptionFactory;
 import com.tinkerpop.blueprints.util.StringFactory;
+
 import org.neo4j.graphdb.Relationship;
 
 /**
@@ -33,6 +34,11 @@ public class Neo4j2Edge extends Neo4j2Element<Relationship> implements Edge {
             throw ExceptionFactory.bothIsNotSupported();
 
     }
+    
+    @Override
+	public void remove() {
+    	this.graph.removeEdge(this);
+	}
 
     public boolean equals(final Object object) {
         return object instanceof Neo4j2Edge && ((Neo4j2Edge) object).getId().equals(this.getId());
@@ -42,6 +48,11 @@ public class Neo4j2Edge extends Neo4j2Element<Relationship> implements Edge {
         return StringFactory.edgeString(this);
     }
 
+    /**
+	 * Deprecated, use getRawElement() instead.
+	 * @return The underlying Neo4j Relationship object.
+	 */
+    @Deprecated
     public Relationship getRawEdge() {
         return this.rawElement;
     }

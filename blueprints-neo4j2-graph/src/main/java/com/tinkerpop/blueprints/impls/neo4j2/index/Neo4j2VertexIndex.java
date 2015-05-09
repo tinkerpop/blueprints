@@ -31,7 +31,7 @@ public class Neo4j2VertexIndex extends Neo4j2ElementIndex<Vertex, Node> {
 
 	@Override
 	protected Node getRawElement(Vertex element) {
-		return ((Neo4j2Vertex)element).getRawVertex();
+		return ((Neo4j2Vertex)element).getRawElement();
 	}
 
 	@Override

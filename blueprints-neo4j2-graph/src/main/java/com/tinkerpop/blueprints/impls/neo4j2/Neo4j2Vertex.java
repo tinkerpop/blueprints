@@ -27,6 +27,8 @@ import com.tinkerpop.blueprints.util.StringFactory;
  */
 public class Neo4j2Vertex extends Neo4j2Element<Node> implements Vertex {
 
+	private ElementWrapper<Neo4j2Vertex, Relationship> adjacentVertexWrapper = null;
+	
 	public Neo4j2Vertex(final Node node, final Neo4j2Graph graph) {
 		super(graph);
 		this.rawElement = node;
@@ -60,7 +62,7 @@ public class Neo4j2Vertex extends Neo4j2Element<Node> implements Vertex {
 	public Collection<String> getLabels() {
 		this.graph.autoStartTransaction(false);
 		final Collection<String> labels = new ArrayList<String>();
-		for (Label label : getRawVertex().getLabels()) {
+		for (Label label : getRawElement().getLabels()) {
 			labels.add(label.name());
 		}
 		return labels;
@@ -68,17 +70,22 @@ public class Neo4j2Vertex extends Neo4j2Element<Node> implements Vertex {
 
 	public void addLabel(String label) {
 		graph.autoStartTransaction(true);
-		getRawVertex().addLabel(DynamicLabel.label(label));
+		getRawElement().addLabel(DynamicLabel.label(label));
 	}
 
 	public void removeLabel(String label) {
 		graph.autoStartTransaction(true);
-		getRawVertex().removeLabel(DynamicLabel.label(label));
+		getRawElement().removeLabel(DynamicLabel.label(label));
 	}
 
 	public VertexQuery query() {
 		this.graph.autoStartTransaction(false);
 		return new DefaultVertexQuery(this);
+	}
+	
+	@Override
+	public void remove() {
+		this.graph.removeVertex(this);
 	}
 
 	public boolean equals(final Object object) {
@@ -89,6 +96,11 @@ public class Neo4j2Vertex extends Neo4j2Element<Node> implements Vertex {
 		return StringFactory.vertexString(this);
 	}
 
+	/**
+	 * Deprecated, use getRawElement() instead.
+	 * @return The underlying Neo4j Node object.
+	 */
+	@Deprecated
 	public Node getRawVertex() {
 		return this.rawElement;
 	}
@@ -127,7 +139,6 @@ public class Neo4j2Vertex extends Neo4j2Element<Node> implements Vertex {
 		}
 	}
 	
-	private ElementWrapper<Neo4j2Vertex, Relationship> adjacentVertexWrapper = null;
 	private ElementWrapper<Neo4j2Vertex, Relationship> getAdjacentVertexWrapper(){
 		if(adjacentVertexWrapper == null){
 			adjacentVertexWrapper = new ElementWrapper<Neo4j2Vertex, Relationship>(){

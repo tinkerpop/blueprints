@@ -42,7 +42,7 @@ public class Neo4j2GraphCypherTest {
     private void queryAndAssert(Neo4j2Vertex vertex) {
         Map<String, Object> params = MapUtil.map("prop", "value");
         Map<String,Object> row = IteratorUtil.single(graph.query("MATCH (n:Label {key:{prop}}) RETURN n", params));
-        assertEquals(vertex.getRawVertex(), row.get("n"));
+        assertEquals(vertex.getRawElement(), row.get("n"));
     }
 
     @After

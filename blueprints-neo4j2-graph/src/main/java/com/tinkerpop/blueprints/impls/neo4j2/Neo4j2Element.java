@@ -1,20 +1,19 @@
 package com.tinkerpop.blueprints.impls.neo4j2;
 
 
-import com.tinkerpop.blueprints.Edge;
-import com.tinkerpop.blueprints.Element;
-import com.tinkerpop.blueprints.Vertex;
-import com.tinkerpop.blueprints.util.ElementHelper;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.Relationship;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
+
+import com.tinkerpop.blueprints.Element;
+import com.tinkerpop.blueprints.util.ElementHelper;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -27,6 +26,8 @@ abstract class Neo4j2Element<S extends PropertyContainer> implements Element {
     public Neo4j2Element(final Neo4j2Graph graph) {
         this.graph = graph;
     }
+    
+    public abstract void remove();
 
     public <T> T getProperty(final String key) {
         this.graph.autoStartTransaction(false);
@@ -65,7 +66,7 @@ abstract class Neo4j2Element<S extends PropertyContainer> implements Element {
         return this.getId().hashCode();
     }
 
-    public PropertyContainer getRawElement() {
+    public S getRawElement() {
         return this.rawElement;
     }
 
@@ -76,13 +77,6 @@ abstract class Neo4j2Element<S extends PropertyContainer> implements Element {
         } else {
             return ((Relationship) this.rawElement).getId();
         }
-    }
-
-    public void remove() {
-        if (this instanceof Vertex)
-            this.graph.removeVertex((Vertex) this);
-        else
-            this.graph.removeEdge((Edge) this);
     }
 
     public boolean equals(final Object object) {
