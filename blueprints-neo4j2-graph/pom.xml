@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.xnlogic.blueprints</groupId>
-    <artifactId>xn-blueprints-neo4j2-graph</artifactId>
-    <version>2.6.1</version>
-    <name>XN-Blueprints-Neo4j2-Graph</name>
+    <parent>
+        <groupId>com.tinkerpop.blueprints</groupId>
+        <artifactId>blueprints</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>blueprints-neo4j2-graph</artifactId>
+    <name>Blueprints-Neo4j2Graph</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
-    <url>http://xnlogic.com</url>
     <properties>
         <neo4j.version>2.2.1</neo4j.version>
     </properties>
-    <licenses>
-        <license>
-            <name>BSD 3-Clause</name>
-            <url>http://www.opensource.org/licenses/BSD-3-Clause</url>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:git@github.com:xnlogic/blueprints.git</connection>
-        <developerConnection>scm:git:git@github.com:xnlogic/blueprints.git</developerConnection>
-        <url>git@github.com:xnlogic/blueprints.git</url>
-      <tag>HEAD</tag>
-  </scm>
     <dependencies>
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-core</artifactId>
-            <version>2.6.0</version>
+            <version>${tinkerpop.version}</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -68,7 +60,7 @@
         <dependency>
             <groupId>com.tinkerpop.rexster</groupId>
             <artifactId>rexster-core</artifactId>
-            <version>2.6.0</version>
+            <version>${tinkerpop.version}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -84,7 +76,7 @@
         <dependency>
             <groupId>com.tinkerpop.blueprints</groupId>
             <artifactId>blueprints-test</artifactId>
-            <version>2.6.0</version>
+            <version>${tinkerpop.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -124,52 +116,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release</releaseProfiles>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-    <distributionManagement>
-        <repository>
-            <id>bintray</id>
-            <url>https://api.bintray.com/maven/pangloss/maven/xn-blueprints-neo4j2-graph</url>
-        </repository>
-    </distributionManagement>
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
