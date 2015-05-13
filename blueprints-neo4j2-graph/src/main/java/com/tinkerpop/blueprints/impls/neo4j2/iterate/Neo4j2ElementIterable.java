@@ -47,6 +47,12 @@ public abstract class Neo4j2ElementIterable<T extends Element, S extends Propert
 				graph.autoStartTransaction(false);
 				return elementWrapper.wrap(elementIterator.next());
 			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+
 		};
 	}
 
