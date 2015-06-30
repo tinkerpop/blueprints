@@ -308,6 +308,13 @@ public class GraphSONReaderTest {
 
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void inputStreamIsNull() throws IOException {
+        TinkerGraph graph = new TinkerGraph();
+        InputStream inputStream = null;
+        GraphSONReader.inputGraph(graph, inputStream);
+    }
+
 
     private int getIterableCount(Iterable elements) {
         int counter = 0;

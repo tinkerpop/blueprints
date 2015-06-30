@@ -136,6 +136,10 @@ public class GraphSONReader {
     public static void inputGraph(final Graph inputGraph, final InputStream jsonInputStream, int bufferSize,
                                   final Set<String> edgePropertyKeys, final Set<String> vertexPropertyKeys) throws IOException {
 
+        if (jsonInputStream == null) {
+            throw new IllegalArgumentException("InputStream must not be null");
+        }
+
         final JsonParser jp = jsonFactory.createJsonParser(jsonInputStream);
 
         // if this is a transactional graph then we're buffering
