@@ -1,6 +1,6 @@
 !https://github.com/tinkerpop/blueprints/raw/master/doc/images/blueprints-logo.png!
 
-<img alt="" height="150" src="https://raw.githubusercontent.com/apache/incubator-tinkerpop/master/docs/static/images/not-tinkerpop3-gremlin.png" />
+<img alt="" height="170" src="https://raw.githubusercontent.com/apache/incubator-tinkerpop/master/docs/static/images/not-tinkerpop3-gremlin.png" />
 
 *IMPORTANT* - TinkerPop is now a part of the Apache Software Foundation and "TinkerPop 3.x":http://tinkerpop.incubator.apache.org/ is the latest incarnation of The TinkerPop.  This project is TinkerPop 2.x and is in maintenance mode.  
 
