@@ -1,0 +1,5 @@
+nodedef>name
+a
+b
+edgedef>node1,node2
+a,b

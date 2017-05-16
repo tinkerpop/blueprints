@@ -1,0 +1,8 @@
+nodedef>name VARCHAR,label VARCHAR2,class INT, visible BOOLEAN default false,color VARCHAR,width FLOAT,height DOUBLE
+a,"Hello 'world' !",1,true,"114,116,177",10.10,20.24567
+b,"Well, this is",2, ,"219,116,251",10.98,10.986123
+c,"A correct 'GDF' file",,,, ,
+edgedef>node1 VARCHAR,node2 VARCHAR,directed BOOLEAN,color VARCHAR, weight LONG default 100
+a, b,true," 114,116,177",
+b,c ,false,"219,116,251 ",300
+c, a  , ,,
