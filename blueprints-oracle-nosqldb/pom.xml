@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.tinkerpop.blueprints</groupId>
+        <artifactId>blueprints</artifactId>
+        <version>2.2.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <artifactId>blueprints-oracle-nosqldb</artifactId>
+    <name>Blueprints-Oracle-KV</name>
+    <description>Blueprints property graph implementation for the Oracle NoSQL database</description>
+    <dependencies>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-core</artifactId>
+            <version>${blueprints.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>commons-lang</groupId>
+        	<artifactId>commons-lang</artifactId>
+        	<version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>oracle.kv</groupId>
+            <artifactId>oracle-kvstore</artifactId>
+            <version>1.2.123</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/kvstore-1.2.123.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>oracle.kv</groupId>
+            <artifactId>oracle-kvclient</artifactId>
+            <version>1.2.123</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/kvclient-1.2.123.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.tinkerpop.blueprints</groupId>
+            <artifactId>blueprints-test</artifactId>
+            <version>${blueprints.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- TESTING -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <directory>${basedir}/target</directory>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources
+                </directory>
+            </resource>
+        </resources>
+      <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/resources
+                </directory>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+                    <argLine>-DtestKVGraph=true -DgraphName=blueprint -DstoreName=kvstore -Dhostname=Daniel-McClarys-MacBook-Pro.local -DhostPort=5000
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
