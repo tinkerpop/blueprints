@@ -234,6 +234,8 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
     public void testRollbackExceptionOnBeforeTxCommit() throws Exception {
         Neo4j2Graph graph = (Neo4j2Graph) graphTest.generateGraph();
         GraphDatabaseService rawGraph = graph.getRawGraph();
+        // make sure the current transaction is closed
+        graph.commit();
         rawGraph.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
             @Override
             public Object beforeCommit(TransactionData data) throws Exception {
