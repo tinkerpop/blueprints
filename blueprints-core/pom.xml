@@ -10,6 +10,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>blueprints-core</artifactId>
+    <packaging>bundle</packaging>
     <url>http://blueprints.tinkerpop.com</url>
     <name>Blueprints-Core</name>
     <description>Core interfaces and utilities for Blueprints</description>
@@ -88,6 +89,18 @@
                     <outputDirectory>target</outputDirectory>
                     <workDirectory>target/assembly/work</workDirectory>
                     <tarLongFileMode>warn</tarLongFileMode>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Export-Package>com.tinkerpop.blueprints*</Export-Package>
+                    </instructions>
                 </configuration>
             </plugin>
         </plugins>
