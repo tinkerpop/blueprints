@@ -8,6 +8,9 @@
         <version>2.7.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+    <properties>
+	   <neo4j.version>2.1.6</neo4j.version>
+	</properties>
     <artifactId>blueprints-neo4j2-graph</artifactId>
     <name>Blueprints-Neo4j2Graph</name>
     <description>Blueprints property graph implementation for the Neo4j 2 graph database</description>
