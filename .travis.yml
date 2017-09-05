@@ -1,12 +1,5 @@
 language: java
 install: mvn install -DskipTests=true
-notifications:
-  email:
-    - okrammarko@gmail.com
-    - spmva@genoprime.com
-    - josh@fortytwo.net
-    - me@matthiasb.com
-    - l.garulli@gmail.com
 jdk:
   - oraclejdk7
   - openjdk7
