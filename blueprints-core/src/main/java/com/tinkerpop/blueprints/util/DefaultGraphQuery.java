@@ -67,19 +67,43 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
     }
 
     public Iterable<Edge> edges() {
-        return new DefaultGraphQueryIterable<Edge>(false);
+        return new DefaultGraphQueryIterable<Edge>() {
+            protected Set<String> getIndexedKeys() {
+                return ((KeyIndexableGraph) graph).getIndexedKeys(Edge.class);
+            }
+
+            protected Iterable<Edge> getAllElements() {
+                return graph.getEdges();
+            }
+
+            protected Iterable<Edge> getElementsFromContainer(HasContainer container) {
+                return graph.getEdges(container.key, container.value);
+            }
+        };
     }
 
     public Iterable<Vertex> vertices() {
-        return new DefaultGraphQueryIterable<Vertex>(true);
+        return new DefaultGraphQueryIterable<Vertex>() {
+            protected Set<String> getIndexedKeys() {
+                return ((KeyIndexableGraph) graph).getIndexedKeys(Vertex.class);
+            }
+
+            protected Iterable<Vertex> getAllElements() {
+                return graph.getVertices();
+            }
+
+            protected Iterable<Vertex> getElementsFromContainer(HasContainer container) {
+                return graph.getVertices(container.key, container.value);
+            }
+        };
     }
 
-    protected class DefaultGraphQueryIterable<T extends Element> implements Iterable<T> {
+    protected abstract class DefaultGraphQueryIterable<T extends Element> implements Iterable<T> {
 
         private Iterable<T> iterable = null;
 
-        public DefaultGraphQueryIterable(final boolean forVertex) {
-            this.iterable = (Iterable<T>) getElementIterable(forVertex ? Vertex.class : Edge.class);
+        public DefaultGraphQueryIterable() {
+            this.iterable = getElementIterable();
         }
 
         public Iterator<T> iterator() {
@@ -140,9 +164,9 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
             };
         }
 
-        private Iterable<?> getElementIterable(final Class<? extends Element> elementClass) {
+        private Iterable<T> getElementIterable() {
             if (graph instanceof KeyIndexableGraph) {
-                final Set<String> keys = getIndexedKeys(elementClass);
+                final Set<String> keys = getIndexedKeys();
                 HasContainer container = null;
                 for (final HasContainer hasContainer : hasContainers) {
                     if (hasContainer.predicate.equals(com.tinkerpop.blueprints.Compare.EQUAL) && keys.contains(hasContainer.key)) {
@@ -151,23 +175,17 @@ public class DefaultGraphQuery extends DefaultQuery implements GraphQuery {
                     }
                 }
                 if (container != null) {
-                    if (Vertex.class.isAssignableFrom(elementClass))
-                        return graph.getVertices(container.key, container.value);
-                    else
-                        return graph.getEdges(container.key, container.value);
+                    return getElementsFromContainer(container);
                 }
             }
 
-            if (Vertex.class.isAssignableFrom(elementClass))
-                return graph.getVertices();
-            else
-                return graph.getEdges();
+            return getAllElements();
         }
 
-        protected Set<String> getIndexedKeys(final Class<? extends Element> elementClass) {
-          return ((KeyIndexableGraph) graph).getIndexedKeys(elementClass);
-        }
-        
+        protected abstract Set<String> getIndexedKeys();
+
+        protected abstract Iterable<T> getAllElements();
+
+        protected abstract Iterable<T> getElementsFromContainer(HasContainer container);
     }
-
 }
