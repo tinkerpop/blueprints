@@ -812,14 +812,13 @@ class PropertyGraphSailConnection extends SailConnectionBase {
             if (null == value) {
                 return new StatementIteration();
             } else {
-                // TODO: lookup matching vertices and edges faster using indices
                 String key = keyFromPredicate(predicate);
                 Source<Vertex> vertices = new Source<Vertex>(
-                        context.graph.getVertices().iterator(),
+                        context.graph.getVertices(key, value).iterator(),
                         vertexPropertiesWithKeyAndValue(key, predicate, value, (Literal) object));
                 if (firstClassEdges) {
                     Source<Edge> edges = new Source<Edge>(
-                            context.graph.getEdges().iterator(),
+                            context.graph.getEdges(key, value).iterator(),
                             edgePropertiesWithKeyAndValue(key, predicate, value, (Literal) object));
                     return new StatementIteration(vertices, edges);
                 } else {
@@ -887,14 +886,13 @@ class PropertyGraphSailConnection extends SailConnectionBase {
             Source<Edge> edges = new Source<Edge>(edgeIterator, tails);
             return new StatementIteration(edges);
         } else if (isPropertyPredicate(predicate)) {
-            // TODO: find elements faster using indices
             String key = keyFromPredicate(predicate);
             Source<Vertex> vertices = new Source<Vertex>(
-                    context.graph.getVertices().iterator(),
+                    context.graph.query().has(key).vertices().iterator(),
                     vertexPropertiesWithKey(key, predicate));
             if (firstClassEdges) {
                 Source<Edge> edges = new Source<Edge>(
-                        context.graph.getEdges().iterator(),
+                        context.graph.query().has(key).edges().iterator(),
                         edgePropertiesWithKey(key, predicate));
                 return new StatementIteration(vertices, edges);
             } else {
