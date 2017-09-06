@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.kernel.security.URLAccessValidationError;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.graphdb.schema.Schema;
@@ -15,6 +16,7 @@ import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.store.StoreId;
 
+import java.net.URL;
 import java.util.Map;
 
 import static org.junit.Assert.assertThat;
@@ -221,6 +223,11 @@ public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
         }
 
         @Override
+        public URL validateURLAccess(URL url) throws URLAccessValidationError {
+            return url;
+        }
+
+        @Override
         public ResourceIterator<Node> findNodes(Label label, String s, Object o) {
             return ((GraphDatabaseAPI) getLazy()).findNodes(label, s, o);
         }
@@ -247,7 +254,7 @@ public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
     }
 
     /**
-     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4j2Graph#getInternalIndexKeys}
+     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4j2Graph#getIndexedKeys(Class)}
      * won't load any index, with an additional {@link ClassCastException}
      */
     @Test
@@ -259,7 +266,7 @@ public class Neo4j2GraphUsingANonInternalAbstractGraphClassFail {
     }
 
     /**
-     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4j2Graph#getInternalIndexKeys}
+     * in this test, our class is a graph database service, but not an InternalAbstractGraphDatabase instance.As a consequence, {@link Neo4j2Graph#getIndexedKeys(Class)}
      * won't load any index, with an additional {@link ClassCastException}
      */
     @Test

@@ -8,7 +8,6 @@ import org.neo4j.graphdb.NotInTransactionException;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.index.impl.lucene.LowerCaseKeywordAnalyzer;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 
 import com.tinkerpop.blueprints.Direction;
@@ -19,6 +18,7 @@ import com.tinkerpop.blueprints.TestSuite;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.blueprints.impls.GraphTest;
 import com.tinkerpop.blueprints.impls.neo4j2.index.Neo4j2VertexIndex;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 
 /**
  * @author Marko A. Rodriguez (http://markorodriguez.com)
@@ -223,7 +223,7 @@ public class Neo4j2GraphSpecificTestSuite extends TestSuite {
     }
 
     public void testHaGraph() throws Exception {
-        assertTrue(InternalAbstractGraphDatabase.class.isAssignableFrom(HighlyAvailableGraphDatabase.class));
+        assertTrue(GraphDatabaseFacade.class.isAssignableFrom(HighlyAvailableGraphDatabase.class));
 
         /*String directory = this.getWorkingDirectory();
         Neo4j2HaGraph graph = new Neo4j2HaGraph(directory);
