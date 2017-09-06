@@ -17,6 +17,18 @@
             <artifactId>blueprints-core</artifactId>
             <version>${tinkerpop.version}</version>
         </dependency>
+        <!-- query caching -->
+        <dependency>
+            <groupId>org.cache2k</groupId>
+            <artifactId>cache2k-api</artifactId>
+            <version>0.20</version>
+        </dependency>
+        <dependency>
+            <groupId>org.cache2k</groupId>
+            <artifactId>cache2k-core</artifactId>
+            <version>0.20</version>
+            <scope>runtime</scope>
+        </dependency>
         <!-- SESAME SUPPORT -->
         <dependency>
             <groupId>org.openrdf.sesame</groupId>
