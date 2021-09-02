@@ -3,3 +3,7 @@ install: mvn install -DskipTests=true
 jdk:
   - oraclejdk7
   - openjdk7
+
+cache:
+  directories:
+  - $HOME/.m2
